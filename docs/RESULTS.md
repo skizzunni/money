@@ -182,6 +182,30 @@ You downloaded `NSXUSD` back to November 2010, about 16 years in all. The 2010�
 - **2026 is a losing year so far:** −$3,155 through September on 1 MNQ.
 - **The bot matches the research.** Its 5-minute reference (`mnqbot/noise.py`) makes the same trades as the 1-minute research version on 1,979 of 1,999 clean sessions. The other 20 are holidays and other irregular sessions.
 
+## Fourth round: can it trade more often?
+
+Nine versions of noise-area momentum, fixed before running ([`research/noise_tuning.py`](../research/noise_tuning.py)):
+
+- **Variants:** check every 30, 15 or 5 minutes (first check at 10:00), with the noise band at 0.8×, 1.0× or 1.2×.
+- **Selection:** pick the best on 2010–2019, then judge it on 2020 to September 2026, which the choice never saw. Switch only if the pick also beats the current version on 2020–2026.
+- **Terms:** 1 MNQ at today's price and costs, over 3,331 complete sessions with no missing minutes.
+
+| Version | Trades a day | Win % | 2010–19 $/day (t) | 2020–26 $/day (t) | Worst intraday dip | Worst losing stretch | Evaluation pass / fail, 2020–26 starts |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| 30 min × 0.8 | 0.99 | 37% | +14.26 (2.04) | +24.96 (2.41) | −$2,465 | $9,876 | 42% / 56% |
+| **30 min × 1.0 (current)** | **0.84** | **39%** | **+18.51 (2.83)** | **+24.11 (2.65)** | **−$2,465** | **$9,211** | **41% / 56%** |
+| 30 min × 1.2 | 0.72 | 40% | +15.69 (2.59) | +21.76 (2.51) | −$2,465 | $5,913 | 35% / 61% |
+| 15 min × 0.8 | 1.28 | 32% | +18.14 (2.55) | +26.72 (2.52) | −$3,703 | $10,563 | 42% / 57% |
+| 15 min × 1.0 | 1.11 | 33% | +18.09 (2.73) | +17.43 (1.86) | −$2,297 | $9,108 | 39% / 61% |
+| 15 min × 1.2 | 0.97 | 33% | +15.12 (2.48) | +20.67 (2.34) | −$2,577 | $5,063 | 34% / 63% |
+| 5 min × 0.8 | 2.04 | 25% | +15.42 (2.14) | +21.26 (1.96) | −$3,609 | $7,579 | 40% / 60% |
+| 5 min × 1.0 | 1.77 | 26% | +14.07 (2.13) | +16.63 (1.67) | −$3,526 | $6,958 | 36% / 64% |
+| 5 min × 1.2 | 1.57 | 28% | +12.74 (2.11) | +17.43 (1.93) | −$3,290 | $5,772 | 38% / 59% |
+
+- **The current version was the best on 2010–2019, so it stays.**
+- **Checking more often adds trades, not edge.** At 5 minutes it trades about twice as often, but only about a quarter of trades win, the t-stat drops, and the worst dip deepens to about −$3,600.
+- **Two versions earned a little more per day in 2020–2026,** 15 min × 0.8 and 30 min × 0.8. Neither was best on 2010–2019, so switching to one because of 2020–2026 would be fitting to the test. Their evaluation odds are no better either.
+
 ## What this does and doesn't say
 
 - **It says** that the original sweep/breakout rules have no edge after realistic costs on 2023–2026 Nasdaq-100 data, and would very likely not pass a $25K evaluation. Of three published strategies, only noise-area momentum held up over 16 years, and even it fails most $25K evaluations.
@@ -198,6 +222,7 @@ python research/nsx_study.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"   # the study
 python research/nsx_holes.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"   # the data-hole check and best case
 python research/published_lab.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"   # the published strategies + cost check
 python research/noise_eval.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"      # noise momentum on a $25K evaluation
+python research/noise_tuning.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"    # can it trade more often? (no)
 ```
 
 The raw data isn't stored in this repo.
