@@ -272,6 +272,46 @@ Each one was tested against the next 30 minutes, the next 60 minutes, and the mo
 - **The afternoon trend looked solid for twelve years** (+$22.53 a day), then lost money in 2023–2026, including −$7,411 in 2026.
 - **The one edge that survives all of this** is noise-area momentum, the strategy already in TradingView. It trades only on the bigger, rarer moves that these all-days tests can't see.
 
+## Seventh round: the overnight session, regimes, and a nonlinear walk-forward model
+
+Three things the sixth round didn't try ([`research/discovery3.py`](../research/discovery3.py)), with the same luck filter and periods:
+
+| Search | Tests | Passed the luck filter, 2011–18 | Repeated, 2019–22 |
+|---|---:|---|---|
+| 13 new overnight and cross-day measurements (Asia and Europe moves, 08:30–09:30 move, overnight volatility and trend consistency, overnight extremes vs yesterday's, yesterday's afternoon) | 385 | 0 | 0 |
+| Regime-conditional: 13 measurements × 6 regimes (volatility, last month, overnight range) | 1,872 | 33 | **20** |
+
+**The 20 survivors are one family:** after a wide overnight range, or when the last month is down, price on the far side of its daily average at 11:30–13:30 keeps going into the close. That's the afternoon-trend idea that failed the sixth round, plus a regime filter.
+
+**Walk-forward gradient boosting.** A nonlinear model on all 43 measurements, pooled across half hours. For each year from 2015 to 2026 it is trained on 2011 up to the year before and predicts that year, so every prediction is out of sample. The primary rule (fixed in advance) trades only when the predicted move is more than twice the round-trip cost.
+
+| Target | Rule | Trades a day | $/day, 2015–26 | t | Years up |
+|---|---|---:|---:|---:|---:|
+| Next 30 min | always in | 12.0 | +1.15 | 0.11 | 6 of 12 |
+| Next 30 min | > 1× cost | 4.8 | +9.16 | 1.08 | 8 of 12 |
+| Next 30 min | **> 2× cost (primary)** | 2.3 | +8.51 | **1.22** | 9 of 12 |
+| To the close | always in | 12.0 | −16.38 | −1.45 | 4 of 12 |
+| To the close | > 1× cost | 11.6 | −16.34 | −1.46 | 5 of 12 |
+| To the close | > 2× cost (primary) | 11.2 | −17.80 | −1.61 | 4 of 12 |
+
+Nothing near the bar of t ≥ 2.5. Flexible models find nothing a simple rule can't.
+
+**Final test of the regime family** ([`research/regime_trend.py`](../research/regime_trend.py)). Six candidates were fixed before running: enter at 13:30 or 11:30 on the side of the daily average, hold to the close, only in the regime (overnight range wide, last month down, or either). On 2011–2022, the years that found the idea:
+
+| Candidate | Days traded | $/day | t |
+|---|---:|---:|---:|
+| 13:30, overnight range wide | 59% | +21.18 | 3.51 |
+| **13:30, last month down (picked)** | 47% | +22.66 | **4.17** |
+| 13:30, either | 72% | +24.89 | 3.98 |
+| 13:30, no filter (reference) | 100% | +22.53 | 3.46 |
+| 11:30, any regime | 47–72% | +13.64 to +17.23 | 1.96–2.15 |
+
+**Run once on 2023 to September 2026:** 748 sessions, traded 44% of days, **−$5.10 a day, t −0.58**, 47% of trades won, by year 2023 +$954, 2024 −$2,170, 2025 +$3,509, 2026 −$6,111. **Failed.** On a $25K evaluation starting from every 2023–2026 day: 13% pass, 78% fail.
+
+- **The regime filter didn't fix the afternoon trend.** Over 2011–2022 it looks strong (t 4.17) because 2011–2022 is where it was found. On the untouched years it loses.
+- **Across all 16 years it still shows t 3.6 and 14 winning years.** That's the trap: a backtest over the years that found the rule proves nothing. Only the final test counts.
+- **Noise-area momentum remains the only survivor** of seven rounds.
+
 ## What this does and doesn't say
 
 - **It says** that the original sweep/breakout rules have no edge after realistic costs on 2023–2026 Nasdaq-100 data, and would very likely not pass a $25K evaluation. Of three published strategies, only noise-area momentum held up over 16 years, and even it fails most $25K evaluations.
@@ -293,6 +333,8 @@ python research/noise_daily.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"     # can it 
 python research/discovery.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"      # search for new patterns, one at a time
 python research/discovery2.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"     # extremes, and all of them combined
 python research/afternoon.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"      # the afternoon-trend idea, final test
+python research/discovery3.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"     # overnight, regimes, walk-forward boosting
+python research/regime_trend.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"   # the regime-trend family, final test
 ```
 
 The raw data isn't stored in this repo.
