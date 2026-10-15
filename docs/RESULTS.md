@@ -1,6 +1,6 @@
 # Does the bot have an edge? A multi-year test
 
-**Verdict: no.** On 3¾ years of Nasdaq-100 data, none of the seven pre-declared variants shows an edge that survives costs. The variant picked on the tuning years lost money on the unseen years. **Don't pay for a prop evaluation to trade these rules.**
+**Verdict: no.** On 3¾ years of Nasdaq-100 data, none of the seven pre-declared variants shows an edge that survives costs. The variant picked on the tuning years lost money on the unseen years. A second round tested three published intraday strategies, and none of them passed either ([below](#second-round-published-strategies)). **Don't pay for a prop evaluation to trade these rules.**
 
 ---
 
@@ -97,10 +97,34 @@ The tables above are as run, holes included. Here they are again with the trades
 - **With the holes removed, the risk rails held.** No trade in any variant lost more than 1.01R, and no day lost more than $263.
 - **This is an approximation.** Removing trades after the fact isn't the same as a re-run: later trades on the same day could have sized or fired differently.
 
+## Second round: published strategies
+
+Three intraday strategies with published evidence on US index ETFs, each run with its authors' settings and no tuning, on the same data. The rules and the pass bar were fixed before running and are written out in [`research/published_lab.py`](../research/published_lab.py).
+
+- **S1, 5-minute opening range** (Zarattini & Aziz, 2023). Trade in the direction of the 09:30–09:35 candle at the 09:35 open. The stop goes at that candle's far end, the target at 10R, and otherwise the trade exits at the close.
+- **S2, noise-area momentum** (Zarattini, Aziz & Barbon, 2024). Every half hour, go long above or short below the day's usual range, exit when price comes back inside it, and be out by the close. S2b adds the paper's VWAP trailing stop, using a time-weighted average because the data has no volume.
+- **S3, last-half-hour momentum** (Gao, Han, Li & Zhou, 2018). At 15:30, trade in the direction of the move from the previous close to 10:00, and exit at the close.
+- **Pass bar.** After costs, a t-stat of at least 2.5 on daily P&L, positive in both 2023–2024 and 2025–2026, and positive in at least 3 of the 4 years.
+- **Fills and costs.** Same as above, on 1-minute bars.
+
+| Strategy | Trades | Win % | Avg per trade | Net | t | 2023–24 | 2025–26 | Years up | Result |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---|
+| S1, every signal, in R | 769 | 24.3% | +0.053R | +40.6R | 0.64 | −5.6R | +46.2R | 2 of 4 | fail |
+| S1, $150 risk | 618 | 22.3% | +$10.65 | +$6,579 | 0.89 | −$1,072 | +$7,651 | 3 of 4 | fail |
+| S2a, 1 contract | 591 | 39.6% | +$5.45 | +$3,221 | 0.57 | +$3,895 | −$674 | 3 of 4 | fail |
+| S2b, 1 contract | 628 | 39.0% | +$4.16 | +$2,615 | 0.46 | +$4,024 | −$1,408 | 3 of 4 | fail |
+| S3, 1 contract | 798 | 49.7% | +$0.90 | +$721 | 0.24 | −$37 | +$758 | 2 of 4 | fail |
+
+- **None passes.** All are slightly positive overall, but not by more than luck produces. The best t-stat is 0.89, against a bar of 2.5.
+- **S1 comes closest, and its edge is too thin for an evaluation.** At +0.053R per trade it still had a losing stretch 38R deep. Keeping that inside a $1,500 drawdown means risking under $40 a trade. That earns about $2 a trade, so reaching a $1,500 target would take roughly three years.
+- **3¾ years can't settle edges this small.** Day-to-day results swing so much that telling a +0.05R edge from luck takes far more history than this. The papers used much longer periods.
+- **What the S1 rows cover.** The $150-risk row skips the roughly 150 days whose first candle is too wide to trade with $150 of risk. The R row takes every signal, as the paper does.
+- **Days left out.** Only full sessions count. Holidays, half days, and the weeks when the US and European clock changes differ are dropped (this data's session ends at 15:15 New York time in those weeks). Days with a trade open across missing minutes are left out too.
+
 ## What this does and doesn't say
 
 - **It says** that these specific rules, on 5-minute Nasdaq-100 data from 2023 to 2026, have no edge after realistic costs. It also says they would very likely not pass a $25K evaluation.
-- **It doesn't say** that sweeps or breakouts can never work. Other rules, timeframes or filters weren't tested.
+- **It doesn't say** that sweeps or breakouts can never work. Only the rules above were tested, on 3¾ years.
 - **Testing more variants on the same data would be data-mining.** Anything found that way would need fresh unseen data to be believed.
 - **Risk control can't create an edge that isn't there.** Once the data holes are removed, the rails kept every loss within 1.01R and every day under the $300 limit, and the rules still lost money.
 
@@ -111,6 +135,7 @@ Download the `NSXUSD` ASCII 1-minute files from HistData.com, then run:
 ```bash
 python research/nsx_study.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"   # the study
 python research/nsx_holes.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"   # the data-hole check and best case
+python research/published_lab.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"   # the published strategies
 ```
 
 The raw data isn't stored in this repo.

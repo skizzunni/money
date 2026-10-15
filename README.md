@@ -17,7 +17,7 @@ A rules-based MNQ day-trading strategy with prop-firm risk rails. Every piece be
 
 **Beating buy-and-hold MNQ is not guaranteed either.** The backtester reports it as a plain YES/NO, so you can check instead of trusting.
 
-**It has been tested on real data, and it has no edge.** On 3¾ years of Nasdaq-100 1-minute data (Jan 2023 → Sep 2026), tuned on 2023–2024 and then run once on 2025–2026, it lost money after costs. Even with zero costs it sits near break-even. Full numbers are in [docs/RESULTS.md](docs/RESULTS.md). **Don't pay for a prop evaluation to trade these rules.** The tests prove the machinery works (fills, sizing, rails, no look-ahead). The study shows the rules themselves don't make money.
+**It has been tested on real data, and it has no edge.** On 3¾ years of Nasdaq-100 1-minute data (Jan 2023 → Sep 2026), tuned on 2023–2024 and then run once on 2025–2026, it lost money after costs. Even with zero costs it sits near break-even. Three published intraday strategies tested the same way didn't pass either. Full numbers are in [docs/RESULTS.md](docs/RESULTS.md). **Don't pay for a prop evaluation to trade these rules.** The tests prove the machinery works (fills, sizing, rails, no look-ahead). The study shows the rules themselves don't make money.
 
 ## The strategy in plain English
 
@@ -167,6 +167,8 @@ pine/mnq_liquidity_sweep_bot.pine         TradingView strategy: same rules, Stra
 docs/RULES.md                             every rule, exactly, with a worked example
 docs/RESULTS.md                           multi-year test on real Nasdaq-100 data: no edge
 research/nsx_study.py                     the script that runs that test on HistData.com files
+research/nsx_holes.py                     how the free data's missing minutes affect that test
+research/published_lab.py                 three published intraday strategies on the same data
 mnqbot/config.py                          every setting, with defaults
 mnqbot/strategy.py                        sweep -> displacement -> FVG setup, and opening range breakout
 mnqbot/engine.py                          fills, sizing, daily rails, prop evaluation simulation
