@@ -1,4 +1,4 @@
-"""Plant one bug at a time in the signals indicator; the parity edge cases must catch every one.
+"""Plant one bug at a time in the Pine scripts; the parity tests must catch every one.
 
     python tests/mutation_check.py      (about 1-2 minutes: each mutant is parsed once)
 
@@ -25,46 +25,83 @@ TARGET_FIRST = (
     "        else if open >= posStop\n            exitPx := open + slip\n            exitWhy := stopWhy\n"
     "        else if high >= posStop\n            exitPx := posStop + slip\n            exitWhy := stopWhy\n"
 )
+# (script, original text, buggy replacement)
 MUTANTS = {
-    "target fills on touch": ("        else if low <= posTarget - thru\n", "        else if low <= posTarget\n"),
-    "entry fills on touch": ("pendDir < 0 ? high >= pendEntry + thru", "pendDir < 0 ? high >= pendEntry"),
-    "breakeven on fill bar": ("if posDir != 0 and posBar < bar_index\n", "if posDir != 0 and posBar <= bar_index\n"),
-    "target before stop": (STOP_FIRST, TARGET_FIRST),
-    "expiry off by one": ("bar_index - pendBar >= expiryBars", "bar_index - pendBar > expiryBars"),
+    "target fills on touch": (
+        "indicator", "        else if low <= posTarget - thru\n", "        else if low <= posTarget\n"
+    ),
+    "entry fills on touch": ("indicator", "pendDir < 0 ? high >= pendEntry + thru", "pendDir < 0 ? high >= pendEntry"),
+    "breakeven on fill bar": (
+        "indicator", "if posDir != 0 and posBar < bar_index\n", "if posDir != 0 and posBar <= bar_index\n"
+    ),
+    "target before stop": ("indicator", STOP_FIRST, TARGET_FIRST),
+    "expiry off by one": ("indicator", "bar_index - pendBar >= expiryBars", "bar_index - pendBar > expiryBars"),
     "daily room sign": (
+        "indicator",
         "math.min(riskPerTrade, dailyMaxLoss + dayPnl,",
         "math.min(riskPerTrade, dailyMaxLoss - dayPnl,",
     ),
+    "all-in-one: breakeven on fill bar": (
+        "all_in_one",
+        "if posDir != 0 and bar_index > posBar and beAtR > 0",
+        "if posDir != 0 and bar_index >= posBar and beAtR > 0",
+    ),
+    "all-in-one: expiry off by one": (
+        "all_in_one", "bar_index - pendBar >= expiryBars", "bar_index - pendBar > expiryBars"
+    ),
+    "all-in-one: breakeven exit labelled stop": ("all_in_one", 'comment_loss = "breakeven"', 'comment_loss = "stop"'),
+    "all-in-one: daily room sign": (
+        "all_in_one",
+        "math.min(riskPerTrade, dailyMaxLoss + dayPnlNow,",
+        "math.min(riskPerTrade, dailyMaxLoss - dayPnlNow,",
+    ),
+    "all-in-one: backtest ignores simulated room": (
+        "all_in_one",
+        "buffer = evalMode ? relNow - threshold() : roomToLine",
+        "buffer = roomToLine",
+    ),
 }
+
+
+def _tests(T, script):
+    """The parity checks that run against one script, as (name, zero-argument callable)."""
+    if script == "indicator":
+        return [(case, lambda c=case: T.test_edge_cases_indicator(c)) for case in T.EDGE]
+    tests = [
+        (f"{case} [{mode}]", lambda c=case, m=mode: T.test_all_in_one_edge_cases(c, m))
+        for case in T.EDGE
+        for mode in ("live", "eval")
+    ]
+    tests.append(("eval sizes from simulated room", lambda: T.test_eval_mode_sizes_from_simulated_room("all_in_one")))
+    return tests
 
 
 def check(args):
     name, tmp = args
     import test_pine_parity as T
+    from pine_interpreter import PineError
 
-    from mnqbot.engine import backtest
-
-    old, new = MUTANTS[name]
-    src = T.INDICATOR.read_text()
+    script, old, new = MUTANTS[name]
+    attr = {"indicator": "INDICATOR", "all_in_one": "AIO"}[script]
+    src = getattr(T, attr).read_text()
     assert src.count(old) == 1, f"mutation anchor not found: {name}"
     mutant = Path(tmp) / f"mutant_{list(MUTANTS).index(name)}.pine"
     mutant.write_text(src.replace(old, new))
-    T.INDICATOR = mutant
+    setattr(T, attr, mutant)
     caught = []
-    for case, (bars, extra, risk) in T.EDGE.items():
-        res = backtest(bars, T._edge_cfg(risk, evals=False))
-        inputs = {"Watch latest swing high/low": False, "Your room to the drawdown line $": 1e9} | extra
-        orders, trades, _ = T.run_indicator(bars, inputs)
-        if orders != T.engine_orders(res) or trades != T.engine_trades(res, bars):
-            caught.append(case)
+    for label, test in _tests(T, script):
+        try:
+            test()
+        except (AssertionError, PineError):
+            caught.append(label)
     return name, caught
 
 
 def main() -> int:
-    with tempfile.TemporaryDirectory() as tmp, ProcessPoolExecutor(len(MUTANTS)) as ex:
+    with tempfile.TemporaryDirectory() as tmp, ProcessPoolExecutor(6) as ex:
         results = list(ex.map(check, [(m, tmp) for m in MUTANTS]))
     for name, caught in results:
-        print(f"{'CAUGHT' if caught else 'MISSED'}  {name:24s} {caught[:2]}")
+        print(f"{'CAUGHT' if caught else 'MISSED'}  {name:44s} {caught[:2]}")
     missed = [n for n, c in results if not c]
     return 1 if missed else 0
 

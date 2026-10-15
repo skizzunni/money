@@ -1,9 +1,10 @@
 # MNQ Liquidity Sweep Bot
 
-A rules-based MNQ day-trading strategy with prop-firm risk rails. Three pieces implement exactly the same rules:
+A rules-based MNQ day-trading strategy with prop-firm risk rails. Every piece below implements exactly the same rules:
 
 | Piece | What it's for |
 |---|---|
+| **`pine/mnq_liquidity_sweep_all_in_one.pine`** | **Start here. One TradingView script that does everything:** BUY/SELL signals with size, limit price, stop and target, phone alerts, a dashboard, and a Strategy Tester backtest with optional prop-evaluation simulation. |
 | `pine/mnq_liquidity_sweep_signals.pine` | **TradingView indicator that tells you when to BUY or SELL.** It gives the limit price, stop, target and size, then alerts you to fill, move to breakeven, cancel, or flatten. |
 | `pine/mnq_liquidity_sweep_bot.pine` | TradingView strategy with the same rules, for backtesting in Strategy Tester with prop-evaluation simulation. |
 | `mnqbot/` (Python) | A stricter backtester with worst-case fills, back-to-back evaluation simulation, Monte Carlo pass odds, and a buy-and-hold MNQ benchmark. |
@@ -47,6 +48,17 @@ All of these are inputs in the TradingView script and fields in the Python confi
 ## Use it in TradingView
 
 You need a browser once to add the script. The TradingView phone app can run scripts but can't paste new ones.
+
+**The easy way: one script.** Paste `pine/mnq_liquidity_sweep_all_in_one.pine` into Pine Editor, then click **Save** and **Add to chart**.
+
+- It draws the levels, BUY/SELL labels and every fill, breakeven, cancel and exit.
+- It runs the backtest in **Strategy Tester** and shows a dashboard.
+- Under **Mode → Account mode**, choose how it sizes trades:
+  - **Live: my real account** (default): uses **Your room to the drawdown line $**, which you update every morning.
+  - **Backtest a prop evaluation**: simulates back-to-back evaluations using the **Prop firm** settings.
+- **Alerts:** Condition *MNQ Liquidity Sweep All-in-One* → **alert() function calls only**.
+
+The separate indicator and strategy below do the same jobs split in two.
 
 1. On tradingview.com, open an **MNQ1!** chart on **5 minutes**, with **extended trading hours ON**. The overnight levels need overnight bars, and the defaults are tuned for 5 minutes.
 2. **Signals:** open **Pine Editor**, paste the whole of `pine/mnq_liquidity_sweep_signals.pine`, click **Save**, then **Add to chart**.
@@ -111,9 +123,9 @@ The report shows win rate, profit factor, expectancy in dollars and R, max drawd
 
 ### How the TradingView scripts are checked
 
-TradingView can't be run here, so `tests/pine_interpreter.py` runs the **actual `.pine` files** bar by bar. It is a strict interpreter for the part of Pine v6 these scripts use, with a broker emulator that applies the same worst-case fill rules. `tests/test_pine_parity.py` then requires both scripts to produce the same orders, fills, exits and P/L as the Python engine, to the cent. That holds on 120 sessions of test data and on 16 hand-built cases that sit exactly on every fill boundary. The strategy's evaluation pass/fail counts must match too.
+TradingView can't be run here, so `tests/pine_interpreter.py` runs the **actual `.pine` files** bar by bar. It is a strict interpreter for the part of Pine v6 these scripts use, with a broker emulator that applies the same worst-case fill rules. `tests/test_pine_parity.py` then requires all three scripts to produce the same orders, fills, exits and P/L as the Python engine, to the cent. For the all-in-one script, that covers both account modes, plus exit reasons, exit labels and alert text. It holds on 120 sessions of test data and on 17 hand-built cases that sit exactly on every fill boundary. The evaluation pass/fail counts must match too.
 
-`python tests/mutation_check.py` plants six realistic bugs in the indicator (a fill on touch, an off-by-one expiry, target before stop, and so on) and confirms the tests catch every one. The first test run parses the scripts, which takes about 2 minutes, and caches them. Skip those tests with `pytest -m "not slow"`.
+`python tests/mutation_check.py` plants 11 realistic bugs in the indicator and the all-in-one script (a fill on touch, an off-by-one expiry, target before stop, a mislabeled exit, and so on) and confirms the tests catch every one. The first test run parses the scripts, which takes about 2 minutes, and caches them. Skip those tests with `pytest -m "not slow"`.
 
 ---
 
@@ -141,16 +153,17 @@ If it doesn't pass these, change the idea, not just the numbers, or don't trade 
 ## Files
 
 ```
-pine/mnq_liquidity_sweep_signals.pine  TradingView indicator: BUY/SELL signals, alerts, dashboard
-pine/mnq_liquidity_sweep_bot.pine      TradingView strategy: same rules, Strategy Tester backtest
-docs/RULES.md                          every rule, exactly, with a worked example
-mnqbot/config.py                       every setting, with defaults
-mnqbot/strategy.py                     levels -> sweep -> displacement -> FVG setup
-mnqbot/engine.py                       fills, sizing, daily rails, prop evaluation simulation
-mnqbot/report.py                       metrics, benchmark, Monte Carlo
-mnqbot/data.py                         CSV loading, sessions, ATR, optional Yahoo download
-tests/pine_interpreter.py              strict Pine v6 interpreter used to check the .pine files
-tests/                                 unit tests, Pine-vs-Python parity tests, mutation check
+pine/mnq_liquidity_sweep_all_in_one.pine  TradingView: signals + alerts + dashboard + backtest in one
+pine/mnq_liquidity_sweep_signals.pine     TradingView indicator: BUY/SELL signals, alerts, dashboard
+pine/mnq_liquidity_sweep_bot.pine         TradingView strategy: same rules, Strategy Tester backtest
+docs/RULES.md                             every rule, exactly, with a worked example
+mnqbot/config.py                          every setting, with defaults
+mnqbot/strategy.py                        levels -> sweep -> displacement -> FVG setup
+mnqbot/engine.py                          fills, sizing, daily rails, prop evaluation simulation
+mnqbot/report.py                          metrics, benchmark, Monte Carlo
+mnqbot/data.py                            CSV loading, sessions, ATR, optional Yahoo download
+tests/pine_interpreter.py                 strict Pine v6 interpreter used to check the .pine files
+tests/                                    unit tests, Pine-vs-Python parity tests, mutation check
 ```
 
 *Not financial advice. Futures are leveraged and you can lose more than you expect. Past backtest results don't predict future results.*

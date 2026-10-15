@@ -1,7 +1,8 @@
 # MNQ Liquidity Sweep: the exact rules
 
-These rules are implemented identically in three places:
+These rules are implemented identically in four places:
 
+- **All-in-one (start here):** [`pine/mnq_liquidity_sweep_all_in_one.pine`](../pine/mnq_liquidity_sweep_all_in_one.pine). It covers signals, alerts, the dashboard and the backtest.
 - **Signals indicator:** [`pine/mnq_liquidity_sweep_signals.pine`](../pine/mnq_liquidity_sweep_signals.pine)
 - **Backtest strategy:** [`pine/mnq_liquidity_sweep_bot.pine`](../pine/mnq_liquidity_sweep_bot.pine)
 - **Python backtester:** [`mnqbot/`](../mnqbot)
@@ -118,8 +119,8 @@ If contracts = 0, there is no signal.
 
 **Room to your drawdown line** is your account balance minus the balance where your firm liquidates you:
 
-- **Indicator:** enter it in settings and update it every morning. The default is $1,500.
-- **Strategy and Python:** simulated (see §9).
+- **Indicator, and the all-in-one in *Live: my real account* mode:** enter it in settings and update it every morning. The default is $1,500.
+- **Strategy, the all-in-one in *Backtest a prop evaluation* mode, and Python:** simulated (see §9).
 
 The firm's own cap (30 micros) also applies in the strategy and Python.
 
@@ -156,7 +157,7 @@ P/L = direction × (exit − entry) × contracts × $2 − 2 × $0.62 × contrac
 
 ---
 
-## 9. Evaluation simulation (strategy and Python only)
+## 9. Evaluation simulation (strategy, all-in-one in backtest mode, and Python)
 
 Defaults are for a $25K evaluation with a $1,500 drawdown. **Check your firm's current rules.**
 
@@ -170,7 +171,12 @@ Defaults are for a $25K evaluation with a $1,500 drawdown. **Check your firm's c
 
 ## 10. Alerts, and exactly what to do
 
-**To set up:** create an alert on the chart. For Condition, choose **MNQ Liquidity Sweep Signals → Any alert() function call**. Turn on app notifications.
+**To set up:** create an alert on the chart and turn on app notifications. For Condition, choose:
+
+- **MNQ Liquidity Sweep All-in-One → alert() function calls only**, or
+- **MNQ Liquidity Sweep Signals → Any alert() function call**
+
+The messages are the same in both scripts.
 
 A signal alert looks exactly like this:
 
@@ -248,13 +254,13 @@ Now suppose the 09:55 bar's low had been 19985 instead, so there is no breakeven
 
 **Verified by the tests (`python -m pytest`):**
 
-- The real `.pine` source files are run through a strict Pine interpreter (`tests/pine_interpreter.py`). Both scripts produce **the same orders, fills, exits and P/L as the Python engine, to the cent**, on 120 sessions of test data and 16 hand-built boundary cases.
-- The strategy also matches Python's evaluation pass/fail counts.
-- Six deliberately planted bugs were each caught by these tests. Rerun that check with `python tests/mutation_check.py`.
+- The real `.pine` source files are run through a strict Pine interpreter (`tests/pine_interpreter.py`). All three scripts produce **the same orders, fills, exits and P/L as the Python engine, to the cent**, on 120 sessions of test data and 17 hand-built boundary cases. The all-in-one is checked in both account modes, including exit reasons, labels and alert text.
+- The strategy and the all-in-one in backtest mode also match Python's evaluation pass/fail counts.
+- 11 deliberately planted bugs were each caught by these tests. Rerun that check with `python tests/mutation_check.py`.
 
 **Not verified, so check these yourself:**
 
 1. **Compiling inside TradingView.** It wasn't reachable from here. The interpreter enforces Pine v6's main rules, but if TradingView shows an error, send me the line.
-2. **The TradingView strategy's fills.** They come from TradingView's own simulator, which can order events inside a bar differently. The indicator and Python always assume the worst case.
+2. **The TradingView strategies' fills.** The strategy and all-in-one Strategy Tester numbers come from TradingView's own simulator, which can order events inside a bar differently. The indicator and Python always assume the worst case.
 3. **Whether it makes money on real MNQ data.** No rule set wins every trade. Backtest it (README → "Is it any good?") before risking money.
 4. **Your firm's rules.** They change, and most firms ban automated order entry.

@@ -545,7 +545,19 @@ class StrategyEmulator:
 
     @property
     def closedtrades(self):
-        return len(self.closed)
+        return _ClosedTrades(self.closed)
+
+    @property
+    def wintrades(self):
+        return sum(t["pnl"] > 0 for t in self.closed)
+
+    @property
+    def grossprofit(self):
+        return float(sum(t["pnl"] for t in self.closed if t["pnl"] > 0))
+
+    @property
+    def grossloss(self):
+        return float(-sum(t["pnl"] for t in self.closed if t["pnl"] < 0))
 
     @property
     def opentrades(self):
@@ -557,8 +569,8 @@ class StrategyEmulator:
         self.entries[id] = {"dir": d, "qty": int(qty), "limit": limit, "bar": self.rt.i}
         self.orders.append({"bar": self.rt.i, "dir": d, "qty": int(qty), "limit": limit})
 
-    def exit(self, id, from_entry, stop=None, limit=None, **kw):
-        self.exits[from_entry] = {"stop": stop, "limit": limit}
+    def exit(self, id, from_entry, stop=None, limit=None, comment_loss=None, comment_profit=None, **kw):
+        self.exits[from_entry] = {"stop": stop, "limit": limit, "loss": comment_loss, "profit": comment_profit}
 
     def cancel(self, id):
         self.entries.pop(id, None)
@@ -601,11 +613,37 @@ class StrategyEmulator:
         d, stop, limit = self.pos["dir"], ex["stop"], ex["limit"]
         if self.pos["bar"] == i:  # fill bar: worst case, stop only
             if stop is not None and ((d < 0 and h >= stop) or (d > 0 and l <= stop)):
-                self._close(stop + slip if d < 0 else stop - slip, "stop")
+                self._close(stop + slip if d < 0 else stop - slip, ex["loss"])
             return
         if stop is not None and ((d < 0 and o >= stop) or (d > 0 and o <= stop)):
-            self._close(o + slip if d < 0 else o - slip, "stop")
+            self._close(o + slip if d < 0 else o - slip, ex["loss"])
         elif stop is not None and ((d < 0 and h >= stop) or (d > 0 and l <= stop)):
-            self._close(stop + slip if d < 0 else stop - slip, "stop")
+            self._close(stop + slip if d < 0 else stop - slip, ex["loss"])
         elif limit is not None and ((d < 0 and l <= limit - thru) or (d > 0 and h >= limit + thru)):
-            self._close(limit, "target")
+            self._close(limit, ex["profit"])
+
+
+class _ClosedTrades(int):
+    """`strategy.closedtrades` is a count that also has per-trade functions (profit(i), exit_price(i), ...)."""
+
+    def __new__(cls, closed):
+        obj = super().__new__(cls, len(closed))
+        obj._closed = closed
+        return obj
+
+    def _get(self, i, key):
+        if not 0 <= i < len(self._closed):
+            raise PineError(f"closed trade {i} does not exist")
+        return self._closed[i][key]
+
+    def profit(self, i):
+        return float(self._get(i, "pnl"))
+
+    def exit_price(self, i):
+        return float(self._get(i, "exit"))
+
+    def exit_comment(self, i):
+        return self._get(i, "reason")
+
+    def exit_bar_index(self, i):
+        return self._get(i, "exit_bar")
