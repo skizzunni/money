@@ -2,7 +2,7 @@
 
 **Verdict: the original sweep/breakout bot has no edge.** On 3¾ years of Nasdaq-100 data, none of its seven pre-declared variants shows an edge that survives costs, and the variant picked on the tuning years lost money on the unseen years. **Don't pay for a prop evaluation to trade those rules.**
 
-**One published strategy does have an edge over 16 years: noise-area momentum** ([third round](#third-round-16-years-2010-2026)). It holds at today's costs as a share of price, but it carries real caveats, and as first traded it failed more $25K evaluations than it passed. The [ninth round](#ninth-round-the-account-and-the-exit) changed that: with a resting-stop exit it passes about 6 in 10 historical $25K evaluations, and about 84% of $100K ones, on 1 MNQ. It's now in TradingView as [`pine/mnq_noise_momentum.pine`](../pine/mnq_noise_momentum.pine), with its rules in [NOISE.md](NOISE.md).
+**One published strategy does have an edge over 16 years: noise-area momentum** ([third round](#third-round-16-years-2010-2026)). It holds at today's costs as a share of price, but it carries real caveats, and as first traded it failed more $25K evaluations than it passed. The [ninth round](#ninth-round-the-account-and-the-exit) changed that: with a resting-stop exit it passes about 6 in 10 historical $25K evaluations on 1 MNQ. The [tenth round](#tenth-round-why-the-trades-lose) then studied why its trades lose and moved the stop 0.24 noise units past the line, which raised profit per day by 43% on years the analysis never saw. It's now in TradingView as [`pine/mnq_noise_momentum.pine`](../pine/mnq_noise_momentum.pine), with its rules in [NOISE.md](NOISE.md).
 
 ---
 
@@ -353,6 +353,42 @@ With 2 or 3 contracts the odds fall back toward the $25K numbers: more contracts
 - **The price is time.** About a year of trading days to reach the $100K target, and an evaluation fee for each month of it.
 - **Tiers as I understand Take Profit Trader's** (their site is unreachable from here): verify the targets, drawdowns, fees and the rule on holding through the night before paying.
 
+## Tenth round: why the trades lose
+
+A trade-level post-mortem of the strategy (resting stop on the line) on 1-minute data ([`research/postmortem.py`](../research/postmortem.py)). Study period 2011–2018, 2,084 trades:
+
+- **77% of trades lose**, average loss $69 against an average win of $308. 98% of losses are stop-outs.
+- **77% of the losers are premature:** stopped on the line, after which price went on at least one full risk in our direction. $69,000 of the $110,000 lost.
+- **Losers die in 10 minutes (median); winners last 209.** The stop on the line catches the first wobble after entry.
+- **Half of all trades are re-entries** after a stop-out (21% win rate, net positive).
+- Winners rarely go far against us first (80th percentile of their adverse excursion: 0.62 of the initial risk). Losers often go our way first (42% reached one full risk).
+- 10:00 entries made 44% of all profit; entries after 14:00 lost.
+- Premature stop-outs overshot the line by 0.09 σ (median) and 0.24 σ (75th percentile) before resuming.
+
+**Overlays**, each with one number taken from 2011–2018, confirmed on 2019–2022 (at least +10% per day and no lower t), then the confirmed set run once on 2023–2026:
+
+| Overlay | 2011–18 $/day (t) | 2019–22 $/day (t) | Confirmed | 2023–26 $/day (t), win % |
+|---|---:|---:|---|---:|
+| Base: stop on the line | +21.62 (3.38) | +23.70 (2.49) | — | +14.13 (1.28), 25% |
+| O1 tighter stop at 0.62 × risk | +23.03 (3.75) | +24.27 (2.67) | no (+2%) | +15.98 (1.44), 21% |
+| O2 breakeven after 1 risk | +19.93 (3.20) | +28.44 (3.12) | yes | **+9.06 (1.04)**, 19%: failed its final test in the first run |
+| O3 no entries from 14:00 | +22.73 (3.74) | +18.30 (2.11) | no | +13.22 (1.24), 26% |
+| O6 continuation entry (stop order at the signal close) | +21.65 (3.40) | +24.02 (2.51) | no | +14.46 (1.30), 26% |
+| **O7 stop 0.24 σ past the line** | **+24.44 (3.57)** | **+34.10 (3.26)** | **yes** | **+20.14 (1.75), 34%** |
+| O6 + O7 | +24.49 (3.59) | +33.91 (3.24) | yes | +20.82 (1.81), 35% |
+| O8 trend filter (trailing 20-day trendiness ≥ 1) | +16.92 (2.99) | +14.48 (1.78) | no | +12.00 (1.21), 26% |
+| O7 + O8 | +20.27 (3.33) | +25.66 (2.85) | no | +15.06 (1.46), 34% |
+
+O4 (no re-entry) and O5 (minimum push) were switched off by their own rule: re-entries and weak pushes make money in 2011–2018.
+
+**What happened with the final test, exactly.** In the first run O2 was the only confirmed overlay, and it failed its final test (+$9.06 against +$14.13). O6 and O7 were added after that. In the second run my script combined everything confirmed, O2 + O7, and the combination failed (+$13.02), because O2 drags it down. **O7 on its own clears the final-test bar in every period**, including 2023–2026: +43% per day, t 1.28 → 1.75, win rate 25% → 34%, 30% fewer trades, drawdown $6,208 → $5,785. It is adopted on that basis, and this paragraph is the caveat.
+
+**Robustness of the number.** 0.12, 0.24 and 0.36 all beat the base on both the study and confirmation periods (2019–2022: +$27.70, +$34.10, +$35.01 per day against +$23.70), so 0.24 is not a lucky value.
+
+**The strategy with the buffered stop, all 16 years, 1 MNQ:** **+$26.02 a day, t 5.04, 15 of 16 years positive, worst intraday dip −$1,552, worst losing stretch $5,666.** 2026 through September: −$1,527. Evaluation odds from every start day, 500 sessions: $25K 62% / 38%, $50K 74% / 26%, $100K 78% / 22%, $150K 74% / 3% (23% still running, median 253 days).
+
+**Why it is losing now.** Trendiness = |open-to-close move| ÷ the day's noise. Good years: 1.12–1.25 (2018: 1.25, +$80 a day on the on-line stop). 2019: 1.05, −$3. 2025: 1.01, +$10. 2026: 0.99, −$12. Days have stopped moving more than their own noise, so breakouts don't follow through. The trailing trend filter (O8) didn't help: by the time 20 days of low trendiness switch it off, the bad patch is mostly over.
+
 ## What this does and doesn't say
 
 - **It says** that the original sweep/breakout rules have no edge after realistic costs on 2023–2026 Nasdaq-100 data, and would very likely not pass a $25K evaluation. Of three published strategies, only noise-area momentum held up over 16 years, and even it fails most $25K evaluations.
@@ -378,6 +414,7 @@ python research/discovery3.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"     # overnigh
 python research/regime_trend.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"   # the regime-trend family, final test
 python research/round8.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"         # volatility sizing, the 24-hour clock
 python research/round9.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"         # the resting-stop exit, account tiers
+python research/postmortem.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"     # why the trades lose; the buffered stop
 ```
 
 The raw data isn't stored in this repo.
