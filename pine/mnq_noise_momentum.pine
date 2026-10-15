@@ -14,9 +14,9 @@
 // Noise area for each half-hour mark = the day's open (and previous close) plus/minus the
 // average distance price has moved from the 09:30 open by that time over the last 14 sessions.
 //
-// Tested on 16 years of Nasdaq-100 data: see docs/RESULTS.md. It has an edge, but it loses
-// often and has losing years. With the resting stop it passed about 6 in 10 historical $25K /
-// $1,500 evaluations on 1 MNQ, and about 84% of $100K ones. It does NOT "never lose".
+// Tested on 16 years of Nasdaq-100 data: see docs/RESULTS.md. About $26 a day on 1 MNQ, 15 of
+// 16 years positive, but about two thirds of trades lose and 2026 is a losing year so far. It
+// passed about 6 in 10 historical $25K evaluations and about 78% of $100K ones. Not "never lose".
 //
 // Chart: MNQ1! (or the front-month MNQ contract), 5 minutes (1, 5, 10, 15 or 30 work).
 // The rules are the same as the Python reference in mnqbot/noise.py.
