@@ -207,6 +207,21 @@ var int attBufferSkips = 0
 var int evalsPassed = 0
 var int evalsFailed = 0
 
+// setup funnel: counts over the loaded chart history
+var int fDays = 0
+var int fSweeps = 0
+var int fSetups = 0
+var int fTooTight = 0
+var int fTooWide = 0
+var int fBlocked = 0
+var int fNoSize = 0
+var int fSignals = 0
+var int fFilled = 0
+var int fUnfilled = 0
+var float fRiskSum = 0.0
+var float fRiskMin = na
+var float fRiskMax = na
+
 // events on this bar
 bool fillNow = false
 int fillDir = 0
@@ -334,6 +349,7 @@ if evalMode and not attFailed and relNow + openWorst <= threshold()
     breachNow := true
     if pendDir != 0
         strategy.cancel(pendDir > 0 ? "L" : "S")
+        cancelNow := true
         pendDir := 0
     if strategy.position_size != 0
         strategy.close_all(comment = "liquidated", immediately = true)
@@ -363,6 +379,7 @@ float gapHi = na
 float gapLo = na
 string setupName = ""
 float setupLevel = na
+float setupRisk = na  // stop size of any setup found, even one rejected for size
 
 if armedDir != 0 and bar_index > armedSweepBar
     if bar_index > armedExpires
@@ -386,6 +403,7 @@ if armedDir != 0 and bar_index > armedSweepBar
                     float e = roundTick(gapLo + entryLevel * (gapHi - gapLo))
                     float s = roundTick(armedExtreme + stopBufTicks * tick)
                     float r = s - e
+                    setupRisk := r
                     if r >= minStopPts and r <= maxStopPts
                         setupNow := true
                         setupDir := -1
@@ -402,6 +420,7 @@ if armedDir != 0 and bar_index > armedSweepBar
                     float e = roundTick(gapHi - entryLevel * (gapHi - gapLo))
                     float s = roundTick(armedExtreme - stopBufTicks * tick)
                     float r = e - s
+                    setupRisk := r
                     if r >= minStopPts and r <= maxStopPts
                         setupNow := true
                         setupDir := 1
@@ -558,6 +577,31 @@ if strategy.closedtrades > seenClosed
 lastCum := strategy.netprofit
 lastTotal := strategy.closedtrades + strategy.opentrades
 
+// ───────────────────────────── 9. setup funnel (where setups drop out)
+if isRth and (bar_index == 0 or not isRth[1])
+    fDays += 1
+if sweptBear or sweptBull
+    fSweeps += 1
+if not na(setupRisk)
+    fSetups += 1
+    fRiskSum += setupRisk
+    fRiskMin := na(fRiskMin) ? setupRisk : math.min(fRiskMin, setupRisk)
+    fRiskMax := na(fRiskMax) ? setupRisk : math.max(fRiskMax, setupRisk)
+    if setupRisk < minStopPts
+        fTooTight += 1
+    else if setupRisk > maxStopPts
+        fTooWide += 1
+    else if why != ""
+        fBlocked += 1
+    else if signalQty < 1
+        fNoSize += 1
+if signalNow
+    fSignals += 1
+if fillNow
+    fFilled += 1
+if cancelNow
+    fUnfilled += 1
+
 // ───────────────────────────── alerts (one message per bar)
 string msg = ""
 string json = ""
@@ -622,7 +666,7 @@ if showSignals and signalNow
          color = setupDir > 0 ? color.teal : color.red, textcolor = color.white, size = size.small)
 
 // ───────────────────────────── dashboard
-var table dash = table.new(position.top_right, 2, 11, bgcolor = color.new(color.black, 15), border_width = 1, border_color = color.new(color.gray, 60))
+var table dash = table.new(position.top_right, 2, 14, bgcolor = color.new(color.black, 15), border_width = 1, border_color = color.new(color.gray, 60))
 // Strategies calculate once per closed bar, so refresh on the last historical bar and on every live bar.
 if showDash and (barstate.islastconfirmedhistory or barstate.isrealtime)
     int n = strategy.closedtrades
@@ -667,4 +711,17 @@ if showDash and (barstate.islastconfirmedhistory or barstate.isrealtime)
     table.cell(dash, 1, 8, btText, text_color = color.white, text_size = size.small)
     table.cell(dash, 0, 9, "Evaluations", text_color = color.silver, text_size = size.small)
     table.cell(dash, 1, 9, evals, text_color = color.white, text_size = size.small)
-    table.cell(dash, 0, 10, "P/L and backtest are simulated with this script's fill rules", text_color = color.gray, text_size = size.tiny)
+    string funnel = str.tostring(fSweeps) + " sweeps > " + str.tostring(fSetups) + " setups > " + str.tostring(fSignals) + " signals > "
+         + str.tostring(fFilled) + " filled"
+    string dropped = "stop over " + str.tostring(maxStopPts) + " pts: " + str.tostring(fTooWide) + " | under " + str.tostring(minStopPts) + " pts: "
+         + str.tostring(fTooTight) + " | daily limits/busy: " + str.tostring(fBlocked) + " | can't size: " + str.tostring(fNoSize)
+         + " | never filled: " + str.tostring(fUnfilled)
+    string stops = fSetups == 0 ? "no setups yet"
+         : "avg " + str.tostring(fRiskSum / fSetups, "#.#") + " pts | smallest " + str.tostring(fRiskMin, "#.##") + " | largest " + str.tostring(fRiskMax, "#.##")
+    table.cell(dash, 0, 10, "Setup funnel (" + str.tostring(fDays) + " days)", text_color = color.silver, text_size = size.small)
+    table.cell(dash, 1, 10, funnel, text_color = color.white, text_size = size.small)
+    table.cell(dash, 0, 11, "Setups dropped", text_color = color.silver, text_size = size.small)
+    table.cell(dash, 1, 11, dropped, text_color = color.white, text_size = size.small)
+    table.cell(dash, 0, 12, "Setup stop sizes", text_color = color.silver, text_size = size.small)
+    table.cell(dash, 1, 12, stops, text_color = color.white, text_size = size.small)
+    table.cell(dash, 0, 13, "P/L and backtest are simulated with this script's fill rules", text_color = color.gray, text_size = size.tiny)

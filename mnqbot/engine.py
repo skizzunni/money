@@ -78,6 +78,7 @@ class BacktestResult:
     bars: pd.DataFrame
     config: BotConfig
     orders: list[tuple[Setup, int]] = field(default_factory=list)  # every limit order placed, filled or not
+    funnel: dict = field(default_factory=dict)  # sweeps -> setups -> dropped -> signals -> filled
 
     def trades_frame(self) -> pd.DataFrame:
         rows = []
@@ -189,6 +190,7 @@ class Backtester:
         attempts: list[Attempt] = []
         skipped: dict[str, int] = {}
         orders: list[tuple[Setup, int]] = []
+        n_filled = n_unfilled = 0
         equity = [0.0] * len(b)
 
         cum = 0.0  # realized net P/L since the start of the backtest
@@ -333,6 +335,7 @@ class Backtester:
                 s = pending.setup
                 if hhmm[i] >= flatten or day_blocked:
                     pending = None
+                    n_unfilled += 1
                 else:
                     d = s.direction
                     filled = h[i] >= s.entry + thru if d < 0 else l[i] <= s.entry - thru
@@ -340,6 +343,7 @@ class Backtester:
                         pos = _Position(s, pending.qty, i, s.stop)
                         pending = None
                         day_trades += 1
+                        n_filled += 1
                         stopped = h[i] >= pos.stop if d < 0 else l[i] <= pos.stop
                         if stopped:
                             close_pos(i, pos.stop + slip if d < 0 else pos.stop - slip, "stop")
@@ -347,6 +351,7 @@ class Backtester:
                         missed = l[i] <= s.target if d < 0 else h[i] >= s.target
                         if missed or i - s.bar >= cfg.strategy.order_expiry_bars:
                             pending = None
+                            n_unfilled += 1
 
             # ---- open position (entered on an earlier bar)
             if pos is not None and pos.entry_bar < i:
@@ -384,6 +389,8 @@ class Backtester:
             if not att.failed and rel_worst <= threshold():
                 att.failed = True
                 day_blocked = True
+                if pending is not None:
+                    n_unfilled += 1
                 pending = None
                 if pos is not None:
                     s, d = pos.setup, pos.setup.direction
@@ -429,6 +436,23 @@ class Backtester:
             finish_attempt("open", None)
 
         daily = pd.DataFrame(daily_rows).set_index("trade_date")
+        risks = sig.setup_risks
+        lo, hi = cfg.strategy.min_stop_points, cfg.strategy.max_stop_points
+        funnel = {
+            "days": int(b.groupby("trade_date")["is_rth"].any().sum()),
+            "sweeps": sig.n_sweeps,
+            "setups": len(risks),
+            "stop_too_tight": sum(r < lo for r in risks),
+            "stop_too_wide": sum(r > hi for r in risks),
+            "blocked": sum(v for k, v in skipped.items() if k != "size_zero"),
+            "too_big_to_size": skipped.get("size_zero", 0),
+            "signals": len(orders),
+            "filled": n_filled,
+            "never_filled": n_unfilled,
+            "stop_points_avg": sum(risks) / len(risks) if risks else None,
+            "stop_points_min": min(risks, default=None),
+            "stop_points_max": max(risks, default=None),
+        }
         return BacktestResult(
             trades=trades,
             daily=daily,
@@ -438,6 +462,7 @@ class Backtester:
             bars=b,
             config=cfg,
             orders=orders,
+            funnel=funnel,
         )
 
 

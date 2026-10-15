@@ -98,6 +98,9 @@ class SignalEngine:
         self._on_hi = math.nan
         self._on_lo = math.nan
         self._on_final = False
+        # funnel: how far each idea gets (see engine.BacktestResult.funnel)
+        self.n_sweeps = 0
+        self.setup_risks: list[float] = []  # stop size of every displacement + FVG found, valid or not
 
     # ------------------------------------------------------------------ helpers
     def in_window(self, i: int) -> bool:
@@ -192,6 +195,7 @@ class SignalEngine:
             target = round_to_tick(entry + cfg.reward_risk * risk, tick)
 
         self.armed = None
+        self.setup_risks.append(risk)
         if not (cfg.min_stop_points <= risk <= cfg.max_stop_points):
             return None
         return Setup(
@@ -229,6 +233,8 @@ class SignalEngine:
         if not self.in_window(i) or (bear and bull):
             return
         expires = i + self.cfg.max_bars_after_sweep
+        if bear or bull:
+            self.n_sweeps += 1
         if bear:
             self.armed = _Armed(-1, bear[0], bear[1], i, h, expires)
         elif bull:

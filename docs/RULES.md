@@ -250,11 +250,31 @@ Now suppose the 09:55 bar's low had been 19985 instead, so there is no breakeven
 
 ---
 
-## 13. What is and isn't verified
+## 13. Setup funnel (all-in-one dashboard and Python report)
+
+Each count covers the loaded chart history.
+
+| Count | Exactly |
+|---|---|
+| Days | Trading days that had RTH bars |
+| Sweeps | Sweeps that started a setup (§3) |
+| Setups | Bars where all four conditions of §4 were met, before the stop-size check |
+| Stop over / under | Setups with R > max stop / R < min stop (§4) |
+| Daily limits/busy | Valid setups blocked by a rail in §5 |
+| Can't size | Valid setups where contracts = 0 (§6) |
+| Signals | Limit orders placed |
+| Filled / never filled | Orders that filled / were cancelled unfilled (§7, or a drawdown breach) |
+| Setup stop sizes | Average, smallest and largest R of all setups, in points |
+
+Setups = stop over + stop under + daily limits/busy + can't size + signals.
+
+---
+
+## 14. What is and isn't verified
 
 **Verified by the tests (`python -m pytest`):**
 
-- The real `.pine` source files are run through a strict Pine interpreter (`tests/pine_interpreter.py`). All three scripts produce **the same orders, fills, exits and P/L as the Python engine, to the cent**, on 120 sessions of test data and 17 hand-built boundary cases. The all-in-one is checked in both account modes, including exit reasons, labels and alert text.
+- The real `.pine` source files are run through a strict Pine interpreter (`tests/pine_interpreter.py`). All three scripts produce **the same orders, fills, exits and P/L as the Python engine, to the cent**, on 120 sessions of test data and 17 hand-built boundary cases. The all-in-one is checked in both account modes, including exit reasons, labels, alert text and every setup funnel count.
 - The strategy and the all-in-one in backtest mode also match Python's evaluation pass/fail counts.
 - 11 deliberately planted bugs were each caught by these tests. Rerun that check with `python tests/mutation_check.py`.
 

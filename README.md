@@ -57,6 +57,7 @@ You need a browser once to add the script. The TradingView phone app can run scr
   - **Live: my real account** (default): uses **Your room to the drawdown line $**, which you update every morning.
   - **Backtest a prop evaluation**: simulates back-to-back evaluations using the **Prop firm** settings.
 - **Alerts:** Condition *MNQ Liquidity Sweep All-in-One* → **alert() function calls only**.
+- The dashboard's **Setup funnel** counts, over the loaded history, how many sweeps the bot saw and how many became setups, signals and fills. It also shows where the rest dropped out (stop too wide or tight, daily limits, can't size, never filled) and the typical stop size. The Python report prints the same funnel, and the tests hold the two to identical numbers.
 
 The separate indicator and strategy below do the same jobs split in two.
 

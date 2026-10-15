@@ -377,3 +377,61 @@ def test_eval_mode_sizes_from_simulated_room(script):
         orders, trades, _, _ = run_aio(bars, inputs | EVAL_MODE)
         assert trades == engine_trades_with_reason(res, bars)
     assert orders == engine_orders(res)
+
+
+FUNNEL_VARS = {
+    "days": "fDays", "sweeps": "fSweeps", "setups": "fSetups", "stop_too_tight": "fTooTight",
+    "stop_too_wide": "fTooWide", "blocked": "fBlocked", "too_big_to_size": "fNoSize",
+    "signals": "fSignals", "filled": "fFilled", "never_filled": "fUnfilled",
+}
+
+
+def pine_funnel(rt):
+    g = rt.globals
+    f = {k: g[v] for k, v in FUNNEL_VARS.items()}
+    f["stop_points_avg"] = _r(g["fRiskSum"] / g["fSetups"]) if g["fSetups"] else None
+    f["stop_points_min"] = None if is_na(g["fRiskMin"]) else _r(g["fRiskMin"])
+    f["stop_points_max"] = None if is_na(g["fRiskMax"]) else _r(g["fRiskMax"])
+    return f
+
+
+def engine_funnel(res):
+    f = dict(res.funnel)
+    for k in ("stop_points_avg", "stop_points_min", "stop_points_max"):
+        f[k] = None if f[k] is None else _r(f[k])
+    return f
+
+
+@pytest.mark.parametrize("mode", ["live", "eval"])
+def test_all_in_one_funnel_matches_engine(bars, mode):
+    if mode == "live":
+        res = backtest(bars, _no_eval(loose_cfg()))
+        _, _, _, rt = run_aio(bars, LOOSE | NO_EVAL_ROOM)
+    else:
+        res = backtest(bars, loose_cfg())
+        _, _, _, rt = run_aio(bars, LOOSE | EVAL_MODE)
+    f = pine_funnel(rt)
+    assert f["sweeps"] > f["setups"] > f["signals"] > 0
+    assert f == engine_funnel(res)
+
+
+@pytest.mark.parametrize("name", list(EDGE))
+def test_all_in_one_funnel_edge_cases(name):
+    bars, extra, risk = EDGE[name]
+    res = backtest(bars, _edge_cfg(risk, evals=False))
+    _, _, _, rt = run_aio(bars, {"Watch latest swing high/low": False} | extra | NO_EVAL_ROOM)
+    assert pine_funnel(rt) == engine_funnel(res)
+
+
+def test_all_in_one_funnel_counts_rejected_stops():
+    from test_strategy import short_day
+
+    bars = short_day()
+    cfg = BotConfig()
+    cfg.strategy.use_swings = False
+    cfg.strategy.max_stop_points = 15.0
+    res = backtest(bars, _no_eval(cfg))
+    _, _, _, rt = run_aio(bars, {"Watch latest swing high/low": False, "Max stop (points)": 15.0} | NO_EVAL_ROOM)
+    f = pine_funnel(rt)
+    assert (f["sweeps"], f["setups"], f["stop_too_wide"], f["signals"]) == (1, 1, 1, 0)
+    assert f == engine_funnel(res)

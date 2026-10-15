@@ -248,3 +248,25 @@ def test_trade_date_rolls_at_6pm():
     bars = bars_from_rows("2026-10-12 17:55", [(1, 1, 1, 1)] * 2)  # Monday 17:55 and 18:00
     assert str(bars.trade_date.iloc[0]) == "2026-10-12"
     assert str(bars.trade_date.iloc[1]) == "2026-10-13"
+
+
+def test_funnel_adds_up(result):
+    f = result.funnel
+    assert f["sweeps"] >= f["setups"] > 0
+    assert f["setups"] == f["stop_too_tight"] + f["stop_too_wide"] + f["blocked"] + f["too_big_to_size"] + f["signals"]
+    assert f["blocked"] + f["too_big_to_size"] == sum(result.skipped.values())
+    assert f["signals"] == len(result.orders)
+    assert f["filled"] == len(result.trades)
+    assert f["signals"] - f["filled"] - f["never_filled"] in (0, 1)  # one order may still be working at the end
+
+
+def test_funnel_counts_rejected_stop_sizes():
+    from test_strategy import short_day
+
+    bars = short_day()  # one setup with a 17-point stop
+    cfg = BotConfig()
+    cfg.strategy.use_swings = False
+    cfg.strategy.max_stop_points = 15.0
+    f = backtest(bars, cfg).funnel
+    assert (f["sweeps"], f["setups"], f["stop_too_wide"], f["signals"]) == (1, 1, 1, 0)
+    assert f["stop_points_avg"] == f["stop_points_max"] == 17.0

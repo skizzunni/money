@@ -100,6 +100,7 @@ def summarize(res: BacktestResult, mc_sims: int = 5000, mc_sessions: int = 60, s
         daily, cfg.prop, mc_sims, mc_sessions, seed, min_buffer=min_tradable_buffer(cfg)
     )
     out["skipped_setups"] = dict(sorted(res.skipped.items()))
+    out["funnel"] = res.funnel
     return out
 
 
@@ -234,6 +235,20 @@ def format_report(s: dict) -> str:
             f"Monte Carlo ({mc['sims']} shuffled runs, {mc['max_sessions']} sessions max):",
             f"  pass {_pct(mc['pass_rate'])}, fail {_pct(mc['fail_rate'])}, ran out of time {_pct(mc['timeout_rate'])}",
         ]
+    f = s.get("funnel")
+    if f:
+        lines += [
+            "-" * 64,
+            f"Setup funnel over {f['days']} days:",
+            f"  {f['sweeps']} sweeps > {f['setups']} setups > {f['signals']} signals > {f['filled']} filled",
+            f"  dropped: stop too wide {f['stop_too_wide']}, too tight {f['stop_too_tight']},"
+            f" daily limits/busy {f['blocked']}, can't size {f['too_big_to_size']}, never filled {f['never_filled']}",
+        ]
+        if f["setups"]:
+            lines.append(
+                f"  setup stop sizes: avg {f['stop_points_avg']:.1f} pts,"
+                f" smallest {f['stop_points_min']:.2f}, largest {f['stop_points_max']:.2f}"
+            )
     if s["skipped_setups"]:
         lines.append(f"Setups skipped by risk rails: {s['skipped_setups']}")
     lines.append("=" * 64)

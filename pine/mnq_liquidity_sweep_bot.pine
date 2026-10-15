@@ -334,6 +334,7 @@ float gapHi = na
 float gapLo = na
 string setupName = ""
 float setupLevel = na
+float setupRisk = na  // stop size of any setup found, even one rejected for size
 
 if armedDir != 0 and bar_index > armedSweepBar
     if bar_index > armedExpires
@@ -357,6 +358,7 @@ if armedDir != 0 and bar_index > armedSweepBar
                     float e = roundTick(gapLo + entryLevel * (gapHi - gapLo))
                     float s = roundTick(armedExtreme + stopBufTicks * tick)
                     float r = s - e
+                    setupRisk := r
                     if r >= minStopPts and r <= maxStopPts
                         setupNow := true
                         setupDir := -1
@@ -373,6 +375,7 @@ if armedDir != 0 and bar_index > armedSweepBar
                     float e = roundTick(gapHi - entryLevel * (gapHi - gapLo))
                     float s = roundTick(armedExtreme - stopBufTicks * tick)
                     float r = e - s
+                    setupRisk := r
                     if r >= minStopPts and r <= maxStopPts
                         setupNow := true
                         setupDir := 1
