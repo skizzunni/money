@@ -77,6 +77,7 @@ class BacktestResult:
     skipped: dict[str, int]
     bars: pd.DataFrame
     config: BotConfig
+    orders: list[tuple[Setup, int]] = field(default_factory=list)  # every limit order placed, filled or not
 
     def trades_frame(self) -> pd.DataFrame:
         rows = []
@@ -187,6 +188,7 @@ class Backtester:
         daily_rows: list[dict] = []
         attempts: list[Attempt] = []
         skipped: dict[str, int] = {}
+        orders: list[tuple[Setup, int]] = []
         equity = [0.0] * len(b)
 
         cum = 0.0  # realized net P/L since the start of the backtest
@@ -403,6 +405,7 @@ class Backtester:
                     qty = self.size(setup.risk_points, cum - day_start_cum, buffer)
                     if qty >= 1:
                         pending = _Pending(setup, qty)
+                        orders.append((setup, qty))
                         att.buffer_skips = 0
                     else:
                         why = "size_zero"
@@ -434,6 +437,7 @@ class Backtester:
             skipped=skipped,
             bars=b,
             config=cfg,
+            orders=orders,
         )
 
 

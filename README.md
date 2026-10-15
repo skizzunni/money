@@ -1,11 +1,13 @@
 # MNQ Liquidity Sweep Bot
 
-A rules-based MNQ day-trading strategy with prop-firm risk rails. It comes as two pieces that implement the same logic:
+A rules-based MNQ day-trading strategy with prop-firm risk rails. Three pieces implement exactly the same rules:
 
 | Piece | What it's for |
 |---|---|
-| `pine/mnq_liquidity_sweep_bot.pine` | TradingView strategy: draws the levels, backtests in Strategy Tester, and sends trade alerts to your phone. |
-| `mnqbot/` (Python) | A stricter backtester with pessimistic fills, back-to-back prop evaluation simulation, Monte Carlo pass odds, and a buy-and-hold MNQ benchmark. |
+| `pine/mnq_liquidity_sweep_signals.pine` | **TradingView indicator that tells you when to BUY or SELL.** It gives the limit price, stop, target and size, then alerts you to fill, move to breakeven, cancel, or flatten. |
+| `pine/mnq_liquidity_sweep_bot.pine` | TradingView strategy with the same rules, for backtesting in Strategy Tester with prop-evaluation simulation. |
+| `mnqbot/` (Python) | A stricter backtester with worst-case fills, back-to-back evaluation simulation, Monte Carlo pass odds, and a buy-and-hold MNQ benchmark. |
+| [`docs/RULES.md`](docs/RULES.md) | **Every rule written out exactly**, with a worked example and what to do for each alert. |
 
 ## Read this first
 
@@ -46,20 +48,21 @@ All of these are inputs in the TradingView script and fields in the Python confi
 
 You need a browser once to add the script. The TradingView phone app can run scripts but can't paste new ones.
 
-1. On tradingview.com, open an **MNQ1!** chart on **5 minutes** (1–3 minutes also works), with **extended trading hours ON**. The overnight levels need overnight bars.
-2. Open **Pine Editor**, paste the whole of `pine/mnq_liquidity_sweep_bot.pine`, click **Save**, then **Add to chart**.
-3. Open **Strategy Tester** and read the results honestly (see below). The dashboard in the top-right corner shows today's status, the room left to the drawdown line, and how many back-to-back evaluations the backtest would have passed or failed.
-4. Set your firm's actual rules in the script settings under **Prop firm**. Rules change, so check them on the firm's site.
-5. **Phone alerts:** click Alert (⏰) → Condition: *MNQ Liquidity Sweep Bot* → **alert() function calls only** → turn on *Notify in app* → Create. Each setup arrives as a ready-to-place bracket, like this:
+1. On tradingview.com, open an **MNQ1!** chart on **5 minutes**, with **extended trading hours ON**. The overnight levels need overnight bars, and the defaults are tuned for 5 minutes.
+2. **Signals:** open **Pine Editor**, paste the whole of `pine/mnq_liquidity_sweep_signals.pine`, click **Save**, then **Add to chart**.
+   - The indicator draws the levels, BUY/SELL labels with the limit price, stop, target and size, and every fill, breakeven, cancel and exit. It also shows a dashboard.
+   - In its settings, set **Your room to the drawdown line $** every morning: your balance minus your firm's liquidation balance.
+3. **Backtest:** do the same with `pine/mnq_liquidity_sweep_bot.pine`, then open **Strategy Tester** and read the results honestly (see below). Set your firm's actual rules under **Prop firm**, since rules change. The strategy's dashboard shows how many back-to-back evaluations would have passed or failed.
+4. **Phone alerts:** on the indicator, click Alert (⏰) → Condition: *MNQ Liquidity Sweep Signals* → **Any alert() function call** → turn on *Notify in app* → Create. Each signal arrives as a ready-to-place bracket. This is the exact alert for the worked example in the rulebook:
 
    ```
-   MNQ SHORT setup (swept ONH 31210.00)
-   SELL LIMIT 3 @ 31198.00
-   STOP 31215.00 | TARGET 31164.00
-   Risk ~$107 | cancel if not filled in 6 bars
+   MNQ SELL signal (swept ONH 20010.00)
+   SELL LIMIT 4 @ 19998.00
+   STOP 20015.00 | TARGET 19964.00
+   Risk $142.96 | cancel if not filled within 6 bars (30 min)
    ```
 
-   You place that bracket in Tradovate yourself. Follow-up alerts tell you when it fills, when to move the stop to breakeven, when to cancel, and when to flatten.
+   You place that bracket in Tradovate yourself. Follow-up alerts tell you when it filled, when to move the stop to breakeven, when to cancel, and when to flatten. [RULES.md §10](docs/RULES.md#10-alerts-and-exactly-what-to-do) says exactly what to do for each one.
 
 On high-impact news days (FOMC, CPI, NFP), tick **Do NOT trade today** or set a **News blackout** window.
 
@@ -75,7 +78,7 @@ The script can send **TradersPost JSON** (`Alert format` setting) for a personal
 
 ```bash
 pip install -e ".[dev]"            # pandas, numpy, pytest
-python -m pytest                   # 33 tests
+python -m pytest                   # all tests (first run ~3 min: parses the .pine files)
 python -m mnqbot config > my.json  # all settings, edit as you like
 ```
 
@@ -106,6 +109,12 @@ The report shows win rate, profit factor, expectancy in dollars and R, max drawd
 - Fees default to $0.62 per contract per side. Change them in `costs`.
 - Evaluations: the end-of-day trailing drawdown stops trailing at the starting balance, and touching the line intraday fails the account. Passing needs the target, a minimum number of trading days, and the consistency rule. An account stuck so close to the line that it can't size a trade counts as failed, because you'd be paying for a reset.
 
+### How the TradingView scripts are checked
+
+TradingView can't be run here, so `tests/pine_interpreter.py` runs the **actual `.pine` files** bar by bar. It is a strict interpreter for the part of Pine v6 these scripts use, with a broker emulator that applies the same worst-case fill rules. `tests/test_pine_parity.py` then requires both scripts to produce the same orders, fills, exits and P/L as the Python engine, to the cent. That holds on 120 sessions of test data and on 16 hand-built cases that sit exactly on every fill boundary. The strategy's evaluation pass/fail counts must match too.
+
+`python tests/mutation_check.py` plants six realistic bugs in the indicator (a fill on touch, an off-by-one expiry, target before stop, and so on) and confirms the tests catch every one. The first test run parses the scripts, which takes about 2 minutes, and caches them. Skip those tests with `pytest -m "not slow"`.
+
 ---
 
 ## Is it any good?
@@ -123,21 +132,25 @@ If it doesn't pass these, change the idea, not just the numbers, or don't trade 
 
 ## Where TradingView and Python can differ
 
-- TradingView may resolve some intrabar orderings differently from the Python worst-case rule.
-- On a drawdown breach, TradingView exits at the bar close. Python exits at the drawdown line.
-- Swing-level confirmation and level tie-breaking match by construction. Commission and slippage are hardcoded at the top of the Pine script for sizing, so keep them in sync if you change them in the strategy properties.
+- **Indicator:** it uses the same worst-case fill rules as Python, and the parity tests hold it to identical trades. The one deliberate difference is that the room to your drawdown line is your input, not simulated.
+- **Strategy:** fills come from TradingView's own simulator, which can order events inside a bar differently, so its Strategy Tester numbers can differ from Python's. On a drawdown breach, TradingView exits at the bar close; Python exits at the line price.
+- The strategy's sizing uses fees and slippage hardcoded at the top of the script ($0.62, 1 tick). Keep them in sync if you change them in the strategy's Properties. The indicator has them as inputs.
 - Python can't know news days unless you list them in `risk.no_trade_dates` / `risk.blackout_windows`.
+- ATR needs about 100 bars to settle, so the first bars of a chart can differ slightly from a backtest that started earlier.
 
 ## Files
 
 ```
-pine/mnq_liquidity_sweep_bot.pine   TradingView strategy + alerts + dashboard
-mnqbot/config.py                    every setting, with defaults
-mnqbot/strategy.py                  levels -> sweep -> displacement -> FVG setup
-mnqbot/engine.py                    fills, sizing, daily rails, prop evaluation simulation
-mnqbot/report.py                    metrics, benchmark, Monte Carlo
-mnqbot/data.py                      CSV loading, sessions, ATR, optional Yahoo download
-tests/                              33 tests
+pine/mnq_liquidity_sweep_signals.pine  TradingView indicator: BUY/SELL signals, alerts, dashboard
+pine/mnq_liquidity_sweep_bot.pine      TradingView strategy: same rules, Strategy Tester backtest
+docs/RULES.md                          every rule, exactly, with a worked example
+mnqbot/config.py                       every setting, with defaults
+mnqbot/strategy.py                     levels -> sweep -> displacement -> FVG setup
+mnqbot/engine.py                       fills, sizing, daily rails, prop evaluation simulation
+mnqbot/report.py                       metrics, benchmark, Monte Carlo
+mnqbot/data.py                         CSV loading, sessions, ATR, optional Yahoo download
+tests/pine_interpreter.py              strict Pine v6 interpreter used to check the .pine files
+tests/                                 unit tests, Pine-vs-Python parity tests, mutation check
 ```
 
 *Not financial advice. Futures are leveraged and you can lose more than you expect. Past backtest results don't predict future results.*

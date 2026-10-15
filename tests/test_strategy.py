@@ -2,7 +2,7 @@ from conftest import bars_from_rows
 
 from mnqbot.config import BotConfig
 from mnqbot.engine import backtest
-from mnqbot.strategy import scan
+from mnqbot.strategy import round_to_tick, scan
 
 FLAT = (20000, 20003, 19997, 20000)
 
@@ -92,3 +92,11 @@ def test_unfilled_order_expires():
     after = [(19993, 19996, 19990, 19994)] * 8  # never trades up to 19998.25
     res = backtest(short_day(after=after), cfg_no_swings())
     assert res.trades == []
+
+
+def test_half_ticks_round_up():
+    # a 23-tick gap has its midpoint exactly half a tick off the grid
+    assert round_to_tick(19997.625, 0.25) == 19997.75
+    assert round_to_tick(19997.375, 0.25) == 19997.5
+    assert round_to_tick(19997.6, 0.25) == 19997.5
+    assert round_to_tick(19997.7, 0.25) == 19997.75

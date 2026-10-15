@@ -1,0 +1,582 @@
+//@version=6
+// MNQ Liquidity Sweep Signals
+// ------------------------------------------------------------------
+// Tells you when to BUY or SELL, the exact limit price, stop, target and
+// size, and when to cancel, move the stop to breakeven, or flatten.
+// The rules are written out in docs/RULES.md and are the same as the
+// strategy script (pine/mnq_liquidity_sweep_bot.pine) and the Python
+// backtester (mnqbot/).
+//
+// Chart: MNQ1! (or the front-month MNQ contract), 5 minutes,
+// extended trading hours ON.
+//
+// The indicator follows every signal as if you took it exactly as shown,
+// with worst-case fills, so the P/L it reports is that hypothetical.
+// ------------------------------------------------------------------
+indicator("MNQ Liquidity Sweep Signals", shorttitle = "LSS", overlay = true,
+     max_bars_back = 500, max_lines_count = 500, max_boxes_count = 500, max_labels_count = 500)
+
+const string TZ = "America/New_York"
+
+// ───────────────────────────── inputs (same defaults as the strategy)
+grpS = "Setup"
+entrySess    = input.session("0935-1130", "Entry window (New York time)", group = grpS)
+flattenHour  = input.int(15, "Flatten at (NY) hour", minval = 0, maxval = 23, group = grpS, inline = "fl")
+flattenMin   = input.int(50, "min", minval = 0, maxval = 59, group = grpS, inline = "fl")
+usePrevDay   = input.bool(true, "Watch previous day RTH high/low", group = grpS)
+useOvernight = input.bool(true, "Watch overnight high/low", group = grpS)
+useSwings    = input.bool(true, "Watch latest swing high/low", group = grpS)
+swingLen     = input.int(5, "Swing length (bars each side)", minval = 1, maxval = 50, group = grpS)
+sweepTicks   = input.int(2, "Sweep must trade this many ticks through", minval = 0, maxval = 200, group = grpS)
+maxBarsAfter = input.int(12, "Displacement must come within N bars", minval = 1, maxval = 200, group = grpS)
+atrLen       = input.int(14, "ATR length", minval = 1, maxval = 200, group = grpS)
+dispAtr      = input.float(1.0, "Displacement body >= ATR x", minval = 0.0, maxval = 10.0, step = 0.1, group = grpS)
+minFvgTicks  = input.int(4, "Min fair value gap (ticks)", minval = 1, maxval = 2000, group = grpS)
+entryLevel   = input.float(0.5, "Entry inside gap (0 near edge, 0.5 middle, 1 far edge)", minval = 0.0, maxval = 1.0, step = 0.05, group = grpS)
+stopBufTicks = input.int(4, "Stop buffer beyond sweep (ticks)", minval = 0, maxval = 400, group = grpS)
+rr           = input.float(2.0, "Reward : risk", minval = 0.5, maxval = 10.0, step = 0.25, group = grpS)
+minStopPts   = input.float(8.0, "Min stop (points)", minval = 0.25, group = grpS)
+maxStopPts   = input.float(60.0, "Max stop (points)", minval = 0.25, group = grpS)
+expiryBars   = input.int(6, "Cancel unfilled entry after N bars", minval = 1, maxval = 200, group = grpS)
+beAtR        = input.float(1.0, "Stop to breakeven at R (0 = off)", minval = 0.0, maxval = 10.0, step = 0.25, group = grpS)
+
+grpR = "Risk rails"
+riskPerTrade = input.float(150, "Max $ risk per trade (incl. fees)", minval = 1, group = grpR)
+maxContracts = input.int(15, "Max contracts", minval = 1, maxval = 1000, group = grpR)
+dailyMaxLoss = input.float(300, "Daily max loss $ (done for the day)", minval = 1, group = grpR)
+dailyLock    = input.float(600, "Daily profit lock $ (done for the day)", minval = 1, group = grpR)
+maxTrades    = input.int(3, "Max trades per day", minval = 1, maxval = 100, group = grpR)
+roomToLine   = input.float(1500, "Your room to the drawdown line $", minval = 0, group = grpR,
+     tooltip = "Account balance minus the balance where your firm liquidates you. Update it every morning.")
+bufferFrac   = input.float(0.25, "Max share of that room risked per trade", minval = 0.01, maxval = 1.0, step = 0.05, group = grpR)
+skipToday    = input.bool(false, "Do NOT trade today (FOMC / CPI / NFP)", group = grpR)
+useBlackout  = input.bool(false, "Daily news blackout", group = grpR, inline = "bo")
+blackoutSess = input.session("0955-1005", "", group = grpR, inline = "bo")
+
+grpC = "Costs"
+commission = input.float(0.62, "Fees per contract per side $", minval = 0, group = grpC)
+slipTicks  = input.int(1, "Stop / market slippage (ticks)", minval = 0, maxval = 100, group = grpC)
+fillTicks  = input.int(1, "Limit fills need price this many ticks through", minval = 0, maxval = 100, group = grpC)
+
+grpA = "Alerts"
+alertMode     = input.string("Phone (I place the trade)", "Alert format", options = ["Phone (I place the trade)", "TradersPost JSON (auto)"], group = grpA,
+     tooltip = "Most prop firms, very likely including Take Profit Trader, ban automated order entry. Use the JSON format only on an account whose rules allow it.")
+webhookTicker = input.string("MNQ1!", "Webhook ticker", group = grpA)
+
+grpV = "Display"
+showLevels  = input.bool(true, "Liquidity levels", group = grpV)
+showSignals = input.bool(true, "Signals, fills and exits", group = grpV)
+showWindow  = input.bool(true, "Shade the entry window", group = grpV)
+showDash    = input.bool(true, "Dashboard", group = grpV)
+
+// ───────────────────────────── helpers
+tick = syminfo.mintick
+pv   = syminfo.pointvalue
+jsonMode = alertMode == "TradersPost JSON (auto)"
+slip = slipTicks * tick
+thru = fillTicks * tick
+
+// nearest tick, exact half ticks round up (same as mnqbot.strategy.round_to_tick)
+roundTick(float p) => math.floor(p / tick + 0.5) * tick
+fmtPx(float p) => str.tostring(p, format.mintick)
+fmtUsd(float x) => (x < 0 ? "-$" : "$") + str.tostring(math.abs(x), "#,##0.00")
+perContract(float riskPts) => riskPts * pv + 2 * commission + slipTicks * tick * pv
+tradePnl(int dir, float entry, float exitPx, int qty) => dir * (exitPx - entry) * qty * pv - 2 * commission * qty
+
+// CME trading day: bars from 18:00 New York time belong to the next date
+tradingDay(int t) =>
+    int tt = t + 6 * 60 * 60 * 1000
+    year(tt, TZ) * 10000 + month(tt, TZ) * 100 + dayofmonth(tt, TZ)
+
+// Swing confirmed n bars ago: strictly above the n bars before it, not below the n bars after.
+isPivotHigh(int n) =>
+    bool ok = true
+    float p = high[n]
+    for k = 1 to n
+        if high[n + k] >= p or high[n - k] > p
+            ok := false
+    ok
+
+isPivotLow(int n) =>
+    bool ok = true
+    float p = low[n]
+    for k = 1 to n
+        if low[n + k] <= p or low[n - k] < p
+            ok := false
+    ok
+
+nyHHMM       = hour(time, TZ) * 100 + minute(time, TZ)
+isRth        = nyHHMM >= 930 and nyHHMM < 1600
+isOvernight  = nyHHMM >= 1800 or nyHHMM < 930
+inWindow     = not na(time(timeframe.period, entrySess, TZ))
+inBlackout   = useBlackout and not na(time(timeframe.period, blackoutSess, TZ))
+afterFlatten = nyHHMM >= flattenHour * 100 + flattenMin
+dayKey       = tradingDay(time)
+isToday      = dayKey == tradingDay(timenow)
+atrVal       = ta.atr(atrLen)
+pivH         = isPivotHigh(swingLen)
+pivL         = isPivotLow(swingLen)
+barMinutes   = timeframe.in_seconds() / 60.0
+
+// ───────────────────────────── state
+var float lvPDH = na
+var float lvPDL = na
+var float lvONH = na
+var float lvONL = na
+var float lvSWH = na
+var float lvSWL = na
+var bool tkPDH = false
+var bool tkPDL = false
+var bool tkONH = false
+var bool tkONL = false
+var bool tkSWH = false
+var bool tkSWL = false
+
+var float rthHi = na
+var float rthLo = na
+var float prevHi = na
+var float prevLo = na
+var float onHi = na
+var float onLo = na
+var bool onFinal = false
+var int dayStartBar = 0
+
+var int armedDir = 0
+var float armedLevel = na
+var string armedName = ""
+var int armedSweepBar = na
+var float armedExtreme = na
+var int armedExpires = na
+
+var int pendDir = 0
+var int pendBar = na
+var int pendQty = 0
+var float pendEntry = na
+var float pendStop = na
+var float pendTarget = na
+
+var int posDir = 0
+var int posBar = na
+var int posQty = 0
+var float posEntry = na
+var float posStop = na
+var float posTarget = na
+var float posRisk = na
+var bool beDone = false
+
+var int curDay = 0
+var bool dayInit = false
+var float dayPnl = 0.0
+var int dayTrades = 0
+var array<float> tradePnls = array.new<float>()
+
+// events on this bar
+bool signalNow = false
+int signalDir = 0
+bool fillNow = false
+int fillDir = 0
+bool cancelNow = false
+bool beNow = false
+float exitPx = na
+string exitWhy = ""
+float exitPnl = na
+int exitDir = 0
+
+// ───────────────────────────── 1. new trading day
+if dayKey != curDay
+    if dayInit and posDir != 0
+        float pnlEnd = tradePnl(posDir, posEntry, close[1], posQty)
+        array.push(tradePnls, pnlEnd)
+        if showSignals
+            label.new(bar_index - 1, close[1], "DAY END " + fmtUsd(pnlEnd), style = label.style_label_left, color = color.gray, textcolor = color.white, size = size.tiny)
+        posDir := 0
+    if dayInit and not na(rthHi)
+        prevHi := rthHi
+        prevLo := rthLo
+    pendDir := 0
+    curDay := dayKey
+    dayInit := true
+    dayPnl := 0.0
+    dayTrades := 0
+    dayStartBar := bar_index
+    rthHi := na
+    rthLo := na
+    onHi := na
+    onLo := na
+    onFinal := false
+    armedDir := 0
+    lvPDH := usePrevDay ? prevHi : na
+    lvPDL := usePrevDay ? prevLo : na
+    tkPDH := false
+    tkPDL := false
+    lvONH := na
+    lvONL := na
+    lvSWH := na
+    lvSWL := na
+
+// ───────────────────────────── 2. working limit order: fill or cancel
+if pendDir != 0
+    if afterFlatten
+        pendDir := 0
+        cancelNow := true
+    else
+        bool filled = pendDir < 0 ? high >= pendEntry + thru : low <= pendEntry - thru
+        if filled
+            posDir := pendDir
+            posBar := bar_index
+            posQty := pendQty
+            posEntry := pendEntry
+            posStop := pendStop
+            posTarget := pendTarget
+            posRisk := math.abs(pendEntry - pendStop)
+            beDone := false
+            pendDir := 0
+            dayTrades += 1
+            fillNow := true
+            fillDir := posDir
+            // on the fill bar only the stop counts (worst case)
+            bool stoppedOnFill = posDir < 0 ? high >= posStop : low <= posStop
+            if stoppedOnFill
+                exitPx := posDir < 0 ? posStop + slip : posStop - slip
+                exitWhy := "STOP"
+        else
+            bool missed = pendDir < 0 ? low <= pendTarget : high >= pendTarget
+            if missed or bar_index - pendBar >= expiryBars
+                pendDir := 0
+                cancelNow := true
+
+// ───────────────────────────── 3. open position: stop first, then target, then breakeven
+if posDir != 0 and posBar < bar_index
+    string stopWhy = beDone ? "BREAKEVEN" : "STOP"
+    if posDir < 0
+        if open >= posStop
+            exitPx := open + slip
+            exitWhy := stopWhy
+        else if high >= posStop
+            exitPx := posStop + slip
+            exitWhy := stopWhy
+        else if low <= posTarget - thru
+            exitPx := posTarget
+            exitWhy := "TARGET"
+    else
+        if open <= posStop
+            exitPx := open - slip
+            exitWhy := stopWhy
+        else if low <= posStop
+            exitPx := posStop - slip
+            exitWhy := stopWhy
+        else if high >= posTarget + thru
+            exitPx := posTarget
+            exitWhy := "TARGET"
+    if na(exitPx) and beAtR > 0 and not beDone
+        float trigger = posEntry + posDir * beAtR * posRisk
+        if (posDir < 0 and low <= trigger) or (posDir > 0 and high >= trigger)
+            beDone := true
+            posStop := posEntry
+            beNow := true
+
+// ───────────────────────────── 4. flatten before the close
+if posDir != 0 and na(exitPx) and afterFlatten
+    exitPx := posDir > 0 ? close - slip : close + slip
+    exitWhy := "FLATTEN"
+
+// ───────────────────────────── 5. book the exit
+if posDir != 0 and not na(exitPx)
+    exitPnl := tradePnl(posDir, posEntry, exitPx, posQty)
+    exitDir := posDir
+    dayPnl += exitPnl
+    array.push(tradePnls, exitPnl)
+    posDir := 0
+
+// ───────────────────────────── 6. liquidity levels and setups
+if isRth and not onFinal
+    onFinal := true
+    if useOvernight and not na(onHi)
+        lvONH := onHi
+        lvONL := onLo
+        tkONH := false
+        tkONL := false
+
+bool setupNow = false
+int setupDir = 0
+float setupEntry = na
+float setupStop = na
+float setupTarget = na
+float gapHi = na
+float gapLo = na
+string setupName = ""
+float setupLevel = na
+
+if armedDir != 0 and bar_index > armedSweepBar
+    if bar_index > armedExpires
+        armedDir := 0
+    else
+        if armedDir < 0
+            armedExtreme := math.max(armedExtreme, high)
+            if close > armedLevel
+                armedDir := 0
+        else
+            armedExtreme := math.min(armedExtreme, low)
+            if close < armedLevel
+                armedDir := 0
+        if armedDir != 0 and inWindow and bar_index - 1 >= armedSweepBar and not na(atrVal[1])
+            float minGap = minFvgTicks * tick
+            float body = close[1] - open[1]
+            if armedDir < 0
+                if low[2] - high >= minGap and -body >= dispAtr * atrVal[1] and close < armedLevel
+                    gapHi := low[2]
+                    gapLo := high
+                    float e = roundTick(gapLo + entryLevel * (gapHi - gapLo))
+                    float s = roundTick(armedExtreme + stopBufTicks * tick)
+                    float r = s - e
+                    if r >= minStopPts and r <= maxStopPts
+                        setupNow := true
+                        setupDir := -1
+                        setupEntry := e
+                        setupStop := s
+                        setupTarget := roundTick(e - rr * r)
+                        setupName := armedName
+                        setupLevel := armedLevel
+                    armedDir := 0
+            else
+                if low - high[2] >= minGap and body >= dispAtr * atrVal[1] and close > armedLevel
+                    gapLo := high[2]
+                    gapHi := low
+                    float e = roundTick(gapHi - entryLevel * (gapHi - gapLo))
+                    float s = roundTick(armedExtreme - stopBufTicks * tick)
+                    float r = e - s
+                    if r >= minStopPts and r <= maxStopPts
+                        setupNow := true
+                        setupDir := 1
+                        setupEntry := e
+                        setupStop := s
+                        setupTarget := roundTick(e + rr * r)
+                        setupName := armedName
+                        setupLevel := armedLevel
+                    armedDir := 0
+
+// sweeps: trade through an untaken level, close back on the other side
+through = sweepTicks * tick
+float bearLevel = na
+string bearName = ""
+float bullLevel = na
+string bullName = ""
+
+if not na(lvPDH) and not tkPDH and high >= lvPDH + through
+    tkPDH := true
+    if close < lvPDH and (na(bearLevel) or lvPDH > bearLevel)
+        bearLevel := lvPDH
+        bearName := "PDH"
+if not na(lvONH) and not tkONH and high >= lvONH + through
+    tkONH := true
+    if close < lvONH and (na(bearLevel) or lvONH > bearLevel)
+        bearLevel := lvONH
+        bearName := "ONH"
+if not na(lvSWH) and not tkSWH and high >= lvSWH + through
+    tkSWH := true
+    if close < lvSWH and (na(bearLevel) or lvSWH > bearLevel)
+        bearLevel := lvSWH
+        bearName := "SWH"
+if not na(lvPDL) and not tkPDL and low <= lvPDL - through
+    tkPDL := true
+    if close > lvPDL and (na(bullLevel) or lvPDL < bullLevel)
+        bullLevel := lvPDL
+        bullName := "PDL"
+if not na(lvONL) and not tkONL and low <= lvONL - through
+    tkONL := true
+    if close > lvONL and (na(bullLevel) or lvONL < bullLevel)
+        bullLevel := lvONL
+        bullName := "ONL"
+if not na(lvSWL) and not tkSWL and low <= lvSWL - through
+    tkSWL := true
+    if close > lvSWL and (na(bullLevel) or lvSWL < bullLevel)
+        bullLevel := lvSWL
+        bullName := "SWL"
+
+bool sweptBear = false
+bool sweptBull = false
+if inWindow and not (not na(bearLevel) and not na(bullLevel))
+    if not na(bearLevel)
+        sweptBear := true
+        armedDir := -1
+        armedLevel := bearLevel
+        armedName := bearName
+        armedSweepBar := bar_index
+        armedExtreme := high
+        armedExpires := bar_index + maxBarsAfter
+    else if not na(bullLevel)
+        sweptBull := true
+        armedDir := 1
+        armedLevel := bullLevel
+        armedName := bullName
+        armedSweepBar := bar_index
+        armedExtreme := low
+        armedExpires := bar_index + maxBarsAfter
+
+// session ranges
+if isRth
+    rthHi := na(rthHi) ? high : math.max(rthHi, high)
+    rthLo := na(rthLo) ? low : math.min(rthLo, low)
+else if isOvernight and not onFinal
+    onHi := na(onHi) ? high : math.max(onHi, high)
+    onLo := na(onLo) ? low : math.min(onLo, low)
+
+// swing levels, only from today's bars
+if useSwings and bar_index - 2 * swingLen >= dayStartBar
+    if pivH
+        lvSWH := high[swingLen]
+        tkSWH := false
+    if pivL
+        lvSWL := low[swingLen]
+        tkSWL := false
+
+// ───────────────────────────── 7. risk rails, sizing, signal
+string why = ""
+if posDir != 0 or pendDir != 0
+    why := "busy"
+else if skipToday and isToday
+    why := "no-trade day"
+else if inBlackout
+    why := "news blackout"
+else if afterFlatten
+    why := "late"
+else if dayTrades >= maxTrades
+    why := "max trades"
+else if dayPnl <= -dailyMaxLoss
+    why := "daily loss limit"
+else if dayPnl >= dailyLock
+    why := "profit locked"
+
+maxRiskNow = math.max(0.0, math.min(riskPerTrade, dailyMaxLoss + dayPnl, bufferFrac * roomToLine))
+
+sizeFor(float riskPts) =>
+    float per = perContract(riskPts)
+    int q = maxRiskNow > 0 and per > 0 ? math.floor(maxRiskNow / per + 1e-9) : 0
+    math.max(0, math.min(q, maxContracts))
+
+int signalQty = 0
+if setupNow and why == ""
+    signalQty := sizeFor(math.abs(setupEntry - setupStop))
+    if signalQty >= 1
+        pendDir := setupDir
+        pendBar := bar_index
+        pendQty := signalQty
+        pendEntry := setupEntry
+        pendStop := setupStop
+        pendTarget := setupTarget
+        signalNow := true
+        signalDir := setupDir
+
+// ───────────────────────────── alerts (one message per bar)
+string msg = ""
+string json = ""
+if signalNow
+    float riskUsd = signalQty * perContract(math.abs(setupEntry - setupStop))
+    string side = signalDir > 0 ? "buy" : "sell"
+    msg := "MNQ " + (signalDir > 0 ? "BUY" : "SELL") + " signal (swept " + setupName + " " + fmtPx(setupLevel) + ")\n"
+         + str.upper(side) + " LIMIT " + str.tostring(signalQty) + " @ " + fmtPx(setupEntry) + "\n"
+         + "STOP " + fmtPx(setupStop) + " | TARGET " + fmtPx(setupTarget) + "\n"
+         + "Risk " + fmtUsd(riskUsd) + " | cancel if not filled within " + str.tostring(expiryBars) + " bars (" + str.tostring(expiryBars * barMinutes) + " min)"
+    json := "{\"ticker\":\"" + webhookTicker + "\",\"action\":\"" + side + "\",\"orderType\":\"limit\",\"limitPrice\":" + fmtPx(setupEntry)
+         + ",\"quantity\":" + str.tostring(signalQty) + ",\"stopLoss\":{\"type\":\"stop\",\"stopPrice\":" + fmtPx(setupStop)
+         + "},\"takeProfit\":{\"limitPrice\":" + fmtPx(setupTarget) + "}}"
+if cancelNow
+    msg := (msg == "" ? "" : msg + "\n---\n") + "CANCEL the unfilled MNQ limit order"
+    json := json == "" ? "{\"ticker\":\"" + webhookTicker + "\",\"action\":\"cancel\"}" : json
+if fillNow
+    msg := (msg == "" ? "" : msg + "\n---\n") + "FILLED " + (fillDir > 0 ? "LONG " : "SHORT ") + str.tostring(posQty) + " MNQ @ " + fmtPx(posEntry)
+if beNow
+    msg := (msg == "" ? "" : msg + "\n---\n") + "MOVE STOP TO BREAKEVEN " + fmtPx(posEntry)
+    json := json == "" ? "{\"ticker\":\"" + webhookTicker + "\",\"action\":\"breakeven\"}" : json
+if not na(exitPnl)
+    msg := (msg == "" ? "" : msg + "\n---\n") + (exitWhy == "FLATTEN" ? "FLATTEN NOW (end of session) " : "EXITED at " + exitWhy + " ") + fmtUsd(exitPnl)
+    if exitWhy == "FLATTEN"
+        json := "{\"ticker\":\"" + webhookTicker + "\",\"action\":\"exit\",\"cancel\":true}"
+string out = jsonMode ? json : msg
+if out != ""
+    alert(out, alert.freq_once_per_bar_close)
+
+alertcondition(signalNow and signalDir > 0, "BUY signal", "MNQ BUY signal. Open TradingView for limit price, stop, target and size.")
+alertcondition(signalNow and signalDir < 0, "SELL signal", "MNQ SELL signal. Open TradingView for limit price, stop, target and size.")
+alertcondition(cancelNow or beNow or exitWhy == "FLATTEN", "Manage trade (cancel / breakeven / flatten)", "MNQ: manage your trade now. Open TradingView.")
+
+// ───────────────────────────── drawing
+bgcolor(showWindow and inWindow ? color.new(color.blue, 94) : na, title = "Entry window")
+
+cHigh = color.new(color.red, 0)
+cLow  = color.new(color.teal, 0)
+plot(showLevels ? lvPDH : na, "Prev day high", tkPDH ? color.new(cHigh, 75) : cHigh, 2, plot.style_linebr)
+plot(showLevels ? lvPDL : na, "Prev day low", tkPDL ? color.new(cLow, 75) : cLow, 2, plot.style_linebr)
+plot(showLevels ? lvONH : na, "Overnight high", tkONH ? color.new(color.orange, 75) : color.orange, 1, plot.style_linebr)
+plot(showLevels ? lvONL : na, "Overnight low", tkONL ? color.new(color.aqua, 75) : color.aqua, 1, plot.style_linebr)
+plot(showLevels ? lvSWH : na, "Swing high", tkSWH ? color.new(color.gray, 80) : color.gray, 1, plot.style_linebr)
+plot(showLevels ? lvSWL : na, "Swing low", tkSWL ? color.new(color.gray, 80) : color.gray, 1, plot.style_linebr)
+
+plot(pendDir != 0 ? pendEntry : posDir != 0 ? posEntry : na, "Entry", color.yellow, 1, plot.style_linebr)
+plot(pendDir != 0 ? pendStop : posDir != 0 ? posStop : na, "Stop", color.red, 1, plot.style_linebr)
+plot(pendDir != 0 ? pendTarget : posDir != 0 ? posTarget : na, "Target", color.lime, 1, plot.style_linebr)
+
+plotshape(showSignals and sweptBear, "Buy-side sweep", shape.triangledown, location.abovebar, color.red, size = size.tiny)
+plotshape(showSignals and sweptBull, "Sell-side sweep", shape.triangleup, location.belowbar, color.teal, size = size.tiny)
+plotshape(showSignals and fillNow ? posEntry : na, "Filled", shape.circle, location.absolute, color.yellow, size = size.tiny)
+plotshape(showSignals and beNow ? posEntry : na, "Breakeven", shape.diamond, location.absolute, color.white, size = size.tiny)
+plotshape(showSignals and cancelNow, "Order cancelled", shape.xcross, location.abovebar, color.gray, size = size.tiny)
+
+if showSignals and signalNow
+    box.new(bar_index - 2, gapHi, bar_index + expiryBars, gapLo, border_color = color.new(color.yellow, 40), bgcolor = color.new(color.yellow, 85))
+    string txt = (signalDir > 0 ? "BUY " : "SELL ") + str.tostring(signalQty) + "\n@ " + fmtPx(setupEntry)
+         + "\nSL " + fmtPx(setupStop) + "\nTP " + fmtPx(setupTarget)
+    label.new(bar_index, signalDir > 0 ? low : high, txt,
+         style = signalDir > 0 ? label.style_label_up : label.style_label_down,
+         color = signalDir > 0 ? color.teal : color.red, textcolor = color.white, size = size.small)
+
+if showSignals and not na(exitPnl)
+    label.new(bar_index, exitPx, exitWhy + " " + fmtUsd(exitPnl),
+         style = exitDir > 0 ? label.style_label_down : label.style_label_up,
+         color = exitPnl > 0 ? color.new(color.green, 20) : color.new(color.gray, 20), textcolor = color.white, size = size.tiny)
+
+// ───────────────────────────── dashboard
+var table dash = table.new(position.top_right, 2, 8, bgcolor = color.new(color.black, 15), border_width = 1, border_color = color.new(color.gray, 60))
+if showDash and barstate.islast
+    int n = array.size(tradePnls)
+    int wins = 0
+    float grossWin = 0.0
+    float grossLoss = 0.0
+    for p in tradePnls
+        if p > 0
+            wins += 1
+            grossWin += p
+        else
+            grossLoss -= p
+    string chartStats = n == 0 ? "no trades on this chart yet"
+         : str.tostring(n) + " trades | " + str.tostring(100.0 * wins / n, "#") + "% won | PF "
+         + (grossLoss > 0 ? str.tostring(grossWin / grossLoss, "#.##") : "n/a") + " | net " + fmtUsd(grossWin - grossLoss)
+    string orderText = posDir != 0 ? (posDir > 0 ? "LONG " : "SHORT ") + str.tostring(posQty) + " @ " + fmtPx(posEntry) + " | SL " + fmtPx(posStop) + " | TP " + fmtPx(posTarget)
+         : pendDir != 0 ? (pendDir > 0 ? "BUY LIMIT " : "SELL LIMIT ") + str.tostring(pendQty) + " @ " + fmtPx(pendEntry) + " | SL " + fmtPx(pendStop) + " | TP " + fmtPx(pendTarget)
+         : "none"
+    string status = posDir != 0 ? "IN TRADE"
+         : pendDir != 0 ? "ORDER WORKING"
+         : skipToday and isToday ? "OFF: no-trade day"
+         : dayPnl <= -dailyMaxLoss ? "DONE: daily loss limit"
+         : dayPnl >= dailyLock ? "DONE: profit locked"
+         : dayTrades >= maxTrades ? "DONE: max trades"
+         : armedDir != 0 ? "SWEEP SEEN: waiting for displacement"
+         : inWindow ? "WATCHING"
+         : "OUTSIDE ENTRY WINDOW"
+    color statusColor = str.startswith(status, "DONE") or str.startswith(status, "OFF") ? color.red
+         : status == "IN TRADE" or status == "ORDER WORKING" ? color.yellow : color.lime
+    table.cell(dash, 0, 0, "MNQ Sweep Signals", text_color = color.white, text_size = size.small)
+    table.cell(dash, 1, 0, status, text_color = statusColor, text_size = size.small)
+    table.cell(dash, 0, 1, "Order / position", text_color = color.silver, text_size = size.small)
+    table.cell(dash, 1, 1, orderText, text_color = color.white, text_size = size.small)
+    table.cell(dash, 0, 2, "Today P/L*", text_color = color.silver, text_size = size.small)
+    table.cell(dash, 1, 2, fmtUsd(dayPnl), text_color = dayPnl >= 0 ? color.lime : color.red, text_size = size.small)
+    table.cell(dash, 0, 3, "Trades today", text_color = color.silver, text_size = size.small)
+    table.cell(dash, 1, 3, str.tostring(dayTrades) + " / " + str.tostring(maxTrades), text_color = color.white, text_size = size.small)
+    table.cell(dash, 0, 4, "Max risk next trade", text_color = color.silver, text_size = size.small)
+    table.cell(dash, 1, 4, fmtUsd(maxRiskNow), text_color = color.white, text_size = size.small)
+    table.cell(dash, 0, 5, "Next signal blocked by", text_color = color.silver, text_size = size.small)
+    table.cell(dash, 1, 5, why == "" ? "-" : why, text_color = color.silver, text_size = size.small)
+    table.cell(dash, 0, 6, "This chart*", text_color = color.silver, text_size = size.small)
+    table.cell(dash, 1, 6, chartStats, text_color = color.white, text_size = size.small)
+    table.cell(dash, 0, 7, "* if every signal was taken exactly as shown, worst-case fills", text_color = color.gray, text_size = size.tiny)

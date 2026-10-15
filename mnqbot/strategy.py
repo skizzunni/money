@@ -67,7 +67,8 @@ def _hhmm(s: str) -> int:
 
 
 def round_to_tick(price: float, tick: float) -> float:
-    return round(round(price / tick) * tick, 10)
+    """Nearest tick; exact half ticks round up. Same formula as the Pine scripts: floor(x / tick + 0.5)."""
+    return round(math.floor(price / tick + 0.5) * tick, 10)
 
 
 class SignalEngine:
@@ -212,8 +213,9 @@ class SignalEngine:
         bear: tuple[str, float] | None = None  # highest buy-side level swept and closed back below
         bull: tuple[str, float] | None = None  # lowest sell-side level swept and closed back above
 
-        for name, lvl in self.levels.items():
-            if lvl.taken:
+        for name in HIGH_LEVELS + LOW_LEVELS:  # fixed order, same as the Pine scripts
+            lvl = self.levels.get(name)
+            if lvl is None or lvl.taken:
                 continue
             if name in HIGH_LEVELS and h >= lvl.price + through:
                 lvl.taken = True

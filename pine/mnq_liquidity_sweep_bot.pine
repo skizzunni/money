@@ -81,7 +81,8 @@ tick = syminfo.mintick
 pv   = syminfo.pointvalue
 jsonMode = alertMode == "TradersPost JSON (auto)"
 
-roundTick(float p) => math.round(p / tick) * tick
+// nearest tick, exact half ticks round up (same as mnqbot.strategy.round_to_tick)
+roundTick(float p) => math.floor(p / tick + 0.5) * tick
 fmtPx(float p) => str.tostring(p, format.mintick)
 fmtUsd(float x) => (x < 0 ? "-$" : "$") + str.tostring(math.abs(x), "#,##0.00")
 perContract(float riskPts) => riskPts * pv + 2 * COMMISSION_PER_SIDE + SLIPPAGE_TICKS * tick * pv
@@ -103,13 +104,19 @@ isPivotLow(int n) =>
             ok := false
     ok
 
+// CME trading day: bars from 18:00 New York time belong to the next date
+tradingDay(int t) =>
+    int tt = t + 6 * 60 * 60 * 1000
+    year(tt, TZ) * 10000 + month(tt, TZ) * 100 + dayofmonth(tt, TZ)
+
 nyHHMM       = hour(time, TZ) * 100 + minute(time, TZ)
 isRth        = nyHHMM >= 930 and nyHHMM < 1600
 isOvernight  = nyHHMM >= 1800 or nyHHMM < 930
 inWindow     = not na(time(timeframe.period, entrySess, TZ))
 inBlackout   = useBlackout and not na(time(timeframe.period, blackoutSess, TZ))
 afterFlatten = nyHHMM >= flattenHour * 100 + flattenMin
-newDay       = timeframe.change("D")
+dayKey       = tradingDay(time)
+isToday      = dayKey == tradingDay(timenow)
 atrVal       = ta.atr(atrLen)
 pivH         = isPivotHigh(swingLen)
 pivL         = isPivotLow(swingLen)
@@ -167,6 +174,7 @@ var float posRisk = na
 var bool beDone = false
 
 // day and evaluation accounting
+var int curDay = 0
 var bool dayInit = false
 var float dayStartCum = 0.0
 var int dayStartTrades = 0
@@ -189,7 +197,7 @@ threshold() => math.min(attPeakEod - propMaxDD, lockRel)
 totalTrades = strategy.closedtrades + strategy.opentrades
 
 // ───────────────────────────── 1. new trading day (CME day starts 18:00 NY)
-if newDay or not dayInit
+if dayKey != curDay
     if dayInit
         float dayPnl = lastCum - dayStartCum
         int dayTradeCount = lastTotal - dayStartTrades
@@ -224,6 +232,7 @@ if newDay or not dayInit
         if not na(rthHi)
             prevHi := rthHi
             prevLo := rthLo
+    curDay := dayKey
     dayInit := true
     dayStartCum := lastCum
     dayStartTrades := lastTotal
@@ -457,7 +466,7 @@ if strategy.position_size != 0 or pendDir != 0
     why := "busy"
 else if dayBlocked
     why := "account failed"
-else if skipToday
+else if skipToday and isToday
     why := "no-trade day"
 else if inBlackout
     why := "news blackout"
@@ -538,7 +547,7 @@ if showSetups and setupNow
 var table dash = table.new(position.top_right, 2, 9, bgcolor = color.new(color.black, 15), border_width = 1, border_color = color.new(color.gray, 60))
 if showDash and barstate.islast
     string status = dayBlocked ? "ACCOUNT LINE HIT: done"
-         : skipToday ? "OFF: no-trade day"
+         : skipToday and isToday ? "OFF: no-trade day"
          : dayPnlNow <= -dailyMaxLoss ? "DONE: daily loss limit"
          : dayPnlNow >= dailyLock ? "DONE: profit locked"
          : dayTradesNow >= maxTrades ? "DONE: max trades"
