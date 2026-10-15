@@ -670,7 +670,7 @@ if breachNow or flattenNow
 if signalNow
     float riskUsd = signalQty * perContract(math.abs(setupEntry - setupStop))
     string side = setupDir > 0 ? "buy" : "sell"
-    msg := addLine(msg, "MNQ " + (setupDir > 0 ? "BUY" : "SELL") + " signal (swept " + setupName + " " + fmtPx(setupLevel) + ")\n"
+    msg := addLine(msg, "MNQ " + (setupDir > 0 ? "BUY" : "SELL") + " signal (" + (setupName == "ORH" or setupName == "ORL" ? "broke " : "swept ") + setupName + " " + fmtPx(setupLevel) + ")\n"
          + str.upper(side) + " LIMIT " + str.tostring(signalQty) + " @ " + fmtPx(setupEntry) + "\n"
          + "STOP " + fmtPx(setupStop) + " | TARGET " + fmtPx(setupTarget) + "\n"
          + "Risk " + fmtUsd(riskUsd) + " | cancel if not filled within " + str.tostring(expiryBars) + " bars (" + str.tostring(expiryBars * barMinutes) + " min)")

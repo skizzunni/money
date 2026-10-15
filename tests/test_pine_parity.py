@@ -523,6 +523,8 @@ def test_orb_all_in_one(name, mode):
     assert orders == engine_orders(res)
     assert trades == engine_trades_with_reason(res, bars)
     _check_labels_and_alerts(rt, orders, trades)
+    for bar, *_ in orders:
+        assert "signal (broke OR" in dict(rt.alerts)[bar]
     if mode == "live":
         assert pine_funnel(rt) == engine_funnel(res)
 

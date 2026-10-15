@@ -554,7 +554,7 @@ if setupNow and why == ""
         attBufferSkips := 0
         float riskUsd = qty * perContract(math.abs(setupEntry - setupStop))
         string side = setupDir > 0 ? "buy" : "sell"
-        string phone = "MNQ " + (setupDir > 0 ? "LONG" : "SHORT") + " setup (swept " + setupName + " " + fmtPx(setupLevel) + ")\n"
+        string phone = "MNQ " + (setupDir > 0 ? "LONG" : "SHORT") + " setup (" + (setupName == "ORH" or setupName == "ORL" ? "broke " : "swept ") + setupName + " " + fmtPx(setupLevel) + ")\n"
              + str.upper(side) + " LIMIT " + str.tostring(qty) + " @ " + fmtPx(setupEntry) + "\n"
              + "STOP " + fmtPx(setupStop) + " | TARGET " + fmtPx(setupTarget) + "\n"
              + "Risk ~" + fmtUsd(riskUsd) + " | cancel if not filled in " + str.tostring(expiryBars) + " bars"

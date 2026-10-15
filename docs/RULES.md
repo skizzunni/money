@@ -216,6 +216,7 @@ Risk $142.96 | cancel if not filled within 6 bars (30 min)
 |---|---|
 | `SELL LIMIT 4 @ 19998.00` / `STOP 20015.00 \| TARGET 19964.00` | Place a **sell limit**, 4 contracts at 19998.00, with an attached bracket: stop-loss at 20015.00 and take-profit at 19964.00. |
 | `BUY LIMIT …` | Same, buy side. |
+| `… signal (broke ORH 20010.00)` | An opening range breakout signal (§4b). You place it exactly the same way. |
 | `FILLED SHORT 4 MNQ @ 19998.00` | Confirm your order filled and the bracket is live. |
 | `MOVE STOP TO BREAKEVEN 19998.00` | Move your stop to 19998.00. |
 | `CANCEL the unfilled MNQ limit order` | Cancel the entry order and its bracket. |
