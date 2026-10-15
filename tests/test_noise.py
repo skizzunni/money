@@ -64,6 +64,8 @@ def above_then_below(p):
 
 
 CHECK = NoiseConfig(exit_mode="check")  # the paper's half-hour exit; the default is the resting stop
+STOP0 = NoiseConfig(stop_buffer=0.0)  # the resting stop exactly on the line (the default sits 0.24 sigma past it)
+BUF = 0.24 * 0.001  # the default buffer as a share of price in the quiet history, where sigma = 0.1%
 
 
 def with_low(bars: pd.DataFrame, i: int, low: float, open_: float | None = None) -> pd.DataFrame:
@@ -125,7 +127,7 @@ def test_reverse_when_through_the_other_side():
 
 def test_stop_exits_at_the_line_when_a_bar_dips_inside():
     bars, p = scenario(above_then_inside)
-    res = run(bars)  # default: resting stop
+    res = run(bars, STOP0)
     ub = p * 1.001
     assert res.events == [(bar(14, CHECK_10_00), "BUY"), (bar(14, CHECK_10_30), "EXIT")]
     t = res.trades[0]
@@ -139,7 +141,7 @@ def test_stop_fills_on_a_touch_between_checks_then_reenters_at_the_next_check():
     bars, p = scenario(above_all_day)
     ub = p * 1.001
     bars = with_low(bars, bar(14, 8), p * 1.0005)  # 10:10 bar wicks below the line, closes back above it
-    res = run(bars)
+    res = run(bars, STOP0)
     assert res.events == [(bar(14, CHECK_10_00), "BUY"), (bar(14, 8), "EXIT"), (bar(14, CHECK_10_30), "BUY"),
                           (bar(14, CLOSE_16_00), "FLAT")]
     first, second = res.trades
@@ -150,11 +152,11 @@ def test_stop_fills_on_a_touch_between_checks_then_reenters_at_the_next_check():
 def test_stop_can_fill_on_the_entry_bar_at_the_line_or_the_open():
     bars, p = scenario(above_all_day)
     ub = p * 1.001
-    touched = run(with_low(bars, bar(14, CHECK_10_00 + 1), p * 1.0005))  # entry bar opens above, dips to the line
+    touched = run(with_low(bars, bar(14, CHECK_10_00 + 1), p * 1.0005), STOP0)  # entry bar dips to the line
     t = touched.trades[0]
     entry_bar = bar(14, CHECK_10_00 + 1)
     assert (t.entry_bar, t.exit_bar, t.exit) == (entry_bar, entry_bar, pytest.approx(ub - 0.25))
-    gapped = run(with_low(bars, bar(14, CHECK_10_00 + 1), p * 1.0005, open_=p * 1.0005))  # opens already inside
+    gapped = run(with_low(bars, bar(14, CHECK_10_00 + 1), p * 1.0005, open_=p * 1.0005), STOP0)  # opens inside
     t = gapped.trades[0]
     assert t.entry == pytest.approx(p * 1.0005 + 0.25) and t.exit == pytest.approx(p * 1.0005 - 0.25)
     assert t.pnl == pytest.approx(-0.5 * 2 - 1.24)
@@ -175,7 +177,7 @@ def widening_history_then_breakout() -> tuple[pd.DataFrame, float]:
 
 def test_stop_moves_with_the_line_and_fills_at_the_open_when_the_line_passes_the_price():
     bars, p = widening_history_then_breakout()
-    res = run(bars)
+    res = run(bars, STOP0)
     assert res.bands[0][1] == pytest.approx(p * 1.001) and res.bands[1][1] == pytest.approx(p * 1.003)
     # long from the 10:00 check; at 10:30 the upper line moves to +0.3%, above the price: out at the next open
     assert res.events == [(bar(14, CHECK_10_00), "BUY"), (bar(14, CHECK_10_30 + 1), "EXIT")]
@@ -185,6 +187,18 @@ def test_stop_moves_with_the_line_and_fills_at_the_open_when_the_line_passes_the
     check = run(bars, CHECK)  # the half-hour rule reaches the same exit a different way
     assert check.trades[0].exit_bar == bar(14, CHECK_10_30 + 1)
     assert check.trades[0].exit == pytest.approx(p * 1.002 - 0.25)
+
+
+def test_default_stop_sits_past_the_line():
+    bars, p = scenario(above_all_day)
+    ub = p * 1.001
+    stop = ub * (1 - BUF)
+    held = run(with_low(bars, bar(14, 8), stop + 0.05))  # dips below the line but not to the stop
+    assert held.trades[0].reason == "16:00 close" and held.events == [(bar(14, CHECK_10_00), "BUY"),
+                                                                       (bar(14, CLOSE_16_00), "FLAT")]
+    assert run(with_low(bars, bar(14, 8), stop + 0.05), STOP0).trades[0].reason == "Back inside"  # on the line: out
+    t = run(with_low(bars, bar(14, 8), stop - 0.05)).trades[0]  # dips through the stop
+    assert (t.exit_bar, t.reason) == (bar(14, 8), "Back inside") and t.exit == pytest.approx(stop - 0.25)
 
 
 def test_exit_mode_must_be_known():
@@ -294,9 +308,11 @@ def run_pine(bars, inputs=None, minutes=5):
     return trades, events, {i: (u, lo) for i, u, lo in bands}
 
 
-def assert_parity(bars, minutes=5, lookback=14, skip_dates=None, exit_mode="stop"):
+def assert_parity(bars, minutes=5, lookback=14, skip_dates=None, exit_mode="stop", stop_buffer=None):
     cfg, inputs = NoiseConfig(lookback=lookback, exit_mode=exit_mode), {"Sessions in the noise average": lookback}
     inputs["Exit"] = "Resting stop at the line" if exit_mode == "stop" else "Half-hour check"
+    if stop_buffer is not None:
+        cfg.stop_buffer = inputs["Stop distance past the line, in noise units"] = stop_buffer
     if skip_dates is not None:
         cfg.skip_dates = inputs["Don't trade on these dates"] = skip_dates
     res = run(bars, cfg, minutes=minutes)
@@ -320,15 +336,20 @@ HAND_BUILT = {
     "entry bar opens inside the line": lambda: with_low(scenario(above_all_day)[0], bar(14, CHECK_10_00 + 1),
                                                         P0 * 1.001 ** 14 * 1.0005, open_=P0 * 1.001 ** 14 * 1.0005),
     "line moves past the price": lambda: widening_history_then_breakout()[0],
+    "stop buffer holds": lambda: with_low(scenario(above_all_day)[0], bar(14, 8),
+                                          P0 * 1.001 ** 14 * 1.001 * (1 - BUF) + 0.05),
+    "stop buffer hit": lambda: with_low(scenario(above_all_day)[0], bar(14, 8),
+                                        P0 * 1.001 ** 14 * 1.001 * (1 - BUF) - 0.05),
 }
-MODES = ["stop", "check"]
+MODES = {"stop": ("stop", None), "stop on the line": ("stop", 0.0), "check": ("check", None)}
 
 
 @pytest.mark.slow
 @pytest.mark.parametrize("name", list(HAND_BUILT))
-@pytest.mark.parametrize("mode", MODES)
+@pytest.mark.parametrize("mode", list(MODES))
 def test_pine_hand_built(name, mode):
-    assert_parity(HAND_BUILT[name](), exit_mode=mode)
+    exit_mode, buf = MODES[mode]
+    assert_parity(HAND_BUILT[name](), exit_mode=exit_mode, stop_buffer=buf)
 
 
 @pytest.mark.slow
@@ -349,16 +370,19 @@ def test_pine_short_session_cases():
     assert res.trades[0].reason == "Session ended"
 
 
+RANDOM_CASES = [(5, "stop"), (15, "stop"), (5, "stop on the line"), (5, "check")]
+
+
 @pytest.mark.slow
-@pytest.mark.parametrize("minutes", [5, 15])
-@pytest.mark.parametrize("mode", MODES)
+@pytest.mark.parametrize("minutes,mode", RANDOM_CASES)
 def test_pine_random_sessions(minutes, mode):
     bars = synth_bars(sessions=90, seed=5)
     if minutes != 5:
         bars = annotate(resample(bars[["open", "high", "low", "close", "volume"]], f"{minutes}min"))
-    res = assert_parity(bars, minutes, exit_mode=mode)
+    exit_mode, buf = MODES[mode]
+    res = assert_parity(bars, minutes, exit_mode=exit_mode, stop_buffer=buf)
     assert len(res.trades) > 20 and {e for _, e in res.events} >= {"BUY", "SELL", "EXIT", "FLAT"}
-    if mode == "stop":
+    if mode == "stop on the line":
         assert any(t.reason == "Back inside" and t.exit_bar == t.entry_bar for t in res.trades), "a fill-bar stop"
 
 

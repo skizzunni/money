@@ -4,8 +4,10 @@
 // Intraday momentum from Zarattini, Aziz & Barbon (2024), "Beat the Market",
 // with the paper's settings. Every half hour from 10:00 to 15:30 New York time:
 //   * flat:  BUY if price closed above the noise area, SELL if below it
-//   * in a trade: a stop order rests at the noise line and moves with it ("Resting stop", the default);
-//     or, with "Half-hour check", EXIT when a check closes back inside (REVERSE if through the other side)
+//   * in a trade: a stop order rests just past the noise line (0.24 noise units: the distance price
+//     typically overshoots the line before resuming, from 16 years of data) and moves with the line
+//     ("Resting stop", the default); or, with "Half-hour check", EXIT when a check closes back inside
+//     the lines (REVERSE if through the other side)
 // Everything is closed at the 16:00 close. No trades until 14 full sessions are on the chart,
 // and none on the dates in "Don't trade on these dates" (holidays and half days by default).
 //
@@ -43,6 +45,8 @@ skipDates = input.string("2026-01-01,2026-01-19,2026-02-16,2026-04-03,2026-05-25
 exitMode = input.string("Resting stop at the line", "Exit", options = ["Resting stop at the line", "Half-hour check"], group = grpT,
      tooltip = "Resting stop: once in a trade, a stop order sits at the noise line and moves with it at every half hour. Tested on 16 years: smaller worst days and better evaluation odds. Half-hour check: the paper's rule, exit only when a half-hour check closes back inside the lines.")
 useStop = exitMode == "Resting stop at the line"
+stopBuf = input.float(0.24, "Stop distance past the line, in noise units", minval = 0, maxval = 2, step = 0.01, group = grpT,
+     tooltip = "0 puts the stop exactly on the line. 0.24 is how far price typically overshoots the line before resuming, measured on 2011-2018; it cut whipsaw stop-outs and raised profit per day on every later period. See docs/RESULTS.md.")
 grpV = "Display"
 showBands = input.bool(true, "Show noise area", group = grpV)
 showLabels = input.bool(true, "Show BUY / SELL / EXIT labels", group = grpV)
@@ -71,6 +75,7 @@ var float prevClose = na
 var float lastRthClose = na
 var float ub = na
 var float lb = na
+var float sig = na   // this check's noise (sigma), which sets the stop distance
 var moves = array.new_float(lookback * N_CHECKS, na)   // ring buffer: one row of 12 moves per session
 var today = array.new_float(N_CHECKS, na)
 var int filled = 0
@@ -100,6 +105,7 @@ if tMin == RTH_OPEN
     dayOpen := open
     ub := na
     lb := na
+    sig := na
     skipToday := str.contains(skipDates, str.format_time(time, "yyyy-MM-dd", TZ))
     for k = 0 to N_CHECKS - 1
         array.set(today, k, na)
@@ -117,12 +123,15 @@ if isCheck and not na(dayOpen)
         for d = 0 to lookback - 1
             s += array.get(moves, d * N_CHECKS + k)
         sigma = s / lookback
+        sig := sigma
         ub := math.max(dayOpen, prevClose) * (1 + sigma)
         lb := math.min(dayOpen, prevClose) * (1 - sigma)
         nextCheck = k == N_CHECKS - 1 ? "the 16:00 close" : hhmmText(endMin + 30)
-        holdLong = useStop ? "Put a stop at the upper line, " + px(ub) + ", and move it to the new line at every half hour." :
+        longStopNow = ub * (1 - stopBuf * sig)
+        shortStopNow = lb * (1 + stopBuf * sig)
+        holdLong = useStop ? "Put a stop at " + px(longStopNow) + " (just below the upper line), and move it when the line moves, at every half hour." :
              "Hold until a half-hour check closes back below the upper line, or the 16:00 close."
-        holdShort = useStop ? "Put a stop at the lower line, " + px(lb) + ", and move it to the new line at every half hour." :
+        holdShort = useStop ? "Put a stop at " + px(shortStopNow) + " (just above the lower line), and move it when the line moves, at every half hour." :
              "Hold until a half-hour check closes back above the lower line, or the 16:00 close."
         pos = strategy.position_size
         inPosStop = useStop and pos != 0   // exits are the resting stop's job
@@ -168,14 +177,16 @@ if isCheck and not na(dayOpen)
                 alert("SELL " + str.tostring(qty) + " MNQ at market now. Price " + px(close) + " is below the noise area (lower " +
                      px(lb) + "). " + holdShort + " Next check " + nextCheck + ".", alert.freq_once_per_bar_close)
 
-// ── The resting stop: at the current line, re-placed every bar so it moves with the line
+// ── The resting stop: just past the current line, re-placed every bar so it moves with the line
+longStop = ub * (1 - stopBuf * sig)
+shortStop = lb * (1 + stopBuf * sig)
 if useStop and inRth and not na(ub)
     if strategy.position_size > 0 or longPlaced
-        strategy.exit("Long exit", "Long", stop = ub, comment = "Back inside",
-             alert_message = "EXIT LONG: price touched the upper line (" + px(ub) + "). Your stop should have filled. If you had no stop in, exit at market now.")
+        strategy.exit("Long exit", "Long", stop = longStop, comment = "Back inside",
+             alert_message = "EXIT LONG: price hit the stop at " + px(longStop) + " (just below the upper line " + px(ub) + "). Your stop should have filled. If you had no stop in, exit at market now.")
     if strategy.position_size < 0 or shortPlaced
-        strategy.exit("Short exit", "Short", stop = lb, comment = "Back inside",
-             alert_message = "EXIT SHORT: price touched the lower line (" + px(lb) + "). Your stop should have filled. If you had no stop in, exit at market now.")
+        strategy.exit("Short exit", "Short", stop = shortStop, comment = "Back inside",
+             alert_message = "EXIT SHORT: price hit the stop at " + px(shortStop) + " (just above the lower line " + px(lb) + "). Your stop should have filled. If you had no stop in, exit at market now.")
 
 // ── 16:00: flat, and store today's moves if the session was complete
 if inRth and endMin == RTH_CLOSE
@@ -201,7 +212,7 @@ plot(showBands and inRth ? ub : na, "Upper noise line", color.teal, 2, plot.styl
 plot(showBands and inRth ? lb : na, "Lower noise line", color.maroon, 2, plot.style_linebr)
 bgcolor(shadeTrades and strategy.position_size > 0 ? color.new(color.teal, 88) : shadeTrades and strategy.position_size < 0 ? color.new(color.maroon, 88) : na)
 
-var table dash = table.new(position.top_right, 2, 8, bgcolor = color.new(color.black, 15), border_width = 1, border_color = color.new(color.gray, 60))
+var table dash = table.new(position.top_right, 2, 9, bgcolor = color.new(color.black, 15), border_width = 1, border_color = color.new(color.gray, 60))
 if showDash and (barstate.islastconfirmedhistory or barstate.isrealtime)
     pos = strategy.position_size
     status = not validTf ? "Use a 1/5/10/15/30 min chart" : filled < lookback ? "Building history" : pos > 0 ? "LONG" : pos < 0 ? "SHORT" : skipToday and inRth ? "No trades today (date list)" : "Flat"
@@ -222,7 +233,9 @@ if showDash and (barstate.islastconfirmedhistory or barstate.isrealtime)
     table.cell(dash, 0, 6, "Last signal", text_color = color.silver, text_size = size.small)
     table.cell(dash, 1, 6, lastSignal, text_color = color.white, text_size = size.small)
     table.cell(dash, 0, 7, "Exit rule", text_color = color.silver, text_size = size.small)
-    table.cell(dash, 1, 7, useStop ? "stop at the line" : "half-hour check", text_color = color.white, text_size = size.small)
+    table.cell(dash, 1, 7, useStop ? "stop " + str.tostring(stopBuf) + " noise units past the line" : "half-hour check", text_color = color.white, text_size = size.small)
+    table.cell(dash, 0, 8, "Your stop", text_color = color.silver, text_size = size.small)
+    table.cell(dash, 1, 8, not useStop ? "-" : pos > 0 ? px(longStop) : pos < 0 ? px(shortStop) : "-", text_color = color.white, text_size = size.small)
     table.cell(dash, 0, 5, "Backtest net", text_color = color.silver, text_size = size.small)
     table.cell(dash, 1, 5, (strategy.netprofit < 0 ? "-$" : "$") + str.tostring(math.abs(strategy.netprofit), "#,##0.00"),
          text_color = strategy.netprofit >= 0 ? color.lime : color.red, text_size = size.small)

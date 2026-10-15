@@ -4,7 +4,7 @@ A rules-based MNQ day-trading strategy with prop-firm risk rails. Every piece be
 
 | Piece | What it's for |
 |---|---|
-| **`pine/mnq_noise_momentum.pine`** | **The one strategy here with a tested edge (16 years).** Noise-area momentum from a 2024 paper: BUY/SELL/EXIT alerts every half hour, flat at 16:00. Rules in [`docs/NOISE.md`](docs/NOISE.md). With its resting-stop exit it passes about 6 in 10 historical $25K evaluations on 1 MNQ, and about 84% of $100K ones. |
+| **`pine/mnq_noise_momentum.pine`** | **The one strategy here with a tested edge (16 years).** Noise-area momentum from a 2024 paper: BUY/SELL/EXIT alerts every half hour, flat at 16:00. Rules in [`docs/NOISE.md`](docs/NOISE.md). Over 16 years: about $26 a day on 1 MNQ, 15 of 16 years positive; it passes about 6 in 10 historical $25K evaluations and about 78% of $100K ones. |
 | `pine/mnq_liquidity_sweep_all_in_one.pine` | The original sweep/breakout bot in one TradingView script (no edge on real data, see below): BUY/SELL signals with size, limit price, stop and target, phone alerts, a dashboard, and a Strategy Tester backtest with optional prop-evaluation simulation. |
 | `pine/mnq_liquidity_sweep_signals.pine` | **TradingView indicator that tells you when to BUY or SELL.** It gives the limit price, stop, target and size, then alerts you to fill, move to breakeven, cancel, or flatten. |
 | `pine/mnq_liquidity_sweep_bot.pine` | TradingView strategy with the same rules, for backtesting in Strategy Tester with prop-evaluation simulation. |
@@ -20,7 +20,7 @@ A rules-based MNQ day-trading strategy with prop-firm risk rails. Every piece be
 
 **The original sweep/breakout bot has no edge.** On 3¾ years of Nasdaq-100 1-minute data (Jan 2023 → Sep 2026), tuned on 2023–2024 and then run once on 2025–2026, it lost money after costs. Even with zero costs it sits near break-even. **Don't pay for a prop evaluation to trade those rules.**
 
-**Noise-area momentum is the one strategy that held up.** It was tested on 16 years (Nov 2010 → Sep 2026), was positive in 14 of 16 years, and had a t-stat of 3.5 at today's costs. But it wins only 38% of trades, depends on a few big trend days, and is down $3,155 so far in 2026 on 1 MNQ. With its resting-stop exit it passes about 6 in 10 historical $25K evaluations, and about 84% of $100K ones, on 1 MNQ over a longer run. Forward-test it on alerts before you pay for anything. Full numbers are in [docs/RESULTS.md](docs/RESULTS.md).
+**Noise-area momentum is the one strategy that held up.** It was tested on 16 years (Nov 2010 → Sep 2026), was positive in 14 of 16 years, and had a t-stat of 3.5 at today's costs. But it wins only 38% of trades, depends on a few big trend days, and is down about $1,500 so far in 2026 on 1 MNQ, the least trending year in the data. A trade-level post-mortem moved its stop 0.24 noise units past the line, which raised profit per day by 43% on years the analysis never saw; over 16 years it makes about $26 a day on 1 MNQ with 15 positive years, and passes about 6 in 10 historical $25K evaluations and about 78% of $100K ones. Forward-test it on alerts before you pay for anything. Full numbers are in [docs/RESULTS.md](docs/RESULTS.md).
 
 ## The strategy in plain English
 
@@ -141,7 +141,7 @@ TradingView can't be run here, so `tests/pine_interpreter.py` runs the **actual 
 
 ## Is it any good?
 
-**For the sweep/breakout rules, no.** They fail rules 2 and 3 below on 3¾ years of real data. **Noise-area momentum** passed a 16-year test at today's costs; with its resting-stop exit it passes about 6 in 10 historical $25K evaluations and about 84% of $100K ones. See [docs/RESULTS.md](docs/RESULTS.md).
+**For the sweep/breakout rules, no.** They fail rules 2 and 3 below on 3¾ years of real data. **Noise-area momentum** passed a 16-year test at today's costs; with its stop just past the line it passes about 6 in 10 historical $25K evaluations and about 78% of $100K ones. See [docs/RESULTS.md](docs/RESULTS.md).
 
 Decide with data, not hope. The rules of thumb:
 
@@ -178,6 +178,7 @@ research/discovery3.py                    overnight session, regimes, and a walk
 research/regime_trend.py                  the regime-trend family from that search, on unseen years (failed)
 research/round8.py                        volatility sizing and the 24-hour clock (neither helps)
 research/round9.py                        the resting-stop exit and account tiers (both help)
+research/postmortem.py                    why the trades lose, and the buffered stop built from it
 pine/mnq_liquidity_sweep_all_in_one.pine  TradingView: signals + alerts + dashboard + backtest in one
 pine/mnq_liquidity_sweep_signals.pine     TradingView indicator: BUY/SELL signals, alerts, dashboard
 pine/mnq_liquidity_sweep_bot.pine         TradingView strategy: same rules, Strategy Tester backtest

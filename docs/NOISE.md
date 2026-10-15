@@ -36,12 +36,12 @@ The lines change at every check, because σ is different for each time of day. I
 
 | You are | The check's close is | Do |
 |---|---|---|
-| Flat | above the upper line | **BUY** 1 MNQ at market, then put a **stop order at the upper line** |
-| Flat | below the lower line | **SELL** 1 MNQ at market, then put a **stop order at the lower line** |
-| In a trade | anything | **Move your stop to the new line.** The lines move at every half hour. |
+| Flat | above the upper line | **BUY** 1 MNQ at market, then put a **stop order just below the upper line** (the alert gives the exact price) |
+| Flat | below the lower line | **SELL** 1 MNQ at market, then put a **stop order just above the lower line** (the alert gives the exact price) |
+| In a trade | anything | **Move your stop to the new level.** The lines, and the stop with them, move at every half hour. |
 | Flat, inside the lines | | Nothing. |
 
-- **The stop is the exit.** It rests at the noise line, so you're out the moment price comes back inside, not at the next half hour. On 16 years of data that cut the worst intraday dip by about 40% and raised the evaluation pass rate ([RESULTS.md](RESULTS.md#ninth-round-the-account-and-the-exit)). If a line moves past the price when it updates, the stop fills at once.
+- **The stop is the exit, and it sits 0.24 noise units past the line:** for a long at upper × (1 − 0.24 σ), for a short at lower × (1 + 0.24 σ). Why there: a trade-by-trade post-mortem of 2011–2018 found that 77% of losing trades were stop-outs on the line that then went on in our direction, and 0.24 σ is how far they typically overshot the line before resuming ([RESULTS.md](RESULTS.md#tenth-round-why-the-trades-lose)). On 2023–2026, years that analysis never saw, it raised profit per day by 43% and the win rate from 25% to 34%. If the stop level moves past the price when the lines update, the stop fills at once. The setting *Stop distance past the line* = 0 puts the stop on the line itself.
 - **After a stop-out you're flat until the next check.** A new signal there can put you back in, including the other way.
 - **Orders are market orders** placed right after the check. The backtest fills them at the next bar's open plus 1 tick of slippage. Stops fill at the line, or at the bar's open if price gapped through, minus 1 tick.
 - **At 16:00, close everything.**
@@ -94,9 +94,9 @@ The label sits on the half-hour candle that just closed, the moment the alert fi
 
 | Alert starts with | Do this |
 |---|---|
-| `BUY 1 MNQ at market now` | Buy 1 MNQ at market, then place a stop at the upper line the alert names. |
-| `SELL 1 MNQ at market now` | Sell 1 MNQ at market, then place a stop at the lower line the alert names. |
-| `EXIT LONG: price touched the upper line` / `EXIT SHORT: price touched the lower line` | Your stop should have filled. If you had no stop in, exit at market now. |
+| `BUY 1 MNQ at market now` | Buy 1 MNQ at market, then place a stop at the price the alert names (just below the upper line). |
+| `SELL 1 MNQ at market now` | Sell 1 MNQ at market, then place a stop at the price the alert names (just above the lower line). |
+| `EXIT LONG: price hit the stop` / `EXIT SHORT: price hit the stop` | Your stop should have filled. If you had no stop in, exit at market now. |
 | `EXIT LONG` / `EXIT SHORT` (half-hour check mode only) | Close the position at market and stay flat. |
 | `REVERSE` | Close the position and open the opposite one, both at market. In Tradovate that means selling 2 to flip a 1-lot long to short, or buying 2 to flip a short to long. |
 | `FLAT` | It's 16:00: close the position at market. |
@@ -115,26 +115,26 @@ Say σ at 10:00 is 0.30%, today opened at 25,000.00, and yesterday closed at 24,
 
 All numbers are from [RESULTS.md](RESULTS.md#third-round-16-years-2010-2026). They cover 16 years of Nasdaq-100 data, 1 MNQ at today's price level, and today's costs.
 
-- **Average:** about **+$18 per session**, with daily swings of about **$300**.
-- **Trade count:** about 200 trades a year, and only **38% of them win**. The average win (about $314) is twice the average loss (about $157), and a few big trend days carry the results.
-- **Worst cases:** with the resting stop, the worst single intraday dip over 16 years was **−$1,412**; with the half-hour check it was −$2,465, and the worst losing stretch −$8,168.
-- **By year:** more than half the gains came from 2018 and 2022. 2011 lost, and **2026 is down $3,155 through September**.
-- **On a $25K / $1,500-drawdown evaluation**, starting on every historical day, with the resting stop:
-  - within 125 sessions: **51% pass, 41% fail**
-  - within 250 sessions: **56% pass, 43% fail**
-  - within 500 sessions: **61% pass, 39% fail**
-  (With the half-hour check: 38% / 57%, 43% / 57% and 47% / 53%.)
+- **Average:** about **+$26 per session** (t = 5.0 over 16 years), with daily swings of about **$300**.
+- **Trade count:** about 220 trades a year, and only **about a third of them win**. The average win (about $340) is close to three times the average loss (about $125), and a few big trend days carry the results. Losing streaks of ten trades are normal.
+- **Worst cases:** the worst single intraday dip over 16 years was **−$1,552**, and the worst losing stretch **$5,666** (with the paper's half-hour exit: −$2,465 and $8,168).
+- **By year:** 15 of 16 years were positive, and more than half the gains came from 2018 and 2022. 2026 is **−$1,527 through September.**
+- **Why it is losing now:** this is a trend strategy, and 2025–2026 are the two least trending years in the data. In the good years a day moved 1.12–1.25 times its own noise; in 2025 it was 1.01 and in 2026 0.99, so breakouts stop following through. A filter that stands aside after such stretches was tested and didn't help: by the time it switches off, the bad patch is over. 2011 lost, and **2026 is down $3,155 through September**.
+- **On a $25K / $1,500-drawdown evaluation**, starting on every historical day:
+  - within 125 sessions: **52% pass, 40% fail**
+  - within 500 sessions: **62% pass, 38% fail**
+  (With the paper's half-hour exit: 38% / 57% and 47% / 53%.)
 - **The account size matters most.** The same strategy and the same 1 MNQ, from every start day in 2011–2026, 500 sessions:
 
 | Evaluation account (target / drawdown) | Pass | Fail | Still running | Median days to pass |
 |---|---:|---:|---:|---:|
-| $25K ($1,500 / $1,500) | 61% | 39% | 0% | 45 |
-| $50K ($3,000 / $2,000) | 64% | 36% | 0% | 85 |
-| **$100K ($6,000 / $3,000)** | **84%** | **7%** | 9% | 203 |
-| $150K ($9,000 / $4,500) | 68% | 3% | 29% | 298 |
+| $25K ($1,500 / $1,500) | 62% | 38% | 0% | 40 |
+| $50K ($3,000 / $2,000) | 74% | 26% | 0% | 80 |
+| **$100K ($6,000 / $3,000)** | **78%** | **22%** | 1% | 186 |
+| $150K ($9,000 / $4,500) | 74% | 3% | 23% | 253 |
 
   A bigger account gives the same 1-contract swings more room, so far fewer runs die. The price is time: about a year of trading days to reach the $100K target, and the evaluation's monthly fee for each of those months. The tiers are as I understand Take Profit Trader's; check them and the fees on their site before paying.
 
 - **Trading more often doesn't help.** Checking every 15 or 5 minutes, or using narrower bands, adds trades but not edge ([RESULTS.md](RESULTS.md#fourth-round-can-it-trade-more-often)). A version that trades on 83% of days doubled the worst losing stretch and lost about $15,000 over 2025–2026 ([fifth round](RESULTS.md#fifth-round-can-it-trade-on-most-days)). About 4 days in 10 with no trade is normal.
 
-**Bottom line:** the edge is real over 16 years. With the resting stop, a $25K evaluation is about 60/40 in your favour; a $100K one is about 84/7, over a longer run. Forward-test it on alerts, without money, before paying for one.
+**Bottom line:** the edge is real over 16 years. A $25K evaluation is about 60/40 in your favour; a $100K one about 78/22, over a longer run. Forward-test it on alerts, without money, before paying for one.

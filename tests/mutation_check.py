@@ -98,8 +98,11 @@ MUTANTS = {
     ),
     "noise: no label when a long exits": ("noise", '                    mark("EXIT", false, color.gray)\n', ""),
     "noise: long stop at the lower line": (
-        "noise", 'strategy.exit("Long exit", "Long", stop = ub,', 'strategy.exit("Long exit", "Long", stop = lb,'
+        "noise",
+        'strategy.exit("Long exit", "Long", stop = longStop,',
+        'strategy.exit("Long exit", "Long", stop = shortStop,',
     ),
+    "noise: stop buffer ignored": ("noise", "longStop = ub * (1 - stopBuf * sig)\n", "longStop = ub\n"),
     "noise: stop not moved with the line": (
         "noise", "    if strategy.position_size > 0 or longPlaced\n", "    if longPlaced\n"
     ),
@@ -118,9 +121,8 @@ def _tests(T, script):
                 for case in N.HAND_BUILT for mode in N.MODES] + [
             ("short session", N.test_pine_short_session_cases),
             ("skips listed dates", N.test_pine_skips_listed_dates),
-            ("random 5m [stop]", lambda: N.test_pine_random_sessions(5, "stop")),
-            ("random 15m [stop]", lambda: N.test_pine_random_sessions(15, "stop")),
-            ("random 5m [check]", lambda: N.test_pine_random_sessions(5, "check")),
+        ] + [(f"random {mins}m [{mode}]", lambda mi=mins, mo=mode: N.test_pine_random_sessions(mi, mo))
+             for mins, mode in N.RANDOM_CASES] + [
             ("RTH-only chart", N.test_pine_rth_only_chart_and_shorter_lookback),
         ]
     if script == "indicator":

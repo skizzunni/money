@@ -12,10 +12,11 @@ Rules, New York time, on any chart whose bar length divides 30 minutes:
     (a session is complete when it reached 16:00 with all 12 checks).
   * Upper = max(day open, previous close) * (1 + sigma); lower = min(day open, previous close) * (1 - sigma).
   * Flat: buy if close > upper, sell short if close < lower.
-  * Exit, exit_mode "stop" (default): once in a trade a stop order rests at the current line (upper for
-    a long, lower for a short) and moves with it at each check. It fills at the line, or at the bar's
-    open if the open is already past the line (the line moved past the price, or a gap). On the bar the
-    entry fills, it fills at the line or the open, whichever is worse.
+  * Exit, exit_mode "stop" (default): once in a trade a stop order rests stop_buffer noise units past
+    the current line (below the upper line for a long: upper * (1 - stop_buffer * sigma); above the lower
+    line for a short) and moves with it at each check. It fills at the stop, or at the bar's open if the
+    open is already past it (the line moved past the price, or a gap). On the bar the entry fills, it
+    fills at the stop or the open, whichever is worse. stop_buffer = 0 puts the stop on the line itself.
     exit_mode "check": the paper's rule. Long: if a check closes below upper, exit, or reverse to short
     if it closes below lower. Short: the mirror image.
   * Entries and check-mode exits are market orders filled at the next bar's open.
@@ -54,7 +55,8 @@ class NoiseConfig:
     commission_per_side: float = 0.62  # $ per contract
     slippage_ticks: int = 1  # on every market fill
     skip_dates: str = SKIP_DATES  # "YYYY-MM-DD,..." sessions with no new trades
-    exit_mode: str = "stop"  # "stop": resting stop at the current line; "check": exit only at the half hours
+    exit_mode: str = "stop"  # "stop": resting stop past the current line; "check": exit only at the half hours
+    stop_buffer: float = 0.24  # the stop sits this many noise units (sigma) past the line; 0 = on the line
 
 
 @dataclass
@@ -104,7 +106,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
     today = [math.nan] * N_CHECKS
     filled = slot = 0
     day_open = prev_close = last_rth_close = math.nan
-    upper = lower = math.nan  # the current noise lines, set at each check
+    upper = lower = sigma = math.nan  # the current noise lines and noise, set at each check
     skip_today = False
     pos = 0
     entry_px, entry_bar = 0.0, 0
@@ -143,7 +145,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
 
         # the resting stop at the line (checked before the script-side logic, like the broker)
         if use_stop and pos and not math.isnan(upper):
-            line = upper if pos > 0 else lower
+            line = upper * (1 - cfg.stop_buffer * sigma) if pos > 0 else lower * (1 + cfg.stop_buffer * sigma)
             if entry_bar == i:  # a stop attached to the entry can fill on the fill bar itself
                 hit = l[i] <= line if pos > 0 else h[i] >= line
                 price = (min(o[i], line) if pos > 0 else max(o[i], line)) - pos * slip
@@ -163,7 +165,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
         if t_min == RTH_OPEN:
             prev_close = last_rth_close
             day_open = o[i]
-            upper = lower = math.nan
+            upper = lower = sigma = math.nan
             today = [math.nan] * N_CHECKS
             skip_today = t.strftime("%Y-%m-%d") in cfg.skip_dates  # substring test, like Pine's str.contains
         if in_rth:
