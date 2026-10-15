@@ -119,3 +119,24 @@ def test_breakout_must_be_in_entry_window():
     cfg = orb_only(window_start="0945")
     (s,) = scan(long_day(), cfg.strategy, cfg.instrument)  # 09:35 close above is ignored
     assert bars_time(long_day(), s.bar) >= "09:45"
+
+
+def test_breakout_close_entry_fills_at_next_open():
+    bars = long_day()
+    cfg = orb_only(orb_entry="close")
+    (s,) = scan(bars, cfg.strategy, cfg.instrument)
+    assert s.market and (s.entry, s.stop) == (20014, 20000)  # estimate from the 09:35 close; stop at range middle
+    res = backtest(bars, cfg)
+    (t,) = res.trades
+    # 09:40 opens at 20014: fill 20014.25 with a tick of slippage, risk 14.25 pts
+    # $28.50 + $1.24 + $0.50 = $30.24 per contract -> 4 contracts; target 20014.25 + 2 * 14.25 = 20042.75
+    assert t.entry_time.strftime("%H:%M") == "09:40"
+    assert (t.entry, t.qty, t.target, t.stop) == (20014.25, 4, 20042.75, 20000)
+    assert round(t.risk_dollars, 2) == round(4 * 30.24, 2)
+
+
+def test_breakout_close_entry_skips_a_gap_through_the_stop():
+    gap_down = (19995, 19998, 19990, 19992)  # 09:40 opens below the 20000 stop
+    rows = PRE + [OR_BAR, (20005, 20016, 20004, 20014), gap_down] + [(19992, 19993, 19991, 19992)] * 3
+    res = backtest(bars_from_rows("2026-10-14 09:00", rows), orb_only(orb_entry="close"))
+    assert res.trades == [] and res.funnel["never_filled"] == 1  # opened below the 20000 stop: no trade

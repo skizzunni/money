@@ -16,14 +16,14 @@ fresh account, trails an end-of-day drawdown line, and ends in a pass
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import date
 
 import pandas as pd
 
 from .config import BotConfig
 from .data import annotate
-from .strategy import Setup, SignalEngine, _hhmm
+from .strategy import Setup, SignalEngine, _hhmm, round_to_tick
 
 
 @dataclass
@@ -336,6 +336,26 @@ class Backtester:
                 if hhmm[i] >= flatten or day_blocked:
                     pending = None
                     n_unfilled += 1
+                elif s.market:
+                    # market order: fill at this bar's open plus slippage; risk and target from the real fill
+                    d = s.direction
+                    fill = o[i] + d * slip
+                    risk_pts = d * (fill - s.stop)
+                    qty = 0
+                    if risk_pts > 0:
+                        buffer = (cum - att.start_cum) - threshold()
+                        qty = min(pending.qty, self.size(risk_pts, cum - day_start_cum, buffer))
+                    pending = None
+                    if qty < 1:
+                        n_unfilled += 1
+                    else:
+                        target = round_to_tick(fill + d * cfg.strategy.reward_risk * risk_pts, tick)
+                        pos = _Position(replace(s, entry=fill, target=target), qty, i, s.stop)
+                        day_trades += 1
+                        n_filled += 1
+                        stopped = h[i] >= pos.stop if d < 0 else l[i] <= pos.stop
+                        if stopped:
+                            close_pos(i, pos.stop + slip if d < 0 else pos.stop - slip, "stop")
                 else:
                     d = s.direction
                     filled = h[i] >= s.entry + thru if d < 0 else l[i] <= s.entry - thru

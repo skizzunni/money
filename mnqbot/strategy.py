@@ -46,6 +46,7 @@ class Setup:
     sweep_bar: int
     fvg_low: float
     fvg_high: float
+    market: bool = False  # True: enter at the next bar's open instead of a limit at `entry`
 
     @property
     def risk_points(self) -> float:
@@ -176,8 +177,11 @@ class SignalEngine:
         if sweep_found:  # a sweep setup on the same bar takes priority
             return None
         d = 1 if c > self._or_hi else -1
-        entry = self._or_hi if d > 0 else self._or_lo
-        stop = round_to_tick(entry - d * cfg.or_stop_frac * (self._or_hi - self._or_lo), self.tick)
+        edge = self._or_hi if d > 0 else self._or_lo
+        stop = round_to_tick(edge - d * cfg.or_stop_frac * (self._or_hi - self._or_lo), self.tick)
+        market = cfg.orb_entry == "close"
+        # retest: limit back at the broken edge; close: market next bar (risk estimated from this close)
+        entry = round_to_tick(c, self.tick) if market else edge
         risk = abs(entry - stop)
         self.setup_risks.append(risk)
         if not (cfg.min_stop_points <= risk <= cfg.max_stop_points):
@@ -193,6 +197,7 @@ class SignalEngine:
             sweep_bar=i,
             fvg_low=self._or_lo,
             fvg_high=self._or_hi,
+            market=market,
         )
 
     def _check_armed(self, i: int) -> Setup | None:

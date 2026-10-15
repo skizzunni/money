@@ -52,7 +52,8 @@ class StrategyConfig:
 
     # Opening range breakout
     or_minutes: int = 5  # opening range = RTH bars from 09:30 for this many minutes
-    or_stop_frac: float = 0.5  # stop this share of the range behind the entry (0.5 = midpoint, 1 = far side)
+    or_stop_frac: float = 0.5  # stop this share of the range behind the broken edge (0.5 = midpoint, 1 = far side)
+    orb_entry: str = "retest"  # "retest": limit at the broken edge; "close": market at the next bar's open
 
 
 @dataclass
