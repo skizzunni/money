@@ -9,6 +9,7 @@ A rules-based MNQ day-trading strategy with prop-firm risk rails. Every piece be
 | `pine/mnq_liquidity_sweep_bot.pine` | TradingView strategy with the same rules, for backtesting in Strategy Tester with prop-evaluation simulation. |
 | `mnqbot/` (Python) | A stricter backtester with worst-case fills, back-to-back evaluation simulation, Monte Carlo pass odds, and a buy-and-hold MNQ benchmark. |
 | [`docs/RULES.md`](docs/RULES.md) | **Every rule written out exactly**, with a worked example and what to do for each alert. |
+| [`docs/RESULTS.md`](docs/RESULTS.md) | **The multi-year test on real Nasdaq-100 data, and its verdict: no edge.** |
 
 ## Read this first
 
@@ -16,7 +17,7 @@ A rules-based MNQ day-trading strategy with prop-firm risk rails. Every piece be
 
 **Beating buy-and-hold MNQ is not guaranteed either.** The backtester reports it as a plain YES/NO, so you can check instead of trusting.
 
-**This has not been tested on real market data yet.** It was built in an environment with no market-data access. The tests prove the machinery works (fills, sizing, rails, no look-ahead). They don't prove the strategy makes money. Run it on real data before you risk anything (see [Is it any good?](#is-it-any-good)).
+**It has been tested on real data, and it has no edge.** On 3¾ years of Nasdaq-100 1-minute data (Jan 2023 → Sep 2026), tuned on 2023–2024 and then run once on 2025–2026, it lost money after costs. Even with zero costs it sits near break-even. Full numbers are in [docs/RESULTS.md](docs/RESULTS.md). **Don't pay for a prop evaluation to trade these rules.** The tests prove the machinery works (fills, sizing, rails, no look-ahead). The study shows the rules themselves don't make money.
 
 ## The strategy in plain English
 
@@ -101,6 +102,7 @@ python -m mnqbot config > my.json  # all settings, edit as you like
 
 - **TradingView export** (best match to what you trade): from an MNQ1! chart with extended hours on, open the chart menu → *Export chart data…*, if your plan includes it.
 - **Yahoo Finance** (quick look, about 60 days of 5-minute bars): `pip install yfinance`, then `python -m mnqbot fetch --out data/mnq_5m.csv`.
+- **HistData.com** (free, years of 1-minute `NSXUSD` bars, the Nasdaq-100 cash index): its files are semicolon-separated with no header, so run them through `research/nsx_study.py` (see [RESULTS.md](docs/RESULTS.md#reproduce)). The free files have some missing minutes, mostly in 2023.
 - Any comma-separated CSV with a header, a time column (unix or ISO) or Date+Time columns, plus open/high/low/close, also works.
 
 ### Run it
@@ -126,13 +128,15 @@ The report shows win rate, profit factor, expectancy in dollars and R, max drawd
 
 ### How the TradingView scripts are checked
 
-TradingView can't be run here, so `tests/pine_interpreter.py` runs the **actual `.pine` files** bar by bar. It is a strict interpreter for the part of Pine v6 these scripts use, with a broker emulator that applies the same worst-case fill rules. `tests/test_pine_parity.py` then requires all three scripts to produce the same orders, fills, exits and P/L as the Python engine, to the cent. For the all-in-one script, that covers both account modes, plus exit reasons, exit labels and alert text. It holds on 120 sessions of test data and on 17 hand-built cases that sit exactly on every fill boundary. The evaluation pass/fail counts must match too.
+TradingView can't be run here, so `tests/pine_interpreter.py` runs the **actual `.pine` files** bar by bar. It is a strict interpreter for the part of Pine v6 these scripts use, with a broker emulator that applies the same worst-case fill rules. `tests/test_pine_parity.py` then requires all three scripts to produce the same orders, fills, exits and P/L as the Python engine, to the cent. For the all-in-one script, that covers both account modes, plus exit reasons, exit labels and alert text. It holds on 120 sessions of test data and on 25 hand-built cases (17 sweep, 8 breakout) that sit exactly on every fill boundary. The evaluation pass/fail counts must match too.
 
-`python tests/mutation_check.py` plants 11 realistic bugs in the indicator and the all-in-one script (a fill on touch, an off-by-one expiry, target before stop, a mislabeled exit, and so on) and confirms the tests catch every one. The first test run parses the scripts, which takes about 2 minutes, and caches them. Skip those tests with `pytest -m "not slow"`.
+`python tests/mutation_check.py` plants 15 realistic bugs in the indicator and the all-in-one script (a fill on touch, an off-by-one expiry, target before stop, a mislabeled exit, and so on) and confirms the tests catch every one. The first test run parses the scripts, which takes about 2 minutes, and caches them. Skip those tests with `pytest -m "not slow"`.
 
 ---
 
 ## Is it any good?
+
+**For these rules, no.** They fail rules 2 and 3 below on 3¾ years of real data. See [docs/RESULTS.md](docs/RESULTS.md).
 
 Decide with data, not hope. The rules of thumb:
 
@@ -151,6 +155,7 @@ If it doesn't pass these, change the idea, not just the numbers, or don't trade 
 - **Strategy:** fills come from TradingView's own simulator, which can order events inside a bar differently, so its Strategy Tester numbers can differ from Python's. On a drawdown breach, TradingView exits at the bar close; Python exits at the line price.
 - The strategy's sizing uses fees and slippage hardcoded at the top of the script ($0.62, 1 tick). Keep them in sync if you change them in the strategy's Properties. The indicator has them as inputs.
 - Python can't know news days unless you list them in `risk.no_trade_dates` / `risk.blackout_windows`.
+- `strategy.orb_entry = "close"` (enter a breakout at the next bar's open instead of waiting for the retest) exists only in Python, for research. The TradingView scripts always use the retest entry.
 - ATR needs about 100 bars to settle, so the first bars of a chart can differ slightly from a backtest that started earlier.
 
 ## Files
@@ -160,8 +165,10 @@ pine/mnq_liquidity_sweep_all_in_one.pine  TradingView: signals + alerts + dashbo
 pine/mnq_liquidity_sweep_signals.pine     TradingView indicator: BUY/SELL signals, alerts, dashboard
 pine/mnq_liquidity_sweep_bot.pine         TradingView strategy: same rules, Strategy Tester backtest
 docs/RULES.md                             every rule, exactly, with a worked example
+docs/RESULTS.md                           multi-year test on real Nasdaq-100 data: no edge
+research/nsx_study.py                     the script that runs that test on HistData.com files
 mnqbot/config.py                          every setting, with defaults
-mnqbot/strategy.py                        levels -> sweep -> displacement -> FVG setup
+mnqbot/strategy.py                        sweep -> displacement -> FVG setup, and opening range breakout
 mnqbot/engine.py                          fills, sizing, daily rails, prop evaluation simulation
 mnqbot/report.py                          metrics, benchmark, Monte Carlo
 mnqbot/data.py                            CSV loading, sessions, ATR, optional Yahoo download
