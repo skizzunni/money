@@ -123,6 +123,6 @@ All numbers are from [RESULTS.md](RESULTS.md#third-round-16-years-2010-2026). Th
   - within 125 sessions: **38% pass, 57% fail**
   - within 250 sessions: **43% pass, 57% fail**
 
-- **Trading more often doesn't help.** Checking every 15 or 5 minutes, or using narrower bands, adds trades but not edge ([RESULTS.md](RESULTS.md#fourth-round-can-it-trade-more-often)).
+- **Trading more often doesn't help.** Checking every 15 or 5 minutes, or using narrower bands, adds trades but not edge ([RESULTS.md](RESULTS.md#fourth-round-can-it-trade-more-often)). A version that trades on 83% of days doubled the worst losing stretch and lost about $15,000 over 2025–2026 ([fifth round](RESULTS.md#fifth-round-can-it-trade-on-most-days)). About 4 days in 10 with no trade is normal.
 
 **Bottom line:** the edge is real over 16 years, but an evaluation is still more likely to fail than pass. Forward-test it on alerts, without money, before paying for one.

@@ -206,6 +206,36 @@ Nine versions of noise-area momentum, fixed before running ([`research/noise_tun
 - **Checking more often adds trades, not edge.** At 5 minutes it trades about twice as often, but only about a quarter of trades win, the t-stat drops, and the worst dip deepens to about −$3,600.
 - **Two versions earned a little more per day in 2020–2026,** 15 min × 0.8 and 30 min × 0.8. Neither was best on 2010–2019, so switching to one because of 2020–2026 would be fitting to the test. Their evaluation odds are no better either.
 
+## Fifth round: can it trade on most days?
+
+The same set-up as the fourth round, with narrower noise bands (0.5×, 0.25×, 0.0×) so that most days trade ([`research/noise_daily.py`](../research/noise_daily.py)).
+
+The bar was set before running:
+
+- a trade on at least 80% of days
+- t ≥ 2 in both 2010–2019 and 2020–2026
+- evaluation odds from 2020–2026 starts no worse than the current version's
+
+| Band | Days with a trade | Trades a day | Win % | 2010–19 $/day (t) | 2020–26 $/day (t) | Evaluation pass / fail, 2020–26 starts | Bar |
+|---|---:|---:|---:|---:|---:|---:|---|
+| **1.0× (current)** | **60%** | **0.84** | **39%** | **+18.51 (2.83)** | **+24.11 (2.65)** | **41% / 56%** | — |
+| 0.5× | 83% | 1.27 | 35% | +18.48 (2.34) | +26.59 (2.21) | 46% / 54% | met |
+| 0.25× | 92% | 1.52 | 35% | +10.33 (1.18) | +23.27 (1.73) | 32% / 68% | missed |
+| 0.0× | 97% | 1.75 | 35% | +11.91 (1.27) | +22.23 (1.50) | 28% / 72% | missed |
+
+0.5× met that bar, but the bar didn't cover everything. Over the full 16 years:
+
+| Band | $/day | Losing years | Worst losing stretch | 2025–2026 total | Evaluation pass / fail, all starts |
+|---|---:|---:|---:|---:|---:|
+| **1.0× (current)** | **+20.89** | **1 of 16** | **$9,211** | **−$89** | **41% / 55%** |
+| 0.5× | +21.93 | 4 of 16 | $20,316 | −$14,902 | 43% / 57% |
+| 0.25× | +15.83 | 5 of 16 | $16,377 | −$13,140 | 34% / 66% |
+| 0.0× | +16.30 | 5 of 16 | $14,018 | −$10,519 | 30% / 70% |
+
+- **The current version stays.** Trading on 83% of days instead of 60% adds about $1 a day. In exchange, the worst losing stretch doubles, losing years go from 1 to 4, and it lost about $15,000 over 2025–2026. The evaluation odds are a wash.
+- **Narrower still is clearly worse:** weaker in both periods and lower evaluation odds.
+- **The full-period table was added after seeing the first one.** It was used only to reject a change, never to adopt one.
+
 ## What this does and doesn't say
 
 - **It says** that the original sweep/breakout rules have no edge after realistic costs on 2023–2026 Nasdaq-100 data, and would very likely not pass a $25K evaluation. Of three published strategies, only noise-area momentum held up over 16 years, and even it fails most $25K evaluations.
@@ -223,6 +253,7 @@ python research/nsx_holes.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"   # the data-ho
 python research/published_lab.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"   # the published strategies + cost check
 python research/noise_eval.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"      # noise momentum on a $25K evaluation
 python research/noise_tuning.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"    # can it trade more often? (no)
+python research/noise_daily.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"     # can it trade on most days? (not safely)
 ```
 
 The raw data isn't stored in this repo.

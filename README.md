@@ -171,6 +171,7 @@ docs/NOISE.md                             its exact rules, alerts and what to ex
 mnqbot/noise.py                           its Python reference (the tests hold the script to it)
 research/noise_eval.py                    its odds on a $25K evaluation
 research/noise_tuning.py                  whether checking more often helps it (it doesn't)
+research/noise_daily.py                   whether it can trade on most days (not safely)
 pine/mnq_liquidity_sweep_all_in_one.pine  TradingView: signals + alerts + dashboard + backtest in one
 pine/mnq_liquidity_sweep_signals.pine     TradingView indicator: BUY/SELL signals, alerts, dashboard
 pine/mnq_liquidity_sweep_bot.pine         TradingView strategy: same rules, Strategy Tester backtest
