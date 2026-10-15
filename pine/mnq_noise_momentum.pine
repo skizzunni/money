@@ -40,6 +40,9 @@ qty      = input.int(1, "Contracts", minval = 1, maxval = 30, group = grpT,
 skipDates = input.string("2026-01-01,2026-01-19,2026-02-16,2026-04-03,2026-05-25,2026-06-19,2026-07-03,2026-09-07,2026-11-26,2026-11-27,2026-12-24,2026-12-25,2027-01-01,2027-01-18,2027-02-15,2027-03-26,2027-05-31,2027-06-18,2027-07-05,2027-09-06,2027-11-25,2027-11-26,2027-12-24",
      "Don't trade on these dates", group = grpT,
      tooltip = "YYYY-MM-DD, comma separated. Pre-filled with the 2026-2027 US market holidays and half days, when MNQ trades a short session. Add news days if you like.")
+exitMode = input.string("Resting stop at the line", "Exit", options = ["Resting stop at the line", "Half-hour check"], group = grpT,
+     tooltip = "Resting stop: once in a trade, a stop order sits at the noise line and moves with it at every half hour. Tested on 16 years: smaller worst days and better evaluation odds. Half-hour check: the paper's rule, exit only when a half-hour check closes back inside the lines.")
+useStop = exitMode == "Resting stop at the line"
 grpV = "Display"
 showBands = input.bool(true, "Show noise area", group = grpV)
 showLabels = input.bool(true, "Show BUY / SELL / EXIT labels", group = grpV)
@@ -74,6 +77,15 @@ var int filled = 0
 var int slot = 0
 var bool skipToday = false
 var string lastSignal = "-"
+var int prevClosed = 0   // closed trades at the end of the previous bar
+
+// ── The resting stop filled during this bar (the broker did it; show it). A trade can open and
+// close inside one bar, so look at the closed-trade count, not the position.
+lastTrade = strategy.closedtrades - 1
+stopFired = useStop and strategy.closedtrades > prevClosed and strategy.closedtrades.exit_comment(lastTrade) == "Back inside"
+if stopFired
+    mark("EXIT", strategy.closedtrades.size(lastTrade) < 0, color.gray)
+    lastSignal := "EXIT (line touched) @ " + px(strategy.closedtrades.exit_price(lastTrade))
 
 // ── A session that ended early (half day, data gap): get flat
 if strategy.position_size != 0 and (not inRth or tMin == RTH_OPEN)
@@ -95,6 +107,8 @@ if inRth
     lastRthClose := close
 
 // ── Half-hour checks
+longPlaced = false
+shortPlaced = false
 if isCheck and not na(dayOpen)
     k = int((endMin - FIRST_CHECK) / 30)
     array.set(today, k, math.abs(close / dayOpen - 1))
@@ -106,9 +120,14 @@ if isCheck and not na(dayOpen)
         ub := math.max(dayOpen, prevClose) * (1 + sigma)
         lb := math.min(dayOpen, prevClose) * (1 - sigma)
         nextCheck = k == N_CHECKS - 1 ? "the 16:00 close" : hhmmText(endMin + 30)
+        holdLong = useStop ? "Put a stop at the upper line, " + px(ub) + ", and move it to the new line at every half hour." :
+             "Hold until a half-hour check closes back below the upper line, or the 16:00 close."
+        holdShort = useStop ? "Put a stop at the lower line, " + px(lb) + ", and move it to the new line at every half hour." :
+             "Hold until a half-hour check closes back above the lower line, or the 16:00 close."
         pos = strategy.position_size
+        inPosStop = useStop and pos != 0   // exits are the resting stop's job
         if not skipToday
-            if pos > 0 and close < ub
+            if not inPosStop and pos > 0 and close < ub
                 if close < lb
                     strategy.entry("Short", strategy.short, qty, comment = "Reverse short")
                     mark("REVERSE\nSELL " + str.tostring(2 * qty), false, color.red)
@@ -121,7 +140,7 @@ if isCheck and not na(dayOpen)
                     lastSignal := "EXIT long " + hhmmText(endMin) + " @ " + px(close)
                     alert("EXIT LONG at market now. Price " + px(close) + " closed back below the upper line (" + px(ub) +
                          "). Stay flat until the next signal.", alert.freq_once_per_bar_close)
-            else if pos < 0 and close > lb
+            else if not inPosStop and pos < 0 and close > lb
                 if close > ub
                     strategy.entry("Long", strategy.long, qty, comment = "Reverse long")
                     mark("REVERSE\nBUY " + str.tostring(2 * qty), true, color.green)
@@ -136,18 +155,27 @@ if isCheck and not na(dayOpen)
                          "). Stay flat until the next signal.", alert.freq_once_per_bar_close)
             else if pos == 0 and close > ub
                 strategy.entry("Long", strategy.long, qty, comment = "Above noise")
+                longPlaced := true
                 mark("BUY " + str.tostring(qty), true, color.green)
                 lastSignal := "BUY " + hhmmText(endMin) + " @ " + px(close)
                 alert("BUY " + str.tostring(qty) + " MNQ at market now. Price " + px(close) + " is above the noise area (upper " +
-                     px(ub) + "). Hold until a half-hour check closes back below the upper line, or the 16:00 close. Next check " +
-                     nextCheck + ".", alert.freq_once_per_bar_close)
+                     px(ub) + "). " + holdLong + " Next check " + nextCheck + ".", alert.freq_once_per_bar_close)
             else if pos == 0 and close < lb
                 strategy.entry("Short", strategy.short, qty, comment = "Below noise")
+                shortPlaced := true
                 mark("SELL " + str.tostring(qty), false, color.red)
                 lastSignal := "SELL " + hhmmText(endMin) + " @ " + px(close)
                 alert("SELL " + str.tostring(qty) + " MNQ at market now. Price " + px(close) + " is below the noise area (lower " +
-                     px(lb) + "). Hold until a half-hour check closes back above the lower line, or the 16:00 close. Next check " +
-                     nextCheck + ".", alert.freq_once_per_bar_close)
+                     px(lb) + "). " + holdShort + " Next check " + nextCheck + ".", alert.freq_once_per_bar_close)
+
+// ── The resting stop: at the current line, re-placed every bar so it moves with the line
+if useStop and inRth and not na(ub)
+    if strategy.position_size > 0 or longPlaced
+        strategy.exit("Long exit", "Long", stop = ub, comment = "Back inside",
+             alert_message = "EXIT LONG: price touched the upper line (" + px(ub) + "). Your stop should have filled. If you had no stop in, exit at market now.")
+    if strategy.position_size < 0 or shortPlaced
+        strategy.exit("Short exit", "Short", stop = lb, comment = "Back inside",
+             alert_message = "EXIT SHORT: price touched the lower line (" + px(lb) + "). Your stop should have filled. If you had no stop in, exit at market now.")
 
 // ── 16:00: flat, and store today's moves if the session was complete
 if inRth and endMin == RTH_CLOSE
@@ -173,7 +201,7 @@ plot(showBands and inRth ? ub : na, "Upper noise line", color.teal, 2, plot.styl
 plot(showBands and inRth ? lb : na, "Lower noise line", color.maroon, 2, plot.style_linebr)
 bgcolor(shadeTrades and strategy.position_size > 0 ? color.new(color.teal, 88) : shadeTrades and strategy.position_size < 0 ? color.new(color.maroon, 88) : na)
 
-var table dash = table.new(position.top_right, 2, 7, bgcolor = color.new(color.black, 15), border_width = 1, border_color = color.new(color.gray, 60))
+var table dash = table.new(position.top_right, 2, 8, bgcolor = color.new(color.black, 15), border_width = 1, border_color = color.new(color.gray, 60))
 if showDash and (barstate.islastconfirmedhistory or barstate.isrealtime)
     pos = strategy.position_size
     status = not validTf ? "Use a 1/5/10/15/30 min chart" : filled < lookback ? "Building history" : pos > 0 ? "LONG" : pos < 0 ? "SHORT" : skipToday and inRth ? "No trades today (date list)" : "Flat"
@@ -193,6 +221,9 @@ if showDash and (barstate.islastconfirmedhistory or barstate.isrealtime)
     table.cell(dash, 1, 4, str.tostring(closed) + " / " + (closed > 0 ? str.tostring(100 * wins / closed, "#") + "%" : "-"), text_color = color.white, text_size = size.small)
     table.cell(dash, 0, 6, "Last signal", text_color = color.silver, text_size = size.small)
     table.cell(dash, 1, 6, lastSignal, text_color = color.white, text_size = size.small)
+    table.cell(dash, 0, 7, "Exit rule", text_color = color.silver, text_size = size.small)
+    table.cell(dash, 1, 7, useStop ? "stop at the line" : "half-hour check", text_color = color.white, text_size = size.small)
     table.cell(dash, 0, 5, "Backtest net", text_color = color.silver, text_size = size.small)
     table.cell(dash, 1, 5, (strategy.netprofit < 0 ? "-$" : "$") + str.tostring(math.abs(strategy.netprofit), "#,##0.00"),
          text_color = strategy.netprofit >= 0 ? color.lime : color.red, text_size = size.small)
+prevClosed := strategy.closedtrades

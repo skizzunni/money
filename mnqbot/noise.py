@@ -12,8 +12,13 @@ Rules, New York time, on any chart whose bar length divides 30 minutes:
     (a session is complete when it reached 16:00 with all 12 checks).
   * Upper = max(day open, previous close) * (1 + sigma); lower = min(day open, previous close) * (1 - sigma).
   * Flat: buy if close > upper, sell short if close < lower.
-    Long: if close < upper, exit, or reverse to short if close < lower. Short: the mirror image.
-  * Orders are market orders filled at the next bar's open.
+  * Exit, exit_mode "stop" (default): once in a trade a stop order rests at the current line (upper for
+    a long, lower for a short) and moves with it at each check. It fills at the line, or at the bar's
+    open if the open is already past the line (the line moved past the price, or a gap). On the bar the
+    entry fills, it fills at the line or the open, whichever is worse.
+    exit_mode "check": the paper's rule. Long: if a check closes below upper, exit, or reverse to short
+    if it closes below lower. Short: the mirror image.
+  * Entries and check-mode exits are market orders filled at the next bar's open.
   * No new trades on the dates in skip_dates (holidays and half days by default).
   * Everything is closed at the 16:00 close. If a session ends early (half day, data gap), a position
     still open is closed at the close of the first bar outside 09:30-16:00 or of the next 09:30 bar.
@@ -49,6 +54,7 @@ class NoiseConfig:
     commission_per_side: float = 0.62  # $ per contract
     slippage_ticks: int = 1  # on every market fill
     skip_dates: str = SKIP_DATES  # "YYYY-MM-DD,..." sessions with no new trades
+    exit_mode: str = "stop"  # "stop": resting stop at the current line; "check": exit only at the half hours
 
 
 @dataclass
@@ -87,6 +93,10 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
         raise ValueError(f"bar length {minutes} min must divide 30")
     idx = bars.index.tz_convert(NY)
     o, c = bars["open"].to_numpy(float), bars["close"].to_numpy(float)
+    h, l = bars["high"].to_numpy(float), bars["low"].to_numpy(float)
+    use_stop = cfg.exit_mode == "stop"
+    if cfg.exit_mode not in ("stop", "check"):
+        raise ValueError(f"exit_mode must be 'stop' or 'check', not {cfg.exit_mode!r}")
     slip = cfg.slippage_ticks * cfg.tick
     lb_n = cfg.lookback
 
@@ -94,6 +104,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
     today = [math.nan] * N_CHECKS
     filled = slot = 0
     day_open = prev_close = last_rth_close = math.nan
+    upper = lower = math.nan  # the current noise lines, set at each check
     skip_today = False
     pos = 0
     entry_px, entry_bar = 0.0, 0
@@ -130,6 +141,21 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                 if pos == 0:
                     open_pos(i, d)
 
+        # the resting stop at the line (checked before the script-side logic, like the broker)
+        if use_stop and pos and not math.isnan(upper):
+            line = upper if pos > 0 else lower
+            if entry_bar == i:  # a stop attached to the entry can fill on the fill bar itself
+                hit = l[i] <= line if pos > 0 else h[i] >= line
+                price = (min(o[i], line) if pos > 0 else max(o[i], line)) - pos * slip
+            elif (pos > 0 and o[i] <= line) or (pos < 0 and o[i] >= line):  # the line moved past the price, or a gap
+                hit, price = True, o[i] - pos * slip
+            else:
+                hit = l[i] <= line if pos > 0 else h[i] >= line
+                price = line - pos * slip
+            if hit:
+                close_pos(i, price, "Back inside")
+                events.append((i, "EXIT"))
+
         if pos and (not in_rth or t_min == RTH_OPEN):  # a session ended early (half day, data gap)
             close_pos(i, c[i] - pos * slip, "Session ended")
             events.append((i, "EXIT"))
@@ -137,6 +163,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
         if t_min == RTH_OPEN:
             prev_close = last_rth_close
             day_open = o[i]
+            upper = lower = math.nan
             today = [math.nan] * N_CHECKS
             skip_today = t.strftime("%Y-%m-%d") in cfg.skip_dates  # substring test, like Pine's str.contains
         if in_rth:
@@ -155,6 +182,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                 bands.append((i, upper, lower))
                 if skip_today:
                     pass
+                elif use_stop and pos:
+                    pass  # exits are the resting stop's job
                 elif pos > 0 and c[i] < upper:
                     pending = ("entry", -1) if c[i] < lower else ("close", 0)
                     events.append((i, "REVERSE" if c[i] < lower else "EXIT"))

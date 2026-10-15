@@ -614,8 +614,10 @@ class StrategyEmulator:
             raise PineError("strategy.close with immediately=true is not emulated")
         self.market_close = {"id": id, "bar": self.rt.i, "comment": comment}
 
-    def exit(self, id, from_entry, stop=None, limit=None, comment_loss=None, comment_profit=None, **kw):
-        self.exits[from_entry] = {"stop": stop, "limit": limit, "loss": comment_loss, "profit": comment_profit}
+    def exit(self, id, from_entry, stop=None, limit=None, comment=None, comment_loss=None, comment_profit=None,
+             alert_message=None, **kw):
+        self.exits[from_entry] = {"stop": stop, "limit": limit, "loss": comment_loss or comment,
+                                  "profit": comment_profit or comment, "alert": alert_message}
 
     def cancel(self, id):
         self.entries.pop(id, None)
@@ -652,7 +654,8 @@ class StrategyEmulator:
             if self.pos is not None and self.pos["dir"] == -e["dir"]:  # an opposite entry reverses
                 self._close(o - self.pos["dir"] * slip, "reversed")
             if self.pos is None:
-                self.pos = {"id": oid, "dir": e["dir"], "qty": e["qty"], "price": o + e["dir"] * slip, "bar": i}
+                self.pos = {"id": oid, "dir": e["dir"], "qty": e["qty"], "price": o + e["dir"] * slip, "bar": i,
+                            "market": True}
         if self.pos is None:
             for oid, e in list(self.entries.items()):
                 if e["bar"] >= i:
@@ -668,14 +671,23 @@ class StrategyEmulator:
         if ex is None:
             return
         d, stop, limit = self.pos["dir"], ex["stop"], ex["limit"]
+
+        def stop_fill(px):
+            self._close(px + slip if d < 0 else px - slip, ex["loss"])
+            if ex.get("alert"):  # an order-fill alert (alert_message on strategy.exit)
+                self.rt.alerts.append((i, ex["alert"]))
+
         if self.pos["bar"] == i:  # fill bar: worst case, stop only
             if stop is not None and ((d < 0 and h >= stop) or (d > 0 and l <= stop)):
-                self._close(stop + slip if d < 0 else stop - slip, ex["loss"])
+                px = stop
+                if self.pos.get("market"):  # a market entry can open past its stop; the stop then fills at the open
+                    px = min(o, stop) if d > 0 else max(o, stop)
+                stop_fill(px)
             return
         if stop is not None and ((d < 0 and o >= stop) or (d > 0 and o <= stop)):
-            self._close(o + slip if d < 0 else o - slip, ex["loss"])
+            stop_fill(o)
         elif stop is not None and ((d < 0 and h >= stop) or (d > 0 and l <= stop)):
-            self._close(stop + slip if d < 0 else stop - slip, ex["loss"])
+            stop_fill(stop)
         elif limit is not None and ((d < 0 and l <= limit - thru) or (d > 0 and h >= limit + thru)):
             self._close(limit, ex["profit"])
 
@@ -698,6 +710,9 @@ class _ClosedTrades(int):
 
     def exit_price(self, i):
         return float(self._get(i, "exit"))
+
+    def size(self, i):  # signed contracts: negative for a short
+        return float(self._get(i, "dir") * self._get(i, "qty"))
 
     def exit_comment(self, i):
         return self._get(i, "reason")
