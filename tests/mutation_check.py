@@ -1,6 +1,7 @@
 """Plant one bug at a time in the Pine scripts; the parity tests must catch every one.
 
-    python tests/mutation_check.py      (about 1-2 minutes: each mutant is parsed once)
+    python tests/mutation_check.py          (a few minutes: each mutant is parsed once)
+    python tests/mutation_check.py noise    (only the noise-momentum script's mutants)
 
 This checks the checker: if a mutant survives, the tests have a blind spot.
 """
@@ -74,11 +75,37 @@ MUTANTS = {
     "all-in-one: range includes the breakout bar": (
         "all_in_one", "if isRth and nyHHMM < orEndHHMM\n", "if isRth and nyHHMM <= orEndHHMM\n"
     ),
+    "noise: upper line from the lower of open and previous close": (
+        "noise", "ub := math.max(dayOpen, prevClose)", "ub := math.min(dayOpen, prevClose)"
+    ),
+    "noise: average divided by one session too few": ("noise", "sigma = s / lookback", "sigma = s / (lookback - 1)"),
+    "noise: long exits only below the lower line": ("noise", "if pos > 0 and close < ub", "if pos > 0 and close < lb"),
+    "noise: checks on the bar that opens at the half hour": (
+        "noise", "(endMin - FIRST_CHECK) % 30 == 0", "(tMin - FIRST_CHECK) % 30 == 0"
+    ),
+    "noise: short sessions stored in the history": ("noise", "        if complete\n", "        if true\n"),
+    "noise: no reversal from long": (
+        "noise",
+        "            if close < lb\n                strategy.entry",
+        "            if false\n                strategy.entry",
+    ),
+    "noise: open position kept into the next session": (
+        "noise", "(not inRth or tMin == RTH_OPEN)", "not inRth"
+    ),
 }
 
 
 def _tests(T, script):
     """The parity checks that run against one script, as (name, zero-argument callable)."""
+    if script == "noise":
+        import test_noise as N
+
+        return [(case, lambda c=case: N.test_pine_hand_built(c)) for case in N.HAND_BUILT] + [
+            ("short session", N.test_pine_short_session_cases),
+            ("random 5m", lambda: N.test_pine_random_sessions(5)),
+            ("random 15m", lambda: N.test_pine_random_sessions(15)),
+            ("RTH-only chart", N.test_pine_rth_only_chart_and_shorter_lookback),
+        ]
     if script == "indicator":
         return [(case, lambda c=case: T.test_edge_cases_indicator(c)) for case in T.EDGE]
     tests = [
@@ -101,15 +128,21 @@ def check(args):
     from pine_interpreter import PineError
 
     script, old, new = MUTANTS[name]
-    attr = {"indicator": "INDICATOR", "all_in_one": "AIO"}[script]
+    attr = {"indicator": "INDICATOR", "all_in_one": "AIO", "noise": "NOISE_PINE"}[script]
     # Always mutate the original file: worker processes are reused, and T.<attr> may still
     # point at the previous mutant.
-    original = {"INDICATOR": "mnq_liquidity_sweep_signals.pine", "AIO": "mnq_liquidity_sweep_all_in_one.pine"}[attr]
+    original = {"INDICATOR": "mnq_liquidity_sweep_signals.pine", "AIO": "mnq_liquidity_sweep_all_in_one.pine",
+                "NOISE_PINE": "mnq_noise_momentum.pine"}[attr]
     src = (HERE.parent / "pine" / original).read_text()
     assert src.count(old) == 1, f"mutation anchor not found: {name}"
     mutant = Path(tmp) / f"mutant_{list(MUTANTS).index(name)}.pine"
     mutant.write_text(src.replace(old, new))
-    setattr(T, attr, mutant)
+    if script == "noise":
+        import test_noise as N
+
+        N.NOISE_PINE = mutant
+    else:
+        setattr(T, attr, mutant)
     caught = []
     for label, test in _tests(T, script):
         try:
@@ -120,8 +153,10 @@ def check(args):
 
 
 def main() -> int:
+    only = sys.argv[1] if len(sys.argv) > 1 else ""  # e.g. "noise" runs only the noise-script mutants
+    names = [m for m in MUTANTS if m.startswith(only)]
     with tempfile.TemporaryDirectory() as tmp, ProcessPoolExecutor(6) as ex:
-        results = list(ex.map(check, [(m, tmp) for m in MUTANTS]))
+        results = list(ex.map(check, [(m, tmp) for m in names]))
     for name, caught in results:
         print(f"{'CAUGHT' if caught else 'MISSED'}  {name:44s} {caught[:2]}")
     missed = [n for n, c in results if not c]

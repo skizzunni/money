@@ -459,6 +459,23 @@ class PineRuntime:
         def array_new(*a):
             return []
 
+        def array_new_float(size=0, initial_value=NA):
+            return [initial_value] * int(size)
+
+        def array_index(a, i):
+            if not isinstance(i, int) or not 0 <= i < len(a):
+                raise PineError(f"array index {i!r} out of bounds for size {len(a)} (bar {rt.i})")
+            return i
+
+        def array_get(a, i):
+            return a[array_index(a, i)]
+
+        def array_set(a, i, v):
+            a[array_index(a, i)] = v
+
+        def to_int(x):
+            return NA if is_na(x) else int(x)  # Pine int() truncates toward zero
+
         return {
             "indicator": Namespace("indicator"),
             "alert": Namespace("alert", call=alert),
@@ -476,7 +493,9 @@ class PineRuntime:
             "math": Namespace("math", max=nmax, min=nmin, floor=floor, abs=abs),
             "str": Namespace("str", tostring=tostring, upper=str.upper, startswith=str.startswith),
             "ta": Namespace("ta", atr=self._atr),
-            "array": Namespace("array", new=array_new, push=lambda a, v: a.append(v), size=len),
+            "array": Namespace("array", new=array_new, push=lambda a, v: a.append(v), size=len,
+                               new_float=array_new_float, get=array_get, set=array_set),
+            "int": to_int,
             "syminfo": Namespace("syminfo", mintick=self.mintick, pointvalue=self.pointvalue),
             "timeframe": Namespace("timeframe", period=str(self.tf_seconds // 60),
                                    in_seconds=lambda tf=None: rt.tf_seconds),
@@ -530,6 +549,8 @@ class StrategyEmulator:
         self.slip_ticks = slippage_ticks
         self.fill_ticks = limit_fill_ticks
         self.entries: dict[str, dict] = {}
+        self.market_entries: dict[str, dict] = {}  # strategy.entry without limit: next bar's open
+        self.market_close: dict | None = None  # strategy.close: next bar's open
         self.exits: dict[str, dict] = {}
         self.pos: dict | None = None
         self.closed: list[dict] = []
@@ -574,8 +595,17 @@ class StrategyEmulator:
     # ---- order calls
     def entry(self, id, direction, qty=None, limit=None, comment=None, **kw):
         d = 1 if direction == self.long else -1
-        self.entries[id] = {"dir": d, "qty": int(qty), "limit": limit, "bar": self.rt.i}
+        order = {"dir": d, "qty": int(qty), "limit": limit, "bar": self.rt.i, "comment": comment}
+        if limit is None:
+            self.market_entries[id] = order
+        else:
+            self.entries[id] = order
         self.orders.append({"bar": self.rt.i, "dir": d, "qty": int(qty), "limit": limit})
+
+    def close(self, id, comment=None, immediately=False, **kw):
+        if immediately:
+            raise PineError("strategy.close with immediately=true is not emulated")
+        self.market_close = {"id": id, "bar": self.rt.i, "comment": comment}
 
     def exit(self, id, from_entry, stop=None, limit=None, comment_loss=None, comment_profit=None, **kw):
         self.exits[from_entry] = {"stop": stop, "limit": limit, "loss": comment_loss, "profit": comment_profit}
@@ -604,6 +634,18 @@ class StrategyEmulator:
         s, tick = self.rt.series, self.rt.mintick
         o, h, l = s["open"][i], s["high"][i], s["low"][i]
         thru, slip = self.fill_ticks * tick, self.slip_ticks * tick
+        # market orders from earlier bars fill at this bar's open, with slippage against us
+        mc, self.market_close = self.market_close, None
+        if mc is not None and mc["bar"] < i and self.pos is not None and self.pos["id"] == mc["id"]:
+            self._close(o - self.pos["dir"] * slip, mc["comment"])
+        for oid, e in list(self.market_entries.items()):
+            if e["bar"] >= i:
+                continue
+            del self.market_entries[oid]
+            if self.pos is not None and self.pos["dir"] == -e["dir"]:  # an opposite entry reverses
+                self._close(o - self.pos["dir"] * slip, "reversed")
+            if self.pos is None:
+                self.pos = {"id": oid, "dir": e["dir"], "qty": e["qty"], "price": o + e["dir"] * slip, "bar": i}
         if self.pos is None:
             for oid, e in list(self.entries.items()):
                 if e["bar"] >= i:

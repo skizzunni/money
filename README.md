@@ -4,7 +4,8 @@ A rules-based MNQ day-trading strategy with prop-firm risk rails. Every piece be
 
 | Piece | What it's for |
 |---|---|
-| **`pine/mnq_liquidity_sweep_all_in_one.pine`** | **Start here. One TradingView script that does everything:** BUY/SELL signals with size, limit price, stop and target, phone alerts, a dashboard, and a Strategy Tester backtest with optional prop-evaluation simulation. |
+| **`pine/mnq_noise_momentum.pine`** | **The one strategy here with a tested edge (16 years).** Noise-area momentum from a 2024 paper: BUY/SELL/EXIT alerts every half hour, flat at 16:00. Rules in [`docs/NOISE.md`](docs/NOISE.md). On a $25K / $1,500 evaluation it still failed more often than it passed. |
+| `pine/mnq_liquidity_sweep_all_in_one.pine` | The original sweep/breakout bot in one TradingView script (no edge on real data, see below): BUY/SELL signals with size, limit price, stop and target, phone alerts, a dashboard, and a Strategy Tester backtest with optional prop-evaluation simulation. |
 | `pine/mnq_liquidity_sweep_signals.pine` | **TradingView indicator that tells you when to BUY or SELL.** It gives the limit price, stop, target and size, then alerts you to fill, move to breakeven, cancel, or flatten. |
 | `pine/mnq_liquidity_sweep_bot.pine` | TradingView strategy with the same rules, for backtesting in Strategy Tester with prop-evaluation simulation. |
 | `mnqbot/` (Python) | A stricter backtester with worst-case fills, back-to-back evaluation simulation, Monte Carlo pass odds, and a buy-and-hold MNQ benchmark. |
@@ -17,7 +18,9 @@ A rules-based MNQ day-trading strategy with prop-firm risk rails. Every piece be
 
 **Beating buy-and-hold MNQ is not guaranteed either.** The backtester reports it as a plain YES/NO, so you can check instead of trusting.
 
-**It has been tested on real data, and it has no edge.** On 3¾ years of Nasdaq-100 1-minute data (Jan 2023 → Sep 2026), tuned on 2023–2024 and then run once on 2025–2026, it lost money after costs. Even with zero costs it sits near break-even. Three published intraday strategies tested the same way didn't pass either. Full numbers are in [docs/RESULTS.md](docs/RESULTS.md). **Don't pay for a prop evaluation to trade these rules.** The tests prove the machinery works (fills, sizing, rails, no look-ahead). The study shows the rules themselves don't make money.
+**The original sweep/breakout bot has no edge.** On 3¾ years of Nasdaq-100 1-minute data (Jan 2023 → Sep 2026), tuned on 2023–2024 and then run once on 2025–2026, it lost money after costs. Even with zero costs it sits near break-even. **Don't pay for a prop evaluation to trade those rules.**
+
+**Noise-area momentum is the one strategy that held up.** It was tested on 16 years (Nov 2010 → Sep 2026), was positive in 14 of 16 years, and had a t-stat of 3.5 at today's costs. But it wins only 38% of trades, depends on a few big trend days, is down $3,155 so far in 2026 on 1 MNQ, and on a $25K / $1,500 evaluation passed only about 4 in 10 historical starts. Forward-test it on alerts before you pay for anything. Full numbers are in [docs/RESULTS.md](docs/RESULTS.md).
 
 ## The strategy in plain English
 
@@ -130,13 +133,15 @@ The report shows win rate, profit factor, expectancy in dollars and R, max drawd
 
 TradingView can't be run here, so `tests/pine_interpreter.py` runs the **actual `.pine` files** bar by bar. It is a strict interpreter for the part of Pine v6 these scripts use, with a broker emulator that applies the same worst-case fill rules. `tests/test_pine_parity.py` then requires all three scripts to produce the same orders, fills, exits and P/L as the Python engine, to the cent. For the all-in-one script, that covers both account modes, plus exit reasons, exit labels and alert text. It holds on 120 sessions of test data and on 25 hand-built cases (17 sweep, 8 breakout) that sit exactly on every fill boundary. The evaluation pass/fail counts must match too.
 
-`python tests/mutation_check.py` plants 15 realistic bugs in the indicator and the all-in-one script (a fill on touch, an off-by-one expiry, target before stop, a mislabeled exit, and so on) and confirms the tests catch every one. The first test run parses the scripts, which takes about 2 minutes, and caches them. Skip those tests with `pytest -m "not slow"`.
+`tests/test_noise.py` holds the noise-momentum script to `mnqbot/noise.py` the same way: same trades, alerts and noise lines, to the cent. That covers hand-built cases (including a half day and a session missing a check), 90 random sessions on 5- and 15-minute bars, and an RTH-only chart.
+
+`python tests/mutation_check.py` plants 22 realistic bugs in the indicator, the all-in-one script and the noise-momentum script (a fill on touch, an off-by-one expiry, target before stop, a mislabeled exit, a wrong noise line, a missing reversal, and so on) and confirms the tests catch every one. The first test run parses the scripts, which takes about 2 minutes, and caches them. Skip those tests with `pytest -m "not slow"`.
 
 ---
 
 ## Is it any good?
 
-**For these rules, no.** They fail rules 2 and 3 below on 3¾ years of real data. See [docs/RESULTS.md](docs/RESULTS.md).
+**For the sweep/breakout rules, no.** They fail rules 2 and 3 below on 3¾ years of real data. **Noise-area momentum** passed a 16-year test at today's costs, but it fails most $25K evaluations. See [docs/RESULTS.md](docs/RESULTS.md).
 
 Decide with data, not hope. The rules of thumb:
 
@@ -161,6 +166,10 @@ If it doesn't pass these, change the idea, not just the numbers, or don't trade 
 ## Files
 
 ```
+pine/mnq_noise_momentum.pine              TradingView: noise-area momentum, the strategy with a tested edge
+docs/NOISE.md                             its exact rules, alerts and what to expect
+mnqbot/noise.py                           its Python reference (the tests hold the script to it)
+research/noise_eval.py                    its odds on a $25K evaluation
 pine/mnq_liquidity_sweep_all_in_one.pine  TradingView: signals + alerts + dashboard + backtest in one
 pine/mnq_liquidity_sweep_signals.pine     TradingView indicator: BUY/SELL signals, alerts, dashboard
 pine/mnq_liquidity_sweep_bot.pine         TradingView strategy: same rules, Strategy Tester backtest
@@ -168,7 +177,7 @@ docs/RULES.md                             every rule, exactly, with a worked exa
 docs/RESULTS.md                           multi-year test on real Nasdaq-100 data: no edge
 research/nsx_study.py                     the script that runs that test on HistData.com files
 research/nsx_holes.py                     how the free data's missing minutes affect that test
-research/published_lab.py                 three published intraday strategies on the same data
+research/published_lab.py                 three published intraday strategies, 2010-2026
 mnqbot/config.py                          every setting, with defaults
 mnqbot/strategy.py                        sweep -> displacement -> FVG setup, and opening range breakout
 mnqbot/engine.py                          fills, sizing, daily rails, prop evaluation simulation

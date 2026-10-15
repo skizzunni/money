@@ -1,0 +1,164 @@
+//@version=6
+// MNQ Noise-Area Momentum
+// ------------------------------------------------------------------
+// Intraday momentum from Zarattini, Aziz & Barbon (2024), "Beat the Market",
+// with the paper's settings. Every half hour from 10:00 to 15:30 New York time:
+//   * flat:  BUY if price closed above the noise area, SELL if below it
+//   * long:  EXIT if price closed back below the upper line (REVERSE to short if below the lower line)
+//   * short: EXIT if price closed back above the lower line (REVERSE to long if above the upper line)
+// Everything is closed at the 16:00 close. No trades until 14 full sessions are on the chart.
+//
+// Noise area for each half-hour mark = the day's open (and previous close) plus/minus the
+// average distance price has moved from the 09:30 open by that time over the last 14 sessions.
+//
+// Tested on 16 years of Nasdaq-100 data: see docs/RESULTS.md. It has an edge, but
+// it loses often and has losing years. On a $25K / $1,500 evaluation it passed about
+// 4 in 10 historical starts. It does NOT "never lose".
+//
+// Chart: MNQ1! (or the front-month MNQ contract), 5 minutes (1, 5, 10, 15 or 30 work).
+// The rules are the same as the Python reference in mnqbot/noise.py.
+// ------------------------------------------------------------------
+strategy("MNQ Noise-Area Momentum", shorttitle = "Noise-Mom", overlay = true,
+     initial_capital = 25000, currency = currency.USD,
+     default_qty_type = strategy.fixed, default_qty_value = 1, pyramiding = 0,
+     commission_type = strategy.commission.cash_per_contract, commission_value = 0.62,
+     slippage = 1, margin_long = 0, margin_short = 0, max_bars_back = 500)
+
+const string TZ = "America/New_York"
+const int N_CHECKS = 12   // 10:00, 10:30, ..., 15:30
+const int FIRST_CHECK = 600
+const int LAST_CHECK = 930
+const int RTH_OPEN = 570
+const int RTH_CLOSE = 960
+
+// ── Inputs
+grpT = "Trading"
+lookback = input.int(14, "Sessions in the noise average", minval = 2, maxval = 60, group = grpT)
+qty      = input.int(1, "Contracts", minval = 1, maxval = 30, group = grpT,
+     tooltip = "1 MNQ is already large for a $1,500 drawdown: see docs/RESULTS.md")
+grpV = "Display"
+showBands = input.bool(true, "Show noise area", group = grpV)
+showDash  = input.bool(true, "Show dashboard", group = grpV)
+
+// ── Clock
+barMin  = int(timeframe.in_seconds() / 60)
+validTf = barMin >= 1 and 30 % barMin == 0
+tMin    = hour(time, TZ) * 60 + minute(time, TZ)
+endMin  = tMin + barMin   // bar close, minutes after midnight
+inRth   = tMin >= RTH_OPEN and endMin <= RTH_CLOSE
+isCheck = validTf and inRth and endMin >= FIRST_CHECK and endMin <= LAST_CHECK and (endMin - FIRST_CHECK) % 30 == 0
+
+hhmmText(int mins) => str.tostring(int(mins / 60)) + ":" + (mins % 60 == 0 ? "00" : "30")
+px(float x) => str.tostring(x, format.mintick)
+
+// ── State
+var float dayOpen = na
+var float prevClose = na
+var float lastRthClose = na
+var float ub = na
+var float lb = na
+var moves = array.new_float(lookback * N_CHECKS, na)   // ring buffer: one row of 12 moves per session
+var today = array.new_float(N_CHECKS, na)
+var int filled = 0
+var int slot = 0
+
+// ── A session that ended early (half day, data gap): get flat
+if strategy.position_size != 0 and (not inRth or tMin == RTH_OPEN)
+    strategy.close_all(comment = "Session ended", immediately = true)
+    alert("EXIT NOW: the session ended with a position open. Close your MNQ position at market.", alert.freq_once_per_bar_close)
+
+// ── New day at the 09:30 bar
+if tMin == RTH_OPEN
+    prevClose := lastRthClose
+    dayOpen := open
+    ub := na
+    lb := na
+    for k = 0 to N_CHECKS - 1
+        array.set(today, k, na)
+if inRth
+    lastRthClose := close
+
+// ── Half-hour checks
+if isCheck and not na(dayOpen)
+    k = int((endMin - FIRST_CHECK) / 30)
+    array.set(today, k, math.abs(close / dayOpen - 1))
+    if filled >= lookback and not na(prevClose)
+        float s = 0.0
+        for d = 0 to lookback - 1
+            s += array.get(moves, d * N_CHECKS + k)
+        sigma = s / lookback
+        ub := math.max(dayOpen, prevClose) * (1 + sigma)
+        lb := math.min(dayOpen, prevClose) * (1 - sigma)
+        nextCheck = k == N_CHECKS - 1 ? "the 16:00 close" : hhmmText(endMin + 30)
+        pos = strategy.position_size
+        if pos > 0 and close < ub
+            if close < lb
+                strategy.entry("Short", strategy.short, qty, comment = "Reverse short")
+                alert("REVERSE: exit the long and SELL " + str.tostring(qty) + " MNQ at market now. Price " + px(close) +
+                     " is below the noise area (lower " + px(lb) + "). Next check " + nextCheck + ".", alert.freq_once_per_bar_close)
+            else
+                strategy.close("Long", comment = "Back inside")
+                alert("EXIT LONG at market now. Price " + px(close) + " closed back below the upper line (" + px(ub) +
+                     "). Stay flat until the next signal.", alert.freq_once_per_bar_close)
+        else if pos < 0 and close > lb
+            if close > ub
+                strategy.entry("Long", strategy.long, qty, comment = "Reverse long")
+                alert("REVERSE: exit the short and BUY " + str.tostring(qty) + " MNQ at market now. Price " + px(close) +
+                     " is above the noise area (upper " + px(ub) + "). Next check " + nextCheck + ".", alert.freq_once_per_bar_close)
+            else
+                strategy.close("Short", comment = "Back inside")
+                alert("EXIT SHORT at market now. Price " + px(close) + " closed back above the lower line (" + px(lb) +
+                     "). Stay flat until the next signal.", alert.freq_once_per_bar_close)
+        else if pos == 0 and close > ub
+            strategy.entry("Long", strategy.long, qty, comment = "Above noise")
+            alert("BUY " + str.tostring(qty) + " MNQ at market now. Price " + px(close) + " is above the noise area (upper " +
+                 px(ub) + "). Hold until a half-hour check closes back below the upper line, or the 16:00 close. Next check " +
+                 nextCheck + ".", alert.freq_once_per_bar_close)
+        else if pos == 0 and close < lb
+            strategy.entry("Short", strategy.short, qty, comment = "Below noise")
+            alert("SELL " + str.tostring(qty) + " MNQ at market now. Price " + px(close) + " is below the noise area (lower " +
+                 px(lb) + "). Hold until a half-hour check closes back above the lower line, or the 16:00 close. Next check " +
+                 nextCheck + ".", alert.freq_once_per_bar_close)
+
+// ── 16:00: flat, and store today's moves if the session was complete
+if inRth and endMin == RTH_CLOSE
+    if strategy.position_size != 0
+        strategy.close_all(comment = "16:00 close", immediately = true)
+        alert("FLAT: close your MNQ position at market now (16:00 close).", alert.freq_once_per_bar_close)
+    if not na(dayOpen)
+        complete = true
+        for k = 0 to N_CHECKS - 1
+            if na(array.get(today, k))
+                complete := false
+        if complete
+            for k = 0 to N_CHECKS - 1
+                array.set(moves, slot * N_CHECKS + k, array.get(today, k))
+            slot := (slot + 1) % lookback
+            filled += 1
+    dayOpen := na
+
+// ── Drawing
+plot(showBands and inRth ? ub : na, "Upper noise line", color.teal, 2, plot.style_linebr)
+plot(showBands and inRth ? lb : na, "Lower noise line", color.maroon, 2, plot.style_linebr)
+
+var table dash = table.new(position.top_right, 2, 6, bgcolor = color.new(color.black, 15), border_width = 1, border_color = color.new(color.gray, 60))
+if showDash and (barstate.islastconfirmedhistory or barstate.isrealtime)
+    pos = strategy.position_size
+    status = not validTf ? "Use a 1/5/10/15/30 min chart" : filled < lookback ? "Building history" : pos > 0 ? "LONG" : pos < 0 ? "SHORT" : "Flat"
+    statusColor = pos > 0 ? color.lime : pos < 0 ? color.red : color.white
+    nextText = not inRth or endMin >= LAST_CHECK ? "10:00 next session" : endMin < FIRST_CHECK ? "10:00" : hhmmText(endMin - (endMin - FIRST_CHECK) % 30 + 30)
+    closed = strategy.closedtrades
+    wins = strategy.wintrades
+    table.cell(dash, 0, 0, "MNQ Noise Momentum", text_color = color.white, text_size = size.small)
+    table.cell(dash, 1, 0, status, text_color = statusColor, text_size = size.small)
+    table.cell(dash, 0, 1, "Sessions of history", text_color = color.silver, text_size = size.small)
+    table.cell(dash, 1, 1, str.tostring(math.min(filled, lookback)) + " / " + str.tostring(lookback), text_color = color.white, text_size = size.small)
+    table.cell(dash, 0, 2, "Upper / lower now", text_color = color.silver, text_size = size.small)
+    table.cell(dash, 1, 2, na(ub) ? "waiting for 10:00" : px(ub) + " / " + px(lb), text_color = color.white, text_size = size.small)
+    table.cell(dash, 0, 3, "Next check", text_color = color.silver, text_size = size.small)
+    table.cell(dash, 1, 3, nextText, text_color = color.white, text_size = size.small)
+    table.cell(dash, 0, 4, "Backtest trades / win %", text_color = color.silver, text_size = size.small)
+    table.cell(dash, 1, 4, str.tostring(closed) + " / " + (closed > 0 ? str.tostring(100 * wins / closed, "#") + "%" : "-"), text_color = color.white, text_size = size.small)
+    table.cell(dash, 0, 5, "Backtest net", text_color = color.silver, text_size = size.small)
+    table.cell(dash, 1, 5, (strategy.netprofit < 0 ? "-$" : "$") + str.tostring(math.abs(strategy.netprofit), "#,##0.00"),
+         text_color = strategy.netprofit >= 0 ? color.lime : color.red, text_size = size.small)
