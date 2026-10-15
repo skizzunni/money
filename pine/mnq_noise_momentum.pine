@@ -23,7 +23,7 @@ strategy("MNQ Noise-Area Momentum", shorttitle = "Noise-Mom", overlay = true,
      initial_capital = 25000, currency = currency.USD,
      default_qty_type = strategy.fixed, default_qty_value = 1, pyramiding = 0,
      commission_type = strategy.commission.cash_per_contract, commission_value = 0.62,
-     slippage = 1, margin_long = 0, margin_short = 0, max_bars_back = 500)
+     slippage = 1, margin_long = 0, margin_short = 0, max_bars_back = 500, max_labels_count = 500)
 
 const string TZ = "America/New_York"
 const int N_CHECKS = 12   // 10:00, 10:30, ..., 15:30
@@ -42,6 +42,8 @@ skipDates = input.string("2026-01-01,2026-01-19,2026-02-16,2026-04-03,2026-05-25
      tooltip = "YYYY-MM-DD, comma separated. Pre-filled with the 2026-2027 US market holidays and half days, when MNQ trades a short session. Add news days if you like.")
 grpV = "Display"
 showBands = input.bool(true, "Show noise area", group = grpV)
+showLabels = input.bool(true, "Show BUY / SELL / EXIT labels", group = grpV)
+shadeTrades = input.bool(true, "Shade the chart while in a trade", group = grpV)
 showDash  = input.bool(true, "Show dashboard", group = grpV)
 
 // ── Clock
@@ -54,6 +56,11 @@ isCheck = validTf and inRth and endMin >= FIRST_CHECK and endMin <= LAST_CHECK a
 
 hhmmText(int mins) => str.tostring(int(mins / 60)) + ":" + (mins % 60 == 0 ? "00" : "30")
 px(float x) => str.tostring(x, format.mintick)
+// A signal label on the candle that triggered it: below the candle for buys, above for sells.
+mark(string txt, bool below, color c) =>
+    if showLabels
+        label.new(bar_index, below ? low : high, txt, yloc = below ? yloc.belowbar : yloc.abovebar,
+             style = below ? label.style_label_up : label.style_label_down, color = c, textcolor = color.white, size = size.normal)
 
 // ── State
 var float dayOpen = na
@@ -66,9 +73,12 @@ var today = array.new_float(N_CHECKS, na)
 var int filled = 0
 var int slot = 0
 var bool skipToday = false
+var string lastSignal = "-"
 
 // ── A session that ended early (half day, data gap): get flat
 if strategy.position_size != 0 and (not inRth or tMin == RTH_OPEN)
+    mark("EXIT NOW", strategy.position_size < 0, color.orange)
+    lastSignal := "EXIT NOW (session ended)"
     strategy.close_all(comment = "Session ended", immediately = true)
     alert("EXIT NOW: the session ended with a position open. Close your MNQ position at market.", alert.freq_once_per_bar_close)
 
@@ -101,28 +111,40 @@ if isCheck and not na(dayOpen)
             if pos > 0 and close < ub
                 if close < lb
                     strategy.entry("Short", strategy.short, qty, comment = "Reverse short")
+                    mark("REVERSE\nSELL " + str.tostring(2 * qty), false, color.red)
+                    lastSignal := "REVERSE to short " + hhmmText(endMin) + " @ " + px(close)
                     alert("REVERSE: exit the long and SELL " + str.tostring(qty) + " MNQ at market now. Price " + px(close) +
                          " is below the noise area (lower " + px(lb) + "). Next check " + nextCheck + ".", alert.freq_once_per_bar_close)
                 else
                     strategy.close("Long", comment = "Back inside")
+                    mark("EXIT", false, color.gray)
+                    lastSignal := "EXIT long " + hhmmText(endMin) + " @ " + px(close)
                     alert("EXIT LONG at market now. Price " + px(close) + " closed back below the upper line (" + px(ub) +
                          "). Stay flat until the next signal.", alert.freq_once_per_bar_close)
             else if pos < 0 and close > lb
                 if close > ub
                     strategy.entry("Long", strategy.long, qty, comment = "Reverse long")
+                    mark("REVERSE\nBUY " + str.tostring(2 * qty), true, color.green)
+                    lastSignal := "REVERSE to long " + hhmmText(endMin) + " @ " + px(close)
                     alert("REVERSE: exit the short and BUY " + str.tostring(qty) + " MNQ at market now. Price " + px(close) +
                          " is above the noise area (upper " + px(ub) + "). Next check " + nextCheck + ".", alert.freq_once_per_bar_close)
                 else
                     strategy.close("Short", comment = "Back inside")
+                    mark("EXIT", true, color.gray)
+                    lastSignal := "EXIT short " + hhmmText(endMin) + " @ " + px(close)
                     alert("EXIT SHORT at market now. Price " + px(close) + " closed back above the lower line (" + px(lb) +
                          "). Stay flat until the next signal.", alert.freq_once_per_bar_close)
             else if pos == 0 and close > ub
                 strategy.entry("Long", strategy.long, qty, comment = "Above noise")
+                mark("BUY " + str.tostring(qty), true, color.green)
+                lastSignal := "BUY " + hhmmText(endMin) + " @ " + px(close)
                 alert("BUY " + str.tostring(qty) + " MNQ at market now. Price " + px(close) + " is above the noise area (upper " +
                      px(ub) + "). Hold until a half-hour check closes back below the upper line, or the 16:00 close. Next check " +
                      nextCheck + ".", alert.freq_once_per_bar_close)
             else if pos == 0 and close < lb
                 strategy.entry("Short", strategy.short, qty, comment = "Below noise")
+                mark("SELL " + str.tostring(qty), false, color.red)
+                lastSignal := "SELL " + hhmmText(endMin) + " @ " + px(close)
                 alert("SELL " + str.tostring(qty) + " MNQ at market now. Price " + px(close) + " is below the noise area (lower " +
                      px(lb) + "). Hold until a half-hour check closes back above the lower line, or the 16:00 close. Next check " +
                      nextCheck + ".", alert.freq_once_per_bar_close)
@@ -130,6 +152,8 @@ if isCheck and not na(dayOpen)
 // ── 16:00: flat, and store today's moves if the session was complete
 if inRth and endMin == RTH_CLOSE
     if strategy.position_size != 0
+        mark("FLAT", strategy.position_size < 0, color.gray)
+        lastSignal := "FLAT 16:00 @ " + px(close)
         strategy.close_all(comment = "16:00 close", immediately = true)
         alert("FLAT: close your MNQ position at market now (16:00 close).", alert.freq_once_per_bar_close)
     if not na(dayOpen)
@@ -147,8 +171,9 @@ if inRth and endMin == RTH_CLOSE
 // ── Drawing
 plot(showBands and inRth ? ub : na, "Upper noise line", color.teal, 2, plot.style_linebr)
 plot(showBands and inRth ? lb : na, "Lower noise line", color.maroon, 2, plot.style_linebr)
+bgcolor(shadeTrades and strategy.position_size > 0 ? color.new(color.teal, 88) : shadeTrades and strategy.position_size < 0 ? color.new(color.maroon, 88) : na)
 
-var table dash = table.new(position.top_right, 2, 6, bgcolor = color.new(color.black, 15), border_width = 1, border_color = color.new(color.gray, 60))
+var table dash = table.new(position.top_right, 2, 7, bgcolor = color.new(color.black, 15), border_width = 1, border_color = color.new(color.gray, 60))
 if showDash and (barstate.islastconfirmedhistory or barstate.isrealtime)
     pos = strategy.position_size
     status = not validTf ? "Use a 1/5/10/15/30 min chart" : filled < lookback ? "Building history" : pos > 0 ? "LONG" : pos < 0 ? "SHORT" : skipToday and inRth ? "No trades today (date list)" : "Flat"
@@ -166,6 +191,8 @@ if showDash and (barstate.islastconfirmedhistory or barstate.isrealtime)
     table.cell(dash, 1, 3, nextText, text_color = color.white, text_size = size.small)
     table.cell(dash, 0, 4, "Backtest trades / win %", text_color = color.silver, text_size = size.small)
     table.cell(dash, 1, 4, str.tostring(closed) + " / " + (closed > 0 ? str.tostring(100 * wins / closed, "#") + "%" : "-"), text_color = color.white, text_size = size.small)
+    table.cell(dash, 0, 6, "Last signal", text_color = color.silver, text_size = size.small)
+    table.cell(dash, 1, 6, lastSignal, text_color = color.white, text_size = size.small)
     table.cell(dash, 0, 5, "Backtest net", text_color = color.silver, text_size = size.small)
     table.cell(dash, 1, 5, (strategy.netprofit < 0 ? "-$" : "$") + str.tostring(math.abs(strategy.netprofit), "#,##0.00"),
          text_color = strategy.netprofit >= 0 ? color.lime : color.red, text_size = size.small)

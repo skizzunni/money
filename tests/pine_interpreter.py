@@ -513,6 +513,7 @@ class PineRuntime:
             "color": Namespace("color"),
             "shape": Namespace("shape"),
             "location": Namespace("location"),
+            "yloc": Namespace("yloc"),
             "size": Namespace("size"),
             "position": Namespace("position"),
             "strategy": self.strategy,

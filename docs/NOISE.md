@@ -67,7 +67,24 @@ Through a **TradingView alert**. It runs on TradingView's servers, so it keeps w
 
 **What arrives:** each alert is a full instruction, sent right at the half hour, for example *"BUY 1 MNQ at market now. Price 29,980.25 is above the noise area (upper 29,960.00). Hold until a half-hour check closes back below the upper line, or the 16:00 close. Next check 10:30."* Act on it right away: the backtest assumes you fill at about that price.
 
-**Where you place the order:** the alert only tells you. You place every order yourself.
+**On the chart:**
+
+| You see | Meaning |
+|---|---|
+| Teal line / maroon line | Upper / lower noise line. They appear from 10:00 and step at each half hour. |
+| Green **BUY 1** label under a candle | That candle's close was above the upper line: buy. |
+| Red **SELL 1** label over a candle | That candle's close was below the lower line: sell. |
+| Grey **EXIT** label | Price closed back inside the lines: close the trade. |
+| **REVERSE / SELL 2** or **REVERSE / BUY 2** | Price went through the other line: flip the position. |
+| Grey **FLAT** label | 16:00: close the trade. |
+| Orange **EXIT NOW** | A session ended early with a trade open: close it. |
+| Teal / maroon shading | You're long / short. |
+| Dashboard *Last signal* | The most recent instruction, with its time and price. |
+| Small arrows with *+1 / −1* | TradingView's own backtest fills, one candle after the label. |
+
+The label sits on the half-hour candle that just closed, the moment the alert fires. The backtest fills at the next candle's open.
+
+**Where you place the order:** the alert and the labels only tell you. You place every order yourself.
 
 | Account | How to place it |
 |---|---|

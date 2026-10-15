@@ -205,6 +205,8 @@ def run_pine(bars, inputs=None, minutes=5):
     trades = [(t["entry_bar"], t["exit_bar"], t["dir"], round(t["entry"], 6), round(t["exit"], 6),
                round(t["pnl"], 6), t["reason"]) for t in rt.strategy.closed]
     events = [(i, msg.split()[0].rstrip(":")) for i, msg in rt.alerts]
+    labels = [(i, text.split()[0]) for i, text in rt.labels]
+    assert labels == events, "every alert has a matching label on the chart"
     return trades, events, {i: (u, lo) for i, u, lo in bands}
 
 

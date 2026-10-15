@@ -94,6 +94,7 @@ MUTANTS = {
         'skipToday := str.contains(skipDates, str.format_time(time, "yyyy-MM-dd", TZ))',
         "skipToday := false",
     ),
+    "noise: no label when a long exits": ("noise", '                    mark("EXIT", false, color.gray)\n', ""),
     "noise: open position kept into the next session": (
         "noise", "(not inRth or tMin == RTH_OPEN)", "not inRth"
     ),
