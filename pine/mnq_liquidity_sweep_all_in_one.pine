@@ -623,7 +623,8 @@ if showSignals and signalNow
 
 // ───────────────────────────── dashboard
 var table dash = table.new(position.top_right, 2, 11, bgcolor = color.new(color.black, 15), border_width = 1, border_color = color.new(color.gray, 60))
-if showDash and barstate.islast
+// Strategies calculate once per closed bar, so refresh on the last historical bar and on every live bar.
+if showDash and (barstate.islastconfirmedhistory or barstate.isrealtime)
     int n = strategy.closedtrades
     string btText = n == 0 ? "no closed trades on this chart yet"
          : str.tostring(n) + " trades | " + str.tostring(100.0 * strategy.wintrades / n, "#") + "% won | PF "

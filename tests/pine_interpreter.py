@@ -503,6 +503,14 @@ class _Barstate:
     def islast(self):
         return self._rt.i == self._rt.n - 1
 
+    @property
+    def islastconfirmedhistory(self):  # every bar here is historical, so the last one
+        return self._rt.i == self._rt.n - 1
+
+    @property
+    def isrealtime(self):
+        return False
+
 
 class StrategyEmulator:
     """Just enough of TradingView's broker emulator for pine/mnq_liquidity_sweep_bot.pine.
