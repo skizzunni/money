@@ -31,8 +31,10 @@ def short_day(sweep_close=20006, after=None):
 
 
 def cfg_no_swings():
+    """Sweep setups only, no swing levels: the hand-built days below test the sweep model."""
     cfg = BotConfig()
     cfg.strategy.use_swings = False
+    cfg.strategy.use_orb = False
     return cfg
 
 

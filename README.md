@@ -26,6 +26,8 @@ A rules-based MNQ day-trading strategy with prop-firm risk rails. Every piece be
 4. **Enter on the retrace.** A limit order goes at the middle of the gap, with the stop 4 ticks beyond the sweep's extreme and the target at 2R. If it doesn't fill within 6 bars, or price reaches the target first, the order is cancelled.
 5. **Manage it.** The stop moves to breakeven at +1R, and everything is flat by 15:50.
 
+**Second setup: opening range breakout.** The opening range is the high and low of the first 5 minutes after 9:30. The first candle in the entry window that closes outside it gives a limit order back at the broken edge (the retest). The stop goes at the middle of the range and the target at 2R, with one breakout per day. It fires far more often than the sweep, with stops a $150 risk can usually cover. **Trade these setups** picks both (default), sweep only, or breakout only.
+
 ## Risk rails (defaults sized for a $25K, $1,500-drawdown evaluation)
 
 | Rail | Default | Why |

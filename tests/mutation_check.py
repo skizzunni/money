@@ -60,6 +60,20 @@ MUTANTS = {
         "buffer = evalMode ? relNow - threshold() : roomToLine",
         "buffer = roomToLine",
     ),
+    "all-in-one: breakout entry at the close": (
+        "all_in_one", "        float e = d > 0 ? orHi : orLo\n", "        float e = close\n"
+    ),
+    "all-in-one: breakout stop at the far side": (
+        "all_in_one",
+        "float s = roundTick(e - d * orStopFrac * (orHi - orLo))",
+        "float s = roundTick(e - d * (orHi - orLo))",
+    ),
+    "all-in-one: second breakout allowed": (
+        "all_in_one", "    orbUsed := true\n    brokeOut := true\n", "    brokeOut := true\n"
+    ),
+    "all-in-one: range includes the breakout bar": (
+        "all_in_one", "if isRth and nyHHMM < orEndHHMM\n", "if isRth and nyHHMM <= orEndHHMM\n"
+    ),
 }
 
 
@@ -73,6 +87,11 @@ def _tests(T, script):
         for mode in ("live", "eval")
     ]
     tests.append(("eval sizes from simulated room", lambda: T.test_eval_mode_sizes_from_simulated_room("all_in_one")))
+    tests += [
+        (f"ORB {case} [{mode}]", lambda c=case, m=mode: T.test_orb_all_in_one(c, m))
+        for case in T.ORB_EDGE
+        for mode in ("live", "eval")
+    ]
     return tests
 
 
@@ -83,7 +102,10 @@ def check(args):
 
     script, old, new = MUTANTS[name]
     attr = {"indicator": "INDICATOR", "all_in_one": "AIO"}[script]
-    src = getattr(T, attr).read_text()
+    # Always mutate the original file: worker processes are reused, and T.<attr> may still
+    # point at the previous mutant.
+    original = {"INDICATOR": "mnq_liquidity_sweep_signals.pine", "AIO": "mnq_liquidity_sweep_all_in_one.pine"}[attr]
+    src = (HERE.parent / "pine" / original).read_text()
     assert src.count(old) == 1, f"mutation anchor not found: {name}"
     mutant = Path(tmp) / f"mutant_{list(MUTANTS).index(name)}.pine"
     mutant.write_text(src.replace(old, new))

@@ -88,6 +88,31 @@ Checked on bar **B**, which must be inside the entry window. **A** = the bar bef
 
 ---
 
+## 4b. Setup: opening range breakout (retest entry)
+
+The **Trade these setups** setting chooses which setups the bot trades:
+
+- **Both** (default)
+- **Liquidity sweep** (§3–4)
+- **Opening range breakout** (this section)
+
+Python uses `strategy.use_sweep` / `strategy.use_orb` for the same choice.
+
+| Item | Exact rule |
+|---|---|
+| Opening range | The highest high (**ORH**) and lowest low (**ORL**) of the RTH bars that open from 09:30 to before 09:30 + **5 minutes**. On a 5-minute chart, that's just the 09:30 bar. |
+| Breakout bar | The **first** bar of the day that opens after the range is complete, is inside the entry window, and **closes above ORH** (buy) or **below ORL** (sell). |
+| One per day | After that bar, no more breakout setups that day, even if the setup is rejected, blocked or never fills. A close outside the range *before* the entry window doesn't count and doesn't use up the day. |
+| **Entry** (limit) | Buy: **ORH**. Sell: **ORL**. You buy the retest of the broken edge, not the breakout candle. |
+| **Stop** | Buy: round(ORH − 0.5 × (ORH − ORL)). Sell: round(ORL + 0.5 × (ORH − ORL)). That's the middle of the range (setting: 0.5; 1.0 = the far side). |
+| **Risk R / Target** | R = \|Entry − Stop\|. Target = round(Entry ± 2 × R). |
+| Valid | 8 ≤ R ≤ 60 points, same as §4 |
+
+- **Same bar as a sweep setup:** if a sweep setup was found on the same bar (valid or not), it takes priority. The breakout still uses up the day.
+- **Same handling as sweep trades:** everything after the setup is identical: the rails (§5), sizing (§6), order handling (§7) and trade management (§8).
+
+---
+
 ## 5. Should the signal be taken? (risk rails)
 
 These checks run in this order at the close of bar B. The first one that applies blocks the signal.
@@ -247,6 +272,8 @@ Now suppose the 09:55 bar's low had been 19985 instead, so there is no breakeven
 | Reward : risk | 2.0 | | Eval min days / consistency | 5 / best day < 50% |
 | Stop size allowed | 8–60 points | | Firm max contracts | 30 |
 | Order expires after | 6 bars | | Breakeven at | 1.0 R |
+| Trade these setups | Both | | Opening range length | 5 minutes |
+| Breakout stop | 0.5 of the range (middle) | | | |
 
 ---
 
@@ -258,7 +285,8 @@ Each count covers the loaded chart history.
 |---|---|
 | Days | Trading days that had RTH bars |
 | Sweeps | Sweeps that started a setup (§3) |
-| Setups | Bars where all four conditions of §4 were met, before the stop-size check |
+| Breakouts | Breakout bars (§4b), one at most per day |
+| Setups | Bars where all four conditions of §4 were met, or a breakout gave a setup (§4b), before the stop-size check |
 | Stop over / under | Setups with R > max stop / R < min stop (§4) |
 | Daily limits/busy | Valid setups blocked by a rail in §5 |
 | Can't size | Valid setups where contracts = 0 (§6) |

@@ -20,6 +20,10 @@ class Instrument:
 
 @dataclass
 class StrategyConfig:
+    # Which setups to trade (both can be on; at most one position at a time)
+    use_sweep: bool = True  # liquidity sweep -> displacement -> fair value gap
+    use_orb: bool = True  # opening range breakout, limit entry on the retest
+
     # Entry window, America/New_York, "HHMM" strings. Sweeps and setups outside it are ignored.
     window_start: str = "0935"
     window_end: str = "1130"
@@ -45,6 +49,10 @@ class StrategyConfig:
     max_stop_points: float = 60.0
     order_expiry_bars: int = 6  # cancel unfilled limit after this many bars
     breakeven_at_r: float = 1.0  # move stop to entry once price reaches this many R (0 = off)
+
+    # Opening range breakout
+    or_minutes: int = 5  # opening range = RTH bars from 09:30 for this many minutes
+    or_stop_frac: float = 0.5  # stop this share of the range behind the entry (0.5 = midpoint, 1 = far side)
 
 
 @dataclass

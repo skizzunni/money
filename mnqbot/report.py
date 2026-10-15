@@ -240,7 +240,8 @@ def format_report(s: dict) -> str:
         lines += [
             "-" * 64,
             f"Setup funnel over {f['days']} days:",
-            f"  {f['sweeps']} sweeps > {f['setups']} setups > {f['signals']} signals > {f['filled']} filled",
+            f"  {f['sweeps']} sweeps + {f['breakouts']} breakouts > {f['setups']} setups > {f['signals']} signals"
+            f" > {f['filled']} filled",
             f"  dropped: stop too wide {f['stop_too_wide']}, too tight {f['stop_too_tight']},"
             f" daily limits/busy {f['blocked']}, can't size {f['too_big_to_size']}, never filled {f['never_filled']}",
         ]

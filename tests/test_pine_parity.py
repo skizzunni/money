@@ -26,6 +26,9 @@ ROOT = Path(__file__).resolve().parents[1]
 INDICATOR = ROOT / "pine" / "mnq_liquidity_sweep_signals.pine"
 STRATEGY = ROOT / "pine" / "mnq_liquidity_sweep_bot.pine"
 
+# Hand-built sweep days: sweep setups only, no swing levels (Python: use_orb=False, use_swings=False).
+SWEEP_ONLY = {"Watch latest swing high/low": False, "Trade these setups": "Liquidity sweep"}
+
 # Same settings as test_engine.loose_cfg(), by input title.
 LOOSE = {
     "Entry window (New York time)": "0935-1500",
@@ -208,6 +211,7 @@ EDGE = _edge_cases()
 def _edge_cfg(risk_overrides, evals=True):
     cfg = BotConfig()
     cfg.strategy.use_swings = False
+    cfg.strategy.use_orb = False
     for k, v in risk_overrides.items():
         setattr(cfg.risk, k, v)
     if not evals:
@@ -220,7 +224,7 @@ def _edge_cfg(risk_overrides, evals=True):
 def test_edge_cases_indicator(name):
     bars, extra, risk = EDGE[name]
     res = backtest(bars, _edge_cfg(risk, evals=False))
-    inputs = {"Watch latest swing high/low": False, "Your room to the drawdown line $": 1e9} | extra
+    inputs = {**SWEEP_ONLY, "Your room to the drawdown line $": 1e9} | extra
     orders, trades, _ = run_indicator(bars, inputs)
     assert orders == engine_orders(res)
     assert trades == engine_trades(res, bars)
@@ -230,7 +234,7 @@ def test_edge_cases_indicator(name):
 def test_edge_cases_strategy(name):
     bars, extra, risk = EDGE[name]
     res = backtest(bars, _edge_cfg(risk))
-    orders, trades, _, _ = run_strategy(bars, {"Watch latest swing high/low": False} | extra)
+    orders, trades, _, _ = run_strategy(bars, {**SWEEP_ONLY} | extra)
     assert orders == engine_orders(res)
     assert trades == engine_trades(res, bars)
 
@@ -334,7 +338,7 @@ def test_all_in_one_live_room_shrinks_size(bars):
 @pytest.mark.parametrize("name", list(EDGE))
 def test_all_in_one_edge_cases(name, mode):
     bars, extra, risk = EDGE[name]
-    inputs = {"Watch latest swing high/low": False} | extra
+    inputs = {**SWEEP_ONLY} | extra
     if mode == "live":
         res = backtest(bars, _edge_cfg(risk, evals=False))
         inputs |= NO_EVAL_ROOM
@@ -366,10 +370,11 @@ def test_eval_mode_sizes_from_simulated_room(script):
     bars = short_day()
     cfg = BotConfig()
     cfg.strategy.use_swings = False
+    cfg.strategy.use_orb = False
     cfg.prop.max_drawdown = 400.0
     res = backtest(bars, cfg)
     assert [q for _, q in res.orders] == [2]
-    inputs = {"Watch latest swing high/low": False, "Max drawdown $ (end-of-day trailing)": 400.0}
+    inputs = {**SWEEP_ONLY, "Max drawdown $ (end-of-day trailing)": 400.0}
     if script == "strategy":
         orders, trades, _, _ = run_strategy(bars, inputs)
         assert trades == engine_trades(res, bars)
@@ -380,7 +385,7 @@ def test_eval_mode_sizes_from_simulated_room(script):
 
 
 FUNNEL_VARS = {
-    "days": "fDays", "sweeps": "fSweeps", "setups": "fSetups", "stop_too_tight": "fTooTight",
+    "days": "fDays", "sweeps": "fSweeps", "breakouts": "fBreakouts", "setups": "fSetups", "stop_too_tight": "fTooTight",
     "stop_too_wide": "fTooWide", "blocked": "fBlocked", "too_big_to_size": "fNoSize",
     "signals": "fSignals", "filled": "fFilled", "never_filled": "fUnfilled",
 }
@@ -411,7 +416,7 @@ def test_all_in_one_funnel_matches_engine(bars, mode):
         res = backtest(bars, loose_cfg())
         _, _, _, rt = run_aio(bars, LOOSE | EVAL_MODE)
     f = pine_funnel(rt)
-    assert f["sweeps"] > f["setups"] > f["signals"] > 0
+    assert f["sweeps"] + f["breakouts"] > f["setups"] > f["signals"] > 0 and f["breakouts"] > 0
     assert f == engine_funnel(res)
 
 
@@ -419,7 +424,7 @@ def test_all_in_one_funnel_matches_engine(bars, mode):
 def test_all_in_one_funnel_edge_cases(name):
     bars, extra, risk = EDGE[name]
     res = backtest(bars, _edge_cfg(risk, evals=False))
-    _, _, _, rt = run_aio(bars, {"Watch latest swing high/low": False} | extra | NO_EVAL_ROOM)
+    _, _, _, rt = run_aio(bars, {**SWEEP_ONLY} | extra | NO_EVAL_ROOM)
     assert pine_funnel(rt) == engine_funnel(res)
 
 
@@ -429,9 +434,104 @@ def test_all_in_one_funnel_counts_rejected_stops():
     bars = short_day()
     cfg = BotConfig()
     cfg.strategy.use_swings = False
+    cfg.strategy.use_orb = False
     cfg.strategy.max_stop_points = 15.0
     res = backtest(bars, _no_eval(cfg))
-    _, _, _, rt = run_aio(bars, {"Watch latest swing high/low": False, "Max stop (points)": 15.0} | NO_EVAL_ROOM)
+    _, _, _, rt = run_aio(bars, {**SWEEP_ONLY, "Max stop (points)": 15.0} | NO_EVAL_ROOM)
     f = pine_funnel(rt)
     assert (f["sweeps"], f["setups"], f["stop_too_wide"], f["signals"]) == (1, 1, 1, 0)
     assert f == engine_funnel(res)
+
+
+# ------------------------------------------------------------------ opening range breakout
+def _orb_cases():
+    import test_orb as O
+
+    after_no_retest = (
+        [(20014, 20016, 20011, 20012)] * 6 + [(20012, 20012, 19980, 19982)] + [(19982, 19983, 19981, 19982)] * 3
+    )
+    half_tick = O.bars_from_rows(
+        "2026-10-14 09:00",
+        O.PRE + [(20000, 20010.25, 19990, 20005), (20005, 20016, 20004, 20014)] + [(20014, 20015, 20009.75, 20013)] * 4,
+    )
+    only = {"Trade these setups": "Opening range breakout", "Watch latest swing high/low": False}
+    return {
+        # name: (bars, Pine inputs, engine StrategyConfig overrides)
+        "long retest to target": (O.long_day(), only, {"use_sweep": False}),
+        "short retest to stop": (O.short_day(), only, {"use_sweep": False}),
+        "one breakout per day": (O.long_day(after_no_retest), only, {"use_sweep": False}),
+        "15-minute range": (
+            O.long_day(),
+            only | {"Opening range length (minutes from 9:30)": 15},
+            {"use_sweep": False, "or_minutes": 15},
+        ),
+        "stop at far side": (
+            O.long_day(), only | {"Breakout stop: share of the range behind entry (0.5 = middle)": 1.0},
+            {"use_sweep": False, "or_stop_frac": 1.0},
+        ),
+        "half-tick midpoint": (half_tick, only, {"use_sweep": False}),
+        "window starts later": (
+            O.long_day(),
+            only | {"Entry window (New York time)": "0945-1130"},
+            {"use_sweep": False, "window_start": "0945"},
+        ),
+        "both setups on": (O.long_day(), {"Watch latest swing high/low": False}, {}),
+    }
+
+
+ORB_EDGE = _orb_cases()
+
+
+def _orb_cfg(overrides, evals):
+    cfg = BotConfig()
+    cfg.strategy.use_swings = False
+    for k, v in overrides.items():
+        setattr(cfg.strategy, k, v)
+    return cfg if evals else _no_eval(cfg)
+
+
+@pytest.mark.parametrize("name", list(ORB_EDGE))
+def test_orb_indicator(name):
+    bars, inputs, over = ORB_EDGE[name]
+    res = backtest(bars, _orb_cfg(over, evals=False))
+    assert res.orders, "case should produce a breakout order"
+    orders, trades, _ = run_indicator(bars, inputs | {"Your room to the drawdown line $": 1e9})
+    assert orders == engine_orders(res)
+    assert trades == engine_trades(res, bars)
+
+
+@pytest.mark.parametrize("name", list(ORB_EDGE))
+def test_orb_strategy(name):
+    bars, inputs, over = ORB_EDGE[name]
+    res = backtest(bars, _orb_cfg(over, evals=True))
+    orders, trades, _, _ = run_strategy(bars, inputs)
+    assert orders == engine_orders(res)
+    assert trades == engine_trades(res, bars)
+
+
+@pytest.mark.parametrize("mode", ["live", "eval"])
+@pytest.mark.parametrize("name", list(ORB_EDGE))
+def test_orb_all_in_one(name, mode):
+    bars, inputs, over = ORB_EDGE[name]
+    if mode == "live":
+        res = backtest(bars, _orb_cfg(over, evals=False))
+        inputs = inputs | NO_EVAL_ROOM
+    else:
+        res = backtest(bars, _orb_cfg(over, evals=True))
+        inputs = inputs | EVAL_MODE
+    orders, trades, _, rt = run_aio(bars, inputs)
+    assert orders == engine_orders(res)
+    assert trades == engine_trades_with_reason(res, bars)
+    _check_labels_and_alerts(rt, orders, trades)
+    if mode == "live":
+        assert pine_funnel(rt) == engine_funnel(res)
+
+
+def test_all_three_scripts_offer_the_same_setup_inputs():
+    names = ("setupType", "orMinutes", "orStopFrac", "useSweep", "useOrb", "orEndMin", "orEndHHMM")
+    blocks = [
+        [line for line in path.read_text().splitlines() if line.split(" ")[0] in names]
+        for path in (INDICATOR, STRATEGY, AIO)
+    ]
+    assert len(blocks[0]) == len(names)
+    assert blocks[0] == blocks[1] == blocks[2]

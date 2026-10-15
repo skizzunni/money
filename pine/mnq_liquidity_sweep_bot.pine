@@ -47,6 +47,15 @@ maxStopPts   = input.float(60.0, "Max stop (points)", minval = 0.25, group = grp
 expiryBars   = input.int(6, "Cancel unfilled entry after N bars", minval = 1, maxval = 200, group = grpS)
 beAtR        = input.float(1.0, "Stop to breakeven at R (0 = off)", minval = 0.0, maxval = 10.0, step = 0.25, group = grpS)
 
+grpT = "Setup type"
+setupType    = input.string("Both", "Trade these setups", options = ["Both", "Liquidity sweep", "Opening range breakout"], group = grpT)
+orMinutes    = input.int(5, "Opening range length (minutes from 9:30)", minval = 5, maxval = 120, step = 5, group = grpT)
+orStopFrac   = input.float(0.5, "Breakout stop: share of the range behind entry (0.5 = middle)", minval = 0.1, maxval = 1.0, step = 0.05, group = grpT)
+useSweep     = setupType != "Opening range breakout"
+useOrb       = setupType != "Liquidity sweep"
+orEndMin     = 9 * 60 + 30 + orMinutes
+orEndHHMM    = math.floor(orEndMin / 60) * 100 + orEndMin % 60
+
 grpR = "Risk rails"
 riskPerTrade = input.float(150, "Max $ risk per trade (incl. fees)", minval = 1, group = grpR)
 maxContracts = input.int(15, "Max contracts", minval = 1, maxval = 1000, group = grpR)
@@ -386,6 +395,35 @@ if armedDir != 0 and bar_index > armedSweepBar
                         setupLevel := armedLevel
                     armedDir := 0
 
+// opening range breakout: first close outside the opening range, limit order back at the broken edge
+var float orHi = na
+var float orLo = na
+var bool orbUsed = false
+bool brokeOut = false
+if bar_index == dayStartBar
+    orHi := na
+    orLo := na
+    orbUsed := false
+if useOrb and not orbUsed and not na(orHi) and nyHHMM >= orEndHHMM and inWindow and (close > orHi or close < orLo)
+    orbUsed := true
+    brokeOut := true
+    if na(setupRisk)
+        int d = close > orHi ? 1 : -1
+        float e = d > 0 ? orHi : orLo
+        float s = roundTick(e - d * orStopFrac * (orHi - orLo))
+        float r = math.abs(e - s)
+        setupRisk := r
+        if r >= minStopPts and r <= maxStopPts
+            setupNow := true
+            setupDir := d
+            setupEntry := e
+            setupStop := s
+            setupTarget := roundTick(e + d * rr * r)
+            setupName := d > 0 ? "ORH" : "ORL"
+            setupLevel := e
+            gapHi := orHi
+            gapLo := orLo
+
 // sweeps: trade through an untaken level, close back on the other side
 through = sweepTicks * tick
 float bearLevel = na
@@ -426,7 +464,7 @@ if not na(lvSWL) and not tkSWL and low <= lvSWL - through
 
 bool sweptBear = false
 bool sweptBull = false
-if inWindow and not (not na(bearLevel) and not na(bullLevel))
+if useSweep and inWindow and not (not na(bearLevel) and not na(bullLevel))
     if not na(bearLevel)
         sweptBear := true
         armedDir := -1
@@ -460,6 +498,11 @@ if useSwings and bar_index - 2 * swingLen >= dayStartBar
     if pivL
         lvSWL := low[swingLen]
         tkSWL := false
+
+// opening range (RTH bars from 09:30 until the range is complete)
+if isRth and nyHHMM < orEndHHMM
+    orHi := na(orHi) ? high : math.max(orHi, high)
+    orLo := na(orLo) ? low : math.min(orLo, low)
 
 // ───────────────────────────── 7. risk rails and order placement
 consistentIf(float total, float best) => propConsistency <= 0 or best < propConsistency / 100.0 * total
@@ -534,6 +577,8 @@ plot(showLevels ? lvONH : na, "Overnight high", tkONH ? color.new(color.orange, 
 plot(showLevels ? lvONL : na, "Overnight low", tkONL ? color.new(color.aqua, 75) : color.aqua, 1, plot.style_linebr)
 plot(showLevels ? lvSWH : na, "Swing high", tkSWH ? color.new(color.gray, 80) : color.gray, 1, plot.style_linebr)
 plot(showLevels ? lvSWL : na, "Swing low", tkSWL ? color.new(color.gray, 80) : color.gray, 1, plot.style_linebr)
+plot(showLevels and useOrb ? orHi : na, "Opening range high", color.purple, 1, plot.style_linebr)
+plot(showLevels and useOrb ? orLo : na, "Opening range low", color.purple, 1, plot.style_linebr)
 plot(posDir != 0 ? posStop : pendDir != 0 ? pendStop : na, "Stop", color.red, 1, plot.style_linebr)
 plot(posDir != 0 ? posTarget : pendDir != 0 ? pendTarget : na, "Target", color.lime, 1, plot.style_linebr)
 plot(pendDir != 0 ? pendEntry : posDir != 0 ? posEntry : na, "Entry", color.yellow, 1, plot.style_linebr)

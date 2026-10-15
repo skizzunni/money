@@ -441,6 +441,7 @@ class Backtester:
         funnel = {
             "days": int(b.groupby("trade_date")["is_rth"].any().sum()),
             "sweeps": sig.n_sweeps,
+            "breakouts": sig.n_breakouts,
             "setups": len(risks),
             "stop_too_tight": sum(r < lo for r in risks),
             "stop_too_wide": sum(r > hi for r in risks),

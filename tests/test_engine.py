@@ -139,6 +139,7 @@ def two_setup_day():
     ] + [(20004, 20006, 20002, 20004)] * 6
     cfg = BotConfig()
     cfg.strategy.use_swings = False
+    cfg.strategy.use_orb = False
     return bars_from_rows("2026-10-14 08:00", rows), cfg
 
 
@@ -252,7 +253,7 @@ def test_trade_date_rolls_at_6pm():
 
 def test_funnel_adds_up(result):
     f = result.funnel
-    assert f["sweeps"] >= f["setups"] > 0
+    assert f["sweeps"] + f["breakouts"] >= f["setups"] > 0
     assert f["setups"] == f["stop_too_tight"] + f["stop_too_wide"] + f["blocked"] + f["too_big_to_size"] + f["signals"]
     assert f["blocked"] + f["too_big_to_size"] == sum(result.skipped.values())
     assert f["signals"] == len(result.orders)
@@ -266,6 +267,7 @@ def test_funnel_counts_rejected_stop_sizes():
     bars = short_day()  # one setup with a 17-point stop
     cfg = BotConfig()
     cfg.strategy.use_swings = False
+    cfg.strategy.use_orb = False
     cfg.strategy.max_stop_points = 15.0
     f = backtest(bars, cfg).funnel
     assert (f["sweeps"], f["setups"], f["stop_too_wide"], f["signals"]) == (1, 1, 1, 0)
