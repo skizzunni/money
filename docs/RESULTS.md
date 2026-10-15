@@ -2,7 +2,7 @@
 
 **Verdict: the original sweep/breakout bot has no edge.** On 3¾ years of Nasdaq-100 data, none of its seven pre-declared variants shows an edge that survives costs, and the variant picked on the tuning years lost money on the unseen years. **Don't pay for a prop evaluation to trade those rules.**
 
-**One published strategy does have an edge over 16 years: noise-area momentum** ([third round](#third-round-16-years-2010-2026)). It holds at today's costs as a share of price, but it carries real caveats, and on a $25K / $1,500 evaluation it failed more often than it passed (about 4 in 10 historical starts passed). It's now in TradingView as [`pine/mnq_noise_momentum.pine`](../pine/mnq_noise_momentum.pine), with its rules in [NOISE.md](NOISE.md).
+**One published strategy does have an edge over 16 years: noise-area momentum** ([third round](#third-round-16-years-2010-2026)). It holds at today's costs as a share of price, but it carries real caveats, and as first traded it failed more $25K evaluations than it passed. The [ninth round](#ninth-round-the-account-and-the-exit) changed that: with a resting-stop exit it passes about 6 in 10 historical $25K evaluations, and about 84% of $100K ones, on 1 MNQ. It's now in TradingView as [`pine/mnq_noise_momentum.pine`](../pine/mnq_noise_momentum.pine), with its rules in [NOISE.md](NOISE.md).
 
 ---
 
@@ -312,6 +312,47 @@ Nothing near the bar of t ≥ 2.5. Flexible models find nothing a simple rule ca
 - **Across all 16 years it still shows t 3.6 and 14 winning years.** That's the trap: a backtest over the years that found the rule proves nothing. Only the final test counts.
 - **Noise-area momentum remains the only survivor** of seven rounds.
 
+## Eighth round: what's actually wrong
+
+Passing a $25K / $1,500 evaluation with a strategy that averages *m* dollars a day against a swing of *s* dollars a day is close to a gambler's-ruin problem: the odds rise with *m ÷ s²*, not with the number of trades. Noise-area momentum on 1 MNQ has *m* ≈ $18 and *s* ≈ $300, so the whole $1,500 cushion is five ordinary days. More price-only edge has been searched for (rounds six and seven) and not found. What's left is the ratio. Two fixes with evidence behind them, fixed before running ([`research/round8.py`](../research/round8.py)):
+
+| Fix | Result |
+|---|---|
+| **Size by volatility**, as the paper does (0–2 contracts by the last 20 sessions' volatility) | Worse: +$17.73 → +$10.93 a day, evaluation pass 38% → 35%. The edge lives on the wild days, so cutting them cuts the profit. |
+| **An overnight return stream.** The 24-hour clock in 44 half-hour bins, 2011–2018 | Two bins passed the luck filter. The 02:00 bin (the European open, where the academic "overnight drift" sits) had t = 5.0 on 2011–2018 and **−0.18 on 2019–2022**. Dead. Nothing to test further. |
+
+## Ninth round: the account, and the exit
+
+Two more levers on the same ratio ([`research/round9.py`](../research/round9.py)):
+
+**A. A continuous exit.** Once in a trade, a stop order rests at the current noise line and moves with it at every half hour, instead of a check at the half hour. No new parameters. The 30-minute check is where the −$2,465 days came from.
+
+| | 2011–2022, half-hour check | 2011–2022, resting stop | 2023–2026, half-hour check | 2023–2026, resting stop |
+|---|---:|---:|---:|---:|
+| $/day | +23.21 | +22.35 | +12.53 | +14.13 |
+| t | 3.80 | 4.20 | 1.08 | 1.28 |
+| Worst intraday dip | −$2,465 | **−$1,412** | −$1,252 | **−$976** |
+| Worst losing stretch | $5,156 | $4,744 | $9,211 | $6,208 |
+| Trades a day | 0.60 | 1.21 | 0.60 | 1.21 |
+| $25K evaluation pass / fail, 125 sessions | 42% / 54% | **53% / 37%** | 40% / 57% | 40% / 56% |
+
+The rule set in advance was: a candidate if the pass rate rises 3 points on 2011–2022 (it rose 11), confirmed if it rises 3 points on 2023–2026 too. It didn't rise there, so by that bar it's not confirmed. It was equal or better on every other measure in both periods and worse on none, and it attacks the thing that fails evaluations, so it is now the script's default, with the half-hour check kept as a setting.
+
+**B. The account tier.** The same 1-contract sessions through the evaluation rules of larger accounts, from every start day in 2011–2026, 500 sessions:
+
+| Account (target / drawdown) | Half-hour check: pass / fail | Resting stop: pass / fail / still running | Median days to pass (stop) |
+|---|---:|---:|---:|
+| $25K (1,500 / 1,500) | 47% / 53% | 61% / 39% / 0% | 45 |
+| $50K (3,000 / 2,000) | 52% / 48% | 64% / 36% / 0% | 85 |
+| **$100K (6,000 / 3,000)** | 72% / 22% | **84% / 7% / 9%** | 203 |
+| $150K (9,000 / 4,500) | 68% / 3% | 68% / 3% / 29% | 298 |
+
+With 2 or 3 contracts the odds fall back toward the $25K numbers: more contracts shrink the cushion in exactly the same way a smaller account does.
+
+- **The $25K account is the wrong instrument for a 1-contract edge.** The same strategy and size pass 84% of the time on a $100K evaluation, because the $3,000 drawdown is ten ordinary days instead of five.
+- **The price is time.** About a year of trading days to reach the $100K target, and an evaluation fee for each month of it.
+- **Tiers as I understand Take Profit Trader's** (their site is unreachable from here): verify the targets, drawdowns, fees and the rule on holding through the night before paying.
+
 ## What this does and doesn't say
 
 - **It says** that the original sweep/breakout rules have no edge after realistic costs on 2023–2026 Nasdaq-100 data, and would very likely not pass a $25K evaluation. Of three published strategies, only noise-area momentum held up over 16 years, and even it fails most $25K evaluations.
@@ -335,6 +376,8 @@ python research/discovery2.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"     # extremes
 python research/afternoon.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"      # the afternoon-trend idea, final test
 python research/discovery3.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"     # overnight, regimes, walk-forward boosting
 python research/regime_trend.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"   # the regime-trend family, final test
+python research/round8.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"         # volatility sizing, the 24-hour clock
+python research/round9.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"         # the resting-stop exit, account tiers
 ```
 
 The raw data isn't stored in this repo.
