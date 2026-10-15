@@ -1,6 +1,8 @@
 # Does the bot have an edge? A multi-year test
 
-**Verdict: no.** On 3¾ years of Nasdaq-100 data, none of the seven pre-declared variants shows an edge that survives costs. The variant picked on the tuning years lost money on the unseen years. A second round tested three published intraday strategies, and none of them passed either ([below](#second-round-published-strategies)). **Don't pay for a prop evaluation to trade these rules.**
+**Verdict: the original sweep/breakout bot has no edge.** On 3¾ years of Nasdaq-100 data, none of its seven pre-declared variants shows an edge that survives costs, and the variant picked on the tuning years lost money on the unseen years. **Don't pay for a prop evaluation to trade those rules.**
+
+**One published strategy does have an edge over 16 years: noise-area momentum** ([third round](#third-round-16-years-2010-2026)). It holds at today's costs as a share of price, but it carries real caveats, and on a $25K / $1,500 evaluation it failed more often than it passed (about 4 in 10 historical starts passed). It's now in TradingView as [`pine/mnq_noise_momentum.pine`](../pine/mnq_noise_momentum.pine), with its rules in [NOISE.md](NOISE.md).
 
 ---
 
@@ -121,9 +123,68 @@ Three intraday strategies with published evidence on US index ETFs, each run wit
 - **What the S1 rows cover.** The $150-risk row skips the roughly 150 days whose first candle is too wide to trade with $150 of risk. The R row takes every signal, as the paper does.
 - **Days left out.** Only full sessions count. Holidays, half days, and the weeks when the US and European clock changes differ are dropped (this data's session ends at 15:15 New York time in those weeks). Days with a trade open across missing minutes are left out too.
 
+## Third round: 16 years, 2010-2026
+
+You downloaded `NSXUSD` back to November 2010, about 16 years in all. The 2010–2022 data was new to every strategy. The clock was checked the same way as before: the 09:30 open spike sits at 09:30 in both winter and summer, every year.
+
+**Pass bar, set before running.** It extends the second round's bar to three eras:
+
+- After costs, a t-stat of at least 2.5 over the whole period.
+- Positive in each era: 2010–2016, 2017–2022 and 2023–2026.
+- Positive in at least 75% of the years with 100+ sessions.
+
+**Units.** The index went from about 2,100 to 30,000, so S1 is scored in R, and S2 and S3 in % of price per trade (summed, at a constant contract value). That way the early years count as much as the recent ones.
+
+**As declared, with today's MNQ costs in index points at every price level:**
+
+| Strategy | Trades | Avg per trade | t | 2010–16 | 2017–22 | 2023–26 | Years up | Result |
+|---|---:|---:|---:|---:|---:|---:|---:|---|
+| S1 opening range, every signal | 3,576 | −0.03R | −0.87 | −276.3R | +123.2R | +40.7R | 8 of 16 | fail |
+| S1 opening range, $150 risk | 3,372 | −$3.23 | −0.67 | −$31,371 | +$13,913 | +$6,579 | 9 of 16 | fail |
+| S2a noise area | 2,915 | +0.020% | 1.91 | −22.0% | +65.8% | +13.1% | 7 of 16 | fail |
+| S2b noise area + TWAP stop | 3,047 | +0.020% | 2.04 | −21.1% | +68.7% | +12.0% | 8 of 16 | fail |
+| S3 last half hour | 3,687 | −0.021% | −4.39 | −39.8% | −37.2% | +0.3% | 3 of 16 | fail |
+
+**The cost question.** Charging today's costs in points at 2011 prices charges about ten times today's cost as a share of price, because 1 tick was a much bigger slice of a 2,300 index. To decide whether to trade these rules *now*, the right charge is today's costs as a share of price. Here is the same set of trades under three cost models:
+
+| Strategy | Costs | Avg per trade | t | 2010–16 | 2017–22 | 2023–26 | Years up | Result |
+|---|---|---:|---:|---:|---:|---:|---:|---|
+| S1 opening range | today's, as share of price | +0.069R | 1.72 | −4.8R | +205.4R | +47.0R | 10 of 16 | fail |
+| S1 opening range | none | +0.096R | 2.32 | +38.8R | +240.6R | +64.2R | 10 of 16 | fail |
+| **S2a noise area** | **today's, as share of price** | **+0.036%** | **3.50** | **+12.8%** | **+76.7%** | **+14.3%** | **14 of 16** | **pass** |
+| S2a noise area | none | +0.039% | 3.86 | +17.0% | +81.0% | +16.5% | 15 of 16 | pass |
+| S2b noise area + TWAP stop | today's, as share of price | +0.036% | 3.72 | +15.4% | +79.9% | +13.2% | 14 of 16 | pass |
+| S2b noise area + TWAP stop | none | +0.039% | 4.11 | +19.7% | +84.4% | +15.6% | 15 of 16 | pass |
+| S3 last half hour | today's, as share of price | −0.004% | −0.91 | +6.0% | −23.8% | +1.9% | 8 of 16 | fail |
+| S3 last half hour | none | −0.001% | −0.14 | +11.4% | −18.6% | +4.9% | 10 of 16 | fail |
+
+- **Noise-area momentum passes once costs are scaled to today, and nothing else does.** Before costs it made money in 15 of 16 years.
+- **Weigh that carefully.** The share-of-price cost model was chosen after seeing the declared result, so it counts for less than a pre-set test. In its favor: this is a published strategy run with its authors' settings, nothing was tuned, and the change is to costs, not to the rules.
+- **The edge is uneven.** More than half of it came from 2018 and 2022, two volatile years.
+
+**On a $25K evaluation.** This is S2a, the version in the TradingView script ([`research/noise_eval.py`](../research/noise_eval.py)), on 1 MNQ at the last price in the data (30,661) with today's costs. The evaluation rules are Take Profit Trader-style: $1,500 target, $1,500 end-of-day trailing drawdown, a breach intraday fails, best day under 50% of profit, and at least 5 trading days. Each evaluation starts on a historical day and runs forward through real history, once for every possible start day.
+
+| | As published (the script) | With the bot's $300 daily loss limit |
+|---|---:|---:|
+| Average per session | +$17.73 | +$14.87 |
+| Daily swing (standard deviation) | $304 | $265 |
+| t-stat | 3.50 | 3.37 |
+| Worst intraday dip | −$2,465 | −$307 |
+| Worst losing stretch | −$8,168 | −$10,474 |
+| 2023–2026 total | +$8,755 | −$14 |
+| Pass / fail within 60 sessions | 30% / 49% | 30% / 43% |
+| Pass / fail within 125 sessions | 38% / 57% | 41% / 53% |
+| Pass / fail within 250 sessions | 43% / 57% | 46% / 53% |
+| Pass / fail within 125 sessions, 2023–2026 starts | 39% / 59% | 34% / 66% |
+
+- **An evaluation is more likely to fail than pass, even with a real edge.** The edge is about $18 a session, against swings of about $300 a day and a $1,500 trailing drawdown. That's thin for passing.
+- **The $300 daily limit isn't used.** It helps a little over 16 years but erases 2023–2026, the period closest to now.
+- **2026 is a losing year so far:** −$3,155 through September on 1 MNQ.
+- **The bot matches the research.** Its 5-minute reference (`mnqbot/noise.py`) makes the same trades as the 1-minute research version on 1,979 of 1,999 clean sessions. The other 20 are holidays and other irregular sessions.
+
 ## What this does and doesn't say
 
-- **It says** that these specific rules, on 5-minute Nasdaq-100 data from 2023 to 2026, have no edge after realistic costs. It also says they would very likely not pass a $25K evaluation.
+- **It says** that the original sweep/breakout rules have no edge after realistic costs on 2023–2026 Nasdaq-100 data, and would very likely not pass a $25K evaluation. Of three published strategies, only noise-area momentum held up over 16 years, and even it fails most $25K evaluations.
 - **It doesn't say** that sweeps or breakouts can never work. Only the rules above were tested, on 3¾ years.
 - **Testing more variants on the same data would be data-mining.** Anything found that way would need fresh unseen data to be believed.
 - **Risk control can't create an edge that isn't there.** Once the data holes are removed, the rails kept every loss within 1.01R and every day under the $300 limit, and the rules still lost money.
@@ -135,7 +196,8 @@ Download the `NSXUSD` ASCII 1-minute files from HistData.com, then run:
 ```bash
 python research/nsx_study.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"   # the study
 python research/nsx_holes.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"   # the data-hole check and best case
-python research/published_lab.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"   # the published strategies
+python research/published_lab.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"   # the published strategies + cost check
+python research/noise_eval.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"      # noise momentum on a $25K evaluation
 ```
 
 The raw data isn't stored in this repo.

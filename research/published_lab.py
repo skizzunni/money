@@ -15,8 +15,12 @@ Fixed before looking at any results:
   S3   Last-half-hour momentum (Gao, Han, Li & Zhou 2018, "Market Intraday Momentum"): at 15:30 go
        in the direction of the return from the previous 16:00 close to 10:00; out at 16:00. 1 contract.
 
-  Pass bar (all three): after costs, mean daily P&L t-stat >= 2.5 over the whole period, positive in
-  both 2023-2024 and 2025-2026, and positive in at least 3 of the 4 calendar years.
+  Pass bar: after costs, mean daily P&L t-stat >= 2.5 over the whole period, positive in each era
+  that has data (2010-2016, 2017-2022, 2023-2026), and positive in at least 75% of the calendar
+  years with 100+ tested days. (The first run, on 2023-2026 only, used: positive in both 2023-2024
+  and 2025-2026 and in 3 of 4 years. Same idea, extended when 2010-2022 data arrived.)
+  S1 is scored in R. S2 and S3 are scored in % of price per trade (constant notional), so the
+  2010s, when the index was near 2,000, count as much as 2026, when it was near 25,000.
 
 Fills and costs follow the repo's cautious defaults: market orders fill at the next 1-minute open plus
 1 tick of slippage, stops fill at the stop (or at the open if price gaps past it) minus 1 tick, a
@@ -200,31 +204,45 @@ def s3_last_half_hour(days: Days, i: int) -> list[Trade]:
     return [Trade(days.dates[i], d, m, mx, entry, exit_px, 1, 0.0, "close", days.hole(i, m, mx))]
 
 
-def evaluate(name: str, trades: list[Trade], eligible: pd.Index, in_r: bool = False) -> dict:
-    """Daily P&L in $ (or in R when in_r), with days that had a trade across missing minutes left out."""
+ERAS = (("2010-2016", 0, 2017), ("2017-2022", 2017, 2023), ("2023-2026", 2023, 9999))
+MIN_DAYS_PER_YEAR = 100  # a calendar year counts toward "years up" only with this many tested days
+
+
+def evaluate(name: str, trades: list[Trade], eligible: pd.Index, unit: str = "$") -> dict:
+    """Daily P&L, with days that had a trade across missing minutes left out.
+
+    unit "$": dollars as sized. "R": each trade's P&L over its risk (1R = stop loss plus costs).
+    "%": each trade's net move as a percent of its entry price, i.e. constant notional, so years
+    with a low index level weigh the same as years with a high one.
+    """
     tf = pd.DataFrame([{**t.__dict__, "pnl": t.pnl, "gross_pts": t.direction * (t.exit - t.entry) + 2 * SLIP}
                        for t in trades])
-    if in_r:
+    if unit == "R":
         tf["pnl"] = tf.pnl / (tf.qty * (tf.risk_pts * PV + SLIP * PV + FEE_RT))
+    elif unit == "%":
+        tf["pnl"] = 100 * (tf.direction * (tf.exit - tf.entry) - FEE_RT / PV) / tf.entry
     bad_days = set(tf.loc[tf.hole, "day"]) if len(tf) else set()
     clean = tf[~tf.day.isin(bad_days)] if len(tf) else tf
     days = eligible.difference(pd.Index(sorted(bad_days)))
     daily = clean.groupby("day").pnl.sum().reindex(days, fill_value=0.0) if len(clean) else pd.Series(0.0, days)
-    years = daily.groupby(daily.index.map(lambda d: d.year)).sum()
-    half1 = daily[daily.index < pd.Timestamp("2025-01-01").date()].sum()
-    half2 = daily[daily.index >= pd.Timestamp("2025-01-01").date()].sum()
+    year = daily.index.map(lambda d: d.year)
+    years = daily.groupby(year).sum()
+    counted = daily.groupby(year).size() >= MIN_DAYS_PER_YEAR
+    in_era = {label: (year >= a) & (year < b) for label, a, b in ERAS}
+    eras = {label: float(daily[m].sum()) for label, m in in_era.items() if m.any()}
     t = daily.mean() / daily.std(ddof=1) * math.sqrt(len(daily)) if daily.std(ddof=1) > 0 else 0.0
-    passed = t >= 2.5 and half1 > 0 and half2 > 0 and (years > 0).sum() >= 3
-    sized_r = len(clean) and not in_r and (clean.risk_pts > 0).all()
-    r = clean.pnl / (clean.qty * (clean.risk_pts * PV + SLIP * PV + FEE_RT)) if sized_r else clean.pnl if in_r else None
+    years_up, years_counted = int((years[counted] > 0).sum()), int(counted.sum())
+    passed = t >= 2.5 and all(v > 0 for v in eras.values()) and years_up >= 0.75 * years_counted
+    sized_r = len(clean) and unit == "$" and (clean.risk_pts > 0).all()
+    r = clean.pnl / (clean.qty * (clean.risk_pts * PV + SLIP * PV + FEE_RT)) if sized_r else None
     return {
-        "name": name, "unit": "R" if in_r else "$", "days": len(daily), "trades": len(clean),
-        "left_out_days": len(bad_days),
+        "name": name, "unit": unit, "days": len(daily), "trades": len(clean), "left_out_days": len(bad_days),
         "win_rate": float((clean.pnl > 0).mean()) if len(clean) else 0.0,
         "avg_trade": float(clean.pnl.mean()) if len(clean) else 0.0,
         "avg_gross_pts": float(clean.gross_pts.mean()) if len(clean) else 0.0,  # per contract, before costs
         "avg_r": float(r.mean()) if r is not None else None,
-        "net": float(daily.sum()), "t": float(t), "half_2023_24": float(half1), "half_2025_26": float(half2),
+        "net": float(daily.sum()), "t": float(t), "eras": eras,
+        "years_up": years_up, "years_counted": years_counted,
         "by_year": {int(y): round(float(v), 2) for y, v in years.items()},
         "worst_day": float(daily.min()), "best_day": float(daily.max()),
         "max_dd": float((daily.cumsum().cummax() - daily.cumsum()).max()),
@@ -236,39 +254,95 @@ def run_all(raw: pd.DataFrame) -> list[dict]:
     days = Days(raw)
     sigma = noise_sigma(days)
     full = np.flatnonzero(days.full)
+    has_sigma = [i for i in full if not np.isnan(sigma[i]).any() and not np.isnan(days.prev_close[i])]
+    has_prev = [i for i in full if not np.isnan(days.prev_close[i])]
+    specs = [  # name, trades for day i, unit, eligible days
+        ("S1 5-min opening range, 10R, every signal", lambda i: s1_orb(days, i, sized=False), "R", list(full)),
+        ("S1 5-min opening range, 10R, $150 risk", lambda i: s1_orb(days, i), "$", list(full)),
+        ("S2a noise area", lambda i: s2_noise(days, i, sigma, use_twap=False), "%", has_sigma),
+        ("S2b noise area + TWAP stop", lambda i: s2_noise(days, i, sigma, use_twap=True), "%", has_sigma),
+        ("S3 last half hour", lambda i: s3_last_half_hour(days, i), "%", has_prev),
+    ]
     out = []
-    specs = {
-        "S1 5-min opening range, 10R, every signal (in R)": lambda i: s1_orb(days, i, sized=False),
-        "S1 5-min opening range, 10R, $150 risk (skips too-wide stops)": lambda i: s1_orb(days, i),
-        "S2a noise area": lambda i: s2_noise(days, i, sigma, use_twap=False),
-        "S2b noise area + TWAP stop": lambda i: s2_noise(days, i, sigma, use_twap=True),
-        "S3 last half hour": lambda i: s3_last_half_hour(days, i),
-    }
-    for name, fn in specs.items():
-        if name.startswith("S2"):
-            elig = [i for i in full if not np.isnan(sigma[i]).any() and not np.isnan(days.prev_close[i])]
-        elif name.startswith("S3"):
-            elig = [i for i in full if not np.isnan(days.prev_close[i])]
-        else:
-            elig = list(full)
+    for name, fn, unit, elig in specs:
         trades = [t for i in elig for t in fn(i)]
-        out.append(evaluate(name, trades, pd.Index([days.dates[i] for i in elig]), in_r="(in R)" in name))
+        out.append(evaluate(name, trades, pd.Index([days.dates[i] for i in elig]), unit))
     return out
+
+
+def cost_check(raw: pd.DataFrame) -> list[str]:
+    """Added after seeing the 2010-2026 result: the same trades under three cost models.
+
+    points: today's MNQ costs in index points at every price level (the declared test above)
+    scaled: today's costs as a share of price, using the last price in the data. In 2011 the index
+            was near 2,300, so 1 tick plus fees was about ten times today's cost as a share of price.
+    gross:  no costs at all
+    """
+    global SLIP, FEE_RT
+    saved = SLIP, FEE_RT
+    SLIP, FEE_RT = 0.0, 0.0  # raw fills; costs are applied per trade below
+    try:
+        ref = float(raw.close.iloc[-1])
+        days = Days(raw)
+        sigma = noise_sigma(days)
+        full = np.flatnonzero(days.full)
+        has_sigma = [i for i in full if not np.isnan(sigma[i]).any() and not np.isnan(days.prev_close[i])]
+        has_prev = [i for i in full if not np.isnan(days.prev_close[i])]
+        specs = [
+            ("S1 opening range", lambda i: s1_orb(days, i, sized=False), "R", list(full)),
+            ("S2a noise area", lambda i: s2_noise(days, i, sigma, use_twap=False), "%", has_sigma),
+            ("S2b noise area + TWAP stop", lambda i: s2_noise(days, i, sigma, use_twap=True), "%", has_sigma),
+            ("S3 last half hour", lambda i: s3_last_half_hour(days, i), "%", has_prev),
+        ]
+        fee_pts = saved[1] / PV
+        lines = [f"reference price for 'scaled': {ref:,.0f}"]
+        for name, fn, unit, elig in specs:
+            tf = pd.DataFrame([t.__dict__ for i in elig for t in fn(i)])
+            bad = set(tf.loc[tf.hole, "day"])
+            tf = tf[~tf.day.isin(bad)]
+            all_days = pd.Index([days.dates[i] for i in elig]).difference(pd.Index(sorted(bad)))
+            move = tf.direction * (tf.exit - tf.entry)
+            for model in ("points", "scaled", "gross"):
+                scale = 1.0 if model == "points" else tf.entry / ref if model == "scaled" else 0.0
+                slip = saved[0] * scale
+                cost = slip + slip * (tf.reason != "target") + fee_pts * scale
+                net = move - cost
+                val = net / (tf.risk_pts + slip + fee_pts * scale) if unit == "R" else 100 * net / tf.entry
+                daily = val.groupby(tf.day).sum().reindex(all_days, fill_value=0.0)
+                year = daily.index.map(lambda d: d.year)
+                yrs = daily.groupby(year).sum()
+                counted = daily.groupby(year).size() >= MIN_DAYS_PER_YEAR
+                eras = [daily[(year >= a) & (year < b)].sum() for _, a, b in ERAS]
+                t = daily.mean() / daily.std(ddof=1) * math.sqrt(len(daily))
+                up, n = int((yrs[counted] > 0).sum()), int(counted.sum())
+                ok = t >= 2.5 and all(v > 0 for v in eras) and up >= 0.75 * n
+                era_text = " ".join(f"{v:+8.2f}" for v in eras)
+                lines.append(f"{name:28s} {model:6s} avg {val.mean():+.4f}{unit}/trade  t={t:+.2f}  "
+                             f"eras {era_text}  years up {up}/{n}  {'PASS' if ok else 'fail'}")
+        return lines
+    finally:
+        SLIP, FEE_RT = saved
 
 
 def main() -> None:
     raw = load_histdata(sys.argv[1])
+    print(f"{len(raw):,} 1-minute bars, {raw.index[0]} .. {raw.index[-1]}")
     for r in run_all(raw):
         u = r["unit"]
-        avg_r = f"  avg {r['avg_r']:+.3f}R" if r["avg_r"] is not None and u == "$" else ""
-        print(f"\n{r['name']}  ->  {'PASS' if r['pass'] else 'fail'}")
+        avg_r = f" ({r['avg_r']:+.3f}R)" if r["avg_r"] is not None else ""
+        eras = ", ".join(f"{k} {v:+,.2f}" for k, v in r["eras"].items())
+        print(f"\n{r['name']}  [{u}]  ->  {'PASS' if r['pass'] else 'fail'}")
         print(f"  {r['trades']} trades on {r['days']} days ({r['left_out_days']} days left out for missing data), "
-              f"win {100 * r['win_rate']:.1f}%, avg {r['avg_trade']:+.3f} {u}/trade{avg_r}, "
+              f"win {100 * r['win_rate']:.1f}%, avg {r['avg_trade']:+.4f} {u}/trade{avg_r}, "
               f"avg {r['avg_gross_pts']:+.2f} pts/contract before costs")
-        print(f"  net {r['net']:+,.1f} {u}, t = {r['t']:+.2f}, 2023-24 {r['half_2023_24']:+,.1f}, "
-              f"2025-26 {r['half_2025_26']:+,.1f}, by year {r['by_year']}")
-        print(f"  worst day {r['worst_day']:+,.1f}, best day {r['best_day']:+,.1f}, "
-              f"max drawdown {r['max_dd']:,.1f} ({u})")
+        print(f"  net {r['net']:+,.2f} {u}, t = {r['t']:+.2f}, eras: {eras}, "
+              f"years up {r['years_up']} of {r['years_counted']}")
+        print(f"  by year {r['by_year']}")
+        print(f"  worst day {r['worst_day']:+,.2f}, best day {r['best_day']:+,.2f}, "
+              f"max drawdown {r['max_dd']:,.2f} ({u})")
+    print("\nCost check, added after seeing the results above (eras: " + ", ".join(e[0] for e in ERAS) + ")")
+    for line in cost_check(raw):
+        print("  " + line)
 
 
 if __name__ == "__main__":
