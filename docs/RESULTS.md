@@ -236,6 +236,42 @@ The bar was set before running:
 - **Narrower still is clearly worse:** weaker in both periods and lower evaluation odds.
 - **The full-period table was added after seeing the first one.** It was used only to reject a change, never to adopt one.
 
+## Sixth round: searching the data for new patterns
+
+Instead of testing known strategies, this round searched the 16 years for patterns of its own, with guards against finding luck.
+
+**Measurements.** 30 measurements, all taken at each half hour from 10:00 to 15:30 ([`research/discovery.py`](../research/discovery.py)):
+
+- the move from the open, the last 30 and 5 minutes, and the first 30 minutes
+- position in the day's range, distance from the average price, and the share of up-minutes
+- volatility and range versus normal, and the move in noise units
+- the overnight range and where the open sits in it, and the gap
+- yesterday's move, range and close position, and price versus yesterday's high and low
+- the last week's and month's move, 20-day volatility, and whether the gap has filled
+- day of week, month turn, and options expiry
+
+Each one was tested against the next 30 minutes, the next 60 minutes, and the move to the close. A test for a time-of-day drift was included too.
+
+**Periods:**
+
+- **Discovery:** 2011–2018, 1,922 sessions.
+- **Confirmation:** 2019–2022, 929 sessions.
+- **Final test:** 2023 to September 2026, 748 sessions, run once.
+
+**The luck filter.** Testing thousands of things finds "patterns" by chance alone, so discoveries had to pass a 5% false discovery rate before going to confirmation.
+
+| Search | Tests | Passed the luck filter, 2011–18 | Repeated, 2019–22 | Final test, 2023–26 |
+|---|---:|---|---|---|
+| Each measurement on its own | 1,085 | 2 (both "last month's move → the last half hour") | 0 (t fell from 4.7 to 1.3) | not reached |
+| Extremes only: top vs bottom 10% ([`discovery2.py`](../research/discovery2.py)) | 735 | 0 | 0 | not reached |
+| All 30 combined in a model, four trading rules (up to 12 trades a day) | 4 | t 3.7–10.4 on the years it learned from | best t 1.62, needed 2 | not reached |
+| Afternoon trend: at 13:30, trade toward the side of the average price, hold to the close ([`afternoon.py`](../research/afternoon.py)) | 3 | t 3.46 on 2011–2022 | — | **−$8.08 a day, t −0.71: failed** |
+
+- **Nothing new held up.** No measurement, alone or in combination, predicted the next 30 minutes, the next hour, or the close on years it hadn't seen.
+- **The combined model shows how backtests fool people.** t = 9–10 on the years it learned from fell to 0.5–1.6 on new years.
+- **The afternoon trend looked solid for twelve years** (+$22.53 a day), then lost money in 2023–2026, including −$7,411 in 2026.
+- **The one edge that survives all of this** is noise-area momentum, the strategy already in TradingView. It trades only on the bigger, rarer moves that these all-days tests can't see.
+
 ## What this does and doesn't say
 
 - **It says** that the original sweep/breakout rules have no edge after realistic costs on 2023–2026 Nasdaq-100 data, and would very likely not pass a $25K evaluation. Of three published strategies, only noise-area momentum held up over 16 years, and even it fails most $25K evaluations.
@@ -254,6 +290,9 @@ python research/published_lab.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"   # the pub
 python research/noise_eval.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"      # noise momentum on a $25K evaluation
 python research/noise_tuning.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"    # can it trade more often? (no)
 python research/noise_daily.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"     # can it trade on most days? (not safely)
+python research/discovery.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"      # search for new patterns, one at a time
+python research/discovery2.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"     # extremes, and all of them combined
+python research/afternoon.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"      # the afternoon-trend idea, final test
 ```
 
 The raw data isn't stored in this repo.
