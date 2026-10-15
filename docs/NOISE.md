@@ -6,16 +6,16 @@
 
 **In one line:** when price has moved further from the open than it usually does by that time of day, trade in that direction. Check every half hour and be flat by the close.
 
-**It does not "never lose."** Read [What to expect](#what-to-expect) before you trade it.
+**It does not "never lose."** Read [What to expect](#6-what-to-expect) before you trade it.
 
 ---
 
 ## 1. Setup
 
-1. **Chart:** `MNQ1!` (or the front-month MNQ contract) on **5 minutes**. 1, 10, 15 and 30 minutes also work. Extended hours can be on or off.
+1. **Chart:** `MNQ1!` (or the front-month MNQ contract) on **30 minutes** or 5 minutes. 1, 10 and 15 minutes also work. Extended hours can be on or off. Every one of these makes the same trades, because the script only acts at the half hours; a 30-minute chart just loads the most history.
 2. **Load it:** Pine Editor → paste the script → *Add to chart*.
 3. **History:** it needs **14 complete sessions** on the chart before its first trade. The dashboard shows *Sessions of history 14 / 14* when it's ready.
-4. **Alerts:** *Create alert* → condition **MNQ Noise-Area Momentum** → **alert() function calls only**. It's a strategy, so TradingView doesn't offer "Any alert() function call" for it. Then turn on app notifications.
+4. **Alerts:** set them up as in [section 4](#4-how-it-tells-you-what-to-do).
 
 ## 2. Definitions (New York time)
 
@@ -48,9 +48,33 @@ The lines change at every check, because σ is different for each time of day. I
 - **At 16:00, close everything.**
 - **There is no stop order between checks.** The exit rule is only looked at every half hour. That is how the strategy was tested, and it's why single days can swing hard (see below).
 - **Size: 1 MNQ.** On a $1,500 drawdown, even that is large for this strategy.
-- **Half days** (the day after Thanksgiving, Christmas Eve, July 3, and similar): skip them, or be flat by 13:00. If a session ends early, the script closes any open position at the first bar after the early end, which can be hours later.
+- **No trades on holidays and half days.** On US market holidays (MLK Day, Memorial Day, Labor Day and so on), MNQ still trades but halts at about 13:00 ET. On half days (the day after Thanksgiving, Christmas Eve) the session also ends early. The 16-year test only traded full sessions, so the script sits these out. Its input *Don't trade on these dates* comes pre-filled with every 2026–2027 holiday and half day, and you can add news days to it. In 2028, add that year's dates.
+- **If a session ends early anyway**, the script closes any open position at the first bar after the early end, or at the next 09:30 bar. That can be hours later.
 
-## 4. Alerts
+## 4. How it tells you what to do
+
+Through a **TradingView alert**. It runs on TradingView's servers, so it keeps working with your browser and the app closed. One alert covers every action.
+
+**Set it up once:**
+
+1. On the chart with the script, click **Alert** (top bar).
+2. **Condition:** *Noise-Mom*, then **alert() function calls only**. It's a strategy, so TradingView doesn't offer "Any alert() function call" for it.
+3. **Notifications:** turn on **Notify in app**, which pushes to the TradingView phone app; log into the app with the same account. Add *Show popup* and *Send email* if you like.
+4. **Expiration:** set it as far out as your plan allows, and recreate it when it expires.
+5. **Create.**
+
+**Recreate the alert whenever you change the script or its settings.** An alert keeps running the version it was created with.
+
+**What arrives:** each alert is a full instruction, sent right at the half hour, for example *"BUY 1 MNQ at market now. Price 29,980.25 is above the noise area (upper 29,960.00). Hold until a half-hour check closes back below the upper line, or the 16:00 close. Next check 10:30."* Act on it right away: the backtest assumes you fill at about that price.
+
+**Where you place the order:** the alert only tells you. You place every order yourself.
+
+| Account | How to place it |
+|---|---|
+| TradingView Paper Trading | The **BUY / SELL** buttons on the chart, or the Trading Panel. Use market, 1 contract. |
+| Take Profit Trader evaluation or funded account (Tradovate) | In the Tradovate app. Or connect Tradovate in TradingView's Trading Panel and use the chart's BUY / SELL buttons on that account. |
+
+**Automatic orders** are possible: a webhook from the alert to a service such as TradersPost, which places the order on Tradovate. Webhooks need a paid TradingView plan, and prop firms set their own rules on automated trading, so check Take Profit Trader's rules before you try it. Doing it by hand is the safe default.
 
 | Alert starts with | Do this |
 |---|---|

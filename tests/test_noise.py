@@ -110,6 +110,23 @@ def test_reverse_when_through_the_other_side():
     assert short.pnl == pytest.approx(-0.5 * 2 - 1.24)
 
 
+def test_no_trades_on_a_listed_date():
+    bars, p = scenario(above_all_day)
+    day = str(bars.index[-1].date())
+    res = run(bars, NoiseConfig(skip_dates=f"2026-01-01,{day}"))
+    assert res.trades == [] and res.events == []
+    assert len(res.bands) == 12  # the noise area is still worked out
+    assert run(bars, NoiseConfig(skip_dates="")).trades
+
+
+def test_default_date_list_is_valid_and_covers_the_holidays():
+    from mnqbot.noise import SKIP_DATES
+
+    dates = pd.to_datetime(SKIP_DATES.split(","), format="%Y-%m-%d")
+    assert dates.is_monotonic_increasing and len(set(dates)) == len(dates) == 23
+    assert {"2026-11-26", "2026-11-27", "2026-12-24", "2027-07-05", "2027-11-26"} <= set(SKIP_DATES.split(","))
+
+
 def test_no_trades_until_the_lookback_is_full():
     bars, _ = scenario(above_all_day)
     assert run(bars, NoiseConfig(lookback=15)).trades == []
@@ -191,9 +208,12 @@ def run_pine(bars, inputs=None, minutes=5):
     return trades, events, {i: (u, lo) for i, u, lo in bands}
 
 
-def assert_parity(bars, minutes=5, lookback=14):
-    res = run(bars, NoiseConfig(lookback=lookback), minutes=minutes)
-    trades, events, pine_bands = run_pine(bars, {"Sessions in the noise average": lookback}, minutes)
+def assert_parity(bars, minutes=5, lookback=14, skip_dates=None):
+    cfg, inputs = NoiseConfig(lookback=lookback), {"Sessions in the noise average": lookback}
+    if skip_dates is not None:
+        cfg.skip_dates = inputs["Don't trade on these dates"] = skip_dates
+    res = run(bars, cfg, minutes=minutes)
+    trades, events, pine_bands = run_pine(bars, inputs, minutes)
     assert trades == trades_of(res)
     assert events == res.events
     for i, u, lo in res.bands:
@@ -214,6 +234,14 @@ HAND_BUILT = {
 @pytest.mark.parametrize("name", list(HAND_BUILT))
 def test_pine_hand_built(name):
     assert_parity(HAND_BUILT[name]())
+
+
+@pytest.mark.slow
+def test_pine_skips_listed_dates():
+    bars, _ = scenario(above_all_day)
+    day = str(bars.index[-1].date())
+    assert assert_parity(bars, skip_dates=f"2026-01-01,{day}").trades == []
+    assert assert_parity(bars, skip_dates="").trades
 
 
 @pytest.mark.slow

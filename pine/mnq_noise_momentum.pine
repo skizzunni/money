@@ -6,7 +6,8 @@
 //   * flat:  BUY if price closed above the noise area, SELL if below it
 //   * long:  EXIT if price closed back below the upper line (REVERSE to short if below the lower line)
 //   * short: EXIT if price closed back above the lower line (REVERSE to long if above the upper line)
-// Everything is closed at the 16:00 close. No trades until 14 full sessions are on the chart.
+// Everything is closed at the 16:00 close. No trades until 14 full sessions are on the chart,
+// and none on the dates in "Don't trade on these dates" (holidays and half days by default).
 //
 // Noise area for each half-hour mark = the day's open (and previous close) plus/minus the
 // average distance price has moved from the 09:30 open by that time over the last 14 sessions.
@@ -36,6 +37,9 @@ grpT = "Trading"
 lookback = input.int(14, "Sessions in the noise average", minval = 2, maxval = 60, group = grpT)
 qty      = input.int(1, "Contracts", minval = 1, maxval = 30, group = grpT,
      tooltip = "1 MNQ is already large for a $1,500 drawdown: see docs/RESULTS.md")
+skipDates = input.string("2026-01-01,2026-01-19,2026-02-16,2026-04-03,2026-05-25,2026-06-19,2026-07-03,2026-09-07,2026-11-26,2026-11-27,2026-12-24,2026-12-25,2027-01-01,2027-01-18,2027-02-15,2027-03-26,2027-05-31,2027-06-18,2027-07-05,2027-09-06,2027-11-25,2027-11-26,2027-12-24",
+     "Don't trade on these dates", group = grpT,
+     tooltip = "YYYY-MM-DD, comma separated. Pre-filled with the 2026-2027 US market holidays and half days, when MNQ trades a short session. Add news days if you like.")
 grpV = "Display"
 showBands = input.bool(true, "Show noise area", group = grpV)
 showDash  = input.bool(true, "Show dashboard", group = grpV)
@@ -61,6 +65,7 @@ var moves = array.new_float(lookback * N_CHECKS, na)   // ring buffer: one row o
 var today = array.new_float(N_CHECKS, na)
 var int filled = 0
 var int slot = 0
+var bool skipToday = false
 
 // ── A session that ended early (half day, data gap): get flat
 if strategy.position_size != 0 and (not inRth or tMin == RTH_OPEN)
@@ -73,6 +78,7 @@ if tMin == RTH_OPEN
     dayOpen := open
     ub := na
     lb := na
+    skipToday := str.contains(skipDates, str.format_time(time, "yyyy-MM-dd", TZ))
     for k = 0 to N_CHECKS - 1
         array.set(today, k, na)
 if inRth
@@ -91,34 +97,35 @@ if isCheck and not na(dayOpen)
         lb := math.min(dayOpen, prevClose) * (1 - sigma)
         nextCheck = k == N_CHECKS - 1 ? "the 16:00 close" : hhmmText(endMin + 30)
         pos = strategy.position_size
-        if pos > 0 and close < ub
-            if close < lb
-                strategy.entry("Short", strategy.short, qty, comment = "Reverse short")
-                alert("REVERSE: exit the long and SELL " + str.tostring(qty) + " MNQ at market now. Price " + px(close) +
-                     " is below the noise area (lower " + px(lb) + "). Next check " + nextCheck + ".", alert.freq_once_per_bar_close)
-            else
-                strategy.close("Long", comment = "Back inside")
-                alert("EXIT LONG at market now. Price " + px(close) + " closed back below the upper line (" + px(ub) +
-                     "). Stay flat until the next signal.", alert.freq_once_per_bar_close)
-        else if pos < 0 and close > lb
-            if close > ub
-                strategy.entry("Long", strategy.long, qty, comment = "Reverse long")
-                alert("REVERSE: exit the short and BUY " + str.tostring(qty) + " MNQ at market now. Price " + px(close) +
-                     " is above the noise area (upper " + px(ub) + "). Next check " + nextCheck + ".", alert.freq_once_per_bar_close)
-            else
-                strategy.close("Short", comment = "Back inside")
-                alert("EXIT SHORT at market now. Price " + px(close) + " closed back above the lower line (" + px(lb) +
-                     "). Stay flat until the next signal.", alert.freq_once_per_bar_close)
-        else if pos == 0 and close > ub
-            strategy.entry("Long", strategy.long, qty, comment = "Above noise")
-            alert("BUY " + str.tostring(qty) + " MNQ at market now. Price " + px(close) + " is above the noise area (upper " +
-                 px(ub) + "). Hold until a half-hour check closes back below the upper line, or the 16:00 close. Next check " +
-                 nextCheck + ".", alert.freq_once_per_bar_close)
-        else if pos == 0 and close < lb
-            strategy.entry("Short", strategy.short, qty, comment = "Below noise")
-            alert("SELL " + str.tostring(qty) + " MNQ at market now. Price " + px(close) + " is below the noise area (lower " +
-                 px(lb) + "). Hold until a half-hour check closes back above the lower line, or the 16:00 close. Next check " +
-                 nextCheck + ".", alert.freq_once_per_bar_close)
+        if not skipToday
+            if pos > 0 and close < ub
+                if close < lb
+                    strategy.entry("Short", strategy.short, qty, comment = "Reverse short")
+                    alert("REVERSE: exit the long and SELL " + str.tostring(qty) + " MNQ at market now. Price " + px(close) +
+                         " is below the noise area (lower " + px(lb) + "). Next check " + nextCheck + ".", alert.freq_once_per_bar_close)
+                else
+                    strategy.close("Long", comment = "Back inside")
+                    alert("EXIT LONG at market now. Price " + px(close) + " closed back below the upper line (" + px(ub) +
+                         "). Stay flat until the next signal.", alert.freq_once_per_bar_close)
+            else if pos < 0 and close > lb
+                if close > ub
+                    strategy.entry("Long", strategy.long, qty, comment = "Reverse long")
+                    alert("REVERSE: exit the short and BUY " + str.tostring(qty) + " MNQ at market now. Price " + px(close) +
+                         " is above the noise area (upper " + px(ub) + "). Next check " + nextCheck + ".", alert.freq_once_per_bar_close)
+                else
+                    strategy.close("Short", comment = "Back inside")
+                    alert("EXIT SHORT at market now. Price " + px(close) + " closed back above the lower line (" + px(lb) +
+                         "). Stay flat until the next signal.", alert.freq_once_per_bar_close)
+            else if pos == 0 and close > ub
+                strategy.entry("Long", strategy.long, qty, comment = "Above noise")
+                alert("BUY " + str.tostring(qty) + " MNQ at market now. Price " + px(close) + " is above the noise area (upper " +
+                     px(ub) + "). Hold until a half-hour check closes back below the upper line, or the 16:00 close. Next check " +
+                     nextCheck + ".", alert.freq_once_per_bar_close)
+            else if pos == 0 and close < lb
+                strategy.entry("Short", strategy.short, qty, comment = "Below noise")
+                alert("SELL " + str.tostring(qty) + " MNQ at market now. Price " + px(close) + " is below the noise area (lower " +
+                     px(lb) + "). Hold until a half-hour check closes back above the lower line, or the 16:00 close. Next check " +
+                     nextCheck + ".", alert.freq_once_per_bar_close)
 
 // ── 16:00: flat, and store today's moves if the session was complete
 if inRth and endMin == RTH_CLOSE
@@ -144,7 +151,7 @@ plot(showBands and inRth ? lb : na, "Lower noise line", color.maroon, 2, plot.st
 var table dash = table.new(position.top_right, 2, 6, bgcolor = color.new(color.black, 15), border_width = 1, border_color = color.new(color.gray, 60))
 if showDash and (barstate.islastconfirmedhistory or barstate.isrealtime)
     pos = strategy.position_size
-    status = not validTf ? "Use a 1/5/10/15/30 min chart" : filled < lookback ? "Building history" : pos > 0 ? "LONG" : pos < 0 ? "SHORT" : "Flat"
+    status = not validTf ? "Use a 1/5/10/15/30 min chart" : filled < lookback ? "Building history" : pos > 0 ? "LONG" : pos < 0 ? "SHORT" : skipToday and inRth ? "No trades today (date list)" : "Flat"
     statusColor = pos > 0 ? color.lime : pos < 0 ? color.red : color.white
     nextText = not inRth or endMin >= LAST_CHECK ? "10:00 next session" : endMin < FIRST_CHECK ? "10:00" : hhmmText(endMin - (endMin - FIRST_CHECK) % 30 + 30)
     closed = strategy.closedtrades

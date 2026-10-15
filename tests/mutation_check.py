@@ -86,8 +86,13 @@ MUTANTS = {
     "noise: short sessions stored in the history": ("noise", "        if complete\n", "        if true\n"),
     "noise: no reversal from long": (
         "noise",
-        "            if close < lb\n                strategy.entry",
-        "            if false\n                strategy.entry",
+        "                if close < lb\n                    strategy.entry",
+        "                if false\n                    strategy.entry",
+    ),
+    "noise: date list ignored": (
+        "noise",
+        'skipToday := str.contains(skipDates, str.format_time(time, "yyyy-MM-dd", TZ))',
+        "skipToday := false",
     ),
     "noise: open position kept into the next session": (
         "noise", "(not inRth or tMin == RTH_OPEN)", "not inRth"
@@ -102,6 +107,7 @@ def _tests(T, script):
 
         return [(case, lambda c=case: N.test_pine_hand_built(c)) for case in N.HAND_BUILT] + [
             ("short session", N.test_pine_short_session_cases),
+            ("skips listed dates", N.test_pine_skips_listed_dates),
             ("random 5m", lambda: N.test_pine_random_sessions(5)),
             ("random 15m", lambda: N.test_pine_random_sessions(15)),
             ("RTH-only chart", N.test_pine_rth_only_chart_and_shorter_lookback),

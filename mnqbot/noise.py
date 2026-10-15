@@ -14,6 +14,7 @@ Rules, New York time, on any chart whose bar length divides 30 minutes:
   * Flat: buy if close > upper, sell short if close < lower.
     Long: if close < upper, exit, or reverse to short if close < lower. Short: the mirror image.
   * Orders are market orders filled at the next bar's open.
+  * No new trades on the dates in skip_dates (holidays and half days by default).
   * Everything is closed at the 16:00 close. If a session ends early (half day, data gap), a position
     still open is closed at the close of the first bar outside 09:30-16:00 or of the next 09:30 bar.
 """
@@ -30,6 +31,13 @@ from .data import NY
 N_CHECKS = 12
 FIRST_CHECK, LAST_CHECK, STEP = 600, 930, 30  # minutes after midnight: 10:00 .. 15:30
 RTH_OPEN, RTH_CLOSE = 570, 960  # 09:30, 16:00
+# US market holidays and half days, when MNQ trades a short session (closed or halted by about 13:00 ET).
+# The 16-year test only traded full sessions, so the bot sits these out. Same list as the Pine input.
+SKIP_DATES = (
+    "2026-01-01,2026-01-19,2026-02-16,2026-04-03,2026-05-25,2026-06-19,2026-07-03,2026-09-07,"
+    "2026-11-26,2026-11-27,2026-12-24,2026-12-25,2027-01-01,2027-01-18,2027-02-15,2027-03-26,"
+    "2027-05-31,2027-06-18,2027-07-05,2027-09-06,2027-11-25,2027-11-26,2027-12-24"
+)
 
 
 @dataclass
@@ -40,6 +48,7 @@ class NoiseConfig:
     point_value: float = 2.0  # MNQ
     commission_per_side: float = 0.62  # $ per contract
     slippage_ticks: int = 1  # on every market fill
+    skip_dates: str = SKIP_DATES  # "YYYY-MM-DD,..." sessions with no new trades
 
 
 @dataclass
@@ -85,6 +94,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
     today = [math.nan] * N_CHECKS
     filled = slot = 0
     day_open = prev_close = last_rth_close = math.nan
+    skip_today = False
     pos = 0
     entry_px, entry_bar = 0.0, 0
     pending: tuple[str, int] | None = None  # ("entry", direction) or ("close", 0), filled at the next open
@@ -128,6 +138,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             prev_close = last_rth_close
             day_open = o[i]
             today = [math.nan] * N_CHECKS
+            skip_today = t.strftime("%Y-%m-%d") in cfg.skip_dates  # substring test, like Pine's str.contains
         if in_rth:
             last_rth_close = c[i]
 
@@ -142,7 +153,9 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                 upper = max(day_open, prev_close) * (1 + sigma)
                 lower = min(day_open, prev_close) * (1 - sigma)
                 bands.append((i, upper, lower))
-                if pos > 0 and c[i] < upper:
+                if skip_today:
+                    pass
+                elif pos > 0 and c[i] < upper:
                     pending = ("entry", -1) if c[i] < lower else ("close", 0)
                     events.append((i, "REVERSE" if c[i] < lower else "EXIT"))
                 elif pos < 0 and c[i] > lower:

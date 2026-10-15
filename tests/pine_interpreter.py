@@ -476,6 +476,11 @@ class PineRuntime:
         def to_int(x):
             return NA if is_na(x) else int(x)  # Pine int() truncates toward zero
 
+        def format_time(t_ms, fmt, tz):
+            if fmt != "yyyy-MM-dd":
+                raise PineError(f"str.format_time format {fmt!r} is not emulated")
+            return rt._ny(int(t_ms), tz).strftime("%Y-%m-%d")
+
         return {
             "indicator": Namespace("indicator"),
             "alert": Namespace("alert", call=alert),
@@ -491,7 +496,8 @@ class PineRuntime:
             "input": Namespace("input", int=self._input, float=self._input, bool=self._input,
                                string=self._input, session=self._input),
             "math": Namespace("math", max=nmax, min=nmin, floor=floor, abs=abs),
-            "str": Namespace("str", tostring=tostring, upper=str.upper, startswith=str.startswith),
+            "str": Namespace("str", tostring=tostring, upper=str.upper, startswith=str.startswith,
+                             contains=lambda source, sub: sub in source, format_time=format_time),
             "ta": Namespace("ta", atr=self._atr),
             "array": Namespace("array", new=array_new, push=lambda a, v: a.append(v), size=len,
                                new_float=array_new_float, get=array_get, set=array_set),
