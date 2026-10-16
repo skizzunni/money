@@ -981,6 +981,20 @@ On 16 October 2026 the bot's four losing shorts were each stopped by a ~17.5-poi
 
   0.75 wins 3–5 points more often in every period, makes more on three of four and has a smaller worst losing stretch on all four, but made 14% less on 2023–2026; 0.5 wins more still and made a third less on 2023–2026. The default stays at 1.0 (the lower trigger failed its pre-registered test in round thirty-nine); *Lock a small win* set to 0.75 is the choice for more winners.
 
+## Why the win rate sits near half: the first minutes are a coin flip
+
+**The S&P 500 at the signal** (HistData SPXUSD 1-minute, 2010 – Sep 2026, its own noise area computed the same way). v1.3's trades at 10 MNQ and $350, 2011–2018: when the S&P was also beyond its line in the same direction, 2,620 trades won 51.5% and made $79 each; when it was still inside its noise area, 1,736 trades won 48.6% and made $40 each. The unconfirmed trades still pay, so skipping them would cost about $69,000 over those eight years for one point of win rate. Not used.
+
+**The geometry.** If price after the entry moved at random, a trade with a 17.5-point stop would reach +a points first with probability 17.5 / (17.5 + a). The lock dial (round forty-three) against that, 2011–2018:
+
+| Lock trigger | Random walk | Measured |
+|---|---|---|
+| +17.5 points (v1.3) | 50.0% | 50.6% |
+| +13.1 points | 57.1% | 55.3% |
+| +8.75 points | 66.7% | 58.8% (fees and slippage cost the tiny wins) |
+
+Over the first minutes after the bot's entry, price is indistinguishable from a coin flip; none of the facts tested at the signal (the S&P, a spike into the close, volume, time of day, waiting minutes, better limit prices) changes that. The win rate is set by where the lock sits against the stop; the profit comes from the half-hour trends the bot is built on, which show only over 30 minutes and more. More winners at the same money would need something that predicts the next few minutes; nothing measured here does.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
@@ -1056,6 +1070,7 @@ python research/trail_lock.py nsx_1m_scaled.pkl nq_1m_scaled.pkl      # the lock
 python research/eval_trail.py nsx_1m_scaled.pkl nq_1m_scaled.pkl      # the trailing lock for the evaluation (no pass)
 python research/spike.py nsx_1m_scaled.pkl nq_1m_scaled.pkl           # skip spikes into the close (no pass)
 python research/better_entry.py nsx_1m_scaled.pkl nq_1m_scaled.pkl    # limit-then-market, second chance (no pass)
+python research/es_confirm.py spx_1m.pkl nsx_1m_scaled.pkl             # the S&P at the signal (descriptive)
 ```
 
 The raw data isn't stored in this repo.
