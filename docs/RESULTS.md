@@ -666,6 +666,22 @@ The scheduled FOMC announcement days 2011–2026 ([`research/fomc_dates.csv`](..
 - **It's small.** About $0.20–0.75 a day per contract (1–3%), from 1–3 trades a year, so the evidence rests on few trades; the independent academic finding behind it is part of why it was adopted. The worst losing stretch is unchanged.
 - **It's in the bot** as *Fed days: no shorts before 14:00*, on by default, with the 2026–2027 dates pre-filled.
 
+## Twenty-fifth round: take half off at a profit, let the rest run
+
+A full take-profit (round seventeen) raised the share of winners but cut the trend days. Scaling out keeps half the position on them: half is closed at a limit 0.5 or 1.0 noise units in profit, the other half runs to the line stop, the max loss or 16:00, with its stop moved to the entry once the first half is banked, or left as before ([`research/scale_out.py`](../research/scale_out.py)). To pass on 2011–2018: winners up at least 10 points, at least 90% of the bot's $ per day, a t-stat within 0.3, a worst losing stretch at most 10% larger.
+
+| Per contract | Win % 2011–18 | Avg win | Avg loss | $/day 2011–18 | t | Worst stretch | $/day 2019–22 | t | Worst stretch |
+|---|---|---|---|---|---|---|---|---|---|
+| **The bot** | **28.1%** | **$316** | **−$91** | **$22.70** | **4.11** | **$3,223** | **$23.05** | **2.44** | **$5,178** |
+| Half at +0.5, rest to breakeven | 50.0% | $119 | −$96 | $13.72 | 3.77 | $2,698 | $14.70 | 2.20 | $4,317 |
+| Half at +0.5, rest as before | 40.4% | $155 | −$82 | $13.33 | 3.78 | $2,629 | $12.23 | 1.86 | $4,619 |
+| Half at +1.0, rest to breakeven | 38.3% | $196 | −$94 | $17.98 | 4.34 | $2,675 | $21.32 | 2.79 | $4,502 |
+| Half at +1.0, rest as before | 37.2% | $203 | −$91 | $17.90 | 4.44 | $2,743 | $20.02 | 2.66 | $4,768 |
+
+- **Nothing passed.** Half off at +0.5 with the rest moved to breakeven wins half the trades, and makes about 40% less: the average win falls from $316 to $119 while the average loss stays about $95.
+- **Half off at +1.0 with a breakeven stop is the smoothest version**: a higher t-stat, a smaller losing stretch and more winning months in both periods. But it makes 8–21% less a day, so it isn't more profit, only a calmer ride.
+- **The losers stay the same size whatever the exit**, because they are breakouts that fail before the trade is ever in profit. Exits can only reshape the winners.
+
 ## What this does and doesn't say
 
 - **It says** that the original sweep/breakout rules have no edge after realistic costs on 2023–2026 Nasdaq-100 data, and would very likely not pass a $25K evaluation. Of three published strategies, only noise-area momentum held up over 16 years, and even it fails most $25K evaluations.
@@ -705,6 +721,7 @@ python research/sizing.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"         # contract
 python research/ensemble.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"       # copies of the bot (a tie, no)
 python research/overnight_noise.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv" # the edge overnight (no)
 python research/fomc.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"            # Fed days: no shorts before 14:00 (adopted)
+python research/scale_out.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"       # half off at a profit (no)
 ```
 
 The raw data isn't stored in this repo.
