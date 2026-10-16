@@ -496,6 +496,29 @@ The bar to pass: the side trades alone at t ≥ 2.64 on 2011–2018, and the bot
 - **The gap fade over 0.5 noise units is the near miss.** It made money in all three periods, and with it the bot made about $9 a day more per contract, with a higher t-stat each time and a trade on 90% of days. It failed one test: its worst losing stretch was 32% larger on 2011–2018 (and 48% larger on 2023–2026). On a $50K evaluation it passed more often at 1 MNQ (66% vs 41% on 2011–2022, 59% vs 38% on 2023–2026), and at 2 MNQ it passed slightly more often and faster. But at 1 MNQ on 2023–2026 it also failed more: 26% vs 7%.
 - **A disclosure.** Before the full run, a check of the code's mechanics on June 2023 to May 2024 showed each variant's side P&L for that year. That year is inside the final test. Nothing was changed after it; the rules above were already written.
 
+## Sixteenth round: more profit from the same trades
+
+The profit comes from a few trend days; about two thirds of trades lose. Two levers act on that from opposite ends ([`research/profit_levers.py`](../research/profit_levers.py)), with the pass bar written before running:
+
+- **Add to winners.** At a later half-hour check, if the trade is up 1 (or 0.5) noise units and still outside the line, add a unit, up to 2 or 3. The whole position keeps one $117-per-contract max loss, measured from the average entry.
+- **Protect winners.** Once a trade is up 1 noise unit, trail a stop 1 or 2 noise units behind the best close, or move it to the entry.
+
+To pass on 2011–2018 a variant needed at least 10% more a day, a t-stat within 0.3, and at least as much a day per dollar of worst losing stretch. Then better than the bot on 2019–2022 and 2023–2026. 1 base contract, prices at today's level.
+
+| Per contract | $/day 2011–18 | $/day 2019–22 | $/day 2023–26 | t 2023–26 | Worst stretch 2023–26 |
+|---|---|---|---|---|---|
+| **The bot** | **$22.70** | **$23.05** | **$23.32** | **2.48** | **$2,222** |
+| Add to 2 units at +1 | $30.16 | $24.77 | $21.38 | 1.62 | $3,891 |
+| Add to 3 units at +1 | $32.98 | $16.09 | $23.86 | 1.55 | $3,894 |
+| Add to 2 units at +0.5 | $33.12 | $26.46 | $21.97 | 1.57 | $4,362 |
+| Trail 1.0 behind | $22.79 | $31.52 | $17.85 | 2.59 | $3,132 |
+| Trail 2.0 behind | $23.14 | $25.41 | $24.35 | 2.61 | $2,222 |
+| Stop to the entry | $23.03 | $25.15 | $17.93 | 2.37 | $2,896 |
+
+- **Nothing passed.** Adding to winners made more on 2011–2018 but with a much bigger losing stretch, so less per dollar of risk; on 2023–2026 it made less. The trailing stops and the breakeven stop didn't reach +10% on 2011–2018.
+- **The 2-unit trailing stop is slightly better in every period**, by $0.44 to $2.36 a day, with the same or a slightly higher t-stat. It's too small to clear the bar, and too small to be worth a second stop to manage by hand.
+- **More profit, for now, comes from size.** The bot makes about $23 a day per contract; profit scales with contracts and so do the losing stretches. The account's drawdown limit sets how many it can carry (round thirteen).
+
 ## What this does and doesn't say
 
 - **It says** that the original sweep/breakout rules have no edge after realistic costs on 2023–2026 Nasdaq-100 data, and would very likely not pass a $25K evaluation. Of three published strategies, only noise-area momentum held up over 16 years, and even it fails most $25K evaluations.
@@ -527,6 +550,7 @@ python research/timeframes.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"     # 5 vs 15 
 python research/eval50k.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"        # the $50K evaluation, 1 to 10 MNQ
 python research/more_trades.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"    # more trades a day? (no)
 python research/fill_in.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"        # a trade every day? (not by the rules)
+python research/profit_levers.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"  # add to winners, trailing stops (no)
 ```
 
 The raw data isn't stored in this repo.
