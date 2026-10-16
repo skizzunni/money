@@ -748,6 +748,35 @@ Yahoo Finance has NQ futures daily bars with volume back to 2000 ([`research/vol
 
 **Nothing passed**; each fact flipped sign between the periods. Daily volume doesn't tell the bot's good days from its bad ones. Intraday volume at the signal is still untested: it needs years of 1-minute futures bars with volume.
 
+## Thirtieth round: market mood and hourly volume at the signal
+
+More of Yahoo Finance's data ([`research/fear_volume.py`](../research/fear_volume.py)): the VIX, VIX3M and VIX9D fear indexes, S&P 500 futures (ES) daily, and NQ futures hourly bars with volume for about two years. Rules fixed before running.
+
+**Part A, market mood**, facts known before the open, with round eighteen's bar:
+
+| Fact | $ per trade, yes / no, 2011–18 | t | $ per trade, yes / no, 2019–22 | t |
+|---|---|---|---|---|
+| Fearful: VIX above its 1-year median | 27.77 / 8.62 | 2.55 | 25.90 / 19.19 | 0.53 |
+| Inverted: VIX at or above VIX3M | 40.45 / 14.61 | 1.73 | 4.71 / 26.80 | −1.07 |
+| Short-term stress: VIX9D at or above VIX | 28.68 / 11.77 | 2.04 | 12.64 / 29.43 | −1.19 |
+| Fear rising: VIX up the day before | 19.96 / 15.93 | 0.54 | 3.06 / 41.60 | −2.94 |
+| Nasdaq leading the S&P over 20 days | 14.54 / 23.05 | −1.10 | 17.16 / 30.84 | −1.02 |
+
+None passed the luck filter (5% false discovery rate over five; "fearful" came closest at p = 0.011).
+
+**Part B, hourly volume at the signal**, June 2024 to September 2026, 553 trades: the last full hour before the signal busier than the same hour over the previous 20 sessions, or not. First half: busy −$10.74 a trade, quiet +$66.29 (t −2.15). Second half: busy +$24.94, quiet +$12.32 (t +0.52). The sign flips: **failed**.
+
+## Thirty-first round: trade more when the market is scared
+
+"Fearful" pointed the same way in both periods, and so did "wilder than normal" in round eighteen, while round eight found that cutting size on wild days hurt. The rule that follows, picked after seeing 2011–2022 and tested once on 2023–2026 ([`research/fear_size.py`](../research/fear_size.py)): 2 units when the previous VIX close is above its 1-year median, 1 otherwise. Pass bar: a higher t-stat and more $ a day per dollar of worst losing stretch than flat sizing (both ratios are the same for flat sizing at any size).
+
+| Per unit | t 2011–18 | $ per $1k stretch | t 2019–22 | $ per $1k stretch | t 2023–26 | $ per $1k stretch | Worst stretch 2023–26 |
+|---|---|---|---|---|---|---|---|
+| Flat | 4.73 | 7.75 | 3.62 | 9.77 | 2.71 | 5.42 | $3,618 |
+| 2 units when scared | 4.85 | 6.82 | 3.46 | 8.26 | 2.16 | 3.51 | $7,237 |
+
+**Failed.** The scared periods hold the losing streaks too, so trading bigger in them doubles the worst stretch and adds less than it risks. The bot earning more per trade on fearful days is real enough to show in three rounds, but it doesn't make a better sizing rule.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
@@ -808,6 +837,8 @@ python research/walkforward_tp.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"  # the tak
 python research/risk_size.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"       # size each trade from the $350 (no)
 python research/volume_days.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv" nq_1d.json  # busier days (no)
 python research/yahoo_forward.py mnq_5m.json 10 350                    # real MNQ bars, the last 60 days
+python research/fear_volume.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv" yahoo_dir   # market mood, hourly volume (no)
+python research/fear_size.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv" yahoo_dir     # bigger when scared (no)
 ```
 
 The raw data isn't stored in this repo.
