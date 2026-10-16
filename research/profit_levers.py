@@ -51,8 +51,9 @@ PERIODS = (("2011-2018", 2011, 2018), ("2019-2022", 2019, 2022), ("2023-2026", 2
 
 
 def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | None = None,
-             target: float | None = None, cap_pts: float = CAP_PTS) -> pd.DataFrame:
-    """target: take profit this many noise units from the first fill (limit); cap_pts: max loss in points."""
+             target: float | None = None, cap_pts: float = CAP_PTS, target_on_fill_bar: bool = True) -> pd.DataFrame:
+    """target: take profit this many noise units from the first fill (limit); cap_pts: max loss in points;
+    target_on_fill_bar False: the limit works from the bar after the fill, as the Pine script places it."""
     checks = list(range(FIRST, LAST + 1, 30))
     kof = {m: j for j, m in enumerate(checks)}
     idx = bars.index.tz_convert(NY)
@@ -107,7 +108,7 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
                 hit, px = (l[i] <= stop if pos > 0 else h[i] >= stop), stop - pos * TICK
             if hit:
                 close(i, px, why)
-            elif target is not None:  # a take-profit limit, after the stop (worst case first)
+            elif target is not None and (target_on_fill_bar or first_bar != i):  # after the stop (worst case first)
                 tp = fills[0] * (1 + pos * target * sigma)
                 if (pos > 0 and h[i] >= tp + TICK) or (pos < 0 and l[i] <= tp - TICK):
                     close(i, tp, "target")

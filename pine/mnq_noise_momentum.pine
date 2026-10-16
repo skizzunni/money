@@ -6,8 +6,8 @@
 //   * flat:  BUY if price closed above the noise area, SELL if below it
 //   * in a trade: a stop order rests just past the noise line (0.24 noise units: the distance price
 //     typically overshoots the line before resuming, from 16 years of data) and moves with the line
-//     ("Resting stop", the default); or, with "Half-hour check", EXIT when a check closes back inside
-//     the lines (REVERSE if through the other side)
+//     ("Resting stop", the default), plus a take-profit limit 1.5 noise units past the fill; or, with
+//     "Half-hour check", EXIT when a check closes back inside the lines (REVERSE if through the other side)
 // Everything is closed at the 16:00 close. No trades until 14 full sessions are on the chart,
 // and none on the dates in "Don't trade on these dates" (holidays and half days by default).
 // On scheduled Fed announcement days, no shorts before the 14:00 statement.
@@ -28,7 +28,8 @@ strategy("MNQ Noise-Area Momentum", shorttitle = "Noise-Mom", overlay = true,
      initial_capital = 25000, currency = currency.USD,
      default_qty_type = strategy.fixed, default_qty_value = 1, pyramiding = 0,
      commission_type = strategy.commission.cash_per_contract, commission_value = 0.62,
-     slippage = 1, margin_long = 0, margin_short = 0, max_bars_back = 500, max_labels_count = 500)
+     slippage = 1, margin_long = 0, margin_short = 0, max_bars_back = 500, max_labels_count = 500,
+     backtest_fill_limits_assumption = 1)
 
 const string TZ = "America/New_York"
 const int N_CHECKS = 12   // 10:00, 10:30, ..., 15:30
@@ -58,6 +59,8 @@ exitMode = input.string("Resting stop at the line", "Exit", options = ["Resting 
 useStop = exitMode == "Resting stop at the line"
 stopBuf = input.float(0.24, "Stop distance past the line, in noise units", minval = 0, maxval = 2, step = 0.01, group = grpT,
      tooltip = "0 puts the stop exactly on the line. 0.24 is how far price typically overshoots the line before resuming, measured on 2011-2018; it cut whipsaw stop-outs and raised profit per day on every later period. See docs/RESULTS.md.")
+tpUnits = input.float(1.5, "Take profit, noise units from the entry (0 = off)", minval = 0, maxval = 10, step = 0.1, group = grpT,
+     tooltip = "A limit order this many noise units past your fill (1.5 x the current noise x the fill price), working from the bar after the fill; with the resting stop only. Chosen walk-forward, each year from the years before only: over 2015-2026 it raised profit per day from $24.66 to $25.77 per contract, the t-stat from 4.71 to 5.39, cut the worst losing stretch from $5,178 to $4,185, and raised the $50K pass rate at 2 MNQ in 2023-2026 from 42% to 68%. See docs/RESULTS.md, round twenty-six.")
 grpV = "Display"
 showBands = input.bool(true, "Show noise area", group = grpV)
 showLabels = input.bool(true, "Show BUY / SELL / EXIT labels", group = grpV)
@@ -79,7 +82,7 @@ hhmmText(int mins) => str.tostring(int(mins / 60)) + ":" + (mins % 60 < 10 ? "0"
 px(float x) => str.tostring(x, format.mintick)
 usd(float x) => (x < 0 ? "-$" : "$") + str.tostring(math.abs(x), "#,##0.00")
 stamp(int t) => str.format_time(t, "MM-dd HH:mm", TZ)   // New York time, month-day hour:minute
-why(string c) => c == "Back inside" ? (useStop ? "stop at the line" : "back inside at a check") : c == "Max loss" ? "max loss stop" : c == "16:00 close" ? "16:00 close" : c == "Session ended" ? "session ended" : str.contains(c, "Reverse") ? "reversed" : c
+why(string c) => c == "Back inside" ? (useStop ? "stop at the line" : "back inside at a check") : c == "Max loss" ? "max loss stop" : c == "Target" ? "take profit" : c == "16:00 close" ? "16:00 close" : c == "Session ended" ? "session ended" : str.contains(c, "Reverse") ? "reversed" : c
 // A signal label on the candle that triggered it: below the candle for buys, above for sells.
 mark(string txt, bool below, color c) =>
     if showLabels
@@ -107,12 +110,16 @@ var int dayStartClosed = 0    // strategy.closedtrades at 09:30, for today's tra
 // ── The resting stop filled during this bar (the broker did it; show it). A trade can open and
 // close inside one bar, so look at the closed-trade count, not the position.
 lastTrade = strategy.closedtrades - 1
-stopFired = useStop and strategy.closedtrades > prevClosed and
-     (strategy.closedtrades.exit_comment(lastTrade) == "Back inside" or strategy.closedtrades.exit_comment(lastTrade) == "Max loss")
+lastWhy = strategy.closedtrades > 0 ? strategy.closedtrades.exit_comment(lastTrade) : ""
+stopFired = useStop and strategy.closedtrades > prevClosed and (lastWhy == "Back inside" or lastWhy == "Max loss" or lastWhy == "Target")
 if stopFired
-    mark("EXIT", strategy.closedtrades.size(lastTrade) < 0, color.gray)
-    lastSignal := "EXIT (" + (strategy.closedtrades.exit_comment(lastTrade) == "Max loss" ? "max loss" : "line touched") + ") @ " +
-         px(strategy.closedtrades.exit_price(lastTrade))
+    if lastWhy == "Target"
+        mark("TARGET", strategy.closedtrades.size(lastTrade) < 0, color.teal)
+        lastSignal := "TARGET hit @ " + px(strategy.closedtrades.exit_price(lastTrade))
+    else
+        mark("EXIT", strategy.closedtrades.size(lastTrade) < 0, color.gray)
+        lastSignal := "EXIT (" + (lastWhy == "Max loss" ? "max loss" : "line touched") + ") @ " +
+             px(strategy.closedtrades.exit_price(lastTrade))
 
 // ── Today's baseline for the dashboard, taken at 09:30 before anything else happens this bar
 if tMin == RTH_OPEN
@@ -158,9 +165,12 @@ if isCheck and not na(dayOpen)
         longStopNow = ub * (1 - stopBuf * sig)
         shortStopNow = lb * (1 + stopBuf * sig)
         capText = maxLoss > 0 ? " Never risk more than " + usd(maxLoss) + " on the trade: if a stop " + usd(maxLoss) + " from your fill is closer, use that one." : ""
-        holdLong = useStop ? "Put a stop at " + px(longStopNow) + " (just below the upper line), and move it when the line moves, at every half hour." + capText :
+        tpText = tpUnits > 0 ? " Take profit with a limit " + str.tostring(tpUnits * sig * close, "#.00") + " points past your fill (about " : ""
+        holdLong = useStop ? "Put a stop at " + px(longStopNow) + " (just below the upper line), and move it when the line moves, at every half hour." + capText +
+             (tpUnits > 0 ? tpText + px(close * (1 + tpUnits * sig)) + ")." : "") :
              "Hold until a half-hour check closes back below the upper line, or the 16:00 close."
-        holdShort = useStop ? "Put a stop at " + px(shortStopNow) + " (just above the lower line), and move it when the line moves, at every half hour." + capText :
+        holdShort = useStop ? "Put a stop at " + px(shortStopNow) + " (just above the lower line), and move it when the line moves, at every half hour." + capText +
+             (tpUnits > 0 ? tpText + px(close * (1 - tpUnits * sig)) + ")." : "") :
              "Hold until a half-hour check closes back above the lower line, or the 16:00 close."
         pos = strategy.position_size
         inPosStop = useStop and pos != 0   // exits are the resting stop's job
@@ -218,13 +228,18 @@ longStop = na(capL) ? lineStopL : math.max(lineStopL, capL)
 shortStop = na(capS) ? lineStopS : math.min(lineStopS, capS)
 longWhy = not na(capL) and capL > lineStopL ? "Max loss" : "Back inside"
 shortWhy = not na(capS) and capS < lineStopS ? "Max loss" : "Back inside"
+// The take-profit limit: tpUnits noise units past the fill. It needs the fill price, so it starts the bar after the fill.
+longTp = strategy.position_size > 0 and tpUnits > 0 ? strategy.position_avg_price * (1 + tpUnits * sig) : na
+shortTp = strategy.position_size < 0 and tpUnits > 0 ? strategy.position_avg_price * (1 - tpUnits * sig) : na
 if useStop and inRth and not na(ub)
     if strategy.position_size > 0 or longPlaced
-        strategy.exit("Long exit", "Long", stop = longStop, comment = longWhy,
-             alert_message = "EXIT LONG: price hit the stop at " + px(longStop) + ". Your stop should have filled. If you had no stop in, exit at market now.")
+        strategy.exit("Long exit", "Long", stop = longStop, limit = longTp, comment_loss = longWhy, comment_profit = "Target",
+             alert_loss = "EXIT LONG: price hit the stop at " + px(longStop) + ". Your stop should have filled. If you had no stop in, exit at market now.",
+             alert_profit = "TARGET: the long reached the take-profit at " + px(nz(longTp)) + ". Your limit should have filled. If not, exit at market now.")
     if strategy.position_size < 0 or shortPlaced
-        strategy.exit("Short exit", "Short", stop = shortStop, comment = shortWhy,
-             alert_message = "EXIT SHORT: price hit the stop at " + px(shortStop) + ". Your stop should have filled. If you had no stop in, exit at market now.")
+        strategy.exit("Short exit", "Short", stop = shortStop, limit = shortTp, comment_loss = shortWhy, comment_profit = "Target",
+             alert_loss = "EXIT SHORT: price hit the stop at " + px(shortStop) + ". Your stop should have filled. If you had no stop in, exit at market now.",
+             alert_profit = "TARGET: the short reached the take-profit at " + px(nz(shortTp)) + ". Your limit should have filled. If not, exit at market now.")
 
 nextText = not inRth or endMin >= LAST_CHECK ? "10:00 next session" : endMin < FIRST_CHECK ? "10:00" : hhmmText(endMin - (endMin - FIRST_CHECK) % 30 + 30)
 
@@ -274,8 +289,10 @@ if showDash and (barstate.islastconfirmedhistory or barstate.isrealtime)
     table.cell(dash, 1, 6, lastSignal, text_color = color.white, text_size = size.small)
     table.cell(dash, 0, 7, "Exit rule", text_color = color.silver, text_size = size.small)
     table.cell(dash, 1, 7, useStop ? "stop " + str.tostring(stopBuf) + " noise units past the line" : "half-hour check", text_color = color.white, text_size = size.small)
-    table.cell(dash, 0, 8, "Your stop", text_color = color.silver, text_size = size.small)
-    table.cell(dash, 1, 8, not useStop ? "-" : pos > 0 ? px(longStop) : pos < 0 ? px(shortStop) : "-", text_color = color.white, text_size = size.small)
+    tpNow = pos > 0 ? longTp : pos < 0 ? shortTp : na
+    table.cell(dash, 0, 8, "Your stop / target", text_color = color.silver, text_size = size.small)
+    table.cell(dash, 1, 8, not useStop or pos == 0 ? "-" : px(pos > 0 ? longStop : shortStop) + " / " + (na(tpNow) ? "-" : px(tpNow)),
+         text_color = color.white, text_size = size.small)
     table.cell(dash, 0, 9, "Today P/L", text_color = color.silver, text_size = size.small)
     table.cell(dash, 1, 9, usd(todayPnlDash), text_color = todayPnlDash >= 0 ? color.lime : color.red, text_size = size.small)
     table.cell(dash, 0, 10, "Open P/L", text_color = color.silver, text_size = size.small)
@@ -316,7 +333,8 @@ if showLog and (barstate.islastconfirmedhistory or barstate.isrealtime)
         logCell(3, row, "OPEN", color.yellow)
         logCell(4, row, px(close) + " now", color.white)
         logCell(5, row, usd(strategy.openprofit), strategy.openprofit >= 0 ? color.lime : color.red)
-        logCell(6, row, not useStop ? "half-hour check" : "stop " + px(sz > 0 ? longStop : shortStop), color.white)
+        openTp = sz > 0 ? longTp : shortTp
+        logCell(6, row, not useStop ? "half-hour check" : "stop " + px(sz > 0 ? longStop : shortStop) + (na(openTp) ? "" : ", target " + px(openTp)), color.white)
         row += 1
     nLog = math.min(logRows, strategy.closedtrades)
     if nLog > 0

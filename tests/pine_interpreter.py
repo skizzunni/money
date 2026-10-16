@@ -518,6 +518,7 @@ class PineRuntime:
             "array": Namespace("array", new=array_new, push=lambda a, v: a.append(v), size=len,
                                new_float=array_new_float, get=array_get, set=array_set),
             "int": to_int,
+            "nz": lambda x, replacement=0.0: replacement if is_na(x) else x,
             "syminfo": Namespace("syminfo", mintick=self.mintick, pointvalue=self.pointvalue),
             "timeframe": Namespace("timeframe", period=str(self.tf_seconds // 60),
                                    in_seconds=lambda tf=None: rt.tf_seconds),
@@ -638,9 +639,10 @@ class StrategyEmulator:
         self.market_close = {"id": id, "bar": self.rt.i, "comment": comment}
 
     def exit(self, id, from_entry, stop=None, limit=None, comment=None, comment_loss=None, comment_profit=None,
-             alert_message=None, **kw):
-        self.exits[from_entry] = {"stop": stop, "limit": limit, "loss": comment_loss or comment,
-                                  "profit": comment_profit or comment, "alert": alert_message}
+             alert_message=None, alert_loss=None, alert_profit=None, **kw):
+        self.exits[from_entry] = {"stop": None if is_na(stop) else stop, "limit": None if is_na(limit) else limit,
+                                  "loss": comment_loss or comment, "profit": comment_profit or comment,
+                                  "alert": alert_loss or alert_message, "alert_profit": alert_profit or alert_message}
 
     def cancel(self, id):
         self.entries.pop(id, None)
@@ -713,6 +715,8 @@ class StrategyEmulator:
             stop_fill(stop)
         elif limit is not None and ((d < 0 and l <= limit - thru) or (d > 0 and h >= limit + thru)):
             self._close(limit, ex["profit"])
+            if ex.get("alert_profit"):
+                self.rt.alerts.append((i, ex["alert_profit"]))
 
 
 class _ClosedTrades(int):

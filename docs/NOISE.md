@@ -36,13 +36,14 @@ The lines change at every check, because σ is different for each time of day. I
 
 | You are | The check's close is | Do |
 |---|---|---|
-| Flat | above the upper line | **BUY** 1 MNQ at market, then put a **stop order just below the upper line** (the alert gives the exact price) |
-| Flat | below the lower line | **SELL** 1 MNQ at market, then put a **stop order just above the lower line** (the alert gives the exact price) |
+| Flat | above the upper line | **BUY** 1 MNQ at market, then put a **stop order just below the upper line** (the alert gives the exact price) and a **take-profit limit 1.5 noise units above your fill** (the alert gives the distance in points) |
+| Flat | below the lower line | **SELL** 1 MNQ at market, then put a **stop order just above the lower line** and a **take-profit limit 1.5 noise units below your fill** |
 | In a trade | anything | **Move your stop to the new level.** The lines, and the stop with them, move at every half hour. Never let it sit further than your max loss from your fill. |
 | Flat, inside the lines | | Nothing. |
 
 - **The stop is the exit, and it sits 0.24 noise units past the line:** for a long at upper × (1 − 0.24 σ), for a short at lower × (1 + 0.24 σ). Why there: a trade-by-trade post-mortem of 2011–2018 found that 77% of losing trades were stop-outs on the line that then went on in our direction, and 0.24 σ is how far they typically overshot the line before resuming ([RESULTS.md](RESULTS.md#tenth-round-why-the-trades-lose)). On 2023–2026, years that analysis never saw, it raised profit per day by 43% and the win rate from 25% to 34%. If the stop level moves past the price when the lines update, the stop fills at once. The setting *Stop distance past the line* = 0 puts the stop on the line itself.
 - **A max loss per trade caps it.** The setting *Max loss per trade* (default $350 for the whole position) puts a second stop that many dollars from your fill; whichever stop is closer is the one in force. It starts the bar after the fill, because it needs the fill price. Over 16 years a cap of $100–$200 per contract raised profit per day in every period and cut the worst losing stretch ([RESULTS.md](RESULTS.md#eleventh-round-the-worst-days-and-a-cap-per-trade)); $35 per contract (a $350 cap over 10 contracts) wrecked it. Fees, slippage and a gap through the stop can add to the loss.
+- **A take-profit limit sits 1.5 noise units past your fill:** for a long at fill × (1 + 1.5 σ), for a short at fill × (1 − 1.5 σ), with σ the current check's noise, so it moves a little at each half hour. It works from the bar after the fill and fills once price trades a tick through it; if the stop and the target are both touched in one bar, the backtest counts the stop. The entry alert gives the distance in points and an approximate price. The setting was chosen walk-forward, each year from the years before only: over 2015–2026 it raised profit per day from $24.66 to $25.77 per contract, the t-stat from 4.71 to 5.39, and cut the worst losing stretch from $5,178 to $4,185 ([RESULTS.md](RESULTS.md), round twenty-six). *Take profit* = 0 turns it off. It applies with the resting stop only.
 - **After a stop-out you're flat until the next check.** A new signal there can put you back in, including the other way.
 - **Orders are market orders** placed right after the check. The backtest fills them at the next bar's open plus 1 tick of slippage. Stops fill at the line, or at the bar's open if price gapped through, minus 1 tick.
 - **At 16:00, close everything.**
@@ -76,6 +77,7 @@ Through a **TradingView alert**. It runs on TradingView's servers, so it keeps w
 | Green **BUY 10 MNQ** label under a candle | That candle's close was above the upper line: buy. |
 | Red **SELL 10 MNQ** label over a candle | That candle's close was below the lower line: sell. |
 | Grey **EXIT** label | Price touched the line and your stop filled (or, in half-hour check mode, a check closed back inside): the trade is over. |
+| Teal **TARGET** label | The take-profit filled: the trade is over, in profit. |
 | **REVERSE / SELL 20** or **REVERSE / BUY 20** | Price went through the other line: flip the position. |
 | Grey **FLAT** label | 16:00: close the trade. |
 | Orange **EXIT NOW** | A session ended early with a trade open: close it. |
@@ -87,7 +89,7 @@ The number on a label is the contracts, from the *Contracts* setting (10 by defa
 
 The label sits on the half-hour candle that just closed, the moment the alert fires. The backtest fills at the next candle's open.
 
-**Trade log.** A table at the bottom right of the chart lists every trade the bot took, newest first. Each row has the time it opened and closed (New York time, month-day hour:minute), the side and contracts, the entry and exit prices, the P/L after fees, and why it closed: *stop at the line*, *max loss stop*, *16:00 close* or *session ended*. While a trade is open it sits on top as **OPEN**, with the price now, the open P/L and the stop to have in. *Trades in the log* sets how many rows it shows (10 by default, up to 30); TradingView's *List of trades* tab has all of them. The dashboard at the top right shows today's P/L, open P/L and trades today. There are no status alerts: nothing to set up to see your trades.
+**Trade log.** A table at the bottom right of the chart lists every trade the bot took, newest first. Each row has the time it opened and closed (New York time, month-day hour:minute), the side and contracts, the entry and exit prices, the P/L after fees, and why it closed: *stop at the line*, *max loss stop*, *take profit*, *16:00 close* or *session ended*. While a trade is open it sits on top as **OPEN**, with the price now, the open P/L, and the stop and target to have in. *Trades in the log* sets how many rows it shows (10 by default, up to 30); TradingView's *List of trades* tab has all of them. The dashboard at the top right shows today's P/L, open P/L and trades today. There are no status alerts: nothing to set up to see your trades.
 
 **Where you place the order:** the alert and the labels only tell you. You place every order yourself.
 
@@ -102,7 +104,8 @@ The label sits on the half-hour candle that just closed, the moment the alert fi
 |---|---|
 | `BUY 1 MNQ at market now` | Buy 1 MNQ at market, then place a stop at the price the alert names (just below the upper line). |
 | `SELL 1 MNQ at market now` | Sell 1 MNQ at market, then place a stop at the price the alert names (just above the lower line). |
-| `EXIT LONG: price hit the stop` / `EXIT SHORT: price hit the stop` | Your stop should have filled. If you had no stop in, exit at market now. |
+| `EXIT LONG: price hit the stop` / `EXIT SHORT: price hit the stop` | Your stop should have filled. If you had no stop in, exit at market now. Cancel the take-profit order. |
+| `TARGET: the long reached the take-profit` / `TARGET: the short …` | Your take-profit limit should have filled. If not, exit at market now. Cancel the stop order. |
 | `EXIT LONG` / `EXIT SHORT` (half-hour check mode only) | Close the position at market and stay flat. |
 | `REVERSE` | Close the position and open the opposite one, both at market. In Tradovate that means selling 2 to flip a 1-lot long to short, or buying 2 to flip a short to long. |
 | `FLAT` | It's 16:00: close the position at market. |

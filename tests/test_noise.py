@@ -230,6 +230,29 @@ def test_max_loss_cap_is_a_second_stop_from_the_bar_after_the_fill():
     assert ten.reason == "Max loss" and ten.exit == pytest.approx(entry - 10 - 0.25)  # $200 over 10 = $20 each
 
 
+def with_high(bars: pd.DataFrame, i: int, high: float) -> pd.DataFrame:
+    out = bars.copy()
+    out.iloc[i, out.columns.get_loc("high")] = high
+    return out
+
+
+def test_take_profit_fills_a_tick_through_from_the_bar_after_the_fill():
+    bars, p = scenario(above_all_day)
+    entry = p * 1.002 + 0.25
+    tp = entry * (1 + 1.5 * 0.001)  # 1.5 noise units; the quiet history's noise is 0.1%
+    t = run(with_high(bars, bar(14, 8), tp + 0.25)).trades[0]
+    assert (t.exit_bar, t.reason) == (bar(14, 8), "Target") and t.exit == pytest.approx(tp)
+    assert t.pnl == pytest.approx((tp - entry) * 2 - 1.24)  # a limit: no slippage on the exit
+    assert run(with_high(bars, bar(14, 8), tp + 0.25)).events[1] == (bar(14, 8), "TARGET")
+    assert run(with_high(bars, bar(14, 8), tp)).trades[0].reason == "16:00 close"  # touched, not traded through
+    fill_bar = run(with_high(bars, bar(14, CHECK_10_00 + 1), tp + 1)).trades[0]
+    assert fill_bar.reason == "16:00 close"  # the limit needs the fill price: it starts the bar after
+    off = run(with_high(bars, bar(14, 8), tp + 1), NoiseConfig(take_profit=0)).trades[0]
+    assert off.reason == "16:00 close"
+    check = run(with_high(bars, bar(14, 8), tp + 1), CHECK).trades[0]
+    assert check.reason != "Target"  # the half-hour-check exit has no take-profit
+
+
 def test_fed_day_no_shorts_before_14_00():
     bars, p = scenario(below_all_day)
     assert scenario(below_all_day)[0].index[bar(14, 0)].strftime("%Y-%m-%d") == TEST_DAY
@@ -370,7 +393,7 @@ def run_pine(bars, inputs=None, minutes=5):
 
 LOG_HEADER = ["Opened (NY)", "Side", "Entry", "Closed (NY)", "Exit", "P/L", "Why"]
 WHY = {"Back inside": "stop at the line", "Max loss": "max loss stop", "16:00 close": "16:00 close",
-       "Session ended": "session ended", "reversed": "reversed"}
+       "Session ended": "session ended", "reversed": "reversed", "Target": "take profit"}
 
 
 def money(text):
@@ -469,6 +492,16 @@ def test_pine_ten_contracts():
 
 
 @pytest.mark.slow
+@pytest.mark.slow
+def test_pine_take_profit():
+    bars, p = scenario(above_all_day)
+    tp = (p * 1.002 + 0.25) * (1 + 1.5 * 0.001)
+    assert assert_parity(with_high(bars, bar(14, 8), tp + 0.25)).trades[0].reason == "Target"
+    assert assert_parity(with_high(bars, bar(14, 8), tp)).trades[0].reason == "16:00 close"
+    res = assert_parity(synth_bars(sessions=90, seed=5))
+    assert sum(t.reason == "Target" for t in res.trades) >= 3, "the random sessions reach the target too"
+
+
 @pytest.mark.slow
 def test_pine_fed_day():
     bars, _ = scenario(below_all_day)

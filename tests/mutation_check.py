@@ -115,6 +115,12 @@ MUTANTS = {
     "noise: stop not moved with the line": (
         "noise", "    if strategy.position_size > 0 or longPlaced\n", "    if longPlaced\n"
     ),
+    "noise: take-profit never placed": (
+        "noise", "stop = longStop, limit = longTp,", "stop = longStop, limit = na,"
+    ),
+    "noise: take-profit from the line instead of the fill": (
+        "noise", "strategy.position_avg_price * (1 + tpUnits * sig) : na", "ub * (1 + tpUnits * sig) : na"
+    ),
     "noise: Fed rule ignored": (
         "noise", "        shortOk = not (fedToday and endMin < FED_CUTOFF)", "        shortOk = true"
     ),
@@ -139,6 +145,7 @@ def _tests(T, script):
             ("ten contracts", N.test_pine_ten_contracts),
             ("max loss cap", N.test_pine_max_loss_cap),
             ("Fed day", N.test_pine_fed_day),
+            ("take profit", N.test_pine_take_profit),
         ] + [(f"random {mins}m [{mode}]", lambda mi=mins, mo=mode: N.test_pine_random_sessions(mi, mo))
              for mins, mode in N.RANDOM_CASES] + [
             ("RTH-only chart", N.test_pine_rth_only_chart_and_shorter_lookback),

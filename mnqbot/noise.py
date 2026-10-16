@@ -19,6 +19,9 @@ Rules, New York time, on any chart whose bar length divides 30 minutes:
     fills at the stop or the open, whichever is worse. stop_buffer = 0 puts the stop on the line itself.
     A second stop sits max_loss_per_trade dollars (for the whole position) from the entry fill, from the
     bar after the fill on; whichever stop is closer is the one in force ("Max loss" when it is the cap).
+    A take-profit limit sits take_profit noise units from the entry fill (entry x (1 +/- take_profit x the
+    current sigma)), from the bar after the fill; it fills at the limit once price trades a tick through it,
+    and only if the stop didn't fill on the same bar ("Target").
     exit_mode "check": the paper's rule. Long: if a check closes below upper, exit, or reverse to short
     if it closes below lower. Short: the mirror image.
   * Entries and check-mode exits are market orders filled at the next bar's open.
@@ -71,6 +74,7 @@ class NoiseConfig:
     max_loss_per_trade: float = 350.0  # $ for the whole position: a second stop this far from the entry; 0 = off
     fed_dates: str = FED_DATES  # "YYYY-MM-DD,..." scheduled Fed announcement days
     fed_no_shorts: bool = True  # on those days, no short entries before 14:00 (round twenty-four)
+    take_profit: float = 1.5  # noise units from the entry fill for a take-profit limit, stop mode only; 0 = off
 
 
 @dataclass
@@ -90,7 +94,7 @@ class NoiseTrade:
 @dataclass
 class NoiseResult:
     trades: list[NoiseTrade]
-    events: list[tuple[int, str]]  # (bar, action) for every alert: BUY, SELL, EXIT, REVERSE, FLAT
+    events: list[tuple[int, str]]  # (bar, action) for every alert: BUY, SELL, EXIT, TARGET, REVERSE, FLAT
     bands: list[tuple[int, float, float]] = field(default_factory=list)  # (check bar, upper, lower)
 
     def trades_frame(self) -> pd.DataFrame:
@@ -176,6 +180,11 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             if hit:
                 close_pos(i, price, reason)
                 events.append((i, "EXIT"))
+            elif cfg.take_profit > 0 and entry_bar != i:  # the take-profit limit, from the bar after the fill
+                tp = entry_px * (1 + pos * cfg.take_profit * sigma)
+                if (pos > 0 and h[i] >= tp + cfg.tick) or (pos < 0 and l[i] <= tp - cfg.tick):
+                    close_pos(i, tp, "Target")
+                    events.append((i, "TARGET"))
 
         if pos and (not in_rth or t_min == RTH_OPEN):  # a session ended early (half day, data gap)
             close_pos(i, c[i] - pos * slip, "Session ended")

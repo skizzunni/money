@@ -682,6 +682,33 @@ A full take-profit (round seventeen) raised the share of winners but cut the tre
 - **Half off at +1.0 with a breakeven stop is the smoothest version**: a higher t-stat, a smaller losing stretch and more winning months in both periods. But it makes 8–21% less a day, so it isn't more profit, only a calmer ride.
 - **The losers stay the same size whatever the exit**, because they are breakouts that fail before the trade is ever in profit. Exits can only reshape the winners.
 
+## Twenty-sixth round: the take-profit, judged walk-forward
+
+Round seventeen found a take-profit about 1.5–2.5 noise units from the entry better in every period, but after all 16 years had been seen. Walk-forward is the standard way to judge a parameter then ([`research/walkforward_tp.py`](../research/walkforward_tp.py)): each year from 2015, pick the setting with the highest daily-P&L t-stat over 2011 up to the year before, from none (the bot) and 1.0, 1.5, 2.0, 2.5 and 3.0 noise units, and trade that year with it. The choice never sees the year it trades. The limit works from the bar after the fill, as the Pine script places it (stricter than round seventeen, where 44 of 798 targets filled on the entry bar). Pass bar, fixed before running: the stitched 2015–2026 record beats the bot on $ per day and t-stat with no larger worst losing stretch.
+
+The procedure picked 2.0 in 2015–2016 and 2019–2021, and 1.5 in 2017–2018 and every year from 2022. It never picked "none".
+
+| Per contract, 2015 – Sep 2026 | $/day | t | Worst losing stretch | Years up |
+|---|---|---|---|---|
+| The bot | $24.66 | 4.71 | $5,178 | 12 of 12 |
+| **Walk-forward take-profit** | **$25.77** | **5.39** | **$4,185** | **12 of 12** |
+
+**It passed, and a 1.5-noise-unit take-profit is now in the bot** (*Take profit*, 0 turns it off). The fixed 1.5 setting by period, with the $50K Test odds at 2 MNQ (as in round thirteen):
+
+| Per contract | Win % | $/day | t | Worst stretch | Months up | $50K pass / fail at 2 MNQ |
+|---|---|---|---|---|---|---|
+| Bot, 2011–2018 | 28.1% | $22.70 | 4.11 | $3,223 | 62% | 51% / 43% |
+| **Take-profit, 2011–2018** | **33.5%** | **$22.10** | **4.41** | **$3,086** | **61%** | **52% / 44%** |
+| Bot, 2019–2022 | 27.2% | $23.05 | 2.44 | $5,178 | 65% | 48% / 51% |
+| **Take-profit, 2019–2022** | **30.1%** | **$33.21** | **3.54** | **$3,181** | **75%** | **47% / 53%** |
+| Bot, 2023–2026 | 30.1% | $23.32 | 2.48 | $2,222 | 58% | 42% / 43% |
+| **Take-profit, 2023–2026** | **33.1%** | **$22.43** | **2.92** | **$2,672** | **60%** | **68% / 25%** |
+
+- **The t-stat is higher in every period**: the same money with smaller swings, or more money (2019–2022).
+- **The $50K odds in 2023–2026 rose from 42% to 68%, and the fail rate fell from 43% to 25%.** Banking the big days at the target smooths the path, and the evaluation is judged on the path.
+- **The win rate rises 3–6 points**, to about a third.
+- **Caveats.** The idea came from looking at all the years (round seventeen); walk-forward removes the look-ahead in the setting, not in the idea. In 2023–2026 alone it made about $0.90 a day less per contract and its worst stretch was about 20% larger; the gain there is the steadier path.
+
 ## What this does and doesn't say
 
 - **It says** that the original sweep/breakout rules have no edge after realistic costs on 2023–2026 Nasdaq-100 data, and would very likely not pass a $25K evaluation. Of three published strategies, only noise-area momentum held up over 16 years, and even it fails most $25K evaluations.
@@ -722,6 +749,7 @@ python research/ensemble.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"       # copies o
 python research/overnight_noise.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv" # the edge overnight (no)
 python research/fomc.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"            # Fed days: no shorts before 14:00 (adopted)
 python research/scale_out.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"       # half off at a profit (no)
+python research/walkforward_tp.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"  # the take-profit, walk-forward (adopted)
 ```
 
 The raw data isn't stored in this repo.
