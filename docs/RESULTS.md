@@ -519,6 +519,35 @@ To pass on 2011–2018 a variant needed at least 10% more a day, a t-stat within
 - **The 2-unit trailing stop is slightly better in every period**, by $0.44 to $2.36 a day, with the same or a slightly higher t-stat. It's too small to clear the bar, and too small to be worth a second stop to manage by hand.
 - **More profit, for now, comes from size.** The bot makes about $23 a day per contract; profit scales with contracts and so do the losing stretches. The account's drawdown limit sets how many it can carry (round thirteen).
 
+## Seventeenth round: the win rate
+
+A TradingView run with 10 contracts showed 2 wins in 5 trades. Over 16 years the bot wins about 30% of trades and makes its money because an average win is about 3.4 times an average loss. Two questions, measured on 1 contract, prices at today's level ([`research/profit_levers.py`](../research/profit_levers.py) with its `target` and `cap_pts` options). These were run after every period had been seen, so they describe; they are not a test.
+
+**What the max loss per contract does to the win rate:**
+
+| Per contract | Win %, 2011–26 | Avg win | Avg loss | $/day 2011–26 | $/day 2023–26 |
+|---|---|---|---|---|---|
+| No max loss | 33.5% | $343 | −$128 | $23.30 | $21.00 |
+| **$117 (that's $350 on 3 MNQ)** | **28.3%** | **$342** | **−$100** | **$22.90** | **$23.30** |
+| $35 (that's $350 on 10 MNQ) | 15.4% | $352 | −$51 | $15.20 | $12.30 |
+
+$350 spread over 10 contracts is a 17.5-point stop, inside normal 5-minute noise: it halves the win rate and about halves the profit.
+
+**What a take-profit does.** A limit this many noise units from the entry, with the line stop and the $117 max loss as before:
+
+| Take profit at | Win % 2011–26 | $/day 2011–18 | $/day 2019–22 | $/day 2023–26 | t 2023–26 | $50K pass at 2 MNQ, 2023–26 |
+|---|---|---|---|---|---|---|
+| none (the bot) | 28.3% | $22.70 | $23.05 | $23.32 | 2.5 | 42% |
+| 0.5 noise units | 48.9% | — | — | $15.30 | 2.5 | — |
+| 1.0 | 36.9% | $21.10 | $25.30 | $21.70 | 3.1 | 66% |
+| 1.5 | 32% | $22.50 | $34.80 | $22.60 | 2.9 | 68% |
+| 2.0 | 30.3% | $24.40 | $31.10 | $23.50 | 2.9 | 51% |
+| 2.5 | 29% | $23.40 | $30.40 | $24.70 | 2.9 | 50% |
+| 3.0 | 29% | $22.80 | $27.20 | $24.10 | 2.8 | 47% |
+
+- **A high win rate costs money.** Taking profit at half a noise unit wins about half the trades and makes a third less, because it cuts the big trend days the profit comes from.
+- **A take-profit at 1.5–2.5 noise units is a lead, not a result.** It is smooth across settings, has a higher t-stat in every period and better $50K odds in 2023–2026, and barely moves the win rate. But most of its extra money is in 2019–2022, and it was found after all 16 years were seen, so there is no untouched data left to confirm it. It needs a forward test: paper trading from October 2026 on.
+
 ## What this does and doesn't say
 
 - **It says** that the original sweep/breakout rules have no edge after realistic costs on 2023–2026 Nasdaq-100 data, and would very likely not pass a $25K evaluation. Of three published strategies, only noise-area momentum held up over 16 years, and even it fails most $25K evaluations.

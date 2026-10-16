@@ -50,7 +50,9 @@ VARIANTS = {"bot": {}, "add to 2 at +1": {"units": 2, "k": 1.0}, "add to 3 at +1
 PERIODS = (("2011-2018", 2011, 2018), ("2019-2022", 2019, 2022), ("2023-2026", 2023, 2026))
 
 
-def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | None = None) -> pd.DataFrame:
+def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | None = None,
+             target: float | None = None, cap_pts: float = CAP_PTS) -> pd.DataFrame:
+    """target: take profit this many noise units from the first fill (limit); cap_pts: max loss in points."""
     checks = list(range(FIRST, LAST + 1, 30))
     kof = {m: j for j, m in enumerate(checks)}
     idx = bars.index.tz_convert(NY)
@@ -89,7 +91,7 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
             why = "line"
             if first_bar != i:
                 avg = sum(fills) / len(fills)
-                cap = avg - pos * CAP_PTS / len(fills)
+                cap = avg - pos * cap_pts / len(fills)
                 if (pos > 0 and cap > stop) or (pos < 0 and cap < stop):
                     stop, why = cap, "cap"
                 if armed:
@@ -105,6 +107,10 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
                 hit, px = (l[i] <= stop if pos > 0 else h[i] >= stop), stop - pos * TICK
             if hit:
                 close(i, px, why)
+            elif target is not None:  # a take-profit limit, after the stop (worst case first)
+                tp = fills[0] * (1 + pos * target * sigma)
+                if (pos > 0 and h[i] >= tp + TICK) or (pos < 0 and l[i] <= tp - TICK):
+                    close(i, tp, "target")
         if pos and (not in_rth or t_min == OPEN):
             close(i, c[i] - pos * TICK, "session")
         if t_min == OPEN:
