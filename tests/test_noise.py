@@ -215,7 +215,7 @@ def test_ten_contracts_scale_the_trade():
     assert ten.qty == 10 and ten.pnl == pytest.approx(10 * one.pnl)
 
 
-def test_max_loss_cap_is_a_second_stop_from_the_bar_after_the_fill():
+def test_max_loss_cap_is_a_second_stop_live_from_the_fill():
     bars, p = scenario(above_all_day)
     entry = p * 1.002 + 0.25  # the fill, with slippage; the line stop is about 25 points below it
     cap = NoiseConfig(max_loss_per_trade=20.0)  # 1 contract: a stop $20 = 10 points from the fill
@@ -225,7 +225,15 @@ def test_max_loss_cap_is_a_second_stop_from_the_bar_after_the_fill():
     default = run(with_low(bars, bar(14, 8), entry - 12)).trades[0]
     assert default.reason == "16:00 close"  # with the default $350 cap the line stop is the closer one
     same_bar = run(with_low(bars, bar(14, CHECK_10_00 + 1), entry - 12), cap).trades[0]
-    assert same_bar.reason == "16:00 close"  # on the fill bar only the line stop exists
+    # on the fill bar the cap works too, like a bracket order, measured from the expected fill (signal close + tick)
+    expected_fill = bars.close.iloc[bar(14, CHECK_10_00)] + 0.25
+    assert (same_bar.exit_bar, same_bar.reason) == (bar(14, CHECK_10_00 + 1), "Max loss")
+    assert same_bar.exit == pytest.approx(expected_fill - 10 - 0.25)
+    gap_up = bars.copy()  # the fill comes in above the signal close: the fill-bar cap still sits from the close
+    gap_up.iloc[bar(14, CHECK_10_00 + 1), gap_up.columns.get_loc("open")] += 3
+    gap_up.iloc[bar(14, CHECK_10_00 + 1), gap_up.columns.get_loc("high")] += 3
+    t = run(with_low(gap_up, bar(14, CHECK_10_00 + 1), expected_fill - 10.5), cap).trades[0]
+    assert t.reason == "Max loss" and t.exit == pytest.approx(expected_fill - 10 - 0.25)
     ten = run(with_low(bars, bar(14, 8), entry - 12), NoiseConfig(max_loss_per_trade=200.0, qty=10)).trades[0]
     assert ten.reason == "Max loss" and ten.exit == pytest.approx(entry - 10 - 0.25)  # $200 over 10 = $20 each
 
@@ -480,7 +488,8 @@ def test_pine_max_loss_cap():
     res = assert_parity(with_low(bars, bar(14, 8), entry - 12), max_loss=20.0)
     assert res.trades[0].reason == "Max loss"
     fill_bar = assert_parity(with_low(bars, bar(14, CHECK_10_00 + 1), entry - 12), max_loss=20.0)
-    assert fill_bar.trades[0].reason != "Max loss"
+    assert fill_bar.trades[0].reason == "Max loss"  # live from the fill bar, like a bracket order
+    assert fill_bar.trades[0].exit_bar == bar(14, CHECK_10_00 + 1)
     assert assert_parity(synth_bars(sessions=60, seed=9), max_loss=100.0).trades
 
 

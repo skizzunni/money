@@ -115,6 +115,9 @@ MUTANTS = {
     "noise: stop not moved with the line": (
         "noise", "    if strategy.position_size > 0 or longPlaced\n", "    if longPlaced\n"
     ),
+    "noise: max loss not live on the fill bar": (
+        "noise", "longPlaced ? close + syminfo.mintick - capPts : na", "na"
+    ),
     "noise: take-profit never placed": (
         "noise", "stop = longStop, limit = longTp,", "stop = longStop, limit = na,"
     ),

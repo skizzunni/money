@@ -709,6 +709,20 @@ The procedure picked 2.0 in 2015–2016 and 2019–2021, and 1.5 in 2017–2018 
 - **The win rate rises 3–6 points**, to about a third.
 - **Caveats.** The idea came from looking at all the years (round seventeen); walk-forward removes the look-ahead in the setting, not in the idea. In 2023–2026 alone it made about $0.90 a day less per contract and its worst stretch was about 20% larger; the gain there is the steadier path.
 
+## Twenty-seventh round: the max loss is live from the fill
+
+A TradingView run at 10 contracts showed a −$867 trade under a $350 max loss. The cap needs the fill price, so the script had started it on the bar after the fill: a short filled at 15:30, price ran up through the cap during that 5-minute bar, and the next bar opened past it. A trader who places the stop with the entry, as a bracket order, has it live from the fill. The backtest now does the same: on the fill bar the cap is measured from the expected fill (the signal close plus a tick), then from the real fill. This is a correction to match how the bot is traded, not a variant chosen by its results. What it does, with the 1.5-noise-unit take-profit ([`research/profit_levers.py`](../research/profit_levers.py), `cap_on_fill_bar`):
+
+| Per contract | $/day 2011–18 | $/day 2019–22 | $/day 2023–26 | t 2023–26 | Worst trade 2019–22 |
+|---|---|---|---|---|---|
+| $117 a contract ($350 on 3), cap from the bar after the fill | $22.10 | $33.21 | $22.43 | 2.92 | −$1,042 |
+| **$117 a contract, cap live from the fill** | **$23.66** | **$32.83** | **$19.60** | **2.71** | **−$338** |
+| $35 a contract ($350 on 10), cap from the bar after the fill | $12.52 | $21.07 | $11.59 | 1.62 | −$1,042 |
+| **$35 a contract, cap live from the fill** | **$14.17** | **$14.31** | **$5.83** | **1.10** | **−$257** |
+
+- **At $117 a contract it's about even**: a little better on 2011–2018, the same on 2019–2022, a little worse on 2023–2026, and the losses past the cap shrink (worst trade −$1,042 to −$338 on 2019–2022).
+- **At $35 a contract the backtest had been flattering.** A $35-per-contract stop sits inside normal 5-minute moves; once it is live from the fill, as it would be in real trading, 2023–2026 falls to about $6 a day per contract and the win rate to about 13%. $350 on 10 contracts is the setting that holds the bot back, not the signal.
+
 ## What this does and doesn't say
 
 - **It says** that the original sweep/breakout rules have no edge after realistic costs on 2023–2026 Nasdaq-100 data, and would very likely not pass a $25K evaluation. Of three published strategies, only noise-area momentum held up over 16 years, and even it fails most $25K evaluations.

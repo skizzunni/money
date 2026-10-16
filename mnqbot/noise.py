@@ -17,8 +17,9 @@ Rules, New York time, on any chart whose bar length divides 30 minutes:
     line for a short) and moves with it at each check. It fills at the stop, or at the bar's open if the
     open is already past it (the line moved past the price, or a gap). On the bar the entry fills, it
     fills at the stop or the open, whichever is worse. stop_buffer = 0 puts the stop on the line itself.
-    A second stop sits max_loss_per_trade dollars (for the whole position) from the entry fill, from the
-    bar after the fill on; whichever stop is closer is the one in force ("Max loss" when it is the cap).
+    A second stop sits max_loss_per_trade dollars (for the whole position) from the entry fill; whichever stop
+    is closer is the one in force ("Max loss" when it is the cap). On the fill bar it is measured from the
+    expected fill (the signal close plus slippage), as a bracket order placed with the entry would be.
     A take-profit limit sits take_profit noise units from the entry fill (entry x (1 +/- take_profit x the
     current sigma)), from the bar after the fill; it fills at the limit once price trades a tick through it,
     and only if the stop didn't fill on the same bar ("Target").
@@ -128,6 +129,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
     skip_today = fed_today = False
     pos = 0
     entry_px, entry_bar = 0.0, 0
+    est_px = math.nan  # expected fill of the pending entry
     pending: tuple[str, int] | None = None  # ("entry", direction) or ("close", 0), filled at the next open
     trades: list[NoiseTrade] = []
     events: list[tuple[int, str]] = []
@@ -165,8 +167,11 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
         if use_stop and pos and not math.isnan(upper):
             line = upper * (1 - cfg.stop_buffer * sigma) if pos > 0 else lower * (1 + cfg.stop_buffer * sigma)
             reason = "Back inside"
-            if cfg.max_loss_per_trade > 0 and entry_bar != i:  # the cap needs the fill price: it starts the bar after
-                cap = entry_px - pos * cfg.max_loss_per_trade / cfg.qty / cfg.point_value
+            if cfg.max_loss_per_trade > 0:
+                # from the fill price; on the fill bar itself from the expected fill (signal close + slippage), as a
+                # bracket order placed with the entry would be
+                base = entry_px if entry_bar != i else est_px
+                cap = base - pos * cfg.max_loss_per_trade / cfg.qty / cfg.point_value
                 if (pos > 0 and cap > line) or (pos < 0 and cap < line):
                     line, reason = cap, "Max loss"
             if entry_bar == i:  # a stop attached to the entry can fill on the fill bar itself
@@ -229,6 +234,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                 elif pos == 0 and c[i] < lower and short_ok:
                     pending = ("entry", -1)
                     events.append((i, "SELL"))
+                if pending is not None and pending[0] == "entry":
+                    est_px = c[i] + pending[1] * slip  # the expected fill, for the max loss on the fill bar
 
         if in_rth and end == RTH_CLOSE:
             if pos:

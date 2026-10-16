@@ -20,8 +20,8 @@
 // passed about 6 in 10 historical $25K evaluations and about 78% of $100K ones. On a $50K evaluation with the
 // $350 max loss, about half passed at 2 MNQ and 1 in 5 at 10 MNQ (docs/RESULTS.md). Not "never lose".
 //
-// Chart: MNQ1! (or the front-month MNQ contract), 5 minutes. 1, 10, 15 and 30 also run, but the max-loss stop
-// starts one bar after the fill, so on a 30-minute chart a trade has no $350 cap for its first half hour.
+// Chart: MNQ1! (or the front-month MNQ contract), 5 minutes. 1, 10, 15 and 30 also run, but the take-profit and the
+// max loss after the fill bar are checked once per bar, so a 30-minute chart sees them later than a trader would.
 // The rules are the same as the Python reference in mnqbot/noise.py.
 // ------------------------------------------------------------------
 strategy("MNQ Noise-Area Momentum", shorttitle = "Noise-Mom", overlay = true,
@@ -45,7 +45,7 @@ lookback = input.int(14, "Sessions in the noise average", minval = 2, maxval = 6
 qty      = input.int(10, "Contracts", minval = 1, maxval = 60, group = grpT,
      tooltip = "Every figure in docs/RESULTS.md is per contract: about $26 a day over 16 years. With the $350 max loss below, 10 contracts made about $13-16 a day per contract (the stop is $35 each), 3 contracts about $22. On a $50K evaluation ($3,000 target, $2,000 end-of-day drawdown), from every start day 2011-2026: 10 MNQ passed about 1 in 5 and failed 4 in 5; 2 MNQ passed about half (60% in 2023-2026); 1 MNQ passed about 45% and failed 25% within 125 sessions. See docs/RESULTS.md, round thirteen.")
 maxLoss  = input.float(350, "Max loss per trade, $ (all contracts, 0 = off)", minval = 0, step = 10, group = grpT,
-     tooltip = "A second stop this many dollars from the entry fill, for the whole position, in force from the bar after the fill; whichever of it and the line stop is closer is used. On 16 years, caps of $100-$200 per contract raised profit per day in every period and cut the worst losing stretch. Fees, slippage and a gap through the stop can add to the loss.")
+     tooltip = "A second stop this many dollars from the entry fill, for the whole position, live from the fill like a bracket order; whichever of it and the line stop is closer is used. Spread over many contracts it gets tight: $350 over 10 contracts is a $35 stop each, which normal 5-minute moves hit, and on 2023-2026 it made about $6 a day per contract against about $20 at $117 each. On 16 years, caps of $100-$200 per contract raised profit per day in every period and cut the worst losing stretch. Fees, slippage and a gap through the stop can add to the loss.")
 skipDates = input.string("2026-01-01,2026-01-19,2026-02-16,2026-04-03,2026-05-25,2026-06-19,2026-07-03,2026-09-07,2026-11-26,2026-11-27,2026-12-24,2026-12-25,2027-01-01,2027-01-18,2027-02-15,2027-03-26,2027-05-31,2027-06-18,2027-07-05,2027-09-06,2027-11-25,2027-11-26,2027-12-24",
      "Don't trade on these dates", group = grpT,
      tooltip = "YYYY-MM-DD, comma separated. Pre-filled with the 2026-2027 US market holidays and half days, when MNQ trades a short session. Add news days if you like.")
@@ -218,12 +218,13 @@ if isCheck and not na(dayOpen)
                      px(lb) + "). " + holdShort + " Next check " + nextCheck + ".", alert.freq_once_per_bar_close)
 
 // ── The resting stop: just past the current line, or the max-loss cap from the fill if that is closer.
-// Re-placed every bar so it moves with the line. The cap needs the fill price, so it starts the bar after the fill.
+// Re-placed every bar so it moves with the line. The cap is live from the fill bar, like a bracket order: placed
+// with the entry, it is measured from the expected fill (the signal close plus a tick), then from the real fill.
 capPts = maxLoss > 0 ? maxLoss / qty / syminfo.pointvalue : na
 lineStopL = ub * (1 - stopBuf * sig)
 lineStopS = lb * (1 + stopBuf * sig)
-capL = strategy.position_size > 0 and not na(capPts) ? strategy.position_avg_price - capPts : na
-capS = strategy.position_size < 0 and not na(capPts) ? strategy.position_avg_price + capPts : na
+capL = na(capPts) ? na : strategy.position_size > 0 ? strategy.position_avg_price - capPts : longPlaced ? close + syminfo.mintick - capPts : na
+capS = na(capPts) ? na : strategy.position_size < 0 ? strategy.position_avg_price + capPts : shortPlaced ? close - syminfo.mintick + capPts : na
 longStop = na(capL) ? lineStopL : math.max(lineStopL, capL)
 shortStop = na(capS) ? lineStopS : math.min(lineStopS, capS)
 longWhy = not na(capL) and capL > lineStopL ? "Max loss" : "Back inside"
@@ -301,7 +302,7 @@ if showDash and (barstate.islastconfirmedhistory or barstate.isrealtime)
     table.cell(dash, 1, 11, str.tostring(closed - dayStartClosed), text_color = color.white, text_size = size.small)
     capLate = maxLoss > 0 and useStop and barMin > 5
     table.cell(dash, 0, 12, "Chart", text_color = color.silver, text_size = size.small)
-    table.cell(dash, 1, 12, capLate ? "use 5 min: on " + str.tostring(barMin) + " min the max loss starts " + str.tostring(barMin) + " min late" : str.tostring(barMin) + " min",
+    table.cell(dash, 1, 12, capLate ? "use 5 min: tested on 5-minute bars; on " + str.tostring(barMin) + " min the target starts " + str.tostring(barMin) + " min late" : str.tostring(barMin) + " min",
          text_color = capLate ? color.orange : color.white, text_size = size.small)
     fedNow = fedToday and inRth and endMin < FED_CUTOFF
     table.cell(dash, 0, 13, "Fed day", text_color = color.silver, text_size = size.small)
