@@ -594,6 +594,37 @@ Rules and pass bar fixed before running ([`research/losers.py`](../research/lose
 - **A 30-minute time stop makes losses about 14% smaller at about the same profit.** It trades a smaller average loss for fewer winners (some slow starters are cut), so the money comes out even. It isn't better, only different.
 - **Waiting for a second check** raises the win rate a little and costs a third of the profit: the entry is half an hour later on the trades that work.
 
+## Twentieth round: let the noise area adapt to today's market
+
+Volatility clusters, so today's normal range might be better predicted by recent and current conditions than by a flat 14-session average ([`research/adaptive.py`](../research/adaptive.py)). Rules and pass bar as in round nineteen, fixed before running. A fifth angle, Fed announcement days, was dropped: this environment's network policy blocks the Federal Reserve's and Wikipedia's sites, and the dates were not going to be typed from memory.
+
+| Per contract | Trades/day 2011–18 | $/day 2011–18 | $/day 2019–22 | Worst stretch 2011–18 | Worst stretch 2019–22 |
+|---|---|---|---|---|---|
+| **The bot** | **0.98** | **$22.70** | **$23.05** | **$3,223** | **$5,178** |
+| Band scaled by the overnight range, strength 0.5 | 1.10 | $16.42 | $25.67 | $4,846 | $5,688 |
+| Band scaled by the overnight range, strength 1.0 | 1.23 | $13.97 | $26.03 | $5,641 | $4,474 |
+| Faster-adapting average (half-life 7 sessions) | 0.95 | $23.47 | $21.10 | $2,842 | $5,199 |
+| An extra check at 09:45 | 1.08 | $22.90 | $25.81 | $4,060 | $5,330 |
+| Only breakouts past yesterday's high or low | 0.70 | $16.64 | $12.82 | $2,813 | $4,426 |
+
+- **The faster-adapting average passed 2011–2018 and failed 2019–2022**, so 2023–2026 was not looked at.
+- **The overnight scaling points opposite ways in the two periods**: worse on 2011–2018, better on 2019–2022. That is noise, not an edge.
+
+## Twenty-first round: contracts that follow the account
+
+A prop account is passed or lost on its path, not its average, so this round changes only how many contracts the bot trades each day, from the account's profit so far ([`research/sizing.py`](../research/sizing.py)). Every size stays within $350 a trade: at most 3 contracts with a $117-per-contract max loss. The $50K Test as reviews describe it, every start day, 125 sessions. To pass: a higher pass rate than a fixed 2 contracts, and a fail rate no higher.
+
+| Size rule | Pass 2011–18 | Fail 2011–18 | Pass 2019–22 | Fail 2019–22 |
+|---|---|---|---|---|
+| **Fixed 2** | **50.6%** | **43.3%** | **47.9%** | **50.9%** |
+| Fixed 3 | 33.4% | 62.6% | 40.9% | 59.1% |
+| Build up: 2, then 3 once up $750, 1 if down $750 | 42.7% | 50.5% | 40.6% | 57.5% |
+| Earn the size: 1, then 2 once up $500, 3 once up $1,500 | 42.0% | 34.9% | 42.1% | 40.8% |
+| Back off: 3, then 2 if down $500, 1 if down $1,000 | 37.1% | 59.7% | 40.2% | 59.2% |
+
+- **Nothing passed.** Fixed 2 contracts stays the best simple choice.
+- **"Earn the size" fails about 8–10 points less often** but passes less too: more attempts are still open after six months. It's the safer way to run an evaluation if a slower pass is acceptable, not a better one.
+
 ## What this does and doesn't say
 
 - **It says** that the original sweep/breakout rules have no edge after realistic costs on 2023–2026 Nasdaq-100 data, and would very likely not pass a $25K evaluation. Of three published strategies, only noise-area momentum held up over 16 years, and even it fails most $25K evaluations.
@@ -628,6 +659,8 @@ python research/fill_in.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"        # a trade 
 python research/profit_levers.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"  # add to winners, trailing stops (no)
 python research/meta_label.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"     # spot the losers at entry? (no)
 python research/losers.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"         # time stops, confirmation, flips (no)
+python research/adaptive.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"       # a noise area that adapts (no)
+python research/sizing.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"         # contracts that follow the account (no)
 ```
 
 The raw data isn't stored in this repo.
