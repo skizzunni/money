@@ -406,7 +406,7 @@ def run_pine(bars, inputs=None, minutes=5):
 
 LOG_HEADER = ["Opened (NY)", "Side", "Entry", "Closed (NY)", "Exit", "P/L", "Why"]
 WHY = {"Back inside": "stop at the line", "Max loss": "max loss stop", "16:00 close": "16:00 close",
-       "Session ended": "session ended", "reversed": "reversed", "Target": "take profit"}
+       "Session ended": "session ended", "reversed": "reversed", "Target": "take profit", "Lock": "locked win"}
 
 
 def money(text):
@@ -433,9 +433,11 @@ def assert_trade_log(log, res, exit_mode, rows=10):
 
 
 def assert_parity(bars, minutes=5, lookback=14, skip_dates=None, exit_mode="stop", stop_buffer=None, qty=1,
-                  max_loss=None, fed_dates=None, fed_no_shorts=None, take_profit=None, hook=None):
+                  max_loss=None, fed_dates=None, fed_no_shorts=None, take_profit=None, hook=None, lock_at=None):
     cfg = NoiseConfig(lookback=lookback, exit_mode=exit_mode, qty=qty)
     inputs = {"Sessions in the noise average": lookback}
+    if lock_at is not None:
+        cfg.lock_at = inputs["Lock a small win: trigger, in max losses (0 = off)"] = lock_at
     if hook is not None:  # webhook orders on, for this contract
         inputs["Webhook orders"], inputs["Contract for the webhook (blank = the chart's)"] = "TradersPost", hook
         cfg.tighten_only = True
@@ -557,6 +559,44 @@ def test_pine_take_profit():
     assert sum(t.reason == "Target" for t in res.trades) >= 3, "the random sessions reach the target too"
 
 
+def lock_case(reach: float):
+    """10 MNQ, $350 max loss (17.5 points a contract): the long's high reaches entry + reach at 10:40, then the bars
+    sit a tick under the entry."""
+    bars, p = scenario(above_all_day)
+    entry = p * 1.002 + 0.25
+    return with_high(bars, bar(14, 8), entry + reach), entry
+
+
+def test_lock_moves_the_stop_the_bar_after_the_trigger():
+    cfg = NoiseConfig(qty=10, max_loss_per_trade=350.0)
+    bars, entry = lock_case(17.5 + 0.01)
+    t = run(bars, cfg).trades[0]
+    # the trigger was touched at 10:40; at 10:45 the bar opens a tick under the entry, below the lock at entry + 2.5,
+    # so the stop fills at that open (on this chart the lock is a bar late; a broker's auto-breakeven fills at +2.5)
+    assert (t.reason, t.exit_bar, t.exit) == ("Lock", bar(14, 9), pytest.approx(entry - 0.25 - 0.25))
+    bars, _ = lock_case(17.5 - 0.25)  # a tick short of the trigger: no lock
+    assert run(bars, cfg).trades[0].reason == "16:00 close"
+    assert run(lock_case(17.5 + 0.01)[0], NoiseConfig(qty=10, max_loss_per_trade=350.0, lock_at=0)).trades[0].reason \
+        == "16:00 close", "lock_at 0 turns it off"
+
+
+def test_lock_fills_at_its_price_when_price_falls_through_it():
+    cfg = NoiseConfig(qty=10, max_loss_per_trade=350.0)
+    bars, entry = lock_case(17.5 + 0.01)
+    up = bars.copy()
+    for j in range(8, 12):  # the bars after the trigger trade higher, then one falls back through the lock
+        i = bar(14, j)
+        up.iloc[i, up.columns.get_loc("open")] = up.iloc[i, up.columns.get_loc("close")] = entry + 10
+        up.iloc[i, up.columns.get_loc("low")] = entry + 9
+        up.iloc[i, up.columns.get_loc("high")] = entry + 17.51 if j == 8 else entry + 11
+    i = bar(14, 12)
+    up.iloc[i, up.columns.get_loc("open")] = entry + 10
+    up.iloc[i, up.columns.get_loc("high")] = entry + 10
+    t = run(up, cfg).trades[0]
+    assert (t.reason, t.exit_bar, t.exit) == ("Lock", i, pytest.approx(entry + 2.5 - 0.25))
+    assert t.pnl > 0, "a locked trade closes as a small winner after fees and slippage"
+
+
 def test_tighten_only_stop_never_loosens():
     """Webhook mode: the stop is the tightest one so far in the trade. Over random sessions it exits some trades
     earlier than the moving line would (so it is exercised), and never later."""
@@ -571,6 +611,17 @@ def test_tighten_only_stop_never_loosens():
         assert t.exit_bar <= b.exit_bar
         earlier += t.exit_bar < b.exit_bar
     assert earlier >= 1
+
+
+@pytest.mark.slow
+def test_pine_lock():
+    assert assert_parity(lock_case(17.5 + 0.01)[0], qty=10, max_loss=350.0).trades[0].reason == "Lock"
+    assert assert_parity(lock_case(17.5 - 0.25)[0], qty=10, max_loss=350.0).trades[0].reason == "16:00 close"
+    assert assert_parity(lock_case(17.5 + 0.01)[0], qty=10, max_loss=350.0, lock_at=0).trades[0].reason == "16:00 close"
+    res = assert_parity(synth_bars(sessions=120, seed=3), qty=10, max_loss=350.0)
+    assert sum(t.reason == "Lock" for t in res.trades) >= 5
+    res = assert_parity(synth_bars(sessions=120, seed=3), qty=10, max_loss=350.0, hook="MNQZ2026")
+    assert sum(t.reason == "Lock" for t in res.trades) >= 5, "the lock with webhook orders"
 
 
 @pytest.mark.slow

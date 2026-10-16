@@ -149,6 +149,21 @@ MUTANTS = {
     "noise: webhook contract input ignored": (
         "noise", "hookSym = hookTicker != \"\" ? hookTicker :", "hookSym = false ? hookTicker :"
     ),
+    "noise: lock never arms": (
+        "noise",
+        "    locked := strategy.position_size > 0 ? high - strategy.position_avg_price >= lockPts : "
+        "strategy.position_avg_price - low >= lockPts\n",
+        "    locked := false\n"
+    ),
+    "noise: lock arms on the close, not the touch": (
+        "noise", "? high - strategy.position_avg_price >= lockPts", "? close - strategy.position_avg_price >= lockPts"
+    ),
+    "noise: lock at the entry, without the offset": (
+        "noise", "strategy.position_avg_price + lockPlus : na", "strategy.position_avg_price : na"
+    ),
+    "noise: lock kept after the trade closes": (
+        "noise", "if strategy.position_size == 0\n    locked := false\n", "if false\n    locked := false\n"
+    ),
     "noise: open position kept into the next session": (
         "noise", "(not inRth or tMin == RTH_OPEN)", "not inRth"
     ),
@@ -169,6 +184,7 @@ def _tests(T, script):
             ("Fed day", N.test_pine_fed_day),
             ("take profit", N.test_pine_take_profit),
             ("webhooks", N.test_pine_webhooks),
+            ("lock", N.test_pine_lock),
         ] + [(f"random {mins}m [{mode}]", lambda mi=mins, mo=mode: N.test_pine_random_sessions(mi, mo))
              for mins, mode in N.RANDOM_CASES] + [
             ("RTH-only chart", N.test_pine_rth_only_chart_and_shorter_lookback),

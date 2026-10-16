@@ -69,6 +69,8 @@ Through a **TradingView alert**. It runs on TradingView's servers, so it keeps w
 
 **What arrives:** each alert is a full instruction, sent right at the half hour, for example *"BUY 3 MNQ at market now. Price 29,980.25 is above the noise area (upper 29,960.00). Bracket: stop 29,921.75 (your $350.00 max loss), take-profit limit 30,070.50, for a fill near 29,980.50. If your fill is different, keep the same distances. At each half hour move the stop with the line (the dashboard shows it); the max loss never moves. Next check 10:30."* **Act on it right away, with a bracket order** (entry, stop and take-profit together; Tradovate calls it a bracket or OSO). Speed matters more than anything else: in the stress tests, filling every entry 5 minutes late cut the profit roughly in half ([RESULTS.md](RESULTS.md), stress tests).
 
+**The lock (v1.2): set it once in Tradovate.** Once a trade has gone as far in your favour as your max loss per contract (17.5 points with $350 on 10 MNQ), its stop moves to the entry plus 2.5 points, so it can't turn into a loser. At your setting it took the winners from about 1 in 7 trades to about 1 in 2 on 16 years of data, for the same money ([RESULTS.md](RESULTS.md), round thirty-seven). It has to act within seconds, so let the broker do it: in Tradovate, make a bracket strategy (ATM) for MNQ with the stop type **Auto Breakeven**, the profit trigger **70 ticks** (17.5 points) and the offset **+10 ticks** (2.5 points), and use it for every entry, with the stop and take-profit from the alert. The chart does the same one bar later, and the entry alert spells it out: *"Auto-breakeven: at 30,002.75 move the stop to 29,987.75."* Set *Lock a small win* to 0 to turn it off. If you change the contracts or the max loss, the trigger in ticks is twice the max loss per contract in dollars (70 ticks for $35).
+
 **On the chart:**
 
 | You see | Meaning |
@@ -120,7 +122,7 @@ In webhook mode the stop **only ever tightens** during a trade, because the brok
 |---|---|
 | `BUY 3 MNQ at market now` | Buy at market with a bracket: the stop and take-profit prices the alert names (or the same distances from your fill). |
 | `SELL 3 MNQ at market now` | Sell at market with a bracket: the stop and take-profit prices the alert names (or the same distances from your fill). |
-| `EXIT LONG: price hit the stop` / `EXIT SHORT: price hit the stop` | Your stop should have filled. If you had no stop in, exit at market now. Cancel the take-profit order. |
+| `EXIT LONG: price hit the stop` / `EXIT SHORT: price hit the stop` | Your stop (the max loss, the line or the lock) should have filled. If you had no stop in, exit at market now. Cancel the take-profit order. |
 | `TARGET: the long reached the take-profit` / `TARGET: the short …` | Your take-profit limit should have filled. If not, exit at market now. Cancel the stop order. |
 | `EXIT LONG` / `EXIT SHORT` (half-hour check mode only) | Close the position at market and stay flat. |
 | `REVERSE` | Close the position and open the opposite one, both at market. In Tradovate that means selling 2 to flip a 1-lot long to short, or buying 2 to flip a short to long. |

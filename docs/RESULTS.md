@@ -865,6 +865,46 @@ The stress tests found a 5-minute-late entry roughly halves the profit. This rou
 - **So automation passes the bar.** But the firm decides: Take Profit Trader's Universal Trading Policies (help center, updated 9 October 2026) say *"Automated trading systems, bots, or algorithmic execution tools are not permitted."* By a 28-firm review of official help pages (prop-memo.com, 21 September 2026), Apex now bans automation too, while Lucid Trading, MyFundedFutures, FundedNext Futures and FTMO Futures allow it in writing, and Tradeify, Bulenox and Topstep allow self-built bots with conditions. Check the firm's own rules before buying.
 - **Webhook mode (v1.1).** For a firm that allows it, the script can now send each order as a TradersPost message with the bracket attached. The broker holds the stop placed with the entry and the strategy can't move it, so in this mode the stop only ever tightens, and an exit message closes the trade when the chart's tighter stop fills. Tested against the moving stop before building it: NQ futures 2015–2025 at $117, $27.10 a day against $27.94, t-stat 5.61 against 5.72, worst losing stretch $4,174 against $4,222; index 2011–2026, $25.07 against $25.11. At $35: $11.74 against $11.82 and $12.31 against $12.30. On real MNQ 5-minute bars from Yahoo, 21 September to midday 16 October 2026, the same trades and winners and slightly more money: +$12,555 against +$12,313 at 10 MNQ and $350, +$6,731 against +$6,662 at 3 MNQ. The same money.
 
+## Thirty-sixth round: more winners at 10 MNQ and $350
+
+The user's TradingView account showed about 5 winners in 15 trades and asked for a much higher win rate without changing sizes. Every exit setting so far was tuned at $117 a contract; at the user's setting, $350 over 10 MNQ, the stop is $35 a contract (17.5 points). There the bot wins about 14% of trades and trades twice a day, because ordinary 5-minute noise hits the stop and the bot re-enters at the next check. Rules fixed before running ([`research/win_rate35.py`](../research/win_rate35.py)), per contract at $35 (×10 for the account), pass bar against the bot: win rate 10 points higher, $ per day no lower, t-stat within 0.3, $ per day per dollar of worst losing stretch no lower.
+
+| 2011–2018, per contract at $35 | Trades/day | Win % | $/day | t |
+|---|---|---|---|---|
+| **The bot** | **2.03** | **15.4%** | **$14.17** | **3.51** |
+| Take-profit 0.5 / 0.75 / 1.0 noise units | 2.3–2.8 | 18–25% | $1.48 / $8.25 / $11.94 | 0.5–3.2 |
+| Lock: once a bar closes 17.5 pts up, stop to entry + 2.5 | 2.32 | 36.7% | $14.38 | 3.83 |
+| Lock at 35 pts up | 2.17 | 27.8% | $13.90 | 3.59 |
+| No entries after 1 / 2 losers today | 0.66 / 1.12 | 17% / 16% | $4.80 / $9.77 | 2.3 / 3.4 |
+| No second entry on a side that lost today | 0.69 | 17.4% | $5.29 | 2.47 |
+
+The lock passed discovery and failed confirmation: on 2019–2022 it won 31% against 12% but made $11.84 a day against $14.31. **The repeat entries the bot takes after a stop-out are where its money is**: limiting them cut the profit by a third to two thirds.
+
+## Thirty-seventh round: the lock with room, and skipping the signals a $35 stop can't survive
+
+Rules fixed before running ([`research/win_rate35b.py`](../research/win_rate35b.py)): five locks with more room ((trigger, lock) of (17.5, 5), (17.5, 8.75), (26.25, 8.75), (26.25, 13.125), (35, 17.5) points), no entry when 17.5 points is under 0.1–0.3 noise units, and every pair. Same pass bar. 2019–2022 had been seen once for one lock.
+
+- **Nothing passed.** The best, the (17.5, 5) lock, won 36.7% against 15.4% at $14.14 a day against $14.17 (t 3.79 against 3.51): it missed the bar by three cents.
+- **Skipping the high-noise signals costs most of the money** ($7.32 a day at 0.1, $1.25 at 0.2): the days the noise is wide are the trend days.
+
+**Descriptive, after both rounds: the lock is a fast exit, and on 5-minute bars it is too slow.** On 5-minute bars the lock can only act at the next bar after the trigger; a broker's auto-breakeven acts on the tick. So the same rule on 1-minute bars of both datasets, armed when price *touches* the trigger and moved from the next minute, as Tradovate's Auto Breakeven would do it (trigger 70 ticks, offset +10 ticks):
+
+| Per contract at $35 (×10 for 10 MNQ at $350) | Win % | $/day | t | Worst losing stretch | Months up |
+|---|---|---|---|---|---|
+| Index 2011 – Sep 2026, the bot | 14.1% | $12.82 | 4.34 | $3,800 | 57% |
+| **Index 2011 – Sep 2026, with the lock** | **48.7%** | **$13.01** | **5.18** | $4,553 | 63% |
+| NQ futures 2015 – Jul 2025, the bot | 13.3% | $11.96 | 3.22 | $3,920 | 58% |
+| **NQ futures 2015 – Jul 2025, with the lock** | **48.0%** | **$11.65** | **3.66** | **$2,655** | 58% |
+| Index 2011–18 / 2019–22 / 2023–26, the bot | 15.5 / 12.1 / 13.4% | $14.63 / $15.60 / $5.60 | | | |
+| Index, with the lock | 50.3 / 46.7 / 47.3% | $14.80 / $16.91 / $4.59 | | | |
+| 5-minute bars (what the TradingView chart shows), index / NQ, the bot | 14.1 / 13.2% | $12.30 / $11.82 | 4.18 / 3.19 | | |
+| 5-minute bars, with the lock | 39.7 / 37.9% | $11.57 / $9.53 | 4.39 / 2.88 | | |
+
+- **About half the trades win instead of one in seven, for about the same money**, with a higher t-stat on both datasets. A locked trade closes at the entry + 2.5 points less a tick, +$3.26 a contract after fees: many of the new winners are small. The average winner is smaller and there are three times as many.
+- **On real MNQ bars from Yahoo, 21 September to midday 16 October 2026** (never used to choose anything here), at 10 MNQ and $350 on 5-minute bars: 50 trades, 23 winners (46%), +$13,474, worst day −$1,382, against 44 trades, 11 winners (25%), +$12,313, worst day −$1,862 without it. Winning days fell from 7 of 10 to 5 of 10.
+- **The $50K evaluation at 10 MNQ and $350** (125-day window, 1-minute bars): passes 28% against 21% on the index 2011–2026, 25% against 13% on 2023–2026, 22% against 22% on NQ futures. At this size most attempts still fail either way.
+- **Caveats.** The lock was found by looking at 2011–2022, and the 1-minute version after every period had been seen; only the Yahoo weeks are new. It is in the bot (v1.2) because the user asked for the win rate at fixed sizes and it keeps the money on both datasets; set *Lock a small win* to 0 to turn it off. On the 5-minute chart it costs 6–19% of the profit; the broker's Auto Breakeven, set as above, is what gets the 1-minute numbers.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
@@ -932,6 +972,8 @@ python research/stress.py nsx_5m_scaled.pkl nq_5m_scaled.pkl           # stress 
 python research/pullback.py nsx_5m_scaled.pkl                          # limit entry on the bounce (no)
 python research/check_times.py nsx_5m_scaled.pkl nq_5m_scaled.pkl      # skip the first or last checks (no)
 python research/delay.py nsx_1m_scaled.pkl nq_1m_scaled.pkl            # each minute of entry delay, 1-minute bars
+python research/win_rate35.py nsx_5m_scaled.pkl nq_5m_scaled.pkl       # more winners at $35 a contract (lock, no pass)
+python research/win_rate35b.py nsx_5m_scaled.pkl nq_5m_scaled.pkl      # the lock with room, skip wide noise (no pass)
 ```
 
 The raw data isn't stored in this repo.

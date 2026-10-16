@@ -15,6 +15,9 @@
 // Noise area for each half-hour mark = the day's open (and previous close) plus/minus the
 // average distance price has moved from the 09:30 open by that time over the last 14 sessions.
 //
+// v1.2, 2026-10-16: the lock. Once a trade is as far up as the max loss per contract, the stop moves to the entry
+// + 2.5 points (Tradovate's Auto Breakeven, 70 ticks / +10 ticks at 10 MNQ and $350). At that setting, on 1-minute
+// data, winners went from about 14% to 48% of trades for the same money (docs/RESULTS.md, round thirty-seven).
 // v1.1, 2026-10-16: optional webhook orders (TradersPost), for prop firms that allow automation (Take Profit Trader
 // does not). Each minute of entry delay cost about 15-25% of the profit on 1-minute data (docs/RESULTS.md, round 35).
 // v1.0, 2026-10-16. Tested on two independent datasets (docs/RESULTS.md): Nasdaq-100 index 1-minute data
@@ -27,7 +30,7 @@
 // max loss after the fill bar are checked once per bar, so a 30-minute chart sees them later than a trader would.
 // The rules are the same as the Python reference in mnqbot/noise.py.
 // ------------------------------------------------------------------
-strategy("MNQ Noise-Area Momentum v1.1", shorttitle = "Noise-Mom", overlay = true,
+strategy("MNQ Noise-Area Momentum v1.2", shorttitle = "Noise-Mom", overlay = true,
      initial_capital = 50000, currency = currency.USD,
      default_qty_type = strategy.fixed, default_qty_value = 1, pyramiding = 0,
      commission_type = strategy.commission.cash_per_contract, commission_value = 0.62,
@@ -64,6 +67,10 @@ stopBuf = input.float(0.24, "Stop distance past the line, in noise units", minva
      tooltip = "0 puts the stop exactly on the line. 0.24 is how far price typically overshoots the line before resuming, measured on 2011-2018; it cut whipsaw stop-outs and raised profit per day on every later period. See docs/RESULTS.md.")
 tpUnits = input.float(1.5, "Take profit, noise units from the entry (0 = off)", minval = 0, maxval = 10, step = 0.1, group = grpT,
      tooltip = "A limit order this many noise units past your fill (1.5 x the current noise x the fill price), working from the bar after the fill; with the resting stop only. Chosen walk-forward, each year from the years before only: over 2015-2026 it raised profit per day from $24.66 to $25.77 per contract, the t-stat from 4.71 to 5.39, cut the worst losing stretch from $5,178 to $4,185, and raised the $50K pass rate at 2 MNQ in 2023-2026 from 42% to 68%. See docs/RESULTS.md, round twenty-six.")
+lockAt = input.float(1.0, "Lock a small win: trigger, in max losses (0 = off)", minval = 0, maxval = 10, step = 0.25, group = grpT,
+     tooltip = "Once a trade has been this far in profit (1 = as far as the max loss: 17.5 points with $350 on 10 MNQ), the stop moves to the entry plus the points below, so the trade can't turn into a loser. Like Tradovate's Auto Breakeven: set the trigger and the offset in your bracket (70 and +10 ticks at the defaults). Tested at $35 a contract on 1-minute data, 2011-2026 index and 2015-2025 NQ futures: winners from about 14% to 48%, the same money, a higher t-stat (docs/RESULTS.md, round thirty-seven). On this chart the lock moves one bar after the trigger is touched, a little later than the broker's.")
+lockPlus = input.float(2.5, "Lock: stop to the entry plus, points", minval = 0, maxval = 50, step = 0.25, group = grpT,
+     tooltip = "2.5 points is $5 a contract, more than the round-trip fees and a tick of slippage, so a locked trade closes as a small winner.")
 grpV = "Display"
 showBands = input.bool(true, "Show noise area", group = grpV)
 showLabels = input.bool(true, "Show BUY / SELL / EXIT labels", group = grpV)
@@ -99,7 +106,7 @@ jsonExit = '{"ticker": "' + hookSym + '", "action": "exit", "cancel": true}'
 hookExit = useHook ? jsonExit : ""
 usd(float x) => (x < 0 ? "-$" : "$") + str.tostring(math.abs(x), "#,##0.00")
 stamp(int t) => str.format_time(t, "MM-dd HH:mm", TZ)   // New York time, month-day hour:minute
-why(string c) => c == "Back inside" ? (useStop ? "stop at the line" : "back inside at a check") : c == "Max loss" ? "max loss stop" : c == "Target" ? "take profit" : c == "16:00 close" ? "16:00 close" : c == "Session ended" ? "session ended" : str.contains(c, "Reverse") ? "reversed" : c
+why(string c) => c == "Back inside" ? (useStop ? "stop at the line" : "back inside at a check") : c == "Max loss" ? "max loss stop" : c == "Lock" ? "locked win" : c == "Target" ? "take profit" : c == "16:00 close" ? "16:00 close" : c == "Session ended" ? "session ended" : str.contains(c, "Reverse") ? "reversed" : c
 // A signal label on the candle that triggered it: below the candle for buys, above for sells.
 mark(string txt, bool below, color c) =>
     if showLabels
@@ -128,7 +135,7 @@ var int dayStartClosed = 0    // strategy.closedtrades at 09:30, for today's tra
 // close inside one bar, so look at the closed-trade count, not the position.
 lastTrade = strategy.closedtrades - 1
 lastWhy = strategy.closedtrades > 0 ? strategy.closedtrades.exit_comment(lastTrade) : ""
-stopFired = useStop and strategy.closedtrades > prevClosed and (lastWhy == "Back inside" or lastWhy == "Max loss" or lastWhy == "Target")
+stopFired = useStop and strategy.closedtrades > prevClosed and (lastWhy == "Back inside" or lastWhy == "Max loss" or lastWhy == "Lock" or lastWhy == "Target")
 if stopFired
     side = strategy.closedtrades.size(lastTrade) > 0 ? "LONG" : "SHORT"
     exitPx = px(strategy.closedtrades.exit_price(lastTrade))
@@ -139,7 +146,7 @@ if stopFired
             alert("TARGET: the " + str.lower(side) + " reached the take-profit at " + exitPx + ". The webhook closed it.", alert.freq_once_per_bar_close)
     else
         mark("EXIT", strategy.closedtrades.size(lastTrade) < 0, color.gray)
-        lastSignal := "EXIT (" + (lastWhy == "Max loss" ? "max loss" : "line touched") + ") @ " + exitPx
+        lastSignal := "EXIT (" + (lastWhy == "Max loss" ? "max loss" : lastWhy == "Lock" ? "locked win" : "line touched") + ") @ " + exitPx
         if useHook
             alert("EXIT " + side + ": price hit the stop at " + exitPx + ". The webhook closed it.", alert.freq_once_per_bar_close)
 
@@ -199,10 +206,13 @@ if isCheck and not na(dayOpen)
         tpTextS = tpUnits > 0 ? ", take-profit limit " + px(estS * (1 - tpUnits * sig)) : ""
         tpL = useStop and tpUnits > 0 ? estL * (1 + tpUnits * sig) : na
         tpS = useStop and tpUnits > 0 ? estS * (1 - tpUnits * sig) : na
+        lockPtsNow = useStop and lockAt > 0 and maxLoss > 0 ? lockAt * maxLoss / qty / syminfo.pointvalue : na
+        lockTextL = na(lockPtsNow) ? "" : " Auto-breakeven: at " + px(estL + lockPtsNow) + " move the stop to " + px(estL + lockPlus) + "."
+        lockTextS = na(lockPtsNow) ? "" : " Auto-breakeven: at " + px(estS - lockPtsNow) + " move the stop to " + px(estS - lockPlus) + "."
         moveText = " If your fill is different, keep the same distances. At each half hour move the stop with the line (the dashboard shows it); the max loss never moves."
-        holdLong = useStop ? "Bracket: stop " + px(bracketL) + " (" + whyL + ")" + tpTextL + ", for a fill near " + px(estL) + "." + moveText :
+        holdLong = useStop ? "Bracket: stop " + px(bracketL) + " (" + whyL + ")" + tpTextL + ", for a fill near " + px(estL) + "." + lockTextL + moveText :
              "Hold until a half-hour check closes back below the upper line, or the 16:00 close."
-        holdShort = useStop ? "Bracket: stop " + px(bracketS) + " (" + whyS + ")" + tpTextS + ", for a fill near " + px(estS) + "." + moveText :
+        holdShort = useStop ? "Bracket: stop " + px(bracketS) + " (" + whyS + ")" + tpTextS + ", for a fill near " + px(estS) + "." + lockTextS + moveText :
              "Hold until a half-hour check closes back above the lower line, or the 16:00 close."
         pos = strategy.position_size
         inPosStop = useStop and pos != 0   // exits are the resting stop's job
@@ -263,6 +273,22 @@ longStop = na(capL) ? lineStopL : math.max(lineStopL, capL)
 shortStop = na(capS) ? lineStopS : math.min(lineStopS, capS)
 longWhy = not na(capL) and capL > lineStopL ? "Max loss" : "Back inside"
 shortWhy = not na(capS) and capS < lineStopS ? "Max loss" : "Back inside"
+// The lock: once a bar has reached lockAt max losses in profit, the stop moves to the entry plus lockPlus, from the next
+// bar (a broker's auto-breakeven does it the moment price touches the trigger).
+var bool locked = false
+lockPts = useStop and lockAt > 0 and maxLoss > 0 ? lockAt * maxLoss / qty / syminfo.pointvalue : na
+if strategy.position_size == 0
+    locked := false
+else if not na(lockPts) and not locked
+    locked := strategy.position_size > 0 ? high - strategy.position_avg_price >= lockPts : strategy.position_avg_price - low >= lockPts
+lockL = locked and strategy.position_size > 0 ? strategy.position_avg_price + lockPlus : na
+lockS = locked and strategy.position_size < 0 ? strategy.position_avg_price - lockPlus : na
+if not na(lockL) and lockL > longStop
+    longStop := lockL
+    longWhy := "Lock"
+if not na(lockS) and lockS < shortStop
+    shortStop := lockS
+    shortWhy := "Lock"
 // Webhook mode: the broker holds the stop placed with the entry and the strategy can't move it, so here the stop only
 // ever tightens (an exit message closes the trade when the chart's tighter stop fills). Same money in the tests.
 var float heldL = na
@@ -327,7 +353,7 @@ if showDash and (barstate.islastconfirmedhistory or barstate.isrealtime)
     closed = strategy.closedtrades
     todayPnlDash = strategy.netprofit - dayStartNet
     wins = strategy.wintrades
-    table.cell(dash, 0, 0, "MNQ Noise Momentum v1.1", text_color = color.white, text_size = size.small)
+    table.cell(dash, 0, 0, "MNQ Noise Momentum v1.2", text_color = color.white, text_size = size.small)
     table.cell(dash, 1, 0, status, text_color = statusColor, text_size = size.small)
     table.cell(dash, 0, 1, "Sessions of history", text_color = color.silver, text_size = size.small)
     table.cell(dash, 1, 1, str.tostring(math.min(filled, lookback)) + " / " + str.tostring(lookback), text_color = color.white, text_size = size.small)
@@ -340,7 +366,7 @@ if showDash and (barstate.islastconfirmedhistory or barstate.isrealtime)
     table.cell(dash, 0, 6, "Last signal", text_color = color.silver, text_size = size.small)
     table.cell(dash, 1, 6, lastSignal, text_color = color.white, text_size = size.small)
     table.cell(dash, 0, 7, "Exit rule", text_color = color.silver, text_size = size.small)
-    table.cell(dash, 1, 7, (useStop ? "stop " + str.tostring(stopBuf) + " noise units past the line" : "half-hour check") + (useHook ? "; webhook orders on (" + hookSym + ")" : ""), text_color = color.white, text_size = size.small)
+    table.cell(dash, 1, 7, (useStop ? "stop " + str.tostring(stopBuf) + " noise units past the line" + (na(lockPts) ? "" : ", lock at +" + px(lockPts)) : "half-hour check") + (useHook ? "; webhook orders on (" + hookSym + ")" : ""), text_color = color.white, text_size = size.small)
     tpNow = pos > 0 ? longTp : pos < 0 ? shortTp : na
     table.cell(dash, 0, 8, "Your stop / target", text_color = color.silver, text_size = size.small)
     table.cell(dash, 1, 8, not useStop or pos == 0 ? "-" : px(pos > 0 ? longStop : shortStop) + " / " + (na(tpNow) ? "-" : px(tpNow)),

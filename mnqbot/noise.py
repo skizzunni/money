@@ -76,6 +76,8 @@ class NoiseConfig:
     fed_dates: str = FED_DATES  # "YYYY-MM-DD,..." scheduled Fed announcement days
     fed_no_shorts: bool = True  # on those days, no short entries before 14:00 (round twenty-four)
     take_profit: float = 1.5  # noise units from the entry fill for a take-profit limit, stop mode only; 0 = off
+    lock_at: float = 1.0  # once the trade has been this many max losses in profit, the stop moves to entry + lock_plus
+    lock_plus: float = 2.5  # points; with lock_at 0 or no max loss, no lock (round thirty-seven)
     tighten_only: bool = False  # webhook mode: in a trade the stop never moves away from the price (round thirty-five)
 
 
@@ -133,6 +135,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
     pos = 0
     entry_px, entry_bar = 0.0, 0
     est_px = math.nan  # expected fill of the pending entry
+    locked = False  # the trade has reached the lock trigger (a broker's auto-breakeven)
     held, held_why = math.nan, ""  # tighten_only: the tightest stop so far in this trade, and what set it
     pending: tuple[str, int] | None = None  # ("entry", direction) or ("close", 0), filled at the next open
     trades: list[NoiseTrade] = []
@@ -145,10 +148,10 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
         pos, entry_px, entry_bar = d, o[i] + d * slip, i
 
     def close_pos(i: int, price: float, reason: str) -> None:
-        nonlocal pos, held
+        nonlocal pos, held, locked
         pnl = pos * (price - entry_px) * cfg.qty * cfg.point_value - 2 * cfg.commission_per_side * cfg.qty
         trades.append(NoiseTrade(pos, cfg.qty, entry_bar, idx[entry_bar], entry_px, i, idx[i], price, reason, pnl))
-        pos, held = 0, math.nan
+        pos, held, locked = 0, math.nan, False
 
     for i in range(len(bars)):
         t = idx[i]
@@ -179,6 +182,10 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                 cap = base - pos * cfg.max_loss_per_trade / cfg.qty / cfg.point_value
                 if (pos > 0 and cap > line) or (pos < 0 and cap < line):
                     line, reason = cap, "Max loss"
+            if locked:  # a small win locked in: the stop at the entry plus lock_plus
+                lk = entry_px + pos * cfg.lock_plus
+                if (pos > 0 and lk > line) or (pos < 0 and lk < line):
+                    line, reason = lk, "Lock"
             if cfg.tighten_only:  # the broker's stop is placed with the entry and only ever tightened
                 if entry_bar != i and ((pos > 0 and held > line) or (pos < 0 and held < line)):
                     line, reason = held, held_why
@@ -199,6 +206,11 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                 if (pos > 0 and h[i] >= tp + cfg.tick) or (pos < 0 and l[i] <= tp - cfg.tick):
                     close_pos(i, tp, "Target")
                     events.append((i, "TARGET"))
+
+        if use_stop and pos and not locked and cfg.lock_at > 0 and cfg.max_loss_per_trade > 0:
+            # the lock arms when the bar reaches the trigger (high for a long, low for a short), from the next bar
+            trigger = cfg.lock_at * cfg.max_loss_per_trade / cfg.qty / cfg.point_value
+            locked = pos * ((h[i] if pos > 0 else l[i]) - entry_px) >= trigger
 
         if pos and (not in_rth or t_min == RTH_OPEN):  # a session ended early (half day, data gap)
             close_pos(i, c[i] - pos * slip, "Session ended")

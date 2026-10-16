@@ -54,7 +54,8 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
              target: float | None = None, cap_pts: float = CAP_PTS, target_on_fill_bar: bool = True,
              cap_on_fill_bar: bool = False, entry_delay: int = 0,
              no_entry_checks: frozenset = frozenset(), minutes: int = 5,
-             ratchet: bool = False) -> pd.DataFrame:
+             ratchet: bool = False, lock: tuple[float, float] | None = None, day_losers: int | None = None,
+             side_once: bool = False, min_cap_units: float = 0.0, lock_touch: bool = False) -> pd.DataFrame:
     """target: take profit this many noise units from the first fill (limit); cap_pts: max loss in points;
     target_on_fill_bar False: the limit works from the bar after the fill, as the Pine script places it;
     cap_on_fill_bar True: the max loss works on the fill bar too, measured from the expected fill (the signal
@@ -63,7 +64,14 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
     no_entry_checks: check times (minutes after midnight, e.g. 930 for 15:30) that open no new trades;
     minutes: the bar length (1 or 5);
     ratchet: the stop never moves away from price during a trade (a broker stop placed with the entry that is only ever
-    tightened), 1 contract."""
+    tightened), 1 contract;
+    lock (arm, offset), in points: once a bar closes at least arm points in profit, the stop moves to the entry plus
+    offset points (never back); lock_touch: the bar's high (long) or low (short) reaching it arms the lock, as a
+    broker's auto-breakeven would, still from the next bar;
+    day_losers: no new entries today after this many losing trades today;
+    side_once: after a losing trade today, no new entries on that side today;
+    min_cap_units: no entry when the max loss is less than this many noise units (sigma x price) from the signal
+    close, i.e. when the stop is tiny next to today's noise."""
     checks = list(range(FIRST, LAST + 1, 30))
     kof = {m: j for j, m in enumerate(checks)}
     idx = bars.index.tz_convert(NY)
@@ -79,14 +87,19 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
     held = math.nan  # with ratchet: the tightest stop so far in this trade
     est = math.nan  # the expected fill of a pending entry: the signal close plus a tick
     wait = 0  # bars still to wait before a pending entry fills (entry_delay)
+    locked = False  # lock: the stop has moved to the entry plus the offset
+    losers, lost_sides = 0, set()  # losing trades today, and the sides they were on
     out = []
 
     def close(i, px, why):
-        nonlocal pos, fills, armed, held
+        nonlocal pos, fills, armed, held, locked, losers
         pnl = sum(pos * (px - e) * PV - FEE for e in fills)
         out.append((idx[first_bar], idx[i], pos, len(fills), pnl, why))
+        if pnl < 0:
+            losers += 1
+            lost_sides.add(pos)
         pos, fills, armed = 0, [], False
-        held = math.nan
+        held, locked = math.nan, False
 
     for i in range(len(bars)):
         t_min = mins[i]
@@ -121,6 +134,10 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
                 cap = est - pos * cap_pts
                 if (pos > 0 and cap > stop) or (pos < 0 and cap < stop):
                     stop, why = cap, "cap"
+            if locked:
+                lk = fills[0] + pos * lock[1]
+                if (pos > 0 and lk > stop) or (pos < 0 and lk < stop):
+                    stop, why = lk, "lock"
             if ratchet:
                 if first_bar == i or math.isnan(held):
                     held = stop
@@ -141,11 +158,16 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
         if pos and (not in_rth or t_min == OPEN):
             close(i, c[i] - pos * TICK, "session")
         if t_min == OPEN:
+            losers = 0
+            lost_sides.clear()
             prev_close, day_open = last_close, o[i]
             upper = lower = sigma = math.nan
             today[:] = np.nan
         if in_rth:
             last_close = c[i]
+        if pos and lock is not None and not locked:
+            seen = (h[i] if pos > 0 else l[i]) if lock_touch else c[i]
+            locked = pos * (seen - fills[0]) >= lock[0]  # from the next bar
         if pos and trail is not None and not math.isnan(sigma):  # best close and the arming test, at bar close
             best = c[i] if math.isnan(best) else (max(best, c[i]) if pos > 0 else min(best, c[i]))
             if not armed and pos * (c[i] - fills[0]) >= sigma * fills[0]:
@@ -157,9 +179,11 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
                 sigma = ring[:, j].mean()
                 upper = max(day_open, prev_close) * (1 + sigma)
                 lower = min(day_open, prev_close) * (1 - sigma)
-                if pos == 0 and c[i] > upper and end not in no_entry_checks:
+                blocked = (end in no_entry_checks or (day_losers is not None and losers >= day_losers)
+                           or cap_pts < min_cap_units * sigma * c[i])
+                if pos == 0 and c[i] > upper and not blocked and not (side_once and 1 in lost_sides):
                     pending, est, wait = 1, c[i] + TICK, entry_delay
-                elif pos == 0 and c[i] < lower and end not in no_entry_checks:
+                elif pos == 0 and c[i] < lower and not blocked and not (side_once and -1 in lost_sides):
                     pending, est, wait = -1, c[i] - TICK, entry_delay
                 elif (pos and len(fills) < units and i != first_bar
                       and ((pos > 0 and c[i] > upper) or (pos < 0 and c[i] < lower))
