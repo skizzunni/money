@@ -71,6 +71,8 @@ Through a **TradingView alert**. It runs on TradingView's servers, so it keeps w
 
 **The lock (v1.2): set it once in Tradovate.** Once a trade has gone as far in your favour as your max loss per contract (17.5 points with $350 on 10 MNQ), its stop moves to the entry plus 2.5 points, so it can't turn into a loser. At your setting it took the winners from about 1 in 7 trades to about 1 in 2 on 16 years of data, for the same money ([RESULTS.md](RESULTS.md), round thirty-seven). It has to act within seconds, so let the broker do it: in Tradovate, make a bracket strategy (ATM) for MNQ with the stop type **Auto Breakeven**, the profit trigger **70 ticks** (17.5 points) and the offset **+10 ticks** (2.5 points), and use it for every entry, with the stop and take-profit from the alert. The chart does the same one bar later, and the entry alert spells it out: *"Auto-breakeven: at 30,002.75 move the stop to 29,987.75."* Set *Lock a small win* to 0 to turn it off. If you change the contracts or the max loss, the trigger in ticks is twice the max loss per contract in dollars (70 ticks for $35).
 
+**Done for the day after 4 losers (v1.3).** After the fourth losing trade of the day the bot takes no new entries until tomorrow (a trade already open runs on as usual). Four losers is about −$1,400 at 10 MNQ and $350. Tested before running on every period of both datasets: more per day, a higher t-stat and a smaller worst losing stretch ([RESULTS.md](RESULTS.md), round thirty-eight). The dashboard's *Trades today* shows the count, and turns orange with *done for today*. *Max losing trades a day* sets it; 0 turns it off.
+
 **On the chart:**
 
 | You see | Meaning |

@@ -78,6 +78,7 @@ class NoiseConfig:
     take_profit: float = 1.5  # noise units from the entry fill for a take-profit limit, stop mode only; 0 = off
     lock_at: float = 1.0  # once the trade has been this many max losses in profit, the stop moves to entry + lock_plus
     lock_plus: float = 2.5  # points; with lock_at 0 or no max loss, no lock (round thirty-seven)
+    max_losers: int = 4  # no new entries today after this many losing trades today; 0 = no limit (round thirty-eight)
     tighten_only: bool = False  # webhook mode: in a trade the stop never moves away from the price (round thirty-five)
 
 
@@ -135,6 +136,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
     pos = 0
     entry_px, entry_bar = 0.0, 0
     est_px = math.nan  # expected fill of the pending entry
+    losers_today = 0  # losing trades closed today
     locked = False  # the trade has reached the lock trigger (a broker's auto-breakeven)
     held, held_why = math.nan, ""  # tighten_only: the tightest stop so far in this trade, and what set it
     pending: tuple[str, int] | None = None  # ("entry", direction) or ("close", 0), filled at the next open
@@ -148,9 +150,11 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
         pos, entry_px, entry_bar = d, o[i] + d * slip, i
 
     def close_pos(i: int, price: float, reason: str) -> None:
-        nonlocal pos, held, locked
+        nonlocal pos, held, locked, losers_today
         pnl = pos * (price - entry_px) * cfg.qty * cfg.point_value - 2 * cfg.commission_per_side * cfg.qty
         trades.append(NoiseTrade(pos, cfg.qty, entry_bar, idx[entry_bar], entry_px, i, idx[i], price, reason, pnl))
+        if pnl < 0 and reason != "Session ended":
+            losers_today += 1
         pos, held, locked = 0, math.nan, False
 
     for i in range(len(bars)):
@@ -219,6 +223,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
         if t_min == RTH_OPEN:
             prev_close = last_rth_close
             day_open = o[i]
+            losers_today = 0
             upper = lower = sigma = math.nan
             today = [math.nan] * N_CHECKS
             skip_today = t.strftime("%Y-%m-%d") in cfg.skip_dates  # substring test, like Pine's str.contains
@@ -238,6 +243,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                 lower = min(day_open, prev_close) * (1 - sigma)
                 bands.append((i, upper, lower))
                 short_ok = not (fed_today and end < FED_CUTOFF)
+                fresh_ok = cfg.max_losers <= 0 or losers_today < cfg.max_losers  # the daily limit: new entries
                 if skip_today:
                     pass
                 elif use_stop and pos:
@@ -249,10 +255,10 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                 elif pos < 0 and c[i] > lower:
                     pending = ("entry", 1) if c[i] > upper else ("close", 0)
                     events.append((i, "REVERSE" if c[i] > upper else "EXIT"))
-                elif pos == 0 and c[i] > upper:
+                elif pos == 0 and c[i] > upper and fresh_ok:
                     pending = ("entry", 1)
                     events.append((i, "BUY"))
-                elif pos == 0 and c[i] < lower and short_ok:
+                elif pos == 0 and c[i] < lower and short_ok and fresh_ok:
                     pending = ("entry", -1)
                     events.append((i, "SELL"))
                 if pending is not None and pending[0] == "entry":

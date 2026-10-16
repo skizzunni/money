@@ -905,6 +905,35 @@ Rules fixed before running ([`research/win_rate35b.py`](../research/win_rate35b.
 - **The $50K evaluation at 10 MNQ and $350** (125-day window, 1-minute bars): passes 28% against 21% on the index 2011–2026, 25% against 13% on 2023–2026, 22% against 22% on NQ futures. At this size most attempts still fail either way.
 - **Caveats.** The lock was found by looking at 2011–2022, and the 1-minute version after every period had been seen; only the Yahoo weeks are new. It is in the bot (v1.2) because the user asked for the win rate at fixed sizes and it keeps the money on both datasets; set *Lock a small win* to 0 to turn it off. On the 5-minute chart it costs 6–19% of the profit; the broker's Auto Breakeven, set as above, is what gets the 1-minute numbers.
 
+## Thirty-eighth round: on top of the lock
+
+Three ideas at 10 MNQ and $350 with the lock on, on 1-minute bars, fixed before running ([`research/lock_more.py`](../research/lock_more.py)): a second lock step (35 points up → stop to entry + 17.5, or 52.5 → + 35); no new entries after a take-profit fills; no new entries after 3 or 4 losing trades in a day. Pass bar against the bot with the lock: $ per day no lower, t-stat within 0.3, $ per day per dollar of worst losing stretch no lower, win rate no more than 2 points lower, on 2011–2018, then 2019–2022, then 2023 – Sep 2026 once, then NQ futures.
+
+| 2011–2018, per contract at $35 | Trades/day | Win % | $/day | t | Worst stretch |
+|---|---|---|---|---|---|
+| **The bot with the lock (v1.2)** | **2.47** | **50.3%** | **$14.80** | **4.36** | **$2,643** |
+| Second step 35 → +17.5 | 2.74 | 50.4% | $12.92 | 4.32 | $2,235 |
+| Second step 52.5 → +35 | 2.82 | 50.4% | $11.50 | 4.04 | $2,370 |
+| Done after a take-profit | 2.07 | 49.5% | $11.19 | 3.77 | $2,705 |
+| Stop after 3 losers | 2.04 | 50.7% | $13.19 | 4.29 | $3,125 |
+| **Stop after 4 losers** | **2.27** | **50.6%** | **$15.19** | **4.67** | **$2,569** |
+
+**Stop after 4 losers passed every stage**, and is in the bot (v1.3, *Max losing trades a day*, 0 = no limit):
+
+| Per contract at $35 | Win % | $/day | t | Worst losing stretch | $50K pass / fail at 10 MNQ |
+|---|---|---|---|---|---|
+| v1.2, 2019–2022 | 46.7% | $16.91 | 3.00 | $2,771 | |
+| **v1.3, 2019–2022** | **47.0%** | **$17.04** | **3.24** | **$2,453** | |
+| v1.2, 2023–2026 | 47.3% | $4.59 | 0.98 | $4,553 | 25% / 75% |
+| **v1.3, 2023–2026** | **47.8%** | **$6.64** | **1.49** | **$3,497** | **23% / 76%** |
+| v1.2, NQ futures 2015–2025 | 48.0% | $11.65 | 3.66 | $2,655 | 22% / 76% |
+| **v1.3, NQ futures 2015–2025** | **48.8%** | **$12.90** | **4.33** | **$1,835** | **25% / 74%** |
+
+- **Four losers in a day is about −$1,400 at 10 MNQ**, most of the $2,000 drawdown; past that, the day's later signals lost on balance. At three the bot gives up too many days that come back.
+- **The second lock step and stopping after a target both cost money.** Locked trades that keep running are the big winners, and so are the re-entries after a target.
+- **On the real MNQ weeks from Yahoo** (21 September – 16 October 2026, 5-minute bars), v1.3 made +$13,068 on 44 trades, 19 winners (43%), against +$13,474 for v1.2 and +$12,313 for v1.1. Four weeks is small next to the tests above.
+- **The evaluation odds at 10 MNQ and $350 barely move** (about a quarter pass). The size, not the rules, is what holds them down.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
@@ -974,6 +1003,7 @@ python research/check_times.py nsx_5m_scaled.pkl nq_5m_scaled.pkl      # skip th
 python research/delay.py nsx_1m_scaled.pkl nq_1m_scaled.pkl            # each minute of entry delay, 1-minute bars
 python research/win_rate35.py nsx_5m_scaled.pkl nq_5m_scaled.pkl       # more winners at $35 a contract (lock, no pass)
 python research/win_rate35b.py nsx_5m_scaled.pkl nq_5m_scaled.pkl      # the lock with room, skip wide noise (no pass)
+python research/lock_more.py nsx_1m_scaled.pkl nq_1m_scaled.pkl       # on top of the lock: 4 losers a day (adopted)
 ```
 
 The raw data isn't stored in this repo.

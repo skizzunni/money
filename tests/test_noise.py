@@ -433,11 +433,14 @@ def assert_trade_log(log, res, exit_mode, rows=10):
 
 
 def assert_parity(bars, minutes=5, lookback=14, skip_dates=None, exit_mode="stop", stop_buffer=None, qty=1,
-                  max_loss=None, fed_dates=None, fed_no_shorts=None, take_profit=None, hook=None, lock_at=None):
+                  max_loss=None, fed_dates=None, fed_no_shorts=None, take_profit=None, hook=None, lock_at=None,
+                  max_losers=None):
     cfg = NoiseConfig(lookback=lookback, exit_mode=exit_mode, qty=qty)
     inputs = {"Sessions in the noise average": lookback}
     if lock_at is not None:
         cfg.lock_at = inputs["Lock a small win: trigger, in max losses (0 = off)"] = lock_at
+    if max_losers is not None:
+        cfg.max_losers = inputs["Max losing trades a day (0 = no limit)"] = max_losers
     if hook is not None:  # webhook orders on, for this contract
         inputs["Webhook orders"], inputs["Contract for the webhook (blank = the chart's)"] = "TradersPost", hook
         cfg.tighten_only = True
@@ -597,6 +600,27 @@ def test_lock_fills_at_its_price_when_price_falls_through_it():
     assert t.pnl > 0, "a locked trade closes as a small winner after fees and slippage"
 
 
+def losers_before_each_entry(res):
+    """For every trade, the losing trades (session ends aside) that closed earlier the same day."""
+    out = []
+    for t in res.trades:
+        day = t.entry_time.date()
+        out.append(sum(u.pnl < 0 and u.reason != "Session ended" and u.exit_time.date() == day
+                       and u.exit_bar < t.entry_bar for u in res.trades))
+    return out
+
+
+def test_daily_loser_limit_blocks_new_entries_only():
+    bars = synth_bars(sessions=120, seed=3)
+    free = run(bars, NoiseConfig(qty=10, max_loss_per_trade=350.0, max_losers=0, skip_dates=""))
+    capped = run(bars, NoiseConfig(qty=10, max_loss_per_trade=350.0, max_losers=2, skip_dates=""))
+    assert max(losers_before_each_entry(free)) > 2, "the random sessions have days with more than 2 losers"
+    assert max(losers_before_each_entry(capped)) <= 2, "no entry after the 2nd loser of the day"
+    assert len(capped.trades) < len(free.trades)
+    first_of_day = [{t.entry_time.date(): t.entry_bar for t in reversed(r.trades)} for r in (free, capped)]
+    assert first_of_day[0] == first_of_day[1], "the limit never touches a day's first trade"
+
+
 def test_tighten_only_stop_never_loosens():
     """Webhook mode: the stop is the tightest one so far in the trade. Over random sessions it exits some trades
     earlier than the moving line would (so it is exercised), and never later."""
@@ -622,6 +646,16 @@ def test_pine_lock():
     assert sum(t.reason == "Lock" for t in res.trades) >= 5
     res = assert_parity(synth_bars(sessions=120, seed=3), qty=10, max_loss=350.0, hook="MNQZ2026")
     assert sum(t.reason == "Lock" for t in res.trades) >= 5, "the lock with webhook orders"
+
+
+@pytest.mark.slow
+def test_pine_daily_loser_limit():
+    bars = synth_bars(sessions=120, seed=3)
+    res = assert_parity(bars, qty=10, max_loss=350.0, max_losers=2)
+    assert max(losers_before_each_entry(res)) <= 2
+    assert len(res.trades) < len(run(bars, NoiseConfig(qty=10, max_loss_per_trade=350.0, max_losers=0)).trades)
+    assert_parity(bars, qty=10, max_loss=350.0, max_losers=0)
+    assert_parity(bars, qty=10, max_loss=350.0, max_losers=1, exit_mode="check")
 
 
 @pytest.mark.slow

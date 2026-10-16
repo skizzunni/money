@@ -15,6 +15,8 @@
 // Noise area for each half-hour mark = the day's open (and previous close) plus/minus the
 // average distance price has moved from the 09:30 open by that time over the last 14 sessions.
 //
+// v1.3, 2026-10-16: no new entries after 4 losing trades in a day (round thirty-eight: more per day, smaller worst
+// stretch, on every period of both datasets).
 // v1.2, 2026-10-16: the lock. Once a trade is as far up as the max loss per contract, the stop moves to the entry
 // + 2.5 points (Tradovate's Auto Breakeven, 70 ticks / +10 ticks at 10 MNQ and $350). At that setting, on 1-minute
 // data, winners went from about 14% to 48% of trades for the same money (docs/RESULTS.md, round thirty-seven).
@@ -30,7 +32,7 @@
 // max loss after the fill bar are checked once per bar, so a 30-minute chart sees them later than a trader would.
 // The rules are the same as the Python reference in mnqbot/noise.py.
 // ------------------------------------------------------------------
-strategy("MNQ Noise-Area Momentum v1.2", shorttitle = "Noise-Mom", overlay = true,
+strategy("MNQ Noise-Area Momentum v1.3", shorttitle = "Noise-Mom", overlay = true,
      initial_capital = 50000, currency = currency.USD,
      default_qty_type = strategy.fixed, default_qty_value = 1, pyramiding = 0,
      commission_type = strategy.commission.cash_per_contract, commission_value = 0.62,
@@ -71,6 +73,8 @@ lockAt = input.float(1.0, "Lock a small win: trigger, in max losses (0 = off)", 
      tooltip = "Once a trade has been this far in profit (1 = as far as the max loss: 17.5 points with $350 on 10 MNQ), the stop moves to the entry plus the points below, so the trade can't turn into a loser. Like Tradovate's Auto Breakeven: set the trigger and the offset in your bracket (70 and +10 ticks at the defaults). Tested at $35 a contract on 1-minute data, 2011-2026 index and 2015-2025 NQ futures: winners from about 14% to 48%, the same money, a higher t-stat (docs/RESULTS.md, round thirty-seven). On this chart the lock moves one bar after the trigger is touched, a little later than the broker's.")
 lockPlus = input.float(2.5, "Lock: stop to the entry plus, points", minval = 0, maxval = 50, step = 0.25, group = grpT,
      tooltip = "2.5 points is $5 a contract, more than the round-trip fees and a tick of slippage, so a locked trade closes as a small winner.")
+maxLosers = input.int(4, "Max losing trades a day (0 = no limit)", minval = 0, maxval = 20, group = grpT,
+     tooltip = "After this many losing trades in a day, no new entries until tomorrow (an open trade runs on as usual). Tested before running at 10 MNQ and $350 with the lock, on 1-minute data: on 2011-2018, 2019-2022, 2023-2026 and NQ futures 2015-2025 it made more per day, with a higher t-stat and a smaller worst losing stretch (31% smaller on NQ futures). 1 or 2 losers cut the profit by a third or more: the winner often comes after a few stop-outs. See docs/RESULTS.md, round thirty-eight.")
 grpV = "Display"
 showBands = input.bool(true, "Show noise area", group = grpV)
 showLabels = input.bool(true, "Show BUY / SELL / EXIT labels", group = grpV)
@@ -107,6 +111,14 @@ hookExit = useHook ? jsonExit : ""
 usd(float x) => (x < 0 ? "-$" : "$") + str.tostring(math.abs(x), "#,##0.00")
 stamp(int t) => str.format_time(t, "MM-dd HH:mm", TZ)   // New York time, month-day hour:minute
 why(string c) => c == "Back inside" ? (useStop ? "stop at the line" : "back inside at a check") : c == "Max loss" ? "max loss stop" : c == "Lock" ? "locked win" : c == "Target" ? "take profit" : c == "16:00 close" ? "16:00 close" : c == "Session ended" ? "session ended" : str.contains(c, "Reverse") ? "reversed" : c
+// Losing trades closed since closed-trade number `first` (today's: from the count at 09:30), for the daily limit
+losersSince(int first) =>
+    int n = 0
+    if strategy.closedtrades > first
+        for j = first to strategy.closedtrades - 1
+            if strategy.closedtrades.profit(j) < 0 and strategy.closedtrades.exit_comment(j) != "Session ended"
+                n += 1
+    n
 // A signal label on the candle that triggered it: below the candle for buys, above for sells.
 mark(string txt, bool below, color c) =>
     if showLabels
@@ -217,6 +229,7 @@ if isCheck and not na(dayOpen)
         pos = strategy.position_size
         inPosStop = useStop and pos != 0   // exits are the resting stop's job
         shortOk = not (fedToday and endMin < FED_CUTOFF)   // Fed day: no shorts before the 14:00 statement
+        freshOk = maxLosers <= 0 or losersSince(dayStartClosed) < maxLosers   // the daily limit on new entries
         if not skipToday
             if not inPosStop and pos > 0 and close < ub
                 if close < lb and shortOk
@@ -244,7 +257,7 @@ if isCheck and not na(dayOpen)
                     lastSignal := "EXIT short " + hhmmText(endMin) + " @ " + px(close)
                     alert("EXIT SHORT at market now. Price " + px(close) + " closed back above the lower line (" + px(lb) +
                          "). Stay flat until the next signal.", alert.freq_once_per_bar_close)
-            else if pos == 0 and close > ub
+            else if pos == 0 and close > ub and freshOk
                 strategy.entry("Long", strategy.long, qty, comment = "Above noise",
                      alert_message = useHook ? jsonEntry("buy", estL, useStop ? bracketL : na, tpL) : "")
                 longPlaced := true
@@ -252,7 +265,7 @@ if isCheck and not na(dayOpen)
                 lastSignal := "BUY " + hhmmText(endMin) + " @ " + px(close)
                 alert("BUY " + str.tostring(qty) + " MNQ at market now. Price " + px(close) + " is above the noise area (upper " +
                      px(ub) + "). " + holdLong + " Next check " + nextCheck + ".", alert.freq_once_per_bar_close)
-            else if pos == 0 and close < lb and shortOk
+            else if pos == 0 and close < lb and shortOk and freshOk
                 strategy.entry("Short", strategy.short, qty, comment = "Below noise",
                      alert_message = useHook ? jsonEntry("sell", estS, useStop ? bracketS : na, tpS) : "")
                 shortPlaced := true
@@ -353,7 +366,7 @@ if showDash and (barstate.islastconfirmedhistory or barstate.isrealtime)
     closed = strategy.closedtrades
     todayPnlDash = strategy.netprofit - dayStartNet
     wins = strategy.wintrades
-    table.cell(dash, 0, 0, "MNQ Noise Momentum v1.2", text_color = color.white, text_size = size.small)
+    table.cell(dash, 0, 0, "MNQ Noise Momentum v1.3", text_color = color.white, text_size = size.small)
     table.cell(dash, 1, 0, status, text_color = statusColor, text_size = size.small)
     table.cell(dash, 0, 1, "Sessions of history", text_color = color.silver, text_size = size.small)
     table.cell(dash, 1, 1, str.tostring(math.min(filled, lookback)) + " / " + str.tostring(lookback), text_color = color.white, text_size = size.small)
@@ -376,7 +389,10 @@ if showDash and (barstate.islastconfirmedhistory or barstate.isrealtime)
     table.cell(dash, 0, 10, "Open P/L", text_color = color.silver, text_size = size.small)
     table.cell(dash, 1, 10, pos != 0 ? usd(strategy.openprofit) : "-", text_color = strategy.openprofit >= 0 ? color.lime : color.red, text_size = size.small)
     table.cell(dash, 0, 11, "Trades today", text_color = color.silver, text_size = size.small)
-    table.cell(dash, 1, 11, str.tostring(closed - dayStartClosed), text_color = color.white, text_size = size.small)
+    losersNow = losersSince(dayStartClosed)
+    doneToday = maxLosers > 0 and losersNow >= maxLosers
+    table.cell(dash, 1, 11, str.tostring(closed - dayStartClosed) + (maxLosers > 0 ? " (" + str.tostring(losersNow) + " lost" + (doneToday ? ": done for today)" : ", limit " + str.tostring(maxLosers) + ")") : ""),
+         text_color = doneToday ? color.orange : color.white, text_size = size.small)
     capLate = maxLoss > 0 and useStop and barMin > 5
     table.cell(dash, 0, 12, "Chart", text_color = color.silver, text_size = size.small)
     table.cell(dash, 1, 12, capLate ? "use 5 min: tested on 5-minute bars; on " + str.tostring(barMin) + " min the target starts " + str.tostring(barMin) + " min late" : str.tostring(barMin) + " min",

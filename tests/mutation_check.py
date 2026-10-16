@@ -164,6 +164,18 @@ MUTANTS = {
     "noise: lock kept after the trade closes": (
         "noise", "if strategy.position_size == 0\n    locked := false\n", "if false\n    locked := false\n"
     ),
+    "noise: daily loser limit ignored": (
+        "noise", "freshOk = maxLosers <= 0 or losersSince(dayStartClosed) < maxLosers", "freshOk = true"
+    ),
+    "noise: daily limit off by one": (
+        "noise", "losersSince(dayStartClosed) < maxLosers   //", "losersSince(dayStartClosed) <= maxLosers   //"
+    ),
+    "noise: daily limit counts winners too": (
+        "noise", "if strategy.closedtrades.profit(j) < 0 and", "if strategy.closedtrades.profit(j) < 1e9 and"
+    ),
+    "noise: daily limit counts earlier days": (
+        "noise", "or losersSince(dayStartClosed) < maxLosers   //", "or losersSince(0) < maxLosers   //"
+    ),
     "noise: open position kept into the next session": (
         "noise", "(not inRth or tMin == RTH_OPEN)", "not inRth"
     ),
@@ -185,6 +197,7 @@ def _tests(T, script):
             ("take profit", N.test_pine_take_profit),
             ("webhooks", N.test_pine_webhooks),
             ("lock", N.test_pine_lock),
+            ("daily loser limit", N.test_pine_daily_loser_limit),
         ] + [(f"random {mins}m [{mode}]", lambda mi=mins, mo=mode: N.test_pine_random_sessions(mi, mo))
              for mins, mode in N.RANDOM_CASES] + [
             ("RTH-only chart", N.test_pine_rth_only_chart_and_shorter_lookback),
