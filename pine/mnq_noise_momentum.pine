@@ -187,6 +187,10 @@ if tMin == RTH_OPEN
         array.set(today, k, na)
 if inRth
     lastRthClose := close
+// Overnight bars on the chart (an ETH session): the dashboard suggests RTH, which loads about 4x more days
+var bool sawOvernight = false
+if tMin < RTH_OPEN or tMin >= RTH_CLOSE + 15
+    sawOvernight := true
 
 // ── Half-hour checks
 longPlaced = false
@@ -395,7 +399,7 @@ if showDash and (barstate.islastconfirmedhistory or barstate.isrealtime)
          text_color = doneToday ? color.orange : color.white, text_size = size.small)
     capLate = maxLoss > 0 and useStop and barMin > 5
     table.cell(dash, 0, 12, "Chart", text_color = color.silver, text_size = size.small)
-    extHours = syminfo.session == session.extended   // 24-hour bars: the 14 sessions of history use up most of the chart
+    extHours = sawOvernight   // 24-hour bars: the 14 sessions of history use up most of the chart
     table.cell(dash, 1, 12, capLate ? "use 5 min: tested on 5-minute bars; on " + str.tostring(barMin) + " min the target starts " + str.tostring(barMin) + " min late" :
          str.tostring(barMin) + " min" + (extHours ? ", ETH: switch to RTH for about 4x more backtest days (same trades)" : ""),
          text_color = capLate or extHours ? color.orange : color.white, text_size = size.small)
