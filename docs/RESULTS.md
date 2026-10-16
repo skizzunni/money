@@ -934,6 +934,27 @@ Three ideas at 10 MNQ and $350 with the lock on, on 1-minute bars, fixed before 
 - **On the real MNQ weeks from Yahoo** (21 September – 16 October 2026, 5-minute bars), v1.3 made +$13,068 on 44 trades, 19 winners (43%), against +$13,474 for v1.2 and +$12,313 for v1.1. Four weeks is small next to the tests above.
 - **The evaluation odds at 10 MNQ and $350 barely move** (about a quarter pass). The size, not the rules, is what holds them down.
 
+## Rounds thirty-nine to forty-two: more winners at 10 MNQ and $350, again
+
+A TradingView screenshot of v1.3 on 16 October 2026 showed 7 winners in 17 trades (41%). On 2011–2018 1-minute data at this setting, half the losing trades are stopped within 2 minutes of the fill and three quarters within 5, mostly by the bounce just after the breakout; only a tenth of the winners close within 2 minutes. Each idea below was fixed before its test; the baseline is v1.3 on 1-minute bars.
+
+| Per contract at $35 (×10 for 10 MNQ at $350) | Win % | $/day | t | Worst stretch | Result |
+|---|---|---|---|---|---|
+| **v1.3, 2011–2018** | **50.6%** | **$15.19** | **4.67** | **$2,569** | |
+| Ghost trade: skip the signal if a trade from the first minute would have been stopped within 1 / 2 / 3 / 5 minutes, else enter then (39) | 47–49% | $4.34–$9.81 | 1.6–3.4 | | failed |
+| Lock at 12.5 points instead of 17.5 (39) | 56.3% | $16.31 | 5.29 | $2,189 | see below |
+| Lock as a trailing stop, activate 12.5 / trail 10 (40, 41) | 57.2% | $9.55 | 5.67 | $1,086 | failed |
+| Skip spikes: no entry when the 5-minute check bar closed in the top fifth of its range toward the signal (42) | 52.1% | $16.08 | 5.32 | $1,501 | failed |
+
+- **The ghost trade fails badly.** Many trades that bounce in the first minutes go on to win, and the ones that survive are entered later, at worse prices.
+- **The lock at 12.5 points** passed 2011–2018 and improved every money measure on 2019–2022 (winners 47.0% → 51.0%, $17.04 → $17.63, t 3.24 → 3.48), but its win rate rose 4 points against the 5 required, so it failed. Looked at afterwards: all of 2011–2026 53.8% against 49.0% and $14.33 against $13.71; NQ futures 52.8% against 48.8% and $13.33 against $12.90; but 2023–2026 $6.14 against $6.64. Not adopted.
+- **The trailing lock** (round forty-one asked the evaluation question directly: pass rate at least 5 points higher, fewer fails, t within 0.3) raised the $50K passes at 10 MNQ from 32% to 43% on 2019–2022, then nearly erased the profit on 2023–2026 ($0.91 a day against $6.64, t 0.39). Failed.
+- **Skipping spikes** came from looking at 2011–2018 (spikes into the close won 44.8% and lost $17 a contract on average), passed 2019–2022 (48.8% against 47.0%, $18.66 against $17.04, worst stretch 41% smaller), then failed 2023–2026 ($5.37 against $6.64, win rate +0.2 points).
+
+**What the TradingView chart shows, and why.** v1.3 at 10 MNQ and $350 over 16 years: **40% winners on 5-minute bars (38.5% on NQ futures), 49% on 1-minute bars (48.7%)**. The lock has to act within seconds; on a 5-minute chart the script moves it a bar late. Letting the lock fill inside the bar along TradingView's own bar path (open, nearer extreme, farther extreme, close) only gets to 40.7%: inside 5 minutes price crosses the trigger and back more often than four prices can show. So the chart will show about 40%, and an account using Tradovate's Auto Breakeven about 49%. **A 17-trade stretch swings between about 24% and 59% winners** (10th to 90th percentile) by chance alone.
+
+**More backtest on the chart.** With 24-hour bars, the 14 sessions of history use up most of what TradingView loads (about 18 days of 5-minute bars on a 5,000-bar plan), leaving 3 days of trades. The bot needs only regular-hours bars: on the Yahoo weeks, an RTH chart (09:30–16:15) gives the same 44 trades to the cent with 4,012 bars instead of 13,538, so the same plan shows about 45 days of trades. The dashboard now says so on an extended-hours chart.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
@@ -1004,6 +1025,10 @@ python research/delay.py nsx_1m_scaled.pkl nq_1m_scaled.pkl            # each mi
 python research/win_rate35.py nsx_5m_scaled.pkl nq_5m_scaled.pkl       # more winners at $35 a contract (lock, no pass)
 python research/win_rate35b.py nsx_5m_scaled.pkl nq_5m_scaled.pkl      # the lock with room, skip wide noise (no pass)
 python research/lock_more.py nsx_1m_scaled.pkl nq_1m_scaled.pkl       # on top of the lock: 4 losers a day (adopted)
+python research/ghost.py nsx_1m_scaled.pkl nq_1m_scaled.pkl           # ghost trade, lower lock (no pass)
+python research/trail_lock.py nsx_1m_scaled.pkl nq_1m_scaled.pkl      # the lock as a trailing stop (no pass)
+python research/eval_trail.py nsx_1m_scaled.pkl nq_1m_scaled.pkl      # the trailing lock for the evaluation (no pass)
+python research/spike.py nsx_1m_scaled.pkl nq_1m_scaled.pkl           # skip spikes into the close (no pass)
 ```
 
 The raw data isn't stored in this repo.

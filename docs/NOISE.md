@@ -12,10 +12,11 @@
 
 ## 1. Setup
 
-1. **Chart:** `MNQ1!` (or the front-month MNQ contract) on **5 minutes**. Extended hours can be on or off. 1, 10, 15 and 30 minutes also run, and without the max loss they make the same trades. With it they don't: the max-loss stop needs the entry fill, so it starts on the bar after the fill. On a 30-minute chart that leaves every trade without its $350 cap for the first half hour, and single trades lose well past $350. The dashboard's *Chart* row turns orange when that applies. See round twelve in [RESULTS.md](RESULTS.md).
+1. **Chart:** `MNQ1!` (or the front-month MNQ contract) on **5 minutes**. **Set the session to RTH** (the *ETH* button at the bottom right of the chart → regular trading hours): the trades are the same, and because the 14 sessions of history then take a quarter of the bars, the backtest covers about four times as many days (about 45 instead of 3 on a 5,000-bar plan). 1, 10, 15 and 30 minutes also run, and without the max loss they make the same trades. With it they don't: the max-loss stop needs the entry fill, so it starts on the bar after the fill. On a 30-minute chart that leaves every trade without its $350 cap for the first half hour, and single trades lose well past $350. The dashboard's *Chart* row turns orange when that applies. See round twelve in [RESULTS.md](RESULTS.md).
 2. **Load it:** Pine Editor → paste the script → *Add to chart*.
 3. **History:** it needs **14 complete sessions** on the chart before its first trade. The dashboard shows *Sessions of history 14 / 14* when it's ready.
-4. **Alerts:** set them up as in [section 4](#4-how-it-tells-you-what-to-do).
+4. **What the chart's win rate means:** at 10 MNQ and $350 the 5-minute backtest shows about 40% winners over 16 years, because the lock moves a bar late on 5-minute bars; with Tradovate's Auto Breakeven doing the lock (section 4) the same trades won about 49% on 1-minute data. Any 17 trades can show anything from about 24% to 59% by chance.
+5. **Alerts:** set them up as in [section 4](#4-how-it-tells-you-what-to-do).
 
 ## 2. Definitions (New York time)
 

@@ -56,7 +56,9 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
              no_entry_checks: frozenset = frozenset(), minutes: int = 5,
              ratchet: bool = False, lock: tuple[float, float] | None = None, day_losers: int | None = None,
              side_once: bool = False, min_cap_units: float = 0.0, lock_touch: bool = False,
-             lock2: tuple[float, float] | None = None, done_after_target: bool = False) -> pd.DataFrame:
+             lock2: tuple[float, float] | None = None, done_after_target: bool = False,
+             ghost: bool = False, trail_pts: tuple[float, float] | None = None,
+             skip_spike: float | None = None, lock_path: bool = False) -> pd.DataFrame:
     """target: take profit this many noise units from the first fill (limit); cap_pts: max loss in points;
     target_on_fill_bar False: the limit works from the bar after the fill, as the Pine script places it;
     cap_on_fill_bar True: the max loss works on the fill bar too, measured from the expected fill (the signal
@@ -71,6 +73,15 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
     broker's auto-breakeven would, still from the next bar; lock2 (arm, offset): a second, higher step, armed the
     same way;
     done_after_target: no new entries today after a take-profit fills;
+    ghost: with entry_delay, the entry is skipped if a trade filled at the first bar's open after the signal would
+    have hit its stop (the closer of the line stop and the max loss) during the wait;
+    trail_pts (activate, offset), in points: once the high (long) or low (short) has reached activate points in profit,
+    a stop trails offset points behind the best high (low) so far, updated each bar for the next;
+    lock_path: the lock arms and can fill inside the bar that reaches the trigger, along TradingView's bar path (open,
+    then the nearer of high and low, then the other, then close): a stop trailing (trigger - offset) behind the best
+    price, only in that bar; from the next bar the fixed lock;
+    skip_spike: no entry when the 5-minute bar ending at the check closed at or beyond this fraction of its range
+    toward the signal's side (1 = at its high for a buy, at its low for a sell);
     day_losers: no new entries today after this many losing trades today;
     side_once: after a losing trade today, no new entries on that side today;
     min_cap_units: no entry when the max loss is less than this many noise units (sigma x price) from the signal
@@ -88,15 +99,17 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
     pos, fills, first_bar, pending, add_pending = 0, [], 0, 0, False
     best, armed = math.nan, False
     held = math.nan  # with ratchet: the tightest stop so far in this trade
+    peak = math.nan  # trail_pts: the best high (long) or low (short) since the fill, once activated
     est = math.nan  # the expected fill of a pending entry: the signal close plus a tick
     wait = 0  # bars still to wait before a pending entry fills (entry_delay)
+    ghost_px = ghost_stop = math.nan  # the ghost trade's fill and stop while waiting
     locked = locked2 = False  # lock: the stop has moved to the entry plus the offset (lock2: the second step)
     target_today = False
     losers, lost_sides = 0, set()  # losing trades today, and the sides they were on
     out = []
 
     def close(i, px, why):
-        nonlocal pos, fills, armed, held, locked, locked2, losers, target_today
+        nonlocal pos, fills, armed, held, locked, locked2, losers, target_today, peak
         pnl = sum(pos * (px - e) * PV - FEE for e in fills)
         out.append((idx[first_bar], idx[i], pos, len(fills), pnl, why))
         if pnl < 0:
@@ -106,6 +119,7 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
             target_today = True
         pos, fills, armed = 0, [], False
         held, locked, locked2 = math.nan, False, False
+        peak = math.nan
 
     for i in range(len(bars)):
         t_min = mins[i]
@@ -113,7 +127,17 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
         in_rth = t_min >= OPEN and end <= CLOSE
         if pending and wait > 0:
             wait -= 1
+            if ghost:
+                if math.isnan(ghost_px):
+                    ghost_px = o[i] + pending * TICK
+                    line = upper * (1 - BUF * sigma) if pending > 0 else lower * (1 + BUF * sigma)
+                    cap = ghost_px - pending * cap_pts
+                    ghost_stop = max(line, cap) if pending > 0 else min(line, cap)
+                if (pending > 0 and l[i] <= ghost_stop) or (pending < 0 and h[i] >= ghost_stop):
+                    pending, wait = 0, 0  # the ghost was stopped: no trade
+                    ghost_px = math.nan
         elif pending:
+            ghost_px = math.nan
             if pos == 0:
                 pos, fills, first_bar = pending, [o[i] + pending * TICK], i
                 best, armed = math.nan, False
@@ -140,6 +164,10 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
                 cap = est - pos * cap_pts
                 if (pos > 0 and cap > stop) or (pos < 0 and cap < stop):
                     stop, why = cap, "cap"
+            if not math.isnan(peak):
+                tr = peak - pos * trail_pts[1]
+                if (pos > 0 and tr > stop) or (pos < 0 and tr < stop):
+                    stop, why = tr, "trail"
             for on, step in ((locked, lock), (locked2, lock2)):
                 if on:
                     lk = fills[0] + pos * step[1]
@@ -156,6 +184,18 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
                 hit, px = True, o[i] - pos * TICK
             else:
                 hit, px = (l[i] <= stop if pos > 0 else h[i] >= stop), stop - pos * TICK
+            if not hit and lock_path and lock is not None and not locked and first_bar != i:
+                # TradingView's path through the bar: open, nearer extreme, farther extreme, close
+                up_first = (h[i] - o[i]) <= (o[i] - l[i])
+                fav, adv = (h[i], l[i]) if pos > 0 else (l[i], h[i])
+                fav_first = up_first if pos > 0 else not up_first
+                trig = fills[0] + pos * lock[0]
+                if pos * (fav - trig) >= 0:
+                    tr = fav - pos * (lock[0] - lock[1])  # the trailing stop once the bar's best price is reached
+                    after = adv if fav_first else c[i]  # where the path goes after the best price
+                    if pos * (after - tr) <= 0:
+                        locked = True
+                        hit, px, why = True, tr - pos * TICK, "lock"
             if hit:
                 close(i, px, why)
             elif target is not None and (target_on_fill_bar or first_bar != i):  # after the stop (worst case first)
@@ -175,6 +215,12 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
         if pos and lock is not None and not locked:
             seen = (h[i] if pos > 0 else l[i]) if lock_touch else c[i]
             locked = pos * (seen - fills[0]) >= lock[0]  # from the next bar
+        if pos and trail_pts is not None:
+            ext = h[i] if pos > 0 else l[i]
+            if not math.isnan(peak):
+                peak = max(peak, ext) if pos > 0 else min(peak, ext)
+            elif pos * (ext - fills[0]) >= trail_pts[0]:
+                peak = ext
         if pos and lock2 is not None and not locked2:
             seen = (h[i] if pos > 0 else l[i]) if lock_touch else c[i]
             locked2 = pos * (seen - fills[0]) >= lock2[0]
@@ -189,7 +235,14 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
                 sigma = ring[:, j].mean()
                 upper = max(day_open, prev_close) * (1 + sigma)
                 lower = min(day_open, prev_close) * (1 - sigma)
-                blocked = (end in no_entry_checks or (day_losers is not None and losers >= day_losers)
+                spike = 0.5
+                if skip_spike is not None:
+                    span = slice(max(0, i - 5 // minutes + 1), i + 1)
+                    hi5, lo5 = h[span].max(), l[span].min()
+                    if hi5 > lo5:
+                        spike = (c[i] - lo5) / (hi5 - lo5) if c[i] > upper else (hi5 - c[i]) / (hi5 - lo5)
+                blocked = ((skip_spike is not None and spike >= skip_spike)
+                           or end in no_entry_checks or (day_losers is not None and losers >= day_losers)
                            or (done_after_target and target_today)
                            or cap_pts < min_cap_units * sigma * c[i])
                 if pos == 0 and c[i] > upper and not blocked and not (side_once and 1 in lost_sides):
