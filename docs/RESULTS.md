@@ -569,6 +569,31 @@ Every earlier round looked for new places to trade. This one keeps the bot's tra
 - **Stage two, added after seeing 2011–2022 only:** the five facts that pointed the same way in both periods, scored 0–5, trading only above a cutoff. Every cutoff kept the win rate at 28% and gave up profit (score ≥ 3: $18.50 a day against $21.64), so nothing went to the final test. 2023–2026 was not looked at for any of this.
 - **The losers can't be told apart at entry.** These facts move the size of the wins a little, not the odds of winning. A breakout that will fail looks like one that will run, until it fails; that is what the stop is for.
 
+## Nineteenth round: three ways at the losing trades
+
+Rules and pass bar fixed before running ([`research/losers.py`](../research/losers.py)), 1 contract, $117 max loss, prices at today's level. To pass on 2011–2018: $ per day no lower than the bot's, a t-stat within 0.3, and more $ per day per dollar of worst losing stretch; the flip trades also had to stand alone at t ≥ 2.73. Then the same on 2019–2022, then 2023–2026 once.
+
+- **Time stop.** Breakouts that work tend to work fast, so a trade still losing 15, 30 or 60 minutes after the fill is closed there.
+- **Two-check confirmation.** Enter only when two half-hour checks in a row close outside the same line.
+- **Flip the failed breakout.** When the bot is stopped out within 30 or 60 minutes, trade the other way: stop at the failed trade's extreme, target the middle of the noise area or the far line.
+
+| Per contract | Win % 2011–18 | Avg loss 2011–18 | $/day 2011–18 | $/day 2019–22 | Flip trades' t, 2011–18 / 2019–22 |
+|---|---|---|---|---|---|
+| **The bot** | **28.1%** | **−$91** | **$22.70** | **$23.05** | |
+| Time stop 15 min | 21.5% | −$70 | $18.48 | $19.61 | |
+| Time stop 30 min | 24.8% | −$78 | $22.04 | $22.85 | |
+| Time stop 60 min | 26.6% | −$85 | $22.64 | $22.33 | |
+| Two checks in a row | 30.1% | −$100 | $15.32 | $15.71 | |
+| Flip within 30 min, target the middle | 30.0% | −$91 | $28.93 | $17.88 | 2.57 / −1.09 |
+| Flip within 30 min, target the far line | 28.1% | −$91 | $30.33 | $19.35 | 2.44 / −0.67 |
+| Flip within 60 min, target the middle | 30.5% | −$91 | $29.46 | $14.42 | 2.53 / −1.69 |
+| Flip within 60 min, target the far line | 28.4% | −$91 | $30.42 | $15.90 | 2.30 / −1.21 |
+
+- **Nothing passed, so 2023–2026 was not looked at.**
+- **Flipping failed breakouts** made $6–8 a day more on 2011–2018, just short of the bar, then lost money on its own on 2019–2022. The trapped-traders move was real in the older years and has not been since.
+- **A 30-minute time stop makes losses about 14% smaller at about the same profit.** It trades a smaller average loss for fewer winners (some slow starters are cut), so the money comes out even. It isn't better, only different.
+- **Waiting for a second check** raises the win rate a little and costs a third of the profit: the entry is half an hour later on the trades that work.
+
 ## What this does and doesn't say
 
 - **It says** that the original sweep/breakout rules have no edge after realistic costs on 2023–2026 Nasdaq-100 data, and would very likely not pass a $25K evaluation. Of three published strategies, only noise-area momentum held up over 16 years, and even it fails most $25K evaluations.
@@ -602,6 +627,7 @@ python research/more_trades.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"    # more tra
 python research/fill_in.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"        # a trade every day? (not by the rules)
 python research/profit_levers.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"  # add to winners, trailing stops (no)
 python research/meta_label.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"     # spot the losers at entry? (no)
+python research/losers.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"         # time stops, confirmation, flips (no)
 ```
 
 The raw data isn't stored in this repo.
