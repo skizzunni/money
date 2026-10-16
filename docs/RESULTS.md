@@ -389,6 +389,40 @@ O4 (no re-entry) and O5 (minimum push) were switched off by their own rule: re-e
 
 **Why it is losing now.** Trendiness = |open-to-close move| ÷ the day's noise. Good years: 1.12–1.25 (2018: 1.25, +$80 a day on the on-line stop). 2019: 1.05, −$3. 2025: 1.01, +$10. 2026: 0.99, −$12. Days have stopped moving more than their own noise, so breakouts don't follow through. The trailing trend filter (O8) didn't help: by the time 20 days of low trendiness switch it off, the bad patch is mostly over.
 
+## Eleventh round: the worst days, and a cap per trade
+
+Where the worst intraday dips and the worst losing stretch come from, and what caps them ([`research/dips.py`](../research/dips.py)). The strategy with the buffered stop, 1 MNQ, 2011–2018.
+
+**The ten worst intraday dips** are the famous crash days: the August 2011 US-downgrade week (the 5th and 10th), December 2018 (the 19th and 27th), the February 2018 "Volmageddon" (the 6th and 9th), September 2015. Each had 3–4 trades and a risk at entry of $470–$910 against a median of $120, because the noise lines were far from the price on those days. Gaps through the stop played almost no part (one day in ten).
+
+**The worst losing stretch** ran from 29 August 2011 to 3 April 2012: 118 sessions, $5,041, with 56 losing days against 22 winning and no single day worse than −$842. It is the chop after a crash, not one bad day.
+
+**Protections**, each with one number from 2011–2018, confirmed on 2019–2022 only if both the worst dip and the max drawdown fell by at least 15% while keeping at least 90% of the profit per day:
+
+| Protection | 2011–18 $/day, dip, DD | 2019–22 $/day, dip, DD | 2023–26 $/day, dip, DD |
+|---|---|---|---|
+| Base | +24.34, −1,381, 5,041 | +33.73, −1,552, 3,667 | +20.15, −861, 5,666 |
+| P1 at most 2 trades a day | +25.99, −1,118, 4,088 | +31.91, −1,376, 3,538 | +6.53, −861, 8,303 |
+| P2 stop for the day after a $361 loss | +25.04, −875, 4,584 | +32.71, −1,376, 3,297 | +9.06, −829, 7,631 |
+| P3 skip entries riskier than $285 | +23.26, −834, 3,085 | +13.35, −827, 2,401 | +10.30, −643, 3,926 |
+| P4 cap the loss per trade at $285 | +25.24, −1,125, 5,061 | +35.77, −1,376, 3,208 | +20.68, −931, 5,590 |
+
+- **Nothing met the bar.** The riskiest entries are the big winners in volatile years (the riskiest 10%: 41% win rate, +$5,006 net), so skipping them (P3) halves the profit. Limiting trades or stopping for the day (P1, P2) blocks the re-entries that made 2023–2026's money.
+- **The worst days can't be removed without removing the edge.** They are the days the market moved 3–5%; a trend strategy that is in the market on those days gets hit on the way in.
+
+**A cap per trade, swept** (added after the above, chosen looking at all periods; the cap starts the minute after the fill, as the script must do it):
+
+| Cap per contract | 2011–18 $/day (t), DD | 2019–22 $/day (t), DD | 2023–26 $/day (t), DD |
+|---|---|---|---|
+| none | +24.34 (3.55), 5,041 | +33.73 (3.22), 3,667 | +20.15 (1.75), 5,666 |
+| $35 | +17.50 (3.25), 4,942 | +21.20 (2.65), 2,533 | +12.95 (1.19), 4,541 |
+| **$100** | **+27.00 (4.24), 3,984** | +30.63 (3.26), 3,555 | **+24.96 (2.24), 2,564** |
+| $200 | +25.83 (3.87), 4,961 | +30.93 (3.02), 3,685 | +24.02 (2.12), 4,498 |
+| $350 | +24.23 (3.54), 5,057 | +33.77 (3.21), 3,296 | +20.10 (1.80), 6,051 |
+
+- **$100–$200 per contract improves nearly everything**, with 2019–2022 giving back about 9% of its profit; **$35 wrecks it; $350 changes nothing.** The script now has *Max loss per trade* = $350 for the whole position and 3 contracts as the default, $117 per contract. With 10 contracts the same $350 would be $35 each.
+- This was chosen with all periods in view, so it is a weaker result than the pre-registered rounds. Two of the three levels tested beat the base everywhere, so it is not a knife-edge.
+
 ## What this does and doesn't say
 
 - **It says** that the original sweep/breakout rules have no edge after realistic costs on 2023–2026 Nasdaq-100 data, and would very likely not pass a $25K evaluation. Of three published strategies, only noise-area momentum held up over 16 years, and even it fails most $25K evaluations.
@@ -415,6 +449,7 @@ python research/regime_trend.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"   # the regi
 python research/round8.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"         # volatility sizing, the 24-hour clock
 python research/round9.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"         # the resting-stop exit, account tiers
 python research/postmortem.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"     # why the trades lose; the buffered stop
+python research/dips.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"           # the worst days; protections; the cap sweep
 ```
 
 The raw data isn't stored in this repo.
