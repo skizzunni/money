@@ -955,6 +955,32 @@ A TradingView screenshot of v1.3 on 16 October 2026 showed 7 winners in 17 trade
 
 **More backtest on the chart.** With 24-hour bars, the 14 sessions of history use up most of what TradingView loads (about 18 days of 5-minute bars on a 5,000-bar plan), leaving 3 days of trades. The bot needs only regular-hours bars: on the Yahoo weeks, an RTH chart (09:30–16:15) gives the same 44 trades to the cent with 4,012 bars instead of 13,538, so the same plan shows about 45 days of trades. The dashboard now says so on an extended-hours chart.
 
+## Forty-third round: a better entry price, and a second chance
+
+On 16 October 2026 the bot's four losing shorts were each stopped by a ~17.5-point bounce, then price went the signals' way. Fixed before running ([`research/better_entry.py`](../research/better_entry.py)): a limit 4.25 or 8.75 points better than the signal close for 2 minutes, then a market order if unfilled (so the runners still get in); or, after a max-loss stop, a stop order to re-enter at the stopped trade's price until the next check. Pass bar: win rate 3 points higher at no less money, t within 0.3, as before.
+
+| 2011–2018, per contract at $35 | Win % | $/day | t |
+|---|---|---|---|
+| **v1.3** | **50.6%** | **$15.19** | **4.67** |
+| Limit 4.25 better, then market | 43.8% | $2.01 | 0.66 |
+| Limit 8.75 better, then market | 43.8% | $4.57 | 1.45 |
+| Second chance | 48.2% | $8.54 | 2.53 |
+
+**Failed, clearly.** The limit fills on the bounces that keep going, which are the losers; the re-entries after a stop-out lose again more often than not.
+
+**Two facts for choosing settings, measured afterwards on 1-minute bars with v1.3's rules:**
+
+- **With the lock, every size wins about half its trades.** Same $350 max loss: 10 MNQ 49%, 5 MNQ 52%, 3 MNQ 51% (index 2011–2026); fewer contracts buy evaluation odds (30% → 38% → 45% passes) and smaller losing stretches, not winners.
+- **The lock trigger is the win-rate dial.** At 10 MNQ and $350:
+
+| Lock trigger (×17.5 points) | Win % 2011–18 / 2019–22 / 2023–26 / NQ | $/day ×10 2011–18 / 2019–22 / 2023–26 / NQ |
+|---|---|---|
+| 1.0 (17.5 pts, the default) | 50.6 / 47.0 / 47.8 / 48.8 | $152 / $170 / $66 / $129 |
+| 0.75 (13.1 pts) | 55.3 / 50.5 / 50.5 / 52.3 | $166 / $181 / $57 / $134 |
+| 0.5 (8.75 pts) | 58.8 / 51.9 / 53.3 / 54.8 | $147 / $173 / $45 / $127 |
+
+  0.75 wins 3–5 points more often in every period, makes more on three of four and has a smaller worst losing stretch on all four, but made 14% less on 2023–2026; 0.5 wins more still and made a third less on 2023–2026. The default stays at 1.0 (the lower trigger failed its pre-registered test in round thirty-nine); *Lock a small win* set to 0.75 is the choice for more winners.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
@@ -1029,6 +1055,7 @@ python research/ghost.py nsx_1m_scaled.pkl nq_1m_scaled.pkl           # ghost tr
 python research/trail_lock.py nsx_1m_scaled.pkl nq_1m_scaled.pkl      # the lock as a trailing stop (no pass)
 python research/eval_trail.py nsx_1m_scaled.pkl nq_1m_scaled.pkl      # the trailing lock for the evaluation (no pass)
 python research/spike.py nsx_1m_scaled.pkl nq_1m_scaled.pkl           # skip spikes into the close (no pass)
+python research/better_entry.py nsx_1m_scaled.pkl nq_1m_scaled.pkl    # limit-then-market, second chance (no pass)
 ```
 
 The raw data isn't stored in this repo.

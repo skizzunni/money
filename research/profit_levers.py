@@ -58,7 +58,8 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
              side_once: bool = False, min_cap_units: float = 0.0, lock_touch: bool = False,
              lock2: tuple[float, float] | None = None, done_after_target: bool = False,
              ghost: bool = False, trail_pts: tuple[float, float] | None = None,
-             skip_spike: float | None = None, lock_path: bool = False) -> pd.DataFrame:
+             skip_spike: float | None = None, lock_path: bool = False,
+             limit_first: tuple[float, int] | None = None, second_chance: bool = False) -> pd.DataFrame:
     """target: take profit this many noise units from the first fill (limit); cap_pts: max loss in points;
     target_on_fill_bar False: the limit works from the bar after the fill, as the Pine script places it;
     cap_on_fill_bar True: the max loss works on the fill bar too, measured from the expected fill (the signal
@@ -80,6 +81,10 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
     lock_path: the lock arms and can fill inside the bar that reaches the trigger, along TradingView's bar path (open,
     then the nearer of high and low, then the other, then close): a stop trailing (trigger - offset) behind the best
     price, only in that bar; from the next bar the fixed lock;
+    limit_first (k, n): at a signal, a limit k points better than the signal close works for n bars, filling when price
+    trades a tick through it; if it hasn't filled, a market order at the next bar's open (the runners still get in);
+    second_chance: after a max-loss stop, a stop order to re-enter at the stopped trade's fill price, same side, until
+    the next half-hour check (once per signal);
     skip_spike: no entry when the 5-minute bar ending at the check closed at or beyond this fraction of its range
     toward the signal's side (1 = at its high for a buy, at its low for a sell);
     day_losers: no new entries today after this many losing trades today;
@@ -103,13 +108,15 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
     est = math.nan  # the expected fill of a pending entry: the signal close plus a tick
     wait = 0  # bars still to wait before a pending entry fills (entry_delay)
     ghost_px = ghost_stop = math.nan  # the ghost trade's fill and stop while waiting
+    lim_px, lim_left, lim_market, lim_bar = math.nan, 0, False, -1  # limit_first: the resting limit
+    chance_side, chance_px, chance_done = 0, math.nan, False  # second_chance: the re-entry stop order
     locked = locked2 = False  # lock: the stop has moved to the entry plus the offset (lock2: the second step)
     target_today = False
     losers, lost_sides = 0, set()  # losing trades today, and the sides they were on
     out = []
 
     def close(i, px, why):
-        nonlocal pos, fills, armed, held, locked, locked2, losers, target_today, peak
+        nonlocal pos, fills, armed, held, locked, locked2, losers, target_today, peak, chance_side, chance_px
         pnl = sum(pos * (px - e) * PV - FEE for e in fills)
         out.append((idx[first_bar], idx[i], pos, len(fills), pnl, why))
         if pnl < 0:
@@ -117,6 +124,8 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
             lost_sides.add(pos)
         if why == "target":
             target_today = True
+        if second_chance and why == "cap" and not chance_done:
+            chance_side, chance_px = pos, fills[0]
         pos, fills, armed = 0, [], False
         held, locked, locked2 = math.nan, False, False
         peak = math.nan
@@ -125,7 +134,23 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
         t_min = mins[i]
         end = t_min + minutes
         in_rth = t_min >= OPEN and end <= CLOSE
-        if pending and wait > 0:
+        if pending and lim_left > 0:  # limit_first: the limit works for a few bars
+            d = pending
+            if (d > 0 and l[i] <= lim_px - TICK) or (d < 0 and h[i] >= lim_px + TICK):
+                if pos == 0:
+                    pos, fills, first_bar = d, [lim_px], i
+                    best, armed, est, lim_bar = math.nan, False, lim_px, i
+                pending, lim_left = 0, 0
+            else:
+                lim_left -= 1
+                lim_market = lim_left == 0  # not filled: a market order at the next bar's open
+        elif pending and lim_market:
+            lim_market = False
+            if pos == 0:
+                pos, fills, first_bar = pending, [o[i] + pending * TICK], i
+                best, armed, est = math.nan, False, o[i] + pending * TICK
+            pending = 0
+        elif pending and wait > 0:
             wait -= 1
             if ghost:
                 if math.isnan(ghost_px):
@@ -144,6 +169,13 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
                 if entry_delay:
                     est = o[i] + pending * TICK  # a late trader places the bracket from the real fill
             pending = 0
+        if chance_side and pos == 0 and not pending:  # second_chance: the re-entry stop order
+            d = chance_side
+            if (d > 0 and h[i] >= chance_px) or (d < 0 and l[i] <= chance_px):
+                px0 = (max(o[i], chance_px) if d > 0 else min(o[i], chance_px)) + d * TICK
+                pos, fills, first_bar = d, [px0], i
+                best, armed, est = math.nan, False, px0
+                chance_side, chance_done = 0, True
         if add_pending:
             if pos:
                 fills.append(o[i] + pos * TICK)
@@ -212,7 +244,7 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
             today[:] = np.nan
         if in_rth:
             last_close = c[i]
-        if pos and lock is not None and not locked:
+        if pos and lock is not None and not locked and lim_bar != i:
             seen = (h[i] if pos > 0 else l[i]) if lock_touch else c[i]
             locked = pos * (seen - fills[0]) >= lock[0]  # from the next bar
         if pos and trail_pts is not None:
@@ -229,6 +261,7 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
             if not armed and pos * (c[i] - fills[0]) >= sigma * fills[0]:
                 armed = True
         if in_rth and not math.isnan(day_open) and end in kof:
+            chance_side, chance_done = 0, False
             j = kof[end]
             today[j] = abs(c[i] / day_open - 1)
             if filled >= LOOKBACK and not math.isnan(prev_close):
@@ -247,13 +280,18 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
                            or cap_pts < min_cap_units * sigma * c[i])
                 if pos == 0 and c[i] > upper and not blocked and not (side_once and 1 in lost_sides):
                     pending, est, wait = 1, c[i] + TICK, entry_delay
+                    if limit_first is not None:
+                        lim_px, lim_left = c[i] - limit_first[0], limit_first[1]
                 elif pos == 0 and c[i] < lower and not blocked and not (side_once and -1 in lost_sides):
                     pending, est, wait = -1, c[i] - TICK, entry_delay
+                    if limit_first is not None:
+                        lim_px, lim_left = c[i] + limit_first[0], limit_first[1]
                 elif (pos and len(fills) < units and i != first_bar
                       and ((pos > 0 and c[i] > upper) or (pos < 0 and c[i] < lower))
                       and pos * (c[i] - fills[0]) >= k * sigma * fills[0]):
                     add_pending = True
         if in_rth and end == CLOSE:
+            chance_side = 0
             if pos:
                 close(i, c[i] - pos * TICK, "16:00")
             add_pending = False
