@@ -777,6 +777,23 @@ None passed the luck filter (5% false discovery rate over five; "fearful" came c
 
 **Failed.** The scared periods hold the losing streaks too, so trading bigger in them doubles the worst stretch and adds less than it risks. The bot earning more per trade on fearful days is real enough to show in three rounds, but it doesn't make a better sizing rule.
 
+## Thirty-second round: volume at the signal, on real NQ futures 1-minute bars
+
+A public dataset on Hugging Face ([mdelcristo/NQ-F_1min_OHLCV_Parquet](https://huggingface.co/datasets/mdelcristo/NQ-F_1min_OHLCV_Parquet), MIT licence) has NQ futures 1-minute bars with volume from January 2015 to July 2025: 3.67 million bars, real exchange prices including the contract rolls (the 09:30 open shows the expected jump, from about 500 contracts a minute to 2,800). [`research/nq_volume.py`](../research/nq_volume.py).
+
+**The bot on this independent data**, as it trades now, 1 contract, $117 max loss: 3,463 trades, 31.0% winners, **$27.94 a day, t = 5.72**, positive in 10 of 11 years (2015 +$6,250, 2016 +$3,299, 2017 +$1,827, 2018 +$15,226, 2019 −$1,337, 2020 +$6,008, 2021 +$9,141, 2022 +$17,439, 2023 +$7,634, 2024 +$2,471, 2025 to July +$3,423). The edge isn't an artefact of the index CFD data the rounds above used. At a $35 stop per contract ($350 over 10 MNQ) the same years give a third as much per contract and three losing years (2017, 2019, 2025).
+
+**Volume at the signal**, four facts against the same time of day over the previous 20 sessions, rules fixed before running (discovery 2015–2019, confirmation 2020–2022, final 2023–2025, roll weeks left out):
+
+| Fact | $ per trade, yes / no, 2015–19 | t | $ per trade, yes / no, 2020–22 | t |
+|---|---|---|---|---|
+| Busy half hour before the signal | 19.15 / 15.84 | 0.29 | 37.11 / 22.56 | 0.82 |
+| Volume surge in the last 5 minutes | 20.51 / 12.85 | 0.71 | 27.85 / 43.79 | −0.84 |
+| Busy day so far | 17.24 / 20.93 | −0.32 | 28.91 / 42.33 | −0.72 |
+| Busy overnight | 23.15 / 12.02 | 1.05 | 30.82 / 35.11 | −0.25 |
+
+**Nothing passed.** Breakouts on heavy volume did no better than breakouts on light volume, so volume confirmation, a staple of breakout trading, adds nothing to this bot.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
@@ -839,6 +856,7 @@ python research/volume_days.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv" nq_1d.json  #
 python research/yahoo_forward.py mnq_5m.json 10 350                    # real MNQ bars, the last 60 days
 python research/fear_volume.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv" yahoo_dir   # market mood, hourly volume (no)
 python research/fear_size.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv" yahoo_dir     # bigger when scared (no)
+python research/nq_volume.py path/to/nq_parquet_dir                    # real NQ futures; volume at the signal (no)
 ```
 
 The raw data isn't stored in this repo.
