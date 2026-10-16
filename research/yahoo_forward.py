@@ -38,7 +38,7 @@ def main() -> None:
     pd.set_option("display.width", 200)
     print(f"{len(bars)} bars, {bars.index[0]} to {bars.index[-1]}; {qty} MNQ, ${max_loss:,.0f} max loss")
     cols = ["entry_time", "direction", "entry", "exit_time", "exit", "reason", "pnl"]
-    print(tf[cols].round(2).to_string(index=False))
+    print(tf[cols].round({"entry": 2, "exit": 2, "pnl": 2}).to_string(index=False))
     day = tf.groupby(tf.exit_time.dt.date).pnl.sum()
     print(f"total ${tf.pnl.sum():,.2f} on {len(tf)} trades, {(tf.pnl > 0).sum()} winners; "
           f"{(day > 0).sum()} winning days of {len(day)}; worst day ${day.min():,.2f}")

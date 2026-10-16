@@ -818,6 +818,21 @@ The bot as it trades now, per contract with $117 of room (the $350 max loss on 3
 
 **One difference to know about**: when a single bar touches both the stop and the take-profit, the tests and the Python reference count the stop (the worst case); TradingView's broker emulator guesses the path inside the bar and sometimes counts the target. So TradingView can show slightly better results than the tests on such bars.
 
+## Thirty-third round: sell the bounce instead of the breakdown
+
+On 16 October 2026 (real MNQ bars from Yahoo, 10 MNQ at $350) the bot shorted five breakdowns by 12:00: four bounced about 17 points inside the first 5 minutes and hit the $35-per-contract stop (−$342 to −$367 each), one ran to the take-profit (+$3,278), +$1,853 on the morning. The idea that day suggests: rest a limit entry a little better than the signal price, so the bounce becomes the entry. Rules fixed before running ([`research/pullback.py`](../research/pullback.py)): a limit 0.1 or 0.25 noise units better than the signal close, filled a tick through, cancelled at the next check; the stop counted on the fill bar if the bar reached it (worst case); everything else as the bot trades.
+
+| Per contract | $/day 2011–18 | t | $/day 2019–22 | t |
+|---|---|---|---|---|
+| **$117 max loss, market entry (the bot)** | **$23.66** | **4.73** | **$32.83** | **3.62** |
+| $117, limit 0.1 better | $15.58 | 3.39 | $20.01 | 2.49 |
+| $117, limit 0.25 better | $8.31 | 2.14 | $5.16 | 0.81 |
+| $35 max loss, market entry | $14.17 | 3.51 | $14.31 | 2.18 |
+| $35, limit 0.1 better | $6.91 | 1.96 | $9.48 | 1.62 |
+| $35, limit 0.25 better | $3.63 | 1.30 | $3.88 | 0.86 |
+
+**Failed, clearly.** The limit fills on the breakouts that come back, which are the ones failing, and misses the ones that run without looking back, which are the ones that pay. The market entry stays.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
@@ -882,6 +897,7 @@ python research/fear_volume.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv" yahoo_dir   #
 python research/fear_size.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv" yahoo_dir     # bigger when scared (no)
 python research/nq_volume.py path/to/nq_parquet_dir                    # real NQ futures; volume at the signal (no)
 python research/stress.py nsx_5m_scaled.pkl nq_5m_scaled.pkl           # stress tests of version 1.0
+python research/pullback.py nsx_5m_scaled.pkl                          # limit entry on the bounce (no)
 ```
 
 The raw data isn't stored in this repo.
