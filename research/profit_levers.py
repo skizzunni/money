@@ -59,7 +59,8 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
              lock2: tuple[float, float] | None = None, done_after_target: bool = False,
              ghost: bool = False, trail_pts: tuple[float, float] | None = None,
              skip_spike: float | None = None, lock_path: bool = False,
-             limit_first: tuple[float, int] | None = None, second_chance: bool = False) -> pd.DataFrame:
+             limit_first: tuple[float, int] | None = None, second_chance: bool = False,
+             skip_days: frozenset = frozenset(), checks_by_year: dict | None = None) -> pd.DataFrame:
     """target: take profit this many noise units from the first fill (limit); cap_pts: max loss in points;
     target_on_fill_bar False: the limit works from the bar after the fill, as the Pine script places it;
     cap_on_fill_bar True: the max loss works on the fill bar too, measured from the expected fill (the signal
@@ -85,6 +86,8 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
     trades a tick through it; if it hasn't filled, a market order at the next bar's open (the runners still get in);
     second_chance: after a max-loss stop, a stop order to re-enter at the stopped trade's fill price, same side, until
     the next half-hour check (once per signal);
+    skip_days: dates (datetime.date, New York) with no new entries;
+    checks_by_year: {year: check times (as no_entry_checks) with no new entries that year};
     skip_spike: no entry when the 5-minute bar ending at the check closed at or beyond this fraction of its range
     toward the signal's side (1 = at its high for a buy, at its low for a sell);
     day_losers: no new entries today after this many losing trades today;
@@ -274,7 +277,9 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
                     hi5, lo5 = h[span].max(), l[span].min()
                     if hi5 > lo5:
                         spike = (c[i] - lo5) / (hi5 - lo5) if c[i] > upper else (hi5 - c[i]) / (hi5 - lo5)
-                blocked = ((skip_spike is not None and spike >= skip_spike)
+                day = idx[i].date()
+                year_block = checks_by_year.get(day.year, frozenset()) if checks_by_year else frozenset()
+                blocked = ((skip_spike is not None and spike >= skip_spike) or day in skip_days or end in year_block
                            or end in no_entry_checks or (day_losers is not None and losers >= day_losers)
                            or (done_after_target and target_today)
                            or cap_pts < min_cap_units * sigma * c[i])

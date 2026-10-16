@@ -995,6 +995,18 @@ On 16 October 2026 the bot's four losing shorts were each stopped by a ~17.5-poi
 
 Over the first minutes after the bot's entry, price is indistinguishable from a coin flip; none of the facts tested at the signal (the S&P, a spike into the close, volume, time of day, waiting minutes, better limit prices) changes that. The win rate is set by where the lock sits against the stop; the profit comes from the half-hour trends the bot is built on, which show only over 30 minutes and more. More winners at the same money would need something that predicts the next few minutes; nothing measured here does.
 
+## Forty-fourth round: drop the trades that lose on average
+
+Dropping trades that lose on average raises winners and money together. Fixed before running ([`research/drop_losers.py`](../research/drop_losers.py)): no entries on monthly options-expiration Fridays (dealer hedging tends to pin the index); or, walk-forward, each year no entries at the half-hour checks that lost on average over all earlier years. Pass bar against v1.3 (1-minute bars, 10 MNQ, $350): win rate higher, $ per day no lower, t within 0.3, $ per day per dollar of worst stretch no lower.
+
+| 2013–2018, per contract at $35 | Win % | $/day | t | Worst stretch |
+|---|---|---|---|---|
+| **v1.3** | **51.35%** | **$15.28** | **4.15** | **$1,548** |
+| No options-expiry Fridays | 51.51% | $15.11 | 4.15 | $1,517 |
+| Walk-forward checks | 51.49% | $15.95 | 4.54 | $1,704 |
+
+**Neither passed**: both moved the win rate by about a sixth of a point, the first for less money, the second with a larger worst stretch. No day or check time stands out as a reliable loser either.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
@@ -1071,6 +1083,7 @@ python research/eval_trail.py nsx_1m_scaled.pkl nq_1m_scaled.pkl      # the trai
 python research/spike.py nsx_1m_scaled.pkl nq_1m_scaled.pkl           # skip spikes into the close (no pass)
 python research/better_entry.py nsx_1m_scaled.pkl nq_1m_scaled.pkl    # limit-then-market, second chance (no pass)
 python research/es_confirm.py spx_1m.pkl nsx_1m_scaled.pkl             # the S&P at the signal (descriptive)
+python research/drop_losers.py nsx_1m_scaled.pkl nq_1m_scaled.pkl     # options-expiry Fridays, walk-forward checks (no)
 ```
 
 The raw data isn't stored in this repo.
