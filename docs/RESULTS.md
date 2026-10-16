@@ -472,6 +472,30 @@ Round five tested checking more often and narrowing the band, but with the paper
 
 Only checks every 10 minutes passed 2011–2018. It failed 2019–2022: less per day, and a t-stat 0.35 lower. **Nothing replaces the bot.** Every extra entry is a weaker breakout than the half-hour ones, and in 2023–2026 every variant made less per day with a bigger losing stretch. The narrower bands looked good in 2019–2022 and fell apart after, which is the pattern of a lucky fit. The full table is in `research/more_trades.py`'s output.
 
+## Fifteenth round: a trade every day
+
+The bot trades on 57% of days. The other 43% are days when price never closes outside the noise area. Two ideas were tested for those days, with rules and a pass bar written before running ([`research/fill_in.py`](../research/fill_in.py)).
+
+- **A fade inside the noise area.** If a breakout of the usual range means trend, a move toward the edge that doesn't break out might come back. At a half-hour check, with the bot flat and price in the outer half (or outer quarter) of the noise area: sell near the upper line or buy near the lower one. The stop is the line itself, where the bot takes over in the other direction. The target is the middle of the area, or halfway to it. Four variants.
+- **A gap fade before 10:00.** The bot never trades 09:30–10:00. If the overnight gap is more than 0.5 or 1.0 times the 10:00 noise, fade it at the 09:30 open, target yesterday's close, out at 10:00. Two variants.
+
+The bar to pass: the side trades alone at t ≥ 2.64 on 2011–2018, and the bot plus them must trade on more days, make at least as much a day, keep the t-stat within 0.3, and keep the worst losing stretch within 20%. Then t ≥ 1.65 and the same four tests on 2019–2022, then on 2023–2026 once. 1 MNQ, $117 max loss, prices at today's level.
+
+| Per contract | Days traded, 2011–18 | $/day 2011–18 | $/day 2019–22 | $/day 2023–26 | Worst stretch 2023–26 | Side trades' t, by period |
+|---|---|---|---|---|---|---|
+| **The bot alone** | **59%** | **$22.70** | **$23.05** | **$23.32** | **$2,222** | |
+| + fade, outer half, target the middle | 91% | $28.46 | $15.67 | $36.53 | $4,202 | 1.51 / −1.06 / 1.90 |
+| + fade, outer half, target halfway | 91% | $22.25 | $17.85 | $28.67 | $4,124 | −0.16 / −1.00 / 1.08 |
+| + fade, outer quarter, target the middle | 77% | $25.89 | $8.66 | $33.48 | $2,222 | 1.13 / −3.03 / 1.98 |
+| + fade, outer quarter, target halfway | 77% | $21.18 | $7.23 | $24.52 | $2,835 | −0.73 / −4.30 / 0.33 |
+| + gap fade, gap > 0.5 noise | 90% | $32.03 | $29.39 | $32.17 | $3,292 | 2.90 / 1.07 / 1.59 |
+| + gap fade, gap > 1.0 noise | 83% | $32.34 | $25.58 | $28.62 | $3,347 | 3.22 / 0.46 / 1.03 |
+
+- **The fade inside the noise area failed.** It lost money in 2019–2022 in every version. The days the bot can't trade aren't reliably two-way.
+- **The gap fade over 1.0 noise units** passed 2011–2018 and failed 2019–2022 (t 0.46). Nothing passed the rules, so the bot is unchanged.
+- **The gap fade over 0.5 noise units is the near miss.** It made money in all three periods, and with it the bot made about $9 a day more per contract, with a higher t-stat each time and a trade on 90% of days. It failed one test: its worst losing stretch was 32% larger on 2011–2018 (and 48% larger on 2023–2026). On a $50K evaluation it passed more often at 1 MNQ (66% vs 41% on 2011–2022, 59% vs 38% on 2023–2026), and at 2 MNQ it passed slightly more often and faster. But at 1 MNQ on 2023–2026 it also failed more: 26% vs 7%.
+- **A disclosure.** Before the full run, a check of the code's mechanics on June 2023 to May 2024 showed each variant's side P&L for that year. That year is inside the final test. Nothing was changed after it; the rules above were already written.
+
 ## What this does and doesn't say
 
 - **It says** that the original sweep/breakout rules have no edge after realistic costs on 2023–2026 Nasdaq-100 data, and would very likely not pass a $25K evaluation. Of three published strategies, only noise-area momentum held up over 16 years, and even it fails most $25K evaluations.
@@ -502,6 +526,7 @@ python research/dips.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"           # the wors
 python research/timeframes.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"     # 5 vs 15 vs 30-minute charts
 python research/eval50k.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"        # the $50K evaluation, 1 to 10 MNQ
 python research/more_trades.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"    # more trades a day? (no)
+python research/fill_in.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"        # a trade every day? (not by the rules)
 ```
 
 The raw data isn't stored in this repo.
