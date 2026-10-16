@@ -548,6 +548,27 @@ $350 spread over 10 contracts is a 17.5-point stop, inside normal 5-minute noise
 - **A high win rate costs money.** Taking profit at half a noise unit wins about half the trades and makes a third less, because it cuts the big trend days the profit comes from.
 - **A take-profit at 1.5–2.5 noise units is a lead, not a result.** It is smooth across settings, has a higher t-stat in every period and better $50K odds in 2023–2026, and barely moves the win rate. But most of its extra money is in 2019–2022, and it was found after all 16 years were seen, so there is no untouched data left to confirm it. It needs a forward test: paper trading from October 2026 on.
 
+## Eighteenth round: can the losing trades be spotted at entry?
+
+Every earlier round looked for new places to trade. This one keeps the bot's trades and asks whether facts known at the moment of each signal separate the losers from the winners, so the bot could skip them ([`research/meta_label.py`](../research/meta_label.py)). Ten facts, each a two-way split, rules fixed before running: the trade goes the way of the overnight gap, of yesterday's move, of the last 20 sessions; the market is wilder than its 1-year normal; the signal is at or before 11:30; how far the close is past the line; the day's range so far; first trade of the day; distance from the day's average price; long or short. 3,457 trades, 1 contract, $117 max loss.
+
+| Fact | $ per trade, yes / no, 2011–18 | t | $ per trade, yes / no, 2019–22 | t |
+|---|---|---|---|---|
+| With the overnight gap | 30.68 / 12.98 | 1.36 | 29.70 / 20.91 | 0.39 |
+| With yesterday's move | 28.12 / 21.45 | 0.54 | 17.55 / 35.41 | −0.89 |
+| With the last 20 sessions | 32.33 / 17.78 | 1.18 | 30.70 / 23.05 | 0.38 |
+| Wilder market than normal | 30.63 / 17.95 | 1.05 | 35.93 / 14.68 | 1.12 |
+| Signal by 11:30 | 29.26 / 17.71 | 0.96 | 25.56 / 28.51 | −0.14 |
+| Closed well past the line | 32.91 / 16.39 | 1.35 | 34.01 / 19.39 | 0.73 |
+| Big range so far | 29.13 / 20.17 | 0.73 | 35.51 / 18.51 | 0.84 |
+| First trade of the day | 25.84 / 22.76 | 0.24 | 32.51 / 19.84 | 0.62 |
+| Far from the day's average price | 29.02 / 20.28 | 0.71 | 27.06 / 26.61 | 0.02 |
+| Long | 24.95 / 24.36 | 0.05 | 34.76 / 19.83 | 0.76 |
+
+- **No fact passed the luck filter** (5% false discovery rate on 2011–2018); the largest t was 1.36.
+- **Stage two, added after seeing 2011–2022 only:** the five facts that pointed the same way in both periods, scored 0–5, trading only above a cutoff. Every cutoff kept the win rate at 28% and gave up profit (score ≥ 3: $18.50 a day against $21.64), so nothing went to the final test. 2023–2026 was not looked at for any of this.
+- **The losers can't be told apart at entry.** These facts move the size of the wins a little, not the odds of winning. A breakout that will fail looks like one that will run, until it fails; that is what the stop is for.
+
 ## What this does and doesn't say
 
 - **It says** that the original sweep/breakout rules have no edge after realistic costs on 2023–2026 Nasdaq-100 data, and would very likely not pass a $25K evaluation. Of three published strategies, only noise-area momentum held up over 16 years, and even it fails most $25K evaluations.
@@ -580,6 +601,7 @@ python research/eval50k.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"        # the $50K
 python research/more_trades.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"    # more trades a day? (no)
 python research/fill_in.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"        # a trade every day? (not by the rules)
 python research/profit_levers.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"  # add to winners, trailing stops (no)
+python research/meta_label.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"     # spot the losers at entry? (no)
 ```
 
 The raw data isn't stored in this repo.
