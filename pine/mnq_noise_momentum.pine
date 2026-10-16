@@ -16,9 +16,11 @@
 //
 // Tested on 16 years of Nasdaq-100 data: see docs/RESULTS.md. About $26 a day on 1 MNQ, 15 of
 // 16 years positive, but about two thirds of trades lose and 2026 is a losing year so far. It
-// passed about 6 in 10 historical $25K evaluations and about 78% of $100K ones. Not "never lose".
+// passed about 6 in 10 historical $25K evaluations and about 78% of $100K ones. On a $50K evaluation with the
+// $350 max loss, about half passed at 2 MNQ and 1 in 5 at 10 MNQ (docs/RESULTS.md). Not "never lose".
 //
-// Chart: MNQ1! (or the front-month MNQ contract), 5 minutes (1, 5, 10, 15 or 30 work).
+// Chart: MNQ1! (or the front-month MNQ contract), 5 minutes. 1, 10, 15 and 30 also run, but the max-loss stop
+// starts one bar after the fill, so on a 30-minute chart a trade has no $350 cap for its first half hour.
 // The rules are the same as the Python reference in mnqbot/noise.py.
 // ------------------------------------------------------------------
 strategy("MNQ Noise-Area Momentum", shorttitle = "Noise-Mom", overlay = true,
@@ -37,8 +39,8 @@ const int RTH_CLOSE = 960
 // ── Inputs
 grpT = "Trading"
 lookback = input.int(14, "Sessions in the noise average", minval = 2, maxval = 60, group = grpT)
-qty      = input.int(3, "Contracts", minval = 1, maxval = 30, group = grpT,
-     tooltip = "Every figure in docs/RESULTS.md is per contract: about $26 a day over 16 years, a worst intraday dip of -$1,552, a worst losing stretch of $5,666. Multiply by the contracts. 3 contracts with the $350 max loss below is $117 per contract, the cap size that tested best. 10 contracts would make that cap $35 per contract, which cut 2023-2026 to about $2 a day: raise the max loss if you raise the size. A $25K / $1,500 evaluation can hold 1 contract at most.")
+qty      = input.int(10, "Contracts", minval = 1, maxval = 60, group = grpT,
+     tooltip = "Every figure in docs/RESULTS.md is per contract: about $26 a day over 16 years. With the $350 max loss below, 10 contracts made about $13-16 a day per contract (the stop is $35 each), 3 contracts about $22. On a $50K evaluation ($3,000 target, $2,000 end-of-day drawdown), from every start day 2011-2026: 10 MNQ passed about 1 in 5 and failed 4 in 5; 2 MNQ passed about half (60% in 2023-2026); 1 MNQ passed about 45% and failed 25% within 125 sessions. See docs/RESULTS.md, round thirteen.")
 maxLoss  = input.float(350, "Max loss per trade, $ (all contracts, 0 = off)", minval = 0, step = 10, group = grpT,
      tooltip = "A second stop this many dollars from the entry fill, for the whole position, in force from the bar after the fill; whichever of it and the line stop is closer is used. On 16 years, caps of $100-$200 per contract raised profit per day in every period and cut the worst losing stretch. Fees, slippage and a gap through the stop can add to the loss.")
 skipDates = input.string("2026-01-01,2026-01-19,2026-02-16,2026-04-03,2026-05-25,2026-06-19,2026-07-03,2026-09-07,2026-11-26,2026-11-27,2026-12-24,2026-12-25,2027-01-01,2027-01-18,2027-02-15,2027-03-26,2027-05-31,2027-06-18,2027-07-05,2027-09-06,2027-11-25,2027-11-26,2027-12-24",
@@ -54,9 +56,9 @@ showBands = input.bool(true, "Show noise area", group = grpV)
 showLabels = input.bool(true, "Show BUY / SELL / EXIT labels", group = grpV)
 shadeTrades = input.bool(true, "Shade the chart while in a trade", group = grpV)
 showDash  = input.bool(true, "Show dashboard", group = grpV)
-grpR = "Reports"
-statusMins = input.int(15, "Status report every N minutes (0 = off)", minval = 0, maxval = 60, step = 5, group = grpR,
-     tooltip = "An alert with your position, stop, open P/L, today's P/L, trades and wins, at every N-minute mark from 09:30 to 16:00. Needs a chart of N minutes or finer (a 5-minute chart for 15-minute reports) and an alert set to 'Order fills and alert() function calls'.")
+showLog   = input.bool(true, "Show trade log", group = grpV,
+     tooltip = "A table at the bottom right with every trade the bot took, newest first: the time it opened and closed (New York, month-day hour:minute), side and contracts, entry and exit prices, P/L after fees, and why it closed. The open trade, if any, is on top.")
+logRows   = input.int(10, "Trades in the log", minval = 1, maxval = 30, group = grpV)
 
 // ── Clock
 barMin  = int(timeframe.in_seconds() / 60)
@@ -69,6 +71,8 @@ isCheck = validTf and inRth and endMin >= FIRST_CHECK and endMin <= LAST_CHECK a
 hhmmText(int mins) => str.tostring(int(mins / 60)) + ":" + (mins % 60 < 10 ? "0" : "") + str.tostring(mins % 60)
 px(float x) => str.tostring(x, format.mintick)
 usd(float x) => (x < 0 ? "-$" : "$") + str.tostring(math.abs(x), "#,##0.00")
+stamp(int t) => str.format_time(t, "MM-dd HH:mm", TZ)   // New York time, month-day hour:minute
+why(string c) => c == "Back inside" ? (useStop ? "stop at the line" : "back inside at a check") : c == "Max loss" ? "max loss stop" : c == "16:00 close" ? "16:00 close" : c == "Session ended" ? "session ended" : str.contains(c, "Reverse") ? "reversed" : c
 // A signal label on the candle that triggered it: below the candle for buys, above for sells.
 mark(string txt, bool below, color c) =>
     if showLabels
@@ -102,7 +106,7 @@ if stopFired
     lastSignal := "EXIT (" + (strategy.closedtrades.exit_comment(lastTrade) == "Max loss" ? "max loss" : "line touched") + ") @ " +
          px(strategy.closedtrades.exit_price(lastTrade))
 
-// ── Today's baseline for the reports, taken at 09:30 before anything else happens this bar
+// ── Today's baseline for the dashboard, taken at 09:30 before anything else happens this bar
 if tMin == RTH_OPEN
     dayStartNet := strategy.netprofit
     dayStartClosed := strategy.closedtrades
@@ -181,14 +185,14 @@ if isCheck and not na(dayOpen)
             else if pos == 0 and close > ub
                 strategy.entry("Long", strategy.long, qty, comment = "Above noise")
                 longPlaced := true
-                mark("BUY " + str.tostring(qty), true, color.green)
+                mark("BUY " + str.tostring(qty) + " MNQ", true, color.green)
                 lastSignal := "BUY " + hhmmText(endMin) + " @ " + px(close)
                 alert("BUY " + str.tostring(qty) + " MNQ at market now. Price " + px(close) + " is above the noise area (upper " +
                      px(ub) + "). " + holdLong + " Next check " + nextCheck + ".", alert.freq_once_per_bar_close)
             else if pos == 0 and close < lb
                 strategy.entry("Short", strategy.short, qty, comment = "Below noise")
                 shortPlaced := true
-                mark("SELL " + str.tostring(qty), false, color.red)
+                mark("SELL " + str.tostring(qty) + " MNQ", false, color.red)
                 lastSignal := "SELL " + hhmmText(endMin) + " @ " + px(close)
                 alert("SELL " + str.tostring(qty) + " MNQ at market now. Price " + px(close) + " is below the noise area (lower " +
                      px(lb) + "). " + holdShort + " Next check " + nextCheck + ".", alert.freq_once_per_bar_close)
@@ -233,29 +237,12 @@ if inRth and endMin == RTH_CLOSE
             filled += 1
     dayOpen := na
 
-// ── Status report at every N-minute mark during the session
-if statusMins > 0 and inRth and endMin % statusMins == 0 and filled >= lookback
-    pos = strategy.position_size
-    todayPnl = strategy.netprofit - dayStartNet
-    todayTrades = strategy.closedtrades - dayStartClosed
-    int todayWins = 0
-    if todayTrades > 0
-        for j = dayStartClosed to strategy.closedtrades - 1
-            if strategy.closedtrades.profit(j) > 0
-                todayWins += 1
-    stopText = not useStop ? "" : ", stop " + px(pos > 0 ? longStop : shortStop)
-    posText = pos == 0 ? "flat" : (pos > 0 ? "LONG " : "SHORT ") + str.tostring(qty) + " MNQ from " + px(strategy.position_avg_price) + stopText +
-         ", open P/L " + usd(strategy.openprofit)
-    alert("STATUS " + hhmmText(endMin) + ": " + posText + ". Today " + usd(todayPnl) + " on " + str.tostring(todayTrades) + " trades (" +
-         str.tostring(todayWins) + " won). Lines " + (na(ub) ? "from 10:00" : px(ub) + " / " + px(lb)) + ". Next check " + nextText + ".",
-         alert.freq_once_per_bar_close)
-
 // ── Drawing
 plot(showBands and inRth ? ub : na, "Upper noise line", color.teal, 2, plot.style_linebr)
 plot(showBands and inRth ? lb : na, "Lower noise line", color.maroon, 2, plot.style_linebr)
 bgcolor(shadeTrades and strategy.position_size > 0 ? color.new(color.teal, 88) : shadeTrades and strategy.position_size < 0 ? color.new(color.maroon, 88) : na)
 
-var table dash = table.new(position.top_right, 2, 12, bgcolor = color.new(color.black, 15), border_width = 1, border_color = color.new(color.gray, 60))
+var table dash = table.new(position.top_right, 2, 13, bgcolor = color.new(color.black, 15), border_width = 1, border_color = color.new(color.gray, 60))
 if showDash and (barstate.islastconfirmedhistory or barstate.isrealtime)
     pos = strategy.position_size
     status = not validTf ? "Use a 1/5/10/15/30 min chart" : filled < lookback ? "Building history" : pos > 0 ? "LONG" : pos < 0 ? "SHORT" : skipToday and inRth ? "No trades today (date list)" : "Flat"
@@ -285,7 +272,50 @@ if showDash and (barstate.islastconfirmedhistory or barstate.isrealtime)
     table.cell(dash, 1, 10, pos != 0 ? usd(strategy.openprofit) : "-", text_color = strategy.openprofit >= 0 ? color.lime : color.red, text_size = size.small)
     table.cell(dash, 0, 11, "Trades today", text_color = color.silver, text_size = size.small)
     table.cell(dash, 1, 11, str.tostring(closed - dayStartClosed), text_color = color.white, text_size = size.small)
+    capLate = maxLoss > 0 and useStop and barMin > 5
+    table.cell(dash, 0, 12, "Chart", text_color = color.silver, text_size = size.small)
+    table.cell(dash, 1, 12, capLate ? "use 5 min: on " + str.tostring(barMin) + " min the max loss starts " + str.tostring(barMin) + " min late" : str.tostring(barMin) + " min",
+         text_color = capLate ? color.orange : color.white, text_size = size.small)
     table.cell(dash, 0, 5, "Backtest net", text_color = color.silver, text_size = size.small)
     table.cell(dash, 1, 5, (strategy.netprofit < 0 ? "-$" : "$") + str.tostring(math.abs(strategy.netprofit), "#,##0.00"),
          text_color = strategy.netprofit >= 0 ? color.lime : color.red, text_size = size.small)
+
+// ── Trade log: every trade, exactly when it opened and closed, newest first
+var table tlog = table.new(position.bottom_right, 7, 32, bgcolor = color.new(color.black, 15), border_width = 1, border_color = color.new(color.gray, 60))
+logCell(int col, int row, string txt, color c) =>
+    table.cell(tlog, col, row, txt, text_color = c, text_size = size.small)
+if showLog and (barstate.islastconfirmedhistory or barstate.isrealtime)
+    table.clear(tlog, 0, 0, 6, 31)
+    logCell(0, 0, "Opened (NY)", color.silver)
+    logCell(1, 0, "Side", color.silver)
+    logCell(2, 0, "Entry", color.silver)
+    logCell(3, 0, "Closed (NY)", color.silver)
+    logCell(4, 0, "Exit", color.silver)
+    logCell(5, 0, "P/L", color.silver)
+    logCell(6, 0, "Why", color.silver)
+    int row = 1
+    if strategy.opentrades > 0
+        sz = strategy.opentrades.size(0)
+        logCell(0, row, stamp(strategy.opentrades.entry_time(0)), color.white)
+        logCell(1, row, (sz > 0 ? "LONG " : "SHORT ") + str.tostring(math.abs(sz)), sz > 0 ? color.lime : color.red)
+        logCell(2, row, px(strategy.opentrades.entry_price(0)), color.white)
+        logCell(3, row, "OPEN", color.yellow)
+        logCell(4, row, px(close) + " now", color.white)
+        logCell(5, row, usd(strategy.openprofit), strategy.openprofit >= 0 ? color.lime : color.red)
+        logCell(6, row, not useStop ? "half-hour check" : "stop " + px(sz > 0 ? longStop : shortStop), color.white)
+        row += 1
+    nLog = math.min(logRows, strategy.closedtrades)
+    if nLog > 0
+        for j = 0 to nLog - 1
+            t = strategy.closedtrades - 1 - j
+            sz = strategy.closedtrades.size(t)
+            pl = strategy.closedtrades.profit(t)
+            logCell(0, row, stamp(strategy.closedtrades.entry_time(t)), color.white)
+            logCell(1, row, (sz > 0 ? "LONG " : "SHORT ") + str.tostring(math.abs(sz)), sz > 0 ? color.lime : color.red)
+            logCell(2, row, px(strategy.closedtrades.entry_price(t)), color.white)
+            logCell(3, row, stamp(strategy.closedtrades.exit_time(t)), color.white)
+            logCell(4, row, px(strategy.closedtrades.exit_price(t)), color.white)
+            logCell(5, row, usd(pl), pl >= 0 ? color.lime : color.red)
+            logCell(6, row, why(strategy.closedtrades.exit_comment(t)), color.white)
+            row += 1
 prevClosed := strategy.closedtrades

@@ -111,6 +111,7 @@ class PineRuntime:
         self.globals: dict = {}
         self.history: list[dict] = []
         self.alerts: list[tuple[int, str]] = []
+        self.tables: list = []  # every table.new, in order
         self.labels: list[tuple[int, str]] = []
         self.i = 0
         self.scopes: list[dict] = []
@@ -477,9 +478,24 @@ class PineRuntime:
             return NA if is_na(x) else int(x)  # Pine int() truncates toward zero
 
         def format_time(t_ms, fmt, tz):
-            if fmt != "yyyy-MM-dd":
+            py = fmt
+            for java, c in (("yyyy", "%Y"), ("MM", "%m"), ("dd", "%d"), ("HH", "%H"), ("mm", "%M")):
+                py = py.replace(java, c)
+            if any(ch.isalpha() for ch in py.replace("%Y", "").replace("%m", "").replace("%d", "")
+                   .replace("%H", "").replace("%M", "")):
                 raise PineError(f"str.format_time format {fmt!r} is not emulated")
-            return rt._ny(int(t_ms), tz).strftime("%Y-%m-%d")
+            return rt._ny(int(t_ms), tz).strftime(py)
+
+        def table_new(position, columns, rows, **kw):
+            t = _Table(int(columns), int(rows))
+            rt.tables.append(t)
+            return t
+
+        def table_cell(t, column, row, text="", **kw):
+            t.cell(int(column), int(row), text)
+
+        def table_clear(t, start_column, start_row, end_column=None, end_row=None):
+            t.clear(int(start_column), int(start_row), end_column, end_row)
 
         return {
             "indicator": Namespace("indicator"),
@@ -509,7 +525,7 @@ class PineRuntime:
             "format": Namespace("format", mintick="mintick"),
             "label": Namespace("label", new=label_new),
             "box": Namespace("box"),
-            "table": Namespace("table"),
+            "table": Namespace("table", new=table_new, cell=table_cell, clear=table_clear),
             "color": Namespace("color"),
             "shape": Namespace("shape"),
             "location": Namespace("location"),
@@ -588,7 +604,7 @@ class StrategyEmulator:
 
     @property
     def closedtrades(self):
-        return _ClosedTrades(self.closed)
+        return _ClosedTrades(self.closed, self.rt.series["time"])
 
     @property
     def wintrades(self):
@@ -604,7 +620,7 @@ class StrategyEmulator:
 
     @property
     def opentrades(self):
-        return 0 if self.pos is None else 1
+        return _OpenTrades(self)
 
     # ---- order calls
     def entry(self, id, direction, qty=None, limit=None, comment=None, **kw):
@@ -702,9 +718,10 @@ class StrategyEmulator:
 class _ClosedTrades(int):
     """`strategy.closedtrades` is a count that also has per-trade functions (profit(i), exit_price(i), ...)."""
 
-    def __new__(cls, closed):
+    def __new__(cls, closed, time=None):
         obj = super().__new__(cls, len(closed))
         obj._closed = closed
+        obj._time = time
         return obj
 
     def _get(self, i, key):
@@ -726,3 +743,59 @@ class _ClosedTrades(int):
 
     def exit_bar_index(self, i):
         return self._get(i, "exit_bar")
+
+    def entry_price(self, i):
+        return float(self._get(i, "entry"))
+
+    def entry_time(self, i):  # the open time of the bar the entry filled on, ms
+        return int(self._time[self._get(i, "entry_bar")])
+
+    def exit_time(self, i):
+        return int(self._time[self._get(i, "exit_bar")])
+
+
+class _OpenTrades(int):
+    """`strategy.opentrades`: 0 or 1 here (no pyramiding), with per-trade functions for trade 0."""
+
+    def __new__(cls, strategy):
+        obj = super().__new__(cls, 0 if strategy.pos is None else 1)
+        obj._s = strategy
+        return obj
+
+    def _pos(self, i):
+        if i != 0 or self._s.pos is None:
+            raise PineError(f"open trade {i} does not exist")
+        return self._s.pos
+
+    def entry_price(self, i):
+        return float(self._pos(i)["price"])
+
+    def entry_time(self, i):
+        return int(self._s.rt.series["time"][self._pos(i)["bar"]])
+
+    def size(self, i):
+        p = self._pos(i)
+        return float(p["dir"] * p["qty"])
+
+
+class _Table:
+    """A table's text, by (column, row), so tests can read what the chart shows."""
+
+    def __init__(self, columns, rows):
+        self.columns, self.rows = columns, rows
+        self.cells: dict[tuple[int, int], str] = {}
+
+    def cell(self, column, row, text):
+        if not (0 <= column < self.columns and 0 <= row < self.rows):
+            raise PineError(f"table cell ({column}, {row}) is outside a {self.columns}x{self.rows} table")
+        self.cells[(column, row)] = text
+
+    def clear(self, c0, r0, c1=None, r1=None):
+        c1 = c0 if c1 is None else int(c1)
+        r1 = r0 if r1 is None else int(r1)
+        self.cells = {k: v for k, v in self.cells.items() if not (c0 <= k[0] <= c1 and r0 <= k[1] <= r1)}
+
+    def grid(self):
+        """Rows of text, top to bottom, up to the last row with anything in it."""
+        last = max((r for _, r in self.cells), default=-1)
+        return [[self.cells.get((c, r), "") for c in range(self.columns)] for r in range(last + 1)]

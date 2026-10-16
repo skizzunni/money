@@ -12,7 +12,7 @@
 
 ## 1. Setup
 
-1. **Chart:** `MNQ1!` (or the front-month MNQ contract) on **30 minutes** or 5 minutes. 1, 10 and 15 minutes also work. Extended hours can be on or off. Every one of these makes the same trades, because the script only acts at the half hours; a 30-minute chart just loads the most history.
+1. **Chart:** `MNQ1!` (or the front-month MNQ contract) on **5 minutes**. Extended hours can be on or off. 1, 10, 15 and 30 minutes also run, and without the max loss they make the same trades. With it they don't: the max-loss stop needs the entry fill, so it starts on the bar after the fill. On a 30-minute chart that leaves every trade without its $350 cap for the first half hour, and single trades lose well past $350. The dashboard's *Chart* row turns orange when that applies. See round twelve in [RESULTS.md](RESULTS.md).
 2. **Load it:** Pine Editor → paste the script → *Add to chart*.
 3. **History:** it needs **14 complete sessions** on the chart before its first trade. The dashboard shows *Sessions of history 14 / 14* when it's ready.
 4. **Alerts:** set them up as in [section 4](#4-how-it-tells-you-what-to-do).
@@ -47,7 +47,7 @@ The lines change at every check, because σ is different for each time of day. I
 - **Orders are market orders** placed right after the check. The backtest fills them at the next bar's open plus 1 tick of slippage. Stops fill at the line, or at the bar's open if price gapped through, minus 1 tick.
 - **At 16:00, close everything.**
 - **The paper's original rule** (exit only if a half-hour check closes back inside the lines, reverse if it closes through the other side) is still there under *Exit → Half-hour check*. It makes fewer trades and had bigger worst days.
-- **Size: the script's default is 3 MNQ with a $350 max loss, $117 per contract.** Every figure in this document and in [RESULTS.md](RESULTS.md) is per contract; multiply by the contracts. If you raise the size, raise the max loss with it: $350 over 10 contracts is $35 each, which cut 2023–2026 to about $2 a day per contract. No $25K / $1,500 evaluation can hold 3 contracts of this; [What to expect](#6-what-to-expect) shows the account size that fits 1.
+- **Size: the script's default is 10 MNQ with a $350 max loss per trade, $35 per contract.** Every figure in this document and in [RESULTS.md](RESULTS.md) is per contract unless it says otherwise; multiply by the contracts. A $35 stop per contract is tight: it made about $13–16 a day per contract against about $22 for 1–3 contracts under the same $350. **On a $50K evaluation, 10 MNQ failed about 4 attempts in 5; 2 MNQ passed about half** (round thirteen in [RESULTS.md](RESULTS.md)). Set *Contracts* to 2 for the evaluation. No $25K / $1,500 evaluation can hold more than 1 contract of this.
 - **No trades on holidays and half days.** On US market holidays (MLK Day, Memorial Day, Labor Day and so on), MNQ still trades but halts at about 13:00 ET. On half days (the day after Thanksgiving, Christmas Eve) the session also ends early. The 16-year test only traded full sessions, so the script sits these out. Its input *Don't trade on these dates* comes pre-filled with every 2026–2027 holiday and half day, and you can add news days to it. In 2028, add that year's dates.
 - **If a session ends early anyway**, the script closes any open position at the first bar after the early end, or at the next 09:30 bar. That can be hours later.
 
@@ -72,19 +72,21 @@ Through a **TradingView alert**. It runs on TradingView's servers, so it keeps w
 | You see | Meaning |
 |---|---|
 | Teal line / maroon line | Upper / lower noise line. They appear from 10:00 and step at each half hour. |
-| Green **BUY 1** label under a candle | That candle's close was above the upper line: buy. |
-| Red **SELL 1** label over a candle | That candle's close was below the lower line: sell. |
+| Green **BUY 10 MNQ** label under a candle | That candle's close was above the upper line: buy. |
+| Red **SELL 10 MNQ** label over a candle | That candle's close was below the lower line: sell. |
 | Grey **EXIT** label | Price touched the line and your stop filled (or, in half-hour check mode, a check closed back inside): the trade is over. |
-| **REVERSE / SELL 2** or **REVERSE / BUY 2** | Price went through the other line: flip the position. |
+| **REVERSE / SELL 20** or **REVERSE / BUY 20** | Price went through the other line: flip the position. |
 | Grey **FLAT** label | 16:00: close the trade. |
 | Orange **EXIT NOW** | A session ended early with a trade open: close it. |
 | Teal / maroon shading | You're long / short. |
 | Dashboard *Last signal* | The most recent instruction, with its time and price. |
-| Small arrows with *+1 / −1* | TradingView's own backtest fills, one candle after the label. |
+| Small arrows with *+10 / −10* | TradingView's own backtest fills, one candle after the label: +10 is 10 contracts bought, −10 is 10 sold. |
+
+The number on a label is the contracts, from the *Contracts* setting (10 by default). **SELL 10 MNQ** means go short 10 contracts.
 
 The label sits on the half-hour candle that just closed, the moment the alert fires. The backtest fills at the next candle's open.
 
-**Status reports every 15 minutes.** At every 15-minute mark from 09:45 to 16:00 the same alert sends a report, for example *"STATUS 10:15: LONG 10 MNQ from 29,980.25, stop 29,951.00, open P/L $240.00. Today $0.00 on 0 trades (0 won). Lines 29,960.00 / 29,700.00. Next check 10:30."* The setting *Status report every N minutes* changes the interval (0 turns it off). It needs a chart of that length or finer: a 5-minute chart for 15-minute reports. The dashboard shows the same figures: today's P/L, open P/L and trades today.
+**Trade log.** A table at the bottom right of the chart lists every trade the bot took, newest first. Each row has the time it opened and closed (New York time, month-day hour:minute), the side and contracts, the entry and exit prices, the P/L after fees, and why it closed: *stop at the line*, *max loss stop*, *16:00 close* or *session ended*. While a trade is open it sits on top as **OPEN**, with the price now, the open P/L and the stop to have in. *Trades in the log* sets how many rows it shows (10 by default, up to 30); TradingView's *List of trades* tab has all of them. The dashboard at the top right shows today's P/L, open P/L and trades today. There are no status alerts: nothing to set up to see your trades.
 
 **Where you place the order:** the alert and the labels only tell you. You place every order yourself.
 

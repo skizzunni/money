@@ -5,7 +5,6 @@ so on the next session the noise area is open (= previous close) * (1 +/- 0.001)
 """
 from __future__ import annotations
 
-import re
 from pathlib import Path
 
 import pandas as pd
@@ -202,22 +201,6 @@ def test_default_stop_sits_past_the_line():
     assert (t.exit_bar, t.reason) == (bar(14, 8), "Back inside") and t.exit == pytest.approx(stop - 0.25)
 
 
-def test_status_report_every_15_minutes():
-    bars, p = scenario(above_all_day)
-    res = run(bars)
-    # 09:45, 10:00, ..., 16:00 on the session after the history is complete (26), plus the 16:00 report on the
-    # session that completed it
-    assert len(res.status) == 27
-    by_bar = {i: tuple(rest) for i, *rest in res.status}
-    pos, entry, pnl, n = by_bar[bar(14, 5)]  # 10:00: flat, the buy fills on the next bar (entry is nan)
-    assert (pos, pnl, n) == (0, 0.0, 0) and entry != entry
-    pos, entry, pnl, n = by_bar[bar(14, 8)]  # 10:15: long, nothing closed yet
-    assert (pos, n) == (1, 0) and entry == pytest.approx(p * 1.002 + 0.25) and pnl == 0.0
-    pos, entry, pnl, n = by_bar[bar(14, CLOSE_16_00)]  # 16:00: flat again, the day's one trade closed
-    assert (pos, n) == (0, 1) and entry != entry and pnl == pytest.approx(res.trades[0].pnl)
-    assert run(bars, NoiseConfig(status_minutes=0)).status == []
-
-
 def test_ten_contracts_scale_the_trade():
     bars, _ = scenario(above_all_day)
     one, ten = run(bars).trades[0], run(bars, NoiseConfig(qty=10)).trades[0]
@@ -340,26 +323,40 @@ def run_pine(bars, inputs=None, minutes=5):
     rt.run(on_bar)
     trades = [(t["entry_bar"], t["exit_bar"], t["dir"], round(t["entry"], 6), round(t["exit"], 6),
                round(t["pnl"], 6), t["reason"]) for t in rt.strategy.closed]
-    status = [(i, msg) for i, msg in rt.alerts if msg.startswith("STATUS")]
-    events = [(i, msg.split()[0].rstrip(":")) for i, msg in rt.alerts if not msg.startswith("STATUS")]
+    events = [(i, msg.split()[0].rstrip(":")) for i, msg in rt.alerts]
     labels = [(i, text.split()[0]) for i, text in rt.labels]
     assert labels == events, "every alert has a matching label on the chart"
-    return trades, events, {i: (u, lo) for i, u, lo in bands}, status
+    logs = [t for t in rt.tables if t.columns == 7]
+    assert len(logs) == 1, "one trade-log table"
+    return trades, events, {i: (u, lo) for i, u, lo in bands}, logs[0].grid()
 
 
-STATUS_RE = re.compile(r"^STATUS \d+:\d\d: (?:(LONG|SHORT) \d+ MNQ from ([\d.]+).*?|flat)\. "
-                       r"Today (-?)\$([\d,.]+) on (\d+) trades")
+LOG_HEADER = ["Opened (NY)", "Side", "Entry", "Closed (NY)", "Exit", "P/L", "Why"]
+WHY = {"Back inside": "stop at the line", "Max loss": "max loss stop", "16:00 close": "16:00 close",
+       "Session ended": "session ended", "reversed": "reversed"}
 
 
-def parse_status(status):
-    out = []
-    for i, msg in status:
-        m = STATUS_RE.match(msg)
-        assert m, msg
-        side, entry, sign, pnl, n = m.groups()
-        d = 1 if side == "LONG" else -1 if side == "SHORT" else 0
-        out.append((i, d, float(entry) if entry else None, (-1 if sign else 1) * float(pnl.replace(",", "")), int(n)))
-    return out
+def money(text):
+    return float(text.replace("$", "").replace(",", ""))
+
+
+def assert_trade_log(log, res, exit_mode, rows=10):
+    """The chart's trade log shows the last trades, newest first: times, side, prices, P/L and why."""
+    assert log[0] == LOG_HEADER
+    body = log[1:]
+    if body and body[0][3] == "OPEN":  # the data ended mid-trade
+        body = body[1:]
+    why = dict(WHY, **({"Back inside": "back inside at a check"} if exit_mode == "check" else {}))
+    expected = []
+    for t in reversed(res.trades[-rows:]):
+        expected.append([t.entry_time.strftime("%m-%d %H:%M"), f"{'LONG' if t.direction > 0 else 'SHORT'} {t.qty}",
+                         t.entry, t.exit_time.strftime("%m-%d %H:%M"), t.exit, round(t.pnl, 2), why[t.reason]])
+    got = [[r[0], r[1], float(r[2]), r[3], float(r[4]), money(r[5]), r[6]] for r in body]
+    assert len(got) == len(expected)
+    for g, e in zip(got, expected, strict=True):
+        assert g[:2] == e[:2] and g[3] == e[3] and g[6] == e[6], (g, e)
+        assert g[2] == pytest.approx(e[2], abs=0.125) and g[4] == pytest.approx(e[4], abs=0.125)  # to the tick
+        assert g[5] == pytest.approx(e[5], abs=0.006), (g, e)
 
 
 def assert_parity(bars, minutes=5, lookback=14, skip_dates=None, exit_mode="stop", stop_buffer=None, qty=1,
@@ -375,13 +372,12 @@ def assert_parity(bars, minutes=5, lookback=14, skip_dates=None, exit_mode="stop
     if skip_dates is not None:
         cfg.skip_dates = inputs["Don't trade on these dates"] = skip_dates
     res = run(bars, cfg, minutes=minutes)
-    trades, events, pine_bands, status = run_pine(bars, inputs, minutes)
+    trades, events, pine_bands, log = run_pine(bars, inputs, minutes)
     assert trades == trades_of(res)
     assert events == res.events
     for i, u, lo in res.bands:
         assert pine_bands[i] == (u, lo)
-    expected = [(i, d, None if d == 0 else round(e, 2), round(pnl, 2), n) for i, d, e, pnl, n in res.status]
-    assert parse_status(status) == expected, "the status reports match the reference"
+    assert_trade_log(log, res, exit_mode)
     return res
 
 

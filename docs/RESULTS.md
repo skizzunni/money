@@ -423,6 +423,55 @@ Where the worst intraday dips and the worst losing stretch come from, and what c
 - **$100–$200 per contract improves nearly everything**, with 2019–2022 giving back about 9% of its profit; **$35 wrecks it; $350 changes nothing.** The script now has *Max loss per trade* = $350 for the whole position and 3 contracts as the default, $117 per contract. With 10 contracts the same $350 would be $35 each.
 - This was chosen with all periods in view, so it is a weaker result than the pre-registered rounds. Two of the three levels tested beat the base everywhere, so it is not a knife-edge.
 
+## Twelfth round: does the chart's bar length matter?
+
+A 30-minute chart in TradingView showed better 2026 results than the bot had shown before, so the same rules were run on 5, 15 and 30-minute bars. Each month's prices were rescaled to today's level, so the $350 max loss is the same distance in points as it is now. 3 MNQ, all costs included, 2011 to September 2026.
+
+Without the max loss, the bar length makes no difference: the script only acts at the half hours, and the line stop doesn't move between them. With it, the bar length matters. The max-loss stop needs the entry fill, so it starts on the bar after the fill. On a 30-minute chart, every trade goes its first half hour with no $350 cap.
+
+| 3 MNQ, $350 max loss | 5 min | 15 min | 30 min |
+|---|---|---|---|
+| Net, 2011–2026 | $287,609 | $291,564 | $280,178 |
+| Net, 2023–2026 | $66,332 | $64,114 | $58,029 |
+| Net, 2026 to September | $4,974 | $7,247 | $5,164 |
+| Worst losing stretch | $11,808 | $15,688 | $16,170 |
+| Trades that lost more than $400 | 146 | 335 | 473 |
+
+**The 5-minute chart is the one that keeps the $350 promise.** It made about the same money as the others over 16 years, with the smallest losing stretch and a third as many trades past $400 as on 30 minutes. In 2026 the three are close, and 15 minutes happened to be best. That is one year, and no bar length is better across the periods. The trades that still lose more than $400 on 5 minutes are fast markets: price jumps past the stop between one minute and the next, as in March 2020.
+
+The script now says so: the dashboard's *Chart* row turns orange on a chart longer than 5 minutes while the max loss is on.
+
+## Thirteenth round: the $50K evaluation, 1 to 10 contracts
+
+Take Profit Trader's $50K Test as reviews describe it: a $3,000 target, a $2,000 end-of-day trailing drawdown (only the closing balance counts), the best day under half the profit, at least 5 trading days, up to 60 MNQ. Check the firm's own page before buying. The bot on a 5-minute chart with the $350 max loss per trade, prices at today's level, every start day from 2011. Each attempt gets 125 sessions, about six months.
+
+| Contracts ($350 max loss per trade) | Pass, 2011–2022 | Fail, 2011–2022 | Pass, 2023–2026 | Fail, 2023–2026 | Median sessions to pass |
+|---|---|---|---|---|---|
+| 1 | 42% | 25% | 46% | 23% | 63–85 |
+| 2 | 48% | 47% | 60% | 35% | 40–57 |
+| 3 | 38% | 60% | 39% | 53% | 27–34 |
+| 5 | 32% | 67% | 32% | 65% | 22–31 |
+| 10 | 20% | 79% | 17% | 82% | 21–45 |
+
+The rest of the attempts were still open after 125 sessions. **2 contracts gave the best odds**: about half the attempts passed, in two to three months. 10 contracts passed fastest when it passed, but failed about 4 attempts in 5. Two things work against it. A losing stretch of 5 or 6 stopped trades at $350 each uses up the $2,000 drawdown. And $350 over 10 contracts is a $35 stop per contract, so normal wiggles stop trades out: it made about $13–16 a day per contract against about $22 at 1–3 contracts.
+
+So the bot is as ready for a $50K evaluation as it will get from this data. At 2 contracts, expect to pay for about two attempts per pass.
+
+## Fourteenth round: more trades a day
+
+Round five tested checking more often and narrowing the band, but with the paper's half-hour exit. The bot now exits on a resting stop and a max loss, so it was tested again. Variants: entry checks every 30, 15, 10 or 5 minutes, and a noise band 1.0, 0.8 or 0.6 times as wide. Twelve variants on 5-minute bars, 1 MNQ, $117 max loss, prices at today's level. The rules were fixed before running. A variant had to make at least 25% more trades a day, at least as much per day, and a t-stat no more than 0.3 lower. It had to do that in 2011–2018, then again in 2019–2022, and once more in 2023–2026 with a worst losing stretch no more than 20% larger.
+
+| Per contract, 2023–2026 | Trades a day | $ a day | t | Worst losing stretch |
+|---|---|---|---|---|
+| **Every 30 min, band 1.0 (the bot)** | **0.89** | **$23.32** | **2.48** | **$2,222** |
+| Every 30 min, band 0.8 | 1.12 | $18.00 | 1.79 | $3,145 |
+| Every 15 min, band 1.0 | 1.03 | $19.76 | 2.07 | $2,799 |
+| Every 10 min, band 1.0 | 1.12 | $14.69 | 1.64 | $5,450 |
+| Every 5 min, band 1.0 | 1.25 | $17.64 | 1.77 | $3,738 |
+| Every 5 min, band 0.6 | 2.13 | $4.67 | 0.39 | $10,755 |
+
+Only checks every 10 minutes passed 2011–2018. It failed 2019–2022: less per day, and a t-stat 0.35 lower. **Nothing replaces the bot.** Every extra entry is a weaker breakout than the half-hour ones, and in 2023–2026 every variant made less per day with a bigger losing stretch. The narrower bands looked good in 2019–2022 and fell apart after, which is the pattern of a lucky fit. The full table is in `research/more_trades.py`'s output.
+
 ## What this does and doesn't say
 
 - **It says** that the original sweep/breakout rules have no edge after realistic costs on 2023–2026 Nasdaq-100 data, and would very likely not pass a $25K evaluation. Of three published strategies, only noise-area momentum held up over 16 years, and even it fails most $25K evaluations.
@@ -450,6 +499,9 @@ python research/round8.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"         # volatili
 python research/round9.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"         # the resting-stop exit, account tiers
 python research/postmortem.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"     # why the trades lose; the buffered stop
 python research/dips.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"           # the worst days; protections; the cap sweep
+python research/timeframes.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"     # 5 vs 15 vs 30-minute charts
+python research/eval50k.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"        # the $50K evaluation, 1 to 10 MNQ
+python research/more_trades.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"    # more trades a day? (no)
 ```
 
 The raw data isn't stored in this repo.

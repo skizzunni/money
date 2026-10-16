@@ -106,8 +106,11 @@ MUTANTS = {
     "noise: max loss cap ignored": (
         "noise", "longStop = na(capL) ? lineStopL : math.max(lineStopL, capL)\n", "longStop = lineStopL\n"
     ),
-    "noise: today's P/L from the wrong baseline": (
-        "noise", "    todayPnl = strategy.netprofit - dayStartNet\n", "    todayPnl = strategy.netprofit\n"
+    "noise: trade log shows the entry time as the exit time": (
+        "noise", "stamp(strategy.closedtrades.exit_time(t))", "stamp(strategy.closedtrades.entry_time(t))"
+    ),
+    "noise: trade log oldest first": (
+        "noise", "            t = strategy.closedtrades - 1 - j\n", "            t = j\n"
     ),
     "noise: stop not moved with the line": (
         "noise", "    if strategy.position_size > 0 or longPlaced\n", "    if longPlaced\n"
