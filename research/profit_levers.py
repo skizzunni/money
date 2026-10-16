@@ -53,13 +53,17 @@ PERIODS = (("2011-2018", 2011, 2018), ("2019-2022", 2019, 2022), ("2023-2026", 2
 def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | None = None,
              target: float | None = None, cap_pts: float = CAP_PTS, target_on_fill_bar: bool = True,
              cap_on_fill_bar: bool = False, entry_delay: int = 0,
-             no_entry_checks: frozenset = frozenset()) -> pd.DataFrame:
+             no_entry_checks: frozenset = frozenset(), minutes: int = 5,
+             ratchet: bool = False) -> pd.DataFrame:
     """target: take profit this many noise units from the first fill (limit); cap_pts: max loss in points;
     target_on_fill_bar False: the limit works from the bar after the fill, as the Pine script places it;
     cap_on_fill_bar True: the max loss works on the fill bar too, measured from the expected fill (the signal
     close plus a tick), as a bracket order placed with the entry would (1 contract only);
     entry_delay: entries fill this many bars late (a slow trader), at that bar's open plus a tick;
-    no_entry_checks: check times (minutes after midnight, e.g. 930 for 15:30) that open no new trades."""
+    no_entry_checks: check times (minutes after midnight, e.g. 930 for 15:30) that open no new trades;
+    minutes: the bar length (1 or 5);
+    ratchet: the stop never moves away from price during a trade (a broker stop placed with the entry that is only ever
+    tightened), 1 contract."""
     checks = list(range(FIRST, LAST + 1, 30))
     kof = {m: j for j, m in enumerate(checks)}
     idx = bars.index.tz_convert(NY)
@@ -72,19 +76,21 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
     upper = lower = sigma = math.nan
     pos, fills, first_bar, pending, add_pending = 0, [], 0, 0, False
     best, armed = math.nan, False
+    held = math.nan  # with ratchet: the tightest stop so far in this trade
     est = math.nan  # the expected fill of a pending entry: the signal close plus a tick
     wait = 0  # bars still to wait before a pending entry fills (entry_delay)
     out = []
 
     def close(i, px, why):
-        nonlocal pos, fills, armed
+        nonlocal pos, fills, armed, held
         pnl = sum(pos * (px - e) * PV - FEE for e in fills)
         out.append((idx[first_bar], idx[i], pos, len(fills), pnl, why))
         pos, fills, armed = 0, [], False
+        held = math.nan
 
     for i in range(len(bars)):
         t_min = mins[i]
-        end = t_min + 5
+        end = t_min + minutes
         in_rth = t_min >= OPEN and end <= CLOSE
         if pending and wait > 0:
             wait -= 1
@@ -115,6 +121,10 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
                 cap = est - pos * cap_pts
                 if (pos > 0 and cap > stop) or (pos < 0 and cap < stop):
                     stop, why = cap, "cap"
+            if ratchet:
+                if first_bar == i or math.isnan(held):
+                    held = stop
+                stop = held = max(held, stop) if pos > 0 else min(held, stop)
             if first_bar == i:
                 hit = l[i] <= stop if pos > 0 else h[i] >= stop
                 px = (min(o[i], stop) if pos > 0 else max(o[i], stop)) - pos * TICK

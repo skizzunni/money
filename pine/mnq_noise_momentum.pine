@@ -15,6 +15,8 @@
 // Noise area for each half-hour mark = the day's open (and previous close) plus/minus the
 // average distance price has moved from the 09:30 open by that time over the last 14 sessions.
 //
+// v1.1, 2026-10-16: optional webhook orders (TradersPost), for prop firms that allow automation (Take Profit Trader
+// does not). Each minute of entry delay cost about 15-25% of the profit on 1-minute data (docs/RESULTS.md, round 35).
 // v1.0, 2026-10-16. Tested on two independent datasets (docs/RESULTS.md): Nasdaq-100 index 1-minute data
 // 2011-2026 and NQ futures 1-minute data 2015-2025. Per contract with $117 of room (the $350 max loss on 3 MNQ):
 // about $28 a day on the futures data, t = 5.7, 10 of 11 years positive, about a third of trades winners; it
@@ -25,7 +27,7 @@
 // max loss after the fill bar are checked once per bar, so a 30-minute chart sees them later than a trader would.
 // The rules are the same as the Python reference in mnqbot/noise.py.
 // ------------------------------------------------------------------
-strategy("MNQ Noise-Area Momentum v1.0", shorttitle = "Noise-Mom", overlay = true,
+strategy("MNQ Noise-Area Momentum v1.1", shorttitle = "Noise-Mom", overlay = true,
      initial_capital = 50000, currency = currency.USD,
      default_qty_type = strategy.fixed, default_qty_value = 1, pyramiding = 0,
      commission_type = strategy.commission.cash_per_contract, commission_value = 0.62,
@@ -70,6 +72,12 @@ showDash  = input.bool(true, "Show dashboard", group = grpV)
 showLog   = input.bool(true, "Show trade log", group = grpV,
      tooltip = "A table at the bottom right with every trade the bot took, newest first: the time it opened and closed (New York, month-day hour:minute), side and contracts, entry and exit prices, P/L after fees, and why it closed. The open trade, if any, is on top.")
 logRows   = input.int(10, "Trades in the log", minval = 1, maxval = 30, group = grpV)
+grpA = "Automation"
+hookMode = input.string("Off", "Webhook orders", options = ["Off", "TradersPost"], group = grpA,
+     tooltip = "TradersPost: every order this strategy fills also carries a TradersPost JSON message (entry with its stop and take-profit attached, and exit), so an alert can place the trades at your broker within seconds. Each minute of delay cost about 15-25% of the profit on 1-minute data (docs/RESULTS.md, round thirty-five). In this mode the stop only ever tightens during a trade, so the broker's stop, placed with the entry, is never tighter than the one on the chart; tested, it made the same money. Check your prop firm allows automation first: Take Profit Trader, Apex and others do not. Setup in docs/NOISE.md.")
+hookTicker = input.string("", "Contract for the webhook (blank = the chart's)", group = grpA,
+     tooltip = "The exact contract, e.g. MNQZ2026. Blank uses the contract behind the chart (MNQ1! -> the current front month). Update it at each quarterly roll if you type one in.")
+useHook = hookMode == "TradersPost"
 
 // ── Clock
 barMin  = int(timeframe.in_seconds() / 60)
@@ -81,6 +89,14 @@ isCheck = validTf and inRth and endMin >= FIRST_CHECK and endMin <= LAST_CHECK a
 
 hhmmText(int mins) => str.tostring(int(mins / 60)) + ":" + (mins % 60 < 10 ? "0" : "") + str.tostring(mins % 60)
 px(float x) => str.tostring(x, format.mintick)
+// ── Webhook messages (TradersPost JSON), sent with order fills when "Webhook orders" is on
+hookSym = hookTicker != "" ? hookTicker : na(syminfo.current_contract) ? syminfo.ticker : syminfo.current_contract
+jsonEntry(string action, float est, float stop, float tp) =>
+    '{"ticker": "' + hookSym + '", "action": "' + action + '", "orderType": "market", "quantity": ' + str.tostring(qty) + ', "price": ' + px(est) +
+         (na(stop) ? '' : ', "stopLoss": {"type": "stop", "stopPrice": ' + px(stop) + '}') +
+         (na(tp) ? '' : ', "takeProfit": {"limitPrice": ' + px(tp) + '}') + '}'
+jsonExit = '{"ticker": "' + hookSym + '", "action": "exit", "cancel": true}'
+hookExit = useHook ? jsonExit : ""
 usd(float x) => (x < 0 ? "-$" : "$") + str.tostring(math.abs(x), "#,##0.00")
 stamp(int t) => str.format_time(t, "MM-dd HH:mm", TZ)   // New York time, month-day hour:minute
 why(string c) => c == "Back inside" ? (useStop ? "stop at the line" : "back inside at a check") : c == "Max loss" ? "max loss stop" : c == "Target" ? "take profit" : c == "16:00 close" ? "16:00 close" : c == "Session ended" ? "session ended" : str.contains(c, "Reverse") ? "reversed" : c
@@ -114,13 +130,18 @@ lastTrade = strategy.closedtrades - 1
 lastWhy = strategy.closedtrades > 0 ? strategy.closedtrades.exit_comment(lastTrade) : ""
 stopFired = useStop and strategy.closedtrades > prevClosed and (lastWhy == "Back inside" or lastWhy == "Max loss" or lastWhy == "Target")
 if stopFired
+    side = strategy.closedtrades.size(lastTrade) > 0 ? "LONG" : "SHORT"
+    exitPx = px(strategy.closedtrades.exit_price(lastTrade))
     if lastWhy == "Target"
         mark("TARGET", strategy.closedtrades.size(lastTrade) < 0, color.teal)
-        lastSignal := "TARGET hit @ " + px(strategy.closedtrades.exit_price(lastTrade))
+        lastSignal := "TARGET hit @ " + exitPx
+        if useHook   // the order-fill alert carries the webhook message; this one is for your phone
+            alert("TARGET: the " + str.lower(side) + " reached the take-profit at " + exitPx + ". The webhook closed it.", alert.freq_once_per_bar_close)
     else
         mark("EXIT", strategy.closedtrades.size(lastTrade) < 0, color.gray)
-        lastSignal := "EXIT (" + (lastWhy == "Max loss" ? "max loss" : "line touched") + ") @ " +
-             px(strategy.closedtrades.exit_price(lastTrade))
+        lastSignal := "EXIT (" + (lastWhy == "Max loss" ? "max loss" : "line touched") + ") @ " + exitPx
+        if useHook
+            alert("EXIT " + side + ": price hit the stop at " + exitPx + ". The webhook closed it.", alert.freq_once_per_bar_close)
 
 // ── Today's baseline for the dashboard, taken at 09:30 before anything else happens this bar
 if tMin == RTH_OPEN
@@ -131,7 +152,7 @@ if tMin == RTH_OPEN
 if strategy.position_size != 0 and (not inRth or tMin == RTH_OPEN)
     mark("EXIT NOW", strategy.position_size < 0, color.orange)
     lastSignal := "EXIT NOW (session ended)"
-    strategy.close_all(comment = "Session ended", immediately = true)
+    strategy.close_all(comment = "Session ended", alert_message = hookExit, immediately = true)
     alert("EXIT NOW: the session ended with a position open. Close your MNQ position at market.", alert.freq_once_per_bar_close)
 
 // ── New day at the 09:30 bar
@@ -176,6 +197,8 @@ if isCheck and not na(dayOpen)
         whyS = bracketS < shortStopNow ? "your " + usd(maxLoss) + " max loss" : "just above the lower line"
         tpTextL = tpUnits > 0 ? ", take-profit limit " + px(estL * (1 + tpUnits * sig)) : ""
         tpTextS = tpUnits > 0 ? ", take-profit limit " + px(estS * (1 - tpUnits * sig)) : ""
+        tpL = useStop and tpUnits > 0 ? estL * (1 + tpUnits * sig) : na
+        tpS = useStop and tpUnits > 0 ? estS * (1 - tpUnits * sig) : na
         moveText = " If your fill is different, keep the same distances. At each half hour move the stop with the line (the dashboard shows it); the max loss never moves."
         holdLong = useStop ? "Bracket: stop " + px(bracketL) + " (" + whyL + ")" + tpTextL + ", for a fill near " + px(estL) + "." + moveText :
              "Hold until a half-hour check closes back below the upper line, or the 16:00 close."
@@ -187,39 +210,41 @@ if isCheck and not na(dayOpen)
         if not skipToday
             if not inPosStop and pos > 0 and close < ub
                 if close < lb and shortOk
-                    strategy.entry("Short", strategy.short, qty, comment = "Reverse short")
+                    strategy.entry("Short", strategy.short, qty, comment = "Reverse short", alert_message = useHook ? jsonEntry("sell", estS, na, na) : "")
                     mark("REVERSE\nSELL " + str.tostring(2 * qty), false, color.red)
                     lastSignal := "REVERSE to short " + hhmmText(endMin) + " @ " + px(close)
                     alert("REVERSE: exit the long and SELL " + str.tostring(qty) + " MNQ at market now. Price " + px(close) +
                          " is below the noise area (lower " + px(lb) + "). Next check " + nextCheck + ".", alert.freq_once_per_bar_close)
                 else
-                    strategy.close("Long", comment = "Back inside")
+                    strategy.close("Long", comment = "Back inside", alert_message = hookExit)
                     mark("EXIT", false, color.gray)
                     lastSignal := "EXIT long " + hhmmText(endMin) + " @ " + px(close)
                     alert("EXIT LONG at market now. Price " + px(close) + " closed back below the upper line (" + px(ub) +
                          "). Stay flat until the next signal.", alert.freq_once_per_bar_close)
             else if not inPosStop and pos < 0 and close > lb
                 if close > ub
-                    strategy.entry("Long", strategy.long, qty, comment = "Reverse long")
+                    strategy.entry("Long", strategy.long, qty, comment = "Reverse long", alert_message = useHook ? jsonEntry("buy", estL, na, na) : "")
                     mark("REVERSE\nBUY " + str.tostring(2 * qty), true, color.green)
                     lastSignal := "REVERSE to long " + hhmmText(endMin) + " @ " + px(close)
                     alert("REVERSE: exit the short and BUY " + str.tostring(qty) + " MNQ at market now. Price " + px(close) +
                          " is above the noise area (upper " + px(ub) + "). Next check " + nextCheck + ".", alert.freq_once_per_bar_close)
                 else
-                    strategy.close("Short", comment = "Back inside")
+                    strategy.close("Short", comment = "Back inside", alert_message = hookExit)
                     mark("EXIT", true, color.gray)
                     lastSignal := "EXIT short " + hhmmText(endMin) + " @ " + px(close)
                     alert("EXIT SHORT at market now. Price " + px(close) + " closed back above the lower line (" + px(lb) +
                          "). Stay flat until the next signal.", alert.freq_once_per_bar_close)
             else if pos == 0 and close > ub
-                strategy.entry("Long", strategy.long, qty, comment = "Above noise")
+                strategy.entry("Long", strategy.long, qty, comment = "Above noise",
+                     alert_message = useHook ? jsonEntry("buy", estL, useStop ? bracketL : na, tpL) : "")
                 longPlaced := true
                 mark("BUY " + str.tostring(qty) + " MNQ", true, color.green)
                 lastSignal := "BUY " + hhmmText(endMin) + " @ " + px(close)
                 alert("BUY " + str.tostring(qty) + " MNQ at market now. Price " + px(close) + " is above the noise area (upper " +
                      px(ub) + "). " + holdLong + " Next check " + nextCheck + ".", alert.freq_once_per_bar_close)
             else if pos == 0 and close < lb and shortOk
-                strategy.entry("Short", strategy.short, qty, comment = "Below noise")
+                strategy.entry("Short", strategy.short, qty, comment = "Below noise",
+                     alert_message = useHook ? jsonEntry("sell", estS, useStop ? bracketS : na, tpS) : "")
                 shortPlaced := true
                 mark("SELL " + str.tostring(qty) + " MNQ", false, color.red)
                 lastSignal := "SELL " + hhmmText(endMin) + " @ " + px(close)
@@ -238,18 +263,35 @@ longStop = na(capL) ? lineStopL : math.max(lineStopL, capL)
 shortStop = na(capS) ? lineStopS : math.min(lineStopS, capS)
 longWhy = not na(capL) and capL > lineStopL ? "Max loss" : "Back inside"
 shortWhy = not na(capS) and capS < lineStopS ? "Max loss" : "Back inside"
+// Webhook mode: the broker holds the stop placed with the entry and the strategy can't move it, so here the stop only
+// ever tightens (an exit message closes the trade when the chart's tighter stop fills). Same money in the tests.
+var float heldL = na
+var float heldS = na
+var string heldWhyL = ""
+var string heldWhyS = ""
+if useHook and useStop
+    if strategy.position_size > 0 and not na(heldL) and heldL > longStop
+        longStop := heldL
+        longWhy := heldWhyL
+    if strategy.position_size < 0 and not na(heldS) and heldS < shortStop
+        shortStop := heldS
+        shortWhy := heldWhyS
+    heldL := strategy.position_size > 0 or longPlaced ? longStop : na
+    heldS := strategy.position_size < 0 or shortPlaced ? shortStop : na
+    heldWhyL := longWhy
+    heldWhyS := shortWhy
 // The take-profit limit: tpUnits noise units past the fill. It needs the fill price, so it starts the bar after the fill.
 longTp = strategy.position_size > 0 and tpUnits > 0 ? strategy.position_avg_price * (1 + tpUnits * sig) : na
 shortTp = strategy.position_size < 0 and tpUnits > 0 ? strategy.position_avg_price * (1 - tpUnits * sig) : na
 if useStop and inRth and not na(ub)
     if strategy.position_size > 0 or longPlaced
         strategy.exit("Long exit", "Long", stop = longStop, limit = longTp, comment_loss = longWhy, comment_profit = "Target",
-             alert_loss = "EXIT LONG: price hit the stop at " + px(longStop) + ". Your stop should have filled. If you had no stop in, exit at market now.",
-             alert_profit = "TARGET: the long reached the take-profit at " + px(nz(longTp)) + ". Your limit should have filled. If not, exit at market now.")
+             alert_loss = useHook ? jsonExit : "EXIT LONG: price hit the stop at " + px(longStop) + ". Your stop should have filled. If you had no stop in, exit at market now.",
+             alert_profit = useHook ? jsonExit : "TARGET: the long reached the take-profit at " + px(nz(longTp)) + ". Your limit should have filled. If not, exit at market now.")
     if strategy.position_size < 0 or shortPlaced
         strategy.exit("Short exit", "Short", stop = shortStop, limit = shortTp, comment_loss = shortWhy, comment_profit = "Target",
-             alert_loss = "EXIT SHORT: price hit the stop at " + px(shortStop) + ". Your stop should have filled. If you had no stop in, exit at market now.",
-             alert_profit = "TARGET: the short reached the take-profit at " + px(nz(shortTp)) + ". Your limit should have filled. If not, exit at market now.")
+             alert_loss = useHook ? jsonExit : "EXIT SHORT: price hit the stop at " + px(shortStop) + ". Your stop should have filled. If you had no stop in, exit at market now.",
+             alert_profit = useHook ? jsonExit : "TARGET: the short reached the take-profit at " + px(nz(shortTp)) + ". Your limit should have filled. If not, exit at market now.")
 
 nextText = not inRth or endMin >= LAST_CHECK ? "10:00 next session" : endMin < FIRST_CHECK ? "10:00" : hhmmText(endMin - (endMin - FIRST_CHECK) % 30 + 30)
 
@@ -258,7 +300,7 @@ if inRth and endMin == RTH_CLOSE
     if strategy.position_size != 0
         mark("FLAT", strategy.position_size < 0, color.gray)
         lastSignal := "FLAT 16:00 @ " + px(close)
-        strategy.close_all(comment = "16:00 close", immediately = true)
+        strategy.close_all(comment = "16:00 close", alert_message = hookExit, immediately = true)
         alert("FLAT: close your MNQ position at market now (16:00 close).", alert.freq_once_per_bar_close)
     if not na(dayOpen)
         complete = true
@@ -285,7 +327,7 @@ if showDash and (barstate.islastconfirmedhistory or barstate.isrealtime)
     closed = strategy.closedtrades
     todayPnlDash = strategy.netprofit - dayStartNet
     wins = strategy.wintrades
-    table.cell(dash, 0, 0, "MNQ Noise Momentum v1.0", text_color = color.white, text_size = size.small)
+    table.cell(dash, 0, 0, "MNQ Noise Momentum v1.1", text_color = color.white, text_size = size.small)
     table.cell(dash, 1, 0, status, text_color = statusColor, text_size = size.small)
     table.cell(dash, 0, 1, "Sessions of history", text_color = color.silver, text_size = size.small)
     table.cell(dash, 1, 1, str.tostring(math.min(filled, lookback)) + " / " + str.tostring(lookback), text_color = color.white, text_size = size.small)
@@ -298,7 +340,7 @@ if showDash and (barstate.islastconfirmedhistory or barstate.isrealtime)
     table.cell(dash, 0, 6, "Last signal", text_color = color.silver, text_size = size.small)
     table.cell(dash, 1, 6, lastSignal, text_color = color.white, text_size = size.small)
     table.cell(dash, 0, 7, "Exit rule", text_color = color.silver, text_size = size.small)
-    table.cell(dash, 1, 7, useStop ? "stop " + str.tostring(stopBuf) + " noise units past the line" : "half-hour check", text_color = color.white, text_size = size.small)
+    table.cell(dash, 1, 7, (useStop ? "stop " + str.tostring(stopBuf) + " noise units past the line" : "half-hour check") + (useHook ? "; webhook orders on (" + hookSym + ")" : ""), text_color = color.white, text_size = size.small)
     tpNow = pos > 0 ? longTp : pos < 0 ? shortTp : na
     table.cell(dash, 0, 8, "Your stop / target", text_color = color.silver, text_size = size.small)
     table.cell(dash, 1, 8, not useStop or pos == 0 ? "-" : px(pos > 0 ? longStop : shortStop) + " / " + (na(tpNow) ? "-" : px(tpNow)),

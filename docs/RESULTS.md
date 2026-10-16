@@ -847,6 +847,24 @@ A 15:30 entry has 25 minutes to pay before the 16:00 exit; a 10:00 entry is judg
 
 **Nothing passed; the idea was wrong.** By entry time, 2011–2022, the 10:00 entries are the bot's best (722 trades, $30.98 each, the largest total of any check) and the 15:30 entries pay $23.48 each. The weak ones are midday: 13:00 (198 trades, −$10.93 each) and 14:00 ($1.37). With twelve check times, one or two looking bad is what chance produces, and none of these differences is large next to the spread of single trades, so the midday checks stay too.
 
+## Thirty-fifth round: what each minute of delay costs
+
+The stress tests found a 5-minute-late entry roughly halves the profit. This round measures it minute by minute, on 1-minute bars of both datasets ([`research/delay.py`](../research/delay.py)). Entries fill at the open of the first minute after the check (what an automated order gets), or 1, 2, 3 or 5 minutes later, with the max loss then measured from the real fill. Everything else is the bot as it trades. The 1-minute simulation matches the reference engine trade for trade (306 of 306 trades on NQ 2019, same P/L to the cent). The rule, fixed before running: build automation if 1–3 minutes of delay cost 15% or more.
+
+| $ per day per contract, % of on time | Index 2011–26, $117 | Index, $35 | NQ futures 2015–25, $117 | NQ futures, $35 |
+|---|---|---|---|---|
+| On time (automated) | $26.31 (100%) | $12.82 (100%) | $29.02 (100%) | $11.96 (100%) |
+| 1 minute late | $20.27 (77%) | $11.21 (87%) | $24.79 (85%) | $9.06 (76%) |
+| 2 minutes late | $17.96 (68%) | $8.46 (66%) | $20.83 (72%) | $7.85 (66%) |
+| 3 minutes late | $15.91 (60%) | $8.84 (69%) | $15.54 (54%) | $4.49 (38%) |
+| 5 minutes late | $14.03 (53%) | $3.99 (31%) | $17.10 (59%) | $2.55 (21%) |
+| *5-minute bars, on time (the TradingView backtest)* | *$25.11 (95%)* | *$12.30 (96%)* | *$27.94 (96%)* | *$11.82 (99%)* |
+
+- **Each minute late costs about 15–25% of the profit.** The breakout pays most in the minutes right after the check, and a late entry also starts further from the line, so its stop is closer and fills more often. At $35 a contract (the $350 over 10 MNQ) three minutes late leaves about 40–70%.
+- **The 5-minute backtest is not flattered by its bar length.** On 1-minute bars, where stops and targets are resolved minute by minute, the same rules make 1–5% more than on 5-minute bars.
+- **So automation passes the bar.** But the firm decides: Take Profit Trader's Universal Trading Policies (help center, updated 9 October 2026) say *"Automated trading systems, bots, or algorithmic execution tools are not permitted."* By a 28-firm review of official help pages (prop-memo.com, 21 September 2026), Apex now bans automation too, while Lucid Trading, MyFundedFutures, FundedNext Futures and FTMO Futures allow it in writing, and Tradeify, Bulenox and Topstep allow self-built bots with conditions. Check the firm's own rules before buying.
+- **Webhook mode (v1.1).** For a firm that allows it, the script can now send each order as a TradersPost message with the bracket attached. The broker holds the stop placed with the entry and the strategy can't move it, so in this mode the stop only ever tightens, and an exit message closes the trade when the chart's tighter stop fills. Tested against the moving stop before building it: NQ futures 2015–2025 at $117, $27.10 a day against $27.94, t-stat 5.61 against 5.72, worst losing stretch $4,174 against $4,222; index 2011–2026, $25.07 against $25.11. At $35: $11.74 against $11.82 and $12.31 against $12.30. On real MNQ 5-minute bars from Yahoo, 21 September to midday 16 October 2026, the same trades and winners and slightly more money: +$12,555 against +$12,313 at 10 MNQ and $350, +$6,731 against +$6,662 at 3 MNQ. The same money.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
@@ -913,6 +931,7 @@ python research/nq_volume.py path/to/nq_parquet_dir                    # real NQ
 python research/stress.py nsx_5m_scaled.pkl nq_5m_scaled.pkl           # stress tests of version 1.0
 python research/pullback.py nsx_5m_scaled.pkl                          # limit entry on the bounce (no)
 python research/check_times.py nsx_5m_scaled.pkl nq_5m_scaled.pkl      # skip the first or last checks (no)
+python research/delay.py nsx_1m_scaled.pkl nq_1m_scaled.pkl            # each minute of entry delay, 1-minute bars
 ```
 
 The raw data isn't stored in this repo.

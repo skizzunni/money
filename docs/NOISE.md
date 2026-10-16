@@ -98,7 +98,23 @@ The label sits on the half-hour candle that just closed, the moment the alert fi
 | TradingView Paper Trading | The **BUY / SELL** buttons on the chart, or the Trading Panel. Use market, 1 contract. |
 | Take Profit Trader evaluation or funded account (Tradovate) | In the Tradovate app. Or connect Tradovate in TradingView's Trading Panel and use the chart's BUY / SELL buttons on that account. |
 
-**Automatic orders** are possible: a webhook from the alert to a service such as TradersPost, which places the order on Tradovate. Webhooks need a paid TradingView plan, and prop firms set their own rules on automated trading, so check Take Profit Trader's rules before you try it. Doing it by hand is the safe default.
+**Speed is worth money.** On 1-minute data, each minute between the alert and your fill cost about 15–25% of the profit, and three minutes late left about half ([RESULTS.md](RESULTS.md), round thirty-five). By hand, have the order ticket open before each half hour with the size and bracket distances set, and send it as soon as the alert lands.
+
+**Automatic orders (webhook mode, v1.1).** First check your prop firm allows automation. **Take Profit Trader does not**: its Universal Trading Policies say *"Automated trading systems, bots, or algorithmic execution tools are not permitted."* Apex bans it too. Lucid Trading, MyFundedFutures, FundedNext Futures and FTMO Futures allow it in writing (September–October 2026; rules change, so read the firm's own page before you buy). Where it is allowed:
+
+1. Get a TradersPost account and connect your Tradovate account (the firm's login). In the TradersPost strategy subscription, turn on **Use signal quantity**, **Use signal stop loss** and **Use signal take profit**, and allow the ticker MNQ.
+2. In the script's settings, **Automation → Webhook orders: TradersPost**. Leave the contract blank to use the one behind the chart, or type the exact one (e.g. `MNQZ2026`) and change it at each quarterly roll.
+3. Create an alert: **Condition** *Noise-Mom*, **Order fills only**; **Message** exactly `{{strategy.order.alert_message}}`; **Notifications → Webhook URL** your TradersPost URL. Webhooks need a paid TradingView plan.
+4. For your phone, create a second alert with **alert() function calls only** and *Notify in app*. It sends the usual instructions, plus a line when a stop or target fills.
+
+What the webhook sends, each time the strategy fills an order on the chart:
+
+| When | Message |
+|---|---|
+| An entry fills | `{"ticker": "MNQZ2026", "action": "buy", "orderType": "market", "quantity": 10, "price": 25080.25, "stopLoss": {"type": "stop", "stopPrice": 25062.75}, "takeProfit": {"limitPrice": 25190.50}}` (`sell` for a short): a market order with its stop and take-profit attached, the same bracket the text alert names. |
+| A stop, the take-profit, 16:00 or a session end closes the trade | `{"ticker": "MNQZ2026", "action": "exit", "cancel": true}`: close at market and cancel the bracket. If the broker's own stop or take-profit already filled, there is nothing left to close. |
+
+In webhook mode the stop **only ever tightens** during a trade, because the broker holds the stop placed with the entry and the script can't move it. When the line moves closer to price, the chart's stop fills first and the exit message closes the trade. Tested both ways: the same money ([RESULTS.md](RESULTS.md), round thirty-five). Watch the first few trades on the TradersPost *Signals* page and in Tradovate, and keep the phone alert on.
 
 | Alert starts with | Do this |
 |---|---|

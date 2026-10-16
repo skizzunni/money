@@ -90,8 +90,9 @@ class PineRuntime:
 
     def __init__(self, tree, bars, inputs: dict | None = None, mintick=0.25, pointvalue=2.0,
                  timeframe_seconds=300, timenow_ms: int | None = None, commission=0.62, slippage_ticks=1,
-                 limit_fill_ticks=1):
+                 limit_fill_ticks=1, current_contract=NA):
         self.tree = tree
+        self.current_contract = current_contract  # syminfo.current_contract: na unless the chart is a continuous future
         self.inputs = dict(inputs or {})
         self.used_inputs: set[str] = set()
         self.n = len(bars)
@@ -512,14 +513,15 @@ class PineRuntime:
             "input": Namespace("input", int=self._input, float=self._input, bool=self._input,
                                string=self._input, session=self._input),
             "math": Namespace("math", max=nmax, min=nmin, floor=floor, abs=abs),
-            "str": Namespace("str", tostring=tostring, upper=str.upper, startswith=str.startswith,
+            "str": Namespace("str", tostring=tostring, upper=str.upper, lower=str.lower, startswith=str.startswith,
                              contains=lambda source, sub: sub in source, format_time=format_time),
             "ta": Namespace("ta", atr=self._atr),
             "array": Namespace("array", new=array_new, push=lambda a, v: a.append(v), size=len,
                                new_float=array_new_float, get=array_get, set=array_set),
             "int": to_int,
             "nz": lambda x, replacement=0.0: replacement if is_na(x) else x,
-            "syminfo": Namespace("syminfo", mintick=self.mintick, pointvalue=self.pointvalue),
+            "syminfo": Namespace("syminfo", mintick=self.mintick, pointvalue=self.pointvalue, ticker="MNQ1!",
+                                 current_contract=self.current_contract),
             "timeframe": Namespace("timeframe", period=str(self.tf_seconds // 60),
                                    in_seconds=lambda tf=None: rt.tf_seconds),
             "barstate": _Barstate(self),
@@ -624,19 +626,20 @@ class StrategyEmulator:
         return _OpenTrades(self)
 
     # ---- order calls
-    def entry(self, id, direction, qty=None, limit=None, comment=None, **kw):
+    def entry(self, id, direction, qty=None, limit=None, comment=None, alert_message=None, **kw):
         d = 1 if direction == self.long else -1
-        order = {"dir": d, "qty": int(qty), "limit": limit, "bar": self.rt.i, "comment": comment}
+        order = {"dir": d, "qty": int(qty), "limit": limit, "bar": self.rt.i, "comment": comment,
+                 "alert": alert_message}
         if limit is None:
             self.market_entries[id] = order
         else:
             self.entries[id] = order
         self.orders.append({"bar": self.rt.i, "dir": d, "qty": int(qty), "limit": limit})
 
-    def close(self, id, comment=None, immediately=False, **kw):
+    def close(self, id, comment=None, immediately=False, alert_message=None, **kw):
         if immediately:
             raise PineError("strategy.close with immediately=true is not emulated")
-        self.market_close = {"id": id, "bar": self.rt.i, "comment": comment}
+        self.market_close = {"id": id, "bar": self.rt.i, "comment": comment, "alert": alert_message}
 
     def exit(self, id, from_entry, stop=None, limit=None, comment=None, comment_loss=None, comment_profit=None,
              alert_message=None, alert_loss=None, alert_profit=None, **kw):
@@ -647,13 +650,19 @@ class StrategyEmulator:
     def cancel(self, id):
         self.entries.pop(id, None)
 
-    def close_all(self, comment=None, immediately=False, **kw):
+    def close_all(self, comment=None, immediately=False, alert_message=None, **kw):
         if not immediately:
             raise PineError("close_all without immediately=true is not emulated")
         if self.pos is not None:
             c = self.rt.series["close"][self.rt.i]
             tick = self.rt.mintick
             self._close(c - self.slip_ticks * tick if self.pos["dir"] > 0 else c + self.slip_ticks * tick, comment)
+            self._fill_alert(self.rt.i, alert_message)
+
+    def _fill_alert(self, i, msg):
+        """An order-fill alert: the order's alert_message, sent when it fills (empty: the alert dialog's text)."""
+        if msg and not is_na(msg):
+            self.rt.alerts.append((i, msg))
 
     # ---- bar processing (before the script runs on the bar)
     def _close(self, price, reason):
@@ -672,6 +681,7 @@ class StrategyEmulator:
         mc, self.market_close = self.market_close, None
         if mc is not None and mc["bar"] < i and self.pos is not None and self.pos["id"] == mc["id"]:
             self._close(o - self.pos["dir"] * slip, mc["comment"])
+            self._fill_alert(i, mc.get("alert"))
         for oid, e in list(self.market_entries.items()):
             if e["bar"] >= i:
                 continue
@@ -681,6 +691,7 @@ class StrategyEmulator:
             if self.pos is None:
                 self.pos = {"id": oid, "dir": e["dir"], "qty": e["qty"], "price": o + e["dir"] * slip, "bar": i,
                             "market": True}
+                self._fill_alert(i, e.get("alert"))
         if self.pos is None:
             for oid, e in list(self.entries.items()):
                 if e["bar"] >= i:
@@ -688,6 +699,7 @@ class StrategyEmulator:
                 d = e["dir"]
                 if (d < 0 and h >= e["limit"] + thru) or (d > 0 and l <= e["limit"] - thru):
                     self.pos = {"id": oid, "dir": d, "qty": e["qty"], "price": e["limit"], "bar": i}
+                    self._fill_alert(i, e.get("alert"))
                     del self.entries[oid]
                     break
         if self.pos is None:

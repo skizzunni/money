@@ -76,6 +76,7 @@ class NoiseConfig:
     fed_dates: str = FED_DATES  # "YYYY-MM-DD,..." scheduled Fed announcement days
     fed_no_shorts: bool = True  # on those days, no short entries before 14:00 (round twenty-four)
     take_profit: float = 1.5  # noise units from the entry fill for a take-profit limit, stop mode only; 0 = off
+    tighten_only: bool = False  # webhook mode: in a trade the stop never moves away from the price (round thirty-five)
 
 
 @dataclass
@@ -97,6 +98,8 @@ class NoiseResult:
     trades: list[NoiseTrade]
     events: list[tuple[int, str]]  # (bar, action) for every alert: BUY, SELL, EXIT, TARGET, REVERSE, FLAT
     bands: list[tuple[int, float, float]] = field(default_factory=list)  # (check bar, upper, lower)
+    # (signal bar, direction, expected fill, stop, take-profit) for every entry: the bracket sent with it (nan: none)
+    orders: list[tuple[int, int, float, float, float]] = field(default_factory=list)
 
     def trades_frame(self) -> pd.DataFrame:
         return pd.DataFrame([t.__dict__ for t in self.trades])
@@ -130,20 +133,22 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
     pos = 0
     entry_px, entry_bar = 0.0, 0
     est_px = math.nan  # expected fill of the pending entry
+    held, held_why = math.nan, ""  # tighten_only: the tightest stop so far in this trade, and what set it
     pending: tuple[str, int] | None = None  # ("entry", direction) or ("close", 0), filled at the next open
     trades: list[NoiseTrade] = []
     events: list[tuple[int, str]] = []
     bands: list[tuple[int, float, float]] = []
+    orders: list[tuple[int, int, float, float, float]] = []
 
     def open_pos(i: int, d: int) -> None:
         nonlocal pos, entry_px, entry_bar
         pos, entry_px, entry_bar = d, o[i] + d * slip, i
 
     def close_pos(i: int, price: float, reason: str) -> None:
-        nonlocal pos
+        nonlocal pos, held
         pnl = pos * (price - entry_px) * cfg.qty * cfg.point_value - 2 * cfg.commission_per_side * cfg.qty
         trades.append(NoiseTrade(pos, cfg.qty, entry_bar, idx[entry_bar], entry_px, i, idx[i], price, reason, pnl))
-        pos = 0
+        pos, held = 0, math.nan
 
     for i in range(len(bars)):
         t = idx[i]
@@ -174,6 +179,10 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                 cap = base - pos * cfg.max_loss_per_trade / cfg.qty / cfg.point_value
                 if (pos > 0 and cap > line) or (pos < 0 and cap < line):
                     line, reason = cap, "Max loss"
+            if cfg.tighten_only:  # the broker's stop is placed with the entry and only ever tightened
+                if entry_bar != i and ((pos > 0 and held > line) or (pos < 0 and held < line)):
+                    line, reason = held, held_why
+                held, held_why = line, reason
             if entry_bar == i:  # a stop attached to the entry can fill on the fill bar itself
                 hit = l[i] <= line if pos > 0 else h[i] >= line
                 price = (min(o[i], line) if pos > 0 else max(o[i], line)) - pos * slip
@@ -235,7 +244,17 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                     pending = ("entry", -1)
                     events.append((i, "SELL"))
                 if pending is not None and pending[0] == "entry":
-                    est_px = c[i] + pending[1] * slip  # the expected fill, for the max loss on the fill bar
+                    d = pending[1]
+                    est_px = c[i] + d * slip  # the expected fill, for the max loss on the fill bar
+                    stop = tp = math.nan
+                    if use_stop:  # the bracket: the closer of the line stop and the max loss, and the take-profit
+                        stop = upper * (1 - cfg.stop_buffer * sigma) if d > 0 else lower * (1 + cfg.stop_buffer * sigma)
+                        if cfg.max_loss_per_trade > 0:
+                            cap = est_px - d * cfg.max_loss_per_trade / cfg.qty / cfg.point_value
+                            stop = max(stop, cap) if d > 0 else min(stop, cap)
+                        if cfg.take_profit > 0:
+                            tp = est_px * (1 + d * cfg.take_profit * sigma)
+                    orders.append((i, d, est_px, stop, tp))
 
         if in_rth and end == RTH_CLOSE:
             if pos:
@@ -247,4 +266,4 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                 filled += 1
             day_open = math.nan
 
-    return NoiseResult(trades, events, bands)
+    return NoiseResult(trades, events, bands, orders)

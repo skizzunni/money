@@ -130,6 +130,25 @@ MUTANTS = {
     "noise: Fed rule also blocks reversals after 14:00": (
         "noise", "        shortOk = not (fedToday and endMin < FED_CUTOFF)", "        shortOk = not fedToday"
     ),
+    "noise: webhook stop loosens with the line": (
+        "noise", "    if strategy.position_size > 0 and not na(heldL) and heldL > longStop\n", "    if false\n"
+    ),
+    "noise: webhook entry sent without its stop": (
+        "noise", "jsonEntry(\"buy\", estL, useStop ? bracketL : na, tpL)", "jsonEntry(\"buy\", estL, na, tpL)"
+    ),
+    "noise: webhook take-profit from the line": (
+        "noise", "tpL = useStop and tpUnits > 0 ? estL * (1 + tpUnits * sig) : na",
+        "tpL = useStop and tpUnits > 0 ? ub * (1 + tpUnits * sig) : na"
+    ),
+    "noise: no webhook exit when the stop fills": (
+        "noise", "alert_loss = useHook ? jsonExit : \"EXIT LONG", "alert_loss = useHook ? \"\" : \"EXIT LONG"
+    ),
+    "noise: webhook messages with webhooks off": (
+        "noise", "hookExit = useHook ? jsonExit : \"\"", "hookExit = jsonExit"
+    ),
+    "noise: webhook contract input ignored": (
+        "noise", "hookSym = hookTicker != \"\" ? hookTicker :", "hookSym = false ? hookTicker :"
+    ),
     "noise: open position kept into the next session": (
         "noise", "(not inRth or tMin == RTH_OPEN)", "not inRth"
     ),
@@ -149,6 +168,7 @@ def _tests(T, script):
             ("max loss cap", N.test_pine_max_loss_cap),
             ("Fed day", N.test_pine_fed_day),
             ("take profit", N.test_pine_take_profit),
+            ("webhooks", N.test_pine_webhooks),
         ] + [(f"random {mins}m [{mode}]", lambda mi=mins, mo=mode: N.test_pine_random_sessions(mi, mo))
              for mins, mode in N.RANDOM_CASES] + [
             ("RTH-only chart", N.test_pine_rth_only_chart_and_shorter_lookback),

@@ -5,6 +5,7 @@ so on the next session the noise area is open (= previous close) * (1 +/- 0.001)
 """
 from __future__ import annotations
 
+import json
 import math
 import random
 from pathlib import Path
@@ -394,12 +395,13 @@ def run_pine(bars, inputs=None, minutes=5):
     rt.run(on_bar)
     trades = [(t["entry_bar"], t["exit_bar"], t["dir"], round(t["entry"], 6), round(t["exit"], 6),
                round(t["pnl"], 6), t["reason"]) for t in rt.strategy.closed]
-    events = [(i, msg.split()[0].rstrip(":")) for i, msg in rt.alerts]
+    hooks = [(i, msg) for i, msg in rt.alerts if msg.startswith("{")]  # webhook messages, sent with order fills
+    events = [(i, msg.split()[0].rstrip(":")) for i, msg in rt.alerts if not msg.startswith("{")]
     labels = [(i, text.split()[0]) for i, text in rt.labels]
     assert labels == events, "every alert has a matching label on the chart"
     logs = [t for t in rt.tables if t.columns == 7]
     assert len(logs) == 1, "one trade-log table"
-    return trades, events, {i: (u, lo) for i, u, lo in bands}, logs[0].grid()
+    return trades, events, {i: (u, lo) for i, u, lo in bands}, logs[0].grid(), hooks
 
 
 LOG_HEADER = ["Opened (NY)", "Side", "Entry", "Closed (NY)", "Exit", "P/L", "Why"]
@@ -431,9 +433,12 @@ def assert_trade_log(log, res, exit_mode, rows=10):
 
 
 def assert_parity(bars, minutes=5, lookback=14, skip_dates=None, exit_mode="stop", stop_buffer=None, qty=1,
-                  max_loss=None, fed_dates=None, fed_no_shorts=None, take_profit=None):
+                  max_loss=None, fed_dates=None, fed_no_shorts=None, take_profit=None, hook=None):
     cfg = NoiseConfig(lookback=lookback, exit_mode=exit_mode, qty=qty)
     inputs = {"Sessions in the noise average": lookback}
+    if hook is not None:  # webhook orders on, for this contract
+        inputs["Webhook orders"], inputs["Contract for the webhook (blank = the chart's)"] = "TradersPost", hook
+        cfg.tighten_only = True
     inputs["Exit"] = "Resting stop at the line" if exit_mode == "stop" else "Half-hour check"
     inputs["Contracts"] = qty  # the script's default is 10; the reference's is 1
     if take_profit is not None:
@@ -449,13 +454,49 @@ def assert_parity(bars, minutes=5, lookback=14, skip_dates=None, exit_mode="stop
     if fed_no_shorts is not None:
         cfg.fed_no_shorts = inputs["Fed days: no shorts before 14:00"] = fed_no_shorts
     res = run(bars, cfg, minutes=minutes)
-    trades, events, pine_bands, log = run_pine(bars, inputs, minutes)
+    trades, events, pine_bands, log, hooks = run_pine(bars, inputs, minutes)
     assert trades == trades_of(res)
     assert events == res.events
     for i, u, lo in res.bands:
         assert pine_bands[i] == (u, lo)
     assert_trade_log(log, res, exit_mode)
+    if hook is None:
+        assert hooks == [], "no webhook messages unless webhook orders are on"
+    else:
+        assert_webhooks(hooks, res, hook or "MNQ1!", qty)
     return res
+
+
+def assert_webhooks(hooks, res, ticker, qty):
+    """With webhook orders on, every fill sends one TradersPost message: an entry (with the bracket the reference
+    computed at the signal) when an entry fills, and an exit (cancelling the bracket) when a trade closes. A reversal
+    is one buy/sell message, which TradersPost reads as close and reverse."""
+    got = [(i, json.loads(m)) for i, m in hooks]  # every message is valid JSON
+    orders = {o[0] + 1: o for o in res.orders}  # fill bar -> the order sent at the signal
+    want = []
+    for t in res.trades:
+        _, d, est, stop, tp = orders[t.entry_bar]
+        assert d == t.direction
+        msg = {"ticker": ticker, "action": "buy" if d > 0 else "sell", "orderType": "market", "quantity": qty,
+               "price": est}
+        if not math.isnan(stop):
+            msg["stopLoss"] = {"type": "stop", "stopPrice": stop}
+        if not math.isnan(tp):
+            msg["takeProfit"] = {"limitPrice": tp}
+        want.append((t.entry_bar, msg))
+        if t.reason != "reversed":
+            want.append((t.exit_bar, {"ticker": ticker, "action": "exit", "cancel": True}))
+    want.sort(key=lambda x: x[0])  # stable: an entry before an exit on the same bar
+    assert len(got) == len(want)
+    for (gi, g), (wi, w) in zip(got, want, strict=True):
+        assert gi == wi, (gi, g, wi, w)
+        assert g.keys() == w.keys() and g["ticker"] == w["ticker"] and g["action"] == w["action"], (g, w)
+        if "price" in w:
+            assert g["orderType"] == "market" and g["quantity"] == w["quantity"]
+            assert g["price"] == pytest.approx(w["price"], abs=0.005)
+        for k, field in (("stopLoss", "stopPrice"), ("takeProfit", "limitPrice")):
+            if k in w:
+                assert g[k][field] == pytest.approx(w[k][field], abs=0.005), (k, g, w)
 
 
 HAND_BUILT = {
@@ -514,6 +555,37 @@ def test_pine_take_profit():
     assert assert_parity(with_high(bars, bar(14, 8), tp)).trades[0].reason == "16:00 close"
     res = assert_parity(synth_bars(sessions=90, seed=5))
     assert sum(t.reason == "Target" for t in res.trades) >= 3, "the random sessions reach the target too"
+
+
+def test_tighten_only_stop_never_loosens():
+    """Webhook mode: the stop is the tightest one so far in the trade. Over random sessions it exits some trades
+    earlier than the moving line would (so it is exercised), and never later."""
+    bars = synth_bars(sessions=120, seed=3)
+    base, held = (run(bars, NoiseConfig(tighten_only=t, skip_dates="")) for t in (False, True))
+    a = {t.entry_bar: t for t in base.trades}
+    earlier = 0
+    for t in held.trades:
+        b = a.get(t.entry_bar)
+        if b is None:
+            continue  # the trades diverged after an earlier exit
+        assert t.exit_bar <= b.exit_bar
+        earlier += t.exit_bar < b.exit_bar
+    assert earlier >= 1
+
+
+@pytest.mark.slow
+def test_pine_webhooks():
+    bars, p = scenario(above_all_day)
+    tp = (p * 1.002 + 0.25) * (1 + 1.5 * 0.001)
+    assert assert_parity(bars, hook="MNQZ2026").trades[0].reason == "16:00 close"
+    assert assert_parity(with_high(bars, bar(14, 8), tp + 0.25), hook="").trades[0].reason == "Target"
+    stopped = with_low(bars, bar(14, 8), P0 * 1.001 ** 14 * 1.0005)
+    assert assert_parity(stopped, hook="MNQZ2026", max_loss=0).trades[0].reason == "Back inside"
+    bars, _ = scenario(above_then_below)
+    res = assert_parity(bars, hook="MNQZ2026", exit_mode="check")
+    assert [t.reason for t in res.trades[:1]] == ["reversed"]
+    res = assert_parity(synth_bars(sessions=120, seed=3), hook="MNQZ2026", qty=10, max_loss=1166.67)
+    assert {"Back inside", "Max loss", "Target"} <= {t.reason for t in res.trades}
 
 
 @pytest.mark.slow
@@ -632,7 +704,7 @@ STRESS_CASES = list(range(40))
 
 @pytest.mark.slow
 @pytest.mark.parametrize("i", STRESS_CASES)
-def test_pine_stress(i):
+def test_pine_stress(i, hook=None):
     """The Pine script and the reference agree trade for trade, alert for alert and on every trade-log row, on a
     harsh market with random settings."""
     c = stress_case(i)
@@ -647,8 +719,15 @@ def test_pine_stress(i):
     exit_mode, buf = MODES[c["mode"]]
     res = assert_parity(bars, c["minutes"], lookback=c["lookback"], exit_mode=exit_mode, stop_buffer=buf,
                         qty=c["qty"], max_loss=c["max_loss"], take_profit=c["take_profit"], fed_dates=fed,
-                        skip_dates=skip)
+                        skip_dates=skip, hook=hook)
     assert len(res.trades) >= 10, c
+
+
+@pytest.mark.slow
+@pytest.mark.parametrize("i", STRESS_CASES[::2])
+def test_pine_stress_webhooks(i):
+    """The same harsh markets with webhook orders on: every message matches the reference's orders and exits."""
+    test_pine_stress(i, hook="MNQZ2026" if i % 4 else "")
 
 
 def test_stress_market_has_what_it_claims():
