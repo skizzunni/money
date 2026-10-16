@@ -833,6 +833,20 @@ On 16 October 2026 (real MNQ bars from Yahoo, 10 MNQ at $350) the bot shorted fi
 
 **Failed, clearly.** The limit fills on the breakouts that come back, which are the ones failing, and misses the ones that run without looking back, which are the ones that pay. The market entry stays.
 
+## Thirty-fourth round: are the first and last checks worth trading?
+
+A 15:30 entry has 25 minutes to pay before the 16:00 exit; a 10:00 entry is judged against a noise area built from the noisiest half hour of the day. Four variants, fixed before running ([`research/check_times.py`](../research/check_times.py)): no entries at 15:30; at 15:00 or 15:30; at 10:00; at 10:00 or 15:30. The pass bar was the usual one on the index data, plus a replication on the NQ futures data.
+
+| Per contract | $/day 2011–18 | t | $/day 2019–22 | t |
+|---|---|---|---|---|
+| **The bot** | **$23.66** | **4.73** | **$32.83** | **3.62** |
+| No 15:30 | $21.70 | 4.54 | $31.64 | 3.53 |
+| No 15:00 or 15:30 | $19.88 | 4.23 | $33.46 | 3.74 |
+| No 10:00 | $20.23 | 4.18 | $26.83 | 3.12 |
+| No 10:00 or 15:30 | $18.34 | 3.98 | $25.25 | 2.99 |
+
+**Nothing passed; the idea was wrong.** By entry time, 2011–2022, the 10:00 entries are the bot's best (722 trades, $30.98 each, the largest total of any check) and the 15:30 entries pay $23.48 each. The weak ones are midday: 13:00 (198 trades, −$10.93 each) and 14:00 ($1.37). With twelve check times, one or two looking bad is what chance produces, and none of these differences is large next to the spread of single trades, so the midday checks stay too.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
@@ -898,6 +912,7 @@ python research/fear_size.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv" yahoo_dir     #
 python research/nq_volume.py path/to/nq_parquet_dir                    # real NQ futures; volume at the signal (no)
 python research/stress.py nsx_5m_scaled.pkl nq_5m_scaled.pkl           # stress tests of version 1.0
 python research/pullback.py nsx_5m_scaled.pkl                          # limit entry on the bounce (no)
+python research/check_times.py nsx_5m_scaled.pkl nq_5m_scaled.pkl      # skip the first or last checks (no)
 ```
 
 The raw data isn't stored in this repo.

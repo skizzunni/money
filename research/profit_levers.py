@@ -52,12 +52,14 @@ PERIODS = (("2011-2018", 2011, 2018), ("2019-2022", 2019, 2022), ("2023-2026", 2
 
 def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | None = None,
              target: float | None = None, cap_pts: float = CAP_PTS, target_on_fill_bar: bool = True,
-             cap_on_fill_bar: bool = False, entry_delay: int = 0) -> pd.DataFrame:
+             cap_on_fill_bar: bool = False, entry_delay: int = 0,
+             no_entry_checks: frozenset = frozenset()) -> pd.DataFrame:
     """target: take profit this many noise units from the first fill (limit); cap_pts: max loss in points;
     target_on_fill_bar False: the limit works from the bar after the fill, as the Pine script places it;
     cap_on_fill_bar True: the max loss works on the fill bar too, measured from the expected fill (the signal
     close plus a tick), as a bracket order placed with the entry would (1 contract only);
-    entry_delay: entries fill this many bars late (a slow trader), at that bar's open plus a tick."""
+    entry_delay: entries fill this many bars late (a slow trader), at that bar's open plus a tick;
+    no_entry_checks: check times (minutes after midnight, e.g. 930 for 15:30) that open no new trades."""
     checks = list(range(FIRST, LAST + 1, 30))
     kof = {m: j for j, m in enumerate(checks)}
     idx = bars.index.tz_convert(NY)
@@ -145,9 +147,9 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
                 sigma = ring[:, j].mean()
                 upper = max(day_open, prev_close) * (1 + sigma)
                 lower = min(day_open, prev_close) * (1 - sigma)
-                if pos == 0 and c[i] > upper:
+                if pos == 0 and c[i] > upper and end not in no_entry_checks:
                     pending, est, wait = 1, c[i] + TICK, entry_delay
-                elif pos == 0 and c[i] < lower:
+                elif pos == 0 and c[i] < lower and end not in no_entry_checks:
                     pending, est, wait = -1, c[i] - TICK, entry_delay
                 elif (pos and len(fills) < units and i != first_bar
                       and ((pos > 0 and c[i] > upper) or (pos < 0 and c[i] < lower))
