@@ -736,6 +736,34 @@ The rules "up to 10 MNQ" and "at most $350 per trade" squeeze the stop to $35 a 
 - **Risk sizing failed.** The bot's line stop is usually far enough from the entry that only 1–3 contracts fit in $350, so it wins the most trades (about 40%) and has the smallest swings, but makes the least.
 - **Fixed 10 at $350 made about twice what fixed 3 did on 2011–2022**, with a losing stretch 3–5 times as deep and a lower t-stat; on 2023–2026 the two made about the same (round twenty-seven). Fixed 10 is a choice for a large account, not for a $2,000 evaluation drawdown.
 
+## Twenty-ninth round: busier days, from daily NQ futures volume
+
+Yahoo Finance has NQ futures daily bars with volume back to 2000 ([`research/volume_days.py`](../research/volume_days.py) has the download). Its 5-minute bars go back only 60 days, too short for an intraday volume test, so this round asks whether the bot does better on busier days. Three facts known before the open, rules fixed before running: yesterday's volume above its 20-day average; the last 5 days' average above the 60-day average; the 5-day average above the 20-day average. Contract-roll weeks (10 days before to 3 after each quarterly expiry) are left out, because volume moves between contracts there. The same bar as round eighteen: a false-discovery filter on 2011–2018, confirmation on 2019–2022, then a final test.
+
+| Fact | $ per trade, yes / no, 2011–18 | t | $ per trade, yes / no, 2019–22 | t |
+|---|---|---|---|---|
+| Heavy yesterday | 24.34 / 11.33 | 1.55 | 21.64 / 38.99 | −1.11 |
+| Active week | 23.35 / 14.16 | 1.11 | 26.19 / 30.11 | −0.26 |
+| Volume rising | 20.56 / 17.76 | 0.33 | 25.63 / 31.20 | −0.37 |
+
+**Nothing passed**; each fact flipped sign between the periods. Daily volume doesn't tell the bot's good days from its bad ones. Intraday volume at the signal is still untested: it needs years of 1-minute futures bars with volume.
+
+## A check on real MNQ futures data, September 21 to October 15, 2026
+
+Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
+
+The same weeks at four settings (the bot as it is now, take-profit and fill-bar cap included):
+
+| Setting | Trades | Winners | Total | Winning days | Worst day |
+|---|---|---|---|---|---|
+| 10 MNQ, $350 max loss | 39 | 10 (26%) | +$10,460 | 6 of 9 | −$1,862 |
+| 3 MNQ, $350 max loss | 20 | 14 (70%) | +$6,390 | 8 of 9 | −$366 |
+| 2 MNQ, $350 max loss | 18 | 13 (72%) | +$3,543 | 8 of 9 | −$244 |
+| 10 MNQ, $1,170 max loss | 20 | 14 (70%) | +$21,285 | 8 of 9 | −$1,218 |
+
+- **The $35-per-contract stop is visible trade by trade.** At 10 MNQ and $350 the bot was stopped 29 times, 7 times in a row on 22 September and 5 on 30 September, re-entering at each check because price was still outside the line. With $117 a contract the same signals gave 20 trades, 14 of them winners.
+- **Four weeks is a small sample.** Over 16 years the bot wins about a third of its trades at $117 a contract; 70% here is a good month, not the new normal. What carries over is the comparison between settings on the same days.
+
 ## What this does and doesn't say
 
 - **It says** that the original sweep/breakout rules have no edge after realistic costs on 2023–2026 Nasdaq-100 data, and would very likely not pass a $25K evaluation. Of three published strategies, only noise-area momentum held up over 16 years, and even it fails most $25K evaluations.
@@ -778,6 +806,8 @@ python research/fomc.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"            # Fed day
 python research/scale_out.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"       # half off at a profit (no)
 python research/walkforward_tp.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"  # the take-profit, walk-forward (adopted)
 python research/risk_size.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"       # size each trade from the $350 (no)
+python research/volume_days.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv" nq_1d.json  # busier days (no)
+python research/yahoo_forward.py mnq_5m.json 10 350                    # real MNQ bars, the last 60 days
 ```
 
 The raw data isn't stored in this repo.
