@@ -723,6 +723,19 @@ A TradingView run at 10 contracts showed a −$867 trade under a $350 max loss. 
 - **At $117 a contract it's about even**: a little better on 2011–2018, the same on 2019–2022, a little worse on 2023–2026, and the losses past the cap shrink (worst trade −$1,042 to −$338 on 2019–2022).
 - **At $35 a contract the backtest had been flattering.** A $35-per-contract stop sits inside normal 5-minute moves; once it is live from the fill, as it would be in real trading, 2023–2026 falls to about $6 a day per contract and the win rate to about 13%. $350 on 10 contracts is the setting that holds the bot back, not the signal.
 
+## Twenty-eighth round: size each trade from the $350
+
+The rules "up to 10 MNQ" and "at most $350 per trade" squeeze the stop to $35 a contract at a fixed 10. Risk-based sizing keeps both: at each signal, n = floor($350 / (distance from the expected fill to the bot's line stop × $2)), between 1 and 10, with the $350 max loss for the whole position live from the fill ([`research/risk_size.py`](../research/risk_size.py)). The bot otherwise as it trades now (take-profit, fill-bar cap). Pass bar, fixed before running: against fixed 10, more $ a day in total, a higher t-stat, a worst losing stretch no larger, on 2011–2018, then 2019–2022, then 2023–2026.
+
+| Total, $350 max loss | Avg contracts | Win % 2011–18 | $/day 2011–18 | t | Worst stretch | $/day 2019–22 | t | Worst stretch |
+|---|---|---|---|---|---|---|---|---|
+| Fixed 10 | 10 | 15.4% | $141.74 | 3.51 | $28,423 | $143.12 | 2.18 | $47,457 |
+| Fixed 3 | 3 | 33.3% | $70.98 | 4.73 | $9,165 | $98.50 | 3.62 | $10,077 |
+| Risk-sized up to 10 | 1.8–2.7 | 39.4% | $30.98 | 2.88 | $9,629 | $52.31 | 3.74 | $5,466 |
+
+- **Risk sizing failed.** The bot's line stop is usually far enough from the entry that only 1–3 contracts fit in $350, so it wins the most trades (about 40%) and has the smallest swings, but makes the least.
+- **Fixed 10 at $350 made about twice what fixed 3 did on 2011–2022**, with a losing stretch 3–5 times as deep and a lower t-stat; on 2023–2026 the two made about the same (round twenty-seven). Fixed 10 is a choice for a large account, not for a $2,000 evaluation drawdown.
+
 ## What this does and doesn't say
 
 - **It says** that the original sweep/breakout rules have no edge after realistic costs on 2023–2026 Nasdaq-100 data, and would very likely not pass a $25K evaluation. Of three published strategies, only noise-area momentum held up over 16 years, and even it fails most $25K evaluations.
@@ -764,6 +777,7 @@ python research/overnight_noise.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv" # the edg
 python research/fomc.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"            # Fed days: no shorts before 14:00 (adopted)
 python research/scale_out.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"       # half off at a profit (no)
 python research/walkforward_tp.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"  # the take-profit, walk-forward (adopted)
+python research/risk_size.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"       # size each trade from the $350 (no)
 ```
 
 The raw data isn't stored in this repo.
