@@ -52,11 +52,12 @@ PERIODS = (("2011-2018", 2011, 2018), ("2019-2022", 2019, 2022), ("2023-2026", 2
 
 def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | None = None,
              target: float | None = None, cap_pts: float = CAP_PTS, target_on_fill_bar: bool = True,
-             cap_on_fill_bar: bool = False) -> pd.DataFrame:
+             cap_on_fill_bar: bool = False, entry_delay: int = 0) -> pd.DataFrame:
     """target: take profit this many noise units from the first fill (limit); cap_pts: max loss in points;
     target_on_fill_bar False: the limit works from the bar after the fill, as the Pine script places it;
     cap_on_fill_bar True: the max loss works on the fill bar too, measured from the expected fill (the signal
-    close plus a tick), as a bracket order placed with the entry would (1 contract only)."""
+    close plus a tick), as a bracket order placed with the entry would (1 contract only);
+    entry_delay: entries fill this many bars late (a slow trader), at that bar's open plus a tick."""
     checks = list(range(FIRST, LAST + 1, 30))
     kof = {m: j for j, m in enumerate(checks)}
     idx = bars.index.tz_convert(NY)
@@ -70,6 +71,7 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
     pos, fills, first_bar, pending, add_pending = 0, [], 0, 0, False
     best, armed = math.nan, False
     est = math.nan  # the expected fill of a pending entry: the signal close plus a tick
+    wait = 0  # bars still to wait before a pending entry fills (entry_delay)
     out = []
 
     def close(i, px, why):
@@ -82,10 +84,14 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
         t_min = mins[i]
         end = t_min + 5
         in_rth = t_min >= OPEN and end <= CLOSE
-        if pending:
+        if pending and wait > 0:
+            wait -= 1
+        elif pending:
             if pos == 0:
                 pos, fills, first_bar = pending, [o[i] + pending * TICK], i
                 best, armed = math.nan, False
+                if entry_delay:
+                    est = o[i] + pending * TICK  # a late trader places the bracket from the real fill
             pending = 0
         if add_pending:
             if pos:
@@ -140,9 +146,9 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
                 upper = max(day_open, prev_close) * (1 + sigma)
                 lower = min(day_open, prev_close) * (1 - sigma)
                 if pos == 0 and c[i] > upper:
-                    pending, est = 1, c[i] + TICK
+                    pending, est, wait = 1, c[i] + TICK, entry_delay
                 elif pos == 0 and c[i] < lower:
-                    pending, est = -1, c[i] - TICK
+                    pending, est, wait = -1, c[i] - TICK, entry_delay
                 elif (pos and len(fills) < units and i != first_bar
                       and ((pos > 0 and c[i] > upper) or (pos < 0 and c[i] < lower))
                       and pos * (c[i] - fills[0]) >= k * sigma * fills[0]):

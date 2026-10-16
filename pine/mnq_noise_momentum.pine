@@ -15,17 +15,18 @@
 // Noise area for each half-hour mark = the day's open (and previous close) plus/minus the
 // average distance price has moved from the 09:30 open by that time over the last 14 sessions.
 //
-// Tested on 16 years of Nasdaq-100 data: see docs/RESULTS.md. About $26 a day on 1 MNQ, 15 of
-// 16 years positive, but about two thirds of trades lose and 2026 is a losing year so far. It
-// passed about 6 in 10 historical $25K evaluations and about 78% of $100K ones. On a $50K evaluation with the
-// $350 max loss, about half passed at 2 MNQ and 1 in 5 at 10 MNQ (docs/RESULTS.md). Not "never lose".
+// v1.0, 2026-10-16. Tested on two independent datasets (docs/RESULTS.md): Nasdaq-100 index 1-minute data
+// 2011-2026 and NQ futures 1-minute data 2015-2025. Per contract with $117 of room (the $350 max loss on 3 MNQ):
+// about $28 a day on the futures data, t = 5.7, 10 of 11 years positive, about a third of trades winners; it
+// survives double slippage, double fees and every setting nudged both ways (docs/RESULTS.md, stress tests).
+// Most trades lose small and a few trend days pay for them. Not "never lose".
 //
 // Chart: MNQ1! (or the front-month MNQ contract), 5 minutes. 1, 10, 15 and 30 also run, but the take-profit and the
 // max loss after the fill bar are checked once per bar, so a 30-minute chart sees them later than a trader would.
 // The rules are the same as the Python reference in mnqbot/noise.py.
 // ------------------------------------------------------------------
-strategy("MNQ Noise-Area Momentum", shorttitle = "Noise-Mom", overlay = true,
-     initial_capital = 25000, currency = currency.USD,
+strategy("MNQ Noise-Area Momentum v1.0", shorttitle = "Noise-Mom", overlay = true,
+     initial_capital = 50000, currency = currency.USD,
      default_qty_type = strategy.fixed, default_qty_value = 1, pyramiding = 0,
      commission_type = strategy.commission.cash_per_contract, commission_value = 0.62,
      slippage = 1, margin_long = 0, margin_short = 0, max_bars_back = 500, max_labels_count = 500,
@@ -43,7 +44,7 @@ const int FED_CUTOFF = 840   // 14:00, the Fed statement
 grpT = "Trading"
 lookback = input.int(14, "Sessions in the noise average", minval = 2, maxval = 60, group = grpT)
 qty      = input.int(10, "Contracts", minval = 1, maxval = 60, group = grpT,
-     tooltip = "Every figure in docs/RESULTS.md is per contract: about $26 a day over 16 years. With the $350 max loss below, 10 contracts made about $13-16 a day per contract (the stop is $35 each), 3 contracts about $22. On a $50K evaluation ($3,000 target, $2,000 end-of-day drawdown), from every start day 2011-2026: 10 MNQ passed about 1 in 5 and failed 4 in 5; 2 MNQ passed about half (60% in 2023-2026); 1 MNQ passed about 45% and failed 25% within 125 sessions. See docs/RESULTS.md, round thirteen.")
+     tooltip = "Every figure in docs/RESULTS.md is per contract. What matters is the max loss per contract (the dashboard shows it): with $117 of room the bot made about $28 a day per contract on NQ futures 2015-2025; spread to $35 (the $350 max loss over 10 contracts) about a third of that. On a $50K evaluation ($3,000 target, $2,000 end-of-day drawdown) 2 MNQ with the $350 max loss gave the best odds, about half to two thirds passing; 10 MNQ failed most attempts. See docs/RESULTS.md, rounds thirteen, twenty-seven and thirty-two.")
 maxLoss  = input.float(350, "Max loss per trade, $ (all contracts, 0 = off)", minval = 0, step = 10, group = grpT,
      tooltip = "A second stop this many dollars from the entry fill, for the whole position, live from the fill like a bracket order; whichever of it and the line stop is closer is used. Spread over many contracts it gets tight: $350 over 10 contracts is a $35 stop each, which normal 5-minute moves hit, and on 2023-2026 it made about $6 a day per contract against about $20 at $117 each. On 16 years, caps of $100-$200 per contract raised profit per day in every period and cut the worst losing stretch. Fees, slippage and a gap through the stop can add to the loss.")
 skipDates = input.string("2026-01-01,2026-01-19,2026-02-16,2026-04-03,2026-05-25,2026-06-19,2026-07-03,2026-09-07,2026-11-26,2026-11-27,2026-12-24,2026-12-25,2027-01-01,2027-01-18,2027-02-15,2027-03-26,2027-05-31,2027-06-18,2027-07-05,2027-09-06,2027-11-25,2027-11-26,2027-12-24",
@@ -164,13 +165,21 @@ if isCheck and not na(dayOpen)
         nextCheck = k == N_CHECKS - 1 ? "the 16:00 close" : hhmmText(endMin + 30)
         longStopNow = ub * (1 - stopBuf * sig)
         shortStopNow = lb * (1 + stopBuf * sig)
-        capText = maxLoss > 0 ? " Never risk more than " + usd(maxLoss) + " on the trade: if a stop " + usd(maxLoss) + " from your fill is closer, use that one." : ""
-        tpText = tpUnits > 0 ? " Take profit with a limit " + str.tostring(tpUnits * sig * close, "#.00") + " points past your fill (about " : ""
-        holdLong = useStop ? "Put a stop at " + px(longStopNow) + " (just below the upper line), and move it when the line moves, at every half hour." + capText +
-             (tpUnits > 0 ? tpText + px(close * (1 + tpUnits * sig)) + ")." : "") :
+        // The bracket to place with the entry, from the expected fill (this close plus a tick): the stop is the closer of
+        // the line stop and the max loss, the target tpUnits noise units away. Same numbers the backtest uses.
+        capPtsNow = maxLoss > 0 ? maxLoss / qty / syminfo.pointvalue : na
+        estL = close + syminfo.mintick
+        estS = close - syminfo.mintick
+        bracketL = na(capPtsNow) ? longStopNow : math.max(longStopNow, estL - capPtsNow)
+        bracketS = na(capPtsNow) ? shortStopNow : math.min(shortStopNow, estS + capPtsNow)
+        whyL = bracketL > longStopNow ? "your " + usd(maxLoss) + " max loss" : "just below the upper line"
+        whyS = bracketS < shortStopNow ? "your " + usd(maxLoss) + " max loss" : "just above the lower line"
+        tpTextL = tpUnits > 0 ? ", take-profit limit " + px(estL * (1 + tpUnits * sig)) : ""
+        tpTextS = tpUnits > 0 ? ", take-profit limit " + px(estS * (1 - tpUnits * sig)) : ""
+        moveText = " If your fill is different, keep the same distances. At each half hour move the stop with the line (the dashboard shows it); the max loss never moves."
+        holdLong = useStop ? "Bracket: stop " + px(bracketL) + " (" + whyL + ")" + tpTextL + ", for a fill near " + px(estL) + "." + moveText :
              "Hold until a half-hour check closes back below the upper line, or the 16:00 close."
-        holdShort = useStop ? "Put a stop at " + px(shortStopNow) + " (just above the lower line), and move it when the line moves, at every half hour." + capText +
-             (tpUnits > 0 ? tpText + px(close * (1 - tpUnits * sig)) + ")." : "") :
+        holdShort = useStop ? "Bracket: stop " + px(bracketS) + " (" + whyS + ")" + tpTextS + ", for a fill near " + px(estS) + "." + moveText :
              "Hold until a half-hour check closes back above the lower line, or the 16:00 close."
         pos = strategy.position_size
         inPosStop = useStop and pos != 0   // exits are the resting stop's job
@@ -268,7 +277,7 @@ plot(showBands and inRth ? ub : na, "Upper noise line", color.teal, 2, plot.styl
 plot(showBands and inRth ? lb : na, "Lower noise line", color.maroon, 2, plot.style_linebr)
 bgcolor(shadeTrades and strategy.position_size > 0 ? color.new(color.teal, 88) : shadeTrades and strategy.position_size < 0 ? color.new(color.maroon, 88) : na)
 
-var table dash = table.new(position.top_right, 2, 14, bgcolor = color.new(color.black, 15), border_width = 1, border_color = color.new(color.gray, 60))
+var table dash = table.new(position.top_right, 2, 15, bgcolor = color.new(color.black, 15), border_width = 1, border_color = color.new(color.gray, 60))
 if showDash and (barstate.islastconfirmedhistory or barstate.isrealtime)
     pos = strategy.position_size
     status = not validTf ? "Use a 1/5/10/15/30 min chart" : filled < lookback ? "Building history" : pos > 0 ? "LONG" : pos < 0 ? "SHORT" : skipToday and inRth ? "No trades today (date list)" : "Flat"
@@ -276,7 +285,7 @@ if showDash and (barstate.islastconfirmedhistory or barstate.isrealtime)
     closed = strategy.closedtrades
     todayPnlDash = strategy.netprofit - dayStartNet
     wins = strategy.wintrades
-    table.cell(dash, 0, 0, "MNQ Noise Momentum", text_color = color.white, text_size = size.small)
+    table.cell(dash, 0, 0, "MNQ Noise Momentum v1.0", text_color = color.white, text_size = size.small)
     table.cell(dash, 1, 0, status, text_color = statusColor, text_size = size.small)
     table.cell(dash, 0, 1, "Sessions of history", text_color = color.silver, text_size = size.small)
     table.cell(dash, 1, 1, str.tostring(math.min(filled, lookback)) + " / " + str.tostring(lookback), text_color = color.white, text_size = size.small)
@@ -308,6 +317,11 @@ if showDash and (barstate.islastconfirmedhistory or barstate.isrealtime)
     table.cell(dash, 0, 13, "Fed day", text_color = color.silver, text_size = size.small)
     table.cell(dash, 1, 13, fedNow ? "yes: no shorts until 14:00" : fedToday and inRth ? "yes: statement out, normal rules" : "no",
          text_color = fedNow ? color.orange : color.white, text_size = size.small)
+    perContract = maxLoss / qty
+    tight = maxLoss > 0 and perContract < 60
+    table.cell(dash, 0, 14, "Max loss per contract", text_color = color.silver, text_size = size.small)
+    table.cell(dash, 1, 14, maxLoss <= 0 ? "off" : usd(perContract) + (tight ? ": tight, normal moves hit it (about $117 tested best)" : ""),
+         text_color = tight ? color.orange : color.white, text_size = size.small)
     table.cell(dash, 0, 5, "Backtest net", text_color = color.silver, text_size = size.small)
     table.cell(dash, 1, 5, (strategy.netprofit < 0 ? "-$" : "$") + str.tostring(math.abs(strategy.netprofit), "#,##0.00"),
          text_color = strategy.netprofit >= 0 ? color.lime : color.red, text_size = size.small)

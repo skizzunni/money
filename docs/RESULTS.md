@@ -794,6 +794,30 @@ A public dataset on Hugging Face ([mdelcristo/NQ-F_1min_OHLCV_Parquet](https://h
 
 **Nothing passed.** Breakouts on heavy volume did no better than breakouts on light volume, so volume confirmation, a staple of breakout trading, adds nothing to this bot.
 
+## Stress tests of version 1.0
+
+The bot as it trades now, per contract with $117 of room (the $350 max loss on 3 MNQ), on both datasets: the index data 2011–2026 and the NQ futures 2015–2025 ([`research/stress.py`](../research/stress.py), simulated with `mnqbot.noise`, the reference the Pine script is tested against). Pass bars fixed before running: profitable with t ≥ 2 under double slippage, doubled fees, and every setting nudged both ways; profitable with every entry filled one bar late.
+
+| Per contract | Index 2011–26 $/day | t | NQ futures 2015–25 $/day | t |
+|---|---|---|---|---|
+| **As it trades** | **$25.11** | **6.53** | **$27.94** | **5.72** |
+| Slippage 2 ticks a side (double) | $23.94 | 6.22 | $26.42 | 5.42 |
+| Slippage 3 ticks a side | $22.88 | 5.96 | $25.45 | 5.22 |
+| Fees doubled | $23.50 | 6.12 | $26.26 | 5.38 |
+| Stop buffer 0.12 / 0.36 | $22.01 / $24.26 | 5.85 / 6.16 | $24.03 / $27.29 | 5.08 / 5.47 |
+| Take-profit off / 1.0 / 2.0 | $23.50 / $21.45 / $25.84 | 5.50 / 5.95 / 6.37 | $29.54 / $24.80 / $30.36 | 5.27 / 5.37 / 5.91 |
+| Lookback 10 / 20 sessions | $23.74 / $23.73 | 6.04 / 6.09 | $25.92 / $25.39 | 5.16 / 5.13 |
+| Max loss $80 / $160 a contract | $19.51 / $24.63 | 5.48 / 6.24 | $19.35 / $29.91 | 4.36 / 5.89 |
+| Every entry 5 minutes late | $13.20 | 3.63 | $16.60 | 3.52 |
+
+**Every case passed on both datasets.** No setting sits on a cliff: every neighbour of every setting is profitable with t above 4. Costs matter little. Speed matters most: an entry 5 minutes late roughly halves the profit, because the trades that work move fast.
+
+**10,000 reshuffled years** (20-session blocks of the real daily P&L, 252 sessions each), per contract: a losing year 3.6% of the time on the index data and 2.8% on the futures; the 5th-percentile year +$481 and +$971; the 95th-percentile deepest drawdown within a year $3,764 and $4,222. Multiply by the contracts.
+
+**Pine tests for version 1.0**: besides the hand-built cases, 40 randomised cases run the script against the reference on a harsher synthetic market (price gaps between bars, missing bars, half days, trend and quiet days, a daylight-saving change) with random settings (exit mode, 1–10 contracts, max loss off to $1,170, stop buffer, take-profit, lookback 5 or 14, 5/10/15-minute charts, extended hours on or off, random Fed and holiday dates). They agree on every trade, every alert and every trade-log row, across about 1,000 line stops, 500 max-loss stops, 400 take-profits, 500 fill-bar exits and 500 stops filled at a gapped open. A mutation check confirms the tests catch each of 20 planted bugs.
+
+**One difference to know about**: when a single bar touches both the stop and the take-profit, the tests and the Python reference count the stop (the worst case); TradingView's broker emulator guesses the path inside the bar and sometimes counts the target. So TradingView can show slightly better results than the tests on such bars.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
@@ -857,6 +881,7 @@ python research/yahoo_forward.py mnq_5m.json 10 350                    # real MN
 python research/fear_volume.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv" yahoo_dir   # market mood, hourly volume (no)
 python research/fear_size.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv" yahoo_dir     # bigger when scared (no)
 python research/nq_volume.py path/to/nq_parquet_dir                    # real NQ futures; volume at the signal (no)
+python research/stress.py nsx_5m_scaled.pkl nq_5m_scaled.pkl           # stress tests of version 1.0
 ```
 
 The raw data isn't stored in this repo.

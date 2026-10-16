@@ -5,8 +5,11 @@ so on the next session the noise area is open (= previous close) * (1 +/- 0.001)
 """
 from __future__ import annotations
 
+import math
+import random
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 import pytest
 from conftest import synth_bars
@@ -428,11 +431,13 @@ def assert_trade_log(log, res, exit_mode, rows=10):
 
 
 def assert_parity(bars, minutes=5, lookback=14, skip_dates=None, exit_mode="stop", stop_buffer=None, qty=1,
-                  max_loss=None, fed_dates=None, fed_no_shorts=None):
+                  max_loss=None, fed_dates=None, fed_no_shorts=None, take_profit=None):
     cfg = NoiseConfig(lookback=lookback, exit_mode=exit_mode, qty=qty)
     inputs = {"Sessions in the noise average": lookback}
     inputs["Exit"] = "Resting stop at the line" if exit_mode == "stop" else "Half-hour check"
-    inputs["Contracts"] = qty  # the script's default is 3; the reference's is 1
+    inputs["Contracts"] = qty  # the script's default is 10; the reference's is 1
+    if take_profit is not None:
+        cfg.take_profit = inputs["Take profit, noise units from the entry (0 = off)"] = take_profit
     if max_loss is not None:
         cfg.max_loss_per_trade = inputs["Max loss per trade, $ (all contracts, 0 = off)"] = max_loss
     if stop_buffer is not None:
@@ -574,3 +579,85 @@ def test_pine_rth_only_chart_and_shorter_lookback():
     rth = bars[bars.is_rth]
     res = assert_parity(rth, lookback=5)
     assert len(res.trades) > 20
+
+
+# ----------------------------------------------------------------- stress: a harsher market, random settings
+
+def stress_bars(seed: int, sessions: int = 70, start: str = "2026-02-16") -> pd.DataFrame:
+    """5-minute bars on CME hours with what real markets do and the plain random walk doesn't: price gaps between
+    bars, missing bars, half-day sessions that stop at 13:00, trend days, volatility that changes day to day, and
+    a daylight-saving change inside the window (March 8 or November 1, 2026)."""
+    rng = np.random.default_rng(seed)
+    price = 20_000.0
+    frames = []
+    for day in pd.bdate_range(start, periods=sessions):
+        prev = day - pd.Timedelta(days=1)
+        end = "12:55" if rng.random() < 0.04 else "16:55"
+        idx = pd.date_range(f"{prev.date()} 18:00", f"{day.date()} {end}", freq="5min", tz=NY)
+        rth = ((idx.hour * 100 + idx.minute) >= 930) & ((idx.hour * 100 + idx.minute) < 1600)
+        day_vol = float(np.exp(rng.normal(0.0, 0.5)))
+        drift = float(rng.choice([0, 0, 0, 1, -1]) * rng.uniform(0.3, 1.2))
+        rows, kept = [], []
+        for t, is_rth in zip(idx, rth, strict=True):
+            if rng.random() < 0.01:  # a missing bar
+                continue
+            sigma = (3.0 if is_rth else 1.2) * day_vol
+            o = price
+            if is_rth and rng.random() < 0.03:  # a gap between bars
+                o = price + float(rng.choice([-1, 1]) * rng.integers(4, 60)) * 0.25
+            path = o + np.cumsum(rng.standard_t(3, size=5) * sigma + (drift if is_rth else 0.0))
+            c = round(float(path[-1]) * 4) / 4
+            hi = math.ceil(max(o, float(path.max())) * 4) / 4
+            lo = math.floor(min(o, float(path.min())) * 4) / 4
+            rows.append((o, hi, lo, c))
+            kept.append(t)
+            price = c
+        frames.append(pd.DataFrame(rows, columns=["open", "high", "low", "close"], index=pd.DatetimeIndex(kept)))
+    df = pd.concat(frames)
+    df["volume"] = 100.0
+    return annotate(df)
+
+
+def stress_case(i: int) -> dict:
+    r = random.Random(1000 + i)
+    return {"seed": 2000 + i, "minutes": r.choice([5, 5, 5, 10, 15]), "mode": r.choice(list(MODES)),
+            "qty": r.choice([1, 3, 10]), "max_loss": r.choice([0.0, 50.0, 350.0, 1170.0]),
+            "take_profit": r.choice([0.0, 1.0, 1.5]), "lookback": r.choice([5, 14]),
+            "start": r.choice(["2026-02-16", "2026-09-14"]), "rth_only": r.random() < 0.25,
+            "fed_every": r.choice([0, 3, 4]), "skip_every": r.choice([0, 0, 7])}
+
+
+STRESS_CASES = list(range(40))
+
+
+@pytest.mark.slow
+@pytest.mark.parametrize("i", STRESS_CASES)
+def test_pine_stress(i):
+    """The Pine script and the reference agree trade for trade, alert for alert and on every trade-log row, on a
+    harsh market with random settings."""
+    c = stress_case(i)
+    bars = stress_bars(c["seed"], start=c["start"])
+    if c["rth_only"]:
+        bars = bars[bars.is_rth]
+    if c["minutes"] != 5:
+        bars = annotate(resample(bars[["open", "high", "low", "close", "volume"]], f"{c['minutes']}min"))
+    days = sorted({str(d.date()) for d in bars.index[bars.is_rth]})
+    fed = ",".join(days[c["lookback"] + 2 :: c["fed_every"]]) if c["fed_every"] else ""
+    skip = ",".join(days[c["lookback"] + 3 :: c["skip_every"]]) if c["skip_every"] else ""
+    exit_mode, buf = MODES[c["mode"]]
+    res = assert_parity(bars, c["minutes"], lookback=c["lookback"], exit_mode=exit_mode, stop_buffer=buf,
+                        qty=c["qty"], max_loss=c["max_loss"], take_profit=c["take_profit"], fed_dates=fed,
+                        skip_dates=skip)
+    assert len(res.trades) >= 10, c
+
+
+def test_stress_market_has_what_it_claims():
+    bars = stress_bars(2000)
+    rth = bars[bars.is_rth]
+    gaps = (rth.open != rth.close.shift()).sum()
+    steps = rth.index.to_series().diff().dt.total_seconds().div(60)
+    assert gaps > 100 and (steps == 10).sum() > 5  # gaps between bars, and missing bars
+    last = rth.groupby(rth.index.date).apply(lambda d: d.index[-1].hour * 100 + d.index[-1].minute)
+    assert (last == 1255).any() and (last == 1555).any()  # half days and full days
+    offsets = {t.utcoffset() for t in bars.index}
+    assert len(offsets) == 2  # the daylight-saving change is inside the window

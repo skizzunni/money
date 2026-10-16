@@ -67,7 +67,7 @@ Through a **TradingView alert**. It runs on TradingView's servers, so it keeps w
 
 **Recreate the alert whenever you change the script or its settings.** An alert keeps running the version it was created with.
 
-**What arrives:** each alert is a full instruction, sent right at the half hour, for example *"BUY 1 MNQ at market now. Price 29,980.25 is above the noise area (upper 29,960.00). Hold until a half-hour check closes back below the upper line, or the 16:00 close. Next check 10:30."* Act on it right away: the backtest assumes you fill at about that price.
+**What arrives:** each alert is a full instruction, sent right at the half hour, for example *"BUY 3 MNQ at market now. Price 29,980.25 is above the noise area (upper 29,960.00). Bracket: stop 29,921.75 (your $350.00 max loss), take-profit limit 30,070.50, for a fill near 29,980.50. If your fill is different, keep the same distances. At each half hour move the stop with the line (the dashboard shows it); the max loss never moves. Next check 10:30."* **Act on it right away, with a bracket order** (entry, stop and take-profit together; Tradovate calls it a bracket or OSO). Speed matters more than anything else: in the stress tests, filling every entry 5 minutes late cut the profit roughly in half ([RESULTS.md](RESULTS.md), stress tests).
 
 **On the chart:**
 
@@ -102,8 +102,8 @@ The label sits on the half-hour candle that just closed, the moment the alert fi
 
 | Alert starts with | Do this |
 |---|---|
-| `BUY 1 MNQ at market now` | Buy 1 MNQ at market, then place a stop at the price the alert names (just below the upper line). |
-| `SELL 1 MNQ at market now` | Sell 1 MNQ at market, then place a stop at the price the alert names (just above the lower line). |
+| `BUY 3 MNQ at market now` | Buy at market with a bracket: the stop and take-profit prices the alert names (or the same distances from your fill). |
+| `SELL 3 MNQ at market now` | Sell at market with a bracket: the stop and take-profit prices the alert names (or the same distances from your fill). |
 | `EXIT LONG: price hit the stop` / `EXIT SHORT: price hit the stop` | Your stop should have filled. If you had no stop in, exit at market now. Cancel the take-profit order. |
 | `TARGET: the long reached the take-profit` / `TARGET: the short …` | Your take-profit limit should have filled. If not, exit at market now. Cancel the stop order. |
 | `EXIT LONG` / `EXIT SHORT` (half-hour check mode only) | Close the position at market and stay flat. |
