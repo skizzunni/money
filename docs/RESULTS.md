@@ -625,6 +625,31 @@ A prop account is passed or lost on its path, not its average, so this round cha
 - **Nothing passed.** Fixed 2 contracts stays the best simple choice.
 - **"Earn the size" fails about 8–10 points less often** but passes less too: more attempts are still open after six months. It's the safer way to run an evaluation if a slower pass is acceptable, not a better one.
 
+## Twenty-second round: spread the contracts over copies of the bot
+
+Instead of a better signal, the same signal split across copies that differ only in when they check (:00/:30 or :15/:45) or how many sessions the noise area averages (10, 14 or 20). No copy is picked for its own backtest; the average should keep the profit and shrink the losing stretches ([`research/ensemble.py`](../research/ensemble.py)). To pass on 2011–2018: at least 95% of the bot's $ per day, a t-stat at least as high, a smaller worst losing stretch; then the same on 2019–2022 and 2023–2026.
+
+| Per contract | $/day 2011–18 | t | Worst stretch | $/day 2019–22 | t | Worst stretch |
+|---|---|---|---|---|---|---|
+| **The bot** | **$22.70** | **4.11** | **$3,223** | **$23.05** | **2.44** | **$5,178** |
+| Half at :00/:30, half at :15/:45 | $20.62 | 3.87 | $4,514 | $18.23 | 2.09 | $4,802 |
+| Thirds on 10, 14 and 20 sessions | $22.86 | 4.19 | $3,154 | $22.54 | 2.43 | $4,716 |
+| All six | $20.82 | 3.95 | $4,296 | $18.20 | 2.11 | $5,052 |
+
+- **The mixed windows passed 2011–2018 and missed 2019–2022 by 0.01 on the t-stat.** It's a tie with the bot, not an improvement: the copies' daily P&L is 94–96% correlated, so splitting barely smooths anything.
+- **Checking at :15/:45 is worse than :00/:30**, so mixing it in costs profit.
+
+## Twenty-third round: the bot's edge in the overnight sessions
+
+Nasdaq futures trade about 23 hours a day; the bot works 10:00–16:00. The same logic, a move past the usual range for the time since the session opened, was run inside the European session (03:00–09:25, checks 03:30–09:00) and the Asian one (20:00–02:55, checks 20:30–02:30), with the noise area built around each session's open, the bot's stops, and 2 ticks of slippage for the thinner market ([`research/overnight_noise.py`](../research/overnight_noise.py)). To pass: t ≥ 2.24 on 2011–2018, then t ≥ 1.65 on 2019–2022 and 2023–2026.
+
+| Per contract, 2011–2018 | Trades a day | Win % | $/day | t | Worst stretch |
+|---|---|---|---|---|---|
+| Europe | 1.50 | 23.0% | −$4.16 | −1.20 | $11,159 |
+| Asia | 1.29 | 25.5% | +$3.70 | 1.41 | $3,233 |
+
+- **Neither passed.** Overnight moves past the usual range don't keep going the way the day session's do. The edge belongs to the regular session, when the most traders and the most hedging flow are in the market.
+
 ## What this does and doesn't say
 
 - **It says** that the original sweep/breakout rules have no edge after realistic costs on 2023–2026 Nasdaq-100 data, and would very likely not pass a $25K evaluation. Of three published strategies, only noise-area momentum held up over 16 years, and even it fails most $25K evaluations.
@@ -661,6 +686,8 @@ python research/meta_label.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"     # spot the
 python research/losers.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"         # time stops, confirmation, flips (no)
 python research/adaptive.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"       # a noise area that adapts (no)
 python research/sizing.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"         # contracts that follow the account (no)
+python research/ensemble.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"       # copies of the bot (a tie, no)
+python research/overnight_noise.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv" # the edge overnight (no)
 ```
 
 The raw data isn't stored in this repo.
