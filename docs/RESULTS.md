@@ -650,6 +650,22 @@ Nasdaq futures trade about 23 hours a day; the bot works 10:00–16:00. The same
 
 - **Neither passed.** Overnight moves past the usual range don't keep going the way the day session's do. The edge belongs to the regular session, when the most traders and the most hedging flow are in the market.
 
+## Twenty-fourth round: Fed announcement days
+
+The scheduled FOMC announcement days 2011–2026 ([`research/fomc_dates.csv`](../research/fomc_dates.csv), 127 days) come from the Federal Reserve's meeting calendars; unscheduled meetings, conference calls and notation votes are left out. The statement is at 14:00 New York time (in 2011–2012 some came at 12:30 or 14:15). Four variants, fixed before running, with the pass bar of rounds nineteen and twenty ([`research/fomc.py`](../research/fomc.py)): step aside (flat at 13:55, no entries at 13:30 or 14:00), skip the day, 2 contracts on entries from 14:30, and no shorts before 14:00 (stocks have tended to drift up into the announcement: Lucca and Moench, 2015).
+
+| Per contract | $/day 2011–18 | t | $/day 2019–22 | t | $/day 2023–26 | t | Worst stretch 2023–26 |
+|---|---|---|---|---|---|---|---|
+| **The bot** | **$22.70** | **4.11** | **$23.05** | **2.44** | **$23.32** | **2.48** | **$2,222** |
+| Step aside | $22.56 | 4.08 | $23.06 | 2.45 | | | |
+| Skip the day | $23.08 | 4.21 | $22.23 | 2.38 | | | |
+| 2 contracts after 14:30 | $22.79 | 4.09 | $23.83 | 2.46 | | | |
+| **No shorts before 14:00** | **$22.96** | **4.16** | **$23.22** | **2.46** | **$24.07** | **2.55** | **$2,222** |
+
+- **No shorts before 14:00 passed all three periods**, including the final test on 2023–2026, run once. The pre-announcement shorts it skips lost money in every period: 21 trades in all, 9 + 5 + 7.
+- **It's small.** About $0.20–0.75 a day per contract (1–3%), from 1–3 trades a year, so the evidence rests on few trades; the independent academic finding behind it is part of why it was adopted. The worst losing stretch is unchanged.
+- **It's in the bot** as *Fed days: no shorts before 14:00*, on by default, with the 2026–2027 dates pre-filled.
+
 ## What this does and doesn't say
 
 - **It says** that the original sweep/breakout rules have no edge after realistic costs on 2023–2026 Nasdaq-100 data, and would very likely not pass a $25K evaluation. Of three published strategies, only noise-area momentum held up over 16 years, and even it fails most $25K evaluations.
@@ -688,6 +704,7 @@ python research/adaptive.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"       # a noise 
 python research/sizing.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"         # contracts that follow the account (no)
 python research/ensemble.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"       # copies of the bot (a tie, no)
 python research/overnight_noise.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv" # the edge overnight (no)
+python research/fomc.py "path/to/DAT_ASCII_NSXUSD_M1_*.csv"            # Fed days: no shorts before 14:00 (adopted)
 ```
 
 The raw data isn't stored in this repo.

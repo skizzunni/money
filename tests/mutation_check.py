@@ -88,7 +88,7 @@ MUTANTS = {
     "noise: short sessions stored in the history": ("noise", "        if complete\n", "        if true\n"),
     "noise: no reversal from long": (
         "noise",
-        "                if close < lb\n                    strategy.entry",
+        "                if close < lb and shortOk\n                    strategy.entry",
         "                if false\n                    strategy.entry",
     ),
     "noise: date list ignored": (
@@ -115,6 +115,12 @@ MUTANTS = {
     "noise: stop not moved with the line": (
         "noise", "    if strategy.position_size > 0 or longPlaced\n", "    if longPlaced\n"
     ),
+    "noise: Fed rule ignored": (
+        "noise", "        shortOk = not (fedToday and endMin < FED_CUTOFF)", "        shortOk = true"
+    ),
+    "noise: Fed rule also blocks reversals after 14:00": (
+        "noise", "        shortOk = not (fedToday and endMin < FED_CUTOFF)", "        shortOk = not fedToday"
+    ),
     "noise: open position kept into the next session": (
         "noise", "(not inRth or tMin == RTH_OPEN)", "not inRth"
     ),
@@ -132,6 +138,7 @@ def _tests(T, script):
             ("skips listed dates", N.test_pine_skips_listed_dates),
             ("ten contracts", N.test_pine_ten_contracts),
             ("max loss cap", N.test_pine_max_loss_cap),
+            ("Fed day", N.test_pine_fed_day),
         ] + [(f"random {mins}m [{mode}]", lambda mi=mins, mo=mode: N.test_pine_random_sessions(mi, mo))
              for mins, mode in N.RANDOM_CASES] + [
             ("RTH-only chart", N.test_pine_rth_only_chart_and_shorter_lookback),

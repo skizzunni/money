@@ -63,6 +63,14 @@ def above_then_below(p):
     return [p] * CHECK_10_00 + [p * 1.002] * (CHECK_10_30 - CHECK_10_00) + [p * 0.998] * (BARS_PER_DAY - CHECK_10_30)
 
 
+def below_all_day(p):
+    return [p] * CHECK_10_00 + [p * 0.998] * (BARS_PER_DAY - CHECK_10_00)
+
+
+CHECK_14_00 = 53  # the bar whose close is 14:00, the Fed statement
+TEST_DAY = "2026-03-20"  # the session after quiet_history's 14 sessions
+
+
 CHECK = NoiseConfig(exit_mode="check")  # the paper's half-hour exit; the default is the resting stop
 STOP0 = NoiseConfig(stop_buffer=0.0)  # the resting stop exactly on the line (the default sits 0.24 sigma past it)
 BUF = 0.24 * 0.001  # the default buffer as a share of price in the quiet history, where sigma = 0.1%
@@ -222,6 +230,35 @@ def test_max_loss_cap_is_a_second_stop_from_the_bar_after_the_fill():
     assert ten.reason == "Max loss" and ten.exit == pytest.approx(entry - 10 - 0.25)  # $200 over 10 = $20 each
 
 
+def test_fed_day_no_shorts_before_14_00():
+    bars, p = scenario(below_all_day)
+    assert scenario(below_all_day)[0].index[bar(14, 0)].strftime("%Y-%m-%d") == TEST_DAY
+    assert run(bars).events[0] == (bar(14, CHECK_10_00), "SELL")  # an ordinary day: short at 10:00
+    fed = NoiseConfig(fed_dates=f"2026-01-28,{TEST_DAY}")
+    res = run(bars, fed)
+    assert res.events[0] == (bar(14, CHECK_14_00), "SELL")  # the first check at or after the 14:00 statement
+    assert res.trades[0].direction == -1 and res.trades[0].entry_bar == bar(14, CHECK_14_00 + 1)
+    off = NoiseConfig(fed_dates=TEST_DAY, fed_no_shorts=False)
+    assert run(bars, off).events[0] == (bar(14, CHECK_10_00), "SELL")
+
+
+def test_fed_day_keeps_longs_and_turns_a_morning_reversal_into_an_exit():
+    bars, _ = scenario(above_all_day)
+    fed = NoiseConfig(fed_dates=TEST_DAY)
+    assert trades_of(run(bars, fed)) == trades_of(run(bars))  # longs as usual
+    bars, _ = scenario(above_then_below)
+    res = run(bars, NoiseConfig(fed_dates=TEST_DAY, exit_mode="check"))
+    assert res.events[:3] == [(bar(14, CHECK_10_00), "BUY"), (bar(14, CHECK_10_30), "EXIT"),
+                              (bar(14, CHECK_14_00), "SELL")]
+
+
+def test_default_fed_dates_are_wednesdays_or_thursdays_and_eight_a_year():
+    from mnqbot.noise import FED_DATES
+    days = pd.to_datetime(FED_DATES.split(","))
+    assert set(days.year) == {2026, 2027} and all((days.year == y).sum() == 8 for y in (2026, 2027))
+    assert set(days.dayofweek) <= {2, 3}
+
+
 def test_exit_mode_must_be_known():
     with pytest.raises(ValueError):
         run(scenario(above_all_day)[0], NoiseConfig(exit_mode="trailing"))
@@ -360,7 +397,7 @@ def assert_trade_log(log, res, exit_mode, rows=10):
 
 
 def assert_parity(bars, minutes=5, lookback=14, skip_dates=None, exit_mode="stop", stop_buffer=None, qty=1,
-                  max_loss=None):
+                  max_loss=None, fed_dates=None, fed_no_shorts=None):
     cfg = NoiseConfig(lookback=lookback, exit_mode=exit_mode, qty=qty)
     inputs = {"Sessions in the noise average": lookback}
     inputs["Exit"] = "Resting stop at the line" if exit_mode == "stop" else "Half-hour check"
@@ -371,6 +408,10 @@ def assert_parity(bars, minutes=5, lookback=14, skip_dates=None, exit_mode="stop
         cfg.stop_buffer = inputs["Stop distance past the line, in noise units"] = stop_buffer
     if skip_dates is not None:
         cfg.skip_dates = inputs["Don't trade on these dates"] = skip_dates
+    if fed_dates is not None:
+        cfg.fed_dates = inputs["Fed announcement days"] = fed_dates
+    if fed_no_shorts is not None:
+        cfg.fed_no_shorts = inputs["Fed days: no shorts before 14:00"] = fed_no_shorts
     res = run(bars, cfg, minutes=minutes)
     trades, events, pine_bands, log = run_pine(bars, inputs, minutes)
     assert trades == trades_of(res)
@@ -425,6 +466,30 @@ def test_pine_ten_contracts():
     bars, _ = scenario(above_then_below)
     res = assert_parity(bars, qty=10)
     assert res.trades[0].qty == 10 and all(t.qty == 10 for t in res.trades)
+
+
+@pytest.mark.slow
+@pytest.mark.slow
+def test_pine_fed_day():
+    bars, _ = scenario(below_all_day)
+    res = assert_parity(bars, fed_dates=TEST_DAY)
+    assert res.events[0] == (bar(14, CHECK_14_00), "SELL")
+    assert assert_parity(bars, fed_dates=TEST_DAY, fed_no_shorts=False).events[0] == (bar(14, CHECK_10_00), "SELL")
+    bars, _ = scenario(above_then_below)
+    res = assert_parity(bars, fed_dates=TEST_DAY, exit_mode="check")
+    assert [e for _, e in res.events[:3]] == ["BUY", "EXIT", "SELL"]
+
+
+@pytest.mark.slow
+def test_pine_fed_days_on_random_sessions():
+    bars = synth_bars(sessions=60, seed=11)
+    days = sorted({str(d.date()) for d in bars.index[bars.is_rth]})
+    fed = ",".join(days[16::3])  # every third session once the history is full
+    res = assert_parity(bars, fed_dates=fed)
+    assert len(res.trades) > 20
+    base = run(bars, NoiseConfig(fed_dates=""))
+    assert len(res.trades) != len(base.trades) or trades_of(res) != trades_of(base), "the rule changed something"
+    assert_parity(bars, fed_dates=fed, exit_mode="check")
 
 
 @pytest.mark.slow

@@ -23,6 +23,8 @@ Rules, New York time, on any chart whose bar length divides 30 minutes:
     if it closes below lower. Short: the mirror image.
   * Entries and check-mode exits are market orders filled at the next bar's open.
   * No new trades on the dates in skip_dates (holidays and half days by default).
+  * Fed days (fed_dates, the scheduled FOMC announcement days): no short entries from the checks before
+    14:00 (10:00-13:30), when fed_no_shorts is on. In check mode a reversal to short there is a plain exit.
   * Everything is closed at the 16:00 close. If a session ends early (half day, data gap), a position
     still open is closed at the close of the first bar outside 09:30-16:00 or of the next 09:30 bar.
 """
@@ -46,6 +48,13 @@ SKIP_DATES = (
     "2026-11-26,2026-11-27,2026-12-24,2026-12-25,2027-01-01,2027-01-18,2027-02-15,2027-03-26,"
     "2027-05-31,2027-06-18,2027-07-05,2027-09-06,2027-11-25,2027-11-26,2027-12-24"
 )
+# Scheduled FOMC announcement days (statement at 14:00 New York time), from federalreserve.gov. Same list as
+# the Pine input; research/fomc_dates.csv has 2011-2026.
+FED_DATES = (
+    "2026-01-28,2026-03-18,2026-04-29,2026-06-17,2026-07-29,2026-09-16,2026-10-28,2026-12-09,"
+    "2027-01-27,2027-03-17,2027-04-28,2027-06-09,2027-07-28,2027-09-15,2027-10-27,2027-12-08"
+)
+FED_CUTOFF = 840  # 14:00: no shorts from the checks before this on Fed days
 
 
 @dataclass
@@ -60,6 +69,8 @@ class NoiseConfig:
     exit_mode: str = "stop"  # "stop": resting stop past the current line; "check": exit only at the half hours
     stop_buffer: float = 0.24  # the stop sits this many noise units (sigma) past the line; 0 = on the line
     max_loss_per_trade: float = 350.0  # $ for the whole position: a second stop this far from the entry; 0 = off
+    fed_dates: str = FED_DATES  # "YYYY-MM-DD,..." scheduled Fed announcement days
+    fed_no_shorts: bool = True  # on those days, no short entries before 14:00 (round twenty-four)
 
 
 @dataclass
@@ -110,7 +121,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
     filled = slot = 0
     day_open = prev_close = last_rth_close = math.nan
     upper = lower = sigma = math.nan  # the current noise lines and noise, set at each check
-    skip_today = False
+    skip_today = fed_today = False
     pos = 0
     entry_px, entry_bar = 0.0, 0
     pending: tuple[str, int] | None = None  # ("entry", direction) or ("close", 0), filled at the next open
@@ -176,6 +187,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             upper = lower = sigma = math.nan
             today = [math.nan] * N_CHECKS
             skip_today = t.strftime("%Y-%m-%d") in cfg.skip_dates  # substring test, like Pine's str.contains
+            fed_today = cfg.fed_no_shorts and t.strftime("%Y-%m-%d") in cfg.fed_dates
         if in_rth:
             last_rth_close = c[i]
 
@@ -190,20 +202,22 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                 upper = max(day_open, prev_close) * (1 + sigma)
                 lower = min(day_open, prev_close) * (1 - sigma)
                 bands.append((i, upper, lower))
+                short_ok = not (fed_today and end < FED_CUTOFF)
                 if skip_today:
                     pass
                 elif use_stop and pos:
                     pass  # exits are the resting stop's job
                 elif pos > 0 and c[i] < upper:
-                    pending = ("entry", -1) if c[i] < lower else ("close", 0)
-                    events.append((i, "REVERSE" if c[i] < lower else "EXIT"))
+                    rev = c[i] < lower and short_ok
+                    pending = ("entry", -1) if rev else ("close", 0)
+                    events.append((i, "REVERSE" if rev else "EXIT"))
                 elif pos < 0 and c[i] > lower:
                     pending = ("entry", 1) if c[i] > upper else ("close", 0)
                     events.append((i, "REVERSE" if c[i] > upper else "EXIT"))
                 elif pos == 0 and c[i] > upper:
                     pending = ("entry", 1)
                     events.append((i, "BUY"))
-                elif pos == 0 and c[i] < lower:
+                elif pos == 0 and c[i] < lower and short_ok:
                     pending = ("entry", -1)
                     events.append((i, "SELL"))
 
