@@ -102,7 +102,13 @@ MUTANTS = {
         'strategy.exit("Long exit", "Long", stop = longStop,',
         'strategy.exit("Long exit", "Long", stop = shortStop,',
     ),
-    "noise: stop buffer ignored": ("noise", "longStop = ub * (1 - stopBuf * sig)\n", "longStop = ub\n"),
+    "noise: stop buffer ignored": ("noise", "lineStopL = ub * (1 - stopBuf * sig)\n", "lineStopL = ub\n"),
+    "noise: max loss cap ignored": (
+        "noise", "longStop = na(capL) ? lineStopL : math.max(lineStopL, capL)\n", "longStop = lineStopL\n"
+    ),
+    "noise: today's P/L from the wrong baseline": (
+        "noise", "    todayPnl = strategy.netprofit - dayStartNet\n", "    todayPnl = strategy.netprofit\n"
+    ),
     "noise: stop not moved with the line": (
         "noise", "    if strategy.position_size > 0 or longPlaced\n", "    if longPlaced\n"
     ),
@@ -121,6 +127,8 @@ def _tests(T, script):
                 for case in N.HAND_BUILT for mode in N.MODES] + [
             ("short session", N.test_pine_short_session_cases),
             ("skips listed dates", N.test_pine_skips_listed_dates),
+            ("ten contracts", N.test_pine_ten_contracts),
+            ("max loss cap", N.test_pine_max_loss_cap),
         ] + [(f"random {mins}m [{mode}]", lambda mi=mins, mo=mode: N.test_pine_random_sessions(mi, mo))
              for mins, mode in N.RANDOM_CASES] + [
             ("RTH-only chart", N.test_pine_rth_only_chart_and_shorter_lookback),

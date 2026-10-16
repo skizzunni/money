@@ -17,6 +17,8 @@ Rules, New York time, on any chart whose bar length divides 30 minutes:
     line for a short) and moves with it at each check. It fills at the stop, or at the bar's open if the
     open is already past it (the line moved past the price, or a gap). On the bar the entry fills, it
     fills at the stop or the open, whichever is worse. stop_buffer = 0 puts the stop on the line itself.
+    A second stop sits max_loss_per_trade dollars (for the whole position) from the entry fill, from the
+    bar after the fill on; whichever stop is closer is the one in force ("Max loss" when it is the cap).
     exit_mode "check": the paper's rule. Long: if a check closes below upper, exit, or reverse to short
     if it closes below lower. Short: the mirror image.
   * Entries and check-mode exits are market orders filled at the next bar's open.
@@ -57,6 +59,8 @@ class NoiseConfig:
     skip_dates: str = SKIP_DATES  # "YYYY-MM-DD,..." sessions with no new trades
     exit_mode: str = "stop"  # "stop": resting stop past the current line; "check": exit only at the half hours
     stop_buffer: float = 0.24  # the stop sits this many noise units (sigma) past the line; 0 = on the line
+    status_minutes: int = 15  # a status snapshot at every N-minute mark in 09:30-16:00 (0 = off), as the script reports
+    max_loss_per_trade: float = 350.0  # $ for the whole position: a second stop this far from the entry; 0 = off
 
 
 @dataclass
@@ -78,6 +82,8 @@ class NoiseResult:
     trades: list[NoiseTrade]
     events: list[tuple[int, str]]  # (bar, action) for every alert: BUY, SELL, EXIT, REVERSE, FLAT
     bands: list[tuple[int, float, float]] = field(default_factory=list)  # (check bar, upper, lower)
+    # (bar, direction, entry price or nan, today's realized P&L, trades closed today) at each report time
+    status: list[tuple[int, int, float, float, int]] = field(default_factory=list)
 
     def trades_frame(self) -> pd.DataFrame:
         return pd.DataFrame([t.__dict__ for t in self.trades])
@@ -114,15 +120,19 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
     trades: list[NoiseTrade] = []
     events: list[tuple[int, str]] = []
     bands: list[tuple[int, float, float]] = []
+    status: list[tuple[int, int, float, float, int]] = []
+    realized = 0.0
+    day_start_realized, day_start_trades = 0.0, 0
 
     def open_pos(i: int, d: int) -> None:
         nonlocal pos, entry_px, entry_bar
         pos, entry_px, entry_bar = d, o[i] + d * slip, i
 
     def close_pos(i: int, price: float, reason: str) -> None:
-        nonlocal pos
+        nonlocal pos, realized
         pnl = pos * (price - entry_px) * cfg.qty * cfg.point_value - 2 * cfg.commission_per_side * cfg.qty
         trades.append(NoiseTrade(pos, cfg.qty, entry_bar, idx[entry_bar], entry_px, i, idx[i], price, reason, pnl))
+        realized += pnl
         pos = 0
 
     for i in range(len(bars)):
@@ -146,6 +156,11 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
         # the resting stop at the line (checked before the script-side logic, like the broker)
         if use_stop and pos and not math.isnan(upper):
             line = upper * (1 - cfg.stop_buffer * sigma) if pos > 0 else lower * (1 + cfg.stop_buffer * sigma)
+            reason = "Back inside"
+            if cfg.max_loss_per_trade > 0 and entry_bar != i:  # the cap needs the fill price: it starts the bar after
+                cap = entry_px - pos * cfg.max_loss_per_trade / cfg.qty / cfg.point_value
+                if (pos > 0 and cap > line) or (pos < 0 and cap < line):
+                    line, reason = cap, "Max loss"
             if entry_bar == i:  # a stop attached to the entry can fill on the fill bar itself
                 hit = l[i] <= line if pos > 0 else h[i] >= line
                 price = (min(o[i], line) if pos > 0 else max(o[i], line)) - pos * slip
@@ -155,8 +170,11 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                 hit = l[i] <= line if pos > 0 else h[i] >= line
                 price = line - pos * slip
             if hit:
-                close_pos(i, price, "Back inside")
+                close_pos(i, price, reason)
                 events.append((i, "EXIT"))
+
+        if t_min == RTH_OPEN:  # today's baseline for the reports, before anything else happens this bar
+            day_start_realized, day_start_trades = realized, len(trades)
 
         if pos and (not in_rth or t_min == RTH_OPEN):  # a session ended early (half day, data gap)
             close_pos(i, c[i] - pos * slip, "Session ended")
@@ -209,4 +227,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                 filled += 1
             day_open = math.nan
 
-    return NoiseResult(trades, events, bands)
+        if cfg.status_minutes and in_rth and end % cfg.status_minutes == 0 and filled >= lb_n:
+            status.append((i, pos, entry_px if pos else math.nan, realized - day_start_realized,
+                           len(trades) - day_start_trades))
+
+    return NoiseResult(trades, events, bands, status)

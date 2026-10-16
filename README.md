@@ -4,7 +4,7 @@ A rules-based MNQ day-trading strategy with prop-firm risk rails. Every piece be
 
 | Piece | What it's for |
 |---|---|
-| **`pine/mnq_noise_momentum.pine`** | **The one strategy here with a tested edge (16 years).** Noise-area momentum from a 2024 paper: BUY/SELL/EXIT alerts every half hour, flat at 16:00. Rules in [`docs/NOISE.md`](docs/NOISE.md). Over 16 years: about $26 a day on 1 MNQ, 15 of 16 years positive; it passes about 6 in 10 historical $25K evaluations and about 78% of $100K ones. |
+| **`pine/mnq_noise_momentum.pine`** | **The one strategy here with a tested edge (16 years).** Noise-area momentum from a 2024 paper: BUY/SELL/EXIT alerts, a resting stop that moves with the noise line, a max loss per trade, a status report every 15 minutes, flat at 16:00. Rules in [`docs/NOISE.md`](docs/NOISE.md). Over 16 years: about $26 a day on 1 MNQ, 15 of 16 years positive; it passes about 6 in 10 historical $25K evaluations and about 78% of $100K ones. |
 | `pine/mnq_liquidity_sweep_all_in_one.pine` | The original sweep/breakout bot in one TradingView script (no edge on real data, see below): BUY/SELL signals with size, limit price, stop and target, phone alerts, a dashboard, and a Strategy Tester backtest with optional prop-evaluation simulation. |
 | `pine/mnq_liquidity_sweep_signals.pine` | **TradingView indicator that tells you when to BUY or SELL.** It gives the limit price, stop, target and size, then alerts you to fill, move to breakeven, cancel, or flatten. |
 | `pine/mnq_liquidity_sweep_bot.pine` | TradingView strategy with the same rules, for backtesting in Strategy Tester with prop-evaluation simulation. |
@@ -179,6 +179,7 @@ research/regime_trend.py                  the regime-trend family from that sear
 research/round8.py                        volatility sizing and the 24-hour clock (neither helps)
 research/round9.py                        the resting-stop exit and account tiers (both help)
 research/postmortem.py                    why the trades lose, and the buffered stop built from it
+research/dips.py                          the worst days, what caps them, and the max loss per trade
 pine/mnq_liquidity_sweep_all_in_one.pine  TradingView: signals + alerts + dashboard + backtest in one
 pine/mnq_liquidity_sweep_signals.pine     TradingView indicator: BUY/SELL signals, alerts, dashboard
 pine/mnq_liquidity_sweep_bot.pine         TradingView strategy: same rules, Strategy Tester backtest

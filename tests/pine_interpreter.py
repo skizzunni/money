@@ -580,6 +580,13 @@ class StrategyEmulator:
         return float(sum(t["pnl"] for t in self.closed))
 
     @property
+    def openprofit(self):  # unrealized, at this bar's close, before commission
+        if self.pos is None:
+            return 0.0
+        c = self.rt.series["close"][self.rt.i]
+        return float(self.pos["dir"] * (c - self.pos["price"]) * self.pos["qty"] * self.rt.pointvalue)
+
+    @property
     def closedtrades(self):
         return _ClosedTrades(self.closed)
 

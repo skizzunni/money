@@ -38,15 +38,16 @@ The lines change at every check, because σ is different for each time of day. I
 |---|---|---|
 | Flat | above the upper line | **BUY** 1 MNQ at market, then put a **stop order just below the upper line** (the alert gives the exact price) |
 | Flat | below the lower line | **SELL** 1 MNQ at market, then put a **stop order just above the lower line** (the alert gives the exact price) |
-| In a trade | anything | **Move your stop to the new level.** The lines, and the stop with them, move at every half hour. |
+| In a trade | anything | **Move your stop to the new level.** The lines, and the stop with them, move at every half hour. Never let it sit further than your max loss from your fill. |
 | Flat, inside the lines | | Nothing. |
 
 - **The stop is the exit, and it sits 0.24 noise units past the line:** for a long at upper × (1 − 0.24 σ), for a short at lower × (1 + 0.24 σ). Why there: a trade-by-trade post-mortem of 2011–2018 found that 77% of losing trades were stop-outs on the line that then went on in our direction, and 0.24 σ is how far they typically overshot the line before resuming ([RESULTS.md](RESULTS.md#tenth-round-why-the-trades-lose)). On 2023–2026, years that analysis never saw, it raised profit per day by 43% and the win rate from 25% to 34%. If the stop level moves past the price when the lines update, the stop fills at once. The setting *Stop distance past the line* = 0 puts the stop on the line itself.
+- **A max loss per trade caps it.** The setting *Max loss per trade* (default $350 for the whole position) puts a second stop that many dollars from your fill; whichever stop is closer is the one in force. It starts the bar after the fill, because it needs the fill price. Over 16 years a cap of $100–$200 per contract raised profit per day in every period and cut the worst losing stretch ([RESULTS.md](RESULTS.md#eleventh-round-the-worst-days-and-a-cap-per-trade)); $35 per contract (a $350 cap over 10 contracts) wrecked it. Fees, slippage and a gap through the stop can add to the loss.
 - **After a stop-out you're flat until the next check.** A new signal there can put you back in, including the other way.
 - **Orders are market orders** placed right after the check. The backtest fills them at the next bar's open plus 1 tick of slippage. Stops fill at the line, or at the bar's open if price gapped through, minus 1 tick.
 - **At 16:00, close everything.**
 - **The paper's original rule** (exit only if a half-hour check closes back inside the lines, reverse if it closes through the other side) is still there under *Exit → Half-hour check*. It makes fewer trades and had bigger worst days.
-- **Size: 1 MNQ.** On a $1,500 drawdown even that is large for this strategy; [What to expect](#6-what-to-expect) shows the account size that fits it.
+- **Size: the script's default is 3 MNQ with a $350 max loss, $117 per contract.** Every figure in this document and in [RESULTS.md](RESULTS.md) is per contract; multiply by the contracts. If you raise the size, raise the max loss with it: $350 over 10 contracts is $35 each, which cut 2023–2026 to about $2 a day per contract. No $25K / $1,500 evaluation can hold 3 contracts of this; [What to expect](#6-what-to-expect) shows the account size that fits 1.
 - **No trades on holidays and half days.** On US market holidays (MLK Day, Memorial Day, Labor Day and so on), MNQ still trades but halts at about 13:00 ET. On half days (the day after Thanksgiving, Christmas Eve) the session also ends early. The 16-year test only traded full sessions, so the script sits these out. Its input *Don't trade on these dates* comes pre-filled with every 2026–2027 holiday and half day, and you can add news days to it. In 2028, add that year's dates.
 - **If a session ends early anyway**, the script closes any open position at the first bar after the early end, or at the next 09:30 bar. That can be hours later.
 
@@ -82,6 +83,8 @@ Through a **TradingView alert**. It runs on TradingView's servers, so it keeps w
 | Small arrows with *+1 / −1* | TradingView's own backtest fills, one candle after the label. |
 
 The label sits on the half-hour candle that just closed, the moment the alert fires. The backtest fills at the next candle's open.
+
+**Status reports every 15 minutes.** At every 15-minute mark from 09:45 to 16:00 the same alert sends a report, for example *"STATUS 10:15: LONG 10 MNQ from 29,980.25, stop 29,951.00, open P/L $240.00. Today $0.00 on 0 trades (0 won). Lines 29,960.00 / 29,700.00. Next check 10:30."* The setting *Status report every N minutes* changes the interval (0 turns it off). It needs a chart of that length or finer: a 5-minute chart for 15-minute reports. The dashboard shows the same figures: today's P/L, open P/L and trades today.
 
 **Where you place the order:** the alert and the labels only tell you. You place every order yourself.
 

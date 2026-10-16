@@ -5,6 +5,7 @@ so on the next session the noise area is open (= previous close) * (1 +/- 0.001)
 """
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 import pandas as pd
@@ -201,6 +202,43 @@ def test_default_stop_sits_past_the_line():
     assert (t.exit_bar, t.reason) == (bar(14, 8), "Back inside") and t.exit == pytest.approx(stop - 0.25)
 
 
+def test_status_report_every_15_minutes():
+    bars, p = scenario(above_all_day)
+    res = run(bars)
+    # 09:45, 10:00, ..., 16:00 on the session after the history is complete (26), plus the 16:00 report on the
+    # session that completed it
+    assert len(res.status) == 27
+    by_bar = {i: tuple(rest) for i, *rest in res.status}
+    pos, entry, pnl, n = by_bar[bar(14, 5)]  # 10:00: flat, the buy fills on the next bar (entry is nan)
+    assert (pos, pnl, n) == (0, 0.0, 0) and entry != entry
+    pos, entry, pnl, n = by_bar[bar(14, 8)]  # 10:15: long, nothing closed yet
+    assert (pos, n) == (1, 0) and entry == pytest.approx(p * 1.002 + 0.25) and pnl == 0.0
+    pos, entry, pnl, n = by_bar[bar(14, CLOSE_16_00)]  # 16:00: flat again, the day's one trade closed
+    assert (pos, n) == (0, 1) and entry != entry and pnl == pytest.approx(res.trades[0].pnl)
+    assert run(bars, NoiseConfig(status_minutes=0)).status == []
+
+
+def test_ten_contracts_scale_the_trade():
+    bars, _ = scenario(above_all_day)
+    one, ten = run(bars).trades[0], run(bars, NoiseConfig(qty=10)).trades[0]
+    assert ten.qty == 10 and ten.pnl == pytest.approx(10 * one.pnl)
+
+
+def test_max_loss_cap_is_a_second_stop_from_the_bar_after_the_fill():
+    bars, p = scenario(above_all_day)
+    entry = p * 1.002 + 0.25  # the fill, with slippage; the line stop is about 25 points below it
+    cap = NoiseConfig(max_loss_per_trade=20.0)  # 1 contract: a stop $20 = 10 points from the fill
+    t = run(with_low(bars, bar(14, 8), entry - 12), cap).trades[0]  # dips 12 points: past the cap, not the line
+    assert (t.exit_bar, t.reason) == (bar(14, 8), "Max loss") and t.exit == pytest.approx(entry - 10 - 0.25)
+    assert t.pnl == pytest.approx(-20 - 0.5 - 1.24)  # the cap, plus the exit tick and fees
+    default = run(with_low(bars, bar(14, 8), entry - 12)).trades[0]
+    assert default.reason == "16:00 close"  # with the default $350 cap the line stop is the closer one
+    same_bar = run(with_low(bars, bar(14, CHECK_10_00 + 1), entry - 12), cap).trades[0]
+    assert same_bar.reason == "16:00 close"  # on the fill bar only the line stop exists
+    ten = run(with_low(bars, bar(14, 8), entry - 12), NoiseConfig(max_loss_per_trade=200.0, qty=10)).trades[0]
+    assert ten.reason == "Max loss" and ten.exit == pytest.approx(entry - 10 - 0.25)  # $200 over 10 = $20 each
+
+
 def test_exit_mode_must_be_known():
     with pytest.raises(ValueError):
         run(scenario(above_all_day)[0], NoiseConfig(exit_mode="trailing"))
@@ -302,25 +340,48 @@ def run_pine(bars, inputs=None, minutes=5):
     rt.run(on_bar)
     trades = [(t["entry_bar"], t["exit_bar"], t["dir"], round(t["entry"], 6), round(t["exit"], 6),
                round(t["pnl"], 6), t["reason"]) for t in rt.strategy.closed]
-    events = [(i, msg.split()[0].rstrip(":")) for i, msg in rt.alerts]
+    status = [(i, msg) for i, msg in rt.alerts if msg.startswith("STATUS")]
+    events = [(i, msg.split()[0].rstrip(":")) for i, msg in rt.alerts if not msg.startswith("STATUS")]
     labels = [(i, text.split()[0]) for i, text in rt.labels]
     assert labels == events, "every alert has a matching label on the chart"
-    return trades, events, {i: (u, lo) for i, u, lo in bands}
+    return trades, events, {i: (u, lo) for i, u, lo in bands}, status
 
 
-def assert_parity(bars, minutes=5, lookback=14, skip_dates=None, exit_mode="stop", stop_buffer=None):
-    cfg, inputs = NoiseConfig(lookback=lookback, exit_mode=exit_mode), {"Sessions in the noise average": lookback}
+STATUS_RE = re.compile(r"^STATUS \d+:\d\d: (?:(LONG|SHORT) \d+ MNQ from ([\d.]+).*?|flat)\. "
+                       r"Today (-?)\$([\d,.]+) on (\d+) trades")
+
+
+def parse_status(status):
+    out = []
+    for i, msg in status:
+        m = STATUS_RE.match(msg)
+        assert m, msg
+        side, entry, sign, pnl, n = m.groups()
+        d = 1 if side == "LONG" else -1 if side == "SHORT" else 0
+        out.append((i, d, float(entry) if entry else None, (-1 if sign else 1) * float(pnl.replace(",", "")), int(n)))
+    return out
+
+
+def assert_parity(bars, minutes=5, lookback=14, skip_dates=None, exit_mode="stop", stop_buffer=None, qty=1,
+                  max_loss=None):
+    cfg = NoiseConfig(lookback=lookback, exit_mode=exit_mode, qty=qty)
+    inputs = {"Sessions in the noise average": lookback}
     inputs["Exit"] = "Resting stop at the line" if exit_mode == "stop" else "Half-hour check"
+    inputs["Contracts"] = qty  # the script's default is 3; the reference's is 1
+    if max_loss is not None:
+        cfg.max_loss_per_trade = inputs["Max loss per trade, $ (all contracts, 0 = off)"] = max_loss
     if stop_buffer is not None:
         cfg.stop_buffer = inputs["Stop distance past the line, in noise units"] = stop_buffer
     if skip_dates is not None:
         cfg.skip_dates = inputs["Don't trade on these dates"] = skip_dates
     res = run(bars, cfg, minutes=minutes)
-    trades, events, pine_bands = run_pine(bars, inputs, minutes)
+    trades, events, pine_bands, status = run_pine(bars, inputs, minutes)
     assert trades == trades_of(res)
     assert events == res.events
     for i, u, lo in res.bands:
         assert pine_bands[i] == (u, lo)
+    expected = [(i, d, None if d == 0 else round(e, 2), round(pnl, 2), n) for i, d, e, pnl, n in res.status]
+    assert parse_status(status) == expected, "the status reports match the reference"
     return res
 
 
@@ -350,6 +411,24 @@ MODES = {"stop": ("stop", None), "stop on the line": ("stop", 0.0), "check": ("c
 def test_pine_hand_built(name, mode):
     exit_mode, buf = MODES[mode]
     assert_parity(HAND_BUILT[name](), exit_mode=exit_mode, stop_buffer=buf)
+
+
+@pytest.mark.slow
+def test_pine_max_loss_cap():
+    bars, p = scenario(above_all_day)
+    entry = p * 1.002 + 0.25
+    res = assert_parity(with_low(bars, bar(14, 8), entry - 12), max_loss=20.0)
+    assert res.trades[0].reason == "Max loss"
+    fill_bar = assert_parity(with_low(bars, bar(14, CHECK_10_00 + 1), entry - 12), max_loss=20.0)
+    assert fill_bar.trades[0].reason != "Max loss"
+    assert assert_parity(synth_bars(sessions=60, seed=9), max_loss=100.0).trades
+
+
+@pytest.mark.slow
+def test_pine_ten_contracts():
+    bars, _ = scenario(above_then_below)
+    res = assert_parity(bars, qty=10)
+    assert res.trades[0].qty == 10 and all(t.qty == 10 for t in res.trades)
 
 
 @pytest.mark.slow
