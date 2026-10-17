@@ -1029,6 +1029,10 @@ Dropping trades that lose on average raises winners and money together. Fixed be
 - **A closer take-profit for the evaluation.** At 10 MNQ and $350, take-profit 1.25 against 1.5: $50K passes 34% / 36% / 27% against 32% / 32% / 23% on the index 2011–2018 / 2019–2022 / 2023–2026 and 28% against 25% on NQ futures, with smaller worst stretches on three of the four; but $ per day ×10 of 152 / 166 / 79 / 116 against 152 / 170 / 66 / 129, so 10% less on NQ futures. A trade-off, so 1.5 stays; *Take profit* 1.25 is the setting for someone who cares only about passing.
 - **The Fed rule at this size** still helps: $138.5 against $137.1 a day ×10 on the index, $132.2 against $129.0 on NQ futures, with a higher t-stat and no larger worst stretch.
 
+## Fifty-second round: a lock trigger scaled to the day's noise
+
+The lock trigger as k × the check's noise (σ × price), kept between 8.75 and 17.5 points ([`research/lock_sigma.py`](../research/lock_sigma.py)): sooner on quiet days, the full 17.5 on volatile ones. On 2011–2018 every k met the bar (k = 0.15: 53.7% against 50.6% winners, $16.60 against $15.19 a day, t 5.19 against 4.67, $50K passes 36% against 32%). On 2019–2022, a volatile stretch where the trigger mostly sat at 17.5, it tied v1.3 ($17.03 against $17.04 a day, 47.6% against 47.0% winners) and so missed the bar; 2023–2026 was not looked at. Not adopted.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
@@ -1112,6 +1116,7 @@ python research/mes.py nsx_1m_scaled.pkl spx_1m_scaled.pkl             # the sam
 python research/confirm_lock.py spx_1m.pkl nsx_1m_scaled.pkl nq_1m_scaled.pkl  # earlier lock if the S&P disagrees (no)
 python research/walkforward_tp35.py nsx_1m_scaled.pkl nq_1m_scaled.pkl  # the take-profit at $35, walk-forward (1.5 stays)
 python research/walkforward_more.py nsx_1m_scaled.pkl nq_1m_scaled.pkl  # lookback, lock offset, loser limit (all stay)
+python research/lock_sigma.py nsx_1m_scaled.pkl nq_1m_scaled.pkl       # a noise-scaled lock trigger (ties 2019-22)
 ```
 
 The raw data isn't stored in this repo.
