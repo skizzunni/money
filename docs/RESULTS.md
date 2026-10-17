@@ -1858,6 +1858,35 @@ the total paid per evaluation is not reliably higher: the first payout comes soo
 On real MNQ bars from Yahoo (37 nights, August-October 2026) the 100-point stop made +$894 at 1 MNQ, 40% of nights
 up. **Not built in.**
 
+## Round one hundred and six: the overnight long until the first payout
+
+`research/overnight_first.py` (description, chosen after round 105): the overnight long on the funded account only
+until its first payout, then off. It pays even less in total than leaving it on ($1,150 / $605 / $88 / $604 per
+evaluation against $1,268 / $727 / $31 / $690 now). It also measures the two-week goal directly: a first payout
+within 10 sessions of being funded happens 0.2-0.6% of the time now and 1.5-3.3% with the overnight long. Apex's first
+payout needs +$2,600 and five $200 days; in two weeks that is about $1,300 a week, four times what the strategy
+makes on average. **Not adopted.**
+
+## Round one hundred and seven: the strategy now on Apex's 50K EOD-trail evaluation
+
+A check, not a search: the strategy as it is now (bot + breakout) on the EOD-trail evaluation ($3,000 target,
+$2,000 drawdown set from end-of-day balances, $1,000 daily loss limit, 30 days) with the evaluation side at round
+sixty's EOD setting, 6 MNQ / $300 / 3 losers, against the intraday trail the user trades now. The funded account is
+modelled as before (drawdown trailing open profit until +$100), so if an EOD evaluation leads to an EOD funded
+account this understates it.
+
+| | Pass %, 2011-18 / 2019-25 / NQ | Bust % | Median sessions to pass | Paid per evaluation |
+|---|---|---|---|---|
+| Intraday trail, bot 4 MNQ (now) | 26.4 / 21.7 / 22.7 | 60 / 61 / 67 | 10 / 10 / 10 | $1,268 / $727 / $690 |
+| EOD trail, bot 4 MNQ | 33.0 / 32.9 / 30.5 | 43 / 34 / 42 | 11 / 12 / 11 | $1,500 / $875 / $908 |
+| EOD trail, bot 6 MNQ, $300 | 39.6 / 40.0 / 36.9 | 53 / 48 / 58 | 7 / 8 / 7 | $1,864 / $1,369 / $1,117 |
+| EOD trail, bot 8 MNQ, $400 | 39.4 / 37.9 / 38.8 | 58 / 57 / 59 | 6 / 5 / 5 | $2,052 / $1,364 / $1,230 |
+| EOD trail, 6 MNQ + the overnight long | 40.8 / 38.4 / 35.3 | 52 / 56 / 62 | 7 / 7 / 6 | $2,094 / $1,012 / $1,179 |
+
+The plan is the largest lever found: 1.6-1.8 times the passes and 1.5-1.9 times the money per evaluation, in every
+period. 6 and 8 MNQ are close; 6 stays (round sixty's choice, not refitted here). The overnight long is mixed again.
+**Recommended for the next evaluation: the EOD plan, evaluation side 6 MNQ, $300, 3 losers** (already a setting).
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
@@ -1956,6 +1985,7 @@ python research/combo_more.py nsx1m_scaled.pkl nq1m_scaled.pkl         # breakou
 python research/w_manage.py nsx1m_scaled.pkl nq1m_scaled.pkl           # lock / take-profit for the breakout (no)
 python research/overnight_drift.py nsx1m_scaled.pkl nq1m_scaled.pkl    # the overnight drift (positive, below the bar)
 python research/overnight_combo.py nsx1m_scaled.pkl nq1m_scaled.pkl    # the overnight long on the account (no)
+python research/overnight_first.py nsx1m_scaled.pkl nq1m_scaled.pkl    # ... until the first payout (no)
 ```
 
 The raw data isn't stored in this repo.
