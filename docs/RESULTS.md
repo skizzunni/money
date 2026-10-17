@@ -1251,6 +1251,28 @@ pass rate, on 2019-26 and on NQ futures. 4 MNQ, $200 max loss, 1-minute bars, op
 - **The payout rules cap one Apex account**, whatever the strategy: at most 6 payouts of $1,500-$3,000 (about
   $13,000 in all), with at least 5 qualifying days between them.
 
+## Round sixty-six: playing the Apex payout rules (one account, all 6 payouts)
+
+`research/payout_policy.py`. The user's goal for one 50K account: all six payouts, as reliably and fast as possible.
+The bot earns on a few big days, which collides with the 50% consistency rule and the five $200 days a payout needs.
+Policies (24 combinations): a daily profit stop in the funded account (none, $400, $600, $900), a protect mode
+(2 MNQ while the balance is at or above $52,600 and the next payout isn't taken yet), 3, 4 or 6 MNQ at a 25-point
+cap; and a $1,000 daily profit stop in the evaluation. Pass bar, fixed before running: the best 2011-18 policy by the
+chance an evaluation leads to all six payouts must beat the current setup by 25% (relative) on 2019-25 and NQ futures,
+with no less paid per evaluation.
+
+| Policy | Paid per evaluation, 2011-18 / 2019-25 / NQ | All six payouts, % of evaluations | At least one payout, % | Weeks from funded to the 6th payout |
+|---|---|---|---|---|
+| Current (4 MNQ, no stop) | $862 / $553 / $550 | 5.7 / 3.4 / 3.7 | 10.9 / 5.3 / 7.1 | 152 / 124 / 153 |
+| 4 MNQ, protect mode (2011-18 best) | $1,034 / $573 / $631 | 7.1 / 3.6 / 4.3 | 12.4 / 6.0 / 7.1 | 156 / 143 / 159 |
+| 3 MNQ, $900 daily profit stop, protect | — / $752 / $625 | — / 3.4 / 2.6 | — / 11.5 / 12.8 | — / 51-83 |
+
+**FAIL**: protect mode raised the six-payout chance by 6% (2019-25) and 18% (NQ futures) against the 25% needed; the
+evaluation profit stop lowered the pass rate. Description: under every policy only 3-7% of evaluations reach all six
+payouts, and those take about 2½-3 years, because a funded account makes about $65-160 a week and the six payouts
+add up to about $13,000. A $900 daily profit stop roughly doubles the chance of at least one payout; protect mode was
+slightly better in all three periods.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
