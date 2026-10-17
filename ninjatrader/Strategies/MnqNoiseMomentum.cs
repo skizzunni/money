@@ -53,16 +53,16 @@ namespace NinjaTrader.NinjaScript.Strategies
                 IsInstantiatedOnEachOptimizationIteration = true;
 
                 Funded = false;
-                EvalQty = 3;
+                EvalQty = 6;           // Apex 50K evaluation, end-of-day plan (docs/RESULTS.md round 60)
                 FundedQty = 10;
                 PlaceOrders = true;
-                EvalMaxLoss = 350;     // a 25K evaluation needs less: $200 and 2 losers (docs/RESULTS.md round 59)
+                EvalMaxLoss = 300;     // 3 losers x $300 stays under the plan's $1,000 daily loss limit
                 FundedMaxLoss = 350;
                 TakeProfit = 1.5;
                 StopBuffer = 0.24;
                 LockAt = 1.0;
                 LockPlus = 2.5;
-                EvalMaxLosers = 4;
+                EvalMaxLosers = 3;
                 FundedMaxLosers = 4;
                 Lookback = 14;
                 FedNoShorts = true;
@@ -393,7 +393,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         #region Properties
         [NinjaScriptProperty]
-        [Display(Name = "FUNDED ACCOUNT (on: 10 MNQ; off: the 3 MNQ evaluation)", Order = 1, GroupName = "1. Account")]
+        [Display(Name = "FUNDED ACCOUNT (on: 10 MNQ, $350; off: the 50K evaluation, 6 MNQ, $300)", Order = 1, GroupName = "1. Account")]
         public bool Funded { get; set; }
 
         [NinjaScriptProperty]
