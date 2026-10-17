@@ -28,11 +28,12 @@ account. Copy that account to others with a trade copier (Tradesyncer, or NinjaT
    - **Account:** the one account the bot trades (Tradesyncer's leader).
    - **Calculate: On bar close.** Any other setting and the strategy won't trade; the chart says so.
    - **Start behavior: Wait until flat** (the default).
-   - **FUNDED ACCOUNT:** off = evaluation: **3 MNQ, $200 max loss a trade, no new entries after 2 losers**. On =
-     funded, as before: **10 MNQ, $350, 4 losers**. The evaluation side is sized for an Apex 25K ($1,000 trailing
-     drawdown): at $350 and 4 losers, 3–4% of days would lose the whole $1,000 in one day; at $200 and 2, none did
-     (research round fifty-nine, [RESULTS.md](RESULTS.md#round-fifty-nine-an-apex-25k-evaluation)). Pick the
-     **end-of-day** drawdown plan when you buy it: the intraday one busts far more often with this bot.
+   - **FUNDED ACCOUNT:** off = evaluation: **3 MNQ**. On = funded: **10 MNQ**. Both: $350 max loss a trade, no new
+     entries after 4 losers a day (each side has its own max loss and loser limit in the settings). These are for a
+     50K evaluation. On a **25K** account ($1,000 drawdown) set the evaluation to **$200 and 2 losers**: at $350 and
+     4, 3–4% of days lose the whole $1,000 in one day; at $200 and 2, none did
+     ([RESULTS.md](RESULTS.md#round-fifty-nine-an-apex-25k-evaluation)). Pick the **end-of-day** drawdown plan when
+     you buy an evaluation: the intraday one busts far more often with this bot.
    - **Place orders:** on = the strategy trades; off = alerts only.
    - Leave the rest at the tested defaults: take-profit 1.5, line stop 0.24, lock at 1.0 → entry + 2.5, 14 sessions,
      Fed days on.
@@ -46,13 +47,13 @@ P/L and losers. The orange and green lines on the chart are the stop and take-pr
 ## What it does
 
 - **10:00, 10:30 … 15:30 New York**, at the close of each check bar: if flat, price outside the noise area, the day
-  not on the skip list, fewer than 2 losers today (4 funded), and not a short before 14:00 on a Fed day, it sends a **market
+  not on the skip list, fewer than 4 losers today, and not a short before 14:00 on a Fed day, it sends a **market
   order**. The stop-loss and take-profit go in with it, in ticks from the fill. NinjaTrader sends them the moment
   the entry fills, as one OCO pair. The stop is the closer of the line stop and the max loss. The max loss is rounded
   toward the price, so a trade never risks more than the max loss (fees and slippage aside).
 - **Every bar close in a trade:** the stop moves with the line (it's measured from your real fill), and to
-  **entry + 2.5 points** once a bar has reached +1 max loss (the lock: +17.5 points at 10 MNQ and $350, about +33.3
-  at 3 MNQ and $200). The
+  **entry + 2.5 points** once a bar has reached +1 max loss (the lock: +17.5 points at 10 MNQ, about +58.3 at
+  3 MNQ). The
   take-profit stays 1.5 noise units from the fill. If the line has moved past the price, the position is closed at
   market, because a stop can't rest there.
 - **16:00 New York:** any position is closed at market, whatever happened before. A session that ends early (a half
@@ -101,8 +102,8 @@ not identical: NinjaTrader's historical fills differ from the worst-case fills t
   NinjaTrader's API it uses, with the backtest's fill model. **The trades it places are the Python bot's trades,
   to the cent.** Also: a stop goes in before every entry, every order price is on the tick, the first stop never
   risks more than the max loss, every position is flat by 16:00 even when the real fills drift from the bot's, a rejected
-  stop closes the position, alerts-only mode places nothing, and the switch puts on 3 contracts at $200 and 2
-  losers, or 10 at $350 and 4.
+  stop closes the position, alerts-only mode places nothing, and the switch puts on 3 or 10 contracts with each
+  side's own max loss and loser limit.
 - Every NinjaTrader call (SetStopLoss, SetProfitTarget, ExitLong, OnOrderUpdate, Alert, Draw.TextFixed,
   GetCurrentBid, StartBehavior, RealtimeErrorHandling) was checked against NinjaTrader's help guide.
 - Mutation check: breaking the rules or the order handling on purpose (a stop in the wrong place, no 16:00 exit, the

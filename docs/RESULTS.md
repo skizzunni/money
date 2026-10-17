@@ -1126,8 +1126,8 @@ intraday pick passed 2019-26 (+8.1) and missed on NQ futures (+4.9). What the ta
 1. **$350 and 4 losers is too much for a $1,000 drawdown.** 3-4% of days would lose the whole drawdown in one day,
    and 14-16% would hit the end-of-day plan's $500 daily limit. At $200 and 2 losers no day reached -$1,000 and
    almost none -$500, and the pass rate is as good or slightly better on all three data sets, with fewer busts. The
-   cost: it makes less a day (about $45-54 against $60-77 at 3 MNQ), which a 30-day evaluation absorbs. That is why the evaluation side of the switch is now 3 MNQ, $200, 2 losers: a judgement call on
-   risk (it wasn't the 2011-18 pick), not a test result. The funded side stays 10 MNQ, $350, 4 losers.
+   cost: it makes less a day (about $45-54 against $60-77 at 3 MNQ), which a 30-day evaluation absorbs. For a 25K account the evaluation side should be 3 MNQ, $200, 2 losers: a judgement call on risk (it
+   wasn't the 2011-18 pick), not a test result. (The user then went back to 50K evaluations: round sixty.)
 2. **Buy the end-of-day plan.** On the intraday plan open profit drags the threshold up, and every setting busts
    57-96% of attempts.
 3. **10 MNQ doesn't fit a 25K account**: 4-8% pass on the intraday plan, 27-36% end-of-day, 15-16% of days at

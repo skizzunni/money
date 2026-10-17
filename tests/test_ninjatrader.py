@@ -198,8 +198,8 @@ def run_sim(sim, bars: pd.DataFrame, tmp: Path, minutes: int = 5, **props):
 
 
 TIME_EXITS = ("16:00 close", "Session ended")
-# the strategy's switch: an evaluation trades 3 MNQ, $200 max loss, 2 losers a day; funded 10 MNQ, $350, 4 losers
-ACCOUNTS = {False: dict(qty=3, max_loss_per_trade=200.0, max_losers=2), True: dict(qty=10, max_loss_per_trade=350.0,
+# the strategy's switch: an evaluation trades 3 MNQ, funded 10 MNQ, both with a $350 max loss and 4 losers a day
+ACCOUNTS = {False: dict(qty=3, max_loss_per_trade=350.0, max_losers=4), True: dict(qty=10, max_loss_per_trade=350.0,
                                                                                   max_losers=4)}
 
 
@@ -316,7 +316,7 @@ def test_alerts_only_places_no_orders(sim, tmp_path):
 def test_dashboard_and_switch(sim, tmp_path):
     bars = synth_bars(sessions=30, seed=3)
     _, _, dash, printed = run_sim(sim, bars, tmp_path)
-    assert "Evaluation, 3 MNQ, $200 max loss, 2 losers a day" in dash and "Orders: ON" in dash
+    assert "Evaluation, 3 MNQ, $350 max loss, 4 losers a day" in dash and "Orders: ON" in dash
     assert any("BUY 3 MNQ (Evaluation)" in p or "SELL 3 MNQ (Evaluation)" in p for p in printed)
     _, _, dash, printed = run_sim(sim, bars, tmp_path, Funded=True)
     assert "Funded, 10 MNQ, $350 max loss, 4 losers a day" in dash
