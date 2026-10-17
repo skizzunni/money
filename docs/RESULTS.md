@@ -1474,6 +1474,17 @@ results over past sessions are good. Adoption bar as round seventy-six. Pass % /
 **None adopted.** The filters cut busts but sit out the trend days that pay; the bot's streaks don't predict its next
 days.
 
+## Round seventy-nine: all 34 cues in one walk-forward model
+
+`research/trade_model.py`. Logistic (C 0.1) and ridge (alpha 10) on round seventy's 34 cues per trade, trained on
+earlier years only and scored year by year (index 2015-26, NQ futures 2015-25); trades sized 6 / 4 / 2 MNQ by the
+predicted tercile (cut-offs from the training years). Adoption bar fixed before running: top tercile beats bottom with
+t >= 2 out of sample on both, and more paid per evaluation with no lower pass rate.
+
+Out of sample: AUC 0.523-0.528; winners 52.9% / 52.2% / 48.0% (index) and 52.9% / 52.1% / 48.3% (NQ) by tercile;
+top vs bottom t 0.91 (index), 0.38 (NQ). Sizing by tercile: evaluation pass 25.0% -> 18.2% (index), 23.5% -> 19.9%
+(NQ). **FAIL**: the cues tilt the odds by 4-5 points, too little to size on a $2,000 trailing drawdown.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
