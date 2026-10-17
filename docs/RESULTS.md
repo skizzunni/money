@@ -1384,6 +1384,22 @@ report days (t 1.84 / 1.30 / 1.71), skip them (the mirror), a 1.25x wider noise 
 makes about 2.5-3.4 times its usual $ a day on jobs-report days, in the same direction in all three data sets; with
 about 12 such days a year the evidence stays under the bar. A replication on other scheduled releases follows.
 
+## Round seventy-four: do other scheduled releases replicate the jobs-report days?
+
+`research/news_days.py`, dates in [`ism_dates.csv`](../research/ism_dates.csv) (ISM manufacturing, the first business day
+of the month; January excluded, its release day varies) and `fomc_dates.csv`; jobs-report days left out of every group.
+Pass bar fixed before running: the bot earns more on ISM days and on FOMC days than on days without news in all three
+periods, and a pooled one-sided t >= 2.0 for at least one.
+
+| Period | ISM days | FOMC days | Jobs-report days | No news |
+|---|---|---|---|---|
+| 2011-18 | $124.01 (79) | $36.57 (64) | $149.71 (93) | $50.51 |
+| 2019-26 | $64.04 (76) | -$33.50 (59) | $99.49 (87) | $44.46 |
+| NQ futures 2015-25 | $94.01 (107) | -$10.77 (82) | $103.44 (120) | $40.37 |
+
+**FAIL**: ISM days lean the jobs-report way (t 0.83 pooled), FOMC days go the other way. "News days make trend days" is
+not a rule to size on.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
