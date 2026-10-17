@@ -1400,6 +1400,47 @@ periods, and a pooled one-sided t >= 2.0 for at least one.
 **FAIL**: ISM days lean the jobs-report way (t 0.83 pooled), FOMC days go the other way. "News days make trend days" is
 not a rule to size on.
 
+## Round seventy-five: the near-misses of round seventy, on data they hadn't seen
+
+`research/cue_replicate.py`. Round seventy's three near-misses, definitions unchanged, pass bar fixed before running
+(Bonferroni for 3: the predicted sign with t >= 2.4 on index 2019-26 and t >= 1.5 on NQ futures 2019-25), as the daily
+P/L difference against the bot alone:
+
+| Rule | t 2011-18 | t 2019-26 | t NQ 2015-25 | t NQ 2019-25 | Verdict |
+|---|---|---|---|---|---|
+| B8: 2x size when the signal bar's wick against the trade is over half its range | 4.46 | 3.40 | 3.85 | 2.42 | **PASS** |
+| B3: skip oversized signal bars | 1.42 | -1.94 | -0.75 | -1.23 | FAIL |
+| C3: skip the last trading day of the month | 1.29 | -0.10 | 0.53 | -0.48 | FAIL |
+
+**The first cue in these rounds to hold on data it hadn't seen.** For a long, the 5-minute bar that closes above the
+line has closed in the lower half below its high (the mirror for a short); it is known when the bar closes, before the
+entry fills. Checked independently on the 5-minute bars the NinjaTrader strategy trades (4 MNQ, $200):
+
+| Data | Wick trades | Other trades | Wick trades' share of the profit |
+|---|---|---|---|
+| Index 2011-18 | 42% of trades, $49 a trade, 49% winners | $15, 45% | 70% |
+| Index 2019-26 | 39%, $53, 46% | $14, 42% | 70% |
+| NQ 2015-18 | 42%, $52, 48% | $7, 44% | 84% |
+| NQ 2019-25 | 40%, $31, 46% (t 0.91 on this slice) | $15, 41% | 58% |
+
+## Round seventy-six: sizing the wick trades on a 50K Apex account
+
+`research/wick_size.py`. Only the contracts change (wick / other trades, the same 25-point cap), on the 50K
+intraday-trail evaluation and funded account. Adoption bar fixed before running: more paid per evaluation than 4 / 4 in
+all three periods, with no lower pass rate.
+
+| Split (wick / other) | Paid per evaluation, 2011-18 / 2019-25 / NQ | Evaluation pass % | $ a week, bot alone |
+|---|---|---|---|
+| 4 / 4 (now) | $862 / $553 / $550 | 27.5 / 22.9 / 25.3 | $272 / $270 / $245 |
+| 6 / 2 | $1,113 / $315 / $713 | 27.9 / 15.5 / 19.6 | $338 / $302 / $267 |
+| 8 / 2 | $1,078 / $101 / $324 | 24.4 / 13.9 / 18.4 | $438 / $386 / $339 |
+| 6 / 0 | $649 / $172 / $494 | 24.3 / 14.3 / 15.6 | $302 / $251 / $217 |
+| 10 / 2 | $851 / $103 / $299 | 22.8 / 12.2 / 15.7 | $539 / $470 / $412 |
+
+**None adopted.** Size on the wick trades raises the bot's weekly $ (up to $412-539 a week at 10 / 2), but fewer,
+bigger trades make the path rougher, and on a $2,000 trailing drawdown the evaluation busts more: on 2019-25 every split
+passes less often and pays less than 4 / 4. The cue is real; turning it into size doesn't fit this drawdown.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
