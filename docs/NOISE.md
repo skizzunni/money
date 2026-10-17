@@ -123,6 +123,7 @@ In webhook mode the stop **only ever tightens** during a trade, because the brok
 
 | Alert starts with | Do this |
 |---|---|
+| `HEADS-UP: 10:00 BUY likely` / `… SELL likely` (v1.4) | Five minutes before a check, price is already past that check's line: about 9 times in 10 the BUY or SELL follows. Open the order ticket now, with the contracts, the stop distance, the take-profit distance and the auto-breakeven it names, so you can send it the second the check alert arrives. Don't enter before the check: about 1 in 10 heads-ups gets no signal. |
 | `BUY 3 MNQ at market now` | Buy at market with a bracket: the stop and take-profit prices the alert names (or the same distances from your fill). |
 | `SELL 3 MNQ at market now` | Sell at market with a bracket: the stop and take-profit prices the alert names (or the same distances from your fill). |
 | `EXIT LONG: price hit the stop` / `EXIT SHORT: price hit the stop` | Your stop (the max loss, the line or the lock) should have filled. If you had no stop in, exit at market now. Cancel the take-profit order. |

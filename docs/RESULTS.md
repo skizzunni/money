@@ -1019,6 +1019,14 @@ Dropping trades that lose on average raises winners and money together. Fixed be
 - **Lock the breakouts the S&P doesn't confirm earlier** ([`research/confirm_lock.py`](../research/confirm_lock.py)): every trade taken, but a signal the S&P did not confirm locks at 13.1 points instead of 17.5. Win rate +2.0 / +1.2 / +0.9 points on 2011–2018 / 2019–2022 / 2023–2026 and a smaller worst losing stretch in each, $ per day +6% / +7% / −1% (the last is $0.07 a day per contract, so it missed the bar); on NQ futures 2015–2025, +1.4 points and −2% $ per day. About a point of win rate for about the same money: not adopted.
 - **Re-enter after a lock exit** (a stop order at the trade's lock trigger price, until the next check; a quick look at 2011–2018, simulator option `relock`): 47.2% winners and $7.31 a day against 50.6% and $15.19, worst stretch twice as large. The shake-outs are not followed by continuation more often than chance.
 
+## Rounds forty-nine and fifty: the take-profit at $35, and a heads-up before the check
+
+- **The take-profit, re-chosen walk-forward at 10 MNQ and $350 with the lock** ([`research/walkforward_tp35.py`](../research/walkforward_tp35.py)): each year the level with the best t-stat over all earlier years, from none and 1.0–3.0 noise units. The index picked 1.25 every year, NQ futures 1.5 in most; the stitched records tie fixed 1.5 ($135 and $125 a day ×10 against the same). 1.5 stays.
+- **The heads-up (v1.4).** Each check's lines are known from the open, so five minutes before a check the script can see whether price is already past the line. On 2011–2018 (5-minute bars), when it was, a signal followed at the check 93–94% of the time; when it was inside, 3%; and 92% of all signals were already past the line five minutes earlier. With the position, the daily limit and the Fed rule taken into account (2017–2018), 89% of heads-ups were followed by that signal and 85% of signals had one. Placing orders by hand, each minute between the check and the fill cost 15–25% of the profit (round thirty-five); with the order prepared, the fill is seconds after the check. The heads-up is an alert and a dashboard note only, so the trades and the backtest don't change.
+- **Three more settings, walk-forward at 10 MNQ and $350** ([`research/walkforward_more.py`](../research/walkforward_more.py)): sessions in the noise average (10/14/20/30), the lock offset (1.25/2.5/5) and the daily loser limit (3/4/5/6). Each either picked v1.3's value nearly every year or did worse when it moved away (a 10-session lookback: +$9 a day on the index, −$15 on NQ futures and a far larger worst stretch). v1.3's settings are where the walk-forward lands.
+- **The moving line stop at this size.** With $35 a contract the max loss is nearly always the closer stop: over 2011–2026 the line closed 51 of 8,315 trades (0.6%), and a bracket left alone all trade made $136 a day ×10 against $137 (NQ futures $127 against $129). The entry alert now says to leave the stop where it is when the max loss is the closer stop: one bracket, nothing to move.
+- **The Fed rule at this size** still helps: $138.5 against $137.1 a day ×10 on the index, $132.2 against $129.0 on NQ futures, with a higher t-stat and no larger worst stretch.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
@@ -1100,6 +1108,8 @@ python research/time_exits.py nsx_1m_scaled.pkl nq_1m_scaled.pkl      # time loc
 python research/release_days.py nsx_1m_scaled.pkl nq_1m_scaled.pkl    # no 10:00 entry on ISM days (no)
 python research/mes.py nsx_1m_scaled.pkl spx_1m_scaled.pkl             # the same bot on MES (no edge)
 python research/confirm_lock.py spx_1m.pkl nsx_1m_scaled.pkl nq_1m_scaled.pkl  # earlier lock if the S&P disagrees (no)
+python research/walkforward_tp35.py nsx_1m_scaled.pkl nq_1m_scaled.pkl  # the take-profit at $35, walk-forward (1.5 stays)
+python research/walkforward_more.py nsx_1m_scaled.pkl nq_1m_scaled.pkl  # lookback, lock offset, loser limit (all stay)
 ```
 
 The raw data isn't stored in this repo.

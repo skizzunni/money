@@ -396,12 +396,14 @@ def run_pine(bars, inputs=None, minutes=5):
     trades = [(t["entry_bar"], t["exit_bar"], t["dir"], round(t["entry"], 6), round(t["exit"], 6),
                round(t["pnl"], 6), t["reason"]) for t in rt.strategy.closed]
     hooks = [(i, msg) for i, msg in rt.alerts if msg.startswith("{")]  # webhook messages, sent with order fills
-    events = [(i, msg.split()[0].rstrip(":")) for i, msg in rt.alerts if not msg.startswith("{")]
+    heads = [(i, 1 if " BUY likely" in msg else -1) for i, msg in rt.alerts if msg.startswith("HEADS-UP")]
+    events = [(i, msg.split()[0].rstrip(":")) for i, msg in rt.alerts
+              if not msg.startswith("{") and not msg.startswith("HEADS-UP")]
     labels = [(i, text.split()[0]) for i, text in rt.labels]
     assert labels == events, "every alert has a matching label on the chart"
     logs = [t for t in rt.tables if t.columns == 7]
     assert len(logs) == 1, "one trade-log table"
-    return trades, events, {i: (u, lo) for i, u, lo in bands}, logs[0].grid(), hooks
+    return trades, events, {i: (u, lo) for i, u, lo in bands}, logs[0].grid(), hooks, heads
 
 
 LOG_HEADER = ["Opened (NY)", "Side", "Entry", "Closed (NY)", "Exit", "P/L", "Why"]
@@ -459,9 +461,10 @@ def assert_parity(bars, minutes=5, lookback=14, skip_dates=None, exit_mode="stop
     if fed_no_shorts is not None:
         cfg.fed_no_shorts = inputs["Fed days: no shorts before 14:00"] = fed_no_shorts
     res = run(bars, cfg, minutes=minutes)
-    trades, events, pine_bands, log, hooks = run_pine(bars, inputs, minutes)
+    trades, events, pine_bands, log, hooks, heads = run_pine(bars, inputs, minutes)
     assert trades == trades_of(res)
     assert events == res.events
+    assert heads == res.headsups, "the heads-up alerts five minutes before a check"
     for i, u, lo in res.bands:
         assert pine_bands[i] == (u, lo)
     assert_trade_log(log, res, exit_mode)
@@ -621,6 +624,18 @@ def test_daily_loser_limit_blocks_new_entries_only():
     assert first_of_day[0] == first_of_day[1], "the limit never touches a day's first trade"
 
 
+def test_headsups_come_five_minutes_before_most_signals():
+    bars = synth_bars(sessions=120, seed=3)
+    res = run(bars, NoiseConfig(qty=10, max_loss_per_trade=350.0))
+    signals = {o[0]: o[1] for o in res.orders}
+    assert len(res.headsups) >= 10
+    followed = sum(signals.get(i + 1) == d for i, d in res.headsups)  # the check is the next 5-minute bar
+    assert followed / len(res.headsups) > 0.5
+    idx = bars.index.tz_convert(NY)
+    for i, _ in res.headsups:
+        assert (idx[i].hour * 60 + idx[i].minute + 10 - 600) % 30 == 0, "the bar ending five minutes before a check"
+
+
 def test_tighten_only_stop_never_loosens():
     """Webhook mode: the stop is the tightest one so far in the trade. Over random sessions it exits some trades
     earlier than the moving line would (so it is exercised), and never later."""
@@ -644,6 +659,7 @@ def test_pine_lock():
     assert assert_parity(lock_case(17.5 + 0.01)[0], qty=10, max_loss=350.0, lock_at=0).trades[0].reason == "16:00 close"
     res = assert_parity(synth_bars(sessions=120, seed=3), qty=10, max_loss=350.0)
     assert sum(t.reason == "Lock" for t in res.trades) >= 5
+    assert len(res.headsups) >= 10, "the heads-ups are checked against the script too"
     res = assert_parity(synth_bars(sessions=120, seed=3), qty=10, max_loss=350.0, hook="MNQZ2026")
     assert sum(t.reason == "Lock" for t in res.trades) >= 5, "the lock with webhook orders"
 

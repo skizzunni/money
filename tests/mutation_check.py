@@ -176,6 +176,14 @@ MUTANTS = {
     "noise: daily limit counts earlier days": (
         "noise", "or losersSince(dayStartClosed) < maxLosers   //", "or losersSince(0) < maxLosers   //"
     ),
+    "noise: heads-up at the check instead of before it": ("noise", "preEnd = endMin + 5\n", "preEnd = endMin\n"),
+    "noise: heads-up while in a trade": (
+        "noise", "not na(prevClose) and strategy.position_size == 0 and not skipToday and (maxLosers",
+        "not na(prevClose) and not skipToday and (maxLosers"
+    ),
+    "noise: heads-up from the wrong check's noise": (
+        "noise", "kh = int((preEnd - FIRST_CHECK) / 30)", "kh = math.max(0, int((preEnd - FIRST_CHECK) / 30) - 1)"
+    ),
     "noise: open position kept into the next session": (
         "noise", "(not inRth or tMin == RTH_OPEN)", "not inRth"
     ),

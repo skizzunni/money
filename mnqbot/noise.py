@@ -103,6 +103,8 @@ class NoiseResult:
     bands: list[tuple[int, float, float]] = field(default_factory=list)  # (check bar, upper, lower)
     # (signal bar, direction, expected fill, stop, take-profit) for every entry: the bracket sent with it (nan: none)
     orders: list[tuple[int, int, float, float, float]] = field(default_factory=list)
+    # (bar, direction) five minutes before a check, when flat and the close is already past that check's line
+    headsups: list[tuple[int, int]] = field(default_factory=list)
 
     def trades_frame(self) -> pd.DataFrame:
         return pd.DataFrame([t.__dict__ for t in self.trades])
@@ -144,6 +146,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
     events: list[tuple[int, str]] = []
     bands: list[tuple[int, float, float]] = []
     orders: list[tuple[int, int, float, float, float]] = []
+    headsups: list[tuple[int, int]] = []
 
     def open_pos(i: int, d: int) -> None:
         nonlocal pos, entry_px, entry_bar
@@ -274,6 +277,21 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                             tp = est_px * (1 + d * cfg.take_profit * sigma)
                     orders.append((i, d, est_px, stop, tp))
 
+        # heads-up: five minutes before a check, flat, and the close already past that check's line (round fifty)
+        nxt = end + 5
+        if (in_rth and 5 % minutes == 0 and not math.isnan(day_open) and FIRST_CHECK <= nxt <= LAST_CHECK
+                and (nxt - FIRST_CHECK) % STEP == 0 and filled >= lb_n and not math.isnan(prev_close) and pos == 0
+                and not skip_today and (cfg.max_losers <= 0 or losers_today < cfg.max_losers)):
+            k = (nxt - FIRST_CHECK) // STEP
+            s = 0.0
+            for d in range(lb_n):  # same summation order as the check
+                s += ring[d * N_CHECKS + k]
+            sg = s / lb_n
+            if c[i] > max(day_open, prev_close) * (1 + sg):
+                headsups.append((i, 1))
+            elif c[i] < min(day_open, prev_close) * (1 - sg) and not (fed_today and nxt < FED_CUTOFF):
+                headsups.append((i, -1))
+
         if in_rth and end == RTH_CLOSE:
             if pos:
                 close_pos(i, c[i] - pos * slip, "16:00 close")
@@ -284,4 +302,4 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                 filled += 1
             day_open = math.nan
 
-    return NoiseResult(trades, events, bands, orders)
+    return NoiseResult(trades, events, bands, orders, headsups)
