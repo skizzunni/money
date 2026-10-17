@@ -1729,6 +1729,23 @@ positive in all three data sets at every k; k 0.5 with the stop at the opposite 
 $200-900 a contract. With a 25-point stop it loses everywhere. Turtle Soup, 80-20 and the Holy Grail are rare and
 inconsistent. What the Williams breakout adds to the bot on the Apex account is round ninety-eight.
 
+## Round ninety-eight: the Williams breakout added to the bot
+
+`research/williams_combo.py` (description; every period had been seen). The bot as the strategy trades it plus
+Williams k 0.5 (stop at the opposite level, W5, or at the open, W2) at 1 or 2 MNQ, overlapping positions summed minute
+by minute.
+
+| Bot + | $ a week, 2011-18 / 2019-25 / NQ | Evaluation pass % | Paid per evaluation | First payout within 20 sessions |
+|---|---|---|---|---|
+| nothing | 272 / 270 / 245 | 24.6 / 19.5 / 22.8 | $962 / $559 / $599 | 5.5 / 2.2 / 1.7% |
+| W2 x1 | 357 / 378 / 351 | 24.1 / 19.6 / 21.3 | $1,040 / $475 / $517 | 10.9 / 7.6 / 9.1% |
+| W5 x1 | 374 / 402 / 364 | 21.4 / 17.8 / 19.5 | $841 / $350 / $395 | 13.8 / 6.6 / 9.9% |
+| W5 x2 | 475 / 534 / 484 | 18.2 / 11.5 / 14.8 | $319 / $151 / $144 | 13.9 / 7.7 / 11.7% |
+
+It adds $85-130 a week at 1 MNQ and brings the first payout sooner, but its stops are wide (W5: 95th percentile
+$1,300-1,800 a trade at 1 MNQ), red days rise to 43-50%, and on a $2,000 trailing drawdown evaluations bust more and
+pay less per evaluation in 2019-25 and on NQ. **Not added.** (Correlation of daily P/L with the bot: 0.4.)
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
