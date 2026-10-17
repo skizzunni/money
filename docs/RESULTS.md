@@ -1577,6 +1577,22 @@ lock in the evaluation, 4 MNQ, $200; the funded account as the strategy trades i
 **FAIL**: the fixed lock had the best 2011-18 pass rate of all six. Trailing halves the busts but cuts the trend days
 that reach $3,000; a third to three quarters of evaluations then run out of time.
 
+## Round eighty-six: more checks on news days
+
+`research/news_checks.py`. On jobs-report days and the sessions after mega-cap earnings (rounds seventy-three and
+eighty), V1 checks every 15 minutes, each quarter hour with its own noise; V2 allows one more loser. Every other day as
+now. Bar fixed before running: pass rate no lower and payouts per evaluation higher in all three periods.
+
+| Variant | Evaluation pass % (2011-18 / 2019-25 / NQ) | Paid per evaluation | $ a week |
+|---|---|---|---|
+| Now | 27.5 / 22.9 / 25.3 | $1,135 / $585 / $628 | $272 / $270 / $245 |
+| V1 15-minute checks on news days | 28.4 / 25.1 / 27.3 | $1,141 / $577 / $579 | $295 / $283 / $263 |
+| V2 one more loser on news days | 26.9 / 23.1 / 24.8 | $1,123 / $446 / $490 | $269 / $259 / $242 |
+
+**FAIL** for both. V1 passes more evaluations (+0.9 to +2.2 points) and makes more a week in all three periods, but paid
+1.5% and 8% less per evaluation on 2019-25 and NQ. Not adopted: it needs the coming earnings dates entered by hand, and
+the gain is small.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
