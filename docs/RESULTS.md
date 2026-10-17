@@ -1273,6 +1273,25 @@ payouts, and those take about 2½-3 years, because a funded account makes about 
 add up to about $13,000. A $900 daily profit stop roughly doubles the chance of at least one payout; protect mode was
 slightly better in all three periods.
 
+## Round sixty-seven: the TradingView size on Apex (description)
+
+`research/pine_size.py`. The user's TradingView run (10 MNQ, $1,170 max loss) made $6,000+ in a day in October 2026,
+while the NinjaTrader settings (4 MNQ, $200) make about $270 a week. The same bot at each size, over 16 years, and on
+the 50K intraday-trail evaluation and funded account (round sixty-one's simulation, base caps):
+
+| Setting | $ a week, bot alone (2011-18 / 2019-25 / NQ) | Weeks at $1,500+ | Days at -$2,000 or worse | Worst week | 50K evaluation pass % | Paid per evaluation |
+|---|---|---|---|---|---|---|
+| 4 MNQ, $200 (NinjaTrader now) | $272 / $270 / $245 | 16-17% | 0% | -$2,782 | 23-28% | $550-862 |
+| 10 MNQ, $1,170, 4 losers (TradingView) | $968 / $1,250 / $1,125 | 37-41% | 8-9% | -$28,467 | 12-16% | $74-223 |
+| 10 MNQ, $1,170, 1 loser | $739 / $877 / $822 | 33-35% | 0-0.1% | -$25,668 | 13-16% | $104-256 |
+| 10 MNQ, $350, 4 losers | $727 / $666 / $626 | 31-34% | 0% | -$5,413 | 15-18% | $32-398 |
+
+The big size does what the user saw: it averages about $1,000-1,250 a week and makes $6,000+ on 2-3.5% of days. It
+also loses $2,000 or more, a 50K account's whole drawdown, on about one day in twelve, and its worst weeks lose
+$13,000-28,000. On Apex it passes the evaluation in a median of 2 sessions when it passes (12-16% of attempts), and
+then the funded account almost always busts before a payout: 1-2% of evaluations are ever paid. The average week is
+not the problem; the drawdown is.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
