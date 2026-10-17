@@ -28,11 +28,12 @@ account. Copy that account to others with a trade copier (Tradesyncer, or NinjaT
    - **Account:** the one account the bot trades (Tradesyncer's leader).
    - **Calculate: On bar close.** Any other setting and the strategy won't trade; the chart says so.
    - **Start behavior: Wait until flat** (the default).
-   - **FUNDED ACCOUNT:** off = the Apex **50K evaluation: 6 MNQ, $300 max loss a trade, no new entries after 3
-     losers a day**. On = funded: **10 MNQ, $350, 4 losers**. Each side has its own contracts, max loss and loser
-     limit in the settings. Buy the **50K EOD Trail** evaluation, not Intraday Trail: with this bot the intraday plan
-     busts far more often (round sixty, [RESULTS.md](RESULTS.md#round-sixty-an-apex-50k-evaluation)). Three losers
-     at $300 is $900, under the plan's $1,000 daily loss limit.
+   - **FUNDED ACCOUNT:** off = the Apex **50K Intraday Trail evaluation: 4 MNQ, $200 max loss a trade, no new
+     entries after 3 losers a day**. On = funded: **10 MNQ, $350, 4 losers**. Each side has its own contracts, max
+     loss and loser limit in the settings. For a **50K EOD Trail** evaluation set the evaluation side to **6 MNQ,
+     $300, 3 losers** instead (3 x $300 stays under that plan's $1,000 daily loss limit). The EOD plan passes more
+     often with this bot: about 37-39% of attempts against 24-28% (round sixty,
+     [RESULTS.md](RESULTS.md#round-sixty-an-apex-50k-evaluation)).
    - **Place orders:** on = the strategy trades; off = alerts only.
    - Leave the rest at the tested defaults: take-profit 1.5, line stop 0.24, lock at 1.0 → entry + 2.5, 14 sessions,
      Fed days on.
@@ -52,7 +53,7 @@ P/L and losers. The orange and green lines on the chart are the stop and take-pr
   toward the price, so a trade never risks more than the max loss (fees and slippage aside).
 - **Every bar close in a trade:** the stop moves with the line (it's measured from your real fill), and to
   **entry + 2.5 points** once a bar has reached +1 max loss (the lock: +17.5 points at 10 MNQ and $350, +25 at
-  6 MNQ and $300). The take-profit stays 1.5 noise units from the fill. If the line has moved past the price, the position is closed at
+  4 MNQ and $200). The take-profit stays 1.5 noise units from the fill. If the line has moved past the price, the position is closed at
   market, because a stop can't rest there.
 - **16:00 New York:** any position is closed at market, whatever happened before. A session that ends early (a half
   day) is closed at its first bar outside 09:30–16:00.

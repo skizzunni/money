@@ -198,8 +198,8 @@ def run_sim(sim, bars: pd.DataFrame, tmp: Path, minutes: int = 5, **props):
 
 
 TIME_EXITS = ("16:00 close", "Session ended")
-# the strategy's switch: a 50K evaluation trades 6 MNQ, $300 max loss, 3 losers a day; funded 10 MNQ, $350, 4 losers
-ACCOUNTS = {False: dict(qty=6, max_loss_per_trade=300.0, max_losers=3), True: dict(qty=10, max_loss_per_trade=350.0,
+# the strategy's switch: a 50K evaluation trades 4 MNQ, $200 max loss, 3 losers a day; funded 10 MNQ, $350, 4 losers
+ACCOUNTS = {False: dict(qty=4, max_loss_per_trade=200.0, max_losers=3), True: dict(qty=10, max_loss_per_trade=350.0,
                                                                                   max_losers=4)}
 
 
@@ -309,15 +309,15 @@ def test_alerts_only_places_no_orders(sim, tmp_path):
     trades, orders, dash, printed = run_sim(sim, bars, tmp_path, PlaceOrders=False)
     assert not trades and not [o for o in orders if o[1] in ("Enter", "Exit")]
     n = len(run(bars, NoiseConfig(**ACCOUNTS[False])).orders)
-    assert n and sum("BUY 6 MNQ" in p or "SELL 6 MNQ" in p for p in printed) == n
+    assert n and sum("BUY 4 MNQ" in p or "SELL 4 MNQ" in p for p in printed) == n
     assert "Orders: OFF" in dash
 
 
 def test_dashboard_and_switch(sim, tmp_path):
     bars = synth_bars(sessions=30, seed=3)
     _, _, dash, printed = run_sim(sim, bars, tmp_path)
-    assert "Evaluation, 6 MNQ, $300 max loss, 3 losers a day" in dash and "Orders: ON" in dash
-    assert any("BUY 6 MNQ (Evaluation)" in p or "SELL 6 MNQ (Evaluation)" in p for p in printed)
+    assert "Evaluation, 4 MNQ, $200 max loss, 3 losers a day" in dash and "Orders: ON" in dash
+    assert any("BUY 4 MNQ (Evaluation)" in p or "SELL 4 MNQ (Evaluation)" in p for p in printed)
     _, _, dash, printed = run_sim(sim, bars, tmp_path, Funded=True)
     assert "Funded, 10 MNQ, $350 max loss, 4 losers a day" in dash
     assert any("BUY 10 MNQ (Funded)" in p or "SELL 10 MNQ (Funded)" in p for p in printed)

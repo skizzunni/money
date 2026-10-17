@@ -1171,6 +1171,18 @@ on 2019-26 (+1.3 points) and NQ futures (+4.0), with more busts. Description, no
    It is now the evaluation setting: a judgement call, not a test result.
 3. Every setting passes about 4 attempts in 10 at best. A 25K evaluation (round fifty-nine) passes about as often;
    the 50K is worth more once funded.
+4. **The user had already bought the intraday plan.** There, every setting passes about a quarter of attempts. The
+   best on average, 4 MNQ, $200, 3 losers (27.6 / 24.0 / 24.2% pass, 57-65% bust, no -$1,000 days), ties the old
+   3 MNQ, $350, 4 losers (25.1 / 25.0 / 23.9%, 61-65% bust, 3-4% of days at -$1,000) on passing and has fewer
+   blow-up days, so it is the intraday evaluation setting. 6 MNQ at $300 is worse there (20-24% pass, 74-77% bust).
+
+| Setting (intraday plan) | Pass / bust / timeout %: 2011-18 | 2019-26 | NQ futures |
+|---|---|---|---|
+| **4 MNQ, $200, 3 losers (intraday evaluation setting)** | 27.6 / 57.2 / 15.2 | 24.0 / 59.8 / 16.2 | 24.2 / 65.2 / 10.6 |
+| 3 MNQ, $350, 4 losers | 25.1 / 61.3 / 13.6 | 25.0 / 61.5 / 13.5 | 23.9 / 64.8 / 11.3 |
+| 5 MNQ, $175, 4 losers | 27.0 / 62.8 / 10.2 | 22.7 / 65.5 / 11.7 | 22.7 / 71.3 / 6.0 |
+| 6 MNQ, $300, 3 losers | 24.1 / 74.1 / 1.8 | 20.2 / 76.6 / 3.2 | 22.1 / 77.4 / 0.4 |
+| 10 MNQ, $350, 4 losers | 17.7 / 82.3 / 0.0 | 14.0 / 84.4 / 1.6 | 14.2 / 85.8 / 0.0 |
 
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
