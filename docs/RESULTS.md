@@ -1457,6 +1457,23 @@ seventy-five). Adoption bar as round seventy-six. Pass % / paid per evaluation:
 
 **None adopted.** E4 raises winners to 54-57% but pays less on two of three periods.
 
+## Round seventy-eight: trade only when the bot's own recent results are good
+
+`research/regime_filter.py`. The bot runs virtually all the time; the account trades live only when its virtual
+results over past sessions are good. Adoption bar as round seventy-six. Pass % / paid per evaluation / $ a week:
+
+| Variant | 2011-18 | 2019-25 | NQ 2015-24 |
+|---|---|---|---|
+| R0 the bot | 27.5 / $862 / $272 | 22.9 / $553 / $270 | 25.3 / $550 / $245 |
+| R1 last 10 sessions > 0 | 21.5 / $848 / $194 | 15.2 / $173 / $63 | 17.2 / $199 / $130 |
+| R2 last 20 > 0 | 19.7 / $726 / $171 | 16.6 / $375 / $154 | 18.2 / $280 / $119 |
+| R3 last 5 > 0 | 20.9 / $313 / $166 | 11.2 / $128 / $53 | 13.4 / $27 / $50 |
+| R4 4 MNQ when last 10 > 0, else 2 | 22.5 / $979 / $233 | 17.7 / $321 / $166 | 22.3 / $423 / $188 |
+| R5 sit out after 3 losing days | 25.1 / $827 / $221 | 20.1 / $731 / $191 | 22.3 / $356 / $156 |
+
+**None adopted.** The filters cut busts but sit out the trend days that pay; the bot's streaks don't predict its next
+days.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
