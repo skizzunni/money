@@ -1717,6 +1717,18 @@ and a point-of-control magnet at 11:00; $300 risk, up to 10 MNQ. Protocol fixed 
 negative after 2018; acceptance breakouts are positive in all three periods but weak (t 0.3-1.5, about one trade every
 three weeks). Yesterday's profile levels don't give an MNQ edge.
 
+## Round ninety-seven: classic named daytrade systems
+
+`research/classic_systems.py`. 18 rules: Larry Williams' volatility breakout (stop orders at the open +/- 0.3, 0.5 or
+0.7 of yesterday's range, first side only, out at the close; stop at the open, at the opposite level, or 25 points),
+Turtle Soup, Raschke's 80-20, and the Holy Grail. Protocol fixed before running.
+
+**0 survivors** at discovery (best p 0.006, needed 0.0028). Description: the Williams breakout with wide stops is
+positive in all three data sets at every k; k 0.5 with the stop at the opposite level made $31 / $47 / $38 a trade at
+1 MNQ (t 2.75 / 2.97 / 2.99 on 2011-18 / 2019-26 / NQ futures, 52-55% winners, about 3 trades a week), but risks
+$200-900 a contract. With a 25-point stop it loses everywhere. Turtle Soup, 80-20 and the Holy Grail are rare and
+inconsistent. What the Williams breakout adds to the bot on the Apex account is round ninety-eight.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
