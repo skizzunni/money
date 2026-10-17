@@ -1633,6 +1633,19 @@ sessions 3.3% / 2.9% / 1.4% of starts (2011-18 / 2019-25 / NQ), busting 13-16% w
 **FAIL** (round eighty-seven's pick paid 6.5% / 5.5%). Tight loss stops keep the account alive longer but cut the
 days that reach the payout.
 
+## Round ninety: profit uncapped, only losses capped
+
+`research/loss_only.py` (description). The user's rule: no daily profit stop, only a daily loss stop ($250, $350,
+$500, $800 or none), 4-10 MNQ, 2 or 3 losers, both locks. The funded account's first payout:
+
+| Best by "paid within 20 sessions" | Paid within 10 | within 20 | within 40 | Busted within 40 |
+|---|---|---|---|---|
+| 4 MNQ, no loss stop (or $800), 3 losers, lock 1.0 / +2.5 (2011-18 / 2019-25 / NQ) | 0.8 / 0.8 / 0.5% | 11.1 / 6.9 / 7.0% | 25.6 / 21.8 / 22.1% | 63-67% |
+
+With profit uncapped, a payout within two weeks almost never happens (under 1% of starts at any size or loss stop):
+the bot's profit comes in big days, and Apex's 50% consistency rule then blocks the request until enough smaller green
+days dilute the big one. Bigger size only adds busts. A daily loss stop changes little.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
