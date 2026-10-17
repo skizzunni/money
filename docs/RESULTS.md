@@ -1665,6 +1665,17 @@ payout within 40 sessions (8 weeks) and, at 4 MNQ with a $900 floor, lowers bust
 over the account's life in two of three; at 6 MNQ it pays sooner still and much less in total. A faster first payout
 and more total payouts pull against each other.
 
+## Round ninety-two: a different strategy, intraday trend pullbacks
+
+`research/trend_pullback.py`. 24 rules: a trend-day qualifier at 10:30 or 11:00 (80% of minutes above the day's average
+price and a fresh high, or a strong first hour), then buy pullbacks to the 5-minute 9- or 20-period EMA (the mirror for
+downtrends), stop beyond the pullback or 25 points, 2R or a trailing exit, $300 risk a trade up to 10 MNQ. Protocol
+fixed before running: Benjamini-Hochberg on 2011-18, then 2019-26, then NQ futures.
+
+**0 survivors** (best p 0.004, needed 0.0021): the 9-EMA pullback with a swing stop and trailing exit made $15-25 a day
+(t 2.2-2.9) at 40% winners, 21% green days and 27% red; 10 of 24 rules lose. Like the bot, it makes its money from a
+few trend days, and it is no stronger than the bot.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
