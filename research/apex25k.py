@@ -98,7 +98,9 @@ def attempt(days, q, plan, horizon_days):
             else:  # whichever comes first: the threshold (a fail) or the daily loss limit (closed, done for today)
                 eq = bal + q * lo_path
                 bust, stop = np.flatnonzero(eq <= thr), np.flatnonzero(eq - day_start <= -DLL)
-                if bust.size and (not stop.size or bust[0] <= stop[0]):
+                # in the minute both are crossed, price falls through the higher one first
+                if bust.size and (not stop.size or bust[0] < stop[0] or
+                                  (bust[0] == stop[0] and thr >= day_start - DLL)):
                     return "failed", n + 1
                 if stop.size:
                     bal = day_start - DLL
