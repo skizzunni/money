@@ -184,6 +184,9 @@ MUTANTS = {
     "noise: heads-up from the wrong check's noise": (
         "noise", "kh = int((preEnd - FIRST_CHECK) / 30)", "kh = math.max(0, int((preEnd - FIRST_CHECK) / 30) - 1)"
     ),
+    "noise: dashboard previews the current check's lines": (
+        "noise", "kn = int((nextEndD - FIRST_CHECK) / 30)", "kn = math.max(0, int((nextEndD - FIRST_CHECK) / 30) - 1)"
+    ),
     "noise: open position kept into the next session": (
         "noise", "(not inRth or tMin == RTH_OPEN)", "not inRth"
     ),
@@ -206,6 +209,7 @@ def _tests(T, script):
             ("webhooks", N.test_pine_webhooks),
             ("lock", N.test_pine_lock),
             ("daily loser limit", N.test_pine_daily_loser_limit),
+            ("next lines", N.test_pine_dashboard_shows_the_next_checks_lines),
         ] + [(f"random {mins}m [{mode}]", lambda mi=mins, mo=mode: N.test_pine_random_sessions(mi, mo))
              for mins, mode in N.RANDOM_CASES] + [
             ("RTH-only chart", N.test_pine_rth_only_chart_and_shorter_lookback),

@@ -710,7 +710,7 @@ def test_pine_evaluation_tracker(target):
     tf = tf[tf.exit_time.dt.date >= start]
     day_pnl = tf.groupby(tf.exit_time.dt.date).pnl.sum().tolist()
     state, rel, peak, best, tdays = eval_walk(day_pnl, target, 2000.0, 50.0, 5)
-    grid = [t for t in rt.tables if t.columns == 2 and t.grid()[0][0].startswith("Evaluation")][0].grid()
+    grid = [t.grid() for t in rt.tables if t.columns == 2 and t.grid() and t.grid()[0][0].startswith("Evaluation")][0]
     assert grid[0][1] == state
     assert money(grid[1][1].split(" of ")[0]) == pytest.approx(rel, abs=0.01)
     assert money(grid[2][1].split(":")[0]) == pytest.approx(min(peak - 2000.0, 0.0), abs=0.01)
@@ -718,6 +718,24 @@ def test_pine_evaluation_tracker(target):
     assert int(grid[5][1]) == tdays
     if target == 300.0:
         assert state in ("PASSED", "FAILED"), "a low target decides the walk"
+
+
+@pytest.mark.slow
+def test_pine_dashboard_shows_the_next_checks_lines():
+    """The dashboard's preview of the next check's lines equals the lines that check then uses."""
+    pytest.importorskip("pynescript", reason="pip install pynescript to check the .pine files")
+    from pine_interpreter import PineRuntime, load_pine
+
+    full = synth_bars(sessions=40, seed=7)
+    res = run(full, NoiseConfig())
+    i, upper, lower = res.bands[-5]  # a check late in the data; cut the bars ten minutes before it
+    cut = full.iloc[: i - 1]
+    rt = PineRuntime(load_pine(NOISE_PINE), cut, {"Contracts": 1}, timeframe_seconds=300)
+    rt.run(lambda j, g: None)
+    dash = [t.grid() for t in rt.tables if t.columns == 2 and t.grid() and t.grid()[0][0].startswith("MNQ Noise")][0]
+    cell = dash[2][1]
+    when = full.index[i].tz_convert(NY) + pd.Timedelta(minutes=5)  # the check's close
+    assert f"at {when.hour}:{when.minute:02d}: {upper:.2f} / {lower:.2f}" in cell, cell
 
 
 @pytest.mark.slow

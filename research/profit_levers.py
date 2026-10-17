@@ -65,7 +65,7 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
              skip_checks_on: dict | None = None, lock_unconfirmed: float | None = None,
              confirmed: tuple[set, set, set] | None = None, relock: bool = False,
              lock_sigma: tuple[float, float, float] | None = None,
-             lock_early: tuple[float, int] | None = None, noise_stat: str = "mean") -> pd.DataFrame:
+             lock_early: tuple[float, int] | None = None, noise_stat: str = "mean", step: int = 30) -> pd.DataFrame:
     """target: take profit this many noise units from the first fill (limit); cap_pts: max loss in points;
     target_on_fill_bar False: the limit works from the bar after the fill, as the Pine script places it;
     cap_on_fill_bar True: the max loss works on the fill bar too, measured from the expected fill (the signal
@@ -101,6 +101,7 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
     lock_sigma (k, lo, hi): the lock trigger is k x the check's noise (sigma x price), kept between lo and hi points;
     lock_early (trigger, n): during the first n bars after the fill the lock arms at this (lower) trigger; later at
     the trade's normal trigger;
+    step: minutes between checks (30 in the bot; 15 adds the quarter hours);
     noise_stat: how the 14 sessions' moves make the noise: "mean" (the paper), "median", or "trim" (the mean without
     the largest and smallest);
     relock: after a lock exit, a stop order re-enters on the same side at the trade's lock trigger price (its fill plus
@@ -113,7 +114,7 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
     side_once: after a losing trade today, no new entries on that side today;
     min_cap_units: no entry when the max loss is less than this many noise units (sigma x price) from the signal
     close, i.e. when the stop is tiny next to today's noise."""
-    checks = list(range(FIRST, LAST + 1, 30))
+    checks = list(range(FIRST, LAST + 1, step))
     kof = {m: j for j, m in enumerate(checks)}
     idx = bars.index.tz_convert(NY)
     mins = (idx.hour * 60 + idx.minute).to_numpy()
