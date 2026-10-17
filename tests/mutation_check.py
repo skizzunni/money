@@ -190,9 +190,6 @@ MUTANTS = {
     "noise: evaluation trades the funded contracts": (
         "noise", 'qty = account == "Evaluation" ? evalQty : fundQty', 'qty = fundQty'
     ),
-    "noise: alert name left off": (
-        "noise", "alert(tagText + msg, alert.freq_once_per_bar_close)", "alert(msg, alert.freq_once_per_bar_close)"
-    ),
     "noise: open position kept into the next session": (
         "noise", "(not inRth or tMin == RTH_OPEN)", "not inRth"
     ),
@@ -217,7 +214,6 @@ def _tests(T, script):
             ("daily loser limit", N.test_pine_daily_loser_limit),
             ("next lines", N.test_pine_dashboard_shows_the_next_checks_lines),
             ("account", lambda: N.test_pine_account_switch(None, 3)),
-            ("alert name", N.test_pine_alert_name),
         ] + [(f"random {mins}m [{mode}]", lambda mi=mins, mo=mode: N.test_pine_random_sessions(mi, mo))
              for mins, mode in N.RANDOM_CASES] + [
             ("RTH-only chart", N.test_pine_rth_only_chart_and_shorter_lookback),

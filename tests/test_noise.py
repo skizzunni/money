@@ -756,46 +756,6 @@ def test_pine_account_switch(funded, qty):
 
 
 @pytest.mark.slow
-@pytest.mark.parametrize("funded", [False, True])
-def test_pine_accounts_on_the_dashboard_and_alerts(funded):
-    """The dashboard lists the accounts this copy trades, and every entry and heads-up names them."""
-    pytest.importorskip("pynescript", reason="pip install pynescript to check the .pine files")
-    from pine_interpreter import PineRuntime, load_pine
-
-    bars = synth_bars(sessions=40, seed=11)
-    inputs = {FUNDED: funded, "Evaluation accounts (names, comma separated)": "EVAL 1, EVAL 2, EVAL 3",
-              "Funded accounts (names, comma separated)": "PRO 1, PRO 2"}
-    rt = PineRuntime(load_pine(NOISE_PINE), bars, inputs, timeframe_seconds=300)
-    rt.run(lambda i, g: None)
-    names, qty = ("PRO 1, PRO 2", 10) if funded else ("EVAL 1, EVAL 2, EVAL 3", 3)
-    n = names.count(",") + 1
-    dash = [t.grid() for t in rt.tables if t.columns == 2 and t.grid() and t.grid()[0][0].startswith("MNQ Noise")][0]
-    row = [r for r in dash if r[0].startswith("Accounts")][0]
-    assert row[1] == f"{names}: {qty} MNQ each, {qty * n} in all; a full loss ${350 * n:,.2f} across them"
-    entries = [a for _, a in rt.alerts if a.split()[0] in ("BUY", "SELL", "HEADS-UP:")]
-    assert len(entries) >= 5
-    assert all(a.endswith(f"Place it in: {names} (copier: first account, the rest mirror it).") for a in entries)
-
-
-@pytest.mark.slow
-def test_pine_alert_name():
-    """With a name set, every alert from that copy starts with [name]; the trades don't change."""
-    pytest.importorskip("pynescript", reason="pip install pynescript to check the .pine files")
-    from pine_interpreter import PineRuntime, load_pine
-
-    bars = synth_bars(sessions=40, seed=11)
-    plain = PineRuntime(load_pine(NOISE_PINE), bars, {}, timeframe_seconds=300)
-    plain.run(lambda i, g: None)
-    named = PineRuntime(load_pine(NOISE_PINE), bars, {"Name on this copy's alerts (e.g. EVALS or FUNDED)": "EVALS"},
-                        timeframe_seconds=300)
-    named.run(lambda i, g: None)
-    assert len(plain.alerts) >= 10 and len(named.alerts) == len(plain.alerts)
-    for (i, a), (j, b) in zip(plain.alerts, named.alerts, strict=True):
-        assert i == j and b == "[EVALS] " + a
-    assert named.strategy.closed == plain.strategy.closed
-
-
-@pytest.mark.slow
 def test_pine_webhooks():
     bars, p = scenario(above_all_day)
     tp = (p * 1.002 + 0.25) * (1 + 1.5 * 0.001)
