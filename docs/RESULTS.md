@@ -1208,6 +1208,27 @@ Description: 10 MNQ paid the least per evaluation on 2019-25 because it busts th
 now the funded setting: a judgement call, not a test result. Most funded accounts end in a bust after one or two
 payouts; what one pays in total averages about $1,750-3,100.
 
+## Round sixty-two: more trades on quiet days (a fade inside the noise area)
+
+`research/quiet_fade.py`. The user asked for more trades a week on one account. The bot trades on about 57% of days;
+on the rest price stays inside the noise area. Idea: on those days fade a check that closes in the outer part of the
+noise area (more than 0.5 or 0.75 noise units past the anchor, still inside the line), target the anchor or halfway,
+stop where the bot itself would go in the other direction (the line + 0.24 sigma) or $200, 4 MNQ, flat at 16:00; ten
+variants (bot not traded today / bot flat at the moment, one or two fades a day). Pass bar, fixed before running:
+alone t >= 2, and bot + fade better than the bot alone in $ a day and in $ a day per $1k of worst losing stretch, on
+2011-18, then 2019-26 and NQ futures.
+
+| Bot alone → bot + the best fade (0.75, anchor, up to 2 a day) | Trades a week | Days with a trade | $ a day | 50K intraday evaluation pass / bust % |
+|---|---|---|---|---|
+| 2011-18 | 9.0 → 12.3 | 59% → 70% | 54.55 → 56.85 | 24.5 / 58.7 → 25.7 / 67.7 |
+| 2019-26 | 8.3 → 11.4 | 55% → 65% | 49.57 → 37.48 | 23.0 / 59.3 → 21.5 / 70.8 |
+| NQ futures 2015-25 | 8.8 → 12.1 | 57% → 68% | 40.58 → 24.71 | 22.4 / 63.4 → 19.4 / 76.3 |
+
+**FAIL at every stage.** No variant made money on its own in any period (best on 2011-18: +$2.29 a day, t 0.30; all
+lose on 2019-26 and NQ futures), they win 15-37% of the time: the outer part of the noise area doesn't revert. The
+extra 3 trades a week cost money and add 9-13 points of busts to the evaluation. More trades only help when each one
+has an edge.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
