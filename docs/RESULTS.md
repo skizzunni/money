@@ -1593,6 +1593,24 @@ now. Bar fixed before running: pass rate no lower and payouts per evaluation hig
 1.5% and 8% less per evaluation on 2019-25 and NQ. Not adopted: it needs the coming earnings dates entered by hand, and
 the gain is small.
 
+## Round eighty-seven: the first payout within two weeks of being funded
+
+`research/fast_payout.py`. A funded 50K intraday-trail account from every session, up to 10 sessions: 360 policies
+(4-10 MNQ at a 25-point cap, a daily profit stop of $400-$1,000 or none, a daily loss stop of $500, $800 or none, 1-3
+losers, two locks). Apex's first payout needs 5 days of $200+, +$2,600 and no day above half the profit. Pick and bar
+fixed before running.
+
+| Policy | Paid within 10 sessions, 2011-18 / 2019-25 / NQ | Busted within 10 | Paid within 20 |
+|---|---|---|---|
+| 10 MNQ, stop the day at +$800 or -$800, 3 losers, lock 0.5 / +6.25 (the 2011-18 pick) | 8.1% / 6.5% / 5.5% | 33-36% | 22-28% |
+| 10 MNQ, stop at +$800, 3 losers, lock 1.0 / +2.5 (best on 2019-25 and NQ) | 7.7% / 9.8% / 7.0% | 43-49% | 22-26% |
+| 4 MNQ, no stops (the funded setting now) | 0.0% / 0.2% / 0.0% | 11-16% | 2-6% |
+
+**NOT ADOPTED**: no policy pays within two weeks more often than it busts; the best pays within two weeks in fewer than
+one start in ten. The binding rule is the five $200 days: the bot trades on about 57% of days and ends about a third
+of days $200 up, so five such days rarely come inside ten sessions, whatever the size. The fastest policies are a
+coin flip with the account within four weeks, and two weeks is out of reach for this strategy under these rules.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
