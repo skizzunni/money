@@ -1646,6 +1646,25 @@ With profit uncapped, a payout within two weeks almost never happens (under 1% o
 the bot's profit comes in big days, and Apex's 50% consistency rule then blocks the request until enough smaller green
 days dilute the big one. Bigger size only adds busts. A daily loss stop changes little.
 
+## Round ninety-one: a dynamic daily profit cap for the 50% consistency rule
+
+`research/dynamic_cap.py`. A day's profit is at most half the cycle's when it is at most the cycle's profit before it.
+So on the funded account the bot may make up to max(floor, profit since the last payout) a day, then stops; big days
+stay allowed once the cycle can absorb them. Floors $400, $600, $900 or no cap, 4 or 6 MNQ; evaluation unchanged. Bar
+fixed before running (the 2011-18 best by payouts per evaluation beats no cap by 10% in payouts and in payouts within
+40 sessions on 2019-25 and NQ).
+
+| Funded | Paid per evaluation, 2011-18 / 2019-25 / NQ | First payout within 20 sessions | within 40 | Busted within 40 |
+|---|---|---|---|---|
+| 4 MNQ, no cap (now) | $1,135 / $585 / $628 | 5.5 / 2.2 / 1.7% | 23.3 / 14.7 / 12.2% | 47 / 54 / 53% |
+| 4 MNQ, floor $900 | $678 / $867 / $499 | 6.2 / 6.7 / 4.0% | 25.6 / 29.6 / 23.8% | 42 / 40 / 45% |
+| 6 MNQ, floor $600 | $427 / $348 / $318 | 11.9 / 16.5 / 11.2% | 29.3 / 35.0 / 30.0% | 60 / 51 / 56% |
+
+**NOT ADOPTED** (the 2011-18 pick was no cap). Description: the dynamic cap roughly doubles the chance of a first
+payout within 40 sessions (8 weeks) and, at 4 MNQ with a $900 floor, lowers busts in all three periods, but pays less
+over the account's life in two of three; at 6 MNQ it pays sooner still and much less in total. A faster first payout
+and more total payouts pull against each other.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
