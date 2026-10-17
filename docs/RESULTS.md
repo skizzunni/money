@@ -1017,6 +1017,7 @@ Dropping trades that lose on average raises winners and money together. Fixed be
 
 - **The same bot on MES** ([`research/mes.py`](../research/mes.py)), 10 contracts and $350: $35 a contract is 7 S&P points, about twice as wide against the noise as 17.5 Nasdaq points. On HistData SPXUSD 1-minute bars the bot has no edge on the S&P at this size: $4.84 a day on 2011–2018, $12.35 on 2019–2022 and −$80 on 2023–2026, against $152, $170 and $66 on MNQ. The edge is the Nasdaq's.
 - **Lock the breakouts the S&P doesn't confirm earlier** ([`research/confirm_lock.py`](../research/confirm_lock.py)): every trade taken, but a signal the S&P did not confirm locks at 13.1 points instead of 17.5. Win rate +2.0 / +1.2 / +0.9 points on 2011–2018 / 2019–2022 / 2023–2026 and a smaller worst losing stretch in each, $ per day +6% / +7% / −1% (the last is $0.07 a day per contract, so it missed the bar); on NQ futures 2015–2025, +1.4 points and −2% $ per day. About a point of win rate for about the same money: not adopted.
+- **Re-enter after a lock exit** (a stop order at the trade's lock trigger price, until the next check; a quick look at 2011–2018, simulator option `relock`): 47.2% winners and $7.31 a day against 50.6% and $15.19, worst stretch twice as large. The shake-outs are not followed by continuation more often than chance.
 
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 

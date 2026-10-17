@@ -63,7 +63,7 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
              skip_days: frozenset = frozenset(), checks_by_year: dict | None = None,
              time_lock: tuple[int, float] | None = None, time_exit: int | None = None,
              skip_checks_on: dict | None = None, lock_unconfirmed: float | None = None,
-             confirmed: tuple[set, set, set] | None = None) -> pd.DataFrame:
+             confirmed: tuple[set, set, set] | None = None, relock: bool = False) -> pd.DataFrame:
     """target: take profit this many noise units from the first fill (limit); cap_pts: max loss in points;
     target_on_fill_bar False: the limit works from the bar after the fill, as the Pine script places it;
     cap_on_fill_bar True: the max loss works on the fill bar too, measured from the expected fill (the signal
@@ -96,6 +96,8 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
     lock_unconfirmed, confirmed (three sets of check-bar times: a second market closed beyond its own upper line;
     below its lower line; it has a bar): a trade whose signal that market did not confirm locks at this trigger
     instead of lock[0] (times the second market has no bar for count as confirmed);
+    relock: after a lock exit, a stop order re-enters on the same side at the trade's lock trigger price (its fill plus
+    the trigger), until the next half-hour check (once per signal);
     skip_checks_on: {date: check times with no new entries that day} (e.g. 10:00 on release days);
     time_exit n: a trade that hasn't reached the lock n bars after the fill closes at that bar's close (market);
     skip_spike: no entry when the 5-minute bar ending at the check closed at or beyond this fraction of its range
@@ -140,6 +142,8 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
             target_today = True
         if second_chance and why == "cap" and not chance_done:
             chance_side, chance_px = pos, fills[0]
+        if relock and why == "lock" and not chance_done:
+            chance_side, chance_px = pos, fills[0] + pos * trade_trigger
         pos, fills, armed = 0, [], False
         held, locked, locked2 = math.nan, False, False
         peak = math.nan
