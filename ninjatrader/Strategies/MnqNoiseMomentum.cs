@@ -63,8 +63,10 @@ namespace NinjaTrader.NinjaScript.Strategies
                 FundedMaxLoss = 200;
                 TakeProfit = 1.5;
                 StopBuffer = 0.24;
-                LockAt = 1.0;
-                LockPlus = 2.5;
+                EvalLockAt = 1.0;
+                EvalLockPlus = 2.5;
+                FundedLockAt = 0.5;    // funded: arm earlier, stop to entry + 6.25 (docs/RESULTS.md round 83)
+                FundedLockPlus = 6.25;
                 EvalMaxLosers = 3;
                 FundedMaxLosers = 2;
                 Lookback = 14;
@@ -111,6 +113,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         int Qty { get { return Funded ? FundedQty : EvalQty; } }
         double MaxLoss { get { return Funded ? FundedMaxLoss : EvalMaxLoss; } }
+        double LockAt { get { return Funded ? FundedLockAt : EvalLockAt; } }
+        double LockPlus { get { return Funded ? FundedLockPlus : EvalLockPlus; } }
         int MaxLosers { get { return Funded ? FundedMaxLosers : EvalMaxLosers; } }
         string Account { get { return Funded ? "Funded" : "Evaluation"; } }
 
@@ -452,13 +456,23 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         [NinjaScriptProperty]
         [Range(0.0, 10.0)]
-        [Display(Name = "Lock at, max losses of profit (0 = off)", Order = 4, GroupName = "2. Exits")]
-        public double LockAt { get; set; }
+        [Display(Name = "Evaluation: lock at, max losses of profit (0 = off)", Order = 4, GroupName = "2. Exits")]
+        public double EvalLockAt { get; set; }
 
         [NinjaScriptProperty]
         [Range(0.0, 100.0)]
-        [Display(Name = "Lock: stop to entry + points", Order = 5, GroupName = "2. Exits")]
-        public double LockPlus { get; set; }
+        [Display(Name = "Evaluation: lock moves the stop to entry + points", Order = 5, GroupName = "2. Exits")]
+        public double EvalLockPlus { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0.0, 10.0)]
+        [Display(Name = "Funded: lock at, max losses of profit (0 = off)", Order = 6, GroupName = "2. Exits")]
+        public double FundedLockAt { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0.0, 100.0)]
+        [Display(Name = "Funded: lock moves the stop to entry + points", Order = 7, GroupName = "2. Exits")]
+        public double FundedLockPlus { get; set; }
 
         [NinjaScriptProperty]
         [Range(2, 60)]

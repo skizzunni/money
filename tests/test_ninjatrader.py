@@ -198,9 +198,9 @@ def run_sim(sim, bars: pd.DataFrame, tmp: Path, minutes: int = 5, **props):
 
 
 TIME_EXITS = ("16:00 close", "Session ended")
-# the strategy's switch: a 50K evaluation trades 4 MNQ, $200 max loss, 3 losers a day; funded 4 MNQ, $200, 2 losers
-ACCOUNTS = {False: dict(qty=4, max_loss_per_trade=200.0, max_losers=3), True: dict(qty=4, max_loss_per_trade=200.0,
-                                                                                 max_losers=2)}
+# the switch: a 50K evaluation trades 4 MNQ, $200, 3 losers a day; funded 4 MNQ, $200, 2 losers, the lock at 0.5 / +6.25
+ACCOUNTS = {False: dict(qty=4, max_loss_per_trade=200.0, max_losers=3),
+            True: dict(qty=4, max_loss_per_trade=200.0, max_losers=2, lock_at=0.5, lock_plus=6.25)}
 
 
 def account(funded: bool, **kw) -> NoiseConfig:

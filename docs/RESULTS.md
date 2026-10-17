@@ -1521,6 +1521,28 @@ The 1-minute chart is better on every measure in every period: 5-7 points more w
 smaller losing stretches, more passes and fewer busts. The guide and the strategy now say to use it. (All the Apex
 simulations of rounds fifty-nine to eighty already used the 1-minute engine.)
 
+## Rounds eighty-two and eighty-three: the lock, tuned for the Apex account
+
+`research/lock_apex.py`: twelve locks (arm at 0.5, 0.75, 1.0, 1.25 max loss; stop to entry + 2.5, 6.25, 12.5 points),
+4 MNQ, $200, 1-minute bars, the same lock in the evaluation and funded account. Adoption bar fixed before running: the
+2011-18 best by payouts per evaluation beats the current (1.0, +2.5) by 10% on 2019-25 and NQ futures with no lower
+pass rate. The 2011-18 best (0.5, +6.25) paid 20% and 30% more but passed fewer evaluations (19.2% vs 22.9%, 20.5% vs
+25.3%): **FAIL**. Arming at 0.5 raised winners to 57-63% and cut evaluation busts by 6-12 points, but fewer
+evaluations reached $3,000 within 30 days.
+
+`research/lock_split.py` (description: chosen after seeing round eighty-two): the current lock in the evaluation, an
+earlier one on the funded account only, so the pass rate is unchanged.
+
+| Funded lock | Paid per evaluation, 2011-18 / 2019-25 / NQ | Funded winners | Funded accounts that bust | Weeks to the 1st payout |
+|---|---|---|---|---|
+| 1.0, +2.5 (was) | $862 / $553 / $550 | 50-52% | 79-83% | 5-8 |
+| **0.5, +6.25 (now)** | **$1,135 / $585 / $628** | **58-63%** | **69-80%** | 8-11 |
+| 0.5, +2.5 | $1,322 / $520 / $474 | 58-63% | 64-85% | 8-10 |
+| 0.75, +2.5 | $809 / $681 / $348 | 54-57% | 80-89% | 7-9 |
+
+(0.5, +6.25) is better than the old funded lock in all three periods on payouts per evaluation, winners and busts; the
+first payout comes 2-3 weeks later. The NinjaTrader strategy's funded side now uses it: a judgement call, not a test.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
