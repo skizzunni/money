@@ -1292,6 +1292,25 @@ $13,000-28,000. On Apex it passes the evaluation in a median of 2 sessions when 
 then the funded account almost always busts before a payout: 1-2% of evaluations are ever paid. The average week is
 not the problem; the drawdown is.
 
+## Round sixty-eight: the bot on gold, silver, crude oil and the euro
+
+`research/other_markets.py`: the same v1.6 rules on other markets Apex trades on the same account, each in its own
+regular hours (gold and silver 08:20-13:30, crude 09:00-14:30, euro 08:20-15:00 New York), $200 max loss, contracts
+set before looking at P/L so the stop sits as far from price in noise units as the Nasdaq bot's (8 MGC, 3 SIL, 17 MCL,
+20 M6E). HistData 1-minute data (crude has no files for January 2024 - May 2026). Pass bar, strict because four
+markets were tried: t >= 2.5 on 2011-18 alone, then t >= 1.5 on 2019-26, then a better 50K account combined.
+
+| Market | $ a day 2011-18 / 2019-26 | t | Trades a week | Winners |
+|---|---|---|---|---|
+| Nasdaq, 4 MNQ (for reference) | 55.75 / 56.05 | 4.02 / 3.76 | 9.4 / 8.9 | 51% / 50% |
+| Gold | 19.71 / 2.27 | 1.74 / 0.20 | 6.0 / 6.2 | 10% |
+| Silver | 10.14 / -41.21 | 0.78 / -3.68 | 7.8 / 7.7 | 43-47% |
+| Crude | -54.51 / -37.44 | -5.14 / -2.78 | 7.2 / 6.5 | 7-9% |
+| Euro | -134.11 / -117.79 | -19.2 / -16.9 | 7.9 / 7.4 | 38-40% |
+
+**FAIL**: no market passed the first stage. At a $200 stop these markets need many contracts, and fees plus a tick of
+slippage cost $26 (gold) to $75 (euro) a trade against about $7 on 4 MNQ. The edge is the Nasdaq's.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
