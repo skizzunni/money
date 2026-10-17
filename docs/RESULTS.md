@@ -1322,6 +1322,20 @@ NQ futures. **0 of 200 survived the first stage**; the best (the Nasdaq-minus-S&
 p = 0.043, where about 10 of 200 would by chance. Other markets' recent moves don't predict the Nasdaq's next half
 hour beyond chance.
 
+## Round seventy: new price-action cues at the signal
+
+`research/cues.py`. 34 cues from the Nasdaq's own price at the moment of each of the bot's signals, none of them in
+round eighteen: distance to yesterday's high, low and close, the prior week's and the overnight high and low, round
+100- and 250-point levels, gap filled or not (11 level cues); the signal bar's body, close position, size and the bars
+before it (8); repeat breakouts, time since the day's extreme, the opposite line already hit, the previous trade's
+result (9); month turn, Monday/Friday, the day after a big day, the opening range agreeing (6). The bot's own trades at
+4 MNQ, $200 (3,662 on 2011-18). Protocol fixed before running: Benjamini-Hochberg at q = 0.05 on 2011-18, then one
+look at 2019-26, then NQ futures.
+
+One cue survived 2011-18: trades whose 5-minute signal bar closed in its far quarter made -$1.98 against +$46.95
+(t -3.48). On 2019-26 the difference was gone ($29.82 against $31.92, t -0.12). **No survivor.** What is visible at the
+moment of the signal doesn't tell the winners from the losers, as in round eighteen.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
