@@ -1485,6 +1485,22 @@ Out of sample: AUC 0.523-0.528; winners 52.9% / 52.2% / 48.0% (index) and 52.9% 
 top vs bottom t 0.91 (index), 0.38 (NQ). Sizing by tercile: evaluation pass 25.0% -> 18.2% (index), 23.5% -> 19.9%
 (NQ). **FAIL**: the cues tilt the odds by 4-5 points, too little to size on a $2,000 trailing drawdown.
 
+## Round eighty: the session after mega-cap earnings
+
+`research/earnings_days.py`, dates in [`megacap_earnings.csv`](../research/megacap_earnings.csv) (SEC EDGAR 8-K item 2.02
+filings of Apple, Microsoft, Nvidia, Amazon, Alphabet, Meta, Tesla and Broadcom, 2011-2026; the reaction session is
+the filing day if accepted before 09:30 New York, else the next session). Jobs-report days left out. Pass bar fixed
+before running: higher on reaction sessions in all three periods and t >= 2.0 on 2019-26.
+
+| Period | Reaction sessions | $ a day after earnings | Other days | t |
+|---|---|---|---|---|
+| 2011-18 | 204 | $95.07 | $43.56 | 1.05 |
+| 2019-26 | 161 | $114.89 | $36.27 | 1.23 |
+| NQ futures 2015-25 | 243 | $67.80 | $35.52 | 0.72 |
+
+**FAIL** on t. The same pattern as jobs-report days (round seventy-three): the bot makes about 2-3 times its usual $ a
+day after mega-cap earnings in every period, too noisy to prove with this many days.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
