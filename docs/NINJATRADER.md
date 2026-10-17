@@ -38,10 +38,7 @@ account. Copy that account to others with a trade copier (Tradesyncer, or NinjaT
      $2,000 drawdown before it pays much). Each side has its own contracts, max
      loss and loser limit in the settings. For a **50K EOD Trail** evaluation set the evaluation side to **6 MNQ,
      $300, 3 losers** instead (3 x $300 stays under that plan's $1,000 daily loss limit).
-     **Buy the EOD plan for your next evaluation.** With the bot and the breakout, the EOD plan at 6 MNQ passes
-     37-40% of attempts against 22-26% on the intraday trail, in a median 7-8 sessions instead of 10, and pays
-     1.5-1.9 times as much per evaluation (round 107, [RESULTS.md](RESULTS.md); round sixty found the same for the
-     bot alone). Check the plan's current rules on Apex's site before buying.
+     (Rounds 107-108 in [RESULTS.md](RESULTS.md) compare the two plans.)
    - **Place orders:** on = the strategy trades; off = alerts only.
    - **Breakout in the bot's gaps:** on (the default) adds the breakout above: about $40-45 more a week, more
      payouts per evaluation and a first payout about twice as often within 20 sessions, at the cost of more red

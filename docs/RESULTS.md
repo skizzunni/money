@@ -1885,7 +1885,15 @@ account this understates it.
 
 The plan is the largest lever found: 1.6-1.8 times the passes and 1.5-1.9 times the money per evaluation, in every
 period. 6 and 8 MNQ are close; 6 stays (round sixty's choice, not refitted here). The overnight long is mixed again.
-**Recommended for the next evaluation: the EOD plan, evaluation side 6 MNQ, $300, 3 losers** (already a setting).
+For reference only: the user trades the intraday trail, which the strategy's defaults are set for.
+
+## Round one hundred and eight: the EOD route end to end (for reference)
+
+`research/eod_full.py`: an EOD evaluation, then an EOD funded account (threshold under the highest close, locking at
++$100; $250 qualifying days), with round 102's "together", round 105's overnight long and a 6-MNQ funded side
+re-tested on it. Base pays $2,196 / $1,748 / $1,536 per evaluation; "together" passes its bar ($2,276 / $1,749 /
+$1,691, pass rate up 0.8-2.1 points); the overnight long and 6 MNQ funded fail. Not built in: the user trades the
+intraday trail, where "together" failed (round 102).
 
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
@@ -1986,6 +1994,8 @@ python research/w_manage.py nsx1m_scaled.pkl nq1m_scaled.pkl           # lock / 
 python research/overnight_drift.py nsx1m_scaled.pkl nq1m_scaled.pkl    # the overnight drift (positive, below the bar)
 python research/overnight_combo.py nsx1m_scaled.pkl nq1m_scaled.pkl    # the overnight long on the account (no)
 python research/overnight_first.py nsx1m_scaled.pkl nq1m_scaled.pkl    # ... until the first payout (no)
+python research/eod_plan.py nsx1m_scaled.pkl nq1m_scaled.pkl          # the EOD-trail evaluation (reference)
+python research/eod_full.py nsx1m_scaled.pkl nq1m_scaled.pkl          # the EOD route end to end (reference)
 ```
 
 The raw data isn't stored in this repo.
