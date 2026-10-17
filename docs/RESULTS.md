@@ -1072,6 +1072,20 @@ Checks at every quarter hour, each with its own noise ([`research/checks15.py`](
 - **Checks off the half hour** ([`research/offset_checks.py`](../research/offset_checks.py)), each with its own noise: at :05/:35 $7.34 a day and 49.1% winners on 2011–2018, at :10/:40 $11.03 and 48.9%, against $15.19 and 50.6% at :00/:30. The half hours themselves matter.
 - **By check, 2011–2018** (v1.3 at 10 MNQ and $350): entries from the hourly checks made about $95 a trade, those from the half-hour checks about $28. **Locking the half-hour entries at 13.1 points** and keeping 17.5 for the hourly ones ([`research/lock_half.py`](../research/lock_half.py)) passed 2011–2018 (52.7% against 50.6% winners, $15.70 against $15.19) and on 2019–2022 won 49.2% against 47.0% with a better t-stat and a smaller worst stretch, but made $16.98 against $17.04 a day, so it failed.
 
+## Fifty-eighth round: lock the weak-trend breakouts earlier
+
+One rule from rounds forty-eight and fifty-seven ([`research/weak_trend_lock.py`](../research/weak_trend_lock.py)): a trade from a half-hour check, or one the S&P did not confirm, locks at 13.1 points; an hourly, confirmed trade keeps 17.5; every trade taken. The best near-miss so far:
+
+| Per contract at $35 | Win % | $/day | t | Worst stretch |
+|---|---|---|---|---|
+| Index 2011–2018, v1.5 / weak-trend lock | 50.6% / 53.9% | $15.19 / $16.16 | 4.67 / 5.08 | $2,569 / $2,491 |
+| Index 2019–2022 | 47.0% / 49.6% | $17.04 / $18.15 | 3.24 / 3.54 | $2,453 / $2,246 |
+| Index 2023 – Sep 2026 (final) | 47.8% / 49.6% | $6.64 / $7.00 | 1.49 / 1.62 | $3,497 / $3,232 |
+| NQ futures 2015–2025 | 48.8% / 51.3% | $12.90 / $12.68 | 4.33 / 4.38 | $1,835 / $1,929 |
+| NQ futures 2015–2018 / 2019–2022 / 2023–2025 | 50.1→53.9 / 47.7→49.6 / 48.5→50.3% | $13.69→14.26 / $16.13→15.38 / $6.65→6.09 | | |
+
+It passed every index period, the final test included, then failed the NQ futures replication: more winners in every period, but 5–8% less money on 2019–2025 there. On the real MNQ weeks it tied ($13,101 against $13,068, 44% against 43% winners). Not adopted: on the real futures the recent years still pay a little less, the same trade as every earlier lock.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
@@ -1161,6 +1175,7 @@ python research/noise_median.py nsx_1m_scaled.pkl nq_1m_scaled.pkl     # median 
 python research/checks15.py nsx_1m_scaled.pkl nq_1m_scaled.pkl        # a check every 15 minutes (no)
 python research/offset_checks.py nsx_1m_scaled.pkl nq_1m_scaled.pkl    # checks off the half hour (no)
 python research/lock_half.py nsx_1m_scaled.pkl nq_1m_scaled.pkl        # earlier lock for half-hour entries (no, by $0.06)
+python research/weak_trend_lock.py spx_1m.pkl nsx_1m_scaled.pkl nq_1m_scaled.pkl  # weak-trend lock (index yes, NQ no)
 ```
 
 The raw data isn't stored in this repo.

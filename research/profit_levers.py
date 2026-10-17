@@ -326,24 +326,26 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
                            or cap_pts < min_cap_units * sigma * c[i])
                 if pos == 0 and c[i] > upper and not blocked and not (side_once and 1 in lost_sides):
                     pending, est, wait = 1, c[i] + TICK, entry_delay
-                    if lock_half is not None and lock is not None:
-                        sig_trigger = lock_half if end % 60 == 30 else lock[0]
+                    sig_trigger = lock[0] if lock is not None else math.nan  # this signal's lock trigger
                     if lock_sigma is not None:
                         sig_trigger = min(lock_sigma[2], max(lock_sigma[1], lock_sigma[0] * sigma * c[i]))
                     if lock_unconfirmed is not None and lock is not None:
-                        ok = idx[i] not in confirmed[2] or idx[i] in confirmed[0]
-                        sig_trigger = lock[0] if ok else lock_unconfirmed
+                        if not (idx[i] not in confirmed[2] or idx[i] in confirmed[0]):
+                            sig_trigger = min(sig_trigger, lock_unconfirmed)
+                    if lock_half is not None and lock is not None and end % 60 == 30:
+                        sig_trigger = min(sig_trigger, lock_half)
                     if limit_first is not None:
                         lim_px, lim_left = c[i] - limit_first[0], limit_first[1]
                 elif pos == 0 and c[i] < lower and not blocked and not (side_once and -1 in lost_sides):
                     pending, est, wait = -1, c[i] - TICK, entry_delay
-                    if lock_half is not None and lock is not None:
-                        sig_trigger = lock_half if end % 60 == 30 else lock[0]
+                    sig_trigger = lock[0] if lock is not None else math.nan  # this signal's lock trigger
                     if lock_sigma is not None:
                         sig_trigger = min(lock_sigma[2], max(lock_sigma[1], lock_sigma[0] * sigma * c[i]))
                     if lock_unconfirmed is not None and lock is not None:
-                        ok = idx[i] not in confirmed[2] or idx[i] in confirmed[1]
-                        sig_trigger = lock[0] if ok else lock_unconfirmed
+                        if not (idx[i] not in confirmed[2] or idx[i] in confirmed[1]):
+                            sig_trigger = min(sig_trigger, lock_unconfirmed)
+                    if lock_half is not None and lock is not None and end % 60 == 30:
+                        sig_trigger = min(sig_trigger, lock_half)
                     if limit_first is not None:
                         lim_px, lim_left = c[i] + limit_first[0], limit_first[1]
                 elif (pos and len(fills) < units and i != first_bar
