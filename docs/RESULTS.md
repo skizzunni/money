@@ -1612,6 +1612,19 @@ and 34-35% down, and only 11-16% of days $200 or more up (4 to 10 MNQ), so five 
 sessions, whatever the size: its profit comes from a few big days, not from many green ones. The fastest policies are a
 coin flip with the account within four weeks, and two weeks is out of reach for this strategy under these rules.
 
+## Round eighty-eight: more $200 days
+
+`research/green_days.py`. The bot bent toward many +$200 days (Apex's qualifying days): 6, 8 or 10 MNQ at a 25-point
+cap, take-profit 0.25, 0.5 or 1.5 noise units, a +$250 daily profit stop or none, 2 or 3 losers (36 variants).
+
+- A closer take-profit raises the share of $200 days only to about 20% (from 11-16%) and costs money; the best for the
+  two-week payout race (10 MNQ, take-profit 0.25, 3 losers) paid within 10 sessions 2.0-2.6% of starts and busted
+  about 60%: worse than round eighty-seven.
+- A +$250 daily profit stop makes green days (36-46%) outnumber red days (13-20%), but every variant loses money
+  (-$1 to -$27 a day): it caps the big days that pay for the losers. (Ten such days can't reach +$2,600 either.)
+
+**FAIL**: a winning-streak shape at the day level costs this strategy its edge.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
