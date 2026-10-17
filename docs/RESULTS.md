@@ -1922,6 +1922,36 @@ Benjamini-Hochberg at 10% on 2011-18, then t >= 2 on both later sets. The paper'
 on all three sets (t 0.88 / 1.92 / 2.10 and 1.93 / 1.35 / 2.36) but clear neither stage; they overlap the bot's own
 15:00 and 15:30 checks anyway. **Nothing counts.**
 
+## Round one hundred and eleven: breakout trades lost to the bot's timing
+
+`research/combo_late.py` (bar as round 102). Only 8.5% of the breakout's first touches (130 of 1,526 on NQ) come while
+the bot is in a trade, nearly all in the bot's direction. Re-arming the breakout once the bot is flat ("late": 84
+trades on NQ, -$12 each on average) changes almost nothing; round 102's "together" at 6 MNQ in all instead of 10
+still busts 7-14 points more evaluations ($539 against $727 per evaluation in 2019-25). **None adopted.**
+
+## Round one hundred and twelve: the evaluation's lock again, with the breakout
+
+`research/eval_lock_w.py` (adopted if more passes and at least as much paid in all three periods). Arming the lock at
+0.5 max loss in the evaluation helps a lot on 2011-18 (29.6% passed against 26.4%, $1,612 against $1,268 per
+evaluation) and hurts later (17.5% against 21.7% in 2019-25). (0.5, +6.25) and (0.75, +4) the same. **(1.0, +2.5)
+stays.** Read with the threshold stopping at the start (round 109), the picture is the same.
+
+## How the strategy's risk is split
+
+The strategy's two parts, as it trades the evaluation (daily P/L, all sessions):
+
+| | Bot (4 MNQ): $ a day / swing | Breakout: $ a day / swing | Correlation |
+|---|---|---|---|
+| 2011-18 | 55.8 / 626 | 8.9 / 178 | 0.00 |
+| 2019-25 | 51.8 / 648 | 7.9 / 194 | 0.00 |
+| NQ 2015-24 | 49.0 / 627 | 8.3 / 179 | 0.02 |
+
+Uncorrelated in every period. By mean-variance the breakout should carry 1.7-2.0 times its risk ($350-400 a trade),
+stable across periods, but that would raise the whole strategy's return-to-swing ratio by only about 3% (0.099 to
+0.102 a day), and round 101's neighbours at $400 were mixed: not worth changing. That ratio, about 0.1 a day, is
+what sets the pass rate on a $2,000 trailing drawdown with 30 days; rule changes move it by a few percent, and only a
+new edge uncorrelated with both would move it much.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
@@ -2025,6 +2055,8 @@ python research/eod_plan.py nsx1m_scaled.pkl nq1m_scaled.pkl          # the EOD-
 python research/eod_full.py nsx1m_scaled.pkl nq1m_scaled.pkl          # the EOD route end to end (reference)
 python research/eval_lock.py nsx1m_scaled.pkl nq1m_scaled.pkl         # if the evaluation's threshold stops (no)
 python research/last_half_hour.py nsx1m_scaled.pkl nq1m_scaled.pkl    # intraday momentum into the close (no)
+python research/combo_late.py nsx1m_scaled.pkl nq1m_scaled.pkl        # late breakout entries, a smaller together (no)
+python research/eval_lock_w.py nsx1m_scaled.pkl nq1m_scaled.pkl       # the evaluation's lock with the breakout (no)
 ```
 
 The raw data isn't stored in this repo.

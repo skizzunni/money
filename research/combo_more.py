@@ -183,9 +183,14 @@ def job(args):
 
 def evaluate(bars, sess, ev_bot, pa_bot, cands, tog, periods, name):
     """The measures, per period, of the bot plus these Williams candidates."""
-    rows = []
     ev_legs, ev_tr = combine(bars, ev_bot, cands, tog)
     pa_legs, _ = combine(bars, pa_bot, cands, tog)
+    return evaluate_legs(bars, sess, ev_legs, ev_tr, pa_legs, periods, name)
+
+
+def evaluate_legs(bars, sess, ev_legs, ev_tr, pa_legs, periods, name):
+    """The measures, per period, from the evaluation's and the funded account's legs (combine's output)."""
+    rows = []
     ev_all, pa_all = T.leg_paths(bars, ev_legs), T.leg_paths(bars, pa_legs)
     for label, first, last_start in periods:
         ss = [d for d in sess if d >= pd.Timestamp(first)]
