@@ -1625,6 +1625,14 @@ cap, take-profit 0.25, 0.5 or 1.5 noise units, a +$250 daily profit stop or none
 
 **FAIL**: a winning-streak shape at the day level costs this strategy its edge.
 
+## Round eighty-nine: tight daily loss stops for the two-week payout
+
+`research/tight_day_stops.py`. 6-10 MNQ, a daily loss stop of $250 or $350, a profit stop of $500-$800, 2 or 3 losers,
+both locks (72 policies), as round eighty-seven. The pick (10 MNQ, +$800 / -$350, lock 0.5 / +6.25) paid within 10
+sessions 3.3% / 2.9% / 1.4% of starts (2011-18 / 2019-25 / NQ), busting 13-16% within 10 and about 36-49% within 20:
+**FAIL** (round eighty-seven's pick paid 6.5% / 5.5%). Tight loss stops keep the account alive longer but cut the
+days that reach the payout.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
