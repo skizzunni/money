@@ -1336,6 +1336,19 @@ One cue survived 2011-18: trades whose 5-minute signal bar closed in its far qua
 (t -3.48). On 2019-26 the difference was gone ($29.82 against $31.92, t -0.12). **No survivor.** What is visible at the
 moment of the signal doesn't tell the winners from the losers, as in round eighteen.
 
+## Round seventy-one: classic intraday setups on MNQ
+
+`research/setups.py`. 24 rules in 9 families none of the earlier rounds tested: Crabel NR7/NR4, inside day,
+initial-balance breakout, opening drive, gap and go, prior-day high/low breakout, three-day trend, lunch reversal, VWAP
+band fade; $1.24 and a tick a side, stop first when a bar reaches both. Protocol fixed before running:
+Benjamini-Hochberg at q = 0.05 on 2011-18 (best p needed <= 0.0021), then 2019-26, then NQ futures.
+
+**0 survivors** at the first stage; the best was gap and go (gap at least 1.0x its 14-day average, first 5 minutes
+continuing it, in at 09:35, stop at the open, out at 10:29): t 2.78, p 0.005. Description, not a pass: gap and go was the
+only family positive in all three data sets in all four variants (gap at least 0.5x, held to the close: t 2.0 / 3.4 /
+3.5 on 2011-18 / 2019-26 / NQ futures, $54 and $42 a trade on the last two, 18-23% winners, about 1.3 trades a week).
+VWAP band fades lose everywhere (t -2.1 to -2.5). Gap and go gets its own confirmation test (round seventy-two).
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
