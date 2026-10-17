@@ -64,7 +64,8 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
              time_lock: tuple[int, float] | None = None, time_exit: int | None = None,
              skip_checks_on: dict | None = None, lock_unconfirmed: float | None = None,
              confirmed: tuple[set, set, set] | None = None, relock: bool = False,
-             lock_sigma: tuple[float, float, float] | None = None) -> pd.DataFrame:
+             lock_sigma: tuple[float, float, float] | None = None,
+             lock_early: tuple[float, int] | None = None) -> pd.DataFrame:
     """target: take profit this many noise units from the first fill (limit); cap_pts: max loss in points;
     target_on_fill_bar False: the limit works from the bar after the fill, as the Pine script places it;
     cap_on_fill_bar True: the max loss works on the fill bar too, measured from the expected fill (the signal
@@ -98,6 +99,8 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
     below its lower line; it has a bar): a trade whose signal that market did not confirm locks at this trigger
     instead of lock[0] (times the second market has no bar for count as confirmed);
     lock_sigma (k, lo, hi): the lock trigger is k x the check's noise (sigma x price), kept between lo and hi points;
+    lock_early (trigger, n): during the first n bars after the fill the lock arms at this (lower) trigger; later at
+    the trade's normal trigger;
     relock: after a lock exit, a stop order re-enters on the same side at the trade's lock trigger price (its fill plus
     the trigger), until the next half-hour check (once per signal);
     skip_checks_on: {date: check times with no new entries that day} (e.g. 10:00 on release days);
@@ -273,7 +276,8 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
             locked = True
         if pos and lock is not None and not locked and lim_bar != i:
             seen = (h[i] if pos > 0 else l[i]) if lock_touch else c[i]
-            locked = pos * (seen - fills[0]) >= trade_trigger  # from the next bar
+            trig_now = lock_early[0] if lock_early is not None and i - first_bar < lock_early[1] else trade_trigger
+            locked = pos * (seen - fills[0]) >= trig_now  # from the next bar
         if pos and trail_pts is not None:
             ext = h[i] if pos > 0 else l[i]
             if not math.isnan(peak):
