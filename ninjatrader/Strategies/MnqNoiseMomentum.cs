@@ -8,7 +8,8 @@
 //     entry + 2.5 points once price has reached +1 max loss (the lock); the take-profit sits 1.5 noise units from
 //     the fill; if the new stop is already at or past the price, the position is closed at market instead;
 //   * 16:00 New York: everything closed at market. A session that ends early: closed at market too.
-// Setup: 5-minute MNQ chart, Days to load 30 or more (the noise needs 14 full sessions), Calculate on bar close.
+// Setup: 1-minute MNQ chart (the lock arms within the minute: more winners than on 5 minutes, docs/RESULTS.md round
+// 81), Days to load 30 or more (the noise needs 14 full sessions), Calculate on bar close.
 // See docs/NINJATRADER.md. Written in C# 5 for NinjaTrader 8's compiler.
 using System;
 using System.ComponentModel;
@@ -130,7 +131,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (badChart || Calculate != Calculate.OnBarClose)
             {
                 Draw.TextFixed(this, "mnq_dash", badChart ?
-                    "MNQ Noise Momentum: use a 1, 5, 10, 15 or 30 minute chart (5 is the tested one). Not trading." :
+                    "MNQ Noise Momentum: use a 1, 5, 10, 15 or 30 minute chart (1 minute is best). Not trading." :
                     "MNQ Noise Momentum: set Calculate to 'On bar close' in the strategy settings. Not trading.",
                     TextPosition.TopRight);
                 return;
@@ -351,6 +352,8 @@ namespace NinjaTrader.NinjaScript.Strategies
             string s = "MNQ Noise Momentum v1.6: " + Account + ", " + Qty + " MNQ, " + Usd(MaxLoss) + " max loss, " + MaxLosers +
                        " losers a day\n";
             s += "Orders: " + (PlaceOrders ? "ON (the strategy trades this account)" : "OFF (alerts only)") + "\n";
+            if (minutes != 1)
+                s += "Use a 1-minute chart: the lock arms within the minute (about 6 points more winning trades).\n";
             if (!engine.Ready)
                 s += "History: " + engine.SessionsLoaded + "/" + Lookback + " full sessions. No trades yet: set Days to load to 30+.\n";
             if (!double.IsNaN(engine.Upper))

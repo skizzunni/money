@@ -20,8 +20,11 @@ account. Copy that account to others with a trade copier (Tradesyncer, or NinjaT
 1. Close any NinjaScript Editor windows. Copy the two `.cs` files into the folders above.
 2. In NinjaTrader: **New → NinjaScript Editor**, then press **F5** (compile). The bottom of the editor must show no
    errors. If it shows an error, send me the exact message.
-3. A chart: **New → Chart**, instrument **MNQ** front month (e.g. `MNQ 12-26`), **5 Minute**, **Days to load: 30**
-   or more. The noise needs 14 full sessions before the first trade. Any trading-hours template that contains
+3. A chart: **New → Chart**, instrument **MNQ** front month (e.g. `MNQ 12-26`), **1 Minute**, **Days to load: 30**
+   or more. The noise needs 14 full sessions before the first trade. **Use 1 minute, not 5:** the strategy works on
+   bar closes, so on a 1-minute chart the breakeven lock arms within the minute price reaches it instead of at the
+   end of a 5-minute bar. Over 16 years that made 5-7 points more winning trades, more money a week, smaller losing
+   stretches and more passed evaluations (round eighty-one). Any trading-hours template that contains
    09:30–16:00 New York works (`CME US Index Futures ETH` is the default). Any platform time zone works too: the
    strategy converts bar times to New York itself.
 4. Right-click the chart → **Strategies… → MnqNoiseMomentum → Add**, and set:
@@ -79,7 +82,7 @@ stand-in for NinjaTrader, not on NinjaTrader. Watch it trade once in NinjaTrader
    yesterday. Then disconnect.
 2. **Connections → Playback Connection.** In the Playback window pick **Historical**, and set **Start** at least
    **four weeks after** the first downloaded day (the bot needs 14 full sessions before its first trade), End
-   yesterday. Open a 5-minute chart, **Days to load 45**, add the strategy **from the chart** on the **Playback101**
+   yesterday. Open a 1-minute chart, **Days to load 45**, add the strategy **from the chart** on the **Playback101**
    account with Place orders on, drag the speed slider toward **Max** and press play. It trades only between 10:00
    and 16:00 New York; if the dashboard says "History: x/14", start the playback later.
 3. Check, on at least one day with a trade: the entry fills right after a check bar closes; a stop and a take-profit

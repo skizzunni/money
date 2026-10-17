@@ -1501,6 +1501,26 @@ before running: higher on reaction sessions in all three periods and t >= 2.0 on
 **FAIL** on t. The same pattern as jobs-report days (round seventy-three): the bot makes about 2-3 times its usual $ a
 day after mega-cap earnings in every period, too noisy to prove with this many days.
 
+## Round eighty-one: the NinjaTrader strategy on a 1-minute chart
+
+`research/chart_minutes.py` (description). The strategy acts on bar closes: on a 5-minute chart the lock arms only when
+the 5-minute bar closes; on a 1-minute chart, within the minute (the engine is the same; its 1-minute parity with the
+Python bot is in tests/test_ninjatrader.py). At the account's settings (4 MNQ, $200, 3 losers), 5-minute bars built
+from the same 1-minute data, evaluation as round sixty:
+
+| Data | Chart | Winners | $ a week | Worst losing stretch | 50K evaluation pass / bust % |
+|---|---|---|---|---|---|
+| 2011-18 | 5-minute | 46.5% | $258 | $11,118 | 24.1 / 64.5 |
+| | **1-minute** | **51.3%** | **$272** | **$10,957** | **26.2 / 59.0** |
+| 2019-26 | 5-minute | 43.4% | $240 | $17,058 | 20.1 / 68.1 |
+| | **1-minute** | **49.9%** | **$269** | **$13,357** | **21.6 / 63.6** |
+| NQ futures 2015-25 | 5-minute | 44.1% | $194 | $15,275 | 21.5 / 70.2 |
+| | **1-minute** | **50.6%** | **$224** | **$11,890** | **22.7 / 67.0** |
+
+The 1-minute chart is better on every measure in every period: 5-7 points more winning trades, 5-16% more a week,
+smaller losing stretches, more passes and fewer busts. The guide and the strategy now say to use it. (All the Apex
+simulations of rounds fifty-nine to eighty already used the 1-minute engine.)
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
