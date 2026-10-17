@@ -1311,6 +1311,17 @@ markets were tried: t >= 2.5 on 2011-18 alone, then t >= 1.5 on 2019-26, then a 
 **FAIL**: no market passed the first stage. At a $200 stop these markets need many contracts, and fees plus a tick of
 slippage cost $26 (gold) to $75 (euro) a trade against about $7 on 4 MNQ. The edge is the Nasdaq's.
 
+## Round sixty-nine: other markets as cues for the Nasdaq (lead-lag scan)
+
+`research/leadlag.py`. Trading the Nasdaq only, with other markets as cues: at every half-hour check 10:00-15:30, the
+last 5, 15, 30, 60 minutes' and the since-09:30 move of gold, silver, crude oil, the euro, the yen, the dollar index,
+the DAX, the Nikkei and the S&P, and the Nasdaq-minus-S&P move (50 features), each traded with or against its move,
+held 30 minutes or to the close, when the move is in its own top 30% of the past year: 200 rules, $1.24 and a tick a
+side on MNQ. Protocol fixed before running: Benjamini-Hochberg at q = 0.05 on 2011-18, then one look at 2019-26, then
+NQ futures. **0 of 200 survived the first stage**; the best (the Nasdaq-minus-S&P 30-minute move, to the close) had
+p = 0.043, where about 10 of 200 would by chance. Other markets' recent moves don't predict the Nasdaq's next half
+hour beyond chance.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
