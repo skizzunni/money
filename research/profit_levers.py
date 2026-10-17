@@ -65,7 +65,7 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
              skip_checks_on: dict | None = None, lock_unconfirmed: float | None = None,
              confirmed: tuple[set, set, set] | None = None, relock: bool = False,
              lock_sigma: tuple[float, float, float] | None = None,
-             lock_early: tuple[float, int] | None = None) -> pd.DataFrame:
+             lock_early: tuple[float, int] | None = None, noise_stat: str = "mean") -> pd.DataFrame:
     """target: take profit this many noise units from the first fill (limit); cap_pts: max loss in points;
     target_on_fill_bar False: the limit works from the bar after the fill, as the Pine script places it;
     cap_on_fill_bar True: the max loss works on the fill bar too, measured from the expected fill (the signal
@@ -101,6 +101,8 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
     lock_sigma (k, lo, hi): the lock trigger is k x the check's noise (sigma x price), kept between lo and hi points;
     lock_early (trigger, n): during the first n bars after the fill the lock arms at this (lower) trigger; later at
     the trade's normal trigger;
+    noise_stat: how the 14 sessions' moves make the noise: "mean" (the paper), "median", or "trim" (the mean without
+    the largest and smallest);
     relock: after a lock exit, a stop order re-enters on the same side at the trade's lock trigger price (its fill plus
     the trigger), until the next half-hour check (once per signal);
     skip_checks_on: {date: check times with no new entries that day} (e.g. 10:00 on release days);
@@ -296,7 +298,13 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
             j = kof[end]
             today[j] = abs(c[i] / day_open - 1)
             if filled >= LOOKBACK and not math.isnan(prev_close):
-                sigma = ring[:, j].mean()
+                col = ring[:, j]
+                if noise_stat == "median":
+                    sigma = float(np.median(col))
+                elif noise_stat == "trim":
+                    sigma = float(np.sort(col)[1:-1].mean())
+                else:
+                    sigma = col.mean()
                 upper = max(day_open, prev_close) * (1 + sigma)
                 lower = min(day_open, prev_close) * (1 - sigma)
                 spike = 0.5

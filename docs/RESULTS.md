@@ -1054,6 +1054,10 @@ Why the recent years pay less: where the two locks part ways, the 13.1-point loc
 
 On 2011–2018 the losers a 13.1-point lock saves hit it fast (77% within 5 minutes of the fill, median 3) and the runners it cuts later (55%, median 5). Rule, fixed before the tests ([`research/lock_early.py`](../research/lock_early.py)): for the first 5 (or 10) minutes the lock arms at 13.1 points, after that at 17.5. It passed 2011–2018 (54.2% against 50.6% winners, $16.43 against $15.19 a day) and 2019–2022 (49.8% against 47.0%, $17.63 against $17.04), then failed 2023 – Sep 2026 (49.8% against 47.8% winners but $5.53 against $6.64 a day). Every earlier lock tested so far gives up money on 2023–2026, where the trend days it cuts short are bigger.
 
+## Fifty-fourth round: the noise from a median or a trimmed mean
+
+The noise as the median of the 14 sessions, or their mean without the largest and smallest ([`research/noise_median.py`](../research/noise_median.py)), so one extreme day doesn't widen the lines for 14 sessions. The median made less on 2011–2018. The trimmed mean passed 2011–2018 and 2019–2022 and on 2023 – Sep 2026 made more ($7.29 against $6.64 a day) with more trades, but its worst losing stretch grew from $3,497 to $4,053, so it failed; on NQ futures 2015–2025 it made less ($11.73 against $12.90, and $2.56 against $6.65 on 2023–2025). The mean stays.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
@@ -1139,6 +1143,7 @@ python research/walkforward_tp35.py nsx_1m_scaled.pkl nq_1m_scaled.pkl  # the ta
 python research/walkforward_more.py nsx_1m_scaled.pkl nq_1m_scaled.pkl  # lookback, lock offset, loser limit (all stay)
 python research/lock_sigma.py nsx_1m_scaled.pkl nq_1m_scaled.pkl       # a noise-scaled lock trigger (ties 2019-22)
 python research/lock_early.py nsx_1m_scaled.pkl nq_1m_scaled.pkl       # the earlier lock in the first minutes (no)
+python research/noise_median.py nsx_1m_scaled.pkl nq_1m_scaled.pkl     # median / trimmed-mean noise (no)
 ```
 
 The raw data isn't stored in this repo.
