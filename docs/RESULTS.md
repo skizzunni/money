@@ -1676,6 +1676,18 @@ fixed before running: Benjamini-Hochberg on 2011-18, then 2019-26, then NQ futur
 (t 2.2-2.9) at 40% winners, 21% green days and 27% red; 10 of 24 rules lose. Like the bot, it makes its money from a
 few trend days, and it is no stronger than the bot.
 
+## Round ninety-three: trade with the multi-day trend
+
+`research/trend_filter.py`. Trend from completed sessions only: the previous close vs its 20- or 50-session average,
+both agreeing, or the 20-session average's 5-session slope. Rules: with the trend only, or 6 MNQ with it and 2
+against. Bar fixed before running (the 2011-18 best by payouts per evaluation beats the bot by 10% on 2019-25 and NQ
+with no lower pass rate).
+
+Trading only with the trend keeps 39-48% of the trades and **doesn't raise the share of winners** (49-52% either way):
+the multi-day trend doesn't tell this bot's winners from its losers. It halves busts but most evaluations then run out
+of time (45-65% timeouts) and payouts per evaluation collapse. The best on 2011-18, 6 / 2 MNQ by the 20-session
+average's slope, paid $184 against $585 (2019-25) and $601 against $628 (NQ) per evaluation: **FAIL**.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
