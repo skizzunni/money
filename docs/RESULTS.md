@@ -1062,6 +1062,11 @@ The noise as the median of the 14 sessions, or their mean without the largest an
 
 Checks at every quarter hour, each with its own noise ([`research/checks15.py`](../research/checks15.py)), at 10 MNQ and $350 with the lock: on 2011–2018 2.80 trades a day against 2.27 and $16.47 against $15.19, but 49.8% winners against 50.6%, a t-stat of 4.51 against 4.67 and a worst losing stretch of $3,983 against $2,569. Failed: the extra quarter-hour trades add more swings than money.
 
+## The lock dial, finely, and volume at the signal
+
+- **Volume into the signal** (NQ futures 2015–2018, the last five minutes' volume against the same minutes' median over the previous 20 sessions, by fifths): winners 48.6% / 48.0% / 53.4% / 47.7% / 52.7%, with no order to it. No lead from volume either.
+- **The lock trigger between 14 and 17.5 points** (descriptive, chosen after all the data was seen): at 14.9 points (*Lock a small win* 0.85) NQ futures 2015–2025 win 51.1% against 48.8% with $132 against $129 a day ×10 and a worst stretch of $16,377 against $18,347, and 2023–2025 50.1% against 48.5% with $67 against $66; the index 2011–2026 51.2% against 49.0% and $138 against $137; but the index 2023–2026 $49 against $66 (at 14.0 points $56, at 15.75 $48: noisy). On the real MNQ weeks from Yahoo (5-minute bars) 47 trades, 47% winners, +$11,452 against 44, 43%, +$13,068. The input now takes steps of 0.05; the default stays 1.0.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
