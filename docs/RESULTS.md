@@ -1607,8 +1607,9 @@ fixed before running.
 | 4 MNQ, no stops (the funded setting now) | 0.0% / 0.2% / 0.0% | 11-16% | 2-6% |
 
 **NOT ADOPTED**: no policy pays within two weeks more often than it busts; the best pays within two weeks in fewer than
-one start in ten. The binding rule is the five $200 days: the bot trades on about 57% of days and ends about a third
-of days $200 up, so five such days rarely come inside ten sessions, whatever the size. The fastest policies are a
+one start in ten. The binding rule is the five $200 days: the bot trades on about 57% of days, ends 22% of days up
+and 34-35% down, and only 11-16% of days $200 or more up (4 to 10 MNQ), so five such days rarely come inside ten
+sessions, whatever the size: its profit comes from a few big days, not from many green ones. The fastest policies are a
 coin flip with the account within four weeks, and two weeks is out of reach for this strategy under these rules.
 
 ## A check on real MNQ futures data, September 21 to October 15, 2026
