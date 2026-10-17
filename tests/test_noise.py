@@ -674,6 +674,52 @@ def test_pine_daily_loser_limit():
     assert_parity(bars, qty=10, max_loss=350.0, max_losers=1, exit_mode="check")
 
 
+def eval_walk(day_pnl, target, dd, cons, min_days):
+    """The evaluation's end-of-day walk, as the chart's tracker does it (mnqbot.report.run_eval's rules)."""
+    rel = peak = best = 0.0
+    tdays, state = 0, "in progress"
+    for pnl in day_pnl:
+        failed = rel + min(pnl, 0.0) <= min(peak - dd, 0.0)
+        rel += pnl  # the failing day's balance is shown too
+        tdays += 1
+        best = max(best, pnl)
+        peak = max(peak, rel)
+        if failed:
+            state = "FAILED"
+            break
+        if rel >= target and tdays >= min_days and (cons <= 0 or best < cons / 100 * rel):
+            state = "PASSED"
+            break
+    return state, rel, peak, best, tdays
+
+
+@pytest.mark.slow
+@pytest.mark.parametrize("target", [3000.0, 300.0])
+def test_pine_evaluation_tracker(target):
+    bars = synth_bars(sessions=120, seed=3)
+    days = sorted({d.date() for d in bars.index.tz_convert(NY)})
+    start = days[40]
+    inputs = {"Contracts": 10, "Max loss per trade, $ (all contracts, 0 = off)": 350.0,
+              "Evaluation start date, YYYYMMDD (0 = off)": int(start.strftime("%Y%m%d")), "Profit target, $": target}
+    pytest.importorskip("pynescript", reason="pip install pynescript to check the .pine files")
+    from pine_interpreter import PineRuntime, load_pine
+
+    rt = PineRuntime(load_pine(NOISE_PINE), bars, inputs, timeframe_seconds=300)
+    rt.run(lambda i, g: None)
+    tf = run(bars, NoiseConfig(qty=10, max_loss_per_trade=350.0)).trades_frame()
+    tf = tf[tf.exit_time.dt.date >= start]
+    day_pnl = tf.groupby(tf.exit_time.dt.date).pnl.sum().tolist()
+    state, rel, peak, best, tdays = eval_walk(day_pnl, target, 2000.0, 50.0, 5)
+    grid = [t for t in rt.tables if t.columns == 2 and t.grid()[0][0].startswith("Evaluation")][0].grid()
+    assert grid[0][1] == state
+    assert money(grid[1][1].split(" of ")[0]) == pytest.approx(rel, abs=0.01)
+    assert money(grid[2][1].split(":")[0]) == pytest.approx(min(peak - 2000.0, 0.0), abs=0.01)
+    assert money(grid[3][1].split(" ")[0]) == pytest.approx(best, abs=0.01)
+    assert int(grid[5][1]) == tdays
+    if target == 300.0:
+        assert state in ("PASSED", "FAILED"), "a low target decides the walk"
+
+
 @pytest.mark.slow
 def test_pine_webhooks():
     bars, p = scenario(above_all_day)
