@@ -1706,6 +1706,17 @@ against it is a losing trade. (Re-entering the original direction gets its own t
 25-point stop, 1R or 2R target, once a day, 4 MNQ. The 2R re-entries are positive in every period ($5-23 a trade,
 35-38% winners, $2-11 a day) but weak (t 1.1-1.6 / 0.5-1.0 / 2.1-2.8); the 1R ones break even. **No rule counts.**
 
+## Round ninety-six: Market Profile
+
+`research/market_profile.py`. Yesterday's time-at-price profile (point of control, 70% value area) and 14 rules: the
+80% rule (open outside the value area, back inside for one or two half hours, trade to the far edge or the point of
+control), a fade to the point of control after the first 15 or 30 minutes, acceptance breakouts out of the value area,
+and a point-of-control magnet at 11:00; $300 risk, up to 10 MNQ. Protocol fixed before running.
+
+**0 survivors** on 2011-18 (best |t| 1.64, a losing rule). The classic 80% rule wins 28-31% of the time here and turns
+negative after 2018; acceptance breakouts are positive in all three periods but weak (t 0.3-1.5, about one trade every
+three weeks). Yesterday's profile levels don't give an MNQ edge.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
