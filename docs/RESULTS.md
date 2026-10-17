@@ -1033,6 +1033,21 @@ Dropping trades that lose on average raises winners and money together. Fixed be
 
 The lock trigger as k × the check's noise (σ × price), kept between 8.75 and 17.5 points ([`research/lock_sigma.py`](../research/lock_sigma.py)): sooner on quiet days, the full 17.5 on volatile ones. On 2011–2018 every k met the bar (k = 0.15: 53.7% against 50.6% winners, $16.60 against $15.19 a day, t 5.19 against 4.67, $50K passes 36% against 32%). On 2019–2022, a volatile stretch where the trigger mostly sat at 17.5, it tied v1.3 ($17.03 against $17.04 a day, 47.6% against 47.0% winners) and so missed the bar; 2023–2026 was not looked at. Not adopted.
 
+## Most trades profitable: the lock at 0.75
+
+The user's aim, more than half the trades profitable without fewer trades. Descriptive, after rounds thirty-nine and forty-three (where the 13.1-point lock missed the pre-registered bars), at 10 MNQ and $350 on 1-minute bars (the broker's auto-breakeven):
+
+| | Win % | $/day ×10 | t | Worst stretch ×10 | Trades/day | $50K pass |
+|---|---|---|---|---|---|---|
+| Index 2011–2026, lock at 17.5 (v1.5) | 49.0% | $137 | 5.76 | $34,973 | 2.19 | 30% |
+| Index 2011–2026, lock at 13.1 | **53.0%** | **$145** | 6.33 | $31,513 | 2.28 | 31% |
+| NQ futures 2015–2025, lock at 17.5 | 48.8% | $129 | 4.33 | $18,347 | 2.26 | 25% |
+| NQ futures 2015–2025, lock at 13.1 | **52.3%** | **$134** | 4.63 | $16,454 | 2.37 | 28% |
+| Index 2023–2026, 17.5 / 13.1 | 47.8% / 50.5% | $66 / $57 | 1.49 / 1.34 | $34,973 / $31,513 | | 23% / 20% |
+| NQ futures 2023–2025, 17.5 / 13.1 | 48.5% / 50.9% | $66 / $63 | 1.26 / 1.25 | $16,682 / $16,454 | | 19% / 24% |
+
+Over the whole histories the 13.1-point lock wins more than half its trades, makes more money with smaller losing stretches, and takes slightly more trades; over the last three years it still wins about half, for 5–14% less money. On the real MNQ weeks (5-minute bars, the chart's view): 48 trades, 46% winners, +$11,084, against 44, 43% and +$13,068. *Lock a small win* = 0.75 is the setting; the default stays at 1.0 because the recent years pay less.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
