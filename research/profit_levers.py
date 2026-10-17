@@ -62,7 +62,8 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
              limit_first: tuple[float, int] | None = None, second_chance: bool = False,
              skip_days: frozenset = frozenset(), checks_by_year: dict | None = None,
              time_lock: tuple[int, float] | None = None, time_exit: int | None = None,
-             skip_checks_on: dict | None = None) -> pd.DataFrame:
+             skip_checks_on: dict | None = None, lock_unconfirmed: float | None = None,
+             confirmed: tuple[set, set, set] | None = None) -> pd.DataFrame:
     """target: take profit this many noise units from the first fill (limit); cap_pts: max loss in points;
     target_on_fill_bar False: the limit works from the bar after the fill, as the Pine script places it;
     cap_on_fill_bar True: the max loss works on the fill bar too, measured from the expected fill (the signal
@@ -92,6 +93,9 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
     checks_by_year: {year: check times (as no_entry_checks) with no new entries that year};
     time_lock (n, profit): n bars after the fill, if the bar closes at least profit points up, the lock (entry +
     lock offset) goes on from the next bar, as if the trigger had been reached;
+    lock_unconfirmed, confirmed (three sets of check-bar times: a second market closed beyond its own upper line;
+    below its lower line; it has a bar): a trade whose signal that market did not confirm locks at this trigger
+    instead of lock[0] (times the second market has no bar for count as confirmed);
     skip_checks_on: {date: check times with no new entries that day} (e.g. 10:00 on release days);
     time_exit n: a trade that hasn't reached the lock n bars after the fill closes at that bar's close (market);
     skip_spike: no entry when the 5-minute bar ending at the check closed at or beyond this fraction of its range
@@ -119,6 +123,7 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
     ghost_px = ghost_stop = math.nan  # the ghost trade's fill and stop while waiting
     lim_px, lim_left, lim_market, lim_bar = math.nan, 0, False, -1  # limit_first: the resting limit
     chance_side, chance_px, chance_done = 0, math.nan, False  # second_chance: the re-entry stop order
+    trade_trigger = sig_trigger = lock[0] if lock is not None else math.nan  # this trade's lock trigger
     locked = locked2 = False  # lock: the stop has moved to the entry plus the offset (lock2: the second step)
     target_today = False
     losers, lost_sides = 0, set()  # losing trades today, and the sides they were on
@@ -178,6 +183,8 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
                 if entry_delay:
                     est = o[i] + pending * TICK  # a late trader places the bracket from the real fill
             pending = 0
+        if pos and first_bar == i:
+            trade_trigger = sig_trigger
         if chance_side and pos == 0 and not pending:  # second_chance: the re-entry stop order
             d = chance_side
             if (d > 0 and h[i] >= chance_px) or (d < 0 and l[i] <= chance_px):
@@ -260,7 +267,7 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
             locked = True
         if pos and lock is not None and not locked and lim_bar != i:
             seen = (h[i] if pos > 0 else l[i]) if lock_touch else c[i]
-            locked = pos * (seen - fills[0]) >= lock[0]  # from the next bar
+            locked = pos * (seen - fills[0]) >= trade_trigger  # from the next bar
         if pos and trail_pts is not None:
             ext = h[i] if pos > 0 else l[i]
             if not math.isnan(peak):
@@ -298,10 +305,16 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
                            or cap_pts < min_cap_units * sigma * c[i])
                 if pos == 0 and c[i] > upper and not blocked and not (side_once and 1 in lost_sides):
                     pending, est, wait = 1, c[i] + TICK, entry_delay
+                    if lock_unconfirmed is not None and lock is not None:
+                        ok = idx[i] not in confirmed[2] or idx[i] in confirmed[0]
+                        sig_trigger = lock[0] if ok else lock_unconfirmed
                     if limit_first is not None:
                         lim_px, lim_left = c[i] - limit_first[0], limit_first[1]
                 elif pos == 0 and c[i] < lower and not blocked and not (side_once and -1 in lost_sides):
                     pending, est, wait = -1, c[i] - TICK, entry_delay
+                    if lock_unconfirmed is not None and lock is not None:
+                        ok = idx[i] not in confirmed[2] or idx[i] in confirmed[1]
+                        sig_trigger = lock[0] if ok else lock_unconfirmed
                     if limit_first is not None:
                         lim_px, lim_left = c[i] + limit_first[0], limit_first[1]
                 elif (pos and len(fills) < units and i != first_bar
