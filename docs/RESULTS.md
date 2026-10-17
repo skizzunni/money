@@ -1441,6 +1441,22 @@ all three periods, with no lower pass rate.
 bigger trades make the path rougher, and on a $2,000 trailing drawdown the evaluation busts more: on 2019-25 every split
 passes less often and pays less than 4 / 4. The cue is real; turning it into size doesn't fit this drawdown.
 
+## Round seventy-seven: managing wick trades and the rest differently
+
+`research/wick_manage.py`. 4 MNQ, $200 for every trade; only the management changes with the wick cue (round
+seventy-five). Adoption bar as round seventy-six. Pass % / paid per evaluation:
+
+| Variant | 2011-18 | 2019-25 | NQ 2015-24 |
+|---|---|---|---|
+| E0 the bot | 27.5 / $862 | 22.9 / $553 | 25.3 / $550 |
+| E1 wick trades take-profit 2.5 | 24.0 / $604 | 20.0 / $369 | 20.6 / $277 |
+| E2 other trades take-profit 0.75 | 24.9 / $965 | 21.7 / $487 | 22.6 / $462 |
+| E3 E1 + E2 | 21.9 / $715 | 17.1 / $293 | 17.7 / $387 |
+| E4 other trades lock at +0.5 | 27.8 / $817 | 21.9 / $638 | 21.3 / $342 |
+| E5 other trades by a limit at mid-bar | 23.7 / $509 | 17.6 / $416 | 23.4 / $437 |
+
+**None adopted.** E4 raises winners to 54-57% but pays less on two of three periods.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
