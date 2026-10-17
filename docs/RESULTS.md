@@ -1895,6 +1895,33 @@ re-tested on it. Base pays $2,196 / $1,748 / $1,536 per evaluation; "together" p
 $1,691, pass rate up 0.8-2.1 points); the overnight long and 6 MNQ funded fail. Not built in: the user trades the
 intraday trail, where "together" failed (round 102).
 
+## Round one hundred and nine: if the intraday evaluation's threshold stops trailing
+
+`research/eval_lock.py`. Every intraday evaluation result so far let the threshold trail the peak all the way to the
+target. Third-party summaries of Apex's 2026 rules say it stops: in evaluations possibly at the starting balance once
+the peak reaches +$2,000 (funded: at +$100). Not confirmed on Apex's own site from here. The user's evaluation (the
+strategy now):
+
+| Threshold | Pass %, 2011-18 / 2019-25 / NQ | Bust % | Paid per evaluation |
+|---|---|---|---|
+| Never stops (every result so far) | 26.4 / 21.7 / 22.7 | 60 / 61 / 67 | $1,268 / $727 / $690 |
+| Stops at the start | 30.2 / 27.5 / 28.5 | 52 / 50 / 56 | $1,416 / $865 / $838 |
+| Stops at the start, then 1.5x size | 30.0 / 28.9 / 28.9 | 57 / 55 / 61 | $1,480 / $1,024 / $872 |
+| Stops at the start, then 2x size | 29.2 / 27.4 / 28.3 | 60 / 59 / 65 | $1,474 / $1,002 / $872 |
+
+If the threshold does stop, the earlier pass rates are 4-6 points too low. Sizing up once it has stopped pays more
+per evaluation, but x1.5 passes fewer on 2011-18 (30.0 against 30.2), so by the bar (more passes and at least as
+much paid in all three) **not adopted**. The +$100 lock gives the same picture.
+
+## Round one hundred and ten: intraday momentum into the close
+
+`research/last_half_hour.py`. Gao, Han, Li and Zhou (2018): the return from the previous close to 10:00 predicts the
+last half hour. 12 rules (three signals, 15:30 or 15:00 to the close, all days or the larger half); bar:
+Benjamini-Hochberg at 10% on 2011-18, then t >= 2 on both later sets. The paper's own signal is negative from 2019
+(t -2.03) and on NQ futures (-1.20). The open-to-15:00 and close-to-15:00 signals traded into the close are positive
+on all three sets (t 0.88 / 1.92 / 2.10 and 1.93 / 1.35 / 2.36) but clear neither stage; they overlap the bot's own
+15:00 and 15:30 checks anyway. **Nothing counts.**
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
@@ -1996,6 +2023,8 @@ python research/overnight_combo.py nsx1m_scaled.pkl nq1m_scaled.pkl    # the ove
 python research/overnight_first.py nsx1m_scaled.pkl nq1m_scaled.pkl    # ... until the first payout (no)
 python research/eod_plan.py nsx1m_scaled.pkl nq1m_scaled.pkl          # the EOD-trail evaluation (reference)
 python research/eod_full.py nsx1m_scaled.pkl nq1m_scaled.pkl          # the EOD route end to end (reference)
+python research/eval_lock.py nsx1m_scaled.pkl nq1m_scaled.pkl         # if the evaluation's threshold stops (no)
+python research/last_half_hour.py nsx1m_scaled.pkl nq1m_scaled.pkl    # intraday momentum into the close (no)
 ```
 
 The raw data isn't stored in this repo.
