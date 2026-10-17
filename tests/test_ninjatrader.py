@@ -198,6 +198,13 @@ def run_sim(sim, bars: pd.DataFrame, tmp: Path, minutes: int = 5, **props):
 
 
 TIME_EXITS = ("16:00 close", "Session ended")
+# the strategy's switch: an evaluation trades 3 MNQ, $200 max loss, 2 losers a day; funded 10 MNQ, $350, 4 losers
+ACCOUNTS = {False: dict(qty=3, max_loss_per_trade=200.0, max_losers=2), True: dict(qty=10, max_loss_per_trade=350.0,
+                                                                                  max_losers=4)}
+
+
+def account(funded: bool, **kw) -> NoiseConfig:
+    return NoiseConfig(**ACCOUNTS[funded], target_on_fill_bar=True, **kw)
 
 
 def assert_flat_by_16(trades, bars):
@@ -224,7 +231,7 @@ def assert_strategy_matches(trades, res):
 def test_strategy_places_the_bots_trades(sim, tmp_path, seed, funded):
     bars = synth_bars(sessions=90, seed=seed)
     trades, orders, _, _ = run_sim(sim, bars, tmp_path, Funded=funded, RoundPrices=False)
-    res = run(bars, NoiseConfig(qty=10 if funded else 3, target_on_fill_bar=True))
+    res = run(bars, account(funded))
     assert_strategy_matches(trades, res)
     entries = [o for o in orders if o[1] == "Enter"]
     assert len(entries) == len(res.trades) and {o[3] for o in entries} == {"10" if funded else "3"}
@@ -247,20 +254,21 @@ def test_strategy_on_the_tick_grid(sim, tmp_path, funded):
     bars = synth_bars(sessions=120, seed=5)
     qty = 10 if funded else 3
     trades, orders, _, _ = run_sim(sim, bars, tmp_path, Funded=funded)
-    res = run(bars, NoiseConfig(qty=qty, target_on_fill_bar=True))
+    res = run(bars, account(funded))
+    cap = ACCOUNTS[funded]["max_loss_per_trade"]
     prices = [float(o[3]) for o in orders if o[1] in ("SetStopLoss", "SetProfitTarget") and o[4] == "Price"]
     ticks = [float(o[3]) for o in orders if o[1] in ("SetStopLoss", "SetProfitTarget") and o[4] == "Ticks"]
     assert prices and all(abs(p * 4 - round(p * 4)) < 1e-9 for p in prices), "every order on the 0.25 tick"
     assert ticks and all(t == int(t) and t >= 1 for t in ticks), "brackets in whole ticks"
     stops = [float(o[3]) for o in orders if o[1] == "SetStopLoss" and o[4] == "Ticks"]
-    assert max(stops) * 0.25 * qty * 2 <= 350 + 1e-9, "the first stop never risks more than the max loss"
+    assert max(stops) * 0.25 * qty * 2 <= cap + 1e-9, "the first stop never risks more than the max loss"
     by_bar = {o[0]: o for o in res.orders}
     for o in orders:  # the first take-profit is never closer than the tested one
         if o[1] == "SetProfitTarget" and o[4] == "Ticks" and int(o[0]) in by_bar:
             _, d, est, _, tp = by_bar[int(o[0])]
             assert float(o[3]) * 0.25 >= d * (tp - est) - 1e-9, o
     assert [(int(r[0]), int(r[1])) for r in trades][:20] == [(t.direction, t.entry_bar) for t in res.trades][:20]
-    worst = 350 + 2 * 0.62 * qty + 0.25 * 2 * qty  # the max loss, fees and a tick of slippage on the stop
+    worst = cap + 2 * 0.62 * qty + 0.25 * 2 * qty  # the max loss, fees and a tick of slippage on the stop
     assert min(float(r[6]) for r in trades) >= -worst - 1e-6, "a stop rounded toward the price: never past $350"
     assert_flat_by_16(trades, bars)
     total, bot = sum(float(r[6]) for r in trades), sum(t.pnl for t in res.trades)
@@ -293,14 +301,14 @@ def test_strategy_on_one_minute_bars(sim, tmp_path):
     one["high"] = one[["open", "close"]].max(axis=1)
     one["low"] = one[["open", "close"]].min(axis=1)
     trades, _, _, _ = run_sim(sim, one, tmp_path, minutes=1, RoundPrices=False)
-    assert_strategy_matches(trades, run(one, NoiseConfig(qty=3, target_on_fill_bar=True), minutes=1))
+    assert_strategy_matches(trades, run(one, account(False), minutes=1))
 
 
 def test_alerts_only_places_no_orders(sim, tmp_path):
     bars = synth_bars(sessions=60, seed=3)
     trades, orders, dash, printed = run_sim(sim, bars, tmp_path, PlaceOrders=False)
     assert not trades and not [o for o in orders if o[1] in ("Enter", "Exit")]
-    n = len(run(bars, NoiseConfig(qty=3)).orders)
+    n = len(run(bars, NoiseConfig(**ACCOUNTS[False])).orders)
     assert n and sum("BUY 3 MNQ" in p or "SELL 3 MNQ" in p for p in printed) == n
     assert "Orders: OFF" in dash
 
@@ -308,10 +316,10 @@ def test_alerts_only_places_no_orders(sim, tmp_path):
 def test_dashboard_and_switch(sim, tmp_path):
     bars = synth_bars(sessions=30, seed=3)
     _, _, dash, printed = run_sim(sim, bars, tmp_path)
-    assert "Evaluation, 3 MNQ" in dash and "Orders: ON" in dash
+    assert "Evaluation, 3 MNQ, $200 max loss, 2 losers a day" in dash and "Orders: ON" in dash
     assert any("BUY 3 MNQ (Evaluation)" in p or "SELL 3 MNQ (Evaluation)" in p for p in printed)
     _, _, dash, printed = run_sim(sim, bars, tmp_path, Funded=True)
-    assert "Funded, 10 MNQ" in dash
+    assert "Funded, 10 MNQ, $350 max loss, 4 losers a day" in dash
     assert any("BUY 10 MNQ (Funded)" in p or "SELL 10 MNQ (Funded)" in p for p in printed)
     _, orders, dash, _ = run_sim(sim, synth_bars(sessions=8, seed=3), tmp_path)
     assert "History: 8/14" in dash and not orders  # not enough sessions loaded: it says so, and trades nothing

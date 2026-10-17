@@ -56,12 +56,14 @@ namespace NinjaTrader.NinjaScript.Strategies
                 EvalQty = 3;
                 FundedQty = 10;
                 PlaceOrders = true;
-                MaxLoss = 350;
+                EvalMaxLoss = 200;     // 25K evaluation: $1,000 drawdown (research/apex25k.py, round fifty-nine)
+                FundedMaxLoss = 350;
                 TakeProfit = 1.5;
                 StopBuffer = 0.24;
                 LockAt = 1.0;
                 LockPlus = 2.5;
-                MaxLosers = 4;
+                EvalMaxLosers = 2;
+                FundedMaxLosers = 4;
                 Lookback = 14;
                 FedNoShorts = true;
                 SkipDates = NoiseEngine.SkipDatesDefault;
@@ -105,6 +107,8 @@ namespace NinjaTrader.NinjaScript.Strategies
         }
 
         int Qty { get { return Funded ? FundedQty : EvalQty; } }
+        double MaxLoss { get { return Funded ? FundedMaxLoss : EvalMaxLoss; } }
+        int MaxLosers { get { return Funded ? FundedMaxLosers : EvalMaxLosers; } }
         string Account { get { return Funded ? "Funded" : "Evaluation"; } }
 
         int RealDir
@@ -337,7 +341,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         string Dashboard()
         {
-            string s = "MNQ Noise Momentum v1.6: " + Account + ", " + Qty + " MNQ\n";
+            string s = "MNQ Noise Momentum v1.6: " + Account + ", " + Qty + " MNQ, " + Usd(MaxLoss) + " max loss, " + MaxLosers +
+                       " losers a day\n";
             s += "Orders: " + (PlaceOrders ? "ON (the strategy trades this account)" : "OFF (alerts only)") + "\n";
             if (!engine.Ready)
                 s += "History: " + engine.SessionsLoaded + "/" + Lookback + " full sessions. No trades yet: set Days to load to 30+.\n";
@@ -388,7 +393,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         #region Properties
         [NinjaScriptProperty]
-        [Display(Name = "FUNDED ACCOUNT (on: 10 MNQ; off: the 3 MNQ evaluation)", Order = 1, GroupName = "1. Account")]
+        [Display(Name = "FUNDED ACCOUNT (on: 10 MNQ, $350; off: the evaluation, 3 MNQ, $200)", Order = 1, GroupName = "1. Account")]
         public bool Funded { get; set; }
 
         [NinjaScriptProperty]
@@ -402,13 +407,28 @@ namespace NinjaTrader.NinjaScript.Strategies
         public int FundedQty { get; set; }
 
         [NinjaScriptProperty]
-        [Display(Name = "Place orders (off: alerts only, you click)", Order = 4, GroupName = "1. Account")]
-        public bool PlaceOrders { get; set; }
+        [Range(0.0, 100000.0)]
+        [Display(Name = "Evaluation: max loss per trade, $ (0 = off)", Order = 4, GroupName = "1. Account")]
+        public double EvalMaxLoss { get; set; }
 
         [NinjaScriptProperty]
         [Range(0.0, 100000.0)]
-        [Display(Name = "Max loss per trade, $ (0 = off)", Order = 1, GroupName = "2. Exits")]
-        public double MaxLoss { get; set; }
+        [Display(Name = "Funded: max loss per trade, $ (0 = off)", Order = 5, GroupName = "1. Account")]
+        public double FundedMaxLoss { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, 20)]
+        [Display(Name = "Evaluation: no new entries after this many losers today (0 = no limit)", Order = 6, GroupName = "1. Account")]
+        public int EvalMaxLosers { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, 20)]
+        [Display(Name = "Funded: no new entries after this many losers today (0 = no limit)", Order = 7, GroupName = "1. Account")]
+        public int FundedMaxLosers { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Place orders (off: alerts only, you click)", Order = 8, GroupName = "1. Account")]
+        public bool PlaceOrders { get; set; }
 
         [NinjaScriptProperty]
         [Range(0.0, 10.0)]
@@ -429,11 +449,6 @@ namespace NinjaTrader.NinjaScript.Strategies
         [Range(0.0, 100.0)]
         [Display(Name = "Lock: stop to entry + points", Order = 5, GroupName = "2. Exits")]
         public double LockPlus { get; set; }
-
-        [NinjaScriptProperty]
-        [Range(0, 20)]
-        [Display(Name = "No new entries after this many losers today (0 = no limit)", Order = 1, GroupName = "3. Entries")]
-        public int MaxLosers { get; set; }
 
         [NinjaScriptProperty]
         [Range(2, 60)]

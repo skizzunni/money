@@ -1086,6 +1086,54 @@ One rule from rounds forty-eight and fifty-seven ([`research/weak_trend_lock.py`
 
 It passed every index period, the final test included, then failed the NQ futures replication: more winners in every period, but 5–8% less money on 2019–2025 there. On the real MNQ weeks it tied ($13,101 against $13,068, 44% against 43% winners). Not adopted: on the real futures the recent years still pay a little less, the same trade as every earlier lock.
 
+## Round fifty-nine: an Apex 25K evaluation
+
+`research/apex25k.py`. The question: is $350 a trade too much on a 25K evaluation, where the trailing drawdown is
+$1,000? Modelled on 1-minute bars with the bot itself (v1.6 rules, take-profit from the fill as the NinjaTrader
+bracket places it, $1.24 fees and a tick of slippage): $1,500 target, $1,000 trailing drawdown, 30 calendar days,
+up to 40 MNQ. Two plans: intraday trail (the threshold follows the highest equity, open profit included) and
+end-of-day trail (set from the closing balance, plus a $500 daily loss limit that ends the day, not the
+evaluation). Apex's rules as its help center is quoted in search results; the site refuses this machine. An
+evaluation starts on every session. Pass bar, fixed before running: the best 30-day pass rate on 2011-2018 must beat
+the current evaluation setting (3 MNQ, $350, 4 losers) by 5 points, with no more busts, on 2019 - Sep 2026 and on NQ
+futures 2015-2025.
+
+Pass / bust % within 30 days; the last three columns are for the bot alone, without the evaluation's limits.
+
+| Setting | Data | End-of-day plan: pass / bust | Intraday plan: pass / bust | Days at -$500 | Days at -$1,000 | $ a day |
+|---|---|---|---|---|---|---|
+| 3 MNQ, $350, 4 losers (was the evaluation setting) | 2011-18 | 37.2 / 60.5 | 21.5 / 78.3 | 14.2% | 3.0% | 60 |
+| | 2019-26 | 32.1 / 63.6 | 15.9 / 83.6 | 15.6% | 4.0% | 77 |
+| | NQ futures | 36.2 / 61.3 | 19.3 / 80.7 | 15.7% | 3.9% | 67 |
+| 3 MNQ, $250, 3 losers (end-of-day pick) | 2011-18 | 39.8 / 57.1 | 22.9 / 76.7 | 11.5% | 0.1% | 58 |
+| | 2019-26 | 35.2 / 59.9 | 16.5 / 82.3 | 14.3% | 0.1% | 60 |
+| | NQ futures | 37.6 / 58.7 | 19.1 / 80.8 | 14.2% | 0.0% | 54 |
+| **3 MNQ, $200, 2 losers (now the evaluation setting)** | 2011-18 | 39.0 / 55.3 | 24.8 / 73.5 | 0.0% | 0.0% | 54 |
+| | 2019-26 | 40.6 / 52.4 | 18.3 / 79.3 | 0.2% | 0.0% | 45 |
+| | NQ futures | 38.0 / 57.0 | 21.4 / 78.0 | 0.0% | 0.0% | 43 |
+| 2 MNQ, $100, 3 losers (intraday pick) | 2011-18 | 31.9 / 39.9 | 27.6 / 57.2 | 0.0% | 0.0% | 28 |
+| | 2019-26 | 32.2 / 37.3 | 24.0 / 59.8 | 0.1% | 0.0% | 29 |
+| | NQ futures | 31.3 / 42.7 | 24.2 / 65.2 | 0.0% | 0.0% | 23 |
+| 10 MNQ, $350, 4 losers | 2011-18 | 36.4 / 63.6 | 7.8 / 92.2 | 29.5% | 14.5% | 149 |
+| | 2019-26 | 27.3 / 71.0 | 3.8 / 95.7 | 29.0% | 15.2% | 130 |
+| | NQ futures | 31.0 / 68.7 | 4.4 / 95.6 | 30.0% | 16.0% | 122 |
+
+The rest of the time an evaluation times out (2 MNQ at $100 times out 26-31% of the time: too slow for 30 days).
+
+Verdict: **no setting passed the bar.** The end-of-day pick beat the old setting by 3.1 and 1.4 points (5 needed); the
+intraday pick passed 2019-26 (+8.1) and missed on NQ futures (+4.9). What the table does show, as description:
+
+1. **$350 and 4 losers is too much for a $1,000 drawdown.** 3-4% of days would lose the whole drawdown in one day,
+   and 14-16% would hit the end-of-day plan's $500 daily limit. At $200 and 2 losers no day reached -$1,000 and
+   almost none -$500, and the pass rate is as good or slightly better on all three data sets, with fewer busts. The
+   cost: it makes less a day (about $45-54 against $60-77 at 3 MNQ), which a 30-day evaluation absorbs. That is why the evaluation side of the switch is now 3 MNQ, $200, 2 losers: a judgement call on
+   risk (it wasn't the 2011-18 pick), not a test result. The funded side stays 10 MNQ, $350, 4 losers.
+2. **Buy the end-of-day plan.** On the intraday plan open profit drags the threshold up, and every setting busts
+   57-96% of attempts.
+3. **10 MNQ doesn't fit a 25K account**: 4-8% pass on the intraday plan, 27-36% end-of-day, 15-16% of days at
+   -$1,000. On a funded 25K account (same $1,000 drawdown) the funded setting carries that risk too.
+4. Even the best setting passes about 4 attempts in 10 within 30 days. Plan for several attempts.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
