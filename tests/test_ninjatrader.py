@@ -11,6 +11,7 @@ import math
 import os
 import shutil
 import subprocess
+import sys
 from pathlib import Path
 
 import numpy as np
@@ -21,6 +22,10 @@ from test_noise import above_all_day, above_then_below, above_then_inside, below
 
 from mnqbot.data import NY
 from mnqbot.noise import NoiseConfig, run
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "research"))
+import combo_live  # noqa: E402
+import combo_priority  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 NT = ROOT / "ninjatrader"
@@ -184,7 +189,11 @@ def sim(tmp_path_factory):
     return out / "Sim.dll"
 
 
-def run_sim(sim, bars: pd.DataFrame, tmp: Path, minutes: int = 5, **props):
+def run_sim(sim, bars: pd.DataFrame, tmp: Path, minutes: int = 5, breakout: bool | None = False, **props):
+    """The strategy on the stand-in. breakout: the breakout setup on or off (None: the strategy's default); off by
+    default here, so the bot's own trades can be compared with the Python bot's."""
+    if breakout is not None:
+        props["UseBreakout"] = breakout
     path = write_bars(bars, tmp)
     args = [f"{k}={v}" for k, v in props.items()]
     r = subprocess.run([DOTNET, str(sim), str(path), str(minutes), *args], capture_output=True, text=True, env=ENV)
@@ -323,8 +332,9 @@ def test_dashboard_and_switch(sim, tmp_path):
     _, _, dash, printed = run_sim(sim, bars, tmp_path, Funded=True)
     assert "Funded, 4 MNQ, $200 max loss, 2 losers a day" in dash
     assert any("BUY 4 MNQ (Funded)" in p or "SELL 4 MNQ (Funded)" in p for p in printed)
-    _, orders, dash, _ = run_sim(sim, synth_bars(sessions=8, seed=3), tmp_path)
+    _, orders, dash, _ = run_sim(sim, synth_bars(sessions=8, seed=3), tmp_path, breakout=None)
     assert "History: 8/14" in dash and not orders  # not enough sessions loaded: it says so, and trades nothing
+    assert "Breakout: " in dash  # on by default
     _, _, _, printed = run_sim(sim, synth_bars(sessions=20, seed=3), tmp_path)
     daily = [p for p in printed if "MNQ Noise Momentum (Evaluation, 4 MNQ, orders ON)" in p]
     assert len(daily) == 20  # the Output window says every morning whether it can trade
@@ -344,3 +354,66 @@ def test_a_rejected_stop_closes_the_position(sim, tmp_path):
         assert closed.get(b + 1) == "Close: rejected", (b, closed)
     assert sum("ORDER REJECTED" in p for p in printed) == 4
     assert sum("closed at market so it is never left without a stop" in p for p in printed) == 2
+
+
+# ── The breakout in the bot's gaps (docs/RESULTS.md round 101): the account's trades are research/combo_priority.py's
+def rth_minutes(sessions: int, seed: int) -> pd.DataFrame:
+    """Random-walk 1-minute bars, 09:30-15:59 only, each opening at the last close; a drift on some days, so both
+    the bot and the breakout trade."""
+    rng = np.random.default_rng(seed)
+    price, frames = 20_000.0, []
+    for day in pd.bdate_range("2026-03-02", periods=sessions):
+        idx = pd.date_range(f"{day.date()} 09:30", f"{day.date()} 15:59", freq="1min", tz=NY)
+        drift = rng.choice([0.0, 0.0, 0.25, -0.25, 0.5, -0.5])
+        rows = []
+        for _ in idx:
+            path = price + np.cumsum(rng.standard_t(3, size=4) * 1.5 + drift / 4)
+            c = float(np.round(path[-1] * 4) / 4)
+            rows.append((price, float(np.ceil(max(price, path.max()) * 4) / 4),
+                         float(np.floor(min(price, path.min()) * 4) / 4), c))
+            price = c
+        frames.append(pd.DataFrame(rows, columns=["open", "high", "low", "close"], index=idx))
+    df = pd.concat(frames)
+    df["volume"] = 100.0
+    return df
+
+
+def combo_reference(bars: pd.DataFrame, funded: bool):
+    """The bot's trades and the breakout's in its gaps, as research/combo_priority.py trades them; the breakout from
+    the bot's fifteenth session (the strategy waits for its 14 sessions of history) and not on the skip dates."""
+    bot = [(t.entry_bar, t.exit_bar, t.direction, t.entry, t.exit, t.pnl, t.reason)
+           for t in run(bars, account(funded), minutes=1).trades]
+    idx = bars.index.tz_convert(NY)
+    first = sorted(set(idx.normalize()))[14]
+    w = [leg for leg in combo_live.williams_legs(bars, month_skip=False, skip_dates=NoiseConfig().skip_dates.split(","))
+         if idx[leg[0]] >= first]
+    legs = combo_priority.priority(bars, [b[:6] + (4,) for b in bot], w)
+    why = {b[0]: b[6] for b in bot}
+    return sorted((a, b, d, en, ex, pnl, why.get(a, "breakout")) for a, b, d, en, ex, pnl, _ in legs)
+
+
+@pytest.mark.parametrize("funded", [False, True])
+@pytest.mark.parametrize("seed", [3, 5, 9])
+def test_breakout_in_the_bots_gaps(sim, tmp_path, seed, funded):
+    bars = rth_minutes(60, seed)
+    trades, orders, _, _ = run_sim(sim, bars, tmp_path, minutes=1, breakout=True, Funded=funded, RoundPrices=False)
+    last_day = bars.index.tz_convert(NY).normalize()[-1]
+    ref = [r for r in combo_reference(bars, funded) if bars.index.tz_convert(NY)[r[0]].normalize() < last_day]
+    trades = [t for t in trades if bars.index.tz_convert(NY)[int(t[1])].normalize() < last_day]
+    assert len(trades) == len(ref), (len(trades), len(ref))
+    kinds = set()
+    for row, (a, b, d, en, ex, pnl, why) in zip(trades, ref, strict=True):
+        rd, ra, ren, rb, rex, rwhy, rpnl = row
+        assert (int(rd), int(ra)) == (d, a), (row, (a, b, d, en, ex, pnl, why))
+        if why == "breakout":
+            kinds.add("cut" if rwhy == "Breakout: bot first" else "reversed" if rwhy == "Close position" else rwhy)
+            # a stop fills in its bar; a 16:00 exit and a cut fill at the next bar's open
+            assert int(rb) == b + (rwhy != "Stop loss"), (row, b)
+        else:
+            assert int(rb) == b + (why in TIME_EXITS), (row, b, why)
+        assert same(ren, en) and same(rex, ex), (row, en, ex)
+        assert math.isclose(float(rpnl), pnl, abs_tol=1e-6), (row, pnl)
+    assert {"Stop loss", "Flat 16:00"} <= kinds, kinds
+    assert "cut" in kinds or "reversed" in kinds, kinds
+    sizes = {int(o[3]) for o in orders if o[1] == "Enter" and o[2].startswith("W")}
+    assert sizes and all(1 <= q <= 10 for q in sizes)

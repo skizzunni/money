@@ -49,8 +49,11 @@ def bot_legs(bars, losers, lock_at, lock_plus):
     return [(t.entry_bar, t.exit_bar, t.direction, t.entry, t.exit, t.pnl, 4) for t in res.trades]
 
 
-def williams_legs(bars):
-    """One Williams trade a session at most: (start bar, end bar, direction, entry, exit, pnl $, contracts)."""
+def williams_legs(bars, month_skip=True, skip_dates=()):
+    """One Williams trade a session at most: (start bar, end bar, direction, entry, exit, pnl $, contracts).
+    month_skip: no trade on the first session of a month (the rescaled index data's gap); skip_dates: no trade on
+    these days (yyyy-mm-dd; the NinjaTrader strategy's holiday and half-day list)."""
+    skip = {pd.Timestamp(x) for x in skip_dates}
     idx = bars.index.tz_convert(A.NY)
     tmin = (idx.hour * 60 + idx.minute).to_numpy()
     day = idx.normalize()
@@ -62,8 +65,10 @@ def williams_legs(bars):
         b = a + int(np.searchsorted(day[a:b], day[a], side="right"))  # this session's bars only
         rng = prev_rng
         prev_rng = h[a:b].max() - lo[a:b].min()
-        if rng is None or rng <= 0 or n == 0 or day[starts[n - 1]].month != day[a].month:
+        if rng is None or rng <= 0 or (month_skip and (n == 0 or day[starts[n - 1]].month != day[a].month)):
             continue  # no previous session, or the first session of a month (the rescaling gap)
+        if day[a].tz_localize(None) in skip:
+            continue
         up, dn = o[a] + K * rng, o[a] - K * rng
         for j in range(a, b - 1):
             if tmin[j] > LAST_ENTRY:

@@ -1768,6 +1768,33 @@ and $ a week in all three periods, payouts per evaluation at least 90% of the bo
 
 **NOT ADOPTED** (passes 2019-25 only): taking turns blocks some of the bot's trend days, which pay for everything.
 
+## Round one hundred and one: the bot first, the Williams breakout only in its gaps
+
+`research/combo_priority.py` (chosen after round one hundred, so round one hundred's bar, unchanged): the bot keeps
+every trade; a Williams trade is taken only while the bot is flat, and when the bot enters while a Williams trade is
+open, the Williams trade is closed at that minute's open first. Same machinery as round one hundred.
+
+| | $ a week, 2011-18 / 2019-25 / NQ | Evaluation pass % | Paid per evaluation | Paid within 20 sessions | Red days |
+|---|---|---|---|---|---|
+| Bot | 272 / 270 / 245 | 27.5 / 22.9 / 25.3 | $1,135 / $585 / $628 | 5.5 / 2.2 / 1.7% | 34-36% |
+| Bot first, Williams in the gaps | 316 / 311 / 288 | 28.5 / 23.9 / 25.3 | $1,453 / $730 / $741 | 9.9 / 4.4 / 4.0% | 49-50% |
+
+By the bar: **passes 2011-18 and 2019-25; on NQ the pass rate ties (25.3 / 25.3) instead of rising, so formally not
+adopted.** Everything else is better in all three periods: $41-44 more a week, payouts per evaluation up 18-28%, a
+first payout within 20 sessions about twice as often; winners stay at 49-50%. The cost: red days rise from about a
+third to about half (many small breakout losers, at most about $200 + fees each).
+
+Neighbors (a scratch check, same machinery): k 0.5 with the stop at half the range and $400; k 0.3, 0.5 and 0.7
+with a quarter of the range and $200, $300, $200. All four pay out within 20 sessions more often than the bot in all
+three periods; three of four make more $ a week in all three (k 0.7: $265 against $270 in 2019-25); every one pays
+less per evaluation than the bot in at least one period. So the extra trades and the sooner first payout hold up
+around k 0.5 / 0.25 / $200; the gain in payouts per evaluation is the fragile part.
+
+**Built into the NinjaTrader strategy anyway, as a switch, on by default** ("Breakout in the bot's gaps"): the
+miss is a tie, not a loss, and the user asked for more trades a week, more money and the first payout sooner.
+Switch it off for the bot alone. The strategy's trades with it on are `combo_priority.py`'s, trade for trade
+(`tests/test_ninjatrader.py`). It still doesn't make $1,500 a week at this size.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
@@ -1858,6 +1885,10 @@ python research/checks15.py nsx_1m_scaled.pkl nq_1m_scaled.pkl        # a check 
 python research/offset_checks.py nsx_1m_scaled.pkl nq_1m_scaled.pkl    # checks off the half hour (no)
 python research/lock_half.py nsx_1m_scaled.pkl nq_1m_scaled.pkl        # earlier lock for half-hour entries (no, by $0.06)
 python research/weak_trend_lock.py spx_1m.pkl nsx_1m_scaled.pkl nq_1m_scaled.pkl  # weak-trend lock (index yes, NQ no)
+python research/williams_combo.py nsx1m_scaled.pkl nq1m_scaled.pkl     # the Williams breakout added to the bot (no)
+python research/williams_sized.py nsx1m_scaled.pkl nq1m_scaled.pkl     # sized to a fixed risk (positive alone)
+python research/combo_live.py nsx1m_scaled.pkl nq1m_scaled.pkl         # one position at a time, first come (no)
+python research/combo_priority.py nsx1m_scaled.pkl nq1m_scaled.pkl     # the bot first, Williams in the gaps (built in)
 ```
 
 The raw data isn't stored in this repo.

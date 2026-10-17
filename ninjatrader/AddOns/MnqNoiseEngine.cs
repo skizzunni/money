@@ -411,4 +411,99 @@ namespace NinjaTrader.NinjaScript.AddOns.MnqBot
             return string.Format("{0:00}:{1:00}", minuteOfDay / 60, minuteOfDay % 60);
         }
     }
+
+    public sealed class WilliamsSettings
+    {
+        public double K = 0.5;           // levels at today's open +/- K x yesterday's 09:30-16:00 range
+        public double StopFraction = 0.25;  // the stop this share of yesterday's range from the fill
+        public double Risk = 200.0;      // $ a trade: contracts = floor(Risk / stop $ a contract), 1 to MaxQty
+        public int MaxQty = 10;
+        public int LastEntry = 900;      // no new trade from a bar starting after 15:00
+        public double PointValue = 2.0;
+    }
+
+    // Larry Williams' volatility breakout, as research/combo_live.py and combo_priority.py trade it (rounds 99-101):
+    // the first bar of the day (09:30-15:00) that reaches open + K x yesterday's range (long) or open - K x range
+    // (short) gives one trade for the day, entered at the next bar's open, stop StopFraction x range from the fill, out
+    // at the close. A bar reaching both levels ends the day's chance; so does a first touch while the bot is in a trade.
+    // Feed it every bar with its New York start time, after the noise engine, with whether a trade is allowed now.
+    public sealed class WilliamsBreakout
+    {
+        readonly WilliamsSettings s;
+        double prevRange = double.NaN, dayHigh = double.NaN, dayLow = double.NaN;
+        bool done = true;
+
+        public double Up = double.NaN, Down = double.NaN;
+        public int Signal;        // +1 / -1 at this bar's close: enter at the next bar's open; 0 none
+        public int Qty;
+        public double StopPoints;
+        public string Status = "waiting for a full session";
+
+        public WilliamsBreakout(WilliamsSettings settings)
+        {
+            s = settings;
+        }
+
+        public double PreviousRange { get { return prevRange; } }
+
+        public void OnBar(DateTime nyStart, double o, double h, double l, bool allowed)
+        {
+            Signal = 0;
+            int t = nyStart.Hour * 60 + nyStart.Minute;
+            if (t == NoiseEngine.RthOpen)
+            {
+                if (!double.IsNaN(dayHigh))
+                    prevRange = dayHigh - dayLow;
+                dayHigh = dayLow = double.NaN;
+                done = double.IsNaN(prevRange) || prevRange <= 0;
+                Up = done ? double.NaN : o + s.K * prevRange;
+                Down = done ? double.NaN : o - s.K * prevRange;
+                Status = done ? "waiting for a full session" : "watching";
+            }
+            if (t >= NoiseEngine.RthOpen && t < NoiseEngine.RthClose)
+            {
+                dayHigh = double.IsNaN(dayHigh) ? h : Math.Max(dayHigh, h);
+                dayLow = double.IsNaN(dayLow) ? l : Math.Min(dayLow, l);
+            }
+            if (done || t < NoiseEngine.RthOpen)
+                return;
+            if (t > s.LastEntry)
+            {
+                done = true;
+                if (Status == "watching") Status = "no trigger today";
+                return;
+            }
+            bool hu = h >= Up, hd = l <= Down;
+            if (!hu && !hd)
+                return;
+            done = true;
+            if (hu && hd)
+            {
+                Status = "both levels in one bar: no trade today";
+                return;
+            }
+            int d = hu ? 1 : -1;
+            double dist = s.StopFraction * prevRange;
+            int q = (int)Math.Floor(s.Risk / (dist * s.PointValue));
+            if (q < 1)
+            {
+                if (dist * s.PointValue > 1.5 * s.Risk)
+                {
+                    Status = "stop too wide for the risk: no trade today";
+                    return;
+                }
+                q = 1;
+            }
+            q = Math.Min(q, s.MaxQty);
+            if (!allowed)
+            {
+                Status = "triggered while the bot was in a trade: no trade today";
+                return;
+            }
+            Signal = d;
+            Qty = q;
+            StopPoints = dist;
+            Status = (d > 0 ? "BUY " : "SELL ") + q + " triggered";
+        }
+    }
 }

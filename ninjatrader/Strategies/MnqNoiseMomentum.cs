@@ -8,6 +8,11 @@
 //     entry + 2.5 points once price has reached +1 max loss (the lock); the take-profit sits 1.5 noise units from
 //     the fill; if the new stop is already at or past the price, the position is closed at market instead;
 //   * 16:00 New York: everything closed at market. A session that ends early: closed at market too.
+//   * the breakout (on by default, docs/RESULTS.md round 101): in the bot's gaps, Larry Williams' volatility
+//     breakout. The first bar of the day (09:30-15:00) to reach today's open +/- 0.5 x yesterday's 09:30-16:00 range
+//     buys (sells) at market, $200 of risk (1-10 MNQ), the stop a quarter of yesterday's range from the fill, out at
+//     16:00. One a day, only while the bot is flat; the bot always comes first: a bot entry while the breakout trade is
+//     open closes it at market (or reverses it) in the same bar.
 // Setup: 1-minute MNQ chart (the lock arms within the minute: more winners than on 5 minutes, docs/RESULTS.md round
 // 81), Days to load 30 or more (the noise needs 14 full sessions), Calculate on bar close.
 // See docs/NINJATRADER.md. Written in C# 5 for NinjaTrader 8's compiler.
@@ -25,8 +30,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 {
     public class MnqNoiseMomentum : Strategy
     {
-        const string LongName = "Long", ShortName = "Short";
+        const string LongName = "Long", ShortName = "Short", WLongName = "W Long", WShortName = "W Short";
+        const int Nobody = 0, Bot = 1, Breakout = 2;
         NoiseEngine engine;
+        WilliamsBreakout williams;
+        int owner;                  // whose trade the account's position is: Nobody, Bot or Breakout
         NoiseSettings settings;
         TimeZoneInfo newYork;
         int minutes;
@@ -44,7 +52,9 @@ namespace NinjaTrader.NinjaScript.Strategies
                 Description = "MNQ noise-area momentum v1.6: half-hour checks 10:00-15:30 New York, $350 max loss, lock, 16:00 flat.";
                 Calculate = Calculate.OnBarClose;
                 EntriesPerDirection = 1;
-                EntryHandling = EntryHandling.AllEntries;
+                // the bot's entries and the breakout's have their own names, so the bot can enter while the breakout
+                // trade is being closed in the same bar
+                EntryHandling = EntryHandling.UniqueEntries;
                 // NinjaTrader's default: a stop and a target for each fill. With "by strategy position", Playback showed the
                 // target for 3 contracts on a 4-contract position (the entry filled in parts)
                 StopTargetHandling = StopTargetHandling.PerEntryExecution;
@@ -75,6 +85,11 @@ namespace NinjaTrader.NinjaScript.Strategies
                 FedDates = NoiseEngine.FedDatesDefault;
                 SoundAlerts = true;
                 RoundPrices = true;
+                UseBreakout = true;
+                BreakoutK = 0.5;
+                BreakoutStop = 0.25;
+                BreakoutRisk = 200;
+                BreakoutMaxQty = 10;
 
                 AddPlot(Brushes.Teal, "Upper noise line");
                 AddPlot(Brushes.Maroon, "Lower noise line");
@@ -102,6 +117,13 @@ namespace NinjaTrader.NinjaScript.Strategies
                 settings.SkipDates = SkipDates ?? "";
                 settings.FedDates = FedDates ?? "";
                 engine = new NoiseEngine(settings, minutes);
+                WilliamsSettings ws = new WilliamsSettings();
+                ws.K = BreakoutK;
+                ws.StopFraction = BreakoutStop;
+                ws.Risk = BreakoutRisk;
+                ws.MaxQty = BreakoutMaxQty;
+                ws.PointValue = settings.PointValue;
+                williams = new WilliamsBreakout(ws);
             }
         }
 
@@ -147,6 +169,11 @@ namespace NinjaTrader.NinjaScript.Strategies
             int nTrades = engine.Trades.Count, nOrders = engine.Orders.Count;
             int nHeads = engine.HeadsUps.Count;
             engine.OnBar(start, Open[0], High[0], Low[0], Close[0]);
+            // the breakout only while the bot is flat with no entry coming, and the account is flat
+            bool free = engine.Position == 0 && engine.PendingEntry == 0 && !engine.SkipToday && engine.Ready &&
+                        (!PlaceOrders || RealDir == 0) && engine.Orders.Count == nOrders;
+            if (UseBreakout)
+                williams.OnBar(start, Open[0], High[0], Low[0], free);
             if (start.Hour * 60 + start.Minute == NoiseEngine.RthOpen)  // once a day in the Output window, chart or not
                 Print(start.ToString("yyyy-MM-dd") + " MNQ Noise Momentum (" + Account + ", " + Qty + " MNQ, orders " +
                       (PlaceOrders ? "ON" : "OFF") + "): " + (engine.Ready ? "ready, trading today" + (engine.SkipToday ?
@@ -167,6 +194,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             {
                 realLocked = false;
                 closingRejected = false;
+                owner = Nobody;
             }
 
             // 16:00 New York, or a bar outside 09:30-16:00 (a session that ended early): any position is closed at
@@ -182,10 +210,17 @@ namespace NinjaTrader.NinjaScript.Strategies
             // a new entry: the bracket goes in first, so it is attached the moment the entry fills. It is set in ticks
             // from the fill, as a broker's bracket is, so a fill away from the expected price (a fast market) still
             // gets its stop and take-profit on the right side, the same distances away.
-            if (engine.Orders.Count > nOrders && real == 0)
+            // The bot comes first: an open breakout trade is closed in the same direction's case, reversed by the entry
+            // itself in the other.
+            if (engine.Orders.Count > nOrders && (real == 0 || owner == Breakout))
             {
                 NoiseOrder o = engine.Orders[engine.Orders.Count - 1];
                 string name = o.Direction > 0 ? LongName : ShortName;
+                if (real == o.Direction)
+                {
+                    if (real > 0) ExitLong("Breakout: bot first", WLongName);
+                    else ExitShort("Breakout: bot first", WShortName);
+                }
                 SetStopLoss(name, CalculationMode.Ticks, StopTicks(o.Direction * (o.Expected - o.Stop)), false);
                 if (!double.IsNaN(o.Target))
                     SetProfitTarget(name, CalculationMode.Ticks, TargetTicks(o.Direction * (o.Target - o.Expected)));
@@ -193,10 +228,26 @@ namespace NinjaTrader.NinjaScript.Strategies
                     EnterLong(Qty, LongName);
                 else
                     EnterShort(Qty, ShortName);
+                owner = Bot;
+                realLocked = false;
+                closingRejected = false;
                 return;
             }
 
-            if (real == 0)
+            // the breakout: its stop in ticks from the fill, out at 16:00 (above); nothing else to manage
+            if (williams.Signal != 0 && real == 0)
+            {
+                string wname = williams.Signal > 0 ? WLongName : WShortName;
+                SetStopLoss(wname, CalculationMode.Ticks, StopTicks(williams.StopPoints), false);
+                if (williams.Signal > 0)
+                    EnterLong(williams.Qty, wname);
+                else
+                    EnterShort(williams.Qty, wname);
+                owner = Breakout;
+                return;
+            }
+
+            if (real == 0 || owner != Bot)
                 return;
             // in a trade: the stop and the take-profit for the next bar, measured from the real fill
             double avg = Position.AveragePrice;
@@ -240,12 +291,12 @@ namespace NinjaTrader.NinjaScript.Strategies
             return line;
         }
 
-        void Flatten(int real, string why)
+        void Flatten(int real, string why)  // the whole position, whichever setup's it is
         {
             if (real > 0)
-                ExitLong(why, LongName);
+                ExitLong(why, "");
             else if (real < 0)
-                ExitShort(why, ShortName);
+                ExitShort(why, "");
         }
 
         // Orders go in on the tick grid. A stop is rounded toward the price, so a loss never goes past the max loss; a
@@ -322,6 +373,16 @@ namespace NinjaTrader.NinjaScript.Strategies
                     Say("exit", (t.Reason == "Target" ? "TARGET: " : "EXIT: ") + "the " + side + " closed at " + P(t.Exit) +
                         " (" + Why(t.Reason) + "), " + Usd(t.Pnl) + ".");
             }
+            if (UseBreakout && williams.Signal != 0)
+            {
+                string side = williams.Signal > 0 ? "BUY" : "SELL";
+                lastSignal = "Breakout " + side + " " + NoiseEngine.Hhmm(engine.BarTime.Hour * 60 + engine.BarTime.Minute + minutes) +
+                             " @ " + P(Close[0]);
+                Say("breakout", "BREAKOUT " + side + " " + williams.Qty + " MNQ (" + Account + ") at market. Price " + P(Close[0]) +
+                    " is past " + P(williams.Signal > 0 ? williams.Up : williams.Down) + ". Stop " + P(williams.StopPoints) +
+                    " points from the fill, out at 16:00" + (PlaceOrders ? ". The strategy placed it." :
+                    ". Place it now (orders are off); close it if the bot signals before 16:00."));
+            }
             int endMin = engine.BarTime.Hour * 60 + engine.BarTime.Minute + minutes;
             if (endMin >= NoiseEngine.FirstCheck && (endMin - NoiseEngine.FirstCheck) % NoiseEngine.Step == 0)
                 headsUp = "";  // the check it announced has happened
@@ -339,7 +400,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 Values[0][0] = engine.Upper;
                 Values[1][0] = engine.Lower;
             }
-            int real = PlaceOrders ? RealDir : engine.Position;
+            int real = PlaceOrders ? (owner == Bot ? RealDir : 0) : engine.Position;
             double avg = PlaceOrders ? Position.AveragePrice : engine.EntryPrice;
             if (real != 0 && rth)
             {
@@ -368,12 +429,19 @@ namespace NinjaTrader.NinjaScript.Strategies
                 s += "Next check " + NoiseEngine.Hhmm(nm) + ": " + P(nu) + " / " + P(nl) + (headsUp == "" ? "" : "   " + headsUp) + "\n";
             if (engine.SkipToday) s += "Today is on the skip list: no new trades.\n";
             if (engine.FedToday) s += "Fed day: no shorts before 14:00.\n";
+            if (UseBreakout)
+                s += "Breakout: " + (double.IsNaN(williams.Up) ? "" : P(williams.Up) + " / " + P(williams.Down) + ", ") +
+                     williams.Status + "\n";
             int real = RealDir;
             if (PlaceOrders && real != 0)
             {
                 double st = RealStop(real, Position.AveragePrice);
-                s += "Position: " + (real > 0 ? "LONG " : "SHORT ") + Position.Quantity + " @ " + P(Position.AveragePrice) +
-                     (double.IsNaN(st) ? "" : ", stop " + P(RoundStop(real, st))) + (realLocked ? " (locked)" : "") + "\n";
+                if (owner == Breakout)
+                    s += "Position: breakout " + (real > 0 ? "LONG " : "SHORT ") + Position.Quantity + " @ " +
+                         P(Position.AveragePrice) + ", out at 16:00\n";
+                else
+                    s += "Position: " + (real > 0 ? "LONG " : "SHORT ") + Position.Quantity + " @ " + P(Position.AveragePrice) +
+                         (double.IsNaN(st) ? "" : ", stop " + P(RoundStop(real, st))) + (realLocked ? " (locked)" : "") + "\n";
             }
             else if (!PlaceOrders && engine.Position != 0)
                 s += "Bot position: " + (engine.Position > 0 ? "LONG" : "SHORT") + " @ " + P(engine.EntryPrice) + "\n";
@@ -493,6 +561,30 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         [Display(Name = "Sound alerts", Order = 1, GroupName = "4. Alerts")]
         public bool SoundAlerts { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Breakout in the bot's gaps (docs/RESULTS.md round 101)", Order = 1, GroupName = "5. Breakout")]
+        public bool UseBreakout { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0.05, 5.0)]
+        [Display(Name = "Levels: today's open +/- this x yesterday's range", Order = 2, GroupName = "5. Breakout")]
+        public double BreakoutK { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0.05, 5.0)]
+        [Display(Name = "Stop: this x yesterday's range from the fill", Order = 3, GroupName = "5. Breakout")]
+        public double BreakoutStop { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(10.0, 100000.0)]
+        [Display(Name = "Risk a trade, $ (sets the contracts)", Order = 4, GroupName = "5. Breakout")]
+        public double BreakoutRisk { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(1, 100)]
+        [Display(Name = "Most contracts", Order = 5, GroupName = "5. Breakout")]
+        public int BreakoutMaxQty { get; set; }
 
         [Browsable(false)]  // the tests turn it off to compare prices with the Python bot exactly
         public bool RoundPrices { get; set; }

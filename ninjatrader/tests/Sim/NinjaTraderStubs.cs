@@ -6,7 +6,9 @@
 // tick of slippage. The stop and take-profit set before an entry are attached when it fills and work from the fill
 // bar (a bracket set in ticks is measured from the fill price): the stop fills at the stop or the open, whichever is worse, minus a tick; from the next bar it fills at the
 // open minus a tick when the open is past it, else at the stop minus a tick. The take-profit fills at its price once
-// price trades a tick through it, unless the stop filled on that bar.
+// price trades a tick through it, unless the stop filled on that bar. One position at a time: an entry while in a
+// position is allowed only with an exit for it sent on the same bar (both fill at the next open, the exit first) or
+// in the other direction (a reversal: the position is closed at the next open, "Close position", then the entry).
 using System;
 using System.Collections.Generic;
 
@@ -174,7 +176,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         void Check(string signal)
         {
-            if (signal != "Long" && signal != "Short") throw new InvalidOperationException("unknown entry " + signal);
+            if (signal != "Long" && signal != "Short" && signal != "W Long" && signal != "W Short")
+                throw new InvalidOperationException("unknown entry " + signal);
         }
 
         public void SetStopLoss(string fromEntrySignal, CalculationMode mode, double value, bool isSimulatedStop)
@@ -225,8 +228,11 @@ namespace NinjaTrader.NinjaScript.Strategies
         {
             Check(name);
             OrderLog.Add(CurrentBar + ",Enter," + name + "," + qty);
-            if (Position.MarketPosition != MarketPosition.Flat)
+            int real = Position.MarketPosition == MarketPosition.Long ? 1 : Position.MarketPosition == MarketPosition.Short ? -1 : 0;
+            if (real == d && pendExit == null)
                 throw new InvalidOperationException("bar " + CurrentBar + ": entry while in a position");
+            if (pendName != null)
+                throw new InvalidOperationException("bar " + CurrentBar + ": two entries on one bar");
             if (!stops.ContainsKey(name))
                 throw new InvalidOperationException("bar " + CurrentBar + ": entry without a stop");
             pendDir = d; pendQty = qty; pendName = name;
@@ -237,10 +243,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         void Exit(int d, string signalName, string fromEntrySignal)
         {
-            Check(fromEntrySignal);
+            if (fromEntrySignal != "") Check(fromEntrySignal);  // "": every entry
             OrderLog.Add(CurrentBar + ",Exit," + signalName + "," + fromEntrySignal);
             int real = Position.MarketPosition == MarketPosition.Long ? 1 : Position.MarketPosition == MarketPosition.Short ? -1 : 0;
-            if (real == d && posName == fromEntrySignal)
+            if (real == d && (fromEntrySignal == "" || posName == fromEntrySignal))
                 pendExit = signalName;
         }
 
@@ -281,6 +287,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 if (pendExit != null && Position.MarketPosition != MarketPosition.Flat)
                     Fill(i, o[i] - (Position.MarketPosition == MarketPosition.Long ? 1 : -1) * slip, pendExit);
                 pendExit = null;
+                if (pendName != null && Position.MarketPosition != MarketPosition.Flat)  // a reversal
+                    Fill(i, o[i] - (Position.MarketPosition == MarketPosition.Long ? 1 : -1) * slip, "Close position");
                 if (pendName != null)
                 {
                     Position.MarketPosition = pendDir > 0 ? MarketPosition.Long : MarketPosition.Short;
