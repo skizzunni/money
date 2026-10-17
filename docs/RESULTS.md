@@ -1688,6 +1688,17 @@ the multi-day trend doesn't tell this bot's winners from its losers. It halves b
 of time (45-65% timeouts) and payouts per evaluation collapse. The best on 2011-18, 6 / 2 MNQ by the 20-session
 average's slope, paid $184 against $585 (2019-25) and $601 against $628 (NQ) per evaluation: **FAIL**.
 
+## Round ninety-four: reverse a failed breakout
+
+`research/trap_reversal.py`. When a bot trade is stopped out (line stop or max loss) within 3 or 10 minutes of its fill
+or any time, enter the other way at the next minute: stop beyond the failed trade's best price or 25 points, target
+1R or 2R, once a day, 4 MNQ (12 rules). Protocol fixed before running.
+
+**It reliably loses**: every rule loses on 2011-18 ($-11 to $-37 a trade, 30-45% winners; ten of twelve significant,
+all negative), and the fixed-stop versions lose in every period (2019-26 t -2.2 to -3.7, NQ futures t -3.2 to -4.8).
+Added to the bot it cuts $ a week and payouts. A quickly failed breakout doesn't run back the other way; trading
+against it is a losing trade. (Re-entering the original direction gets its own test, round ninety-five.)
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
