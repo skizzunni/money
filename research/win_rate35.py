@@ -48,6 +48,9 @@ PAIRS.update({f"{a} + {b}": {**LOCKS[a], **REPEATS[b]} for a, b in itertools.pro
 
 def _job(args):
     path, name, kw = args
+    kw = dict(kw)
+    off = kw.pop("offset", 0)  # checks moved this many minutes off the half hour (this worker only)
+    P.FIRST, P.LAST = 600 + off, 930 + off
     return name, P.simulate(pd.read_pickle(path), **{**BASE, **kw})
 
 

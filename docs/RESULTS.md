@@ -1067,6 +1067,11 @@ Checks at every quarter hour, each with its own noise ([`research/checks15.py`](
 - **Volume into the signal** (NQ futures 2015–2018, the last five minutes' volume against the same minutes' median over the previous 20 sessions, by fifths): winners 48.6% / 48.0% / 53.4% / 47.7% / 52.7%, with no order to it. No lead from volume either.
 - **The lock trigger between 14 and 17.5 points** (descriptive, chosen after all the data was seen): at 14.9 points (*Lock a small win* 0.85) NQ futures 2015–2025 win 51.1% against 48.8% with $132 against $129 a day ×10 and a worst stretch of $16,377 against $18,347, and 2023–2025 50.1% against 48.5% with $67 against $66; the index 2011–2026 51.2% against 49.0% and $138 against $137; but the index 2023–2026 $49 against $66 (at 14.0 points $56, at 15.75 $48: noisy). On the real MNQ weeks from Yahoo (5-minute bars) 47 trades, 47% winners, +$11,452 against 44, 43%, +$13,068. The input now takes steps of 0.05; the default stays 1.0.
 
+## Rounds fifty-six and fifty-seven: the clock
+
+- **Checks off the half hour** ([`research/offset_checks.py`](../research/offset_checks.py)), each with its own noise: at :05/:35 $7.34 a day and 49.1% winners on 2011–2018, at :10/:40 $11.03 and 48.9%, against $15.19 and 50.6% at :00/:30. The half hours themselves matter.
+- **By check, 2011–2018** (v1.3 at 10 MNQ and $350): entries from the hourly checks made about $95 a trade, those from the half-hour checks about $28. **Locking the half-hour entries at 13.1 points** and keeping 17.5 for the hourly ones ([`research/lock_half.py`](../research/lock_half.py)) passed 2011–2018 (52.7% against 50.6% winners, $15.70 against $15.19) and on 2019–2022 won 49.2% against 47.0% with a better t-stat and a smaller worst stretch, but made $16.98 against $17.04 a day, so it failed.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
@@ -1154,6 +1159,8 @@ python research/lock_sigma.py nsx_1m_scaled.pkl nq_1m_scaled.pkl       # a noise
 python research/lock_early.py nsx_1m_scaled.pkl nq_1m_scaled.pkl       # the earlier lock in the first minutes (no)
 python research/noise_median.py nsx_1m_scaled.pkl nq_1m_scaled.pkl     # median / trimmed-mean noise (no)
 python research/checks15.py nsx_1m_scaled.pkl nq_1m_scaled.pkl        # a check every 15 minutes (no)
+python research/offset_checks.py nsx_1m_scaled.pkl nq_1m_scaled.pkl    # checks off the half hour (no)
+python research/lock_half.py nsx_1m_scaled.pkl nq_1m_scaled.pkl        # earlier lock for half-hour entries (no, by $0.06)
 ```
 
 The raw data isn't stored in this repo.

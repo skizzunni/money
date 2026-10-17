@@ -65,7 +65,8 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
              skip_checks_on: dict | None = None, lock_unconfirmed: float | None = None,
              confirmed: tuple[set, set, set] | None = None, relock: bool = False,
              lock_sigma: tuple[float, float, float] | None = None,
-             lock_early: tuple[float, int] | None = None, noise_stat: str = "mean", step: int = 30) -> pd.DataFrame:
+             lock_early: tuple[float, int] | None = None, noise_stat: str = "mean", step: int = 30,
+             lock_half: float | None = None) -> pd.DataFrame:
     """target: take profit this many noise units from the first fill (limit); cap_pts: max loss in points;
     target_on_fill_bar False: the limit works from the bar after the fill, as the Pine script places it;
     cap_on_fill_bar True: the max loss works on the fill bar too, measured from the expected fill (the signal
@@ -101,6 +102,7 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
     lock_sigma (k, lo, hi): the lock trigger is k x the check's noise (sigma x price), kept between lo and hi points;
     lock_early (trigger, n): during the first n bars after the fill the lock arms at this (lower) trigger; later at
     the trade's normal trigger;
+    lock_half: entries from the :30 checks lock at this trigger instead of lock[0] (the hour's keep lock[0]);
     step: minutes between checks (30 in the bot; 15 adds the quarter hours);
     noise_stat: how the 14 sessions' moves make the noise: "mean" (the paper), "median", or "trim" (the mean without
     the largest and smallest);
@@ -324,6 +326,8 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
                            or cap_pts < min_cap_units * sigma * c[i])
                 if pos == 0 and c[i] > upper and not blocked and not (side_once and 1 in lost_sides):
                     pending, est, wait = 1, c[i] + TICK, entry_delay
+                    if lock_half is not None and lock is not None:
+                        sig_trigger = lock_half if end % 60 == 30 else lock[0]
                     if lock_sigma is not None:
                         sig_trigger = min(lock_sigma[2], max(lock_sigma[1], lock_sigma[0] * sigma * c[i]))
                     if lock_unconfirmed is not None and lock is not None:
@@ -333,6 +337,8 @@ def simulate(bars: pd.DataFrame, units: int = 1, k: float = 1.0, trail: float | 
                         lim_px, lim_left = c[i] - limit_first[0], limit_first[1]
                 elif pos == 0 and c[i] < lower and not blocked and not (side_once and -1 in lost_sides):
                     pending, est, wait = -1, c[i] - TICK, entry_delay
+                    if lock_half is not None and lock is not None:
+                        sig_trigger = lock_half if end % 60 == 30 else lock[0]
                     if lock_sigma is not None:
                         sig_trigger = min(lock_sigma[2], max(lock_sigma[1], lock_sigma[0] * sigma * c[i]))
                     if lock_unconfirmed is not None and lock is not None:
