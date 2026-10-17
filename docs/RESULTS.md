@@ -1349,6 +1349,23 @@ only family positive in all three data sets in all four variants (gap at least 0
 3.5 on 2011-18 / 2019-26 / NQ futures, $54 and $42 a trade on the last two, 18-23% winners, about 1.3 trades a week).
 VWAP band fades lose everywhere (t -2.1 to -2.5). Gap and go gets its own confirmation test (round seventy-two).
 
+## Round seventy-two: gap and go, confirmed on other indexes?
+
+`research/gap_go_confirm.py`. Round seventy-one's gap and go (gap at least 0.5x its 14-session average, the first 5
+minutes continuing it, in at the 6th minute, stop at the open, out at the close) was picked from 24 rules, so the
+Nasdaq's own years were used up. The same rule, unchanged, on markets it was never tuned on, 2011 - Sep 2026, costs
+as a share of price equal to MNQ's. Pass bar fixed before running: t >= 2.0 in at least 2 of 3 markets, none at
+t <= -2.0.
+
+| Market | Trades a year | $ a trade (one MNQ-sized position) | t | t 2011-18 / 2019-26 | Winners |
+|---|---|---|---|---|---|
+| S&P 500 | 56 | +$14.32 | 1.81 | 0.41 / 2.08 | 15% |
+| DAX | 74 | +$20.19 | 2.36 | 2.68 / 0.40 | 15% |
+| Nikkei 225 | 48 | +$23.21 | 1.76 | -0.58 / 2.19 | 18% |
+
+**FAIL** (1 of 3 at t >= 2). All three are positive, none consistent across both halves: a weak momentum tilt at the
+open, not strong enough to trade. Not added.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
