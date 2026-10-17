@@ -1560,6 +1560,23 @@ current one by 2 points on 2019-25 and NQ futures with no lower payouts.
 periods, but with the funded account unchanged that difference comes from which days the passes land on, not from the
 evaluation itself; the pass rate is the clean measure, and it doesn't improve. The evaluation stays as it is.
 
+## Round eighty-five: a trailing stop instead of the lock, for the intraday-trail evaluation
+
+`research/trail_intraday.py`. On an intraday trailing drawdown the threshold follows open-profit peaks, so the lock's
+giveback costs cushion. Five trailing stops (activate at A points, trail B behind the best price) against the fixed
+lock in the evaluation, 4 MNQ, $200; the funded account as the strategy trades it. Bar fixed before running (pass rate
++2 points on 2019-25 and NQ, payouts no lower). Pass / timeout % / paid per evaluation:
+
+| Evaluation exit | 2011-18 | 2019-25 | NQ 2015-24 |
+|---|---|---|---|
+| Fixed lock (now) | 27.5 / 15 / $1,135 | 22.9 / 18 / $585 | 25.3 / 10 / $628 |
+| Trail 25 / 22.5 | 19.2 / 47 / $594 | 18.8 / 46 / $390 | 16.7 / 45 / $426 |
+| Trail 37.5 / 25 | 22.5 / 36 / $900 | 23.3 / 38 / $689 | 16.8 / 34 / $498 |
+| Trail 12.5 / 10 | 11.3 / 72 / $347 | 9.1 / 72 / $276 | 4.7 / 77 / $105 |
+
+**FAIL**: the fixed lock had the best 2011-18 pass rate of all six. Trailing halves the busts but cuts the trend days
+that reach $3,000; a third to three quarters of evaluations then run out of time.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
