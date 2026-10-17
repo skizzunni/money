@@ -44,7 +44,9 @@ namespace NinjaTrader.NinjaScript.Strategies
                 Calculate = Calculate.OnBarClose;
                 EntriesPerDirection = 1;
                 EntryHandling = EntryHandling.AllEntries;
-                StopTargetHandling = StopTargetHandling.ByStrategyPosition;  // one stop and one target for the position
+                // NinjaTrader's default: a stop and a target for each fill. With "by strategy position", Playback showed the
+                // target for 3 contracts on a 4-contract position (the entry filled in parts)
+                StopTargetHandling = StopTargetHandling.PerEntryExecution;
                 IsExitOnSessionCloseStrategy = false;  // the strategy closes at 16:00 New York itself
                 BarsRequiredToTrade = 0;               // the engine waits for its own 14 sessions
                 StartBehavior = StartBehavior.WaitUntilFlat;

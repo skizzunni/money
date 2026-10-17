@@ -54,7 +54,7 @@ needs more days loaded.
 - **10:00, 10:30 … 15:30 New York**, at the close of each check bar: if flat, price outside the noise area, the day
   not on the skip list, fewer than 3 losers today (4 funded), and not a short before 14:00 on a Fed day, it sends a **market
   order**. The stop-loss and take-profit go in with it, in ticks from the fill. NinjaTrader sends them the moment
-  the entry fills, as one OCO pair. The stop is the closer of the line stop and the max loss. The max loss is rounded
+  the entry fills, as an OCO pair (one pair per fill if the entry fills in parts). The stop is the closer of the line stop and the max loss. The max loss is rounded
   toward the price, so a trade never risks more than the max loss (fees and slippage aside).
 - **Every bar close in a trade:** the stop moves with the line (it's measured from your real fill), and to
   **entry + 2.5 points** once a bar has reached +1 max loss (the lock: +17.5 points at 10 MNQ and $350, +25 at
