@@ -20,6 +20,7 @@ from mnqbot.noise import NoiseConfig, run
 
 ROOT = Path(__file__).resolve().parents[1]
 NOISE_PINE = ROOT / "pine" / "mnq_noise_momentum.pine"
+FUNDED = "FUNDED ACCOUNT (tick for 10 MNQ; untick for the 3 MNQ evaluation)"  # the script's account switch
 P0 = 20_000.0
 BARS_PER_DAY = 78  # 09:30 .. 15:55 on 5-minute bars
 CHECK_10_00, CHECK_10_30, CLOSE_16_00 = 5, 11, 77  # bar numbers within a session
@@ -447,7 +448,8 @@ def assert_parity(bars, minutes=5, lookback=14, skip_dates=None, exit_mode="stop
         inputs["Webhook orders"], inputs["Contract for the webhook (blank = the chart's)"] = "TradersPost", hook
         cfg.tighten_only = True
     inputs["Exit"] = "Resting stop at the line" if exit_mode == "stop" else "Half-hour check"
-    inputs["Contracts"] = qty  # the script's default is 10; the reference's is 1
+    inputs[FUNDED] = True  # the script's default is the evaluation's 3 contracts
+    inputs["Contracts on a funded account"] = qty  # the script's default is 10; the reference's is 1
     if take_profit is not None:
         cfg.take_profit = inputs["Take profit, noise units from the entry (0 = off)"] = take_profit
     if max_loss is not None:
@@ -699,7 +701,8 @@ def test_pine_evaluation_tracker(target):
     bars = synth_bars(sessions=120, seed=3)
     days = sorted({d.date() for d in bars.index.tz_convert(NY)})
     start = days[40]
-    inputs = {"Contracts": 10, "Max loss per trade, $ (all contracts, 0 = off)": 350.0,
+    inputs = {FUNDED: True, "Contracts on a funded account": 10,
+              "Max loss per trade, $ (all contracts, 0 = off)": 350.0,
               "Evaluation start date, YYYYMMDD (0 = off)": int(start.strftime("%Y%m%d")), "Profit target, $": target}
     pytest.importorskip("pynescript", reason="pip install pynescript to check the .pine files")
     from pine_interpreter import PineRuntime, load_pine
@@ -730,12 +733,66 @@ def test_pine_dashboard_shows_the_next_checks_lines():
     res = run(full, NoiseConfig())
     i, upper, lower = res.bands[-5]  # a check late in the data; cut the bars ten minutes before it
     cut = full.iloc[: i - 1]
-    rt = PineRuntime(load_pine(NOISE_PINE), cut, {"Contracts": 1}, timeframe_seconds=300)
+    rt = PineRuntime(load_pine(NOISE_PINE), cut, {FUNDED: True, "Contracts on a funded account": 1},
+                     timeframe_seconds=300)
     rt.run(lambda j, g: None)
     dash = [t.grid() for t in rt.tables if t.columns == 2 and t.grid() and t.grid()[0][0].startswith("MNQ Noise")][0]
     cell = dash[2][1]
     when = full.index[i].tz_convert(NY) + pd.Timedelta(minutes=5)  # the check's close
     assert f"at {when.hour}:{when.minute:02d}: {upper:.2f} / {lower:.2f}" in cell, cell
+
+
+@pytest.mark.slow
+@pytest.mark.parametrize("funded, qty", [(None, 3), (False, 3), (True, 10)])
+def test_pine_account_switch(funded, qty):
+    """The evaluation (the default) trades 3 MNQ, the funded switch 10, with the same $350 max loss: the stop and the
+    lock scale."""
+    bars = synth_bars(sessions=60, seed=11)
+    inputs = {} if funded is None else {FUNDED: funded}
+    trades, events, _, _, _, heads = run_pine(bars, inputs, 5)
+    res = run(bars, NoiseConfig(qty=qty, max_loss_per_trade=350.0))
+    assert trades == trades_of(res) and events == res.events and heads == res.headsups
+    assert len(trades) >= 10
+
+
+@pytest.mark.slow
+@pytest.mark.parametrize("funded", [False, True])
+def test_pine_accounts_on_the_dashboard_and_alerts(funded):
+    """The dashboard lists the accounts this copy trades, and every entry and heads-up names them."""
+    pytest.importorskip("pynescript", reason="pip install pynescript to check the .pine files")
+    from pine_interpreter import PineRuntime, load_pine
+
+    bars = synth_bars(sessions=40, seed=11)
+    inputs = {FUNDED: funded, "Evaluation accounts (names, comma separated)": "EVAL 1, EVAL 2, EVAL 3",
+              "Funded accounts (names, comma separated)": "PRO 1, PRO 2"}
+    rt = PineRuntime(load_pine(NOISE_PINE), bars, inputs, timeframe_seconds=300)
+    rt.run(lambda i, g: None)
+    names, qty = ("PRO 1, PRO 2", 10) if funded else ("EVAL 1, EVAL 2, EVAL 3", 3)
+    n = names.count(",") + 1
+    dash = [t.grid() for t in rt.tables if t.columns == 2 and t.grid() and t.grid()[0][0].startswith("MNQ Noise")][0]
+    row = [r for r in dash if r[0].startswith("Accounts")][0]
+    assert row[1] == f"{names}: {qty} MNQ each, {qty * n} in all; a full loss ${350 * n:,.2f} across them"
+    entries = [a for _, a in rt.alerts if a.split()[0] in ("BUY", "SELL", "HEADS-UP:")]
+    assert len(entries) >= 5
+    assert all(a.endswith(f"Place it in: {names} (copier: first account, the rest mirror it).") for a in entries)
+
+
+@pytest.mark.slow
+def test_pine_alert_name():
+    """With a name set, every alert from that copy starts with [name]; the trades don't change."""
+    pytest.importorskip("pynescript", reason="pip install pynescript to check the .pine files")
+    from pine_interpreter import PineRuntime, load_pine
+
+    bars = synth_bars(sessions=40, seed=11)
+    plain = PineRuntime(load_pine(NOISE_PINE), bars, {}, timeframe_seconds=300)
+    plain.run(lambda i, g: None)
+    named = PineRuntime(load_pine(NOISE_PINE), bars, {"Name on this copy's alerts (e.g. EVALS or FUNDED)": "EVALS"},
+                        timeframe_seconds=300)
+    named.run(lambda i, g: None)
+    assert len(plain.alerts) >= 10 and len(named.alerts) == len(plain.alerts)
+    for (i, a), (j, b) in zip(plain.alerts, named.alerts, strict=True):
+        assert i == j and b == "[EVALS] " + a
+    assert named.strategy.closed == plain.strategy.closed
 
 
 @pytest.mark.slow

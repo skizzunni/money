@@ -15,6 +15,7 @@
 // Noise area for each half-hour mark = the day's open (and previous close) plus/minus the
 // average distance price has moved from the 09:30 open by that time over the last 14 sessions.
 //
+// v1.6, 2026-10-17: Account switch: Evaluation (3 MNQ) or Funded (10 MNQ), same $350 max loss and rules.
 // v1.5, 2026-10-17: an evaluation tracker (bottom left): profit, trailing floor, consistency, what it takes to pass.
 // v1.4, 2026-10-17: heads-up alerts five minutes before a check when a signal is likely (about 9 in 10 follow), so a
 // trader placing orders by hand has the bracket ready at the check. Alerts only; no trade changes.
@@ -35,7 +36,7 @@
 // max loss after the fill bar are checked once per bar, so a 30-minute chart sees them later than a trader would.
 // The rules are the same as the Python reference in mnqbot/noise.py.
 // ------------------------------------------------------------------
-strategy("MNQ Noise-Area Momentum v1.5", shorttitle = "Noise-Mom", overlay = true,
+strategy("MNQ Noise-Area Momentum v1.6", shorttitle = "Noise-Mom", overlay = true,
      initial_capital = 50000, currency = currency.USD,
      default_qty_type = strategy.fixed, default_qty_value = 1, pyramiding = 0,
      commission_type = strategy.commission.cash_per_contract, commission_value = 0.62,
@@ -53,8 +54,26 @@ const int FED_CUTOFF = 840   // 14:00, the Fed statement
 // ── Inputs
 grpT = "Trading"
 lookback = input.int(14, "Sessions in the noise average", minval = 2, maxval = 60, group = grpT)
-qty      = input.int(10, "Contracts", minval = 1, maxval = 60, group = grpT,
-     tooltip = "Every figure in docs/RESULTS.md is per contract. What matters is the max loss per contract (the dashboard shows it): with $117 of room the bot made about $28 a day per contract on NQ futures 2015-2025; spread to $35 (the $350 max loss over 10 contracts) about a third of that. On a $50K evaluation ($3,000 target, $2,000 end-of-day drawdown) 2 MNQ with the $350 max loss gave the best odds, about half to two thirds passing; 10 MNQ failed most attempts. See docs/RESULTS.md, rounds thirteen, twenty-seven and thirty-two.")
+funded   = input.bool(false, "FUNDED ACCOUNT (tick for 10 MNQ; untick for the 3 MNQ evaluation)", group = grpT,
+     tooltip = "Unticked: the evaluation's contracts below (3). Ticked: the funded account's (10). Same rules and the same max loss per trade; the stop and the lock scale with the contracts. At 10 MNQ and $350 (a $35 stop a contract) about 25-30% of historical $50K evaluations passed; at 3 MNQ ($117 a contract) about 45-55%, because the stop has room and four losers no longer eat the $2,000 drawdown. To run evaluations and funded accounts at the same time, add the script to the chart twice, one ticked and one not, each with its own alert (see docs/NOISE.md).")
+account  = funded ? "Funded" : "Evaluation"
+evalAccts = input.string("EVAL 1", "Evaluation accounts (names, comma separated)", group = grpT,
+     tooltip = "Your evaluation accounts, e.g. EVAL 1, EVAL 2, EVAL 3. With the box above unticked this copy trades them: the dashboard lists them and every BUY / SELL alert says to place the trade in all of them. Place it in the first and let a trade copier mirror it to the rest at the same moment (Tradovate's group trading, Tradesyncer, TradeCopia: Take Profit Trader allows copiers between your own accounts, never opposite positions). Unlimited evaluations at once.")
+fundAccts = input.string("", "Funded accounts (names, comma separated)", group = grpT,
+     tooltip = "Your funded accounts, e.g. PRO 1, PRO 2 (up to 5 at Take Profit Trader). With the box above ticked this copy trades them. To trade evaluations and funded accounts at the same time, add the script to the chart twice, one ticked and one not: their stops differ (58 points at 3 MNQ, 17.5 at 10), so they are separate trades, each with its own alert.")
+acctList = funded ? fundAccts : evalAccts
+acctNames = array.new_string()
+if acctList != ""
+    for nm in str.split(acctList, ",")
+        nmt = str.trim(nm)
+        if nmt != ""
+            array.push(acctNames, nmt)
+nAccts = array.size(acctNames)
+placeIn = nAccts > 0 ? " Place it in: " + acctList + (nAccts > 1 ? " (copier: first account, the rest mirror it)" : "") + "." : ""
+evalQty  = input.int(3, "Contracts in an evaluation", minval = 1, maxval = 60, group = grpT)
+fundQty  = input.int(10, "Contracts on a funded account", minval = 1, maxval = 60, group = grpT,
+     tooltip = "Every figure in docs/RESULTS.md is per contract. What matters is the max loss per contract (the dashboard shows it): $350 over 10 contracts is $35 a contract, a 17.5-point stop; over 3 it is $117, 58 points. See docs/RESULTS.md, rounds thirteen, twenty-seven, thirty-two and thirty-seven.")
+qty = account == "Evaluation" ? evalQty : fundQty
 maxLoss  = input.float(350, "Max loss per trade, $ (all contracts, 0 = off)", minval = 0, step = 10, group = grpT,
      tooltip = "A second stop this many dollars from the entry fill, for the whole position, live from the fill like a bracket order; whichever of it and the line stop is closer is used. Spread over many contracts it gets tight: $350 over 10 contracts is a $35 stop each, which normal 5-minute moves hit, and on 2023-2026 it made about $6 a day per contract against about $20 at $117 each. On 16 years, caps of $100-$200 per contract raised profit per day in every period and cut the worst losing stretch. Fees, slippage and a gap through the stop can add to the loss.")
 skipDates = input.string("2026-01-01,2026-01-19,2026-02-16,2026-04-03,2026-05-25,2026-06-19,2026-07-03,2026-09-07,2026-11-26,2026-11-27,2026-12-24,2026-12-25,2027-01-01,2027-01-18,2027-02-15,2027-03-26,2027-05-31,2027-06-18,2027-07-05,2027-09-06,2027-11-25,2027-11-26,2027-12-24",
@@ -100,6 +119,8 @@ hookMode = input.string("Off", "Webhook orders", options = ["Off", "TradersPost"
 hookTicker = input.string("", "Contract for the webhook (blank = the chart's)", group = grpA,
      tooltip = "The exact contract, e.g. MNQZ2026. Blank uses the contract behind the chart (MNQ1! -> the current front month). Update it at each quarterly roll if you type one in.")
 useHook = hookMode == "TradersPost"
+acctTag = input.string("", "Name on this copy's alerts (e.g. EVALS or FUNDED)", group = grpA,
+     tooltip = "Starts every alert from this copy of the script with [name], so with two copies on the chart (evaluation and funded) you know at a glance which accounts an alert is for. Blank: no name.")
 
 // ── Clock
 barMin  = int(timeframe.in_seconds() / 60)
@@ -111,6 +132,10 @@ isCheck = validTf and inRth and endMin >= FIRST_CHECK and endMin <= LAST_CHECK a
 
 hhmmText(int mins) => str.tostring(int(mins / 60)) + ":" + (mins % 60 < 10 ? "0" : "") + str.tostring(mins % 60)
 px(float x) => str.tostring(x, format.mintick)
+// every alert() goes through here: once per bar close, with this copy's name in front when one is set
+tagText = acctTag != "" ? "[" + acctTag + "] " : ""
+say(string msg) =>
+    alert(tagText + msg, alert.freq_once_per_bar_close)
 // ── Webhook messages (TradersPost JSON), sent with order fills when "Webhook orders" is on
 hookSym = hookTicker != "" ? hookTicker : na(syminfo.current_contract) ? syminfo.ticker : syminfo.current_contract
 jsonEntry(string action, float est, float stop, float tp) =>
@@ -166,12 +191,12 @@ if stopFired
         mark("TARGET", strategy.closedtrades.size(lastTrade) < 0, color.teal)
         lastSignal := "TARGET hit @ " + exitPx
         if useHook   // the order-fill alert carries the webhook message; this one is for your phone
-            alert("TARGET: the " + str.lower(side) + " reached the take-profit at " + exitPx + ". The webhook closed it.", alert.freq_once_per_bar_close)
+            say("TARGET: the " + str.lower(side) + " reached the take-profit at " + exitPx + ". The webhook closed it.")
     else
         mark("EXIT", strategy.closedtrades.size(lastTrade) < 0, color.gray)
         lastSignal := "EXIT (" + (lastWhy == "Max loss" ? "max loss" : lastWhy == "Lock" ? "locked win" : "line touched") + ") @ " + exitPx
         if useHook
-            alert("EXIT " + side + ": price hit the stop at " + exitPx + ". The webhook closed it.", alert.freq_once_per_bar_close)
+            say("EXIT " + side + ": price hit the stop at " + exitPx + ". The webhook closed it.")
 
 // ── Today's baseline for the dashboard, taken at 09:30 before anything else happens this bar
 if tMin == RTH_OPEN
@@ -183,7 +208,7 @@ if strategy.position_size != 0 and (not inRth or tMin == RTH_OPEN)
     mark("EXIT NOW", strategy.position_size < 0, color.orange)
     lastSignal := "EXIT NOW (session ended)"
     strategy.close_all(comment = "Session ended", alert_message = hookExit, immediately = true)
-    alert("EXIT NOW: the session ended with a position open. Close your MNQ position at market.", alert.freq_once_per_bar_close)
+    say("EXIT NOW: the session ended with a position open. Close your MNQ position at market.")
 
 // ── New day at the 09:30 bar
 if tMin == RTH_OPEN
@@ -254,43 +279,43 @@ if isCheck and not na(dayOpen)
                     strategy.entry("Short", strategy.short, qty, comment = "Reverse short", alert_message = useHook ? jsonEntry("sell", estS, na, na) : "")
                     mark("REVERSE\nSELL " + str.tostring(2 * qty), false, color.red)
                     lastSignal := "REVERSE to short " + hhmmText(endMin) + " @ " + px(close)
-                    alert("REVERSE: exit the long and SELL " + str.tostring(qty) + " MNQ at market now. Price " + px(close) +
-                         " is below the noise area (lower " + px(lb) + "). Next check " + nextCheck + ".", alert.freq_once_per_bar_close)
+                    say("REVERSE: exit the long and SELL " + str.tostring(qty) + " MNQ at market now. Price " + px(close) +
+                         " is below the noise area (lower " + px(lb) + "). Next check " + nextCheck + ".")
                 else
                     strategy.close("Long", comment = "Back inside", alert_message = hookExit)
                     mark("EXIT", false, color.gray)
                     lastSignal := "EXIT long " + hhmmText(endMin) + " @ " + px(close)
-                    alert("EXIT LONG at market now. Price " + px(close) + " closed back below the upper line (" + px(ub) +
-                         "). Stay flat until the next signal.", alert.freq_once_per_bar_close)
+                    say("EXIT LONG at market now. Price " + px(close) + " closed back below the upper line (" + px(ub) +
+                         "). Stay flat until the next signal.")
             else if not inPosStop and pos < 0 and close > lb
                 if close > ub
                     strategy.entry("Long", strategy.long, qty, comment = "Reverse long", alert_message = useHook ? jsonEntry("buy", estL, na, na) : "")
                     mark("REVERSE\nBUY " + str.tostring(2 * qty), true, color.green)
                     lastSignal := "REVERSE to long " + hhmmText(endMin) + " @ " + px(close)
-                    alert("REVERSE: exit the short and BUY " + str.tostring(qty) + " MNQ at market now. Price " + px(close) +
-                         " is above the noise area (upper " + px(ub) + "). Next check " + nextCheck + ".", alert.freq_once_per_bar_close)
+                    say("REVERSE: exit the short and BUY " + str.tostring(qty) + " MNQ at market now. Price " + px(close) +
+                         " is above the noise area (upper " + px(ub) + "). Next check " + nextCheck + ".")
                 else
                     strategy.close("Short", comment = "Back inside", alert_message = hookExit)
                     mark("EXIT", true, color.gray)
                     lastSignal := "EXIT short " + hhmmText(endMin) + " @ " + px(close)
-                    alert("EXIT SHORT at market now. Price " + px(close) + " closed back above the lower line (" + px(lb) +
-                         "). Stay flat until the next signal.", alert.freq_once_per_bar_close)
+                    say("EXIT SHORT at market now. Price " + px(close) + " closed back above the lower line (" + px(lb) +
+                         "). Stay flat until the next signal.")
             else if pos == 0 and close > ub and freshOk
                 strategy.entry("Long", strategy.long, qty, comment = "Above noise",
                      alert_message = useHook ? jsonEntry("buy", estL, useStop ? bracketL : na, tpL) : "")
                 longPlaced := true
                 mark("BUY " + str.tostring(qty) + " MNQ", true, color.green)
                 lastSignal := "BUY " + hhmmText(endMin) + " @ " + px(close)
-                alert("BUY " + str.tostring(qty) + " MNQ at market now. Price " + px(close) + " is above the noise area (upper " +
-                     px(ub) + "). " + holdLong + " Next check " + nextCheck + ".", alert.freq_once_per_bar_close)
+                say("BUY " + str.tostring(qty) + " MNQ at market now. Price " + px(close) + " is above the noise area (upper " +
+                     px(ub) + "). " + holdLong + " Next check " + nextCheck + "." + placeIn)
             else if pos == 0 and close < lb and shortOk and freshOk
                 strategy.entry("Short", strategy.short, qty, comment = "Below noise",
                      alert_message = useHook ? jsonEntry("sell", estS, useStop ? bracketS : na, tpS) : "")
                 shortPlaced := true
                 mark("SELL " + str.tostring(qty) + " MNQ", false, color.red)
                 lastSignal := "SELL " + hhmmText(endMin) + " @ " + px(close)
-                alert("SELL " + str.tostring(qty) + " MNQ at market now. Price " + px(close) + " is below the noise area (lower " +
-                     px(lb) + "). " + holdShort + " Next check " + nextCheck + ".", alert.freq_once_per_bar_close)
+                say("SELL " + str.tostring(qty) + " MNQ at market now. Price " + px(close) + " is below the noise area (lower " +
+                     px(lb) + "). " + holdShort + " Next check " + nextCheck + "." + placeIn)
 
 // ── Heads-up: five minutes before a check, flat, and price already past that check's line. On 2011-2018 a signal
 // followed about 9 times in 10, and 9 signals in 10 had one: time to have the order ready (each minute of delay cost
@@ -311,10 +336,10 @@ if validTf and 5 % barMin == 0 and inRth and preEnd >= FIRST_CHECK and preEnd <=
     readyH = " Get the order ready: " + str.tostring(qty) + " MNQ, stop " + (maxLoss > 0 ? px(maxLoss / qty / syminfo.pointvalue) + " points from your fill (your " + usd(maxLoss) + ")" : "at the line") + (useStop and tpUnits > 0 ? ", take-profit about " + px(tpUnits * sgh * close) + " points" : "") + lockH + "."
     if close > upH
         headsUp := hhmmText(preEnd) + " BUY likely"
-        alert("HEADS-UP: " + hhmmText(preEnd) + " BUY likely. Price " + px(close) + " is already above the " + hhmmText(preEnd) + " upper line (" + px(upH) + ")." + readyH, alert.freq_once_per_bar_close)
+        say("HEADS-UP: " + hhmmText(preEnd) + " BUY likely. Price " + px(close) + " is already above the " + hhmmText(preEnd) + " upper line (" + px(upH) + ")." + readyH + placeIn)
     else if close < loH and not (fedToday and preEnd < FED_CUTOFF)
         headsUp := hhmmText(preEnd) + " SELL likely"
-        alert("HEADS-UP: " + hhmmText(preEnd) + " SELL likely. Price " + px(close) + " is already below the " + hhmmText(preEnd) + " lower line (" + px(loH) + ")." + readyH, alert.freq_once_per_bar_close)
+        say("HEADS-UP: " + hhmmText(preEnd) + " SELL likely. Price " + px(close) + " is already below the " + hhmmText(preEnd) + " lower line (" + px(loH) + ")." + readyH + placeIn)
 
 // ── The resting stop: just past the current line, or the max-loss cap from the fill if that is closer.
 // Re-placed every bar so it moves with the line. The cap is live from the fill bar, like a bracket order: placed
@@ -367,12 +392,12 @@ shortTp = strategy.position_size < 0 and tpUnits > 0 ? strategy.position_avg_pri
 if useStop and inRth and not na(ub)
     if strategy.position_size > 0 or longPlaced
         strategy.exit("Long exit", "Long", stop = longStop, limit = longTp, comment_loss = longWhy, comment_profit = "Target",
-             alert_loss = useHook ? jsonExit : "EXIT LONG: price hit the stop at " + px(longStop) + ". Your stop should have filled. If you had no stop in, exit at market now.",
-             alert_profit = useHook ? jsonExit : "TARGET: the long reached the take-profit at " + px(nz(longTp)) + ". Your limit should have filled. If not, exit at market now.")
+             alert_loss = useHook ? jsonExit : tagText + "EXIT LONG: price hit the stop at " + px(longStop) + ". Your stop should have filled. If you had no stop in, exit at market now.",
+             alert_profit = useHook ? jsonExit : tagText + "TARGET: the long reached the take-profit at " + px(nz(longTp)) + ". Your limit should have filled. If not, exit at market now.")
     if strategy.position_size < 0 or shortPlaced
         strategy.exit("Short exit", "Short", stop = shortStop, limit = shortTp, comment_loss = shortWhy, comment_profit = "Target",
-             alert_loss = useHook ? jsonExit : "EXIT SHORT: price hit the stop at " + px(shortStop) + ". Your stop should have filled. If you had no stop in, exit at market now.",
-             alert_profit = useHook ? jsonExit : "TARGET: the short reached the take-profit at " + px(nz(shortTp)) + ". Your limit should have filled. If not, exit at market now.")
+             alert_loss = useHook ? jsonExit : tagText + "EXIT SHORT: price hit the stop at " + px(shortStop) + ". Your stop should have filled. If you had no stop in, exit at market now.",
+             alert_profit = useHook ? jsonExit : tagText + "TARGET: the short reached the take-profit at " + px(nz(shortTp)) + ". Your limit should have filled. If not, exit at market now.")
 
 nextText = not inRth or endMin >= LAST_CHECK ? "10:00 next session" : endMin < FIRST_CHECK ? "10:00" : hhmmText(endMin - (endMin - FIRST_CHECK) % 30 + 30)
 
@@ -382,7 +407,7 @@ if inRth and endMin == RTH_CLOSE
         mark("FLAT", strategy.position_size < 0, color.gray)
         lastSignal := "FLAT 16:00 @ " + px(close)
         strategy.close_all(comment = "16:00 close", alert_message = hookExit, immediately = true)
-        alert("FLAT: close your MNQ position at market now (16:00 close).", alert.freq_once_per_bar_close)
+        say("FLAT: close your MNQ position at market now (16:00 close).")
     if not na(dayOpen)
         complete = true
         for k = 0 to N_CHECKS - 1
@@ -400,7 +425,7 @@ plot(showBands and inRth ? ub : na, "Upper noise line", color.teal, 2, plot.styl
 plot(showBands and inRth ? lb : na, "Lower noise line", color.maroon, 2, plot.style_linebr)
 bgcolor(shadeTrades and strategy.position_size > 0 ? color.new(color.teal, 88) : shadeTrades and strategy.position_size < 0 ? color.new(color.maroon, 88) : na)
 
-var table dash = table.new(position.top_right, 2, 15, bgcolor = color.new(color.black, 15), border_width = 1, border_color = color.new(color.gray, 60))
+var table dash = table.new(position.top_right, 2, 16, bgcolor = color.new(color.black, 15), border_width = 1, border_color = color.new(color.gray, 60))
 if showDash and (barstate.islastconfirmedhistory or barstate.isrealtime)
     pos = strategy.position_size
     status = not validTf ? "Use a 1/5/10/15/30 min chart" : filled < lookback ? "Building history" : pos > 0 ? "LONG" : pos < 0 ? "SHORT" : skipToday and inRth ? "No trades today (date list)" : "Flat"
@@ -408,7 +433,7 @@ if showDash and (barstate.islastconfirmedhistory or barstate.isrealtime)
     closed = strategy.closedtrades
     todayPnlDash = strategy.netprofit - dayStartNet
     wins = strategy.wintrades
-    table.cell(dash, 0, 0, "MNQ Noise Momentum v1.5", text_color = color.white, text_size = size.small)
+    table.cell(dash, 0, 0, "MNQ Noise Momentum v1.6: " + account + ", " + str.tostring(qty) + " MNQ", text_color = color.white, text_size = size.small)
     table.cell(dash, 1, 0, status, text_color = statusColor, text_size = size.small)
     table.cell(dash, 0, 1, "Sessions of history", text_color = color.silver, text_size = size.small)
     table.cell(dash, 1, 1, str.tostring(math.min(filled, lookback)) + " / " + str.tostring(lookback), text_color = color.white, text_size = size.small)
@@ -460,6 +485,9 @@ if showDash and (barstate.islastconfirmedhistory or barstate.isrealtime)
     table.cell(dash, 0, 14, "Max loss per contract", text_color = color.silver, text_size = size.small)
     table.cell(dash, 1, 14, maxLoss <= 0 ? "off" : usd(perContract) + (tight ? ": tight, normal moves hit it (about $117 tested best)" : ""),
          text_color = tight ? color.orange : color.white, text_size = size.small)
+    table.cell(dash, 0, 15, "Accounts (" + str.lower(account) + ")", text_color = color.silver, text_size = size.small)
+    table.cell(dash, 1, 15, nAccts == 0 ? "none listed: add them in the settings" : acctList + ": " + str.tostring(qty) + " MNQ each, " + str.tostring(qty * nAccts) + " in all" + (maxLoss > 0 ? "; a full loss " + usd(maxLoss * nAccts) + " across them" : ""),
+         text_color = nAccts == 0 ? color.orange : color.white, text_size = size.small)
     table.cell(dash, 0, 5, "Backtest net", text_color = color.silver, text_size = size.small)
     table.cell(dash, 1, 5, (strategy.netprofit < 0 ? "-$" : "$") + str.tostring(math.abs(strategy.netprofit), "#,##0.00"),
          text_color = strategy.netprofit >= 0 ? color.lime : color.red, text_size = size.small)
