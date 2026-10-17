@@ -54,6 +54,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import apex25k as A  # noqa: E402
 import apex_payouts as P  # noqa: E402
+
 from mnqbot.data import NY  # noqa: E402
 from mnqbot.noise import FED_CUTOFF, FIRST_CHECK, LAST_CHECK, N_CHECKS, RTH_CLOSE, RTH_OPEN, STEP  # noqa: E402
 
@@ -140,7 +141,8 @@ def simulate(bars: pd.DataFrame, tp_units: float, runner: str | None, k: float =
                 lk = entry_px + d * LOCK_PLUS
                 if (d > 0 and lk > line) or (d < 0 and lk < line):
                     line, why = lk, "Lock"
-            if phase == 2 and runner in ("trail", "fixed") and ((d > 0 and run_stop > line) or (d < 0 and run_stop < line)):
+            tighter = (d > 0 and run_stop > line) or (d < 0 and run_stop < line)
+            if phase == 2 and runner in ("trail", "fixed") and tighter:
                 line, why = run_stop, "Runner stop"
             if entry_bar == i:
                 hit = lo_[i] <= line if d > 0 else h[i] >= line
@@ -166,12 +168,13 @@ def simulate(bars: pd.DataFrame, tp_units: float, runner: str | None, k: float =
                         unit = sigma * entry_px
                         best = tp
                         run_stop = tp - d * k * unit if runner in ("trail", "fixed") else math.nan
-                        if runner in ("trail", "fixed") and ((d > 0 and c[i] <= run_stop) or (d < 0 and c[i] >= run_stop)):
+                        past = (d > 0 and c[i] <= run_stop) or (d < 0 and c[i] >= run_stop)
+                        if runner in ("trail", "fixed") and past:
                             # the bar already closed past the runner's stop: out at the close
-                            path_hi.append(r_before + n_before * d * ((h[i] if d > 0 else lo_[i]) - entry_px) * PV - FEE * QTY)
-                            path_lo.append(min(r_before + n_before * d * ((lo_[i] if d > 0 else h[i]) - entry_px) * PV,
-                                               realized + n_open * d * ((lo_[i] if d > 0 else h[i]) - entry_px) * PV)
-                                           - FEE * QTY)
+                            fav, adv = (h[i], lo_[i]) if d > 0 else (lo_[i], h[i])
+                            path_hi.append(r_before + n_before * d * (fav - entry_px) * PV - FEE * QTY)
+                            path_lo.append(min(r_before + n_before * d * (adv - entry_px) * PV,
+                                               realized + n_open * d * (adv - entry_px) * PV) - FEE * QTY)
                             finish(i, c[i] - d * slip, "Runner stop")
                             exited = True
             if pos and not exited:

@@ -1229,6 +1229,28 @@ lose on 2019-26 and NQ futures), they win 15-37% of the time: the outer part of 
 extra 3 trades a week cost money and add 9-13 points of busts to the evaluation. More trades only help when each one
 has an edge.
 
+## Rounds sixty-three to sixty-five: more money from the winners, on one 50K account
+
+The user wants more per week from one account. The bot's profit comes from trend days, so three ways to press the
+trades that are already winning, each with its pass bar fixed before running: the best 2011-18 variant must beat the
+bot by 10% in expected payouts per 50K evaluation (round sixty-one's simulation, base caps) with no lower evaluation
+pass rate, on 2019-26 and on NQ futures. 4 MNQ, $200 max loss, 1-minute bars, open profit counted minute by minute.
+
+| Study | Best on 2011-18 | Payouts per evaluation, 2019-26 / NQ (bot: $439 / $317) | Evaluation pass %, 2019-26 / NQ (bot: 22.9 / 25.3) | Verdict |
+|---|---|---|---|---|
+| Pyramid: add contracts when the lock arms ([`pyramid.py`](../research/pyramid.py)) | add 2, stop at the lock | $300 / $333 | 22.0 / 22.3 | FAIL |
+| Runner: half off at the take-profit, trail the rest ([`runner.py`](../research/runner.py)) | trail 1.0 noise unit | $473 / $295 | 21.1 / 24.5 | FAIL |
+| Size ladder on profit and cushion ([`size_ladder.py`](../research/size_ladder.py)) | 6 MNQ from +$1,000 in the evaluation | $463 / $544 (flat 4: $553 / $550) | 18.9 / 20.6 | FAIL |
+
+- **Pyramid:** most trades that reach the lock come back to it, so an add bought 25 points higher loses on most of
+  them; winners fall from about 50% to 10-12% and evaluation busts rise 9-30 points.
+- **Runner:** the half taken off at the take-profit gives up more than the runner earns; a 3.5-unit target for all
+  contracts busts 71-79% of evaluations.
+- **Ladder:** sizing up reaches the target sooner but busts more; in the funded account payouts are capped, so the
+  extra size adds risk and no money. A funded 50K pays about $70-86 a week while it lasts, ladder or not.
+- **The payout rules cap one Apex account**, whatever the strategy: at most 6 payouts of $1,500-$3,000 (about
+  $13,000 in all), with at least 5 qualifying days between them.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
