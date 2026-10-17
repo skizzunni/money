@@ -1795,6 +1795,69 @@ miss is a tie, not a loss, and the user asked for more trades a week, more money
 Switch it off for the bot alone. The strategy's trades with it on are `combo_priority.py`'s, trade for trade
 (`tests/test_ninjatrader.py`). It still doesn't make $1,500 a week at this size.
 
+## Round one hundred and two: the breakout together with the bot, and stop-and-reverse
+
+`research/combo_more.py` (bar fixed before running, against round 101 on all three periods: more $ a week, pass
+rate, payouts per evaluation and first payouts within 20 sessions no lower). From here on overlapping positions are
+summed minute by minute (`trap_reversal.leg_paths`) for every setup, round 101's included, which is a little stricter
+than round 101's own measure (its pass rates here: 26.4 / 21.7 / 22.7%).
+
+| | $ a week, 2011-18 / 2019-25 / NQ | Pass % | Bust % | Paid per evaluation |
+|---|---|---|---|---|
+| Round 101 (the strategy now) | 316 / 311 / 288 | 26.4 / 21.7 / 22.7 | 60 / 61 / 67 | $1,268 / $727 / $690 |
+| Together (a same-direction breakout taken while the bot is in, at most 10 MNQ in all) | 395 / 390 / 384 | 24.6 / 17.9 / 22.0 | 73 / 76 / 75 | $1,281 / $495 / $578 |
+| Stop-and-reverse | 311 / 316 / 292 | 26.2 / 21.1 / 23.5 | 61 / 64 / 69 | $1,179 / $640 / $657 |
+| Both | 379 / 401 / 385 | 24.3 / 16.3 / 21.8 | 74 / 78 / 76 | $1,071 / $449 / $584 |
+
+**None adopted.** Together adds $80-95 a week, but the bigger positions bust 8-14 points more evaluations.
+
+## Round one hundred and three: a lock and take-profit for the breakout trade
+
+`research/w_manage.py` (pick on 2011-18 by payouts per evaluation among variants making at least as much a week;
+adopted if, on 2019-25 and NQ, payouts and pass rate no lower, $ a week at least 95%, fewer red days). Locks at 0.5R,
+1R, 1.5R (R = the breakout's stop), the stop then to entry + 0.1R; take-profits at 2R, 4R, none. The lock does what
+it says: the breakout wins 53-68% of its trades instead of 45-46%, all trades 51-54% instead of 49-50%, red days
+42-46% instead of 49-50%. But payouts per evaluation fall on the later sets (pick, lock 1R: $486 against $727 in
+2019-25, $482 against $690 on NQ). **Not adopted.**
+
+## Round one hundred and four: the overnight drift
+
+`research/overnight_drift.py`. Boyarchenko, Larsen and Whelan ("The Overnight Drift", 2023) find index futures'
+returns concentrated overnight, around the European open. Long 1 MNQ from a time in the night to a later one, $2.24
+costs a trade; 5 windows x every night / after a down session / after an up session; bar: Benjamini-Hochberg at 10%
+on 2011-18, then t >= 2 on 2019-26 and NQ futures 2015-25.
+
+| 18:00 to the 09:30 open, every night | $ a night | Up nights | t |
+|---|---|---|---|
+| 2011-18 | +26.2 | 56.5% | 3.50 |
+| 2019-26 | +22.2 | 54.0% | 1.75 |
+| NQ 2015-25 | +15.0 | 54.5% | 1.62 |
+
+Positive on every data set (18:00-02:00 too: t 1.99 / 2.23 / 1.92), but no rule clears t 2 on both later sets.
+The 02:00-03:00 hour the paper points to is the strongest on 2011-18 (t 3.64) and fades later (0.35 / 1.20).
+**Nothing counts** by the bar.
+
+## Round one hundred and five: the overnight long on the account
+
+`research/overnight_combo.py`. Apex's day runs from 18:00 to 16:59, so a night belongs to the next session's Apex
+day and comes first in it. Long 1 or 2 MNQ at 18:00, stop 75 or 150 points, out at the 09:30 open, added to the
+strategy as it is now. The pre-registered pick (most payouts per evaluation on 2011-18: 1 MNQ, stop 150) **failed**
+(payouts per evaluation $564 against $727 in 2019-25). A check afterwards, of neighbouring stops and of the 13 months
+from July 2025 no combination round had used:
+
+| 1 MNQ, stop 100 points | $ a week, 2011-18 / 2019-25 / Jul 2025-Aug 2026 / NQ | Pass % | Paid per evaluation | First payout within 20 sessions |
+|---|---|---|---|---|
+| Now | 316 / 311 / 242 / 288 | 26.4 / 21.7 / 24.5 / 22.7 | $1,268 / $727 / $31 / $690 | 9.9 / 4.4 / 3.1 / 4.0% |
+| Entered at 18:00 | 392 / 351 / 370 / 329 | 29.4 / 21.8 / 23.4 / 23.4 | $1,510 / $769 / $73 / $773 | 17.1 / 13.2 / 14.1 / 11.2% |
+| Entered at 18:01 (as NinjaTrader can) | 396 / 341 / 334 / 325 | 29.3 / 21.6 / 22.1 / 24.3 | $1,455 / $595 / $41 / $877 | 16.8 / 13.0 / 10.3 / 11.5% |
+| At 18:01, funded account only | 316 / 311 / 242 / 288 | as now | $1,168 / $625 / $114 / $743 | 16.8 / 13.0 / 10.3 / 11.5% |
+
+(The July 2025 window's payouts are small because few funded accounts can finish in it.) It reliably brings the
+first payout two to three times as often within 20 sessions and adds $30-90 a week, but busts rise 6-8 points and
+the total paid per evaluation is not reliably higher: the first payout comes sooner, and later busts give it back.
+On real MNQ bars from Yahoo (37 nights, August-October 2026) the 100-point stop made +$894 at 1 MNQ, 40% of nights
+up. **Not built in.**
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
@@ -1889,6 +1952,10 @@ python research/williams_combo.py nsx1m_scaled.pkl nq1m_scaled.pkl     # the Wil
 python research/williams_sized.py nsx1m_scaled.pkl nq1m_scaled.pkl     # sized to a fixed risk (positive alone)
 python research/combo_live.py nsx1m_scaled.pkl nq1m_scaled.pkl         # one position at a time, first come (no)
 python research/combo_priority.py nsx1m_scaled.pkl nq1m_scaled.pkl     # the bot first, Williams in the gaps (built in)
+python research/combo_more.py nsx1m_scaled.pkl nq1m_scaled.pkl         # breakout together, stop-and-reverse (no)
+python research/w_manage.py nsx1m_scaled.pkl nq1m_scaled.pkl           # lock / take-profit for the breakout (no)
+python research/overnight_drift.py nsx1m_scaled.pkl nq1m_scaled.pkl    # the overnight drift (positive, below the bar)
+python research/overnight_combo.py nsx1m_scaled.pkl nq1m_scaled.pkl    # the overnight long on the account (no)
 ```
 
 The raw data isn't stored in this repo.
