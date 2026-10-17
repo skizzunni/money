@@ -1543,6 +1543,23 @@ earlier one on the funded account only, so the pass rate is unchanged.
 (0.5, +6.25) is better than the old funded lock in all three periods on payouts per evaluation, winners and busts; the
 first payout comes 2-3 weeks later. The NinjaTrader strategy's funded side now uses it: a judgement call, not a test.
 
+## Round eighty-four: the evaluation's lock and size together
+
+`research/eval_lock_size.py`. The earlier lock cut evaluation busts but ran out of time; more size makes the target
+faster. 4, 5 or 6 MNQ (25-point cap) x lock (1.0, +2.5), (0.5, +2.5), (0.5, +6.25), in the evaluation only; the funded
+account as the strategy trades it now. Adoption bar fixed before running: the 2011-18 best by pass rate beats the
+current one by 2 points on 2019-25 and NQ futures with no lower payouts.
+
+| Evaluation | Pass / bust / timeout %, 2011-18 | 2019-25 | NQ 2015-24 | Paid per evaluation |
+|---|---|---|---|---|
+| 4 MNQ, 1.0 / +2.5 (now) | 27.5 / 57.3 / 15.2 | 22.9 / 59.1 / 18.0 | 25.3 / 64.4 / 10.2 | $1,135 / $585 / $628 |
+| 5 MNQ, 0.5 / +6.25 (2011-18 best) | 29.0 / 55.1 / 15.9 | 22.3 / 64.8 / 12.9 | 23.8 / 64.9 / 11.3 | $1,721 / $695 / $835 |
+| 4 MNQ, 0.5 / +6.25 | 26.6 / 42.9 / 30.5 | 19.2 / 50.6 / 30.1 | 20.5 / 50.3 / 29.2 | $1,406 / $667 / $715 |
+
+**FAIL**: the pick passes 0.6 and 1.5 points less often on 2019-25 and NQ. It pays more per evaluation in all three
+periods, but with the funded account unchanged that difference comes from which days the passes land on, not from the
+evaluation itself; the pass rate is the clean measure, and it doesn't improve. The evaluation stays as it is.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
