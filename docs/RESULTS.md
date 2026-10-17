@@ -1366,6 +1366,24 @@ t <= -2.0.
 **FAIL** (1 of 3 at t >= 2). All three are positive, none consistent across both halves: a weak momentum tilt at the
 open, not strong enough to trade. Not added.
 
+## Round seventy-three: jobs-report days
+
+`research/macro_days.py`, dates in [`nfp_dates.csv`](../research/nfp_dates.csv) (derived from BLS's published rule, the
+third Friday after the week with the 12th, checked against the 15 dates that could be confirmed; bls.gov and FRED
+refuse this machine; CPI dropped for want of a source). The bot at 4 MNQ, $200 on jobs-report days and other days:
+
+| Period | Report days: $ a day (days) | Other days | Winners, report / other |
+|---|---|---|---|
+| 2011-18 | $167.67 (84) | $49.22 | 47.9% / 46.6% |
+| 2019-26 | $119.64 (79) | $43.41 | 41.0% / 43.5% |
+| NQ futures 2015-25 | $108.60 (112) | $39.14 | 45.0% / 44.1% |
+
+Four rules, protocol fixed before running (Benjamini-Hochberg on 2011-18, then 2019-26, then NQ futures): 2x size on
+report days (t 1.84 / 1.30 / 1.71), skip them (the mirror), a 1.25x wider noise area (t -1.69 / -0.72 / -0.98), a
+10:00 trade in the direction of the 08:30-10:00 move (t 1.28 / -0.80 / -0.08). **No survivor.** Description: the bot
+makes about 2.5-3.4 times its usual $ a day on jobs-report days, in the same direction in all three data sets; with
+about 12 such days a year the evidence stays under the bar. A replication on other scheduled releases follows.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
