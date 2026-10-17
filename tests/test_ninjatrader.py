@@ -198,9 +198,9 @@ def run_sim(sim, bars: pd.DataFrame, tmp: Path, minutes: int = 5, **props):
 
 
 TIME_EXITS = ("16:00 close", "Session ended")
-# the strategy's switch: a 50K evaluation trades 4 MNQ, $200 max loss, 3 losers a day; funded 10 MNQ, $350, 4 losers
-ACCOUNTS = {False: dict(qty=4, max_loss_per_trade=200.0, max_losers=3), True: dict(qty=10, max_loss_per_trade=350.0,
-                                                                                  max_losers=4)}
+# the strategy's switch: a 50K evaluation trades 4 MNQ, $200 max loss, 3 losers a day; funded 4 MNQ, $200, 2 losers
+ACCOUNTS = {False: dict(qty=4, max_loss_per_trade=200.0, max_losers=3), True: dict(qty=4, max_loss_per_trade=200.0,
+                                                                                 max_losers=2)}
 
 
 def account(funded: bool, **kw) -> NoiseConfig:
@@ -243,7 +243,7 @@ def test_strategy_places_the_bots_trades(sim, tmp_path, seed, funded):
 def test_strategy_moves_the_stop_and_locks(sim, tmp_path):
     bars = synth_bars(sessions=120, seed=3)
     trades, orders, _, _ = run_sim(sim, bars, tmp_path, Funded=True, RoundPrices=False)
-    res = run(bars, NoiseConfig(qty=10, target_on_fill_bar=True))
+    res = run(bars, account(True))
     assert_strategy_matches(trades, res)
     reasons = {t.reason for t in res.trades}
     assert {"Back inside", "Max loss", "Lock", "Target", "16:00 close"} <= reasons, reasons
@@ -288,7 +288,9 @@ def test_strategy_on_gaps(sim, tmp_path, seed):
         if eb == xb and why == "Profit target":
             assert int(d) * (float(ex) - float(en)) > 0, "a take-profit on the fill bar is always a profit"
         if why == "Stop loss" and eb == xb:
-            assert float(pnl) >= -(350 + 12.4 + 5) - 1e-6, "the fill-bar stop is measured from the real fill"
+            a = ACCOUNTS[True]
+            worst = a["max_loss_per_trade"] + (2 * 0.62 + 2 * 0.25) * a["qty"]  # fees and a tick of slippage
+            assert float(pnl) >= -worst - 1e-6, "the fill-bar stop is measured from the real fill"
 
 
 def test_strategy_on_one_minute_bars(sim, tmp_path):
@@ -319,8 +321,8 @@ def test_dashboard_and_switch(sim, tmp_path):
     assert "Evaluation, 4 MNQ, $200 max loss, 3 losers a day" in dash and "Orders: ON" in dash
     assert any("BUY 4 MNQ (Evaluation)" in p or "SELL 4 MNQ (Evaluation)" in p for p in printed)
     _, _, dash, printed = run_sim(sim, bars, tmp_path, Funded=True)
-    assert "Funded, 10 MNQ, $350 max loss, 4 losers a day" in dash
-    assert any("BUY 10 MNQ (Funded)" in p or "SELL 10 MNQ (Funded)" in p for p in printed)
+    assert "Funded, 4 MNQ, $200 max loss, 2 losers a day" in dash
+    assert any("BUY 4 MNQ (Funded)" in p or "SELL 4 MNQ (Funded)" in p for p in printed)
     _, orders, dash, _ = run_sim(sim, synth_bars(sessions=8, seed=3), tmp_path)
     assert "History: 8/14" in dash and not orders  # not enough sessions loaded: it says so, and trades nothing
     _, _, _, printed = run_sim(sim, synth_bars(sessions=20, seed=3), tmp_path)

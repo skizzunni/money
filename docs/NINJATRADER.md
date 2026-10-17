@@ -29,7 +29,9 @@ account. Copy that account to others with a trade copier (Tradesyncer, or NinjaT
    - **Calculate: On bar close.** Any other setting and the strategy won't trade; the chart says so.
    - **Start behavior: Wait until flat** (the default).
    - **FUNDED ACCOUNT:** off = the Apex **50K Intraday Trail evaluation: 4 MNQ, $200 max loss a trade, no new
-     entries after 3 losers a day**. On = funded: **10 MNQ, $350, 4 losers**. Each side has its own contracts, max
+     entries after 3 losers a day**. On = funded: **4 MNQ, $200, 2 losers** (round sixty-one: on a 50K funded account
+     this paid the most per evaluation over 2011-2026 and on NQ futures; 10 MNQ at $350 busts the $2,000 drawdown
+     before it pays much). Each side has its own contracts, max
      loss and loser limit in the settings. For a **50K EOD Trail** evaluation set the evaluation side to **6 MNQ,
      $300, 3 losers** instead (3 x $300 stays under that plan's $1,000 daily loss limit). The EOD plan passes more
      often with this bot: about 37-39% of attempts against 24-28% (round sixty,

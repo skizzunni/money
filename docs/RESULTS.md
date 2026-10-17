@@ -1184,6 +1184,30 @@ on 2019-26 (+1.3 points) and NQ futures (+4.0), with more busts. Description, no
 | 6 MNQ, $300, 3 losers | 24.1 / 74.1 / 1.8 | 20.2 / 76.6 / 3.2 | 22.1 / 77.4 / 0.4 |
 | 10 MNQ, $350, 4 losers | 17.7 / 82.3 / 0.0 | 14.0 / 84.4 / 1.6 | 14.2 / 85.8 / 0.0 |
 
+## Round sixty-one: what a 50K account pays out
+
+`research/apex_payouts.py` simulates the whole path with the bot on 1-minute bars: the 50K intraday-trail evaluation
+at 4 MNQ, $200, 3 losers, then the funded Performance Account under Apex 4.0's payout rules as 2026 reviews quote
+them ($2,000 drawdown trailing open profit until it locks at +$100, tiered daily loss limit, a payout after 5 days of
+$200+, a balance of $52,600, no day over 50% of the profit, caps $1,500-$3,000, at most 6 payouts). Every session is a
+start. Pass bar, fixed before running: the 2011-18 best must beat the funded setting then in use (10 MNQ, $350,
+4 losers) by 10% on 2019-25 and NQ futures under all three payout-cap assumptions.
+
+Expected payouts per evaluation bought (base caps; the evaluation passes 23-28% of the time):
+
+| Funded setting | 2011-18 | 2019-25 | NQ futures 2015-24 | Funded accounts that bust | Payout per funded account per month alive |
+|---|---|---|---|---|---|
+| **4 MNQ, $200, 2 losers (now the funded setting)** | $862 | $552 | $550 | 79-83% | $306-356 |
+| 4 MNQ, $140, 2 losers (the 2011-18 pick) | $1,054 | $673 | $355 | 72-88% | $241-350 |
+| 3 MNQ, $350, 2 losers | $612 | $562 | $495 | 82-84% | $390-664 |
+| 10 MNQ, $350, 4 losers (was the funded setting) | $672 | $172 | $337 | 81-94% | $341-407 |
+
+Verdict: the 2011-18 pick (4 MNQ, $140, 2 losers) beat 10 MNQ by far on 2019-25 but only by 5% on NQ futures: **FAIL**.
+Description: 10 MNQ paid the least per evaluation on 2019-25 because it busts the $2,000 drawdown before most payouts.
+4 MNQ, $200, 2 losers had the best worst case of all 39 settings ($550 per evaluation, $397 under the low caps) and is
+now the funded setting: a judgement call, not a test result. Most funded accounts end in a bust after one or two
+payouts; what one pays in total averages about $1,750-3,100.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.

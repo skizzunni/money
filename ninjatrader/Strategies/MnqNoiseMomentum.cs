@@ -56,16 +56,16 @@ namespace NinjaTrader.NinjaScript.Strategies
 
                 Funded = false;
                 EvalQty = 4;           // Apex 50K evaluation, intraday trail (docs/RESULTS.md round 60)
-                FundedQty = 10;
+                FundedQty = 4;         // 50K funded (PA): pays the most per evaluation (docs/RESULTS.md round 61)
                 PlaceOrders = true;
                 EvalMaxLoss = 200;     // end-of-day plan instead: 6 MNQ, $300, 3 losers
-                FundedMaxLoss = 350;
+                FundedMaxLoss = 200;
                 TakeProfit = 1.5;
                 StopBuffer = 0.24;
                 LockAt = 1.0;
                 LockPlus = 2.5;
                 EvalMaxLosers = 3;
-                FundedMaxLosers = 4;
+                FundedMaxLosers = 2;
                 Lookback = 14;
                 FedNoShorts = true;
                 SkipDates = NoiseEngine.SkipDatesDefault;
@@ -400,7 +400,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         #region Properties
         [NinjaScriptProperty]
-        [Display(Name = "FUNDED ACCOUNT (on: 10 MNQ, $350; off: the 50K evaluation, 4 MNQ, $200)", Order = 1, GroupName = "1. Account")]
+        [Display(Name = "FUNDED ACCOUNT (on: 4 MNQ, $200, 2 losers; off: the 50K evaluation, 4 MNQ, $200, 3 losers)", Order = 1, GroupName = "1. Account")]
         public bool Funded { get; set; }
 
         [NinjaScriptProperty]
