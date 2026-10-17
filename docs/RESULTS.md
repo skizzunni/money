@@ -1699,6 +1699,13 @@ all negative), and the fixed-stop versions lose in every period (2019-26 t -2.2 
 Added to the bot it cuts $ a week and payouts. A quickly failed breakout doesn't run back the other way; trading
 against it is a losing trade. (Re-entering the original direction gets its own test, round ninety-five.)
 
+## Round ninety-five: re-enter after a quick stop-out
+
+`research/reentry.py`. The mirror of round ninety-four, chosen after seeing it, so the bar was strict (t >= 3.0 on
+2011-18, 2.5 on 2019-26, 2.0 on NQ): after a quick line or max-loss stop, re-enter the same way at the next minute,
+25-point stop, 1R or 2R target, once a day, 4 MNQ. The 2R re-entries are positive in every period ($5-23 a trade,
+35-38% winners, $2-11 a day) but weak (t 1.1-1.6 / 0.5-1.0 / 2.1-2.8); the 1R ones break even. **No rule counts.**
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
