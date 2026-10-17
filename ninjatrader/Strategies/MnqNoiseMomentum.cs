@@ -140,6 +140,11 @@ namespace NinjaTrader.NinjaScript.Strategies
             int nTrades = engine.Trades.Count, nOrders = engine.Orders.Count;
             int nHeads = engine.HeadsUps.Count;
             engine.OnBar(start, Open[0], High[0], Low[0], Close[0]);
+            if (start.Hour * 60 + start.Minute == NoiseEngine.RthOpen)  // once a day in the Output window, chart or not
+                Print(start.ToString("yyyy-MM-dd") + " MNQ Noise Momentum (" + Account + ", " + Qty + " MNQ, orders " +
+                      (PlaceOrders ? "ON" : "OFF") + "): " + (engine.Ready ? "ready, trading today" + (engine.SkipToday ?
+                      " (no: skip date)" : "") : "loading history, " + engine.SessionsLoaded + "/" + Lookback +
+                      " full sessions; no trades until " + Lookback + ". Load more days."));
 
             if (PlaceOrders)
                 ManageOrders(start, nOrders);

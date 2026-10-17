@@ -44,6 +44,11 @@ sessions of history are loaded (until 14, it says so and doesn't trade); the noi
 the heads-up; the position with its live stop (and "locked" once the stop is at entry + 2.5); and today's trades,
 P/L and losers. The orange and green lines on the chart are the stop and take-profit.
 
+Add it **from the chart** (step 4), not from the Control Center's Strategies tab: started there it runs without a
+chart, so there's no dashboard and no lines. Either way, every morning at 09:30 it writes one line to the Output
+window (**New → NinjaScript Output**): "ready, trading today", or "loading history, 7/14 full sessions" when it
+needs more days loaded.
+
 ## What it does
 
 - **10:00, 10:30 … 15:30 New York**, at the close of each check bar: if flat, price outside the noise area, the day
@@ -67,10 +72,14 @@ P/L and losers. The orange and green lines on the chart are the stop and take-pr
 The tests here prove the rules and the order handling match the tested Python bot trade for trade, but they run on a
 stand-in for NinjaTrader, not on NinjaTrader. Watch it trade once in NinjaTrader before an evaluation:
 
-1. **Tools → Historical Data → Load** (the *Market Replay* tab): download MNQ replay data for the last 3–5 trading
-   days. The chart also needs 30+ days of 5-minute history before them, for the 14 sessions.
-2. Connect to **Playback**, open the chart, add the strategy on the **Playback101** account with Place orders on,
-   press play at a fast speed.
+1. Connect to your data feed first (Connections → your Apex connection; NinjaTrader only downloads while connected).
+   **Tools → Historical Data → Download:** MNQ front month, Minute, Last, from about **two months back** to
+   yesterday. Then disconnect.
+2. **Connections → Playback Connection.** In the Playback window pick **Historical**, and set **Start** at least
+   **four weeks after** the first downloaded day (the bot needs 14 full sessions before its first trade), End
+   yesterday. Open a 5-minute chart, **Days to load 45**, add the strategy **from the chart** on the **Playback101**
+   account with Place orders on, drag the speed slider toward **Max** and press play. It trades only between 10:00
+   and 16:00 New York; if the dashboard says "History: x/14", start the playback later.
 3. Check, on at least one day with a trade: the entry fills right after a check bar closes; a stop and a take-profit
    appear at once (Orders tab); the stop moves at the half hours and to entry + 2.5 after the lock; everything is
    flat after 16:00; the dashboard's P/L matches the Positions/Executions tabs.

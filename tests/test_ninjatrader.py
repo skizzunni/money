@@ -323,6 +323,10 @@ def test_dashboard_and_switch(sim, tmp_path):
     assert any("BUY 10 MNQ (Funded)" in p or "SELL 10 MNQ (Funded)" in p for p in printed)
     _, orders, dash, _ = run_sim(sim, synth_bars(sessions=8, seed=3), tmp_path)
     assert "History: 8/14" in dash and not orders  # not enough sessions loaded: it says so, and trades nothing
+    _, _, _, printed = run_sim(sim, synth_bars(sessions=20, seed=3), tmp_path)
+    daily = [p for p in printed if "MNQ Noise Momentum (Evaluation, 4 MNQ, orders ON)" in p]
+    assert len(daily) == 20  # the Output window says every morning whether it can trade
+    assert "loading history, 7/14 full sessions" in daily[7] and "ready, trading today" in daily[15]
 
 
 def test_a_rejected_stop_closes_the_position(sim, tmp_path):
