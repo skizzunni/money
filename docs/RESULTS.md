@@ -1746,6 +1746,28 @@ It adds $85-130 a week at 1 MNQ and brings the first payout sooner, but its stop
 $1,300-1,800 a trade at 1 MNQ), red days rise to 43-50%, and on a $2,000 trailing drawdown evaluations bust more and
 pay less per evaluation in 2019-25 and on NQ. **Not added.** (Correlation of daily P/L with the bot: 0.4.)
 
+## Rounds ninety-nine and one hundred: the Williams breakout sized to a fixed risk, and as it can run on one account
+
+`research/williams_sized.py` (description; the Williams family's periods had all been seen): stops scaled to
+yesterday's range and contracts to a fixed $ risk. Six of twelve variants are positive with t >= 2 in all three data
+sets; the strongest, k 0.5 with the stop a quarter of yesterday's range from the fill and $200 of risk a trade (mostly
+1 MNQ), out at the close: t 4.14 / 2.96 / 4.64, $36-46 a trade, 34-36% winners, about 3 trades a week, never more than
+$300 at risk; up in all 11 NQ futures years and 14 of 16 index years. Added to the bot as a separate position it raised
+the evaluation pass rate slightly in all three periods and $ a week by $100-130, with payouts per evaluation up in two
+periods and down in one.
+
+`research/combo_live.py`: on one Apex account the two can't hold opposite positions (hedging is banned) and positions
+net, so the version that can run is one position at a time (whichever setup enters first owns the account until flat),
+with the Williams entry a market order the minute after a level is touched. Bar fixed before running: higher pass rate
+and $ a week in all three periods, payouts per evaluation at least 90% of the bot's.
+
+| | $ a week, 2011-18 / 2019-25 / NQ | Evaluation pass % | Paid per evaluation | Paid within 20 sessions |
+|---|---|---|---|---|
+| Bot | 272 / 270 / 245 | 27.5 / 22.9 / 25.3 | $1,135 / $585 / $628 | 5.5 / 2.2 / 1.7% |
+| Bot + Williams, one position at a time | 201 / 293 / 235 | 22.8 / 23.7 / 19.1 | $1,040 / $644 / $445 | 8.9 / 6.8 / 4.9% |
+
+**NOT ADOPTED** (passes 2019-25 only): taking turns blocks some of the bot's trend days, which pay for everything.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
