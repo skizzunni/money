@@ -5,6 +5,7 @@ A rules-based MNQ day-trading strategy with prop-firm risk rails. Every piece be
 | Piece | What it's for |
 |---|---|
 | **`pine/mnq_noise_momentum.pine`** | **Version 1.6. The one strategy here with a tested edge: 16 years of index data and 10½ years of real NQ futures data, stress-tested ([RESULTS.md](docs/RESULTS.md#stress-tests-of-version-10)).** Noise-area momentum from a 2024 paper: BUY/SELL/EXIT alerts, a resting stop that moves with the noise line, a max loss per trade, a take-profit 1.5 noise units past the fill, a lock that moves the stop to entry + 2.5 points once a trade is as far up as the max loss (about half the trades win at 10 MNQ and $350), no new entries after 4 losing trades in a day, a heads-up alert five minutes before a likely signal, an evaluation tracker (target, trailing floor, consistency), a FUNDED switch (3 MNQ in evaluations, 10 funded), no shorts before the 14:00 statement on Fed days, a trade log on the chart with the exact time of every trade, flat at 16:00, and optional webhook orders (TradersPost) for prop firms that allow automation. Run it on a 5-minute chart. Rules in [`docs/NOISE.md`](docs/NOISE.md). Over 16 years: about $26 a day on 1 MNQ, 15 of 16 years positive; it passes about 6 in 10 historical $25K evaluations and about 78% of $100K ones. |
+| **`ninjatrader/`** | **The same bot (v1.6) as a NinjaTrader 8 strategy that places its own orders on one account**: market entry with the stop and take-profit attached at the fill, the stop moved with the line and to entry + 2.5 at the lock, flat at 16:00 New York, FUNDED switch (3 / 10 MNQ), an alerts-only mode, a dashboard. Checked trade for trade against the Python bot. Install and Playback check in [`docs/NINJATRADER.md`](docs/NINJATRADER.md). |
 | `pine/mnq_liquidity_sweep_all_in_one.pine` | The original sweep/breakout bot in one TradingView script (no edge on real data, see below): BUY/SELL signals with size, limit price, stop and target, phone alerts, a dashboard, and a Strategy Tester backtest with optional prop-evaluation simulation. |
 | `pine/mnq_liquidity_sweep_signals.pine` | **TradingView indicator that tells you when to BUY or SELL.** It gives the limit price, stop, target and size, then alerts you to fill, move to breakeven, cancel, or flatten. |
 | `pine/mnq_liquidity_sweep_bot.pine` | TradingView strategy with the same rules, for backtesting in Strategy Tester with prop-evaluation simulation. |
@@ -169,6 +170,9 @@ If it doesn't pass these, change the idea, not just the numbers, or don't trade 
 pine/mnq_noise_momentum.pine              TradingView: noise-area momentum, the strategy with a tested edge
 docs/NOISE.md                             its exact rules, alerts and what to expect
 mnqbot/noise.py                           its Python reference (the tests hold the script to it)
+ninjatrader/AddOns/MnqNoiseEngine.cs      NinjaTrader 8: the same rules in C# (tests/test_ninjatrader.py holds it to Python)
+ninjatrader/Strategies/MnqNoiseMomentum.cs  NinjaTrader 8: the strategy that places the orders
+docs/NINJATRADER.md                       how to install it, set it up and check it in Playback
 research/noise_eval.py                    its odds on a $25K evaluation
 research/noise_tuning.py                  whether checking more often helps it (it doesn't)
 research/noise_daily.py                   whether it can trade on most days (not safely)

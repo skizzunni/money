@@ -1,0 +1,56 @@
+// Usage: Sim <bars.csv> <minutes> [Property=value ...]
+// bars.csv: "yyyy-MM-dd HH:mm,open,high,low,close" per line, bar START in New York time (the stand-in stamps each bar
+// with its end time, like NinjaTrader). Properties: any public property of the strategy, e.g. Funded=true.
+// Prints the strategy's trades on the account (T), its order calls (O) and the dashboard text (D).
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Reflection;
+using NinjaTrader.NinjaScript.DrawingTools;
+using NinjaTrader.NinjaScript.Strategies;
+
+static class Program
+{
+    static string F(double x) { return x.ToString("R", CultureInfo.InvariantCulture); }
+
+    static int Main(string[] args)
+    {
+        int minutes = int.Parse(args[1], CultureInfo.InvariantCulture);
+        TimeZoneInfo ny = TimeZoneInfo.FindSystemTimeZoneById("America/New_York");
+        NinjaTrader.Core.Globals.GeneralOptions.TimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Europe/London");
+        List<DateTime> t = new List<DateTime>();
+        List<double> o = new List<double>(), h = new List<double>(), l = new List<double>(), c = new List<double>();
+        foreach (string line in File.ReadLines(args[0]))
+        {
+            string[] p = line.Split(',');
+            DateTime start = DateTime.ParseExact(p[0], "yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture);
+            // NinjaTrader shows bar END times in the platform's time zone: here London, to test the conversion
+            t.Add(TimeZoneInfo.ConvertTime(start.AddMinutes(minutes), ny, NinjaTrader.Core.Globals.GeneralOptions.TimeZoneInfo));
+            o.Add(double.Parse(p[1], CultureInfo.InvariantCulture)); h.Add(double.Parse(p[2], CultureInfo.InvariantCulture));
+            l.Add(double.Parse(p[3], CultureInfo.InvariantCulture)); c.Add(double.Parse(p[4], CultureInfo.InvariantCulture));
+        }
+        MnqNoiseMomentum s = new MnqNoiseMomentum();
+        s.BarsPeriod.Value = minutes;
+        s.Run(t, o, h, l, c, delegate (Strategy x)
+        {
+            for (int a = 2; a < args.Length; a++)
+            {
+                string[] kv = args[a].Split(new[] { '=' }, 2);
+                PropertyInfo pi = typeof(MnqNoiseMomentum).GetProperty(kv[0]);  // the strategy's, or the stand-in's
+                if (pi == null) throw new ArgumentException("unknown property " + kv[0]);
+                pi.SetValue(x, Convert.ChangeType(kv[1], pi.PropertyType, CultureInfo.InvariantCulture));
+            }
+        });
+        foreach (SimTrade x in s.SimTrades)
+            Console.WriteLine(string.Join(",", "T", x.Direction, x.EntryBar, F(x.Entry), x.ExitBar, F(x.Exit), x.ExitName, F(x.Pnl)));
+        foreach (string x in s.OrderLog)
+            Console.WriteLine("O," + x);
+        string d;
+        if (Draw.Texts.TryGetValue("mnq_dash", out d))
+            Console.WriteLine("D," + d.Replace("\n", " | "));
+        foreach (string x in s.Printed)
+            Console.WriteLine("P," + x);
+        return 0;
+    }
+}

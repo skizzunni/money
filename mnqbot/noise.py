@@ -80,6 +80,9 @@ class NoiseConfig:
     lock_plus: float = 2.5  # points; with lock_at 0 or no max loss, no lock (round thirty-seven)
     max_losers: int = 4  # no new entries today after this many losing trades today; 0 = no limit (round thirty-eight)
     tighten_only: bool = False  # webhook mode: in a trade the stop never moves away from the price (round thirty-five)
+    # the take-profit also works on the fill bar, from the expected fill, as a bracket sent with the entry does
+    # (the NinjaTrader strategy); off: from the bar after the fill, as the Pine script places it
+    target_on_fill_bar: bool = False
 
 
 @dataclass
@@ -208,8 +211,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             if hit:
                 close_pos(i, price, reason)
                 events.append((i, "EXIT"))
-            elif cfg.take_profit > 0 and entry_bar != i:  # the take-profit limit, from the bar after the fill
-                tp = entry_px * (1 + pos * cfg.take_profit * sigma)
+            elif cfg.take_profit > 0 and (entry_bar != i or cfg.target_on_fill_bar):  # the take-profit limit
+                tp = (entry_px if entry_bar != i else est_px) * (1 + pos * cfg.take_profit * sigma)
                 if (pos > 0 and h[i] >= tp + cfg.tick) or (pos < 0 and l[i] <= tp - cfg.tick):
                     close_pos(i, tp, "Target")
                     events.append((i, "TARGET"))
