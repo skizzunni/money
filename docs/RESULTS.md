@@ -2251,7 +2251,7 @@ funded account; 26 weeks: $191 / $219, $117 / $146, $65 / $88, $100 / $118.)
 - **The payout stop pays more a week in every period, at both horizons** (equal in the newest window over 52 weeks,
   where only 63 starts fit). Per evaluation (round 128) it paid 18% less on 2011-18; per week of a running slot it
   pays more, because the payouts come sooner and the next evaluation starts sooner. **Adopted: on by default.**
-- **$1,500 a week is 20-64 slots.** Copy trading between one's own Apex accounts is allowed (third-party summaries of
+- **$1,500 a week would be 20-64 slots (not an option: the user trades one account).** Copy trading between one's own Apex accounts is allowed (third-party summaries of
   Apex's help center; Tradovate's group copier is on Apex's help center), up to 20 funded accounts. Accounts copied
   from the same trades pay N times one slot on average but do not spread the risk: a bad stretch is bad on all of them.
 - **One account's bound.** The funded strategy makes $41-49 a day with a spread of about $513 (2011-25), $10 a day in
