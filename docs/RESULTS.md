@@ -2356,6 +2356,25 @@ The same weeks at four settings (the bot as it is now, take-profit and fill-bar 
 - **The $35-per-contract stop is visible trade by trade.** At 10 MNQ and $350 the bot was stopped 29 times, 7 times in a row on 22 September and 5 on 30 September, re-entering at each check because price was still outside the line. With $117 a contract the same signals gave 20 trades, 14 of them winners.
 - **Four weeks is a small sample.** Over 16 years the bot wins about a third of its trades at $117 a contract; 70% here is a good month, not the new normal. What carries over is the comparison between settings on the same days.
 
+## The first run in NinjaTrader itself: Strategy Analyzer, September 8 to October 16, 2026
+
+The user ran the strategy in NinjaTrader's Strategy Analyzer on real MNQ DEC26 1-minute data (18 Aug - 17 Oct 2026,
+slippage 1 tick, commission on, default settings; the first 14 sessions are the noise's history, so trades start 8
+Sep). Trade list: [`data/nt_strategy_analyzer_2026-08-18_10-17.csv`](../data/nt_strategy_analyzer_2026-08-18_10-17.csv);
+check: [`research/nt_run_check.py`](../research/nt_run_check.py).
+
+- **70 trades, +$9,276 net, 52.9% winners, profit factor 2.08**, largest loss $410, max drawdown $3,750 (28 Sep - 13
+  Oct, 9 red days in 10).
+- **The rules held in NinjaTrader's own fills**: every bot trade 4 MNQ, every losing bot stop $207.60-209.60 (the $200
+  max loss + fees + a tick), the lock's +$10.40 exits; breakout trades 1-9 MNQ from the $400 risk, worst -$409.50;
+  bot entries the minute after the half-hour checks; three breakout trades handed to the bot in the same minute;
+  everything flat by 16:01.
+- **Through the Apex evaluation's rules** (the $2,000 trail, close at $3,000; worst point of each trade first): started
+  8 Sep it passes on **21 Sep at 12:33** (10 sessions). Started on each day: 14 pass, **7 bust** (the starts from 23 Sep
+  to 5 Oct, which run into the slide), 2 too late to finish.
+- Six weeks of a strongly trending stretch: well above the 16-year average (35-37% of evaluations passed). It shows the
+  strategy runs in NinjaTrader as tested; it is not a forecast.
+
 ## What this does and doesn't say
 
 - **It says** that the original sweep/breakout rules have no edge after realistic costs on 2023–2026 Nasdaq-100 data, and would very likely not pass a $25K evaluation. Of three published strategies, only noise-area momentum held up over 16 years, and even it fails most $25K evaluations.
@@ -2469,6 +2488,7 @@ python research/slot_size.py nsx1m_scaled.pkl nq1m_scaled.pkl          # sizes j
 python research/slot_eval.py nsx1m_scaled.pkl nq1m_scaled.pkl          # breakout $400 in the evaluation (adopted)
 python research/slot_funded.py nsx1m_scaled.pkl nq1m_scaled.pkl        # funded settings per week (none adopted)
 python research/vol_target.py nsx1m_scaled.pkl nq1m_scaled.pkl         # volatility-targeted size (not adopted)
+python research/nt_run_check.py data/nt_strategy_analyzer_2026-08-18_10-17.csv  # the NinjaTrader run
 ```
 
 The raw data isn't stored in this repo.
