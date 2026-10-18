@@ -348,42 +348,48 @@ trades.
 5/22 to 6/26 hole means **trading runs 6/29 to 10/16**, the 77 sessions with data (docs/NATIVE_RUNS.md section 7).
 Summaries are in `verification/native_long/`.
 
-**Missing:**
-- A_L0 (A at 0 ticks with commission) was not run. The 172-trade reference is A at 0 ticks *without* commission.
-  Commission may flip a near-zero trade, and with it the bot's loser count, so the reference minus $1,151.40 is only
-  an estimate.
-- All Trades exports and Outputs.
+**Missing:** all Trades exports and Outputs.
 
 | Run | Positions | Net after commission | Commission | Profit factor | Max drawdown (NT, closed) | Longest losing streak | Long / short net |
 |---|---:|---:|---:|---:|---:|---:|---|
+| A_L0 | 171 | $10,022.70 | $1,143.80 | 1.48 | $4,742.10 | 10 | $7,885.90 / $2,136.80 |
 | A_L1 | 170 | $9,656.80 | $1,136.20 | 1.46 | $4,829.60 | 10 | $7,693.00 / $1,963.80 |
 | A_L2 | 170 | $9,350.80 | $1,136.20 | 1.44 | $4,918.60 | 10 | $7,560.00 / $1,790.80 |
 | B_L0 | 119 | $13,175.60 | $904.40 | 2.27 | $2,736.80 | 6 | $7,144.80 / $6,030.80 |
 | B_L1 | 118 | $12,889.20 | $896.80 | 2.23 | $2,808.80 | 6 | $6,992.40 / $5,896.80 |
 | B_L2 | 118 | $12,663.20 | $896.80 | 2.19 | $2,882.80 | 6 | $6,900.40 / $5,762.80 |
 
-**At 1 tick, B against A** (both executed):
-- net +$3,232.40;
-- drawdown $2,021 lower;
-- losing streak 6 against 10;
-- 52 fewer positions.
+**B against A, both executed, same costs:**
 
-At 2 ticks: net +$3,312.40, drawdown $2,036 lower. **B's lead held over the longer native period.**
+| Slippage | Net (B − A) | Drawdown (B against A) | Losing streak (B / A) |
+|---|---:|---|---|
+| 0 ticks | +$3,152.90 | $2,005 lower | 6 / 10 |
+| 1 tick | +$3,232.40 | $2,021 lower | 6 / 10 |
+| 2 ticks | +$3,312.40 | $2,036 lower | 6 / 10 |
 
-**B is not exactly A's momentum trades over this period:**
-- B_L0's longs are A's momentum longs exactly: 52 trades, $7,540.00 before costs.
-- B_L0's shorts are 67 trades and $6,540.00 against A's (the reference's) 68 and $6,340.00. **One momentum short of
-  −$200 that A took, B did not.**
-- So the breakout changed a momentum entry at least once over this period, unlike in the October window.
-- The likeliest trades are the reference's 7/7 and 7/24 10:01 shorts. Both entered in the same minute a breakout
-  short was closed ("Breakout: bot first").
-- The mechanism is not established. The two Trades exports (A and B) settle it. A momentum change caused by the
-  breakout is an interaction to fix, not a reason to prefer B.
+**B's lead held over the longer native period.**
+
+**B is A's momentum trades, here too** (from the summaries; the Trades exports confirm it trade by trade):
+- B_L0's longs are A_L0's momentum longs: 52 trades, $7,540.00 before costs.
+- A_L0's 77 longs are those 52 plus the reference's 25 breakout longs (+$866.50). Their total, $8,406.50 before
+  costs, equals A_L0's long side.
+- B_L0's shorts, 67 trades and $6,540.00 before costs, are A_L0's shorts without the 27 breakout shorts (−$3,780.00).
+  Again they equal A_L0's short side, $2,760.00.
+
+**Why A_L0 is not the 172-trade reference less commission:**
+- The reference ran without commission. A_L0 has 171 trades, one momentum short of −$200 fewer.
+- The bot's daily loser limit counts its positions after commission (the account's actual result). With commission on,
+  a near-zero trade became a loser, the day reached its 3-loser limit sooner, and one later short (−$200) was not
+  taken.
+- B, also with commission, has the same 67 momentum shorts.
+
+An earlier version of this section read the difference as the breakout changing a momentum trade. That was wrong: it
+compared B, with commission, against the reference, without it.
 
 **Slippage:**
-- B loses $286 from 0 to 1 tick and $226 more to 2 ticks.
-- A loses $306 from 1 to 2 ticks.
-- Over 1 to 2 ticks, at 1 tick B_L1 has one trade fewer than B_L0: a changed fill changed a later opportunity.
+- A loses $366 from 0 to 1 tick and $306 more to 2 ticks.
+- B loses $286 and then $226.
+- At 1 tick B_L1 has one trade fewer than B_L0: a changed fill changed a later opportunity.
 - NinjaTrader mostly leaves stops unslipped (section 4b), so these understate live costs.
 
 **Not yet possible without the Trades exports:**
