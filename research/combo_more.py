@@ -41,6 +41,7 @@ import fast_payout as F  # noqa: E402
 import trap_reversal as T  # noqa: E402
 
 MAXQ, BOTQ = 10, 4
+FORCE_ONE = True  # one contract when it costs 1-1.5x the risk (the strategy); False: skip (round 139)
 SETUPS = ("round 101", "together", "reverse", "both")
 
 
@@ -68,7 +69,7 @@ def w_candidates(bars, reverse, mgmt=None):
         dist = C.S * rng
         q = math.floor(C.RISK / (dist * C.PV))
         if q < 1:
-            if dist * C.PV > 1.5 * C.RISK:
+            if dist * C.PV > 1.5 * C.RISK or not FORCE_ONE:
                 continue
             q = 1
         q = min(q, MAXQ)
