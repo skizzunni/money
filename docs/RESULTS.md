@@ -2262,6 +2262,30 @@ funded account; 26 weeks: $191 / $219, $117 / $146, $65 / $88, $100 / $118.)
 - **Fees decide the newest window.** At $65-101 a slot's payouts only just cover a promotional evaluation price; at
   Apex's quoted list prices for the intraday 50K ($118-249, third-party) the newest 13 months lose money.
 
+## Round one hundred and thirty-three: the evaluation's and the funded account's size, judged as money a week
+
+`research/slot_size.py`. The sizes were chosen per evaluation; per week, passing faster matters. 52 weeks from every
+start, the payout stop on, net $ a week per slot after $100 an evaluation and $79 an activation (pick: the best on
+2011-18; adopted if more on 2019-25 and NQ and no less in the newest 13 months):
+
+| Evaluation / funded | 2011-18 | 2019-25 | Jul 2025-Aug 2026 (63 starts) | NQ 2015-24 |
+|---|---|---|---|---|
+| 4 MNQ, 3 losers / 4 MNQ (now) | $59 | $39 | $0 | $25 |
+| 5 MNQ, 3 losers / 4 MNQ | $65 | $52 | $2 | $32 |
+| 6 MNQ, 2 losers / 4 MNQ | $70 | $62 | -$1 | $31 |
+| 6 MNQ, 3 losers / 4 MNQ | $67 | $58 | $15 | $31 |
+| 8 MNQ, 3 losers / 4 MNQ (pick) | $75 | $51 | -$12 | $33 |
+| 4 MNQ, 3 losers / 3 MNQ | $70 | $35 | -$6 | $38 |
+| 4 MNQ, 3 losers / 5 or 6 MNQ | $59 / $47 | $27 / $19 | -$4 | $9 / -$4 |
+
+**Not adopted** by the bar fixed before running: the pick, 8 MNQ, loses in the newest 13 months. But every bigger
+evaluation (5, 6 and 8 MNQ, either loser limit) nets more than 4 MNQ in all three long periods, and 6 MNQ / 3 losers
+nets more in all four; it was not the pick, so it is not made the default after the fact. It is one setting away:
+**Contracts in an evaluation** 6 and **Evaluation: max loss per trade** $300 (the research keeps the 25-point cap a
+contract; at $200 and 6 MNQ the cap would be 16.7 points, which was not tested). Bigger on the funded account nets
+less everywhere but NQ: 4 MNQ stays. The newest window has only 63 starts that fit 52 weeks, so its numbers move a lot
+with one outcome (most setups there show the same $28.8 a week paid: one funded account's payouts).
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
@@ -2387,6 +2411,7 @@ python research/bold_finish.py nsx1m_scaled.pkl nq1m_scaled.pkl       # bolder n
 python research/w_bracket.py nsx1m_scaled.pkl nq1m_scaled.pkl         # a take-profit for the breakout (8 stops)
 python research/w_lock_target.py nsx1m_scaled.pkl nq1m_scaled.pkl     # the breakout's lock for more winners (no)
 python research/accounts_needed.py nsx1m_scaled.pkl nq1m_scaled.pkl 260 # $ a week per account slot (payout stop on)
+python research/slot_size.py nsx1m_scaled.pkl nq1m_scaled.pkl          # sizes judged per week (6 MNQ eval: setting, not default)
 ```
 
 The raw data isn't stored in this repo.

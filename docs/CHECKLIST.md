@@ -2,7 +2,7 @@
 
 Every requirement from the conversation, its status and the evidence. Status: **done** (verified), **partly**
 (improved, the stated goal not reached), **not met** (with why and what would change it), **open** (being worked on),
-**blocked** (needs something only the user can do). Last updated: October 18, 2026 (rounds through 132).
+**blocked** (needs something only the user can do). Last updated: October 18, 2026 (rounds through 133).
 
 ## The account and its rules
 
@@ -45,10 +45,12 @@ Every requirement from the conversation, its status and the evidence. Status: **
    day (found while adding the file: before, the balance read too high until the payout left, and once it left, the
    new cycle started with a loss the size of the payout, which held the payout stop back).
 2. Re-check the overnight 18:00-02:00 long as more real nights come in (passed 2011-25, lost in 2025-26).
-3. Evaluation price: on the newest 13 months a slot's payouts cover an evaluation only up to $65-101 (round 132);
+3. Evaluation size per week (round 133): 6 MNQ / 3 losers / $300 netted more in all four periods but wasn't the
+   pre-registered pick; re-test it as new real weeks come in before making it the default.
+4. Evaluation price: on the newest 13 months a slot's payouts cover an evaluation only up to $65-101 (round 132);
    buy evaluations at promotional prices, not list.
-4. Allow `apextraderfunding.com` (user) so the rules above can be read at the source.
-5. A Playback run in NinjaTrader with Place orders off: check the alerts arrive and match the chart.
+5. Allow `apextraderfunding.com` (user) so the rules above can be read at the source.
+6. A Playback run in NinjaTrader with Place orders off: check the alerts arrive and match the chart.
 
 ## Failed approaches (and why), so they are not repeated
 
