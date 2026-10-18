@@ -404,6 +404,83 @@ compared B, with commission, against the reference, without it.
 - These 77 sessions are one stretch of one year.
 - **B leads on all native MNQ evidence so far. It is still a candidate, not an established strategy.**
 
+## 4e. A vs B, 6/29 to 10/16, rebuilt from the fills - executed (user's NinjaTrader runs; analysis here)
+
+**Source:** the Output the user saved at 3:53 PM. It holds every run of the day in sequence
+(`verification/native_long/ninjascript_output_all_runs.txt`).
+- Each longer run was rebuilt from its own execution lines (`research/native_long.py`, output in
+  `verification/native_long/analysis.txt`, trades in `*_trades_from_output.csv`).
+- Each was matched to its summary to the cent, at $1.90 a contract.
+
+**Switches and warm-up, confirmed from each run's own settings and funnel lines:**
+- A: UseBreakout True. B: UseBreakout False.
+- All six: engine ready 5/21 16:00.
+- First entry 6/29 10:12 (A) and 13:31 (B); last exit 10/16 13:34.
+- No rejection, no runtime error.
+
+**B is exactly A's momentum trades, trade by trade:**
+- 119 of 119 at 0 ticks, and 118 of 118 at 1 and 2 ticks.
+- Same entry and exit times, prices and contracts.
+- Removing the breakout changed no momentum trade in this period. B − A is exactly the breakout's own result.
+
+| After $1.90 / contract | A_L0 | A_L1 | A_L2 | B_L0 | B_L1 | B_L2 |
+|---|---:|---:|---:|---:|---:|---:|
+| Positions / contracts | 171 / 602 | 170 / 598 | 170 / 598 | 119 / 476 | 118 / 472 | 118 / 472 |
+| Net | $10,022.70 | $9,656.80 | $9,350.80 | $13,175.60 | $12,889.20 | $12,663.20 |
+| Profit factor | 1.5 | 1.5 | 1.4 | 2.3 | 2.2 | 2.2 |
+| Avg win / avg loss | $368 / −$240 | $370 / −$242 | $368 / −$244 | $351 / −$199 | $355 / −$202 | $353 / −$204 |
+| Closed-trade drawdown | $4,742.10 | $4,829.60 | $4,918.60 | $2,736.80 | $2,808.80 | $2,882.80 |
+| Longest losing streak | 10 | 10 | 10 | 6 | 6 | 6 |
+| Worst day | −$920.60 | −$927.60 | −$934.60 | −$622.80 | −$628.80 | −$634.80 |
+| Losing days / days traded | 38 / 62 | 38 / 62 | 38 / 62 | 15 / 35 | 16 / 35 | 16 / 35 |
+| Largest 5 winners' share of net | 109% | 113% | 117% | 75% | 76% | 77% |
+| Without 6/29 (retrospective): net | $10,420.40 | $10,059.00 | $9,759.50 | $13,358.40 | $13,076.00 | $12,856.00 |
+
+**Monthly** (net, 0 ticks; the 1- and 2-tick runs move each month by under $180):
+
+| Month | A | B | B − A (= −breakout) |
+|---|---:|---:|---:|
+| June (6/29-30) | $1,135.50 | $1,350.40 | +$214.90 |
+| July | −$4,101.00 | −$1,918.00 | +$2,183.00 |
+| August | $4,003.80 | $3,360.40 | −$643.40 |
+| September | $6,501.60 | $5,698.80 | −$802.80 |
+| October (1-16) | $2,482.80 | $4,684.00 | +$2,201.20 |
+
+**What the breakout did over these 77 sessions:**
+- Components (0 ticks, net): breakout longs +$741.10 over 25 trades; breakout shorts −$3,894.00 over 27.
+- Net −$3,152.90 over 52 trades.
+- **It helped in August and September and lost in July and October.** B's lead comes from two months, not every
+  month.
+- It did not interfere with momentum entries.
+- It added drawdown: A's drawdown is $2,005 larger, its losing streak 4 longer, its worst day $298 worse.
+
+**July** (net, 0 ticks):
+- A lost $4,101.00: momentum shorts −$1,918.80, momentum longs +$0.80, breakout longs −$811.30, breakout shorts
+  −$1,371.70.
+- B lost $1,918.00: the momentum shorts.
+- **July's momentum loss is in B too.** Removing the breakout halves July's loss; it does not remove it.
+
+**Concentration:** B's five largest winners are 75% of its net. A's are 109%: the rest of A's trades together lost
+money. B is less dependent on a few trades, but still depends on them.
+
+**Not available from these files:**
+- **Intraday account risk.** Each trade's MAE (the Trades export) or the bars are needed; the Output has fills only.
+- **The evaluation replay at intraday resolution,** for the same reason. A replay on closed trades only would
+  understate failures of an intraday-trailing evaluation, so it is not offered as the answer.
+
+**Status:**
+- **B leads A over all native MNQ evidence** (10/1-16 and 6/29-10/16), at 0, 1 and 2 ticks, on net, drawdown,
+  losing streak and worst day.
+- **It remains the leading candidate, not an established strategy:**
+  - one stretch of 77 sessions;
+  - B's lead comes from two of five months;
+  - on ten years of rescaled NQ in the stand-in the breakout added money.
+- Next: the forward simulation (docs/NATIVE_RUNS.md section 8). The Trades exports, if available, add the intraday
+  view first.
+
+**Also in the Output, outside this comparison:** one C run (shorts off) that loaded 57,719 bars (from about 8/20). It
+was ready 9/9 16:00 and made 58 trades from 9/10, net $12,369.80. It has no summary file and is not used here.
+
 ## 5. Not started (brief steps 5-11) - proposed
 
 The following were not started; the brief asked for sections 1-4 first:
