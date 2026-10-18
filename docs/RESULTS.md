@@ -2020,6 +2020,22 @@ first version over 3 3/4 years (the second round, S2b). Bar: more $ a week, pass
 A little safer (more passes and fewer busts on the three main sets), but $28 a week less in 2019-25 and less paid per
 evaluation there, and fewer passes in the newest 13 months. **Not adopted.**
 
+## Round one hundred and seventeen: the breakout's shorts
+
+Longs against shorts, $ a trade as the strategy trades them: the breakout +24.1 / +8.5 (2011-18), +16.6 / +15.1
+(2019-25), +14.2 / -4.1 (July 2025-2026), +28.7 / +5.3 (NQ); the bot +28.9 / +30.5, +42.2 / +19.1, +26.8 / +33.5,
++39.6 / +14.2. Only the breakout's gap shows in 2011-18, so only the breakout is changed (`research/w_long.py`;
+adopted if pass rate and payouts no lower and one higher on 2019-25 and NQ):
+
+| | Pass %, 2019-25 / NQ | Paid per evaluation | Red days |
+|---|---|---|---|
+| Now | 21.7 / 22.7 | $727 / $690 | 49% / 50% |
+| Breakout shorts at half risk | 20.7 / 22.8 | $663 / $656 | 49% / 50% |
+| No breakout shorts | 20.9 / 22.7 | $609 / $576 | 41% / 41% |
+
+Dropping the shorts cuts red days by eight points but pays less. (Half risk barely changes anything: most breakout
+trades are 1 MNQ already.) **Not adopted.**
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
@@ -2129,6 +2145,7 @@ python research/day_giveback.py nsx1m_scaled.pkl nq1m_scaled.pkl      # a daily 
 python research/overnight_early.py nsx1m_scaled.pkl nq1m_scaled.pkl   # overnight 18:00-02:00 (passes; recent data no)
 python research/cushion_size.py nsx1m_scaled.pkl nq1m_scaled.pkl      # smaller size on a thin cushion (no)
 python research/vwap_stop.py nsx1m_scaled.pkl nq1m_scaled.pkl         # the paper's VWAP trailing stop (no)
+python research/w_long.py nsx1m_scaled.pkl nq1m_scaled.pkl            # the breakout's shorts smaller or dropped (no)
 ```
 
 The raw data isn't stored in this repo.
