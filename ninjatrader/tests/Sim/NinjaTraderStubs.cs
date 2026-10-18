@@ -170,7 +170,8 @@ namespace NinjaTrader.NinjaScript.Strategies
     {
         public int Direction, EntryBar, ExitBar;
         public double Entry, Exit, Pnl;
-        public string ExitName;
+        public string ExitName, EntryName;
+        public int Qty;
     }
 
     public class Strategy : NinjaScriptBase
@@ -222,6 +223,8 @@ namespace NinjaTrader.NinjaScript.Strategies
         public string RejectStopsAt { get; set; }  // "bar,bar,...": the broker rejects a stop change on these bars
         public string RejectExitsAt { get; set; }  // "bar,bar,...": the broker rejects a market exit sent on these bars
         public int SlippageTicks = 1;
+        public int SimSlippageTicks { get { return SlippageTicks; } set { SlippageTicks = value; } }  // ticks a market fill
+        public double SimCommissionPerSide { get { return CommissionPerSide; } set { CommissionPerSide = value; } }
         public readonly List<SimTrade> SimTrades = new List<SimTrade>();
         public readonly List<string> OrderLog = new List<string>();
         readonly Dictionary<string, double> stops = new Dictionary<string, double>();
@@ -334,6 +337,8 @@ namespace NinjaTrader.NinjaScript.Strategies
             SimTrade t = new SimTrade();
             t.Direction = d; t.EntryBar = entryBar; t.Entry = Position.AveragePrice; t.ExitBar = i; t.Exit = price;
             t.ExitName = why;
+            t.EntryName = posName;
+            t.Qty = Position.Quantity;
             t.Pnl = d * (price - t.Entry) * Position.Quantity * Instrument.MasterInstrument.PointValue -
                     2 * CommissionPerSide * Position.Quantity;
             SimTrades.Add(t);

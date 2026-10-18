@@ -1,0 +1,284 @@
+diff --git a/ninjatrader/AddOns/MnqNoiseEngine.cs b/ninjatrader/AddOns/MnqNoiseEngine.cs
+index cc77a0b..073bf41 100644
+--- a/ninjatrader/AddOns/MnqNoiseEngine.cs
++++ b/ninjatrader/AddOns/MnqNoiseEngine.cs
+@@ -30,6 +30,7 @@ namespace NinjaTrader.NinjaScript.AddOns.MnqBot
+         public double LockAt = 1.0;          // in max losses of profit; then the stop moves to entry + LockPlus
+         public double LockPlus = 2.5;        // points
+         public int MaxLosers = 4;            // no new entries after this many losers today; 0 = no limit
++        public bool TightenOnly = false;     // in a trade the stop never moves back toward the price (round 139)
+     }
+ 
+     public sealed class NoiseTrade
+@@ -79,6 +80,8 @@ namespace NinjaTrader.NinjaScript.AddOns.MnqBot
+         double dayOpen = double.NaN, prevClose = double.NaN, lastRthClose = double.NaN;
+         int pendingKind, pendingDir;  // pendingKind 1: entry in pendingDir, 2: close; filled at the next bar's open
+         double estPx = double.NaN;
++        double held = double.NaN;     // TightenOnly: the stop so far in this trade, and what set it
++        string heldWhy = "";
+ 
+         public readonly List<NoiseTrade> Trades = new List<NoiseTrade>();
+         public readonly List<NoiseEvent> Events = new List<NoiseEvent>();
+@@ -152,6 +155,11 @@ namespace NinjaTrader.NinjaScript.AddOns.MnqBot
+                 double lk = EntryPrice + p * s.LockPlus;
+                 if ((p > 0 && lk > line) || (p < 0 && lk < line)) { line = lk; reason = "Lock"; }
+             }
++            if (s.TightenOnly && !double.IsNaN(held) && ((p > 0 && held > line) || (p < 0 && held < line)))
++            {
++                line = held;
++                reason = heldWhy;
++            }
+             return line;
+         }
+ 
+@@ -216,6 +224,8 @@ namespace NinjaTrader.NinjaScript.AddOns.MnqBot
+             DayTrades++;
+             Position = 0;
+             Locked = false;
++            held = double.NaN;
++            heldWhy = "";
+         }
+ 
+         void Event(int i, string action)
+@@ -267,6 +277,16 @@ namespace NinjaTrader.NinjaScript.AddOns.MnqBot
+                     double lk = EntryPrice + p * s.LockPlus;
+                     if ((p > 0 && lk > line) || (p < 0 && lk < line)) { line = lk; reason = "Lock"; }
+                 }
++                if (s.TightenOnly)  // the stop placed with the entry is only ever tightened
++                {
++                    if (EntryBar != i && !double.IsNaN(held) && ((p > 0 && held > line) || (p < 0 && held < line)))
++                    {
++                        line = held;
++                        reason = heldWhy;
++                    }
++                    held = line;
++                    heldWhy = reason;
++                }
+                 bool hit;
+                 double price;
+                 if (EntryBar == i)  // a stop attached to the entry can fill on the fill bar itself
+diff --git a/ninjatrader/Strategies/MnqNoiseMomentum.cs b/ninjatrader/Strategies/MnqNoiseMomentum.cs
+index 51acd5a..4cb6b89 100644
+--- a/ninjatrader/Strategies/MnqNoiseMomentum.cs
++++ b/ninjatrader/Strategies/MnqNoiseMomentum.cs
+@@ -53,6 +53,9 @@ namespace NinjaTrader.NinjaScript.Strategies
+         bool badChart;
+         bool realLocked;            // the real position reached the lock trigger
+         bool closingRejected;       // a rejection already sent the position to market
++        bool exitRejected;          // one of the strategy's own exits was rejected: sent again at the next bar
++        double lastStop = double.NaN;  // TightenOnly: the bot's stop so far in this trade
++        double entryStopPts = double.NaN;  // the bot's bracket stop, points from the fill
+         bool evalDone;              // the evaluation's target was reached: everything closed, no new trades
+         double profitBase;          // the strategy's closed P/L when it went live (the history before doesn't count)
+         const double EvalBuffer = 25.0;  // $ past the target, for the closing fees and a tick
+@@ -74,6 +77,8 @@ namespace NinjaTrader.NinjaScript.Strategies
+         double lastLiq = double.NaN;     // the account at the bar before (a payout leaving it shows as a drop)
+         double pendingPayout;            // asked for, not yet seen leaving the account: not in the balance
+         bool cycleLoaded, cycleFromFile, saveFailed;
++        bool botSent, wSent;             // this bar, the entry order really went to the account
++        string notSent = "";            // why an entry signal wasn't sent this bar
+         int mismatchBars;                // bar closes in a row with the account's position not the strategy's
+         static readonly double[] PayoutCaps = { 1500, 1500, 2000, 2500, 2500, 3000 };
+         DateTime evalStart = DateTime.MinValue;
+@@ -94,7 +99,10 @@ namespace NinjaTrader.NinjaScript.Strategies
+                 // NinjaTrader's default: a stop and a target for each fill. With "by strategy position", Playback showed the
+                 // target for 3 contracts on a 4-contract position (the entry filled in parts)
+                 StopTargetHandling = StopTargetHandling.PerEntryExecution;
+-                IsExitOnSessionCloseStrategy = false;  // the strategy closes at 16:00 New York itself
++                // the strategy closes at 16:00 New York itself; NinjaTrader's own exit 60 s before the session's end (its
++                // trading-hours template, holidays and early closes included) is the backstop if no bar comes to do it
++                IsExitOnSessionCloseStrategy = true;
++                ExitOnSessionCloseSeconds = 60;
+                 BarsRequiredToTrade = 0;               // the engine waits for its own 14 sessions
+                 StartBehavior = StartBehavior.WaitUntilFlat;
+                 RealtimeErrorHandling = RealtimeErrorHandling.IgnoreAllErrors;  // OnOrderUpdate flattens on a rejected stop
+@@ -142,6 +150,7 @@ namespace NinjaTrader.NinjaScript.Strategies
+                 FundedBestDay = 0;
+                 PayoutStopInHistory = false;
+                 RememberPayoutCycle = true;
++                TightenOnly = true;    // the stop never moves back toward the price (docs/RESULTS.md round 139)
+                 BreakoutTarget = 8;    // 8 x its stop = 2 x yesterday's range: a full bracket (docs/RESULTS.md round 130)
+                 AccountStart = 50000;
+ 
+@@ -167,6 +176,7 @@ namespace NinjaTrader.NinjaScript.Strategies
+                 settings.LockAt = LockAt;
+                 settings.LockPlus = LockPlus;
+                 settings.MaxLosers = MaxLosers;
++                settings.TightenOnly = TightenOnly;
+                 settings.Lookback = Lookback;
+                 settings.FedNoShorts = FedNoShorts;
+                 settings.SkipDates = SkipDates ?? "";
+@@ -512,8 +522,8 @@ namespace NinjaTrader.NinjaScript.Strategies
+ 
+         // Live: the account's own position in MNQ against the strategy's. They differ after a restart with a position
+         // left open (NinjaTrader cancels a disabled strategy's stop and target), a trade placed by hand, or a fill the
+-        // strategy missed. Two bar closes in a row apart: a loud alert and no new entries (no doubling up) until they
+-        // agree again; the strategy's own position, if any, is still managed.
++        // strategy missed. Apart at a bar close: no new entries (no doubling up) until they agree again; apart at two
++        // in a row: a loud alert. The strategy's own position, if any, is still managed.
+         bool EntriesBlocked()
+         {
+             if (State != State.Realtime || PositionAccount == null)
+@@ -526,11 +536,11 @@ namespace NinjaTrader.NinjaScript.Strategies
+                 mismatchBars = 0;
+                 return false;
+             }
+-            mismatchBars++;
++            mismatchBars++;  // entries are blocked from the first bar apart; the alert waits for the second
+             if (mismatchBars == 2)
+                 Say("account", "ACCOUNT POSITION MISMATCH: the account holds " + acct + " MNQ, the strategy " + mine +
+                     ". No new entries until they agree. If the account's position has no stop, close it or protect it NOW.");
+-            return mismatchBars >= 2;
++            return true;
+         }
+ 
+         static int Signed(Position p)
+@@ -541,11 +551,24 @@ namespace NinjaTrader.NinjaScript.Strategies
+         {
+             int real = RealDir;
+             bool blocked = EntriesBlocked();
++            botSent = wSent = false;
++            notSent = blocked ? "the account's position isn't the strategy's" : "";
+             if (real == 0)
+             {
+                 realLocked = false;
+                 closingRejected = false;
++                exitRejected = false;
+                 owner = Nobody;
++                lastStop = double.NaN;
++            }
++            else if (exitRejected)
++            {
++                // an exit was rejected: never left there, the position is sent to market again at every bar until flat
++                exitRejected = false;
++                Say("retry", "EXIT REJECTED, SENT AGAIN: closing the " + (real > 0 ? "long" : "short") + " at market. " +
++                    "If this repeats, close it by hand.");
++                Flatten(real, "Close: retry");
++                return;
+             }
+ 
+             // 16:00 New York, or a bar outside 09:30-16:00 (a session that ended early): any position is closed at
+@@ -561,6 +584,7 @@ namespace NinjaTrader.NinjaScript.Strategies
+             // the funded account's payout day (round 128): flat, no more trades today
+             if (payoutToday)
+             {
++                notSent = "today is a payout day";
+                 if (real != 0)
+                     Flatten(real, "Payout-eligible");
+                 return;
+@@ -583,7 +607,10 @@ namespace NinjaTrader.NinjaScript.Strategies
+                     return;
+                 }
+                 if (evalDone)
++                {
++                    notSent = "the evaluation's target is reached";
+                     return;
++                }
+             }
+ 
+             // a new entry: the bracket goes in first, so it is attached the moment the entry fills. It is set in ticks
+@@ -601,6 +628,8 @@ namespace NinjaTrader.NinjaScript.Strategies
+                     else ExitShort("Breakout: bot first", WShortName);
+                 }
+                 SetStopLoss(name, CalculationMode.Ticks, StopTicks(o.Direction * (o.Expected - o.Stop)), false);
++                entryStopPts = StopTicks(o.Direction * (o.Expected - o.Stop)) * TickSize;
++                lastStop = double.NaN;
+                 double tpPts = double.IsNaN(o.Target) ? double.NaN : o.Direction * (o.Target - o.Expected);
+                 double evalPts = EvalPoints(BotQty);
+                 if (!double.IsNaN(evalPts) && (double.IsNaN(tpPts) || evalPts < tpPts))
+@@ -611,6 +640,7 @@ namespace NinjaTrader.NinjaScript.Strategies
+                     EnterLong(BotQty, LongName);
+                 else
+                     EnterShort(BotQty, ShortName);
++                botSent = true;
+                 owner = Bot;
+                 realLocked = false;
+                 closingRejected = false;
+@@ -634,6 +664,7 @@ namespace NinjaTrader.NinjaScript.Strategies
+                     EnterLong(wq, wname);
+                 else
+                     EnterShort(wq, wname);
++                wSent = true;
+                 owner = Breakout;
+                 return;
+             }
+@@ -667,6 +698,14 @@ namespace NinjaTrader.NinjaScript.Strategies
+             if (double.IsNaN(stop))
+                 return;
+             stop = RoundStop(real, stop);
++            if (TightenOnly)  // never back toward the price: the tighter of this and the stop it already had
++            {
++                if (double.IsNaN(lastStop) && !double.IsNaN(entryStopPts))
++                    lastStop = avg - real * entryStopPts;  // the bracket sent with the entry
++                if (!double.IsNaN(lastStop) && ((real > 0 && lastStop > stop) || (real < 0 && lastStop < stop)))
++                    stop = lastStop;
++                lastStop = stop;
++            }
+             double px = Close[0];
+             if (State == State.Realtime)
+                 px = real > 0 ? Math.Min(px, GetCurrentBid()) : Math.Max(px, GetCurrentAsk());
+@@ -762,6 +801,12 @@ namespace NinjaTrader.NinjaScript.Strategies
+                 return;
+             string msg = "ORDER REJECTED: " + order.Name + " (" + comment + ").";
+             int real = RealDir;
++            if (real != 0 && IsOwnExit(order.Name))
++            {
++                exitRejected = true;  // ManageOrders sends it again at the next bar
++                Say("rejected", msg + " The exit is sent again at the next bar.");
++                return;
++            }
+             if (real != 0 && !closingRejected && order.Name != "Flat 16:00" && order.Name != "Stop passed" &&
+                 order.Name != "Close: rejected")
+             {
+@@ -776,7 +821,22 @@ namespace NinjaTrader.NinjaScript.Strategies
+             Say("rejected", msg);
+         }
+ 
++        static bool IsOwnExit(string name)
++        {
++            return name == "Close: rejected" || name == "Close: retry" || name == "Flat 16:00" || name == "Stop passed" ||
++                   name == "Evaluation target" || name == "Payout-eligible" || name == "Breakout: bot first";
++        }
++
+         // ── Alerts and dashboard
++
++        // what happened to an entry signal with orders on: sent to the account (the fill shows in the Orders and
++        // Executions tabs), or not sent and why
++        string Sent(bool sent)
++        {
++            if (sent)
++                return ". The strategy sent the order.";
++            return ". NOT sent by the strategy: " + (notSent.Length > 0 ? notSent : "it already holds a position") + ".";
++        }
+         void Tell(int nTrades, int nOrders, int nHeads)
+         {
+             for (int k = nOrders; k < engine.Orders.Count; k++)
+@@ -799,7 +859,7 @@ namespace NinjaTrader.NinjaScript.Strategies
+                 Say("entry", first + side + " " + BotQty + " MNQ (" + Book + ") at market. Price " + P(Close[0]) + ". Stop " +
+                     P(RoundStop(o.Direction, o.Stop)) + (double.IsNaN(o.Target) ? "" : ", take-profit " +
+                     P(RoundTarget(o.Direction, o.Target))) + be +
+-                    (PlaceOrders ? ". The strategy placed it." : ". Place it now (orders are off) with that stop and take-profit."));
++                    (PlaceOrders ? Sent(botSent) : ". Place it now (orders are off) with that stop and take-profit."));
+                 saidStop = RoundStop(o.Direction, o.Stop);
+                 saidTarget = double.IsNaN(o.Target) ? double.NaN : RoundTarget(o.Direction, o.Target);
+             }
+@@ -828,7 +888,7 @@ namespace NinjaTrader.NinjaScript.Strategies
+                 Say("breakout", "BREAKOUT " + side + " " + BreakoutQty + " MNQ (" + Book + ") at market. Price " + P(Close[0]) +
+                     " is past " + P(d > 0 ? williams.Up : williams.Down) + ". Stop " + P(st) + " (" + P(williams.StopPoints) +
+                     " points from the fill)" + (double.IsNaN(tp) ? "" : ", take-profit " + P(tp)) + ", out at 16:00" +
+-                    (PlaceOrders ? ". The strategy placed it." :
++                    (PlaceOrders ? Sent(wSent) :
+                      ". Place it now (orders are off) with that stop and take-profit; close it if the bot signals."));
+                 if (!PlaceOrders)
+                 {
+@@ -1219,6 +1279,10 @@ namespace NinjaTrader.NinjaScript.Strategies
+         [Display(Name = "Funded: best day since the last payout, $", Order = 19, GroupName = "1. Account")]
+         public double FundedBestDay { get; set; }
+ 
++        [NinjaScriptProperty]
++        [Display(Name = "Stop only ever tightens (never moves back toward the price; round 139)", Order = 21, GroupName = "1. Account")]
++        public bool TightenOnly { get; set; }
++
+         [NinjaScriptProperty]
+         [Display(Name = "Funded: remember the payout cycle in a file (a restart goes on from it; new settings above replace it)", Order = 20, GroupName = "1. Account")]
+         public bool RememberPayoutCycle { get; set; }

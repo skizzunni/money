@@ -44,6 +44,8 @@ static class Program
         });
         foreach (SimTrade x in s.SimTrades)
             Console.WriteLine(string.Join(",", "T", x.Direction, x.EntryBar, F(x.Entry), x.ExitBar, F(x.Exit), x.ExitName, F(x.Pnl)));
+        foreach (SimTrade x in s.SimTrades)  // the same trades: which entry, how many contracts
+            Console.WriteLine(string.Join(",", "TN", x.EntryName, x.Qty));
         foreach (string x in s.OrderLog)
             Console.WriteLine("O," + x);
         string d;
