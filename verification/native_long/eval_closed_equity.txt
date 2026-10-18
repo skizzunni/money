@@ -1,0 +1,4 @@
+B_L1 4 MNQ / $200: 56 start dates 2026-06-29..2026-09-17 (overlapping): pass 34, fail 5, expired 17; median days to pass 14.5, to fail 28.0
+B_L1 2 MNQ / $100: 56 start dates 2026-06-29..2026-09-17 (overlapping): pass 12, fail 0, expired 44; median days to pass 20.5, to fail nan
+B_L2 4 MNQ / $200: 56 start dates 2026-06-29..2026-09-17 (overlapping): pass 34, fail 6, expired 16; median days to pass 14.5, to fail 27.5
+B_L2 2 MNQ / $100: 56 start dates 2026-06-29..2026-09-17 (overlapping): pass 12, fail 0, expired 44; median days to pass 20.5, to fail nan
