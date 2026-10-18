@@ -2063,6 +2063,22 @@ data has no post-16:00 bars from 2019, so its main later test can't be run. Fadi
 positive in 2019-26 (t 1.69) and the newest months (t 2.58) but not before (t -2.13 in 2011-18 for the long side, 0.68
 on NQ): not stable.
 
+## Round one hundred and twenty: a breakout of the overnight range
+
+`research/overnight_range.py`: the strategy's breakout with the overnight session's high and low (18:00-09:29) as its
+levels instead of the open +/- half of yesterday's range (only when the open is inside the overnight range); stop,
+size and exit unchanged. One test; bar: t >= 2 on 2011-18, 2019-26 and NQ, positive in the newest 13 months.
+
+| | Trades a year | $ a trade | Winners | t | Correlation with the breakout (days both trade) |
+|---|---|---|---|---|---|
+| 2011-18 | 201 | +22.5 | 32% | 2.56 | 0.63 |
+| 2019-26 | 167 | +22.3 | 31% | 2.08 | 0.54 |
+| July 2025-Sep 2026 | 191 | -9.3 | 28% | -0.43 | 0.35 |
+| NQ 2015-25 | 180 | +30.7 | 32% | 3.42 | 0.64 |
+
+Clears the three main stages but loses in the newest 13 months, and it is largely the same trade as the breakout
+already in the strategy (correlation 0.54-0.64): not the independent source the account needs. **Does not count.**
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
@@ -2175,6 +2191,7 @@ python research/vwap_stop.py nsx1m_scaled.pkl nq1m_scaled.pkl         # the pape
 python research/w_long.py nsx1m_scaled.pkl nq1m_scaled.pkl            # the breakout's shorts smaller or dropped (no)
 python research/touch_size.py nsx1m_scaled.pkl nq1m_scaled.pkl        # smaller bot trades before a breakout touch (no)
 python research/edge_hours.py nsx1m_scaled.pkl nq1m_scaled.pkl        # after the close, before the open (nothing)
+python research/overnight_range.py nsx1m_scaled.pkl nq1m_scaled.pkl   # a breakout of the overnight range (no)
 ```
 
 The raw data isn't stored in this repo.
