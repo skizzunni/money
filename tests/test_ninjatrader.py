@@ -938,3 +938,22 @@ def test_account_position_guard(sim, tmp_path):
         later = [int(o[0]) for o in orders if o[1] == "Enter" and int(o[0]) >= g]
         assert later, "entries resume once the account and the strategy agree"
         assert "MISMATCH" not in dash
+
+
+def test_payout_cycle_alerts_only(sim, tmp_path, payout_case):
+    """Orders off (you click): the same payout days as with orders on, each alert telling you to close everything,
+    and a restart going on from the file the same way."""
+    bars, liq, withdraw, want, end = payout_case
+    w = f"{withdraw[0]}:{withdraw[1]!r}"
+    hits, cycle, printed = payout_run(sim, bars, liq, tmp_path, PayoutStopInHistory=True, SimWithdraw=w,
+                                      PlaceOrders=False, SimUserDataDir=tmp_path / "a")
+    assert hits == [k for k, _ in want], (hits, want)
+    alerts = [p for p in printed if "PAYOUT-ELIGIBLE" in p]
+    assert alerts and all("CLOSE EVERYTHING NOW" in p for p in alerts)
+    s = want[1][0] + 30
+    data = tmp_path / "b"
+    payout_run(sim, bars, liq, tmp_path, n=s, PayoutStopInHistory=True, SimWithdraw=w, PlaceOrders=False,
+               SimUserDataDir=data)
+    hits_b, cycle_b, _ = payout_run(sim, bars, liq, tmp_path, SimRealtimeFrom=s, SimWithdraw=w, PlaceOrders=False,
+                                    SimUserDataDir=data)
+    assert hits_b == [k for k in hits if k >= s] and cycle_b.replace(" (remembered)", "") == cycle
