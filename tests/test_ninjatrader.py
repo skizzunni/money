@@ -1007,3 +1007,20 @@ def test_account_type_from_the_account_name(sim, tmp_path):
     assert sim_acct == funded and "Account: Funded (from the FUNDED ACCOUNT setting)" in dash
     off, _, _, _ = run_sim(sim, bars, tmp_path, SimAccountName="PA-APEX-123456-01", AutoAccountType=False, **kw)
     assert off == evaluation
+
+
+def test_guard_blocks_from_the_first_bar_and_messages_say_what_was_sent(sim, tmp_path):
+    """A position outside the strategy that appears on the very bar of an entry signal blocks that entry (no doubling
+    up, not even for one bar), and the alert says the order was NOT sent and why; with orders on and nothing in the
+    way, every entry alert says the order was sent."""
+    bars = rth_minutes(30, 3)
+    r = 15 * 390
+    base = dict(minutes=1, breakout=True, EvalTarget=0, SimRealtimeFrom=r)
+    _, ref_orders, _, ref_printed = run_sim(sim, bars, tmp_path, **base)
+    entries = [p for p in ref_printed if " MNQ (Evaluation) at market." in p]
+    assert entries and all("The strategy sent the order." in p for p in entries)
+    for kind in (("Long", "Short"), ("W Long", "W Short")):
+        e = next(int(o[0]) for o in ref_orders if o[1] == "Enter" and o[2] in kind and int(o[0]) >= r + 390)
+        _, orders, _, printed = run_sim(sim, bars, tmp_path, SimForeignPosition=f"{e}:{e + 60}:4", **base)
+        assert not [o for o in orders if o[1] == "Enter" and e <= int(o[0]) < e + 60], kind
+        assert any("NOT sent by the strategy: the account's position isn't the strategy's" in p for p in printed), kind

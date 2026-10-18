@@ -179,6 +179,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         public EntryHandling EntryHandling;
         public StopTargetHandling StopTargetHandling;
         public bool IsExitOnSessionCloseStrategy, TraceOrders, IsInstantiatedOnEachOptimizationIteration;
+        public int ExitOnSessionCloseSeconds;  // not modelled: the stand-in has no trading-hours template
         public StartBehavior StartBehavior;
         public RealtimeErrorHandling RealtimeErrorHandling;
         public Position Position = new Position();

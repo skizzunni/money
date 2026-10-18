@@ -74,6 +74,8 @@ namespace NinjaTrader.NinjaScript.Strategies
         double lastLiq = double.NaN;     // the account at the bar before (a payout leaving it shows as a drop)
         double pendingPayout;            // asked for, not yet seen leaving the account: not in the balance
         bool cycleLoaded, cycleFromFile, saveFailed;
+        bool botSent, wSent;             // this bar, the entry order really went to the account
+        string notSent = "";            // why an entry signal wasn't sent this bar
         int mismatchBars;                // bar closes in a row with the account's position not the strategy's
         static readonly double[] PayoutCaps = { 1500, 1500, 2000, 2500, 2500, 3000 };
         DateTime evalStart = DateTime.MinValue;
@@ -94,7 +96,10 @@ namespace NinjaTrader.NinjaScript.Strategies
                 // NinjaTrader's default: a stop and a target for each fill. With "by strategy position", Playback showed the
                 // target for 3 contracts on a 4-contract position (the entry filled in parts)
                 StopTargetHandling = StopTargetHandling.PerEntryExecution;
-                IsExitOnSessionCloseStrategy = false;  // the strategy closes at 16:00 New York itself
+                // the strategy closes at 16:00 New York itself; NinjaTrader's own exit 60 s before the session's end (its
+                // trading-hours template, holidays and early closes included) is the backstop if no bar comes to do it
+                IsExitOnSessionCloseStrategy = true;
+                ExitOnSessionCloseSeconds = 60;
                 BarsRequiredToTrade = 0;               // the engine waits for its own 14 sessions
                 StartBehavior = StartBehavior.WaitUntilFlat;
                 RealtimeErrorHandling = RealtimeErrorHandling.IgnoreAllErrors;  // OnOrderUpdate flattens on a rejected stop
@@ -512,8 +517,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         // Live: the account's own position in MNQ against the strategy's. They differ after a restart with a position
         // left open (NinjaTrader cancels a disabled strategy's stop and target), a trade placed by hand, or a fill the
-        // strategy missed. Two bar closes in a row apart: a loud alert and no new entries (no doubling up) until they
-        // agree again; the strategy's own position, if any, is still managed.
+        // strategy missed. Apart at a bar close: no new entries (no doubling up) until they agree again; apart at two
+        // in a row: a loud alert. The strategy's own position, if any, is still managed.
         bool EntriesBlocked()
         {
             if (State != State.Realtime || PositionAccount == null)
@@ -526,11 +531,11 @@ namespace NinjaTrader.NinjaScript.Strategies
                 mismatchBars = 0;
                 return false;
             }
-            mismatchBars++;
+            mismatchBars++;  // entries are blocked from the first bar apart; the alert waits for the second
             if (mismatchBars == 2)
                 Say("account", "ACCOUNT POSITION MISMATCH: the account holds " + acct + " MNQ, the strategy " + mine +
                     ". No new entries until they agree. If the account's position has no stop, close it or protect it NOW.");
-            return mismatchBars >= 2;
+            return true;
         }
 
         static int Signed(Position p)
@@ -541,6 +546,8 @@ namespace NinjaTrader.NinjaScript.Strategies
         {
             int real = RealDir;
             bool blocked = EntriesBlocked();
+            botSent = wSent = false;
+            notSent = blocked ? "the account's position isn't the strategy's" : "";
             if (real == 0)
             {
                 realLocked = false;
@@ -561,6 +568,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             // the funded account's payout day (round 128): flat, no more trades today
             if (payoutToday)
             {
+                notSent = "today is a payout day";
                 if (real != 0)
                     Flatten(real, "Payout-eligible");
                 return;
@@ -583,7 +591,10 @@ namespace NinjaTrader.NinjaScript.Strategies
                     return;
                 }
                 if (evalDone)
+                {
+                    notSent = "the evaluation's target is reached";
                     return;
+                }
             }
 
             // a new entry: the bracket goes in first, so it is attached the moment the entry fills. It is set in ticks
@@ -611,6 +622,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                     EnterLong(BotQty, LongName);
                 else
                     EnterShort(BotQty, ShortName);
+                botSent = true;
                 owner = Bot;
                 realLocked = false;
                 closingRejected = false;
@@ -634,6 +646,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                     EnterLong(wq, wname);
                 else
                     EnterShort(wq, wname);
+                wSent = true;
                 owner = Breakout;
                 return;
             }
@@ -777,6 +790,15 @@ namespace NinjaTrader.NinjaScript.Strategies
         }
 
         // ── Alerts and dashboard
+
+        // what happened to an entry signal with orders on: sent to the account (the fill shows in the Orders and
+        // Executions tabs), or not sent and why
+        string Sent(bool sent)
+        {
+            if (sent)
+                return ". The strategy sent the order.";
+            return ". NOT sent by the strategy: " + (notSent.Length > 0 ? notSent : "it already holds a position") + ".";
+        }
         void Tell(int nTrades, int nOrders, int nHeads)
         {
             for (int k = nOrders; k < engine.Orders.Count; k++)
@@ -799,7 +821,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 Say("entry", first + side + " " + BotQty + " MNQ (" + Book + ") at market. Price " + P(Close[0]) + ". Stop " +
                     P(RoundStop(o.Direction, o.Stop)) + (double.IsNaN(o.Target) ? "" : ", take-profit " +
                     P(RoundTarget(o.Direction, o.Target))) + be +
-                    (PlaceOrders ? ". The strategy placed it." : ". Place it now (orders are off) with that stop and take-profit."));
+                    (PlaceOrders ? Sent(botSent) : ". Place it now (orders are off) with that stop and take-profit."));
                 saidStop = RoundStop(o.Direction, o.Stop);
                 saidTarget = double.IsNaN(o.Target) ? double.NaN : RoundTarget(o.Direction, o.Target);
             }
@@ -828,7 +850,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 Say("breakout", "BREAKOUT " + side + " " + BreakoutQty + " MNQ (" + Book + ") at market. Price " + P(Close[0]) +
                     " is past " + P(d > 0 ? williams.Up : williams.Down) + ". Stop " + P(st) + " (" + P(williams.StopPoints) +
                     " points from the fill)" + (double.IsNaN(tp) ? "" : ", take-profit " + P(tp)) + ", out at 16:00" +
-                    (PlaceOrders ? ". The strategy placed it." :
+                    (PlaceOrders ? Sent(wSent) :
                      ". Place it now (orders are off) with that stop and take-profit; close it if the bot signals."));
                 if (!PlaceOrders)
                 {
