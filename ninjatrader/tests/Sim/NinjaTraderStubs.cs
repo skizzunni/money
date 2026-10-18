@@ -183,6 +183,27 @@ namespace NinjaTrader.NinjaScript.Strategies
         public Position Position = new Position();
         public SystemPerformance SystemPerformance = new SystemPerformance();
         public Account Account = new Account();
+        // the account's own position in the instrument: the strategy's, plus SimForeignPosition's ("from:to:qty", signed
+        // MNQ held on the account from bar from to bar to, outside the strategy: a restart's leftover, a manual trade)
+        public string SimForeignPosition { get; set; }
+        public Position PositionAccount
+        {
+            get
+            {
+                int d = Position.MarketPosition == MarketPosition.Long ? 1 : Position.MarketPosition == MarketPosition.Short ? -1 : 0;
+                int q = d * Position.Quantity;
+                if (SimForeignPosition != null)
+                {
+                    string[] f = SimForeignPosition.Split(':');
+                    if (CurrentBar >= int.Parse(f[0]) && CurrentBar < int.Parse(f[1])) q += int.Parse(f[2]);
+                }
+                Position p = new Position();
+                p.MarketPosition = q > 0 ? MarketPosition.Long : q < 0 ? MarketPosition.Short : MarketPosition.Flat;
+                p.Quantity = Math.Abs(q);
+                p.AveragePrice = Position.AveragePrice;
+                return p;
+            }
+        }
         public double SimNetLiq { get; set; }  // tests: the account's net liquidation, whatever the strategy did
         public string SimLiqFile { get; set; }  // tests: the account's net liquidation at each bar, one per line
         public string SimWithdraw { get; set; }  // tests: "bar:amount": a payout leaves the account at that bar

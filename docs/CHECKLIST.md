@@ -2,7 +2,7 @@
 
 Every requirement from the conversation, its status and the evidence. Status: **done** (verified), **partly**
 (improved, the stated goal not reached), **not met** (with why and what would change it), **open** (being worked on),
-**blocked** (needs something only the user can do). Last updated: October 18, 2026 (rounds through 133).
+**blocked** (needs something only the user can do). Last updated: October 18, 2026 (rounds through 134).
 
 ## The account and its rules
 
@@ -10,8 +10,8 @@ Every requirement from the conversation, its status and the evidence. Status: **
 |---|---|---|---|
 | 1 | Trade MNQ only ("keep my market") | done | Every setup is MNQ; other markets were tested only as checks (rounds 72, 97) |
 | 2 | Apex only, one 50K account, intraday trail ("i dont have EOD only intraday rn") | done | All defaults and results are for the 50K intraday-trail evaluation and funded account; EOD kept as reference only (rounds 107-108) |
-| 3 | At most 10 MNQ ("you can trade 10 contracts of mnq") | done | Bot 4 MNQ, breakout 1-10, bold finish capped at 10 (`ApexMaxQty`); Apex's 50K evaluation allows 6 minis / 60 micros (third-party, Oct 2026) |
-| 4 | Stay within Apex's rules, no hedging, no rule-breaking | done (manual mode) | One position at a time (no hedging); flat by 16:00; **Apex bans automation**, so Place orders off is the compliant mode, and its alerts are verified to reproduce the strategy's trades exactly (`test_alerts_only_trader_matches_the_strategy`) |
+| 3 | At most 10 MNQ ("you can trade 10 contracts of mnq") | done | Bot 4 MNQ, breakout 1-10 ($400 risk in the evaluation, $200 funded), bold finish capped at 10 (`ApexMaxQty`); Apex's 50K evaluation allows 6 minis / 60 micros (third-party, Oct 2026) |
+| 4 | Stay within Apex's rules, no hedging, no rule-breaking | partly (the user's call) | One position at a time (no hedging); flat by 16:00; **Apex bans automation**, so Place orders off is the compliant mode, and its alerts are verified to reproduce the strategy's trades exactly (`test_alerts_only_trader_matches_the_strategy`); orders on (the user's choice, Oct 18: "i need it to auto place orders"), with a guard: live, if the account's own MNQ position differs from the strategy's, a loud alert and no new entries until they agree (no doubling up on a leftover position) |
 | 5 | Every order with a stop and a take-profit (2026 rule, third-party, unconfirmed on Apex's site) | done | Bot: both from the fill; breakout: stop + take-profit 8x its stop (round 130); parity tests cover both |
 | 6 | Apex's rules verified at the source | blocked | `apextraderfunding.com` is blocked by this environment's network policy; the user can add it under Allowed domains (environment settings). Apex's help center, as quoted by search results (pages themselves blocked here): the intraday evaluation has no daily loss limit; Tradovate's group copier for your own accounts. Third-party sources used meanwhile: 30-day evaluation, $3,000 target, $2,000 intraday trail, no evaluation DLL or consistency rule, funded: threshold locks at +$100, $1,000 DLL tier, 5 x $200 days, $52,600 balance, 50% consistency, caps $1,500-3,000, 6 payouts |
 
@@ -20,7 +20,7 @@ Every requirement from the conversation, its status and the evidence. Status: **
 | # | Requirement | Status | Evidence / what would change it |
 |---|---|---|---|
 | 7 | More trades a week; no days without trading | done | ~12 trades a week (bot + breakout, round 101) against ~8 for the bot alone |
-| 8 | Pass the evaluation more often | done (improved) | Close-at-target: 35-37% passed over 16 years (was 22-26%), 27.9% in the newest 13 months (round 124); bold finish option: about 39% (round 129, off by default) |
+| 8 | Pass the evaluation more often | done (improved) | Close-at-target: 35-37% passed over 16 years (was 22-26%), 27.9% in the newest 13 months (round 124); bold finish option: about 39% (round 129, off by default); per week of a running account: breakout $400 in the evaluation (round 134) nets $70 / $42 / $4 / $32 a week against $59 / $39 / $0 / $25 |
 | 9 | More money per evaluation (the six payouts) | done (improved) | $1,163-1,835 paid per evaluation (was $690-1,268), round 124 |
 | 10 | More likely to win than lose; more winning streaks | partly | 49-50% of trades win; locks raise it to 53-55% and cut red days 5-7 points but cost payouts, re-tested with close-at-target (rounds 103, 112, 131) |
 | 11 | $1,500 a week (at one point $500 a day) | not met | Measured as it is lived (round 132): one account slot, a new evaluation after each failed one, pays $29-77 a week before fees (52 weeks; $29 in the newest 13 months). $1,500 a week is 20-64 such accounts copied (Apex allows 20 funded accounts and copying between your own), or one account with four times the strategy's return for its risk (a daily Sharpe of 0.35 against 0.09): the $2,000 drawdown fails about half the accounts already at the strategy's spread. No rule in 131 rounds came near it |

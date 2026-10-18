@@ -60,7 +60,12 @@ account. Copy that account to others with a trade copier (Tradesyncer, or NinjaT
      loss and loser limit in the settings. For a **50K EOD Trail** evaluation set the evaluation side to **6 MNQ,
      $300, 3 losers** instead (3 x $300 stays under that plan's $1,000 daily loss limit).
      (Rounds 107-108 in [RESULTS.md](RESULTS.md) compare the two plans.)
-   - **Place orders:** on = the strategy trades; off = alerts only.
+   - **Place orders:** on = the strategy trades (the default); off = alerts only. With orders on, live, the strategy
+     compares the account's own MNQ position with its own at every bar close. If they differ for two bar closes (a
+     position left open when the strategy was disabled or restarted, since NinjaTrader then cancels its stop and
+     target; a trade placed by hand; a fill it missed), it alerts "ACCOUNT POSITION MISMATCH" and takes no new
+     entries until they agree, so it never doubles up on a leftover position. **A position the strategy doesn't own
+     has no stop from it: close or protect it yourself.** To restart safely, restart while flat.
    - **Evaluation: close everything at this profit:** $3,000 (the 50K evaluation's target; 0 = off).
    - **Evaluation: bold finish** (off by default; round 129, [RESULTS.md](RESULTS.md)): an evaluation that runs out of
      its 30 days has failed anyway, so late in it more size gives up nothing. Set **the day it was bought** and **bold
@@ -130,7 +135,8 @@ needs more days loaded.
   volatility breakout. Its levels are today's 09:30 open ± half of yesterday's 09:30–16:00 range. The first 1-minute
   bar from 09:30 to 15:00 that reaches one buys (or sells) at market at the next minute's open, with a stop a quarter
   of yesterday's range from the fill and a take-profit 8 stops away (2x yesterday's range; round 130, so every trade
-  carries a full bracket), sized to $200 of risk (1 to 10 MNQ), out at 16:00. One a day at most. It's taken
+  carries a full bracket), sized to $400 of risk in the evaluation and $200 on the funded account (1 to 10 MNQ;
+  round 134: more money a week per account in every period), out at 16:00. One a day at most. It's taken
   only while the bot is flat, and the bot always comes first: if the bot signals while the breakout trade is open,
   the breakout trade is closed at market and the bot's entry goes in on the same bar (opposite directions: the bot's
   entry reverses the position). No breakout trade on the skip dates, or until the bot's 14 sessions are loaded.

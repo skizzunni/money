@@ -2286,6 +2286,24 @@ contract; at $200 and 6 MNQ the cap would be 16.7 points, which was not tested).
 less everywhere but NQ: 4 MNQ stays. The newest window has only 63 starts that fit 52 weeks, so its numbers move a lot
 with one outcome (most setups there show the same $28.8 a week paid: one funded account's payouts).
 
+## Round one hundred and thirty-four: the breakout's risk in the evaluation, and the bold finish, judged per week
+
+`research/slot_eval.py`, as round 133 (52 weeks, payout stop on, net of $100 an evaluation and $79 an activation;
+pick on 2011-18, adopted if more on 2019-25 and NQ and no less in the newest 13 months):
+
+| Evaluation side | 2011-18 | 2019-25 | Jul 2025-Aug 2026 | NQ 2015-24 |
+|---|---|---|---|---|
+| now (breakout $200) | $58.9 | $39.2 | $0.3 | $25.0 |
+| breakout $300 | $60.7 | $41.6 | $4.1 | $29.4 |
+| **breakout $400 (pick)** | **$69.6** | **$42.4** | **$3.6** | **$31.5** |
+| bold finish, day 20, 2.5x | $62.7 | $46.3 | $0.1 | $31.0 |
+| bold finish, day 24, 2x | $57.0 | $46.1 | $0.2 | $26.1 |
+
+**Adopted: the breakout risks $400 a trade in the evaluation** (1-10 MNQ; funded stays $200, round 121). Built into
+the NinjaTrader strategy as its own setting ("Risk a trade in the evaluation"), verified trade for trade against the
+research reference at $400 (evaluation) and $200 (funded). The bold finish nets more in three periods but not in the
+newest 13 months and was not the pick: it stays an option, off.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
@@ -2412,6 +2430,7 @@ python research/w_bracket.py nsx1m_scaled.pkl nq1m_scaled.pkl         # a take-p
 python research/w_lock_target.py nsx1m_scaled.pkl nq1m_scaled.pkl     # the breakout's lock for more winners (no)
 python research/accounts_needed.py nsx1m_scaled.pkl nq1m_scaled.pkl 260 # $ a week per account slot (payout stop on)
 python research/slot_size.py nsx1m_scaled.pkl nq1m_scaled.pkl          # sizes judged per week (6 MNQ eval: setting, not default)
+python research/slot_eval.py nsx1m_scaled.pkl nq1m_scaled.pkl          # breakout $400 in the evaluation (adopted)
 ```
 
 The raw data isn't stored in this repo.

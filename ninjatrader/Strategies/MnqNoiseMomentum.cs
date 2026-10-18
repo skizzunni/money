@@ -10,9 +10,9 @@
 //   * 16:00 New York: everything closed at market. A session that ends early: closed at market too.
 //   * the breakout (on by default, docs/RESULTS.md round 101): in the bot's gaps, Larry Williams' volatility
 //     breakout. The first bar of the day (09:30-15:00) to reach today's open +/- 0.5 x yesterday's 09:30-16:00 range
-//     buys (sells) at market, $200 of risk (1-10 MNQ), the stop a quarter of yesterday's range from the fill, out at
-//     16:00. One a day, only while the bot is flat; the bot always comes first: a bot entry while the breakout trade is
-//     open closes it at market (or reverses it) in the same bar.
+//     buys (sells) at market, $400 of risk in the evaluation and $200 funded (1-10 MNQ; round 134), the stop a quarter
+//     of yesterday's range from the fill, out at 16:00. One a day, only while the bot is flat; the bot always comes
+//     first: a bot entry while the breakout trade is open closes it at market (or reverses it) in the same bar.
 //   * the evaluation's target (docs/RESULTS.md round 124): in the evaluation, everything is closed the moment the
 //     account is $3,000 up (closed + open), which passes it; the take-profit of the trade in progress sits at that
 //     price when it is the closer one. No new trades after that. Live only (not in backtests or the history loaded
@@ -74,6 +74,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         double lastLiq = double.NaN;     // the account at the bar before (a payout leaving it shows as a drop)
         double pendingPayout;            // asked for, not yet seen leaving the account: not in the balance
         bool cycleLoaded, cycleFromFile, saveFailed;
+        int mismatchBars;                // bar closes in a row with the account's position not the strategy's
         static readonly double[] PayoutCaps = { 1500, 1500, 2000, 2500, 2500, 3000 };
         DateTime evalStart = DateTime.MinValue;
         string lastSignal = "-";
@@ -124,6 +125,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 BreakoutK = 0.5;
                 BreakoutStop = 0.25;
                 BreakoutRisk = 200;
+                EvalBreakoutRisk = 400;  // money a week per account, all four periods (docs/RESULTS.md round 134)
                 BreakoutMaxQty = 10;
                 EvalTarget = 3000;
                 EvalProfitSoFar = 0;
@@ -170,7 +172,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 WilliamsSettings ws = new WilliamsSettings();
                 ws.K = BreakoutK;
                 ws.StopFraction = BreakoutStop;
-                ws.Risk = BreakoutRisk;
+                ws.Risk = Funded ? BreakoutRisk : EvalBreakoutRisk;
                 ws.MaxQty = BreakoutMaxQty;
                 ws.PointValue = settings.PointValue;
                 williams = new WilliamsBreakout(ws);
@@ -473,9 +475,38 @@ namespace NinjaTrader.NinjaScript.Strategies
         }
 
         // ── Orders on the account
+
+        // Live: the account's own position in MNQ against the strategy's. They differ after a restart with a position
+        // left open (NinjaTrader cancels a disabled strategy's stop and target), a trade placed by hand, or a fill the
+        // strategy missed. Two bar closes in a row apart: a loud alert and no new entries (no doubling up) until they
+        // agree again; the strategy's own position, if any, is still managed.
+        bool EntriesBlocked()
+        {
+            if (State != State.Realtime || PositionAccount == null)
+                return false;
+            int acct = Signed(PositionAccount), mine = Signed(Position);
+            if (acct == mine)
+            {
+                if (mismatchBars >= 2)
+                    Say("account", "ACCOUNT AND STRATEGY AGREE AGAIN (" + mine + " MNQ): new entries allowed.");
+                mismatchBars = 0;
+                return false;
+            }
+            mismatchBars++;
+            if (mismatchBars == 2)
+                Say("account", "ACCOUNT POSITION MISMATCH: the account holds " + acct + " MNQ, the strategy " + mine +
+                    ". No new entries until they agree. If the account's position has no stop, close it or protect it NOW.");
+            return mismatchBars >= 2;
+        }
+
+        static int Signed(Position p)
+        {
+            return p.MarketPosition == MarketPosition.Long ? p.Quantity : p.MarketPosition == MarketPosition.Short ? -p.Quantity : 0;
+        }
         void ManageOrders(DateTime start, int nOrders)
         {
             int real = RealDir;
+            bool blocked = EntriesBlocked();
             if (real == 0)
             {
                 realLocked = false;
@@ -526,7 +557,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             // gets its stop and take-profit on the right side, the same distances away.
             // The bot comes first: an open breakout trade is closed in the same direction's case, reversed by the entry
             // itself in the other.
-            if (engine.Orders.Count > nOrders && (real == 0 || owner == Breakout))
+            if (!blocked && engine.Orders.Count > nOrders && (real == 0 || owner == Breakout))
             {
                 NoiseOrder o = engine.Orders[engine.Orders.Count - 1];
                 string name = o.Direction > 0 ? LongName : ShortName;
@@ -553,7 +584,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             }
 
             // the breakout: its stop in ticks from the fill, out at 16:00 (above); nothing else to manage
-            if (williams.Signal != 0 && real == 0)
+            if (!blocked && williams.Signal != 0 && real == 0)
             {
                 string wname = williams.Signal > 0 ? WLongName : WShortName;
                 int wq = BreakoutQty;
@@ -908,6 +939,9 @@ namespace NinjaTrader.NinjaScript.Strategies
             string s = "MNQ Noise Momentum v1.6: " + Book + ", " + Qty + " MNQ, " + Usd(MaxLoss) + " max loss, " + MaxLosers +
                        " losers a day\n";
             s += "Orders: " + (PlaceOrders ? "ON (the strategy trades this account)" : "OFF (alerts only)") + "\n";
+            if (PlaceOrders && mismatchBars >= 2)
+                s += "ACCOUNT POSITION MISMATCH: the account holds " + Signed(PositionAccount) + " MNQ, the strategy " +
+                     Signed(Position) + " - no new entries until they agree\n";
             if (minutes != 1)
                 s += "Use a 1-minute chart: the lock arms within the minute (about 6 points more winning trades).\n";
             if (!engine.Ready)
@@ -1081,8 +1115,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         [NinjaScriptProperty]
         [Range(10.0, 100000.0)]
-        [Display(Name = "Risk a trade, $ (sets the contracts)", Order = 4, GroupName = "5. Breakout")]
+        [Display(Name = "Risk a trade on the funded account, $ (sets the contracts)", Order = 4, GroupName = "5. Breakout")]
         public double BreakoutRisk { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(10.0, 100000.0)]
+        [Display(Name = "Risk a trade in the evaluation, $ (sets the contracts; round 134)", Order = 4, GroupName = "5. Breakout")]
+        public double EvalBreakoutRisk { get; set; }
 
         [NinjaScriptProperty]
         [Range(1, 100)]

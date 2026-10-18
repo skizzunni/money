@@ -385,9 +385,13 @@ def combo_reference(bars: pd.DataFrame, funded: bool, target_r: float = 8.0):
            for t in run(bars, account(funded), minutes=1).trades]
     idx = bars.index.tz_convert(NY)
     first = sorted(set(idx.normalize()))[14]
-    w = [leg for leg in combo_live.williams_legs(bars, month_skip=False, skip_dates=NoiseConfig().skip_dates.split(","),
-                                                 target_r=target_r)
-         if idx[leg[0]] >= first]
+    old, combo_live.RISK = combo_live.RISK, 200.0 if funded else 400.0  # the strategy's breakout risk (round 134)
+    try:
+        w = [leg for leg in combo_live.williams_legs(bars, month_skip=False,
+                                                     skip_dates=NoiseConfig().skip_dates.split(","), target_r=target_r)
+             if idx[leg[0]] >= first]
+    finally:
+        combo_live.RISK = old
     legs = combo_priority.priority(bars, [b[:6] + (4,) for b in bot], w)
     why = {b[0]: b[6] for b in bot}
     return sorted((a, b, d, en, ex, pnl, why.get(a, "breakout")) for a, b, d, en, ex, pnl, _ in legs)
@@ -466,11 +470,16 @@ def best_equity(bars, trades):
     """For each trade (strategy rows): the account's closed P/L before it, and its best open P/L ($) from the bars."""
     h, lo = bars.high.to_numpy(float), bars.low.to_numpy(float)
     out, cum = [], 0.0
-    for d, eb, en, xb, ex, _, pnl in trades:
+    for d, eb, en, xb, ex, why, pnl in trades:
         d, eb, xb, en, ex, pnl = int(d), int(eb), int(xb), float(en), float(ex), float(pnl)
         per = d * (ex - en) * 2.0 - 1.24
         q = round(pnl / per) if abs(per) > 1e-9 else 1
-        fav = (h[eb:xb + 1].max() - en) if d > 0 else (en - lo[eb:xb + 1].min())
+        # a stop or a take-profit fills inside its bar; a market exit at the exit bar's open, so that bar's range was
+        # never open to the trade
+        last = xb + 1 if why in ("Stop loss", "Profit target") else xb
+        hi = max(h[eb:last].max(initial=-np.inf), ex)
+        low = min(lo[eb:last].min(initial=np.inf), ex)
+        fav = (hi - en) if d > 0 else (en - low)
         out.append((cum, q * (fav * 2.0 - 1.24)))
         cum += pnl
     return out
@@ -904,3 +913,28 @@ def test_payout_stop_on_by_default_and_live_only(sim, tmp_path):
     assert "Payout cycle: 0/5 days of $200" in dash and "(works live)" in dash
     _, _, dash_eval, _ = run_sim(sim, bars, tmp_path, minutes=1, breakout=True)
     assert "Payout cycle" not in dash_eval
+
+
+def test_account_position_guard(sim, tmp_path):
+    """Live with orders on: while the account's own MNQ position differs from the strategy's (a position left over
+    from a restart, a trade by hand), one loud alert at the second bar close apart and no new entries until they
+    agree; then an all-clear and entries again. Live with the two agreeing: the same trades as the backtest."""
+    bars = rth_minutes(30, 3)
+    r = 15 * 390
+    base = dict(minutes=1, breakout=True, EvalTarget=0)
+    ref, ref_orders, _, _ = run_sim(sim, bars, tmp_path, **base)
+    live, _, _, printed = run_sim(sim, bars, tmp_path, SimRealtimeFrom=r, **base)
+    assert live == ref and not any("MISMATCH" in p for p in printed)
+    for kind in (("Long", "Short"), ("W Long", "W Short")):  # a window over a bot entry, one over a breakout entry
+        e = next(int(o[0]) for o in ref_orders if o[1] == "Enter" and o[2] in kind and int(o[0]) >= r + 390)
+        f, g = e - 30, e + 60
+        _, orders, dash, printed = run_sim(sim, bars, tmp_path, SimRealtimeFrom=r, SimForeignPosition=f"{f}:{g}:4",
+                                           **base)
+        blocked = [int(o[0]) for o in orders if o[1] == "Enter" and f + 1 <= int(o[0]) < g]
+        assert not blocked, (kind, blocked)
+        alerts = [p for p in printed if "ACCOUNT POSITION MISMATCH" in p]
+        assert len(alerts) == 1 and "the account holds 4 MNQ, the strategy 0" in alerts[0], alerts
+        assert sum("AGREE AGAIN" in p for p in printed) == 1
+        later = [int(o[0]) for o in orders if o[1] == "Enter" and int(o[0]) >= g]
+        assert later, "entries resume once the account and the strategy agree"
+        assert "MISMATCH" not in dash
