@@ -155,7 +155,7 @@ dollars of the trail.
 - **The user's MNQ bars.** The native MNQ period is 77 sessions; fewer than 50 evaluations would fit, all
   overlapping.
 - **The account's confirmed rules** (section 1).
-- **Live fills** (section 4b of docs/REFERENCE.md: NinjaTrader leaves stops unslipped, the stand-in slips them).
+- **Live fills.** Backtest slippage is an assumption; the stand-in and NinjaTrader apply it the same way (docs/MNQ_NATIVE.md).
 
 ## 5. Native replay on the user's MNQ - proposed
 

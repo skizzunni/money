@@ -274,13 +274,14 @@ Files are in `verification/native_costs_sep11/`.
 **Where NinjaTrader put the slippage** (per-fill comparison, 1 tick against 0):
 - **Market entries:** slipped, 27 of 28. One was not; it is presumably bounded by its bar.
 - **16:00 market exits:** slipped, 3 of 3.
-- **Stop-loss exits:** not slipped, 18 of 21 at an unchanged price.
+- **Stop-loss exits:** 18 of 21 at an unchanged price.
 - **Take-profits:** never slipped. They move only because they are set in ticks from the slipped fill.
 
-**So NinjaTrader's slippage setting costs about $0.50 a contract a tick here, roughly half of what a stop-filled
-strategy pays live.** The stand-in slips every stop as well, so the stand-in's slippage runs (section 4) are the more
-conservative ones. A conservative check on NinjaTrader's numbers is to deduct another tick a contract on every
-stop-loss exit.
+**CORRECTED (docs/MNQ_NATIVE.md).** The earlier reading here was wrong. The first stop is set in ticks from the
+slipped fill, so it moves a tick with the entry, and an unchanged exit price means the stop *was* slipped. On
+identical MNQ bars the stand-in, which slips every market and stop fill, reproduces NinjaTrader's 1- and 2-tick runs
+to the cent. So NinjaTrader's slippage setting covers stops too, and its slippage results do not understate costs on
+that account.
 
 **Where the reference's after-roll profit came from:**
 - 9/11 to 9/30: 38 trades, +$8,435 before costs. This window is not covered by these four runs.
@@ -330,7 +331,7 @@ stop-loss exit.
 - B is A without them. Nothing else differs.
 
 **Slippage:** each tick costs A $49, B $38 and C $41.50 here. NinjaTrader slips the market entries and exits but
-mostly not the stops (section 4b), so these figures understate live costs. They are not extrapolated beyond these 28
+the stops too (section 4b, corrected), as the stand-in does. They are not extrapolated beyond these 28
 trades.
 
 **Status:**
@@ -390,7 +391,7 @@ compared B, with commission, against the reference, without it.
 - A loses $366 from 0 to 1 tick and $306 more to 2 ticks.
 - B loses $286 and then $226.
 - At 1 tick B_L1 has one trade fewer than B_L0: a changed fill changed a later opportunity.
-- NinjaTrader mostly leaves stops unslipped (section 4b), so these understate live costs.
+- NinjaTrader slips stops as well (section 4b, corrected).
 
 **Not yet possible without the Trades exports:**
 - monthly results, July included;

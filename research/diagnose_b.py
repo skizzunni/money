@@ -61,12 +61,14 @@ print(f"{len(lk)} trades; net ${lk.net.sum():,.0f}; average best {lk.mfe.mean():
       f"{(lk.gross / 8).mean():.1f} pts; exits {lk.why.value_counts().to_dict()}")
 for lo_, hi_ in ((25, 40), (40, 60), (60, 1e9)):
     s = lk[(lk.mfe >= lo_) & (lk.mfe < hi_)]
-    print(f"  best {lo_}-{hi_} pts: {len(s)} trades, avg kept {(s.gross / 8).mean():.1f} pts of avg best {s.mfe.mean():.1f}")
+    print(f"  best {lo_}-{hi_} pts: {len(s)} trades, avg kept {(s.gross / 8).mean():.1f} pts "
+          f"of avg best {s.mfe.mean():.1f}")
 print("\n== Stops: losers")
 ls = t[t.net < 0]
 print(f"{len(ls)} losers, net ${ls.net.sum():,.0f}; average MAE {ls.mae.mean():.1f} pts; later in the day price went "
       f"25+ pts their way after the stop: {(ls.later_best >= 25).sum()} ({100*(ls.later_best >= 25).mean():.0f}%); "
-      f"the 16:00 close was on their side of the entry: {(ls.close_move > 0).sum()} ({100*(ls.close_move > 0).mean():.0f}%)")
+      f"the 16:00 close was on their side of the entry: {(ls.close_move > 0).sum()} "
+      f"({100*(ls.close_move > 0).mean():.0f}%)")
 print("\n== Sideways days: B's day result against the day's directional efficiency (|close-open| / range, 09:30-16:00)")
 o = bars.open.groupby(day).first()
 cl = bars.close.groupby(day).last()

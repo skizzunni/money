@@ -123,8 +123,8 @@ None is expected, because nothing trades before the engine is ready.
 - **These are 26 sessions, about 5 weeks.** They show how the components behaved on this stretch of MNQ, with costs.
   They do not establish an edge, and the 9/11 to 10/17 cost findings (28 trades) are not extrapolated to the full
   history or to live trading.
-- **NinjaTrader's slippage setting left most stop exits unslipped in the 9/11 runs.** So these runs understate stop
-  slippage. That is reported, not corrected silently.
+- **Corrected:** NinjaTrader's slippage setting does slip stop exits. The earlier claim that it did not was a
+  misreading (docs/MNQ_NATIVE.md).
 
 ## 5. Kept separate: the zero-trade run (8/9 to 10/17, `5feac8dc-...04-54_AM.csv`)
 

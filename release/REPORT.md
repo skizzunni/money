@@ -37,8 +37,8 @@ runtime errors**.
 
 The largest 5 trades are 75% of the net.
 
-**Slippage:** NinjaTrader slipped the market entries and exits but left most stop exits unslipped. Its slippage
-results therefore understate live costs.
+**Slippage:** NinjaTrader slips market entries, market exits and stops alike. (An earlier version of this report
+said it left most stops unslipped; that was a misreading, corrected in docs/MNQ_NATIVE.md.)
 
 ## Against the evaluation's rules
 
