@@ -205,7 +205,7 @@ not identical: NinjaTrader's historical fills differ from the worst-case fills t
   account: one "close everything" alert, no trade alerts after it, and the take-profit moved to the target's price.
 - The funded payout stop: the first bar at which closing makes the day payout-eligible, recomputed independently
   from the trades in three cycle states (one where the 50% rule binds), is the strategy's payout day; flat at once, no
-  entries after it that day. On a scripted account through four payout cycles, with a payout leaving the account two
+  entries after it that day. On a scripted account through five payout cycles, with a payout leaving the account two
   days after it was asked for: every payout day and the cycle at the end equal a replica's (and differ from what
   counting the payout as a losing day gives). Stopped and started again at six points (before and after a payout in
   the same day, at a day's first bar, before and after the payout leaves, in a later cycle), it gives the same payout

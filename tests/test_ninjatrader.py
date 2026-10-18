@@ -796,7 +796,7 @@ def cycle_numbers(cycle):
 @pytest.fixture(scope="module")
 def payout_case():
     bars = rth_minutes(40, 5)
-    liq = scripted_account(bars, 2)
+    liq = scripted_account(bars, 8)
     first, _ = payout_replica(bars, liq)
     assert len(first) >= 3, first
     w_bar = first[0][0] + 2 * 390 + 100  # two days after the first payout day, mid-morning
@@ -814,9 +814,14 @@ def test_payout_cycle_on_a_scripted_account(sim, tmp_path, payout_case):
     assert hits == [k for k, _ in want], (hits, want)
     qual, prof, best, taken = cycle_numbers(cycle)
     assert (qual, taken) == (end[0], end[3]) and abs(prof - end[1]) <= 0.5 and abs(best - end[2]) <= 0.5, (cycle, end)
-    # with the payout never leaving, the same days: it was already out of the balance
-    same, _, _ = payout_run(sim, bars, liq, tmp_path, PayoutStopInHistory=True)
+    # with the payout never leaving, the same days: it was already out of the balance; the amount each alert says
+    # to ask for is the replica's (with the payouts asked for kept out of the balance)
+    same, _, printed = payout_run(sim, bars, liq, tmp_path, PayoutStopInHistory=True)
     assert same == hits
+    said = [float(p.split("about $")[1].split(")")[0]) for p in printed if "PAYOUT-ELIGIBLE" in p]
+    kept, _ = payout_replica(bars, liq)
+    assert [round(a) for _, a in kept] == said, (kept, said)
+    assert [round(a) for _, a in payout_replica(bars, liq, naive=True)[0]] != said
     # and had the strategy counted the payout leaving as a loss, a later payout day would move
     lost, _ = payout_replica(bars, liq, withdraw, naive=True)
     assert [k for k, _ in lost] != hits
