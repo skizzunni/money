@@ -1,6 +1,6 @@
 """Round one hundred and thirty-two: what one account slot pays a week, and how many it takes for $1,500 a week.
 
-    python research/accounts_needed.py nsx1m_scaled.pkl nq1m_scaled.pkl
+    python research/accounts_needed.py nsx1m_scaled.pkl nq1m_scaled.pkl [sessions, default 130]
 
 Every result so far is per evaluation bought. The user's goal is money per week. An "account slot" is how a trader
 actually runs it: buy an evaluation; if it fails or times out, buy the next one the next session; once passed, trade
@@ -8,6 +8,8 @@ the funded account until it busts or pays its sixth payout, then buy the next ev
 sessions) from every start session, on the strategy now (bot + breakout, close-at-target in the evaluation, the funded
 settings; research/pass_lock and research/apex_payouts), with and without the funded payout stop (round 128):
   $ a week per slot     the payouts in the 26 weeks / 26
+  break-even eval fee   the evaluation price at which the slot's payouts just cover its evaluations and the $79
+                        activation of each funded account
   evaluations a slot    bought in the 26 weeks (each is a month's fee)
   paid at all %         slots with at least one payout in the 26 weeks
 Copied accounts take the same trades, so N copies started together pay exactly N times one slot: the expected weekly
@@ -35,7 +37,9 @@ import pass_lock as PL  # noqa: E402
 import payout_lock as PO  # noqa: E402
 import trap_reversal as T  # noqa: E402
 
-HORIZON = 130  # sessions: 26 weeks
+HORIZON = int(sys.argv[3]) if len(sys.argv) > 3 else 130  # sessions: 26 weeks (or as given)
+WEEKS = HORIZON / 5
+ACTIVATION = 79.0  # $ per funded account (third-party, 2026; intraday)
 GOAL = 1500.0
 
 
@@ -75,12 +79,13 @@ def job(args):
         starts = [s for s, d in enumerate(ss) if d <= pd.Timestamp(last_start) and s + HORIZON <= len(ss)]
         for lock in (False, True):
             out = np.array([slot(ev_days, pa_days, s, lock) for s in starts])
-            wk = out[:, 0] / 26
+            wk = out[:, 0] / WEEKS
             rows.append({"period": label, "payout stop": "on" if lock else "off", "starts": len(starts),
                          "$ a week per slot": wk.mean(), "median $ a week": float(np.median(wk)),
                          "paid at all %": 100 * float(np.mean(out[:, 0] > 0)),
                          "evals a slot": out[:, 1].mean(), "funded a slot": out[:, 2].mean(),
                          "slots for $1,500": GOAL / wk.mean() if wk.mean() > 0 else np.inf,
+                         "break-even eval fee $": (out[:, 0].mean() - ACTIVATION * out[:, 2].mean()) / out[:, 1].mean(),
                          "funded day mean $": day_pnl.mean(), "funded day sd $": day_pnl.std()})
     return rows
 
