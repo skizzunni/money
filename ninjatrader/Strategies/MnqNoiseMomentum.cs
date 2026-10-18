@@ -20,7 +20,8 @@
 //   * optional, off by default (round 129): from a chosen day of the evaluation's 30, bigger size (2.5x: the bot at
 //     10 MNQ), since an evaluation that runs out of time has failed anyway.
 //   * optional, off by default (round 128): on the funded account, everything closed and no more trades that day the
-//     moment closing makes the day payout-eligible (the payout cycle's state entered once, then kept from the account).
+//     moment closing makes the day payout-eligible (the payout cycle's state entered once, then kept from the account
+//     and remembered in a file across restarts).
 // Setup: 1-minute MNQ chart (the lock arms within the minute: more winners than on 5 minutes, docs/RESULTS.md round
 // 81), Days to load 30 or more (the noise needs 14 full sessions), Calculate on bar close.
 // See docs/NINJATRADER.md. Written in C# 5 for NinjaTrader 8's compiler.
@@ -379,7 +380,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         void SaveCycle()
         {
-            if (!RememberPayoutCycle || cycleDay == DateTime.MinValue || saveFailed)
+            if (!RememberPayoutCycle || cycleDay == DateTime.MinValue)
                 return;
             try
             {
@@ -393,11 +394,13 @@ namespace NinjaTrader.NinjaScript.Strategies
                     File.Replace(tmp, file, null);
                 else
                     File.Move(tmp, file);
+                saveFailed = false;
             }
             catch (Exception e)
             {
-                saveFailed = true;  // once: the payout stop goes on, only a restart would start from the settings
-                Print("Payout cycle: could not write " + CycleFile + " (" + e.Message + ").");
+                if (!saveFailed)  // said once; it tries again at the next bar, and the payout stop goes on meanwhile
+                    Print("Payout cycle: could not write " + CycleFile + " (" + e.Message + "); trying again each bar.");
+                saveFailed = true;
             }
         }
 

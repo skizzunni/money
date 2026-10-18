@@ -832,12 +832,14 @@ def restart_points(want, withdraw):
     day0 = first - first % 390
     return {"before the payout, same day": day0 + 100, "after the payout, same day": first + 5,
             "the next day's first bar": day0 + 390, "before the payout leaves": withdraw[0] - 50,
-            "after it left": withdraw[0] + 200, "a later cycle": want[1][0] + 30}
+            "after it left": withdraw[0] + 200, "a later cycle": want[1][0] + 30,
+            # a full day of the last cycle behind it: its best day comes from the file
+            "the last cycle, a day in": want[-1][0] - want[-1][0] % 390 + 2 * 390 + 50}
 
 
 @pytest.mark.parametrize("where", ["before the payout, same day", "after the payout, same day",
                                    "the next day's first bar", "before the payout leaves", "after it left",
-                                   "a later cycle"])
+                                   "a later cycle", "the last cycle, a day in"])
 def test_payout_cycle_survives_a_restart(sim, tmp_path, payout_case, where):
     """The strategy stopped at a bar and started again (the history replayed, live from that bar) goes on from its
     file: the same payout days after the restart, and the same cycle at the end, as without the restart."""
