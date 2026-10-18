@@ -215,6 +215,11 @@ not identical: NinjaTrader's historical fills differ from the worst-case fills t
   the cent, evaluation and funded, with the breakout's take-profit at 8 stops and at 1 stop (so its fills are covered);
   removing the MOVE STOP alerts or the breakout's 16:00 alert makes it fail. The evaluation's target from the
   account: one "close everything" alert, no trade alerts after it, and the take-profit moved to the target's price.
+- Orders on, live: with a position on the account the strategy doesn't own (injected over a bot entry and over a
+  breakout entry), one alert, no entries until it is gone, then entries again; with none, live trades equal the
+  backtest's. Restarted mid-evaluation in profit, it stops at the target read from the account; the old count (its
+  own P/L since going live) trades on past it.
+- The breakout at $400 in the evaluation and $200 funded: trade for trade against the research reference at each.
 - The funded payout stop: the first bar at which closing makes the day payout-eligible, recomputed independently
   from the trades in three cycle states (one where the 50% rule binds), is the strategy's payout day; flat at once, no
   entries after it that day. On a scripted account through five payout cycles, with a payout leaving the account two
