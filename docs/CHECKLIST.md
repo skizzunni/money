@@ -37,6 +37,7 @@ Every requirement from the conversation, its status and the evidence. Status: **
 | 17 | Alerts complete enough to trade by hand | done | Follow-the-alerts test: the manual trader's trades equal the strategy's, to the cent |
 | 18 | Clear setup instructions | done | `docs/NINJATRADER.md`: install, settings, "Trading it by hand on Apex", Playback check |
 | 19 | Verified in NinjaTrader itself (not just the stand-in) | open (user) | Needs NinjaTrader: a Playback run as in the guide; the stand-in can't prove NinjaTrader's own fills |
+| 20 | One account, one platform, one dashboard ("ONE ACCOUNT. ONE PLATFORM.") | done | Everything that trades runs in the one NinjaTrader strategy on the one Apex account: orders with brackets, both setups, evaluation or funded read from the account's name (no switch to flip), the evaluation's target from the account's balance, the payout cycle kept in a file, the position guard, the on-chart dashboard and alerts (`test_account_type_from_the_account_name` and the tests above). Outside it, only what Apex's website alone does: buying the evaluation, requesting a payout (the strategy says when and about how much) |
 
 ## Open items and next steps
 

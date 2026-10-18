@@ -102,6 +102,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 IsInstantiatedOnEachOptimizationIteration = true;
 
                 Funded = false;
+                AutoAccountType = true;
                 EvalQty = 4;           // Apex 50K evaluation, intraday trail (docs/RESULTS.md round 60)
                 FundedQty = 4;         // 50K funded (PA): pays the most per evaluation (docs/RESULTS.md round 61)
                 PlaceOrders = true;
@@ -151,6 +152,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             }
             else if (State == State.DataLoaded)
             {
+                DetectAccountType();
                 newYork = NewYork();
                 badChart = BarsPeriod.BarsPeriodType != BarsPeriodType.Minute || BarsPeriod.Value <= 0 ||
                            30 % BarsPeriod.Value != 0;
@@ -202,6 +204,24 @@ namespace NinjaTrader.NinjaScript.Strategies
         double LockPlus { get { return Funded ? FundedLockPlus : EvalLockPlus; } }
         int MaxLosers { get { return Funded ? FundedMaxLosers : EvalMaxLosers; } }
         string Book { get { return Funded ? "Funded" : "Evaluation"; } }  // not "Account": that is NinjaTrader's
+        string accountTypeFrom = "the FUNDED ACCOUNT setting";
+
+        // Evaluation or funded from the account the strategy runs on, so the same settings serve both and nothing is
+        // switched by hand when Apex hands over the funded account: Apex names its funded (Performance) accounts
+        // PA-APEX-..., its evaluations APEX-... Any other name (a simulation account): the FUNDED ACCOUNT setting.
+        void DetectAccountType()
+        {
+            if (!AutoAccountType || Account == null || string.IsNullOrEmpty(Account.Name))
+                return;
+            string n = Account.Name.ToUpperInvariant();
+            if (n.StartsWith("PA-") || n.StartsWith("PA_") || n.StartsWith("PAAPEX"))
+                Funded = true;
+            else if (n.StartsWith("APEX"))
+                Funded = false;
+            else
+                return;
+            accountTypeFrom = "the account's name, " + Account.Name;
+        }
 
         // The evaluation's target: on in the evaluation, live (or in the tests)
         bool EvalTargetOn { get { return !Funded && EvalTarget > 0 && (State == State.Realtime || EvalTargetInHistory); } }
@@ -554,7 +574,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 {
                     evalDone = true;
                     Say("evaltarget", "EVALUATION TARGET REACHED: " + Usd(EvalClosed) + " up. Everything is closed and " +
-                        "the strategy takes no new trades. Switch FUNDED ACCOUNT on for the funded account.");
+                        "the strategy takes no new trades. Run it on the funded account (PA-APEX-...) when Apex gives it to you.");
                 }
                 double open = real != 0 ? Position.GetUnrealizedProfitLoss(PerformanceUnit.Currency, Close[0]) : 0.0;
                 if (real != 0 && (evalDone || EvalClosed + open >= EvalTarget + EvalBuffer))
@@ -952,6 +972,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         {
             string s = "MNQ Noise Momentum v1.6: " + Book + ", " + Qty + " MNQ, " + Usd(MaxLoss) + " max loss, " + MaxLosers +
                        " losers a day\n";
+            s += "Account: " + Book + " (from " + accountTypeFrom + ")\n";
             s += "Orders: " + (PlaceOrders ? "ON (the strategy trades this account)" : "OFF (alerts only)") + "\n";
             if (PlaceOrders && mismatchBars >= 2)
                 s += "ACCOUNT POSITION MISMATCH: the account holds " + Signed(PositionAccount) + " MNQ, the strategy " +
@@ -1028,6 +1049,10 @@ namespace NinjaTrader.NinjaScript.Strategies
         [NinjaScriptProperty]
         [Display(Name = "FUNDED ACCOUNT (on: 4 MNQ, $200, 2 losers; off: the 50K evaluation, 4 MNQ, $200, 3 losers)", Order = 1, GroupName = "1. Account")]
         public bool Funded { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Evaluation or funded from the account's name (APEX-... / PA-APEX-...); other names: the setting above", Order = 0, GroupName = "1. Account")]
+        public bool AutoAccountType { get; set; }
 
         [NinjaScriptProperty]
         [Range(1, 100)]

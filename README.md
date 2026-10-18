@@ -1,11 +1,32 @@
 # MNQ Liquidity Sweep Bot
 
-A rules-based MNQ day-trading strategy with prop-firm risk rails. Every piece below implements exactly the same rules:
+## Your system: one account, one platform
+
+**Everything you trade with is one NinjaTrader 8 strategy on your one Apex 50K account**: two files,
+[`ninjatrader/Strategies/MnqNoiseMomentum.cs`](ninjatrader/Strategies/MnqNoiseMomentum.cs) and
+[`ninjatrader/AddOns/MnqNoiseEngine.cs`](ninjatrader/AddOns/MnqNoiseEngine.cs), set up once as in
+[`docs/NINJATRADER.md`](docs/NINJATRADER.md). Nothing else (no TradingView, no webhook service, no Python, no second
+account) is needed to trade; those below are the research and the earlier versions.
+
+| What | Where, all in that one strategy |
+|---|---|
+| Orders | placed by the strategy, each with its stop and take-profit (Place orders on, the default) |
+| The bot + the Williams breakout in its gaps | built in; the breakout risks $400 in the evaluation, $200 funded |
+| Evaluation or funded | read from the account's name (APEX-... / PA-APEX-...): the same settings serve both |
+| The evaluation's $3,000 target | read from the account's balance; everything closed at it; survives restarts |
+| The funded payout stop | closes for the day when closing makes it payout-eligible; the cycle kept in a file across restarts |
+| Safety | flat by 16:00 New York; no new entries if the account's position isn't the strategy's |
+| Dashboard and alerts | on the chart: account type, orders, evaluation progress, payout cycle, today's trades; sound alerts |
+
+What stays outside it, because only Apex's website does it: buying the evaluation and requesting a payout (the
+strategy tells you when to request it and about how much).
+
+## Every piece in this repository
 
 | Piece | What it's for |
 |---|---|
 | **`pine/mnq_noise_momentum.pine`** | **Version 1.6. The one strategy here with a tested edge: 16 years of index data and 10½ years of real NQ futures data, stress-tested ([RESULTS.md](docs/RESULTS.md#stress-tests-of-version-10)).** Noise-area momentum from a 2024 paper: BUY/SELL/EXIT alerts, a resting stop that moves with the noise line, a max loss per trade, a take-profit 1.5 noise units past the fill, a lock that moves the stop to entry + 2.5 points once a trade is as far up as the max loss (about half the trades win at 10 MNQ and $350), no new entries after 4 losing trades in a day, a heads-up alert five minutes before a likely signal, an evaluation tracker (target, trailing floor, consistency), a FUNDED switch (3 MNQ in evaluations, 10 funded), no shorts before the 14:00 statement on Fed days, a trade log on the chart with the exact time of every trade, flat at 16:00, and optional webhook orders (TradersPost) for prop firms that allow automation. Run it on a 5-minute chart. Rules in [`docs/NOISE.md`](docs/NOISE.md). Over 16 years: about $26 a day on 1 MNQ, 15 of 16 years positive; it passes about 6 in 10 historical $25K evaluations and about 78% of $100K ones. |
-| **`ninjatrader/`** | **The same bot (v1.6) as a NinjaTrader 8 strategy that places its own orders on one account**: market entry with the stop and take-profit attached at the fill, the stop moved with the line and to entry + 2.5 at the lock, flat at 16:00 New York, FUNDED switch (Apex 50K intraday-trail evaluation: 4 MNQ, $200, 3 losers a day; funded: 10 MNQ, $350, 4), an alerts-only mode, a dashboard. Checked trade for trade against the Python bot. Install and Playback check in [`docs/NINJATRADER.md`](docs/NINJATRADER.md). |
+| **`ninjatrader/`** | **What you trade with (see above).** The bot (v1.6) plus the Williams breakout as one NinjaTrader 8 strategy that places its own orders on one account: evaluation 4 MNQ, $200, 3 losers a day, the breakout at $400; funded 4 MNQ, $200, 2 losers, the breakout at $200, the payout stop on; flat at 16:00; dashboard and alerts. Checked trade for trade against the Python research code. Install and Playback check in [`docs/NINJATRADER.md`](docs/NINJATRADER.md). |
 | `pine/mnq_liquidity_sweep_all_in_one.pine` | The original sweep/breakout bot in one TradingView script (no edge on real data, see below): BUY/SELL signals with size, limit price, stop and target, phone alerts, a dashboard, and a Strategy Tester backtest with optional prop-evaluation simulation. |
 | `pine/mnq_liquidity_sweep_signals.pine` | **TradingView indicator that tells you when to BUY or SELL.** It gives the limit price, stop, target and size, then alerts you to fill, move to breakeven, cancel, or flatten. |
 | `pine/mnq_liquidity_sweep_bot.pine` | TradingView strategy with the same rules, for backtesting in Strategy Tester with prop-evaluation simulation. |

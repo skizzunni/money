@@ -988,3 +988,22 @@ def test_evaluation_target_from_the_account_after_a_restart(sim, tmp_path):
                 break
             peak = max(peak, cum + fav, cum + float(base[k][6]))
     assert hits >= 2, hits
+
+
+def test_account_type_from_the_account_name(sim, tmp_path):
+    """One set of settings for the evaluation and the funded account: Apex's PA-APEX-... accounts trade the funded
+    settings and its APEX-... accounts the evaluation's, whatever the FUNDED ACCOUNT switch says; any other name (a
+    simulation account) and the auto setting off follow the switch. The dashboard says which and why."""
+    bars = rth_minutes(30, 3)
+    kw = dict(minutes=1, breakout=True)
+    funded, _, _, _ = run_sim(sim, bars, tmp_path, Funded=True, **kw)
+    evaluation, _, _, _ = run_sim(sim, bars, tmp_path, Funded=False, **kw)
+    assert funded != evaluation
+    pa, _, dash, _ = run_sim(sim, bars, tmp_path, SimAccountName="PA-APEX-123456-01", **kw)
+    assert pa == funded and "Account: Funded (from the account's name, PA-APEX-123456-01)" in dash
+    ev, _, dash, _ = run_sim(sim, bars, tmp_path, SimAccountName="APEX-123456-01", Funded=True, **kw)
+    assert ev == evaluation and "Account: Evaluation (from the account's name, APEX-123456-01)" in dash
+    sim_acct, _, dash, _ = run_sim(sim, bars, tmp_path, Funded=True, **kw)
+    assert sim_acct == funded and "Account: Funded (from the FUNDED ACCOUNT setting)" in dash
+    off, _, _, _ = run_sim(sim, bars, tmp_path, SimAccountName="PA-APEX-123456-01", AutoAccountType=False, **kw)
+    assert off == evaluation

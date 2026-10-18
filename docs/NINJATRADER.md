@@ -33,7 +33,8 @@ account. Copy that account to others with a trade copier (Tradesyncer, or NinjaT
    not, close it.
 5. **FLAT**: close everything at market (16:00 New York).
 6. **EVALUATION TARGET REACHED: CLOSE EVERYTHING NOW**: the account (net liquidation, read from NinjaTrader live) is
-   $3,000 up: close everything; the strategy gives no more trade alerts. Then switch FUNDED ACCOUNT on.
+   $3,000 up: close everything; the strategy gives no more trade alerts. When Apex gives you the funded account
+   (PA-APEX-...), run the strategy on it with the same settings: it sees from the name that it is funded.
 7. Bold finish (if you switched it on): from its day, the alerts say 10 MNQ for the bot; trade what they say.
 
 ## Install
@@ -52,6 +53,10 @@ account. Copy that account to others with a trade copier (Tradesyncer, or NinjaT
    - **Account:** the one account the bot trades (Tradesyncer's leader).
    - **Calculate: On bar close.** Any other setting and the strategy won't trade; the chart says so.
    - **Start behavior: Wait until flat** (the default).
+   - **Evaluation or funded from the account's name** (on, the default): on an Apex account the strategy knows from
+     its name which it is (APEX-... evaluation, PA-APEX-... funded), so nothing is switched by hand; the dashboard
+     shows "Account: Funded (from the account's name, ...)". On any other account (Sim101, Playback101) the switch
+     below decides.
    - **FUNDED ACCOUNT:** off = the Apex **50K Intraday Trail evaluation: 4 MNQ, $200 max loss a trade, no new
      entries after 3 losers a day**, lock at +25 points to entry + 2.5. On = funded: **4 MNQ, $200, 2 losers**, and the
      lock arms earlier, at +12.5 points, moving the stop to entry + 6.25 (rounds sixty-one and eighty-three: on a
