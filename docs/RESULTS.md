@@ -1995,7 +1995,10 @@ quarter below $500 (evaluation only; adopted if more passes and at least as much
 
 Busts fall a lot; the evaluations then run out of their 30 days instead, and fewer pass. **None adopted.** With rounds
 63 and 84 (more size busts more) this brackets the evaluation from both sides: the $2,000 trail and the 30-day clock
-together, and the current size sits near the best balance between them for this edge.
+together, and the current size sits near the best balance between them for this edge. Third-party summaries of the
+2026 rules agree the 30 days are fixed (from the purchase date, no renewal or reset; legacy accounts auto-renew), so
+start the strategy on the day the evaluation is bought. With 60 or 90 days instead (a scratch check), the cushion rules
+are still mixed: better on 2011-18, worse in 2019-25.
 
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
