@@ -1,0 +1,40 @@
+trades 2704, net $63,548, gross (after slippage, before commission) $84,098, net $23.5/trade; costs about $11.6/trade (commission $7.6 + 1 tick a side $4.0) = 33% of the edge before costs
+
+== By exit reason (net)
+                  n       net     avg    mfe
+why                                         
+Flat 16:00      130  111626.0   858.7  155.5
+Profit target   170  208168.0  1224.5  164.6
+Stop loss      2361 -253833.6  -107.5   31.2
+Stop passed      43   -2412.8   -56.1   32.9
+
+== By trade number in the day
+             n      net   avg   win
+n_in_day                           
+1          829  12971.6  15.6  49.5
+2          621  19168.4  30.9  52.5
+3         1254  31407.6  25.0  51.0
+
+== By check time (entry signal)
+t     09:59    10:29   10:59   11:29   11:59   12:29  12:59    13:29   13:59   14:29    14:59  15:29
+n     345.0    346.0   307.0   313.0   280.0   230.0  176.0    168.0   160.0   149.0    128.0  102.0
+net  7656.0  16610.4  3716.8 -6884.8  4456.0  5322.0  500.4  13891.2  5304.0 -2630.4  15463.2  142.8
+avg    22.2     48.0    12.1   -22.0    15.9    23.1    2.8     82.7    33.2   -17.7    120.8    1.4
+
+== Giveback: trades whose open profit reached 25+ points (the lock armed)
+1451 trades; net $321,824; average best 76.2 pts, average kept 28.7 pts; exits {'Stop loss': 1115, 'Profit target': 170, 'Flat 16:00': 125, 'Stop passed': 41}
+  best 25-40 pts: 545 trades, avg kept 0.4 pts of avg best 31.3
+  best 40-60 pts: 310 trades, avg kept 2.5 pts of avg best 48.5
+  best 60-1000000000.0 pts: 596 trades, avg kept 68.2 pts of avg best 131.6
+
+== Stops: losers
+1329 losers, net $-269,180; average MAE 34.5 pts; later in the day price went 25+ pts their way after the stop: 936 (70%); the 16:00 close was on their side of the entry: 545 (41%)
+
+== Sideways days: B's day result against the day's directional efficiency (|close-open| / range, 09:30-16:00)
+                  days  trades       net  avg_day
+eff_q                                            
+most sideways      208     521  -40095.6   -192.8
+q2                 207     640  -37398.0   -180.7
+q3                 207     743   20949.2    101.2
+most directional   207     800  120092.0    580.2
+(the day's efficiency is known only at the close: a description of where losses fall, not a usable filter)
