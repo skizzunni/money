@@ -922,3 +922,46 @@ def test_stress_market_has_what_it_claims():
     assert (last == 1255).any() and (last == 1555).any()  # half days and full days
     offsets = {t.utcoffset() for t in bars.index}
     assert len(offsets) == 2  # the daylight-saving change is inside the window
+
+
+# ── research-only exits (round 138): defined rules, checked on generated bars
+def _research_cfg(**kw):
+    return NoiseConfig(qty=1, max_loss_per_trade=50.0, max_losers=0, skip_dates="", target_on_fill_bar=True, **kw)
+
+
+def test_trail_exit_rule():
+    """Once the lock has armed, the stop also sits trail_points behind the best high (long) / low (short) up to the
+    previous bar; a 'Trail' exit fills at that stop (or the open past it) less a tick, and the trail never loosens."""
+    bars = synth_bars(sessions=40, seed=7)
+    h, lo, o = bars.high.to_numpy(), bars.low.to_numpy(), bars.open.to_numpy()
+    res = run(bars, _research_cfg(trail_points=25.0), minutes=5)
+    trails = [t for t in res.trades if t.reason == "Trail"]
+    assert trails, "the trail ended some trades"
+    for t in trails:
+        best = h[t.entry_bar:t.exit_bar].max() if t.direction > 0 else lo[t.entry_bar:t.exit_bar].min()
+        stop = best - t.direction * 25.0
+        want = (min(o[t.exit_bar], stop) if t.direction > 0 else max(o[t.exit_bar], stop)) - t.direction * 0.25
+        assert t.exit == pytest.approx(want), (t, stop)
+        assert t.direction * (t.exit - t.entry) > 0  # it only works after the lock: always a win
+    base = run(bars, _research_cfg(), minutes=5)
+    assert len(base.trades) != len(res.trades) or [t.exit for t in base.trades] != [t.exit for t in res.trades]
+
+
+def test_partial_exit_rule():
+    """partial_at 1R: half closes at the fill + 1R (25 points here), the other half is a separate record of the same
+    entry; the two halves' P/L add up to the position's; a trade closed in two parts counts as one loser at most."""
+    bars = synth_bars(sessions=40, seed=7)
+    res = run(bars, _research_cfg(partial_at=1.0), minutes=5)
+    parts = [t for t in res.trades if t.reason == "Partial"]
+    assert parts
+    by_entry = {}
+    for t in res.trades:
+        by_entry.setdefault(t.entry_bar, []).append(t)
+    for p in parts:
+        assert p.exit == pytest.approx(p.entry + p.direction * 25.0) and p.frac == 0.5
+        assert p.pnl == pytest.approx(0.5 * (25.0 * 2.0 - 2 * 0.62))
+        rest = [t for t in by_entry[p.entry_bar] if t is not p]
+        assert len(rest) == 1 and rest[0].frac == 0.5 and rest[0].exit_bar >= p.exit_bar
+    for t in res.trades:
+        if t.reason != "Partial" and t.entry_bar not in {p.entry_bar for p in parts}:
+            assert t.frac == 1.0
