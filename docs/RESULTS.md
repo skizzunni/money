@@ -1979,6 +1979,24 @@ week dips, and on real MNQ bars from Yahoo (37 nights, August-October 2026) it l
 100) at 1 MNQ. A published effect that held to 2025 and has been losing since: **not built in.** Worth re-checking as
 more nights come in.
 
+## Round one hundred and fifteen: smaller size when the evaluation's cushion runs low
+
+How the user's intraday-trail evaluations bust (the strategy now; 2019-25 / NQ): over a median of 9 sessions, not in
+one day; before the bust day about $1,750 of the $2,000 cushion is already gone and the bust day only has to lose
+another $230-250. `research/cushion_size.py`: half size below $1,000 or $700 of cushion, or half below $1,000 and a
+quarter below $500 (evaluation only; adopted if more passes and at least as much paid in all three periods).
+
+| | Pass %, 2011-18 / 2019-25 / NQ | Bust % | Out of time % |
+|---|---|---|---|
+| Now | 26.4 / 21.7 / 22.7 | 60 / 61 / 67 | 13 / 17 / 10 |
+| Half under $1,000 | 21.3 / 16.4 / 17.5 | 41 / 43 / 47 | 38 / 41 / 36 |
+| Half under $700 | 25.0 / 19.2 / 19.2 | 50 / 50 / 56 | 25 / 31 / 25 |
+| Half under $1,000, a quarter under $500 | 21.6 / 13.9 / 17.0 | 24 / 27 / 24 | 55 / 59 / 59 |
+
+Busts fall a lot; the evaluations then run out of their 30 days instead, and fewer pass. **None adopted.** With rounds
+63 and 84 (more size busts more) this brackets the evaluation from both sides: the $2,000 trail and the 30-day clock
+together, and the current size sits near the best balance between them for this edge.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
@@ -2086,6 +2104,7 @@ python research/combo_late.py nsx1m_scaled.pkl nq1m_scaled.pkl        # late bre
 python research/eval_lock_w.py nsx1m_scaled.pkl nq1m_scaled.pkl       # the evaluation's lock with the breakout (no)
 python research/day_giveback.py nsx1m_scaled.pkl nq1m_scaled.pkl      # a daily give-back stop (no)
 python research/overnight_early.py nsx1m_scaled.pkl nq1m_scaled.pkl   # overnight 18:00-02:00 (passes; recent data no)
+python research/cushion_size.py nsx1m_scaled.pkl nq1m_scaled.pkl      # smaller size on a thin cushion (no)
 ```
 
 The raw data isn't stored in this repo.
