@@ -44,13 +44,17 @@ Every requirement from the conversation, its status and the evidence. Status: **
    asked for now kept out of the balance until it leaves the account, and its leaving no longer counted as a losing
    day (found while adding the file: before, the balance read too high until the payout left, and once it left, the
    new cycle started with a loss the size of the payout, which held the payout stop back).
-2. Re-check the overnight 18:00-02:00 long as more real nights come in (passed 2011-25, lost in 2025-26).
-3. Evaluation size per week (round 133): 6 MNQ / 3 losers / $300 netted more in all four periods but wasn't the
+2. Done: with orders on, the evaluation's target read from the account's balance, so a restart or a reconnect (NinjaTrader
+   recalculates the strategy) no longer resets the count and aims for $3,000 more (found in an adversarial review of
+   the automated mode; tested: restarted mid-evaluation it stops at the target, the old count trades past it).
+3. Re-check the overnight 18:00-02:00 long as more real nights come in (passed 2011-25, lost in 2025-26).
+4. Evaluation size per week (round 133): 6 MNQ / 3 losers / $300 netted more in all four periods but wasn't the
    pre-registered pick; re-test it as new real weeks come in before making it the default.
-4. Evaluation price: on the newest 13 months a slot's payouts cover an evaluation only up to $65-101 (round 132);
+5. Evaluation price: on the newest 13 months a slot's payouts cover an evaluation only up to $65-101 (round 132);
    buy evaluations at promotional prices, not list.
-5. Allow `apextraderfunding.com` (user) so the rules above can be read at the source.
-6. A Playback run in NinjaTrader with Place orders off: check the alerts arrive and match the chart.
+6. Allow `apextraderfunding.com` (user) so the rules above can be read at the source.
+7. A Playback run in NinjaTrader with Place orders on (your mode): check the trades, the brackets and the alerts
+   match the chart.
 
 ## Failed approaches (and why), so they are not repeated
 

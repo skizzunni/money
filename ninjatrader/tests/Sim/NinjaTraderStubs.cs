@@ -49,6 +49,7 @@ namespace NinjaTrader.Cbi
         public double Get(AccountItem item, Currency currency)
         {
             if (item == AccountItem.NetLiquidation) return Value();
+            if (item == AccountItem.CashValue) return Value() - Unrealized();  // the balance: net liquidation less open P/L
             if (item == AccountItem.RealizedProfitLoss) return Realized();
             if (item == AccountItem.UnrealizedProfitLoss) return Unrealized();
             throw new NotSupportedException();

@@ -957,3 +957,34 @@ def test_payout_cycle_alerts_only(sim, tmp_path, payout_case):
     hits_b, cycle_b, _ = payout_run(sim, bars, liq, tmp_path, SimRealtimeFrom=s, SimWithdraw=w, PlaceOrders=False,
                                     SimUserDataDir=data)
     assert hits_b == [k for k in hits if k >= s] and cycle_b.replace(" (remembered)", "") == cycle
+
+
+def test_evaluation_target_from_the_account_after_a_restart(sim, tmp_path):
+    """Orders on, the strategy (re)started in the middle of an evaluation already in profit: the target is read from
+    the account's balance, so it closes everything when the account reaches it; the old count (its own P/L since
+    going live) would trade on past it, aiming for the whole target again."""
+    hits = 0
+    for seed in (3, 5, 9, 11):
+        bars = rth_minutes(60, seed)
+        r = 25 * 390
+        base, _, _, _ = run_sim(sim, bars, tmp_path, minutes=1, breakout=True, RoundPrices=False, EvalTarget=0,
+                                SimRealtimeFrom=r)
+        before = sum(float(t[6]) for t in base if int(t[3]) < r)
+        if before < 300:
+            continue
+        best, peak = best_equity(bars, base), -1e9
+        for k, (cum, fav) in enumerate(best):
+            if int(base[k][1]) > r and int(base[k - 1][3]) < int(base[k][1]) and cum + fav > peak + 150:
+                target = max(peak, cum) + (cum + fav - max(peak, cum)) / 2 - 25
+                got, _, _, printed = run_sim(sim, bars, tmp_path, minutes=1, breakout=True, RoundPrices=False,
+                                             EvalTarget=target, SimRealtimeFrom=r)
+                assert got[:k] == base[:k] and len(got) == k + 1, (seed, k, len(got))
+                assert sum(float(t[6]) for t in got) >= target
+                assert any("EVALUATION TARGET REACHED" in p for p in printed)
+                old, _, _, _ = run_sim(sim, bars, tmp_path, minutes=1, breakout=True, RoundPrices=False,
+                                       EvalTarget=target, SimRealtimeFrom=r, EvalFromAccount=False)
+                assert len(old) > k + 1, "the old count trades on past the target"
+                hits += 1
+                break
+            peak = max(peak, cum + fav, cum + float(base[k][6]))
+    assert hits >= 2, hits

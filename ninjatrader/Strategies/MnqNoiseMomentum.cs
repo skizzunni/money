@@ -129,6 +129,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 BreakoutMaxQty = 10;
                 EvalTarget = 3000;
                 EvalProfitSoFar = 0;
+                EvalFromAccount = true;
                 EvalTargetInHistory = false;
                 EvalStartDate = "";
                 BoldFromDay = 0;
@@ -205,9 +206,22 @@ namespace NinjaTrader.NinjaScript.Strategies
         // The evaluation's target: on in the evaluation, live (or in the tests)
         bool EvalTargetOn { get { return !Funded && EvalTarget > 0 && (State == State.Realtime || EvalTargetInHistory); } }
 
-        double EvalClosed  // the evaluation's closed profit, $
+        // The evaluation's closed profit, $: the account's cash balance less its starting balance (what Apex measures; it
+        // survives a restart, or NinjaTrader recalculating the strategy after a lost connection, with nothing to
+        // re-enter). EvalFromAccount off, or a connection that reports no balance: the strategy's own closed P/L since
+        // it went live, plus "profit already made before this start".
+        double EvalClosed
         {
-            get { return EvalProfitSoFar + SystemPerformance.AllTrades.TradesPerformance.Currency.CumProfit - profitBase; }
+            get
+            {
+                if (EvalFromAccount && Account != null)
+                {
+                    double cash = Account.Get(AccountItem.CashValue, Currency.UsDollar);
+                    if (cash > 0)
+                        return cash - AccountStart;
+                }
+                return EvalProfitSoFar + SystemPerformance.AllTrades.TradesPerformance.Currency.CumProfit - profitBase;
+            }
         }
 
         // The evaluation's profit for the dashboard: the strategy's own when it trades, the account's when it only alerts
@@ -1135,8 +1149,12 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         [NinjaScriptProperty]
         [Range(-100000.0, 100000.0)]
-        [Display(Name = "Evaluation: profit already made before this start, $", Order = 10, GroupName = "1. Account")]
+        [Display(Name = "Evaluation: profit already made before this start, $ (only with the next setting off)", Order = 10, GroupName = "1. Account")]
         public double EvalProfitSoFar { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Evaluation: read its profit from the account (balance - starting balance; survives restarts)", Order = 11, GroupName = "1. Account")]
+        public bool EvalFromAccount { get; set; }
 
         [NinjaScriptProperty]
         [Display(Name = "Evaluation: the day it was bought (yyyy-MM-dd), for the bold finish", Order = 11, GroupName = "1. Account")]

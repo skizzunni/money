@@ -97,9 +97,13 @@ account. Copy that account to others with a trade copier (Tradesyncer, or NinjaT
      so check the dashboard against Apex's and re-enter the cycle if they differ. Started during a day, it takes the
      day's start from the account's P/L for the day (NinjaTrader's realized and unrealized P/L, which reset at each
      trading day): check the dashboard once against Apex's the first time you do it.
-   - **Evaluation: profit already made before this start:** 0 for a new evaluation. **If you restart the strategy in
-     the middle of an evaluation, enter the evaluation's profit so far here** (from Apex's dashboard), or it will aim
-     for $3,000 more. The dashboard shows "Evaluation: $X of $3,000" so you can check it matches.
+   - **Evaluation: read its profit from the account** (on by default): the evaluation's profit is the account's
+     balance less **account's starting balance** (50,000), what Apex itself measures. A restart, or NinjaTrader
+     recalculating the strategy after a lost connection (its default), changes nothing: nothing to re-enter. The
+     dashboard shows "Evaluation: $X of $3,000"; check it once against Apex's dashboard. (Before, the strategy counted
+     only its own P/L since it last went live, so after a restart or a reconnect it would have aimed for $3,000 more.)
+   - **Evaluation: profit already made before this start:** only used with the setting above off (or a connection
+     that reports no balance): then enter the evaluation's profit so far after a restart.
    - **Breakout in the bot's gaps:** on (the default) adds the breakout above: about $40-45 more a week, more
      payouts per evaluation and a first payout about twice as often within 20 sessions, at the cost of more red
      days (about half the days instead of a third). Off = the bot alone.
