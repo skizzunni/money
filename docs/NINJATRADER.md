@@ -183,8 +183,12 @@ stand-in for NinjaTrader, not on NinjaTrader. Watch it trade once in NinjaTrader
    entry the minute after a bar reaches a level, a stop at once, and, if the bot signals while it's open, the
    breakout closed ("Breakout: bot first") or reversed in the same minute as the bot's entry. For the evaluation's
    target, set it low for the test (say $300) and watch it close everything at that profit and stop.
-4. Then run a day on **Sim101** live (real-time data, simulated money) with Tradesyncer copying to a simulated
-   follower, and check the follower gets the same entry, **the same stop moves**, and the 16:00 exit.
+4. Send three things back to check against the tested rules on the same days: the **NinjaScript Output** window's
+   text (right-click → Save as; every alert and the daily lines), the playback's trades (**Control Center →
+   Executions** tab, or Strategy Analyzer → Trades, right-click → Export, CSV), and the 1-minute bars you played
+   (**Tools → Historical Data**, select MNQ, **Export**, Minute). Each of the strategy's trades is then re-run from those
+   same bars, entry, stop, take-profit, exit and P/L, and any difference is a bug to fix before real money.
+5. Then a day live on **Sim101** (real-time data, simulated money): the same checks as 3, with real fills.
 
 **Strategy Analyzer** backtests it too (Slippage 1, Commission template on). Expect close to the Python numbers,
 not identical: NinjaTrader's historical fills differ from the worst-case fills the research uses.
