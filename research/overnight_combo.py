@@ -40,9 +40,10 @@ VARIANTS = [None] + list(itertools.product((1, 2), (75.0, 150.0)))
 FUNDED_ONLY = False  # also each variant on the funded account only (the evaluation as now)
 
 
-def overnight(path, q, stop_pts, delay=0):
+def overnight(path, q, stop_pts, delay=0, end_min=570):
     """Per night: (session date d', pnl, running max of minute equity, minute equity), $ at q contracts. delay 1:
-    enter a bar later (at the close of the first bar from 18:00, as the NinjaTrader strategy can)."""
+    enter a bar later (at the close of the first bar from 18:00, as the NinjaTrader strategy can). end_min: out at
+    the open of that minute of d' (570: 09:30)."""
     bars = pd.read_pickle(path)
     idx = bars.index.tz_convert(A.NY)
     ns = idx.as_unit("ns").asi8
@@ -54,7 +55,7 @@ def overnight(path, q, stop_pts, delay=0):
         d, d2 = sess[k - 1], sess[k]
         if d.month != d2.month:
             continue
-        t1, t2 = (d2 - pd.Timedelta(hours=6)).value, (d2 + pd.Timedelta(minutes=570)).value
+        t1, t2 = (d2 - pd.Timedelta(hours=6)).value, (d2 + pd.Timedelta(minutes=end_min)).value
         j1, j2 = int(np.searchsorted(ns, t1)), int(np.searchsorted(ns, t2))
         if j1 >= len(ns) or j2 >= len(ns) or ns[j1] - t1 > 5 * 60 * 10**9 or ns[j2] - t2 > 5 * 60 * 10**9 or j2 <= j1:
             continue

@@ -1952,6 +1952,33 @@ stable across periods, but that would raise the whole strategy's return-to-swing
 what sets the pass rate on a $2,000 trailing drawdown with 30 days; rule changes move it by a few percent, and only a
 new edge uncorrelated with both would move it much.
 
+## Round one hundred and thirteen: a daily give-back stop for the intraday trail
+
+`research/day_giveback.py` (adopted if more passes and at least as much paid in all three periods): once the day's
+equity (bot + breakout, closed + open) has been up $P, close everything and stop for the day if it falls $G below
+the day's best (P $300 / $600 x G $200 / $400; evaluation only, or both). (A first run compared each minute's low with
+a best that included the same minute's high, triggering stops a real fill wouldn't; the run reported here compares
+with the best before the minute.) It does what it is meant to do (green days up to 42%, red days down to a third,
+evaluation busts down by as much as 44 points) but it cuts the trend days that pay for everything: $ a week falls by a
+third to two thirds and so many evaluations run out of time that passes fall to 7-20%. **None adopted.**
+
+## Round one hundred and fourteen: the overnight long, 18:00 to 02:00
+
+`research/overnight_early.py`. Round 104's most consistent window (t 1.99 / 2.23 / 1.92), 1 MNQ from 18:01 to the
+02:00 open, stop 50 or 100 points, in the evaluation and funded (or funded only); bar as round 105.
+
+| | $ a week, 2011-18 / 2019-25 / NQ | Pass % | Bust % | Paid per evaluation | First payout within 20 sessions |
+|---|---|---|---|---|---|
+| Now | 316 / 311 / 288 | 26.4 / 21.7 / 22.7 | 60 / 61 / 67 | $1,268 / $727 / $690 | 9.9 / 4.4 / 4.0% |
+| Stop 50 | 355 / 344 / 321 | 28.5 / 22.4 / 23.4 | 58 / 60 / 67 | $1,421 / $821 / $799 | 15.0 / 10.2 / 8.4% |
+| Stop 100 | 372 / 349 / 336 | 28.5 / 23.6 / 24.3 | 60 / 61 / 67 | $1,600 / $957 / $720 | 15.0 / 11.1 / 10.8% |
+
+Both pass the bar in all three periods (funded only: fail). But the two newest checks go the other way: on the 13
+months from July 2025 (no round chose anything on them) the pass rate falls (21.0% and 19.3% against 24.5%) and $ a
+week dips, and on real MNQ bars from Yahoo (37 nights, August-October 2026) it lost $1,114 (stop 50) and $999 (stop
+100) at 1 MNQ. A published effect that held to 2025 and has been losing since: **not built in.** Worth re-checking as
+more nights come in.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
@@ -2057,6 +2084,8 @@ python research/eval_lock.py nsx1m_scaled.pkl nq1m_scaled.pkl         # if the e
 python research/last_half_hour.py nsx1m_scaled.pkl nq1m_scaled.pkl    # intraday momentum into the close (no)
 python research/combo_late.py nsx1m_scaled.pkl nq1m_scaled.pkl        # late breakout entries, a smaller together (no)
 python research/eval_lock_w.py nsx1m_scaled.pkl nq1m_scaled.pkl       # the evaluation's lock with the breakout (no)
+python research/day_giveback.py nsx1m_scaled.pkl nq1m_scaled.pkl      # a daily give-back stop (no)
+python research/overnight_early.py nsx1m_scaled.pkl nq1m_scaled.pkl   # overnight 18:00-02:00 (passes; recent data no)
 ```
 
 The raw data isn't stored in this repo.
