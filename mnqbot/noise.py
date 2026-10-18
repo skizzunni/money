@@ -87,6 +87,14 @@ class NoiseConfig:
     # stop is also never looser than the day's VWAP as of the last check (long: max(stop, VWAP)); "bars": as of the
     # last bar's close. Volume-weighted typical price from 09:30; time-weighted where the data has no volume.
     vwap_stop: str = ""
+    # research only (round 138), not in the Pine script or NinjaTrader, both off by default. R is the initial risk in
+    # points (max_loss_per_trade / qty / point_value). trail_points: once the lock has armed, the stop also sits this
+    # many points behind the best high (long) / low (short) since the entry, decided at a bar's close, working from the
+    # next bar, never loosening. partial_at: this many R from the entry fill, a limit closes partial_frac of the
+    # position (a tick through it; the stop first in a bar that reaches both); the rest keeps every rule above.
+    trail_points: float = 0.0
+    partial_at: float = 0.0
+    partial_frac: float = 0.5
 
 
 @dataclass
@@ -101,6 +109,7 @@ class NoiseTrade:
     exit: float
     reason: str
     pnl: float
+    frac: float = 1.0  # the share of the position this record closes (partial_at: the part and the rest)
 
 
 @dataclass
@@ -148,6 +157,9 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
     losers_today = 0  # losing trades closed today
     locked = False  # the trade has reached the lock trigger (a broker's auto-breakeven)
     held, held_why = math.nan, ""  # tighten_only: the tightest stop so far in this trade, and what set it
+    rest, part_pnl = 1.0, 0.0  # partial_at: the share still open, and what the closed part made
+    best = math.nan  # trail_points: the best high (long) / low (short) since the entry, to the last bar's close
+    r_pts = cfg.max_loss_per_trade / cfg.qty / cfg.point_value if cfg.max_loss_per_trade > 0 else math.nan
     vol = bars["volume"].to_numpy(float) if "volume" in bars else np.zeros(len(bars))
     pv_sum = v_sum = 0.0  # today's volume-weighted (or time-weighted) typical price, from 09:30
     vwap_now = vwap_used = math.nan
@@ -163,12 +175,21 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
         pos, entry_px, entry_bar = d, o[i] + d * slip, i
 
     def close_pos(i: int, price: float, reason: str) -> None:
-        nonlocal pos, held, locked, losers_today
-        pnl = pos * (price - entry_px) * cfg.qty * cfg.point_value - 2 * cfg.commission_per_side * cfg.qty
-        trades.append(NoiseTrade(pos, cfg.qty, entry_bar, idx[entry_bar], entry_px, i, idx[i], price, reason, pnl))
-        if pnl < 0 and reason != "Session ended":
+        nonlocal pos, held, locked, losers_today, rest, part_pnl, best
+        pnl = rest * (pos * (price - entry_px) * cfg.qty * cfg.point_value - 2 * cfg.commission_per_side * cfg.qty)
+        trades.append(NoiseTrade(pos, cfg.qty, entry_bar, idx[entry_bar], entry_px, i, idx[i], price, reason, pnl,
+                                 rest))
+        if pnl + part_pnl < 0 and reason != "Session ended":  # a trade closed in parts is one trade
             losers_today += 1
-        pos, held, locked = 0, math.nan, False
+        pos, held, locked, rest, part_pnl, best = 0, math.nan, False, 1.0, 0.0, math.nan
+
+    def close_part(i: int, price: float) -> None:
+        nonlocal rest, part_pnl
+        f = cfg.partial_frac
+        part_pnl = f * (pos * (price - entry_px) * cfg.qty * cfg.point_value - 2 * cfg.commission_per_side * cfg.qty)
+        trades.append(NoiseTrade(pos, cfg.qty, entry_bar, idx[entry_bar], entry_px, i, idx[i], price, "Partial",
+                                 part_pnl, f))
+        rest = 1.0 - f
 
     for i in range(len(bars)):
         t = idx[i]
@@ -206,6 +227,10 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                 lk = entry_px + pos * cfg.lock_plus
                 if (pos > 0 and lk > line) or (pos < 0 and lk < line):
                     line, reason = lk, "Lock"
+                if cfg.trail_points > 0 and not math.isnan(best):  # research: trailing behind the best price
+                    tr = best - pos * cfg.trail_points
+                    if (pos > 0 and tr > line) or (pos < 0 and tr < line):
+                        line, reason = tr, "Trail"
             if cfg.tighten_only:  # the broker's stop is placed with the entry and only ever tightened
                 if entry_bar != i and ((pos > 0 and held > line) or (pos < 0 and held < line)):
                     line, reason = held, held_why
@@ -221,11 +246,21 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             if hit:
                 close_pos(i, price, reason)
                 events.append((i, "EXIT"))
+            if pos and rest == 1.0 and cfg.partial_at > 0 and not math.isnan(r_pts):  # research: part at +partial_at R
+                pt = (entry_px if entry_bar != i else est_px) + pos * cfg.partial_at * r_pts
+                if (pos > 0 and h[i] >= pt + cfg.tick) or (pos < 0 and l[i] <= pt - cfg.tick):
+                    close_part(i, pt)
+            if not pos or hit:
+                pass
             elif cfg.take_profit > 0 and (entry_bar != i or cfg.target_on_fill_bar):  # the take-profit limit
                 tp = (entry_px if entry_bar != i else est_px) * (1 + pos * cfg.take_profit * sigma)
                 if (pos > 0 and h[i] >= tp + cfg.tick) or (pos < 0 and l[i] <= tp - cfg.tick):
                     close_pos(i, tp, "Target")
                     events.append((i, "TARGET"))
+
+        if pos and cfg.trail_points > 0:  # the best price so far, as of this bar's close (used from the next bar)
+            bp = h[i] if pos > 0 else l[i]
+            best = bp if math.isnan(best) else (max(best, bp) if pos > 0 else min(best, bp))
 
         if use_stop and pos and not locked and cfg.lock_at > 0 and cfg.max_loss_per_trade > 0:
             # the lock arms when the bar reaches the trigger (high for a long, low for a short), from the next bar

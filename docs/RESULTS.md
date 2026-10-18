@@ -2356,6 +2356,45 @@ The same weeks at four settings (the bot as it is now, take-profit and fill-bar 
 - **The $35-per-contract stop is visible trade by trade.** At 10 MNQ and $350 the bot was stopped 29 times, 7 times in a row on 22 September and 5 on 30 September, re-entering at each check because price was still outside the line. With $117 a contract the same signals gave 20 trades, 14 of them winners.
 - **Four weeks is a small sample.** Over 16 years the bot wins about a third of its trades at $117 a contract; 70% here is a good month, not the new normal. What carries over is the comparison between settings on the same days.
 
+## Round one hundred and thirty-seven: does the breakout deserve its place? (the audit's stage 6)
+
+`research/components.py`. Each configuration is the whole strategy re-run (never trades removed from a list), on the
+evaluation's settings as in the user's NinjaTrader run; the account column is the running-account model (52 weeks,
+payout stop on, net of $100 an evaluation). Fixed before running.
+
+| | Net $ | $ a trade | Winners | Intraday DD | Net / intraday DD | Worst day | Top-5 share | Net, +2 ticks | Account $/wk |
+|---|---|---|---|---|---|---|---|---|---|
+| **2011-18** combined | 145,240 | 28.9 | 49.7% | 18,556 | 7.8 | -1,475 | 12.5% | 126,445 | **69.6** |
+| momentum only | 113,516 | 29.8 | 51.3% | 13,321 | 8.5 | -1,475 | 14.1% | 98,268 | 36.3 |
+| breakout only | 91,937 | 67.3 | 36.0% | 15,384 | 6.0 | -762 | 24.6% | 88,117 | 29.7 |
+| no breakout shorts | 142,469 | 32.5 | 50.8% | 15,080 | 9.4 | -1,475 | 11.8% | 125,508 | 68.0 |
+| equal risk ($200) | 131,678 | 26.6 | 49.7% | 15,111 | 8.7 | -1,475 | 12.1% | 114,733 | 58.9 |
+| **2019-25** combined | 131,071 | 34.0 | 48.4% | 13,041 | 10.1 | -3,182 | 14.9% | 117,320 | **42.4** |
+| momentum only | 96,227 | 33.1 | 49.4% | 14,707 | 6.5 | -1,173 | 20.0% | 84,595 | 13.9 |
+| breakout only | 78,229 | 73.5 | 34.9% | 10,340 | 7.6 | -3,182 | 34.4% | 75,961 | 16.6 |
+| no breakout shorts | 115,398 | 34.4 | 49.1% | 15,360 | 7.5 | -3,182 | 17.0% | 102,738 | 20.5 |
+| equal risk ($200) | 110,246 | 29.7 | 48.6% | 12,359 | 8.9 | -2,864 | 17.5% | 97,562 | 39.2 |
+| **Jul 2025-Aug 2026** combined | 19,329 | 25.3 | 50.3% | 10,061 | 1.9 | -943 | 67.2% | 16,594 | **3.6** |
+| momentum only | 17,104 | 30.4 | 52.4% | 8,260 | 2.1 | -628 | 76.0% | 14,852 | 2.0 |
+| breakout only | 1,484 | 6.5 | 34.6% | 8,081 | 0.2 | -407 | - | 957 | -25.2 |
+| no breakout shorts | 20,364 | 31.0 | 51.5% | 8,532 | 2.4 | -677 | 63.8% | 17,871 | 0.1 |
+| equal risk ($200) | 17,884 | 23.8 | 50.1% | 8,501 | 2.1 | -803 | 72.6% | 15,388 | 0.3 |
+| **NQ 2015-24** combined | 169,996 | 27.0 | 49.6% | 12,925 | 13.2 | -1,061 | 11.7% | 146,973 | **31.5** |
+| momentum only | 126,079 | 26.2 | 50.9% | 13,366 | 9.4 | -652 | 15.0% | 106,847 | 17.0 |
+| breakout only | 137,080 | 82.6 | 35.5% | 8,470 | 16.2 | -586 | 21.5% | 133,014 | 32.8 |
+| no breakout shorts | 163,672 | 29.7 | 50.6% | 13,480 | 12.1 | -1,061 | 12.2% | 142,622 | 27.0 |
+| equal risk ($200) | 147,958 | 24.2 | 49.8% | 11,841 | 12.5 | -843 | 12.8% | 126,893 | 25.0 |
+
+- **The breakout stays.** With it, the account nets more a week than the bot alone in every period ($69.6 / $42.4 /
+  $3.6 / $31.5 against $36.3 / $13.9 / $2.0 / $17.0) and more in total; the intraday drawdown is larger in two
+  periods and smaller in two. It rarely interferes: it trades only in the bot's gaps.
+- **The breakout's shorts stay.** Without them the account nets less in every period; the export's 8 shorts (7
+  losers) are a small sample, not a pattern (a hypothesis it raised, rejected here on 16 years).
+- **The $400 risk is mostly exposure.** Against the breakout at the bot's $200, net per unit of intraday drawdown is
+  about the same (7.8 vs 8.7, 10.1 vs 8.9, 1.9 vs 2.1, 13.2 vs 12.5): the higher return comes with proportionally more
+  risk. On the account it still nets more a week (evaluations pass sooner), which is why round 134 kept it.
+- Every period here was used by earlier rounds; no data before 16 October 2026 is untouched.
+
 ## The first run in NinjaTrader itself: Strategy Analyzer, September 8 to October 16, 2026
 
 The user ran the strategy in NinjaTrader's Strategy Analyzer on real MNQ DEC26 1-minute data (18 Aug - 17 Oct 2026,
@@ -2488,6 +2527,7 @@ python research/slot_size.py nsx1m_scaled.pkl nq1m_scaled.pkl          # sizes j
 python research/slot_eval.py nsx1m_scaled.pkl nq1m_scaled.pkl          # breakout $400 in the evaluation (adopted)
 python research/slot_funded.py nsx1m_scaled.pkl nq1m_scaled.pkl        # funded settings per week (none adopted)
 python research/vol_target.py nsx1m_scaled.pkl nq1m_scaled.pkl         # volatility-targeted size (not adopted)
+python research/components.py nsx1m_scaled.pkl nq1m_scaled.pkl         # the breakout's place (stays, shorts too)
 python research/nt_run_check.py data/nt_strategy_analyzer_2026-08-18_10-17.csv  # the NinjaTrader run
 ```
 
