@@ -2139,6 +2139,30 @@ rate on 2011-18; adopted if it passes more and pays at least as much on 2019-25 
 (36.2% on 2011-18), passes 37.3% / 35.4% against 37.1% / 34.5% but pays $1,089 against $1,163 on NQ. **4 MNQ / 3
 losers stays.** Bigger sizes pass about as often, faster (5-7 sessions) and bust more.
 
+## Round one hundred and twenty-six: the near-misses again, with close-at-target
+
+`research/retest_lock.py`. The variants rejected on the old pass rule that came closest, against the strategy now
+with close-at-target; adopted if more passes and at least as much paid in all three periods and no fewer passes in
+the newest 13 months.
+
+| | Pass %, 2011-18 / 2019-25 / NQ / July 2025-Aug 2026 | Paid per evaluation | First payout within 20 sessions |
+|---|---|---|---|
+| Now | 35.4 / 37.1 / 34.5 / 27.9 | $1,835 / $1,349 / $1,163 | 9.9 / 4.4 / 4.0% |
+| Breakout together with the bot, 6 MNQ in all | 34.8 / 33.6 / 35.5 / 22.8 | $1,816 / $1,007 / $1,187 | 11.3 / 5.0 / 6.5% |
+| Evaluation lock 0.5 / +2.5 | 38.1 / 30.9 / 30.2 / 19.3 | $1,978 / $1,108 / $1,031 | 9.9 / 4.4 / 4.0% |
+| Breakout $300 in the evaluation | 37.1 / 35.9 / 35.4 / 27.9 | $1,864 / $1,282 / $1,191 | 9.9 / 4.4 / 4.0% |
+| VWAP stop | 35.8 / 35.3 / 34.8 / 25.9 | $1,872 / $1,171 / $1,169 | 10.5 / 4.5 / 3.8% |
+| Overnight long 18:01-02:00 | 36.3 / 37.1 / 33.3 / 21.0 | $2,171 / $1,523 / $1,206 | 15.0 / 11.1 / 10.8% |
+
+**None adopted.** The overnight long pays more in all three periods and brings the first payout two to three times as
+often, but passes fewer evaluations on NQ and in the newest months (and lost on the real MNQ nights of round 114).
+
+## Round one hundred and twenty-seven: when to ask for a payout
+
+`research/payout_buffer.py`: a payout only when the balance after it stays $500 / $1,000 / $2,000 above the minimum.
+Paid per evaluation moves by about +/-2% ($1,822-1,864 against $1,835 on 2011-18; $1,305-1,338 against $1,349 in
+2019-25) and the first payout comes later. **Ask as soon as it's allowed (as now).**
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
@@ -2257,6 +2281,8 @@ python research/funded_bot.py nsx1m_scaled.pkl nq1m_scaled.pkl        # the bot'
 python research/eval_bot.py nsx1m_scaled.pkl nq1m_scaled.pkl          # the bot's evaluation settings with the breakout (stay)
 python research/pass_lock.py nsx1m_scaled.pkl nq1m_scaled.pkl         # close everything at the evaluation's target (adopted)
 python research/pass_lock_size.py nsx1m_scaled.pkl nq1m_scaled.pkl    # the evaluation's size with it (4 MNQ stays)
+python research/retest_lock.py nsx1m_scaled.pkl nq1m_scaled.pkl       # the near-misses with close-at-target (no)
+python research/payout_buffer.py nsx1m_scaled.pkl nq1m_scaled.pkl     # when to ask for a payout (as soon as allowed)
 ```
 
 The raw data isn't stored in this repo.
