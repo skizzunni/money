@@ -64,6 +64,13 @@ said it left most stops unslipped; that was a misreading, corrected in docs/MNQ_
 **The native fact that matters most:** in this same period, B's **closed-trade** drawdown at 4 MNQ reached
 $2,737-2,883, already more than the $2,000 the account allows. The intraday drawdown is at least as large.
 
+**Native, with intraday peaks (added after the MNQ bars arrived; docs/MNQ_NATIVE.md):**
+- **Data:** the traded contracts (09-26, then 12-26 from the 9/10 roll). The stand-in matched NinjaTrader on these
+  bars to the cent.
+- **Result, 7/20 to 10/16, 4 MNQ, 1 tick:** 39 pass / 10 fail / 14 expire of 63 overlapping starts; 4 / 1 / 1 back
+  to back.
+- **Limits:** about 3 independent windows, and the period that chose B.
+
 **Not native, for context only (rescaled NQ and index data on the stand-in; not proof about MNQ):**
 - Over ten years of NQ, the same rules at 4 MNQ: **31.6% pass, 60.7% fail, 7.7% expire.**
 - At 2 MNQ / $100: 7.7% pass, 14.7% fail, 77.6% expire. Smaller size mostly turns outcomes into expiries; it does not
@@ -78,8 +85,9 @@ excessive failure risk:
    Smaller size does not fix that; it mostly runs out of time.
 2. **The native MNQ evidence is one 77-session stretch:** about 2-3 independent evaluation windows. Even there, B's
    closed drawdown went past the $2,000 trailing allowance.
-3. **The evaluation with intraday peaks cannot yet be tested on native MNQ data.** That needs the 1-minute bars or the
-   Trades export with MAE/MFE.
+3. **On native MNQ with intraday peaks it passed more than it failed** (July to October 2026). But that is about
+   3 independent windows from the period that selected it, against ten years of substitute data that say the
+   opposite. It is not enough to establish a pass rate.
 
 **Ready for a frozen practice test: yes, on a simulation account only, as an operational test.**
 - The package compiles in NinjaTrader and ran clean in 22 native backtests.
@@ -92,7 +100,7 @@ excessive failure risk:
 ## Unresolved
 
 - **The account's exact rules** (daily loss limit, minimum days, time limit): not confirmed.
-- **An intraday evaluation replay on native MNQ:** needs the 1-minute bars.
+- **Untouched MNQ data** (03-26, 06-26): not provided. The forward practice test is the validation.
 - **The zero-trade run of 8/9 to 10/17:** cause unknown; needs its original code and settings with diagnostics.
 - **The breakout on ten years of substitute data** added money, which disagrees with the native period. Not resolved;
   B is kept on the native evidence.
