@@ -53,6 +53,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         bool badChart;
         bool realLocked;            // the real position reached the lock trigger
         bool closingRejected;       // a rejection already sent the position to market
+        bool exitRejected;          // one of the strategy's own exits was rejected: sent again at the next bar
         bool evalDone;              // the evaluation's target was reached: everything closed, no new trades
         double profitBase;          // the strategy's closed P/L when it went live (the history before doesn't count)
         const double EvalBuffer = 25.0;  // $ past the target, for the closing fees and a tick
@@ -552,7 +553,17 @@ namespace NinjaTrader.NinjaScript.Strategies
             {
                 realLocked = false;
                 closingRejected = false;
+                exitRejected = false;
                 owner = Nobody;
+            }
+            else if (exitRejected)
+            {
+                // an exit was rejected: never left there, the position is sent to market again at every bar until flat
+                exitRejected = false;
+                Say("retry", "EXIT REJECTED, SENT AGAIN: closing the " + (real > 0 ? "long" : "short") + " at market. " +
+                    "If this repeats, close it by hand.");
+                Flatten(real, "Close: retry");
+                return;
             }
 
             // 16:00 New York, or a bar outside 09:30-16:00 (a session that ended early): any position is closed at
@@ -775,6 +786,12 @@ namespace NinjaTrader.NinjaScript.Strategies
                 return;
             string msg = "ORDER REJECTED: " + order.Name + " (" + comment + ").";
             int real = RealDir;
+            if (real != 0 && IsOwnExit(order.Name))
+            {
+                exitRejected = true;  // ManageOrders sends it again at the next bar
+                Say("rejected", msg + " The exit is sent again at the next bar.");
+                return;
+            }
             if (real != 0 && !closingRejected && order.Name != "Flat 16:00" && order.Name != "Stop passed" &&
                 order.Name != "Close: rejected")
             {
@@ -787,6 +804,12 @@ namespace NinjaTrader.NinjaScript.Strategies
             else
                 msg += " Check the position by hand.";
             Say("rejected", msg);
+        }
+
+        static bool IsOwnExit(string name)
+        {
+            return name == "Close: rejected" || name == "Close: retry" || name == "Flat 16:00" || name == "Stop passed" ||
+                   name == "Evaluation target" || name == "Payout-eligible" || name == "Breakout: bot first";
         }
 
         // ── Alerts and dashboard

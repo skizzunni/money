@@ -220,6 +220,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         // the fill model
         public double CommissionPerSide = 0.62;
         public string RejectStopsAt { get; set; }  // "bar,bar,...": the broker rejects a stop change on these bars
+        public string RejectExitsAt { get; set; }  // "bar,bar,...": the broker rejects a market exit sent on these bars
         public int SlippageTicks = 1;
         public readonly List<SimTrade> SimTrades = new List<SimTrade>();
         public readonly List<string> OrderLog = new List<string>();
@@ -312,6 +313,14 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (fromEntrySignal != "") Check(fromEntrySignal);  // "": every entry
             OrderLog.Add(CurrentBar + ",Exit," + signalName + "," + fromEntrySignal);
             int real = Position.MarketPosition == MarketPosition.Long ? 1 : Position.MarketPosition == MarketPosition.Short ? -1 : 0;
+            if (real == d && RejectExitsAt != null && Array.IndexOf(RejectExitsAt.Split(','), CurrentBar.ToString()) >= 0)
+            {
+                Order rejected = new Order();
+                rejected.Name = signalName;
+                OnOrderUpdate(rejected, 0, 0, Position.Quantity, 0, 0, OrderState.Rejected, Time[0],
+                              ErrorCode.OrderRejected, "the broker refused the exit");
+                return;  // the position stays open
+            }
             if (real == d && (fromEntrySignal == "" || posName == fromEntrySignal))
                 pendExit = signalName;
         }

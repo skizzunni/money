@@ -1024,3 +1024,18 @@ def test_guard_blocks_from_the_first_bar_and_messages_say_what_was_sent(sim, tmp
         _, orders, _, printed = run_sim(sim, bars, tmp_path, SimForeignPosition=f"{e}:{e + 60}:4", **base)
         assert not [o for o in orders if o[1] == "Enter" and e <= int(o[0]) < e + 60], kind
         assert any("NOT sent by the strategy: the account's position isn't the strategy's" in p for p in printed), kind
+
+
+@pytest.mark.parametrize("refusals", [1, 2])
+def test_a_rejected_exit_is_sent_again(sim, tmp_path, refusals):
+    """A stop change is rejected, then the market exit sent in its place is rejected too (once, or twice in a row):
+    the exit is sent again at each following bar until the position is closed, never left there."""
+    bars = synth_bars(sessions=60, seed=3)
+    trades, _, _, _ = run_sim(sim, bars, tmp_path, RoundPrices=False)
+    b = int(next(t for t in trades if int(t[3]) - int(t[1]) >= 6)[1]) + 2
+    rejects = ",".join(str(b + k) for k in range(refusals))
+    got, _, _, printed = run_sim(sim, bars, tmp_path, RoundPrices=False, RejectStopsAt=str(b), RejectExitsAt=rejects)
+    closed = {int(t[3]): t[5] for t in got}
+    assert closed.get(b + refusals + 1) == "Close: retry", (b, refusals, closed)
+    assert sum("The exit is sent again at the next bar" in p for p in printed) == refusals
+    assert sum("EXIT REJECTED, SENT AGAIN" in p for p in printed) == refusals
