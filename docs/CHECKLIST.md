@@ -2,7 +2,7 @@
 
 Every requirement from the conversation, its status and the evidence. Status: **done** (verified), **partly**
 (improved, the stated goal not reached), **not met** (with why and what would change it), **open** (being worked on),
-**blocked** (needs something only the user can do). Last updated: October 18, 2026 (rounds through 134).
+**blocked** (needs something only the user can do). Last updated: October 18, 2026 (rounds through 135).
 
 ## The account and its rules
 
@@ -50,6 +50,7 @@ Every requirement from the conversation, its status and the evidence. Status: **
 3. Re-check the overnight 18:00-02:00 long as more real nights come in (passed 2011-25, lost in 2025-26).
 4. Evaluation size per week (round 133): 6 MNQ / 3 losers / $300 netted more in all four periods but wasn't the
    pre-registered pick; re-test it as new real weeks come in before making it the default.
+   The same for the funded breakout at $300 (round 135).
 5. Evaluation price: on the newest 13 months a slot's payouts cover an evaluation only up to $65-101 (round 132);
    buy evaluations at promotional prices, not list.
 6. Allow `apextraderfunding.com` (user) so the rules above can be read at the source.
