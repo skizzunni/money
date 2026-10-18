@@ -1314,3 +1314,28 @@ def test_live_day_survives_a_restart(sim, tmp_path):
     _, fresh, _, _ = run_sim(sim, bars, tmp_path, minutes=1, breakout=True, EvalTarget=0, DailyMaxLosers=1,
                              SimRealtimeFrom=x + 3, SimUserDataDir=tmp_path / "empty")
     assert [o for o in fresh if o[1] == "Enter" and day[int(o[0])] == day[x] and int(o[0]) >= x + 3]
+
+
+@pytest.mark.parametrize("seed", [3, 5, 9])
+def test_breakout_shorts_off_removes_only_the_breakout_shorts(sim, tmp_path, seed):
+    """BreakoutShorts off (candidate C, docs/REFERENCE.md): a day whose first breakout level reached is the short one
+    has no breakout trade. With the daily gate and the account-level stops off (the defaults in history), nothing else
+    depends on the breakout's shorts, so the trades are the default run's without its "W Short" trades, exactly; the
+    default (on) is the reference's own setting."""
+    bars = rth_minutes(40, seed)
+    path = write_bars(bars, tmp_path)
+
+    def named(props):
+        r = subprocess.run([DOTNET, str(sim), str(path), "1", *[f"{k}={v}" for k, v in props.items()]],
+                           capture_output=True, text=True, env=ENV)
+        assert r.returncode == 0, r.stderr[-3000:]
+        lines = r.stdout.splitlines()
+        t = [x.split(",")[1:] for x in lines if x.startswith("T,")]
+        n = [x.split(",")[1:] for x in lines if x.startswith("TN,")]
+        return [(*a, b[0]) for a, b in zip(t, n, strict=True)]
+
+    base = named({"UseBreakout": True})
+    assert base == named({"UseBreakout": True, "BreakoutShorts": True})
+    off = named({"UseBreakout": True, "BreakoutShorts": False})
+    assert any(x[-1] == "W Short" for x in base)
+    assert off == [x for x in base if x[-1] != "W Short"]

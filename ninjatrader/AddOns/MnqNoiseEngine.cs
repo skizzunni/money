@@ -452,6 +452,7 @@ namespace NinjaTrader.NinjaScript.AddOns.MnqBot
         public int MaxQty = 10;
         public int LastEntry = 900;      // no new trade from a bar starting after 15:00
         public double PointValue = 2.0;
+        public bool Shorts = true;       // off: a day whose first level reached is the short one has no breakout trade
     }
 
     // Larry Williams' volatility breakout, as research/combo_live.py and combo_priority.py trade it (rounds 99-101):
@@ -471,7 +472,7 @@ namespace NinjaTrader.NinjaScript.AddOns.MnqBot
         public double StopPoints;
         public string Status = "waiting for a full session";
         // what this bar did to the day's chance, for the diagnostics: "" nothing, "signal", "both levels", "stop too wide",
-        // "not allowed" (a level reached while a trade isn't allowed)
+        // "not allowed" (a level reached while a trade isn't allowed), "shorts off" (the short level first, shorts off)
         public string Note = "";
 
         public WilliamsBreakout(WilliamsSettings settings)
@@ -520,6 +521,12 @@ namespace NinjaTrader.NinjaScript.AddOns.MnqBot
                 return;
             }
             int d = hu ? 1 : -1;
+            if (d < 0 && !s.Shorts)
+            {
+                Status = "short level first, shorts off: no trade today";
+                Note = "shorts off";
+                return;
+            }
             double dist = s.StopFraction * prevRange;
             int q = (int)Math.Floor(s.Risk / (dist * s.PointValue));
             if (q < 1)

@@ -148,6 +148,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 BreakoutRisk = 200;
                 EvalBreakoutRisk = 400;  // money a week per account, all four periods (docs/RESULTS.md round 134)
                 BreakoutMaxQty = 10;
+                BreakoutShorts = true;
                 EvalTarget = 3000;
                 EvalProfitSoFar = 0;
                 EvalFromAccount = true;
@@ -208,6 +209,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 ws.StopFraction = BreakoutStop;
                 ws.Risk = Funded ? BreakoutRisk : EvalBreakoutRisk;
                 ws.MaxQty = BreakoutMaxQty;
+                ws.Shorts = BreakoutShorts;
                 ws.PointValue = settings.PointValue;
                 williams = new WilliamsBreakout(ws);
                 cycleQual = FundedQualDays;
@@ -1193,6 +1195,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 Block(4, "breakout: both levels in one bar (no trade by rule)", "");
             else if (williams.Note == "stop too wide")
                 Block(4, "breakout: stop too wide for the risk", "");
+            else if (williams.Note == "shorts off")
+                Block(4, "breakout: the short level first, breakout shorts off", "");
             else if (williams.Note == "not allowed")
                 Block(4, "breakout: level reached while a trade isn't allowed",
                       "(" + (!engine.Ready ? "engine not ready" : engine.SkipToday ? "skip date" :
@@ -1269,7 +1273,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                   accountTypeFrom + "), PlaceOrders " + PlaceOrders + ", " + Qty + " MNQ, max loss " + Usd(MaxLoss) +
                   ", losers " + MaxLosers + ", Lookback " + Lookback + ", DailyLossLimit " + DailyLossLimit +
                   ", DailyMaxLosers " + DailyMaxLosers + ", PartialAtR " + PartialAtR + ", TightenOnly " + TightenOnly +
-                  ", UseBreakout " + UseBreakout + " (risk " + Usd(Funded ? BreakoutRisk : EvalBreakoutRisk) + ")");
+                  ", UseBreakout " + UseBreakout + " (risk " + Usd(Funded ? BreakoutRisk : EvalBreakoutRisk) + ", shorts " +
+                  BreakoutShorts + ")");
             Print("MNQ settings: history controls: EvalTarget " + EvalTarget + " in history " + EvalTargetInHistory +
                   ", PayoutStop " + PayoutStop + " in history " + PayoutStopInHistory + ", EvalFromAccount " + EvalFromAccount +
                   ", RememberPayoutCycle " + RememberPayoutCycle + ", StartBehavior " + StartBehavior +
@@ -1743,6 +1748,10 @@ namespace NinjaTrader.NinjaScript.Strategies
         [Range(1, 100)]
         [Display(Name = "Most contracts", Order = 5, GroupName = "5. Breakout")]
         public int BreakoutMaxQty { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Breakout shorts (off: a day whose short level is reached first has no breakout trade)", Order = 7, GroupName = "5. Breakout")]
+        public bool BreakoutShorts { get; set; }
 
         [NinjaScriptProperty]
         [Range(0.0, 100000.0)]

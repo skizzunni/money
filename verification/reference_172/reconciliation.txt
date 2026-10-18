@@ -1,0 +1,47 @@
+== Reference run, rebuilt from its executions
+trades 172 (summary: 172)
+profit before commissions $10,966.50 (summary net: $10966.50, commission $0.00, slippage 0)
+closed-trade drawdown $4,649.50 (summary: ($4649.50))
+longest losing streak 10 (summary: 10)
+days with trades 62, losing days 38, winning days 24
+round-trip contract units 606
+winners 84, losers 87, even 1
+first entry 2026-06-29 10:12:00, last exit 2026-10-16 13:34:00
+
+== By component (before commissions)
+                trades  contracts     pnl
+component                                
+breakout long       25         66   866.5
+breakout short      27         60 -3780.0
+momentum long       52        208  7540.0
+momentum short      68        272  6340.0
+
+== By month (exit month, before commissions)
+component  breakout long  breakout short  momentum long  momentum short   total
+exit_time                                                                      
+2026-06              0.0          -213.0         1396.0             0.0  1183.0
+2026-07           -788.5         -1347.0           54.0         -1906.0 -3987.5
+2026-08            640.0            68.0         3820.0          -300.0  4228.0
+2026-09           1707.5          -823.0         2870.0          3110.0  6864.5
+2026-10           -692.5         -1465.0         -600.0          5436.0  2678.5
+
+== Largest five winners $10,984.00; the other 167: $-17.50
+             entry_time    name  qty     entry      exit      exit_name     pnl
+66  2026-08-04 11:01:00    Long    4  29849.25  30182.25  Profit target  2664.0
+106 2026-09-14 09:48:00  W Long    4  29271.25  29602.25  Profit target  2648.0
+60  2026-08-03 10:31:00    Long    4  28978.00  29252.50  Profit target  2196.0
+170 2026-10-16 12:31:00   Short    4  29675.75  29458.25  Profit target  1740.0
+6   2026-06-30 11:01:00    Long    4  30605.00  30822.00     Flat 16:00  1736.0
+momentum trades at exactly +$20: 43 (exits: {'Stop loss': 43})
+
+== Commission on these same trades (arithmetic, not a rerun)
+$0.00 a side: commission $0.00, net $10,966.50, closed-trade drawdown $4,649.50
+$0.62 a side: commission $751.44, net $10,215.06, closed-trade drawdown $4,845.42
+$0.95 a side: commission $1,151.40, net $9,815.10, closed-trade drawdown $4,949.70
+
+== Sessions: 94 with a 09:30 bar from 2026-05-04 to 2026-10-16; 116 scheduled (holidays out); missing 24: 2026-05-22 .. 2026-06-26
+
+== Previous export: 83 trades; found unchanged here 82 (entry, exit, prices, contracts, entry name); gross equal: True
+   previous: gross $9,499.00, commission $592.80, net $8,906.20
+   the other 90 trades here: $2,177.50 before costs; $8,789.00 + $2,177.50 = $10,966.50
+   of those: 88 before the previous run's first trade ($1,617.50), 0 after its last ($0.00)
