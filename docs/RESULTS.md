@@ -2044,6 +2044,15 @@ signal bar; 4 MNQ, $200): wick trades $52.0 / $44.7 / $38.5 / $38.4 a trade agai
 the others (2011-18 / 2019-25 / July 2025-2026 / NQ), the difference t 2.72 / 1.36 / 0.33 / 1.54. The other trades
 make money too and the gap has shrunk to noise in the newest data: cutting them would mostly give up profit. No round.
 
+## Round one hundred and eighteen: smaller bot trades before the day's breakout has touched
+
+The bot's trades by the day's breakout ($ a trade, 4 MNQ): after a touch in the same direction +49.2 (t 5.40, 62% of
+trades) / +29.4 / +22.3 / +37.8 (2011-18 / 2019-25 / July 2025-2026 / NQ); before any touch +2.1 (t 0.18, 34%) /
++26.9 / +56.0 / +8.6; against a touch (3-4%) noise. `research/touch_size.py`: the before-a-touch trades at 2 or 1
+MNQ (adopted if pass rate and payouts no lower and one higher on 2019-25 and NQ). The worst losing stretch and the
+busts fall a lot (NQ: $9,550 to $6,084 and 67% to 56% at 2 MNQ), but so do the money and the passes where those trades
+earned (2019-25: 21.7% to 16.9% passed; the newest 13 months: $242 to $166 a week). **Not adopted.**
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
@@ -2154,6 +2163,7 @@ python research/overnight_early.py nsx1m_scaled.pkl nq1m_scaled.pkl   # overnigh
 python research/cushion_size.py nsx1m_scaled.pkl nq1m_scaled.pkl      # smaller size on a thin cushion (no)
 python research/vwap_stop.py nsx1m_scaled.pkl nq1m_scaled.pkl         # the paper's VWAP trailing stop (no)
 python research/w_long.py nsx1m_scaled.pkl nq1m_scaled.pkl            # the breakout's shorts smaller or dropped (no)
+python research/touch_size.py nsx1m_scaled.pkl nq1m_scaled.pkl        # smaller bot trades before a breakout touch (no)
 ```
 
 The raw data isn't stored in this repo.
