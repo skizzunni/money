@@ -417,3 +417,80 @@ def test_breakout_in_the_bots_gaps(sim, tmp_path, seed, funded):
     assert "cut" in kinds or "reversed" in kinds, kinds
     sizes = {int(o[3]) for o in orders if o[1] == "Enter" and o[2].startswith("W")}
     assert sizes and all(1 <= q <= 10 for q in sizes)
+
+
+# ── The evaluation's target (docs/RESULTS.md round 124): everything closed the moment the evaluation is up the target
+@pytest.mark.parametrize("seed", [3, 5, 9])
+@pytest.mark.parametrize("target", [300.0, 700.0, 1500.0])
+def test_evaluation_target_closes_everything(sim, tmp_path, seed, target):
+    bars = rth_minutes(60, seed)
+    base, _, _, _ = run_sim(sim, bars, tmp_path, minutes=1, breakout=True, RoundPrices=False, EvalTarget=0)
+    got, orders, dash, printed = run_sim(sim, bars, tmp_path, minutes=1, breakout=True, RoundPrices=False,
+                                         EvalTarget=target, EvalTargetInHistory=True)
+    pnl = [float(t[6]) for t in got]
+    assert len(got) < len(base), "the target is reached before the data ends"
+    k = len(got) - 1
+    assert got[:k] == base[:k], "every trade before the one reaching the target is the same"
+    assert got[k][:3] == base[k][:3], "the trade reaching it is the same entry"
+    assert sum(pnl[:k]) < target + 25 <= sum(pnl[:k]) + max(float(base[k][6]), max(pnl[k], 0)) + 1e3
+    assert sum(pnl) >= target, (sum(pnl), target)  # the buffer covers the closing fees
+    # the take-profit at the target's price (or the normal one, when closer) fills before any close-based exit
+    assert got[k][5] == "Profit target", got[k]
+    d, en, ex = int(got[k][0]), float(got[k][2]), float(got[k][4])
+    q = round(pnl[k] / (d * (ex - en) * 2.0 - 1.24))
+    at_target = en + d * (target + 25 - sum(pnl[:k])) / (q * 2.0)
+    assert math.isclose(ex, at_target, abs_tol=1e-6) or d * (ex - at_target) < 0, (ex, at_target)
+    last_exit = int(got[k][3])
+    assert not [o for o in orders if o[1] == "Enter" and int(o[0]) >= last_exit], "no new trades after the target"
+    assert any("EVALUATION TARGET REACHED" in p for p in printed) and "TARGET REACHED" in dash
+
+
+def test_evaluation_target_only_in_the_evaluation_and_live(sim, tmp_path):
+    bars = rth_minutes(60, 3)
+    funded, _, _, _ = run_sim(sim, bars, tmp_path, minutes=1, breakout=True, Funded=True, RoundPrices=False)
+    funded_t, _, _, _ = run_sim(sim, bars, tmp_path, minutes=1, breakout=True, Funded=True, RoundPrices=False,
+                                EvalTarget=300, EvalTargetInHistory=True)
+    assert funded == funded_t, "no target on the funded account"
+    ev, _, _, _ = run_sim(sim, bars, tmp_path, minutes=1, breakout=True, RoundPrices=False, EvalTarget=0)
+    hist, _, dash, _ = run_sim(sim, bars, tmp_path, minutes=1, breakout=True, RoundPrices=False, EvalTarget=300)
+    assert ev == hist, "the history before going live is not counted"
+    assert "target close works live" in dash
+
+
+def best_equity(bars, trades):
+    """For each trade (strategy rows): the account's closed P/L before it, and its best open P/L ($) from the bars."""
+    h, lo = bars.high.to_numpy(float), bars.low.to_numpy(float)
+    out, cum = [], 0.0
+    for d, eb, en, xb, ex, _, pnl in trades:
+        d, eb, xb, en, ex, pnl = int(d), int(eb), int(xb), float(en), float(ex), float(pnl)
+        per = d * (ex - en) * 2.0 - 1.24
+        q = round(pnl / per) if abs(per) > 1e-9 else 1
+        fav = (h[eb:xb + 1].max() - en) if d > 0 else (en - lo[eb:xb + 1].min())
+        out.append((cum, q * (fav * 2.0 - 1.24)))
+        cum += pnl
+    return out
+
+
+def test_evaluation_target_on_a_breakout_trade(sim, tmp_path):
+    """A target only a breakout trade's run-up reaches (above every earlier trade's best): that trade exits at the
+    target's price, the trades before it are unchanged and nothing follows."""
+    hits = 0
+    for seed in (3, 5, 9, 11, 13):
+        bars = rth_minutes(60, seed)
+        base, orders, _, _ = run_sim(sim, bars, tmp_path, minutes=1, breakout=True, RoundPrices=False, EvalTarget=0)
+        w_entries = {o[0] for o in orders if o[1] == "Enter" and o[2].startswith("W")}
+        best = best_equity(bars, base)
+        peak = -1e9
+        for k, (cum, fav) in enumerate(best):
+            if str(int(base[k][1]) - 1) in w_entries and cum + fav > peak + 150 and cum + fav > 150:
+                target = max(peak, cum) + (cum + fav - max(peak, cum)) / 2 - 25
+                if target <= 0:
+                    continue
+                got, _, _, _ = run_sim(sim, bars, tmp_path, minutes=1, breakout=True, RoundPrices=False,
+                                       EvalTarget=target, EvalTargetInHistory=True)
+                assert got[:k] == base[:k] and len(got) == k + 1 and got[k][:3] == base[k][:3], (seed, k)
+                assert got[k][5] == "Profit target" and sum(float(t[6]) for t in got) >= target, (seed, got[k])
+                hits += 1
+                break
+            peak = max(peak, cum + fav, cum + float(base[k][6]))
+    assert hits, "a breakout trade reached the target on some seed"

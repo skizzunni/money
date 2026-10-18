@@ -35,6 +35,7 @@ namespace NinjaTrader.Core
 namespace NinjaTrader.Cbi
 {
     public enum MarketPosition { Flat, Long, Short }
+    public enum PerformanceUnit { Currency, Percent, Pips, Points, Ticks }
     public enum OrderState { Initialized, Submitted, Accepted, Working, Filled, Cancelled, Rejected }
     public enum ErrorCode { NoError, OrderRejected }
     public class Position
@@ -42,7 +43,19 @@ namespace NinjaTrader.Cbi
         public MarketPosition MarketPosition;
         public double AveragePrice;
         public int Quantity;
+        internal double PointValue = 2.0;
+        public double GetUnrealizedProfitLoss(PerformanceUnit unit, double price)
+        {
+            if (unit != PerformanceUnit.Currency) throw new NotSupportedException();
+            int d = MarketPosition == MarketPosition.Long ? 1 : MarketPosition == MarketPosition.Short ? -1 : 0;
+            return d * (price - AveragePrice) * Quantity * PointValue;
+        }
     }
+    // SystemPerformance.AllTrades.TradesPerformance.Currency.CumProfit: the closed trades' net P/L, fees included
+    public class TradesPerformanceValues { public double CumProfit; }
+    public class TradesPerformance { public TradesPerformanceValues Currency = new TradesPerformanceValues(); }
+    public class TradeCollection { public TradesPerformance TradesPerformance = new TradesPerformance(); }
+    public class SystemPerformance { public TradeCollection AllTrades = new TradeCollection(); }
     public class Order { public string Name; }
     public class MasterInstrument
     {
@@ -150,6 +163,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         public StartBehavior StartBehavior;
         public RealtimeErrorHandling RealtimeErrorHandling;
         public Position Position = new Position();
+        public SystemPerformance SystemPerformance = new SystemPerformance();
 
         // the fill model
         public double CommissionPerSide = 0.62;
@@ -262,6 +276,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             t.Pnl = d * (price - t.Entry) * Position.Quantity * Instrument.MasterInstrument.PointValue -
                     2 * CommissionPerSide * Position.Quantity;
             SimTrades.Add(t);
+            SystemPerformance.AllTrades.TradesPerformance.Currency.CumProfit += t.Pnl;
             Position.MarketPosition = MarketPosition.Flat;
             Position.Quantity = 0;
             Position.AveragePrice = 0;

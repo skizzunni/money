@@ -13,6 +13,10 @@
 //     buys (sells) at market, $200 of risk (1-10 MNQ), the stop a quarter of yesterday's range from the fill, out at
 //     16:00. One a day, only while the bot is flat; the bot always comes first: a bot entry while the breakout trade is
 //     open closes it at market (or reverses it) in the same bar.
+//   * the evaluation's target (docs/RESULTS.md round 124): in the evaluation, everything is closed the moment the
+//     account is $3,000 up (closed + open), which passes it; the take-profit of the trade in progress sits at that
+//     price when it is the closer one. No new trades after that. Live only (not in backtests or the history loaded
+//     before the strategy goes live); it counts the strategy's own P/L from then, plus "evaluation profit so far".
 // Setup: 1-minute MNQ chart (the lock arms within the minute: more winners than on 5 minutes, docs/RESULTS.md round
 // 81), Days to load 30 or more (the noise needs 14 full sessions), Calculate on bar close.
 // See docs/NINJATRADER.md. Written in C# 5 for NinjaTrader 8's compiler.
@@ -41,6 +45,9 @@ namespace NinjaTrader.NinjaScript.Strategies
         bool badChart;
         bool realLocked;            // the real position reached the lock trigger
         bool closingRejected;       // a rejection already sent the position to market
+        bool evalDone;              // the evaluation's target was reached: everything closed, no new trades
+        double profitBase;          // the strategy's closed P/L when it went live (the history before doesn't count)
+        const double EvalBuffer = 25.0;  // $ past the target, for the closing fees and a tick
         string lastSignal = "-";
         string headsUp = "";
 
@@ -90,6 +97,9 @@ namespace NinjaTrader.NinjaScript.Strategies
                 BreakoutStop = 0.25;
                 BreakoutRisk = 200;
                 BreakoutMaxQty = 10;
+                EvalTarget = 3000;
+                EvalProfitSoFar = 0;
+                EvalTargetInHistory = false;
 
                 AddPlot(Brushes.Teal, "Upper noise line");
                 AddPlot(Brushes.Maroon, "Lower noise line");
@@ -125,6 +135,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 ws.PointValue = settings.PointValue;
                 williams = new WilliamsBreakout(ws);
             }
+            else if (State == State.Realtime)
+                profitBase = SystemPerformance.AllTrades.TradesPerformance.Currency.CumProfit;
         }
 
         static TimeZoneInfo NewYork()
@@ -139,6 +151,23 @@ namespace NinjaTrader.NinjaScript.Strategies
         double LockPlus { get { return Funded ? FundedLockPlus : EvalLockPlus; } }
         int MaxLosers { get { return Funded ? FundedMaxLosers : EvalMaxLosers; } }
         string Account { get { return Funded ? "Funded" : "Evaluation"; } }
+
+        // The evaluation's target: on in the evaluation, live (or in the tests)
+        bool EvalTargetOn { get { return !Funded && EvalTarget > 0 && (State == State.Realtime || EvalTargetInHistory); } }
+
+        double EvalClosed  // the evaluation's closed profit, $
+        {
+            get { return EvalProfitSoFar + SystemPerformance.AllTrades.TradesPerformance.Currency.CumProfit - profitBase; }
+        }
+
+        // The price at which the position in progress takes the evaluation to its target (NaN: no position)
+        double EvalTargetPrice(int d)
+        {
+            if (d == 0 || Position.Quantity <= 0)
+                return double.NaN;
+            double need = EvalTarget + EvalBuffer - EvalClosed;
+            return Position.AveragePrice + d * need / (Position.Quantity * settings.PointValue);
+        }
 
         int RealDir
         {
@@ -207,6 +236,26 @@ namespace NinjaTrader.NinjaScript.Strategies
                 return;
             }
 
+            // the evaluation's target: passed once the closed profit is there (the take-profit below aims $25 past it,
+            // for the closing fees); a position already past target + $25 at this close is closed at market
+            if (EvalTargetOn)
+            {
+                if (!evalDone && EvalClosed >= EvalTarget)
+                {
+                    evalDone = true;
+                    Say("evaltarget", "EVALUATION TARGET REACHED: " + Usd(EvalClosed) + " up. Everything is closed and " +
+                        "the strategy takes no new trades. Switch FUNDED ACCOUNT on for the funded account.");
+                }
+                double open = real != 0 ? Position.GetUnrealizedProfitLoss(PerformanceUnit.Currency, Close[0]) : 0.0;
+                if (real != 0 && (evalDone || EvalClosed + open >= EvalTarget + EvalBuffer))
+                {
+                    Flatten(real, "Evaluation target");
+                    return;
+                }
+                if (evalDone)
+                    return;
+            }
+
             // a new entry: the bracket goes in first, so it is attached the moment the entry fills. It is set in ticks
             // from the fill, as a broker's bracket is, so a fill away from the expected price (a fast market) still
             // gets its stop and take-profit on the right side, the same distances away.
@@ -222,8 +271,12 @@ namespace NinjaTrader.NinjaScript.Strategies
                     else ExitShort("Breakout: bot first", WShortName);
                 }
                 SetStopLoss(name, CalculationMode.Ticks, StopTicks(o.Direction * (o.Expected - o.Stop)), false);
-                if (!double.IsNaN(o.Target))
-                    SetProfitTarget(name, CalculationMode.Ticks, TargetTicks(o.Direction * (o.Target - o.Expected)));
+                double tpPts = double.IsNaN(o.Target) ? double.NaN : o.Direction * (o.Target - o.Expected);
+                double evalPts = EvalPoints(Qty);
+                if (!double.IsNaN(evalPts) && (double.IsNaN(tpPts) || evalPts < tpPts))
+                    tpPts = evalPts;
+                if (!double.IsNaN(tpPts))
+                    SetProfitTarget(name, CalculationMode.Ticks, TargetTicks(tpPts));
                 if (o.Direction > 0)
                     EnterLong(Qty, LongName);
                 else
@@ -239,6 +292,9 @@ namespace NinjaTrader.NinjaScript.Strategies
             {
                 string wname = williams.Signal > 0 ? WLongName : WShortName;
                 SetStopLoss(wname, CalculationMode.Ticks, StopTicks(williams.StopPoints), false);
+                double wEval = EvalPoints(williams.Qty);
+                if (!double.IsNaN(wEval))
+                    SetProfitTarget(wname, CalculationMode.Ticks, TargetTicks(wEval));
                 if (williams.Signal > 0)
                     EnterLong(williams.Qty, wname);
                 else
@@ -247,6 +303,16 @@ namespace NinjaTrader.NinjaScript.Strategies
                 return;
             }
 
+            if (real != 0 && owner == Breakout && EvalTargetOn)  // the breakout's target: the evaluation's, from the real fill
+            {
+                double wt = EvalTargetPrice(real);
+                double pxw = Close[0];
+                if ((real > 0 && wt <= pxw) || (real < 0 && wt >= pxw))
+                    Flatten(real, "Evaluation target");
+                else
+                    SetProfitTarget(real > 0 ? WLongName : WShortName, CalculationMode.Price, RoundTarget(real, wt));
+                return;
+            }
             if (real == 0 || owner != Bot)
                 return;
             // in a trade: the stop and the take-profit for the next bar, measured from the real fill
@@ -268,8 +334,28 @@ namespace NinjaTrader.NinjaScript.Strategies
                 return;
             }
             SetStopLoss(name2, CalculationMode.Price, stop, false);
-            if (TakeProfit > 0 && !double.IsNaN(engine.Sigma))
-                SetProfitTarget(name2, CalculationMode.Price, RoundTarget(real, avg * (1 + real * TakeProfit * engine.Sigma)));
+            double tp = TakeProfit > 0 && !double.IsNaN(engine.Sigma) ? avg * (1 + real * TakeProfit * engine.Sigma) : double.NaN;
+            if (EvalTargetOn)
+            {
+                double et = EvalTargetPrice(real);
+                if ((real > 0 && et <= px) || (real < 0 && et >= px))
+                {
+                    Flatten(real, "Evaluation target");
+                    return;
+                }
+                if (double.IsNaN(tp) || (real > 0 && et < tp) || (real < 0 && et > tp))
+                    tp = et;
+            }
+            if (!double.IsNaN(tp))
+                SetProfitTarget(name2, CalculationMode.Price, RoundTarget(real, tp));
+        }
+
+        // Points from the fill at which `qty` contracts take the evaluation to its target (NaN: off)
+        double EvalPoints(int qty)
+        {
+            if (!EvalTargetOn || qty <= 0)
+                return double.NaN;
+            return Math.Max(TickSize, (EvalTarget + EvalBuffer - EvalClosed) / (qty * settings.PointValue));
         }
 
         // The closest of the line stop, the max loss from the real fill and the lock (as NoiseEngine.StopNow)
@@ -429,6 +515,9 @@ namespace NinjaTrader.NinjaScript.Strategies
                 s += "Next check " + NoiseEngine.Hhmm(nm) + ": " + P(nu) + " / " + P(nl) + (headsUp == "" ? "" : "   " + headsUp) + "\n";
             if (engine.SkipToday) s += "Today is on the skip list: no new trades.\n";
             if (engine.FedToday) s += "Fed day: no shorts before 14:00.\n";
+            if (!Funded && EvalTarget > 0)
+                s += "Evaluation: " + Usd(EvalClosed) + " of " + Usd(EvalTarget) + (evalDone ? " - TARGET REACHED, no new trades" :
+                     EvalTargetOn ? " (everything closes at the target)" : " (target close works live)") + "\n";
             if (UseBreakout)
                 s += "Breakout: " + (double.IsNaN(williams.Up) ? "" : P(williams.Up) + " / " + P(williams.Down) + ", ") +
                      williams.Status + "\n";
@@ -585,6 +674,19 @@ namespace NinjaTrader.NinjaScript.Strategies
         [Range(1, 100)]
         [Display(Name = "Most contracts", Order = 5, GroupName = "5. Breakout")]
         public int BreakoutMaxQty { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0.0, 100000.0)]
+        [Display(Name = "Evaluation: close everything at this profit, $ (0 = off)", Order = 9, GroupName = "1. Account")]
+        public double EvalTarget { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(-100000.0, 100000.0)]
+        [Display(Name = "Evaluation: profit already made before this start, $", Order = 10, GroupName = "1. Account")]
+        public double EvalProfitSoFar { get; set; }
+
+        [Browsable(false)]  // the tests turn it on: the evaluation's target in a historical run
+        public bool EvalTargetInHistory { get; set; }
 
         [Browsable(false)]  // the tests turn it off to compare prices with the Python bot exactly
         public bool RoundPrices { get; set; }

@@ -2104,6 +2104,41 @@ with the rest as now pays the most on the two later sets ($839 / $818, 2011-18 $
 busts, but the first payout comes later (3.3 / 3.5% within 20 sessions against 4.4 / 4.0%), against the user's
 two-week goal. **The funded setting stays.**
 
+## Round one hundred and twenty-three: the bot's evaluation settings with the breakout on the account
+
+`research/eval_bot.py`: contracts 3 / 4 / 5 x losers 2 / 3 / 4 (pick the highest pass rate on 2011-18; adopted if it
+passes more and pays at least as much on 2019-25 and NQ). The pick, 4 MNQ / 4 losers (27.0% on 2011-18), passes 19.2%
+against 21.7% in 2019-25. **Not adopted.**
+
+## Round one hundred and twenty-four: close everything the moment the evaluation reaches its target
+
+Challenging the method rather than the strategy: every evaluation result so far (apex25k.attempt) counted a pass only
+when a trade CLOSED with the balance at +$3,000. A trade that carried the account past +$3,000 in open profit and
+then fell back didn't pass, where a trader closes everything at that moment. `research/pass_lock.py`: passed the
+minute the merged minute equity reaches +$3,025 (the threshold checked first, up to and including that minute); a
+take-profit at that price does it (the NinjaTrader strategy now does). Bar: more passes and at least as much paid,
+all three periods.
+
+| The user's intraday-trail evaluation | Pass %, 2011-18 / 2019-25 / NQ / July 2025-Aug 2026 | Bust % | Sessions to pass | Paid per evaluation |
+|---|---|---|---|---|
+| Now (pass only at a trade's close) | 26.4 / 21.7 / 22.7 / 24.5 | 60 / 61 / 67 / 69 | 10 / 10 / 10 / 8 | $1,268 / $727 / $690 |
+| **Close everything at the target** | **35.4 / 37.1 / 34.5 / 27.9** | 54 / 49 / 58 / 68 | 9 / 8 / 8 / 7 | **$1,835 / $1,349 / $1,163** |
+| Threshold stopping at the start (round 109), now | 30.2 / 27.5 / 28.5 / 26.6 | 52 / 50 / 56 / 67 | | $1,416 / $865 / $838 |
+| Threshold stopping at the start, close at the target | 36.7 / 39.3 / 37.1 / 29.0 | 51 / 46 / 53 / 67 | | $1,862 / $1,441 / $1,233 |
+
+**Adopted**, the largest gain since the breakout: 1.3-1.7 times the passes and 1.45-1.9 times the money per
+evaluation, in every period and under both readings of the threshold. In the NinjaTrader strategy as "Evaluation:
+close everything at this profit" ($3,000): the take-profit of the trade in progress at the price that gets there
+($25 past it, for the fees) when that is closer than its own; at market if a bar closes $25 past it; no new trades
+after. Every earlier evaluation result above was measured without it and is too low.
+
+## Round one hundred and twenty-five: the evaluation's size and loser limit, with close-at-target
+
+`research/pass_lock_size.py`: contracts 3 / 4 / 5 / 6 x losers 2 / 3 / 4 with close-at-target (pick the highest pass
+rate on 2011-18; adopted if it passes more and pays at least as much on 2019-25 and NQ). The pick, 5 MNQ / 2 losers
+(36.2% on 2011-18), passes 37.3% / 35.4% against 37.1% / 34.5% but pays $1,089 against $1,163 on NQ. **4 MNQ / 3
+losers stays.** Bigger sizes pass about as often, faster (5-7 sessions) and bust more.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
@@ -2219,6 +2254,9 @@ python research/edge_hours.py nsx1m_scaled.pkl nq1m_scaled.pkl        # after th
 python research/overnight_range.py nsx1m_scaled.pkl nq1m_scaled.pkl   # a breakout of the overnight range (no)
 python research/funded_w.py nsx1m_scaled.pkl nq1m_scaled.pkl          # the breakout's risk on the funded side ($200 stays)
 python research/funded_bot.py nsx1m_scaled.pkl nq1m_scaled.pkl        # the bot's funded settings with the breakout (stay)
+python research/eval_bot.py nsx1m_scaled.pkl nq1m_scaled.pkl          # the bot's evaluation settings with the breakout (stay)
+python research/pass_lock.py nsx1m_scaled.pkl nq1m_scaled.pkl         # close everything at the evaluation's target (adopted)
+python research/pass_lock_size.py nsx1m_scaled.pkl nq1m_scaled.pkl    # the evaluation's size with it (4 MNQ stays)
 ```
 
 The raw data isn't stored in this repo.

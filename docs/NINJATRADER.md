@@ -40,6 +40,10 @@ account. Copy that account to others with a trade copier (Tradesyncer, or NinjaT
      $300, 3 losers** instead (3 x $300 stays under that plan's $1,000 daily loss limit).
      (Rounds 107-108 in [RESULTS.md](RESULTS.md) compare the two plans.)
    - **Place orders:** on = the strategy trades; off = alerts only.
+   - **Evaluation: close everything at this profit:** $3,000 (the 50K evaluation's target; 0 = off).
+   - **Evaluation: profit already made before this start:** 0 for a new evaluation. **If you restart the strategy in
+     the middle of an evaluation, enter the evaluation's profit so far here** (from Apex's dashboard), or it will aim
+     for $3,000 more. The dashboard shows "Evaluation: $X of $3,000" so you can check it matches.
    - **Breakout in the bot's gaps:** on (the default) adds the breakout above: about $40-45 more a week, more
      payouts per evaluation and a first payout about twice as often within 20 sessions, at the cost of more red
      days (about half the days instead of a third). Off = the bot alone.
@@ -49,7 +53,7 @@ account. Copy that account to others with a trade copier (Tradesyncer, or NinjaT
 
 The dashboard at the top right of the chart shows: Evaluation or Funded and the contracts; orders ON/OFF; how many
 sessions of history are loaded (until 14, it says so and doesn't trade); the noise lines now and at the next check;
-the heads-up; the breakout's two levels for today and its status ("watching", "BUY 2 triggered", "no trigger
+the evaluation's profit against its target; the heads-up; the breakout's two levels for today and its status ("watching", "BUY 2 triggered", "no trigger
 today"…); the position with its live stop (and "locked" once the stop is at entry + 2.5); and today's trades,
 P/L and losers. The orange and green lines on the chart are the stop and take-profit.
 
@@ -78,6 +82,14 @@ needs more days loaded.
   only while the bot is flat, and the bot always comes first: if the bot signals while the breakout trade is open,
   the breakout trade is closed at market and the bot's entry goes in on the same bar (opposite directions: the bot's
   entry reverses the position). No breakout trade on the skip dates, or until the bot's 14 sessions are loaded.
+- **The evaluation's target** (round 124, [RESULTS.md](RESULTS.md)): in the evaluation, the moment the account is
+  $3,000 up (closed + open) everything is closed, which passes it. The trade in progress has its take-profit at the
+  price that gets there ($25 past it, for the fees) whenever that is closer than its own; if a bar closes $25 past the
+  target, the position goes at market. After that the strategy takes no new trades and says so (Alerts, Output,
+  dashboard). Without this a trade could carry the account past $3,000 and then fall back. Over 16 years it passes
+  35-37% of evaluations instead of 22-26% and pays 1.5-1.9 times as much per evaluation. It works live only (not in a
+  backtest, and the history loaded before the strategy goes live doesn't count): it counts the strategy's own P/L
+  from the moment it goes live.
 - **A rejected order:** if the broker rejects the stop while you're in a trade, the strategy closes the position at
   market at once, so it's never left without a stop, and the Alerts window says so.
 - **Alerts** (Alerts window, with sound; also in the Output window): heads-up five minutes before a likely signal,
@@ -100,7 +112,8 @@ stand-in for NinjaTrader, not on NinjaTrader. Watch it trade once in NinjaTrader
    appear at once (Orders tab); the stop moves at the half hours and to entry + 2.5 after the lock; everything is
    flat after 16:00; the dashboard's P/L matches the Positions/Executions tabs. On a day with a breakout trade: the
    entry the minute after a bar reaches a level, a stop at once, and, if the bot signals while it's open, the
-   breakout closed ("Breakout: bot first") or reversed in the same minute as the bot's entry.
+   breakout closed ("Breakout: bot first") or reversed in the same minute as the bot's entry. For the evaluation's
+   target, set it low for the test (say $300) and watch it close everything at that profit and stop.
 4. Then run a day on **Sim101** live (real-time data, simulated money) with Tradesyncer copying to a simulated
    follower, and check the follower gets the same entry, **the same stop moves**, and the 16:00 exit.
 
@@ -133,6 +146,9 @@ not identical: NinjaTrader's historical fills differ from the worst-case fills t
 - With the breakout on, on random 1-minute sessions (evaluation and funded, three seeds): **the account's trades
   are `research/combo_priority.py`'s, trade for trade**: the bot's trades all kept, the breakout's only in its
   gaps, cut or reversed at the bot's next entry, stopped, or flat at 16:00, with the same prices, sizes and P/L.
+- With the evaluation's target: every trade before the one that reaches it is unchanged, that one exits at the
+  target's price (a bot trade or a breakout trade), the total is at least the target, and nothing trades after; not on
+  the funded account, and not in a historical run.
 - Every NinjaTrader call (SetStopLoss, SetProfitTarget, ExitLong, OnOrderUpdate, Alert, Draw.TextFixed,
   GetCurrentBid, StartBehavior, RealtimeErrorHandling) was checked against NinjaTrader's help guide.
 - Mutation check: breaking the rules or the order handling on purpose (a stop in the wrong place, no 16:00 exit, the
