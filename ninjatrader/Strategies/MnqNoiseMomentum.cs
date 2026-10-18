@@ -19,7 +19,7 @@
 //     before the strategy goes live); it counts the strategy's own P/L from then, plus "evaluation profit so far".
 //   * optional, off by default (round 129): from a chosen day of the evaluation's 30, bigger size (2.5x: the bot at
 //     10 MNQ), since an evaluation that runs out of time has failed anyway.
-//   * optional, off by default (round 128): on the funded account, everything closed and no more trades that day the
+//   * on by default (rounds 128, 132): on the funded account, everything closed and no more trades that day the
 //     moment closing makes the day payout-eligible (the payout cycle's state entered once, then kept from the account
 //     and remembered in a file across restarts).
 // Setup: 1-minute MNQ chart (the lock arms within the minute: more winners than on 5 minutes, docs/RESULTS.md round
@@ -131,7 +131,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 EvalStartDate = "";
                 BoldFromDay = 0;
                 BoldSize = 2.5;
-                PayoutStop = false;
+                PayoutStop = true;     // pays more a week per account in every period (docs/RESULTS.md round 132)
                 FundedPayoutsTaken = 0;
                 FundedQualDays = 0;
                 FundedCycleProfit = 0;
@@ -1114,7 +1114,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         public double BoldSize { get; set; }
 
         [NinjaScriptProperty]
-        [Display(Name = "Funded: stop for the day once closing makes it payout-eligible (round 128)", Order = 15, GroupName = "1. Account")]
+        [Display(Name = "Funded: stop for the day once closing makes it payout-eligible (rounds 128, 132)", Order = 15, GroupName = "1. Account")]
         public bool PayoutStop { get; set; }
 
         [NinjaScriptProperty]

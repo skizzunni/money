@@ -892,3 +892,15 @@ def test_payout_cycle_days_the_strategy_was_off(sim, tmp_path, payout_case):
     q, p, _, t = cycle_numbers(cycle)
     q_ref, p_ref, _, t_ref = cycle_numbers(ref)
     assert t == t_ref and abs(p - p_ref) <= 0.5 and q <= q_ref, (cycle, ref)
+
+
+def test_payout_stop_on_by_default_and_live_only(sim, tmp_path):
+    """The payout stop is on by default (round 132) on the funded account; in a backtest it doesn't act (it reads the
+    real account), so the trades are those with it off; the dashboard says it works live."""
+    bars = rth_minutes(30, 3)
+    on, _, dash, _ = run_sim(sim, bars, tmp_path, minutes=1, breakout=True, Funded=True)
+    off, _, _, _ = run_sim(sim, bars, tmp_path, minutes=1, breakout=True, Funded=True, PayoutStop=False)
+    assert on == off and on
+    assert "Payout cycle: 0/5 days of $200" in dash and "(works live)" in dash
+    _, _, dash_eval, _ = run_sim(sim, bars, tmp_path, minutes=1, breakout=True)
+    assert "Payout cycle" not in dash_eval

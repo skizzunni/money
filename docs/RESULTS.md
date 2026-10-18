@@ -2228,8 +2228,39 @@ bug: take-profits placed by price were rounded toward the price (up to a tick le
 red days 42-48% (49-55%), but pays $1,568 / $1,377 / $770 per evaluation against $1,810 / $1,414 / $1,138; at 1R the
 same, weaker. **Not adopted**: more winning trades cost payouts on this account.
 
-The funded payout stop of round 128 is now in the NinjaTrader strategy as an option, off by default ("Funded: stop for
+The funded payout stop of round 128 is now in the NinjaTrader strategy as an option (on by default since round 132) ("Funded: stop for
 the day once closing makes it payout-eligible"), verified against an independent replica of the cycle's rules.
+
+## Round one hundred and thirty-two: money a week from one account slot, and the payout stop on
+
+`research/accounts_needed.py`. Every result before counted money per evaluation bought. The goal is money a week, and
+an account is run as a slot: an evaluation; when it fails or times out, the next one the next session; once passed, the
+funded account until it busts or pays its sixth payout, then a new evaluation. From every start session, the strategy
+as it trades now (bot + breakout, close-at-target, funded settings), payouts only, before fees:
+
+| Period | $ a week per slot, 26 weeks (stop off / on) | 52 weeks (off / on) | evaluations a slot, 52 weeks | break-even evaluation price, 52 weeks (off / on) |
+|---|---|---|---|---|
+| 2011-2018 | $45 / $52 | $70 / $77 | 7-7.4 | $498 / $513 |
+| 2019-2025 | $36 / $43 | $47 / $63 | 10.1 | $217 / $301 |
+| Jul 2025-Aug 2026 | $24 / $29 | $29 / $29 (63 starts) | 13-14 | $88 / $101 |
+| NQ 2015-2024 | $31 / $35 | $40 / $48 | 8.8-9.1 | $210 / $243 |
+
+(break-even price: the evaluation price at which the payouts just pay for the evaluations and a $79 activation per
+funded account; 26 weeks: $191 / $219, $117 / $146, $65 / $88, $100 / $118.)
+
+- **The payout stop pays more a week in every period, at both horizons** (equal in the newest window over 52 weeks,
+  where only 63 starts fit). Per evaluation (round 128) it paid 18% less on 2011-18; per week of a running slot it
+  pays more, because the payouts come sooner and the next evaluation starts sooner. **Adopted: on by default.**
+- **$1,500 a week is 20-64 slots.** Copy trading between one's own Apex accounts is allowed (third-party summaries of
+  Apex's help center; Tradovate's group copier is on Apex's help center), up to 20 funded accounts. Accounts copied
+  from the same trades pay N times one slot on average but do not spread the risk: a bad stretch is bad on all of them.
+- **One account's bound.** The funded strategy makes $41-49 a day with a spread of about $513 (2011-25), $10 a day in
+  the newest 13 months. A day's mean m at spread s against a $2,000 drawdown fails with probability about
+  exp(-2 m 2000 / s^2): about half at these numbers, as measured. $300 a day (the $1,500 a week) with only a 20% chance
+  of failing needs a spread of $863 or less: four times the strategy's return for its risk (0.35 a day against 0.09). No rule tested in 131
+  rounds came near that; it is the size of the gap, not a tuning problem.
+- **Fees decide the newest window.** At $65-101 a slot's payouts only just cover a promotional evaluation price; at
+  Apex's quoted list prices for the intraday 50K ($118-249, third-party) the newest 13 months lose money.
 
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
@@ -2355,6 +2386,7 @@ python research/payout_lock.py nsx1m_scaled.pkl nq1m_scaled.pkl       # stop whe
 python research/bold_finish.py nsx1m_scaled.pkl nq1m_scaled.pkl       # bolder near the evaluation's end (option, off)
 python research/w_bracket.py nsx1m_scaled.pkl nq1m_scaled.pkl         # a take-profit for the breakout (8 stops)
 python research/w_lock_target.py nsx1m_scaled.pkl nq1m_scaled.pkl     # the breakout's lock for more winners (no)
+python research/accounts_needed.py nsx1m_scaled.pkl nq1m_scaled.pkl 260 # $ a week per account slot (payout stop on)
 ```
 
 The raw data isn't stored in this repo.

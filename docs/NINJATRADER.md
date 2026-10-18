@@ -69,13 +69,15 @@ account. Copy that account to others with a trade copier (Tradesyncer, or NinjaT
      1.4-3.5 points more evaluations (about 39% instead of 35-37%) and paid 4-12% more per evaluation, but in the newest
      13 months slightly fewer (27.6% against 27.9%), which is why it is off unless you turn it on. Only in the
      evaluation, never on the funded account.
-   - **Funded: stop for the day once closing makes it payout-eligible** (off by default; round 128): on the funded
+   - **Funded: stop for the day once closing makes it payout-eligible** (on by default; rounds 128, 132): on the funded
      account, the moment closing everything would make today count toward a payout that is then allowed (five $200
      days since the last payout, the account $2,600 up, no day above half the cycle's profit, at least $500 to take),
      the strategy closes everything (or, orders off, tells you to), takes no more trades that day and tells you to
      request the payout after the close. Over 16 years it brought the first payout within 20 sessions twice as often
-     (8.8% against 4.4% in 2019-25) and paid slightly more in total on the later data, but 18% less on 2011-18, which
-     is why it is off. Enter the cycle once: **payouts taken so far**, **$200 days since the last payout**, **profit
+     (8.8% against 4.4% in 2019-25). Counted per evaluation it paid 18% less on 2011-18, so it was off at first; counted
+     the way you live it, money a week from an account you keep going (a new evaluation after each failed one), it
+     pays more in every period, over 26 and over 52 weeks (round 132: $77 against $70 a week on 2011-18, $63 against
+     $47 on 2019-25, over 52 weeks), so it is on. Enter the cycle once (for a new funded account all four are 0): **payouts taken so far**, **$200 days since the last payout**, **profit
      since the last payout**, **best day since the last payout** (from Apex's dashboard), and **account's starting
      balance** 50,000. It keeps them up to date from the account each day and shows them on the dashboard ("Payout
      cycle"). Live only.
