@@ -99,6 +99,9 @@ namespace NinjaTrader.NinjaScript.AddOns.MnqBot
         public int LosersToday;
         public double DayPnl;              // closed P/L today, $
         public int DayTrades;
+        // what the last bar's half-hour check found ("" no check this bar): "not ready", "no cross", "signal", or why a
+        // close past a line gave no entry: "skip date", "in a trade", "loser limit", "Fed day" (the diagnostics count them)
+        public string CheckNote = "";
 
         public NoiseEngine(NoiseSettings settings, int barMinutes)
         {
@@ -128,7 +131,11 @@ namespace NinjaTrader.NinjaScript.AddOns.MnqBot
         {
             get { return s.LockAt > 0 && s.MaxLoss > 0 ? s.LockAt * s.MaxLoss / s.Qty / s.PointValue : double.NaN; }
         }
-        public bool FreshOk { get { return s.MaxLosers <= 0 || LosersToday < s.MaxLosers; } }
+        public bool FreshOk { get { return s.MaxLosers <= 0 || LosersCounted < s.MaxLosers; } }
+        // the losers the daily limit counts: the model's own (LosersToday), or, when the wrapper sets it (>= 0), the
+        // day's losing positions from the account's fills (the NinjaTrader strategy placing orders)
+        public int ExternalLosers = -1;
+        public int LosersCounted { get { return ExternalLosers >= 0 ? ExternalLosers : LosersToday; } }
 
         double LineStop(int d)
         {
@@ -348,10 +355,12 @@ namespace NinjaTrader.NinjaScript.AddOns.MnqBot
             if (inRth)
                 lastRthClose = c;
 
+            CheckNote = "";
             if (inRth && !double.IsNaN(dayOpen) && end >= FirstCheck && end <= LastCheck && (end - FirstCheck) % Step == 0)
             {
                 int k = (end - FirstCheck) / Step;
                 today[k] = Math.Abs(c / dayOpen - 1);
+                CheckNote = "not ready";
                 if (filled >= s.Lookback && !double.IsNaN(prevClose))
                 {
                     Sigma = NoiseFor(k);
@@ -365,6 +374,9 @@ namespace NinjaTrader.NinjaScript.AddOns.MnqBot
                         dir = 1;
                     else if (c < Lower && shortOk && FreshOk)
                         dir = -1;
+                    int cross = c > Upper ? 1 : c < Lower ? -1 : 0;  // for the diagnostics only
+                    CheckNote = cross == 0 ? "no cross" : dir != 0 ? "signal" : SkipToday ? "skip date" :
+                                Position != 0 ? "in a trade" : !FreshOk ? "loser limit" : "Fed day";
                     if (dir != 0)
                     {
                         pendingKind = 1;
@@ -458,6 +470,9 @@ namespace NinjaTrader.NinjaScript.AddOns.MnqBot
         public int Qty;
         public double StopPoints;
         public string Status = "waiting for a full session";
+        // what this bar did to the day's chance, for the diagnostics: "" nothing, "signal", "both levels", "stop too wide",
+        // "not allowed" (a level reached while a trade isn't allowed)
+        public string Note = "";
 
         public WilliamsBreakout(WilliamsSettings settings)
         {
@@ -469,6 +484,7 @@ namespace NinjaTrader.NinjaScript.AddOns.MnqBot
         public void OnBar(DateTime nyStart, double o, double h, double l, bool allowed)
         {
             Signal = 0;
+            Note = "";
             int t = nyStart.Hour * 60 + nyStart.Minute;
             if (t == NoiseEngine.RthOpen)
             {
@@ -500,6 +516,7 @@ namespace NinjaTrader.NinjaScript.AddOns.MnqBot
             if (hu && hd)
             {
                 Status = "both levels in one bar: no trade today";
+                Note = "both levels";
                 return;
             }
             int d = hu ? 1 : -1;
@@ -510,6 +527,7 @@ namespace NinjaTrader.NinjaScript.AddOns.MnqBot
                 if (dist * s.PointValue > 1.5 * s.Risk)
                 {
                     Status = "stop too wide for the risk: no trade today";
+                    Note = "stop too wide";
                     return;
                 }
                 q = 1;
@@ -518,9 +536,11 @@ namespace NinjaTrader.NinjaScript.AddOns.MnqBot
             if (!allowed)
             {
                 Status = "triggered while the bot was in a trade: no trade today";
+                Note = "not allowed";
                 return;
             }
             Signal = d;
+            Note = "signal";
             Qty = q;
             StopPoints = dist;
             Status = (d > 0 ? "BUY " : "SELL ") + q + " triggered";

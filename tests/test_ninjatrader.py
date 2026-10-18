@@ -1107,10 +1107,10 @@ def test_daily_ledger_from_fills_counts_positions_not_fills(sim, tmp_path):
     last = day[-1]
     today = [t for t in trades if day[int(t[3])] == last]  # closed today (the ledger's definition)
     pnl = sum(float(t[6]) for t in today)
-    want = (f"Today (fills, both setups): {len(today)} trades, {'-' if pnl < 0 else ''}${abs(pnl):.0f}, "
+    want = (f"Today (simulated fills, both setups): {len(today)} trades, {'-' if pnl < 0 else ''}${abs(pnl):.0f}, "
             f"{sum(float(t[6]) < 0 for t in today)} losers")
-    line = next(s for s in dash.split(" | ") if s.startswith("Today (fills"))
-    line2 = next(s for s in dash2.split(" | ") if s.startswith("Today (fills"))
+    line = next(s for s in dash.split(" | ") if s.startswith("Today (simulated fills"))
+    line2 = next(s for s in dash2.split(" | ") if s.startswith("Today (simulated fills"))
     assert line == want == line2, (line, want, line2)
 
 
@@ -1152,18 +1152,165 @@ def test_daily_gate_loss_limit_both_setups(sim, tmp_path):
     assert stopped, "the gate stopped some entries"
 
 
+def by_position(rows):
+    """Account trades merged per position and exit: {entry bar: [(exit bar, exit price, $)]}, closes at the same bar
+    and price summed (a position in two lots closed together by its stop is one close)."""
+    out: dict[int, dict[tuple[int, float], float]] = {}
+    for eb, xb, ex, pnl in rows:
+        key = (xb, round(ex, 6))
+        out.setdefault(eb, {})[key] = out.get(eb, {}).get(key, 0.0) + pnl
+    return {eb: sorted((xb, ex, round(p, 6)) for (xb, ex), p in v.items()) for eb, v in out.items()}
+
+
 @pytest.mark.parametrize("funded", [False, True])
 def test_half_off_at_1r_matches_the_bot(sim, tmp_path, funded):
-    """The frozen forward-test alternative (docs/VERIFICATION.md): a limit for half the bot's contracts at the fill
-    +/- 1R (25 points), working from the bar after the fill; the rest keeps every rule. The strategy's account trades
-    (the half and the rest as separate records) equal the Python bot's with the same definition, and it fills."""
+    """The frozen forward-test alternative (docs/VERIFICATION.md): half the bot's contracts are their own entry ("Long
+    half" / "Short half") with the same stop and their own take-profit PartialAtR x R from the fill, both sent with the
+    entry as Set orders (no exit order of its own). R is the trade's initial risk: the bracket's stop distance. The
+    account's trades, per position and exit, equal the Python bot's with that definition (partial_r "initial"), and
+    the half's take-profit fills."""
     parts = 0
     for seed in (3, 5, 9):
         bars = synth_bars(sessions=90, seed=seed)
         trades, orders, _, _ = run_sim(sim, bars, tmp_path, Funded=funded, RoundPrices=False, PartialAtR=1.0)
-        assert_strategy_matches(trades, run(bars, account(funded, partial_at=1.0, partial_next_bar=True)))
-        parts += sum(t[5] == "Partial" for t in trades)
-        for t in trades:
-            if t[5] == "Partial":  # the half: 2 of 4 contracts, 25 points from the fill
-                assert math.isclose(abs(float(t[4]) - float(t[2])), 25.0)
+        assert not any(o[1] == "ExitLimit" for o in orders)
+        res = run(bars, account(funded, partial_at=1.0, partial_r="initial"))
+        got = by_position([(int(t[1]), int(t[3]), float(t[4]), float(t[6])) for t in trades])
+        want = by_position([(t.entry_bar, t.exit_bar + (t.reason in TIME_EXITS), t.exit, t.pnl) for t in res.trades])
+        assert got.keys() == want.keys()
+        for eb in got:
+            assert len(got[eb]) == len(want[eb]), (eb, got[eb], want[eb])
+            for (xa, pa, va), (xb, pb, vb) in zip(got[eb], want[eb], strict=True):
+                assert xa == xb and math.isclose(pa, pb, abs_tol=1e-6), (eb, got[eb], want[eb])
+                assert math.isclose(va, vb, abs_tol=1e-6), (eb, got[eb], want[eb])
+        enters = [o for o in orders if o[1] == "Enter" and o[2] in ("Long", "Short", "Long half", "Short half")]
+        assert enters and all(o[3] == "2" for o in enters)  # 4 MNQ: two lots of 2
+        # the half: its own entry, 2 of 4 contracts, closed by its take-profit R from the fill
+        stops = {int(o[0]): float(o[3]) for o in orders if o[1] == "SetStopLoss" and o[2] in ("Long half", "Short half")
+                 and o[4] == "Ticks"}
+        for t in res.trades:
+            if t.reason == "Partial":
+                parts += 1
+                r = next(v for k, v in sorted(stops.items(), reverse=True) if k < t.entry_bar) * 0.25
+                assert math.isclose(abs(t.exit - t.entry), r, abs_tol=1e-6)
     assert parts, "the half was taken on these bars"
+
+
+# ── Diagnostics (docs/NINJATRADER.md, "No trades"): counting only
+def funnel(printed):
+    """The end-of-run funnel's numbers by step, its blocked lines and its last line."""
+    start = max(k for k, p in enumerate(printed) if p.startswith("MNQ funnel, end of run"))
+    lines = printed[start + 1:]
+    steps = {int(p.split()[0]): p for p in lines if p.strip()[:1].isdigit()}
+    num = {k: int(v.split(": ")[1].split()[0]) for k, v in steps.items()}
+    blocked = [p.strip() for p in lines if p.strip().startswith("blocked")]
+    last = next(p.strip() for p in reversed(lines) if "FUNNEL STOPS AT" in p or "every step has entries" in p)
+    return num, blocked, last
+
+
+@pytest.mark.parametrize("seed", [3, 5])
+def test_diagnostics_change_no_trade_and_the_counts_add_up(sim, tmp_path, seed):
+    """Diagnostics on (order trace, a line per order, fill and blocked signal): the same orders and trades as off. The
+    settings are printed at the start; each step's count follows from the one before: every signal is sent or has a
+    recorded reason; every entry sent is accepted and filled; the completed trades are the account's positions."""
+    bars = rth_minutes(40, seed)
+    off = run_sim(sim, bars, tmp_path, minutes=1, breakout=True)
+    on = run_sim(sim, bars, tmp_path, minutes=1, breakout=True, Diagnostics=True)
+    assert off[0] == on[0] and off[1] == on[1]
+    for printed in (off[3], on[3]):
+        sets = [p for p in printed if p.startswith("MNQ settings:")]
+        assert len(sets) == 3 and "1 Minute bars" in sets[0] and "Calculate OnBarClose" in sets[0]
+        for key in ("PlaceOrders True", "Lookback 14", "DailyLossLimit 0", "DailyMaxLosers 0", "PartialAtR 0"):
+            assert key in sets[1], key
+        assert "EvalTarget 3000 in history False" in sets[2] and "PayoutStop True in history False" in sets[2]
+        num, blocked, last = funnel(printed)
+        step4 = sum(int(b.rsplit(": ", 1)[1].split()[0]) for b in blocked if b.startswith("blocked before step 4"))
+        assert num[3] == num[4] + step4 > 0
+        assert num[4] == num[5] == num[6] == num[7] > 0
+        assert num[8] == len({(t[1], t[2]) for t in off[0]}) and last == "every step has entries"
+    assert "TraceOrders True" in [p for p in on[3] if p.startswith("MNQ settings:")][2]
+    assert sum(p.startswith("MNQ order: ") and " Filled" in p for p in on[3]) == funnel(on[3])[0][7]
+    assert sum(p.startswith("MNQ execution: ") for p in on[3]) == funnel(on[3])[0][7]
+    assert not any(p.startswith(("MNQ order: ", "MNQ execution: ", "MNQ blocked (")) for p in off[3])
+
+
+def test_funnel_names_the_step_a_zero_trade_run_stops_at(sim, tmp_path):
+    """Runs made to trade nothing, one cause each: the funnel's last line names the step and the recorded cause."""
+    bars = rth_minutes(40, 3)
+    n = len(bars)
+    every = ",".join(map(str, range(n)))
+    cases = [(dict(PlaceOrders=False), "step 4", "orders are off (alerts only)"),
+             (dict(Lookback=60), "step 2", "before the engine has 60 full sessions"),
+             (dict(DailyLossLimit=1), "step 4", "daily gate: the trade's risk could take today past the loss limit"),
+             (dict(SimIgnoreEntriesAt=every), "step 6", "the entry call gave no order back"),
+             (dict(SimRejectEntriesAt=every), "step 6", "entry rejected")]
+    for props, step, cause in cases:
+        trades, orders, _, printed = run_sim(sim, bars, tmp_path, minutes=1, breakout=True, **props)
+        _, _, last = funnel(printed)
+        assert not trades and last.startswith(f"FUNNEL STOPS AT {step},") and cause in last, (props, last)
+    # a chart the strategy can't use: 7-minute bars
+    _, _, _, printed = run_sim(sim, bars, tmp_path, minutes=7, breakout=True)
+    assert "THE CHART'S BARS DON'T WORK" in printed[0] and "step 1, bars used: 0" in funnel(printed)[2]
+
+
+def test_a_runtime_error_is_printed_and_counted(sim, tmp_path):
+    """An exception inside OnBarUpdate: printed with the bar and its stack, passed on (NinjaTrader stops the strategy
+    and logs it), and the end-of-run funnel counts it."""
+    bars = rth_minutes(40, 3)
+    trades, _, _, printed = run_sim(sim, bars, tmp_path, minutes=1, breakout=True, SimThrowAtBar=9000)
+    err = [p for p in printed if p.startswith("MNQ RUNTIME ERROR at the bar ending")]
+    assert len(err) == 1 and "test error on bar 9000" in err[0]
+    assert any(p.startswith("LOG: Error on calling 'OnBarUpdate' method on bar 9000") for p in printed)
+    num, blocked, _ = funnel(printed)
+    assert num[1] == 9001 and "runtime errors 1" in [p for p in printed if p.strip().startswith("8 completed")][-1]
+    assert any(b.startswith("blocked (error): runtime error: 1") for b in blocked)
+
+
+# ── Simulated (history) and live (the account's fills) accounting, kept apart (docs/VERIFICATION.md)
+def _day_with_a_loser_then_entries(sim, tmp_path, seeds=(3, 5, 9)):
+    """Bars and a day on which, with no gate, a losing trade closes at bar x and the strategy enters again after x+3."""
+    for seed in seeds:
+        bars = rth_minutes(40, seed)
+        trades, orders, _, _ = run_sim(sim, bars, tmp_path, minutes=1, breakout=True, EvalTarget=0)
+        day = _day_of(bars)
+        for t in trades:
+            x = int(t[3])
+            if float(t[6]) < 0 and day[x] != day[-1]:
+                later = [int(o[0]) for o in orders
+                         if o[1] == "Enter" and day[int(o[0])] == day[x] and int(o[0]) > x + 3]
+                if later:
+                    return bars, day, x, later
+    raise AssertionError("no such day in these bars")
+
+
+def test_live_gate_counts_live_fills_not_the_simulated_history(sim, tmp_path):
+    """Going live just after a simulated loser (DailyMaxLosers 1): in a backtest that loser stops the day's later
+    entries; live, the strategy's simulated history isn't the account's, so the live ledger starts empty and entries
+    go on. The dashboard says which book it shows."""
+    bars, day, x, later = _day_with_a_loser_then_entries(sim, tmp_path)
+    _, hist, dash_h, _ = run_sim(sim, bars, tmp_path, minutes=1, breakout=True, EvalTarget=0, DailyMaxLosers=1)
+    assert not [o for o in hist if o[1] == "Enter" and day[int(o[0])] == day[x] and int(o[0]) > x]
+    _, live, dash_l, _ = run_sim(sim, bars, tmp_path, minutes=1, breakout=True, EvalTarget=0, DailyMaxLosers=1,
+                                 SimRealtimeFrom=x + 1)
+    assert [o for o in live if o[1] == "Enter" and day[int(o[0])] == day[x] and int(o[0]) > x]
+    assert "Today (simulated fills, both setups)" in dash_h and "Today (live fills, both setups)" in dash_l
+
+
+def test_live_day_survives_a_restart(sim, tmp_path):
+    """Live from the day's open, a losing trade closes at bar x, the strategy is stopped two bars later and started
+    again (live from x+3, the same data folder): the day's earlier live trades come back from the live-day file, so
+    DailyMaxLosers 1 still stops the day's entries. Without the file, the same restart enters again."""
+    bars, day, x, later = _day_with_a_loser_then_entries(sim, tmp_path)
+    s = int(np.flatnonzero(day == day[x])[0])
+    data = tmp_path / "userdata"
+    first, _, _, _ = run_sim(sim, bars.iloc[:x + 2], tmp_path, minutes=1, breakout=True, EvalTarget=0,
+                             DailyMaxLosers=1, SimRealtimeFrom=s, SimUserDataDir=data)
+    assert any(int(t[3]) == x and float(t[6]) < 0 for t in first)
+    kept = [t for t in first if s <= int(t[3]) and day[int(t[3])] == day[x]]
+    _, orders, dash, printed = run_sim(sim, bars, tmp_path, minutes=1, breakout=True, EvalTarget=0, DailyMaxLosers=1,
+                                       SimRealtimeFrom=x + 3, SimUserDataDir=data)
+    assert any(p.startswith(f"Live day: {len(kept)} live trade record(s) of {day[x]:%Y-%m-%d}") for p in printed)
+    assert not [o for o in orders if o[1] == "Enter" and day[int(o[0])] == day[x] and int(o[0]) >= x + 3]
+    _, fresh, _, _ = run_sim(sim, bars, tmp_path, minutes=1, breakout=True, EvalTarget=0, DailyMaxLosers=1,
+                             SimRealtimeFrom=x + 3, SimUserDataDir=tmp_path / "empty")
+    assert [o for o in fresh if o[1] == "Enter" and day[int(o[0])] == day[x] and int(o[0]) >= x + 3]

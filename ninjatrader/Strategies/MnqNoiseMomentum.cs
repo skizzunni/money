@@ -43,6 +43,7 @@ namespace NinjaTrader.NinjaScript.Strategies
     public class MnqNoiseMomentum : Strategy
     {
         const string LongName = "Long", ShortName = "Short", WLongName = "W Long", WShortName = "W Short";
+        const string LongHalf = "Long half", ShortHalf = "Short half";  // PartialAtR: the half with its own target
         const int Nobody = 0, Bot = 1, Breakout = 2;
         NoiseEngine engine;
         WilliamsBreakout williams;
@@ -56,7 +57,8 @@ namespace NinjaTrader.NinjaScript.Strategies
         bool exitRejected;          // one of the strategy's own exits was rejected: sent again at the next bar
         double lastStop = double.NaN;  // TightenOnly: the bot's stop so far in this trade
         double entryStopPts = double.NaN;  // the bot's bracket stop, points from the fill
-        int botEntryQty;                 // the bot's contracts at entry (the partial exit closes half of them)
+        string halfName = "";            // PartialAtR: the entry name of this trade's half ("": not split)
+        double halfPts = double.NaN;     // its take-profit, points from the fill (PartialAtR x R)
         bool evalDone;              // the evaluation's target was reached: everything closed, no new trades
         double profitBase;          // the strategy's closed P/L when it went live (the history before doesn't count)
         const double EvalBuffer = 25.0;  // $ past the target, for the closing fees and a tick
@@ -83,6 +85,15 @@ namespace NinjaTrader.NinjaScript.Strategies
         int mismatchBars;                // bar closes in a row with the account's position not the strategy's
         static readonly double[] PayoutCaps = { 1500, 1500, 2000, 2500, 2500, 3000 };
         DateTime evalStart = DateTime.MinValue;
+        // the diagnostics (docs/NINJATRADER.md, "No trades"): counts at each step from a bar to a trade, and why a signal
+        // went no further. Counting only: nothing here places, changes or blocks an order.
+        sealed class Tally { public int Step, N; public readonly List<string> Examples = new List<string>(); }
+        readonly Dictionary<string, Tally> blockedBy = new Dictionary<string, Tally>();
+        readonly List<string> blockedOrder = new List<string>();
+        int dBars, dUsed, dReady, dChecks, dNoCross, dBotSignals, dWSignals, dPassed, dSubmitted, dRejected, dCancelled;
+        int dExecs, dErrors;
+        string dFirst = "", dLast = "", dFirstReady = "", dNow = "";
+        readonly HashSet<Order> dAccepted = new HashSet<Order>(), dFilled = new HashSet<Order>();
         string lastSignal = "-";
         string headsUp = "";
 
@@ -155,6 +166,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 DailyMaxLosers = 0;    // shared daily gate, both setups (docs/VERIFICATION.md): off by default
                 DailyLossLimit = 0;
                 PartialAtR = 0;        // half off at 1R: frozen for the forward test, off by default
+                Diagnostics = false;
                 BreakoutTarget = 8;    // 8 x its stop = 2 x yesterday's range: a full bracket (docs/RESULTS.md round 130)
                 AccountStart = 50000;
 
@@ -162,6 +174,11 @@ namespace NinjaTrader.NinjaScript.Strategies
                 AddPlot(Brushes.Maroon, "Lower noise line");
                 AddPlot(Brushes.Orange, "Stop");
                 AddPlot(Brushes.LimeGreen, "Take-profit");
+            }
+            else if (State == State.Configure)
+            {
+                if (Diagnostics)
+                    TraceOrders = true;  // NinjaTrader's own line for each order: submitted, ignored and why, rejected
             }
             else if (State == State.DataLoaded)
             {
@@ -201,9 +218,19 @@ namespace NinjaTrader.NinjaScript.Strategies
                 if (DateTime.TryParseExact(EvalStartDate ?? "", "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture,
                                            System.Globalization.DateTimeStyles.None, out d0))
                     evalStart = d0;
+                PrintSettings();
             }
             else if (State == State.Realtime)
+            {
                 profitBase = SystemPerformance.AllTrades.TradesPerformance.Currency.CumProfit;
+                PrintFunnel("the history before going live");
+                LoadLiveDay();
+            }
+            else if (State == State.Terminated && engine != null)
+            {
+                try { PrintFunnel("end of run"); }
+                catch (Exception e) { Print("MNQ funnel: could not be printed (" + e.Message + ")"); }
+            }
         }
 
         static TimeZoneInfo NewYork()
@@ -356,16 +383,14 @@ namespace NinjaTrader.NinjaScript.Strategies
         }
 
         // ── The payout cycle's file: Documents\NinjaTrader 8\MnqNoiseMomentum\payout-cycle-<account>.txt
-        string CycleFile
+        string CycleFile { get { return DataFile("payout-cycle-"); } }
+
+        string DataFile(string prefix)
         {
-            get
-            {
-                string name = Account == null || string.IsNullOrEmpty(Account.Name) ? "account" : Account.Name;
-                foreach (char c in Path.GetInvalidFileNameChars())
-                    name = name.Replace(c, '_');
-                return Path.Combine(Path.Combine(NinjaTrader.Core.Globals.UserDataDir, "MnqNoiseMomentum"),
-                                    "payout-cycle-" + name + ".txt");
-            }
+            string name = Account == null || string.IsNullOrEmpty(Account.Name) ? "account" : Account.Name;
+            foreach (char c in Path.GetInvalidFileNameChars())
+                name = name.Replace(c, '_');
+            return Path.Combine(Path.Combine(NinjaTrader.Core.Globals.UserDataDir, "MnqNoiseMomentum"), prefix + name + ".txt");
         }
 
         // the settings the remembered state started from: new settings replace it
@@ -487,26 +512,57 @@ namespace NinjaTrader.NinjaScript.Strategies
         {
             if (BarsInProgress != 0)
                 return;
+            try
+            {
+                BarUpdate();
+            }
+            catch (Exception e)
+            {
+                // said in the Output window with the bar, then passed on: NinjaTrader stops the strategy and logs it
+                dErrors++;
+                Block(0, "runtime error", e.GetType().Name + ": " + e.Message);
+                Print("MNQ RUNTIME ERROR at the bar ending " + dNow + " (New York): " + e);
+                throw;
+            }
+        }
+
+        void BarUpdate()
+        {
+            TimeZoneInfo platform = NinjaTrader.Core.Globals.GeneralOptions.TimeZoneInfo ?? TimeZoneInfo.Local;
+            DateTime end = TimeZoneInfo.ConvertTime(DateTime.SpecifyKind(Time[0], DateTimeKind.Unspecified), platform, newYork);
+            dNow = end.ToString("yyyy-MM-dd HH:mm");
+            dBars++;
+            if (dFirst.Length == 0)
+                dFirst = dNow;
+            dLast = dNow;
             if (badChart || Calculate != Calculate.OnBarClose)
             {
+                Block(1, badChart ? "the chart's bars aren't 1-30 minutes dividing 30" : "Calculate isn't On bar close", "");
                 Draw.TextFixed(this, "mnq_dash", badChart ?
                     "MNQ Noise Momentum: use a 1, 5, 10, 15 or 30 minute chart (1 minute is best). Not trading." :
                     "MNQ Noise Momentum: set Calculate to 'On bar close' in the strategy settings. Not trading.",
                     TextPosition.TopRight);
                 return;
             }
-            // NinjaTrader stamps a bar with its end time in the time zone set under Tools > Options > General
-            TimeZoneInfo platform = NinjaTrader.Core.Globals.GeneralOptions.TimeZoneInfo ?? TimeZoneInfo.Local;
-            DateTime end = TimeZoneInfo.ConvertTime(DateTime.SpecifyKind(Time[0], DateTimeKind.Unspecified), platform, newYork);
+            dUsed++;
+            // NinjaTrader stamps a bar with its end time in the time zone set under Tools > Options > General (above)
             DateTime start = end.AddMinutes(-minutes);
             int nTrades = engine.Trades.Count, nOrders = engine.Orders.Count;
             int nHeads = engine.HeadsUps.Count;
+            if (PlaceOrders)  // the bot's loser limit from the day's fills (simulated in history, the account's live)
+            {
+                int bn, bl;
+                double br;
+                Ledger(DayRecords(start), true, out bn, out bl, out br);
+                engine.ExternalLosers = bl;
+            }
             engine.OnBar(start, Open[0], High[0], Low[0], Close[0]);
             // the breakout only while the bot is flat with no entry coming, and the account is flat
             bool free = engine.Position == 0 && engine.PendingEntry == 0 && !engine.SkipToday && engine.Ready &&
                         (!PlaceOrders || RealDir == 0) && engine.Orders.Count == nOrders;
             if (UseBreakout)
                 williams.OnBar(start, Open[0], High[0], Low[0], free);
+            CountSignals(nOrders);
             if (start.Hour * 60 + start.Minute == NoiseEngine.RthOpen)  // once a day in the Output window, chart or not
                 Print(start.ToString("yyyy-MM-dd") + " MNQ Noise Momentum (" + Book + ", " + Qty + " MNQ, orders " +
                       (PlaceOrders ? "ON" : "OFF") + "): " + (engine.Ready ? "ready, trading today" + (engine.SkipToday ?
@@ -518,39 +574,169 @@ namespace NinjaTrader.NinjaScript.Strategies
             lastBarDay = TradingDay(start);
             if (PlaceOrders)
                 ManageOrders(start, nOrders);
+            if (PlaceOrders && LiveBook)
+                SaveLiveDay(start);
+            CountSent(nOrders);
             Tell(nTrades, nOrders, nHeads);
             Draw.TextFixed(this, "mnq_dash", Dashboard(), TextPosition.TopRight);
         }
 
         // ── Orders on the account
 
-        // The trading day's closed trades from NinjaTrader's own trade records (built from executions): one position
-        // filled in parts is several records with the same entry, counted here as one trade. Trading day: from 18:00
-        // New York. Strategy-level: the strategy's trades only (in a backtest, and live since the strategy started).
-        void TodayLedger(DateTime nyNow, out int trades, out int losers, out double realized)
+        // ── The day's closed trades, from executions. Two sources, never mixed: in a backtest and in the history a
+        // strategy runs through before going live, its simulated fills (SystemPerformance.AllTrades); live, only the
+        // account's real fills since the strategy went live (SystemPerformance.RealTimeTrades), with those of earlier
+        // runs today from the live-day file (a restart), never the simulated trades of today's history.
+        sealed class Closed { public long EntryTicks, ExitTicks; public string EntryName, ExitName; public int Qty; public double Pnl; }
+        readonly List<Closed> liveFromFile = new List<Closed>();
+        DateTime liveFileDay = DateTime.MinValue;
+        int liveSaved = -1;
+
+        bool LiveBook { get { return State == State.Realtime; } }
+
+        static string Key(Closed c)
         {
-            trades = losers = 0;
-            realized = 0.0;
+            return c.EntryTicks + "|" + c.EntryName + "|" + c.ExitTicks + "|" + c.Qty + "|" + F(c.Pnl);
+        }
+
+        List<Closed> DayRecords(DateTime nyNow)
+        {
             DateTime day = TradingDay(nyNow);
             TimeZoneInfo platform = NinjaTrader.Core.Globals.GeneralOptions.TimeZoneInfo ?? TimeZoneInfo.Local;
-            Dictionary<string, double> byPosition = new Dictionary<string, double>();
-            for (int k = SystemPerformance.AllTrades.Count - 1; k >= 0; k--)
+            TradeCollection src = LiveBook ? SystemPerformance.RealTimeTrades : SystemPerformance.AllTrades;
+            List<Closed> list = new List<Closed>();
+            Dictionary<string, bool> seen = new Dictionary<string, bool>();
+            for (int k = src.Count - 1; k >= 0; k--)
             {
-                Trade tr = SystemPerformance.AllTrades[k];
+                Trade tr = src[k];
                 DateTime exitNy = TimeZoneInfo.ConvertTime(DateTime.SpecifyKind(tr.Exit.Time, DateTimeKind.Unspecified),
                                                            platform, newYork);
                 if (TradingDay(exitNy) != day)
                     break;
-                string key = tr.Entry.Time.Ticks + "|" + tr.Entry.Name;
-                double v;
-                byPosition[key] = (byPosition.TryGetValue(key, out v) ? v : 0.0) + tr.ProfitCurrency;
-                realized += tr.ProfitCurrency;
+                Closed c = new Closed();
+                c.EntryTicks = tr.Entry.Time.Ticks; c.ExitTicks = tr.Exit.Time.Ticks; c.EntryName = tr.Entry.Name;
+                c.ExitName = tr.Exit.Name; c.Qty = tr.Quantity; c.Pnl = tr.ProfitCurrency;
+                list.Add(c);
+                seen[Key(c)] = true;
             }
-            foreach (double pnl in byPosition.Values)
+            if (LiveBook && liveFileDay == day)
+                foreach (Closed c in liveFromFile)
+                    if (!seen.ContainsKey(Key(c)))
+                        list.Add(c);
+            return list;
+        }
+
+        // the bot's two lots of one trade (PartialAtR) are one position
+        static string Family(string entryName)
+        {
+            if (entryName == LongHalf) return LongName;
+            if (entryName == ShortHalf) return ShortName;
+            return entryName;
+        }
+
+        static bool IsBotEntry(string name)
+        {
+            return name == LongName || name == ShortName || name == LongHalf || name == ShortHalf;
+        }
+
+        // The trading day's closed positions (from 18:00 New York): one position filled in parts, or the bot's two lots,
+        // is several records with the same entry, counted here as one trade. botOnly: the bot's own, for its loser
+        // limit, without the positions closed at the session's end (as the model, which doesn't count those).
+        void TodayLedger(DateTime nyNow, out int trades, out int losers, out double realized)
+        {
+            Ledger(DayRecords(nyNow), false, out trades, out losers, out realized);
+        }
+
+        static void Ledger(List<Closed> records, bool botOnly, out int trades, out int losers, out double realized)
+        {
+            trades = losers = 0;
+            realized = 0.0;
+            Dictionary<string, double> byPosition = new Dictionary<string, double>();
+            Dictionary<string, bool> sessionEnd = new Dictionary<string, bool>();
+            foreach (Closed c in records)
+            {
+                if (botOnly && !IsBotEntry(c.EntryName))
+                    continue;
+                string key = c.EntryTicks + "|" + Family(c.EntryName);
+                double v;
+                byPosition[key] = (byPosition.TryGetValue(key, out v) ? v : 0.0) + c.Pnl;
+                if (c.ExitName == "Flat 16:00" || c.ExitName == "Exit on session close")
+                    sessionEnd[key] = true;
+                realized += c.Pnl;
+            }
+            foreach (KeyValuePair<string, double> kv in byPosition)
             {
                 trades++;
-                if (pnl < 0)
+                if (kv.Value < 0 && !(botOnly && sessionEnd.ContainsKey(kv.Key)))
                     losers++;
+            }
+        }
+
+        // ── The live-day file: Documents\NinjaTrader 8\MnqNoiseMomentum\live-day-<account>.txt, the day's live closed
+        // trades, so a restart during the day still counts them (the loser limits, the daily gate, the dashboard)
+        string LiveFile { get { return DataFile("live-day-"); } }
+
+        void LoadLiveDay()
+        {
+            liveFromFile.Clear();
+            liveFileDay = DateTime.MinValue;
+            try
+            {
+                if (!File.Exists(LiveFile))
+                    return;
+                foreach (string line in File.ReadAllLines(LiveFile))
+                {
+                    if (line.StartsWith("day="))
+                        liveFileDay = DateTime.ParseExact(line.Substring(4), "yyyy-MM-dd", CultureInfo.InvariantCulture);
+                    else if (line.StartsWith("trade="))
+                    {
+                        string[] f = line.Substring(6).Split('|');
+                        Closed c = new Closed();
+                        c.EntryTicks = long.Parse(f[0], CultureInfo.InvariantCulture); c.EntryName = f[1];
+                        c.ExitTicks = long.Parse(f[2], CultureInfo.InvariantCulture); c.ExitName = f[3];
+                        c.Qty = int.Parse(f[4], CultureInfo.InvariantCulture); c.Pnl = double.Parse(f[5], CultureInfo.InvariantCulture);
+                        liveFromFile.Add(c);
+                    }
+                }
+                if (liveFromFile.Count > 0)
+                    Print("Live day: " + liveFromFile.Count + " live trade record(s) of " + liveFileDay.ToString("yyyy-MM-dd") +
+                          " from " + LiveFile);
+            }
+            catch (Exception e)
+            {
+                Print("Live day: could not read " + LiveFile + " (" + e.Message + "); today's earlier live trades are not counted.");
+                liveFromFile.Clear();
+            }
+        }
+
+        void SaveLiveDay(DateTime nyNow)
+        {
+            List<Closed> today = DayRecords(nyNow);
+            if (today.Count == liveSaved && liveFileDay == TradingDay(nyNow))
+                return;
+            try
+            {
+                string file = LiveFile, tmp = file + ".tmp";
+                Directory.CreateDirectory(Path.GetDirectoryName(file));
+                System.Text.StringBuilder b = new System.Text.StringBuilder("day=" + TradingDay(nyNow).ToString("yyyy-MM-dd") + "\n");
+                foreach (Closed c in today)
+                    b.Append("trade=" + c.EntryTicks + "|" + c.EntryName + "|" + c.ExitTicks + "|" + c.ExitName + "|" + c.Qty + "|" +
+                             F(c.Pnl) + "\n");
+                File.WriteAllText(tmp, b.ToString());
+                if (File.Exists(file))
+                    File.Replace(tmp, file, null);
+                else
+                    File.Move(tmp, file);
+                liveFileDay = TradingDay(nyNow);  // the file holds today's only
+                liveFromFile.Clear();
+                liveFromFile.AddRange(today);
+                liveSaved = today.Count;
+            }
+            catch (Exception e)
+            {
+                if (liveSaved != -2)
+                    Print("Live day: could not write " + LiveFile + " (" + e.Message + "); trying again each bar.");
+                liveSaved = -2;
             }
         }
 
@@ -619,6 +805,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 exitRejected = false;
                 owner = Nobody;
                 lastStop = double.NaN;
+                halfName = "";
             }
             else if (exitRejected)
             {
@@ -627,6 +814,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 Say("retry", "EXIT REJECTED, SENT AGAIN: closing the " + (real > 0 ? "long" : "short") + " at market. " +
                     "If this repeats, close it by hand.");
                 Flatten(real, "Close: retry");
+                notSent = "a rejected exit is being sent again";
                 return;
             }
 
@@ -637,6 +825,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (real != 0 && (endMin == NoiseEngine.RthClose || !inRth || tMin == NoiseEngine.RthOpen))
             {
                 Flatten(real, "Flat 16:00");
+                notSent = "the position is being closed (16:00 or the session's end)";
                 return;
             }
 
@@ -694,8 +883,9 @@ namespace NinjaTrader.NinjaScript.Strategies
                     if (real > 0) ExitLong("Breakout: bot first", WLongName);
                     else ExitShort("Breakout: bot first", WShortName);
                 }
-                SetStopLoss(name, CalculationMode.Ticks, StopTicks(o.Direction * (o.Expected - o.Stop)), false);
-                entryStopPts = StopTicks(o.Direction * (o.Expected - o.Stop)) * TickSize;
+                double stopTicks = StopTicks(o.Direction * (o.Expected - o.Stop));
+                SetStopLoss(name, CalculationMode.Ticks, stopTicks, false);
+                entryStopPts = stopTicks * TickSize;  // R: the initial risk, points from the fill
                 lastStop = double.NaN;
                 double tpPts = double.IsNaN(o.Target) ? double.NaN : o.Direction * (o.Target - o.Expected);
                 double evalPts = EvalPoints(BotQty);
@@ -703,12 +893,22 @@ namespace NinjaTrader.NinjaScript.Strategies
                     tpPts = evalPts;
                 if (!double.IsNaN(tpPts))
                     SetProfitTarget(name, CalculationMode.Ticks, TargetTicks(tpPts));
-                if (o.Direction > 0)
-                    EnterLong(BotQty, LongName);
-                else
-                    EnterShort(BotQty, ShortName);
+                // the partial exit (off by default; docs/VERIFICATION.md): half the contracts are their own entry, with
+                // the same stop and their own take-profit PartialAtR x R from the fill, both sent with it (Set orders,
+                // per entry: no separate exit order to conflict with them). Not on a reversal of a breakout trade.
+                int half = PartialAtR > 0 && BotQty >= 2 && real != -o.Direction ? BotQty / 2 : 0;
+                halfName = half > 0 ? (o.Direction > 0 ? LongHalf : ShortHalf) : "";
+                halfPts = half > 0 ? PartialAtR * entryStopPts : double.NaN;
+                if (half > 0)
+                {
+                    SetStopLoss(halfName, CalculationMode.Ticks, stopTicks, false);
+                    double hp = !double.IsNaN(evalPts) && evalPts < halfPts ? evalPts : halfPts;
+                    SetProfitTarget(halfName, CalculationMode.Ticks, TargetTicks(hp));
+                }
+                Submitted(o.Direction > 0 ? EnterLong(BotQty - half, LongName) : EnterShort(BotQty - half, ShortName), "bot");
+                if (half > 0)
+                    Submitted(o.Direction > 0 ? EnterLong(half, LongHalf) : EnterShort(half, ShortHalf), "bot half");
                 botSent = true;
-                botEntryQty = BotQty;
                 owner = Bot;
                 realLocked = false;
                 closingRejected = false;
@@ -732,10 +932,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 if (!double.IsNaN(wPts))
                     SetProfitTarget(wname, CalculationMode.Ticks, TargetTicks(wPts));
                 wTargetPts = BreakoutTarget > 0 ? BreakoutTarget * williams.StopPoints : double.NaN;
-                if (williams.Signal > 0)
-                    EnterLong(wq, wname);
-                else
-                    EnterShort(wq, wname);
+                Submitted(williams.Signal > 0 ? EnterLong(wq, wname) : EnterShort(wq, wname), "breakout");
                 wSent = true;
                 owner = Breakout;
                 return;
@@ -788,6 +985,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 return;
             }
             SetStopLoss(name2, CalculationMode.Price, stop, false);
+            if (halfName.Length > 0)  // the half's stop moves with the rest (kept for the next entry if it is closed)
+                SetStopLoss(halfName, CalculationMode.Price, stop, false);
             double tp = TakeProfit > 0 && !double.IsNaN(engine.Sigma) ? avg * (1 + real * TakeProfit * engine.Sigma) : double.NaN;
             if (EvalTargetOn)
             {
@@ -799,21 +998,16 @@ namespace NinjaTrader.NinjaScript.Strategies
                 }
                 if (double.IsNaN(tp) || (real > 0 && et < tp) || (real < 0 && et > tp))
                     tp = et;
+                if (halfName.Length > 0)  // the half's take-profit: its own, or the evaluation's when nearer
+                {
+                    double hp = avg + real * halfPts;
+                    if ((real > 0 && et < hp) || (real < 0 && et > hp))
+                        hp = et;
+                    SetProfitTarget(halfName, CalculationMode.Price, RoundTarget(real, hp));
+                }
             }
             if (!double.IsNaN(tp))
                 SetProfitTarget(name2, CalculationMode.Price, RoundTarget(real, tp));
-            // the partial exit (off by default; docs/VERIFICATION.md): while the full position is open, a limit for half
-            // the contracts at the fill +/- PartialAtR x R (R: the initial risk in points), sent at each bar's close,
-            // so it works from the bar after the fill
-            if (PartialAtR > 0 && botEntryQty >= 2 && Position.Quantity == botEntryQty)
-            {
-                double rPts = MaxLoss / Qty / settings.PointValue;
-                double pp = RoundTarget(real, avg + real * PartialAtR * rPts);
-                if (real > 0)
-                    ExitLongLimit(botEntryQty / 2, pp, "Partial", LongName);
-                else
-                    ExitShortLimit(botEntryQty / 2, pp, "Partial", ShortName);
-            }
         }
 
         // Points from the fill at which `qty` contracts take the evaluation to its target (NaN: off)
@@ -881,6 +1075,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                                               double averageFillPrice, OrderState orderState, DateTime time,
                                               ErrorCode error, string comment)
         {
+            CountOrder(order, orderState, quantity, filled, averageFillPrice, error, comment);
             if (orderState != OrderState.Rejected)
                 return;
             string msg = "ORDER REJECTED: " + order.Name + " (" + comment + ").";
@@ -905,10 +1100,238 @@ namespace NinjaTrader.NinjaScript.Strategies
             Say("rejected", msg);
         }
 
+        protected override void OnExecutionUpdate(Execution execution, string executionId, double price, int quantity,
+                                                  MarketPosition marketPosition, string orderId, DateTime time)
+        {
+            Order o = execution == null ? null : execution.Order;
+            if (o != null && IsEntry(o.Name))
+            {
+                dExecs++;
+                dFilled.Add(o);
+            }
+            if (Diagnostics)
+                Print("MNQ execution: " + (o == null ? "?" : o.Name) + " " + quantity + " @ " + P(price) + " " + marketPosition +
+                      " " + time);
+        }
+
+        static bool IsEntry(string name)
+        {
+            return name == LongName || name == ShortName || name == WLongName || name == WShortName || name == LongHalf ||
+                   name == ShortHalf;
+        }
+
         static bool IsOwnExit(string name)
         {
             return name == "Close: rejected" || name == "Close: retry" || name == "Flat 16:00" || name == "Stop passed" ||
                    name == "Evaluation target" || name == "Payout-eligible" || name == "Breakout: bot first";
+        }
+
+        // ── Diagnostics: counting only (docs/NINJATRADER.md, "No trades")
+
+        // A step a signal (or a bar) didn't get past, and why; the first three examples are kept (and, with Diagnostics
+        // on, printed as they happen). Step: 0 error, 1 bar not used, 2 engine not ready, 4 signal not sent,
+        // 6 entry not accepted, 7 entry not filled.
+        void Block(int step, string why, string detail)
+        {
+            string key = step + "|" + why;
+            Tally t;
+            if (!blockedBy.TryGetValue(key, out t))
+            {
+                t = new Tally();
+                t.Step = step;
+                blockedBy[key] = t;
+                blockedOrder.Add(key);
+            }
+            t.N++;
+            if (t.Examples.Count < 3)
+            {
+                string ex = dNow + (detail.Length > 0 ? " " + detail : "");
+                t.Examples.Add(ex);
+                if (Diagnostics)
+                    Print("MNQ blocked (step " + step + "): " + why + " - " + ex);
+            }
+        }
+
+        static string EngineWhy(string note)
+        {
+            if (note == "skip date") return "today is on the skip list";
+            if (note == "in a trade") return "the bot's model is already in a trade";
+            if (note == "loser limit") return "the day's losing-trade limit (the bot's own)";
+            if (note == "Fed day") return "Fed day: no shorts before 14:00";
+            return note;
+        }
+
+        // the signals of this bar: the bot's half-hour check (a close past a line) and the breakout's level
+        void CountSignals(int nOrders)
+        {
+            if (engine.Ready)
+            {
+                dReady++;
+                if (dFirstReady.Length == 0)
+                    dFirstReady = dNow;
+            }
+            string note = engine.CheckNote;
+            if (note == "not ready")
+                Block(2, "a half-hour check before the engine has " + Lookback + " full sessions",
+                      "(" + engine.SessionsLoaded + "/" + Lookback + ")");
+            else if (note.Length > 0)
+            {
+                dChecks++;
+                if (note == "no cross")
+                    dNoCross++;
+                else
+                {
+                    dBotSignals++;
+                    if (note != "signal")
+                        Block(4, "bot: " + EngineWhy(note), "");
+                }
+            }
+            if (!UseBreakout || williams.Note.Length == 0)
+                return;
+            dWSignals++;
+            if (williams.Note == "both levels")
+                Block(4, "breakout: both levels in one bar (no trade by rule)", "");
+            else if (williams.Note == "stop too wide")
+                Block(4, "breakout: stop too wide for the risk", "");
+            else if (williams.Note == "not allowed")
+                Block(4, "breakout: level reached while a trade isn't allowed",
+                      "(" + (!engine.Ready ? "engine not ready" : engine.SkipToday ? "skip date" :
+                       engine.Position != 0 ? "bot in a trade" : engine.PendingEntry != 0 ? "bot entry pending" :
+                       engine.Orders.Count != nOrders ? "bot signal this bar" : "the account holds a position") + ")");
+        }
+
+        // whether this bar's signals were sent to the account
+        void CountSent(int nOrders)
+        {
+            bool bot = engine.Orders.Count > nOrders, brk = UseBreakout && williams.Signal != 0;
+            if (!bot && !brk)
+                return;
+            string why = !PlaceOrders ? "orders are off (alerts only)" :
+                         notSent.Length > 0 ? notSent : "the strategy already holds a position", detail = "";
+            if (why.StartsWith("its risk"))  // one reason, whatever the amounts
+            {
+                detail = "(" + why + ")";
+                why = "daily gate: the trade's risk could take today past the loss limit";
+            }
+            else if (why.StartsWith("today's "))
+            {
+                detail = "(" + why + ")";
+                why = "daily gate: the day's losing trades reach the limit";
+            }
+            if (bot && PlaceOrders && botSent) dPassed++;
+            else if (bot) Block(4, "bot: " + why, detail);
+            if (brk && PlaceOrders && wSent) dPassed++;
+            else if (brk) Block(4, "breakout: " + why, detail);
+        }
+
+        void Submitted(Order o, string setup)
+        {
+            dSubmitted++;
+            if (o == null)
+                Block(6, "the entry call gave no order back (NinjaTrader ignored it: the TraceOrders line says why)", setup);
+        }
+
+        void CountOrder(Order order, OrderState state, int quantity, int filled, double avgFill, ErrorCode error,
+                        string comment)
+        {
+            if (Diagnostics)
+                Print("MNQ order: " + order.Name + " " + state + ", " + quantity + " MNQ, " + filled + " filled" +
+                      (filled > 0 ? " @ " + P(avgFill) : "") + (error != ErrorCode.NoError ? ", error " + error : "") +
+                      (string.IsNullOrEmpty(comment) ? "" : " (" + comment + ")"));
+            if (error != ErrorCode.NoError)
+                Block(0, "order error " + error, order.Name + (string.IsNullOrEmpty(comment) ? "" : " (" + comment + ")"));
+            if (!IsEntry(order.Name))
+                return;
+            if (state == OrderState.Accepted || state == OrderState.Working || state == OrderState.Filled ||
+                state == OrderState.PartFilled)
+                dAccepted.Add(order);
+            if (state == OrderState.Rejected)
+            {
+                dRejected++;
+                Block(6, "entry rejected", order.Name + (string.IsNullOrEmpty(comment) ? "" : " (" + comment + ")"));
+            }
+            if (state == OrderState.Cancelled && !dFilled.Contains(order))
+            {
+                dCancelled++;
+                Block(7, "entry cancelled before it filled", order.Name);
+            }
+        }
+
+        void PrintSettings()
+        {
+            TimeZoneInfo platform = NinjaTrader.Core.Globals.GeneralOptions.TimeZoneInfo ?? TimeZoneInfo.Local;
+            Print("MNQ settings: " + Instrument.FullName + ", " + BarsPeriod.Value + " " + BarsPeriod.BarsPeriodType + " bars (" +
+                  Bars.Count + " loaded, trading hours " + Bars.TradingHours + "), Calculate " + Calculate +
+                  (badChart ? " - THE CHART'S BARS DON'T WORK: not trading" : "") +
+                  (Calculate != Calculate.OnBarClose ? " - NOT ON BAR CLOSE: not trading" : "") + ", platform time zone " +
+                  platform.Id);
+            Print("MNQ settings: account " + (Account == null ? "none" : Account.Name) + ", " + Book + " (from " +
+                  accountTypeFrom + "), PlaceOrders " + PlaceOrders + ", " + Qty + " MNQ, max loss " + Usd(MaxLoss) +
+                  ", losers " + MaxLosers + ", Lookback " + Lookback + ", DailyLossLimit " + DailyLossLimit +
+                  ", DailyMaxLosers " + DailyMaxLosers + ", PartialAtR " + PartialAtR + ", TightenOnly " + TightenOnly +
+                  ", UseBreakout " + UseBreakout + " (risk " + Usd(Funded ? BreakoutRisk : EvalBreakoutRisk) + ")");
+            Print("MNQ settings: history controls: EvalTarget " + EvalTarget + " in history " + EvalTargetInHistory +
+                  ", PayoutStop " + PayoutStop + " in history " + PayoutStopInHistory + ", EvalFromAccount " + EvalFromAccount +
+                  ", RememberPayoutCycle " + RememberPayoutCycle + ", StartBehavior " + StartBehavior +
+                  ", exit on session close " + IsExitOnSessionCloseStrategy + " (" + ExitOnSessionCloseSeconds + " s)" +
+                  ", BarsRequiredToTrade " + BarsRequiredToTrade + ", TraceOrders " + TraceOrders + ", Diagnostics " +
+                  Diagnostics);
+        }
+
+        void PrintFunnel(string when)
+        {
+            Dictionary<string, bool> positions = new Dictionary<string, bool>();
+            for (int k = 0; k < SystemPerformance.AllTrades.Count; k++)
+            {
+                Trade tr = SystemPerformance.AllTrades[k];
+                positions[tr.Entry.Time.Ticks + "|" + tr.Entry.Name] = true;
+            }
+            int[] n = { dBars, dUsed, dReady, dBotSignals + dWSignals, dPassed, dSubmitted, dAccepted.Count, dFilled.Count,
+                        positions.Count };
+            string[] step = { "bars loaded", "bars used", "engine ready", "signals", "signals passing the gates",
+                              "entry orders submitted", "entry orders accepted", "entry orders filled", "completed trades" };
+            Print("MNQ funnel, " + when + ":");
+            Print("  1 bars loaded: " + dBars + (dBars > 0 ? " (" + dFirst + " to " + dLast + " New York)" : "") +
+                  "; used: " + dUsed);
+            Print("  2 engine ready: " + dReady + " bars" + (dFirstReady.Length > 0 ? " (from " + dFirstReady + ")" : "") +
+                  "; full sessions " + engine.SessionsLoaded + "/" + Lookback);
+            Print("  3 signals: " + n[3] + " (bot " + dBotSignals + " of " + dChecks + " half-hour checks, " + dNoCross +
+                  " with no close past a line; breakout " + dWSignals + ")");
+            Print("  4 passing the gates: " + dPassed);
+            Print("  5 entry orders submitted: " + dSubmitted);
+            Print("  6 accepted: " + dAccepted.Count + " (rejected " + dRejected + ")");
+            Print("  7 filled: " + dFilled.Count + " (" + dExecs + " executions; cancelled unfilled " + dCancelled + ")");
+            Print("  8 completed trades: " + positions.Count + " (NinjaTrader trade records " + SystemPerformance.AllTrades.Count +
+                  ")" + "; runtime errors " + dErrors);
+            List<string> keys = new List<string>(blockedOrder);  // by step, then as they first happened
+            keys.Sort(delegate (string a, string b)
+            {
+                int c = blockedBy[a].Step.CompareTo(blockedBy[b].Step);
+                return c != 0 ? c : blockedOrder.IndexOf(a).CompareTo(blockedOrder.IndexOf(b));
+            });
+            foreach (string key in keys)
+            {
+                Tally t = blockedBy[key];
+                Print("  blocked " + (t.Step == 0 ? "(error)" : "before step " + t.Step) + ": " + key.Substring(key.IndexOf('|') + 1) +
+                      ": " + t.N + " (e.g. " + string.Join("; ", t.Examples) + ")");
+            }
+            int stop = -1;
+            for (int k = 0; k < n.Length && stop < 0; k++)
+                if (n[k] == 0)
+                    stop = k;
+            if (stop < 0)
+                Print("  every step has entries");
+            else
+            {
+                string why = "";
+                foreach (string key in keys)
+                    if (blockedBy[key].Step == stop || (blockedBy[key].Step == 0 && dErrors + dRejected > 0))
+                        why += (why.Length > 0 ? "; " : "") + key.Substring(key.IndexOf('|') + 1) + " x" + blockedBy[key].N;
+                if (stop == 3 && why.Length == 0 && dChecks > 0)
+                    why = "no close past a line at any of the " + dChecks + " half-hour checks";
+                Print("  FUNNEL STOPS AT step " + (stop == 0 ? 1 : stop) + ", " + step[stop] + ": 0" +
+                      (why.Length > 0 ? ". Recorded there: " + why : ". Nothing recorded there: see the Log tab and the lines above"));
+            }
         }
 
         // ── Alerts and dashboard
@@ -1122,7 +1545,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 int ln, ll;
                 double lr;
                 TodayLedger(engine.BarTime, out ln, out ll, out lr);
-                s += "Today (fills, both setups): " + ln + " trades, " + Usd(lr) + ", " + ll + " losers" +
+                s += "Today (" + (LiveBook ? "live fills" : "simulated fills") + ", both setups): " + ln + " trades, " + Usd(lr) + ", " + ll + " losers" +
                      (DailyMaxLosers > 0 || DailyLossLimit > 0 ? " - daily gate: " + (DailyMaxLosers > 0 ? DailyMaxLosers + " losers" : "") +
                       (DailyMaxLosers > 0 && DailyLossLimit > 0 ? ", " : "") + (DailyLossLimit > 0 ? Usd(DailyLossLimit) : "") : "") + "\n";
             }
@@ -1172,7 +1595,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 s += "Bot position: " + (engine.Position > 0 ? "LONG" : "SHORT") + " @ " + P(engine.EntryPrice) + "\n";
             else
                 s += "Position: flat\n";
-            s += "Today: " + engine.DayTrades + " trades, " + Usd(engine.DayPnl) + ", losers " + engine.LosersToday + "/" + MaxLosers +
+            s += "Bot today" + (PlaceOrders ? "" : " (model)") + ": " + engine.DayTrades + " trades, " + Usd(engine.DayPnl) +
+                 ", losers " + engine.LosersCounted + "/" + MaxLosers + (PlaceOrders ? " (from fills)" : "") +
                  (engine.FreshOk ? "" : " (limit reached: no new entries today)") + "\n";
             s += "Last: " + lastSignal;
             return s;
@@ -1394,6 +1818,10 @@ namespace NinjaTrader.NinjaScript.Strategies
         [NinjaScriptProperty]
         [Display(Name = "Funded: remember the payout cycle in a file (a restart goes on from it; new settings above replace it)", Order = 20, GroupName = "1. Account")]
         public bool RememberPayoutCycle { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Diagnostics: NinjaTrader's order trace and a line for each order, fill and blocked signal (no trading change)", Order = 1, GroupName = "6. Diagnostics")]
+        public bool Diagnostics { get; set; }
 
         [Browsable(false)]  // the tests turn it on: the payout stop in a historical run
         public bool PayoutStopInHistory { get; set; }

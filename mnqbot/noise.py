@@ -87,15 +87,21 @@ class NoiseConfig:
     # stop is also never looser than the day's VWAP as of the last check (long: max(stop, VWAP)); "bars": as of the
     # last bar's close. Volume-weighted typical price from 09:30; time-weighted where the data has no volume.
     vwap_stop: str = ""
-    # research only (round 138), not in the Pine script or NinjaTrader, both off by default. R is the initial risk in
-    # points (max_loss_per_trade / qty / point_value). trail_points: once the lock has armed, the stop also sits this
-    # many points behind the best high (long) / low (short) since the entry, decided at a bar's close, working from the
-    # next bar, never loosening. partial_at: this many R from the entry fill, a limit closes partial_frac of the
-    # position (a tick through it; the stop first in a bar that reaches both); the rest keeps every rule above.
+    # research only (round 138), not in the Pine script, both off by default (partial_at is the NinjaTrader
+    # strategy's PartialAtR with partial_r "initial"). R: see partial_r. trail_points: once the lock has armed, the
+    # stop also sits this many points behind the best high (long) / low (short) since the entry, decided at a bar's
+    # close, working from the next bar, never loosening. partial_at: this many R from the entry fill, a limit closes
+    # partial_frac of the position (a tick through it; the stop first in a bar that reaches both); the rest keeps
+    # every rule above.
     trail_points: float = 0.0
     partial_at: float = 0.0
     partial_frac: float = 0.5
     partial_next_bar: bool = False  # the part's limit works from the bar after the fill (as NinjaTrader can send it)
+    # R for partial_at. "cap": max_loss_per_trade / qty / point_value (round 138). "initial": the trade's initial risk,
+    # the bracket's stop distance from the expected fill (the closer of the line stop and the cap), and the part's
+    # take-profit measured from the real fill and working from the fill bar, as the NinjaTrader strategy sends it: the
+    # half as its own entry with its own take-profit
+    partial_r: str = "cap"
 
 
 @dataclass
@@ -161,6 +167,9 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
     rest, part_pnl = 1.0, 0.0  # partial_at: the share still open, and what the closed part made
     best = math.nan  # trail_points: the best high (long) / low (short) since the entry, to the last bar's close
     r_pts = cfg.max_loss_per_trade / cfg.qty / cfg.point_value if cfg.max_loss_per_trade > 0 else math.nan
+    if cfg.partial_r not in ("cap", "initial"):
+        raise ValueError(f"partial_r must be 'cap' or 'initial', not {cfg.partial_r!r}")
+    r_next = r_trade = math.nan  # partial_r "initial": the pending entry's initial risk, and the open trade's
     vol = bars["volume"].to_numpy(float) if "volume" in bars else np.zeros(len(bars))
     pv_sum = v_sum = 0.0  # today's volume-weighted (or time-weighted) typical price, from 09:30
     vwap_now = vwap_used = math.nan
@@ -172,8 +181,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
     headsups: list[tuple[int, int]] = []
 
     def open_pos(i: int, d: int) -> None:
-        nonlocal pos, entry_px, entry_bar
-        pos, entry_px, entry_bar = d, o[i] + d * slip, i
+        nonlocal pos, entry_px, entry_bar, r_trade
+        pos, entry_px, entry_bar, r_trade = d, o[i] + d * slip, i, r_next
 
     def close_pos(i: int, price: float, reason: str) -> None:
         nonlocal pos, held, locked, losers_today, rest, part_pnl, best
@@ -247,9 +256,11 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             if hit:
                 close_pos(i, price, reason)
                 events.append((i, "EXIT"))
-            if (pos and rest == 1.0 and cfg.partial_at > 0 and not math.isnan(r_pts)  # research: part at +partial_at R
+            initial = cfg.partial_r == "initial"
+            r_now = r_trade if initial else r_pts
+            if (pos and rest == 1.0 and cfg.partial_at > 0 and not math.isnan(r_now)  # research: part at +partial_at R
                     and not (cfg.partial_next_bar and entry_bar == i)):
-                pt = (entry_px if entry_bar != i else est_px) + pos * cfg.partial_at * r_pts
+                pt = (entry_px if entry_bar != i or initial else est_px) + pos * cfg.partial_at * r_now
                 if (pos > 0 and h[i] >= pt + cfg.tick) or (pos < 0 and l[i] <= pt - cfg.tick):
                     close_part(i, pt)
             if not pos or hit:
@@ -336,6 +347,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                             stop = max(stop, cap) if d > 0 else min(stop, cap)
                         if cfg.take_profit > 0:
                             tp = est_px * (1 + d * cfg.take_profit * sigma)
+                    r_next = abs(est_px - stop) if use_stop else math.nan
                     orders.append((i, d, est_px, stop, tp))
 
         # heads-up: five minutes before a check, flat, and the close already past that check's line (round fifty)

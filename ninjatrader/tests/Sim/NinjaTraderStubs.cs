@@ -9,6 +9,8 @@
 // price trades a tick through it, unless the stop filled on that bar. One position at a time: an entry while in a
 // position is allowed only with an exit for it sent on the same bar (both fill at the next open, the exit first) or
 // in the other direction (a reversal: the position is closed at the next open, "Close position", then the entry).
+// A position can be two entries sent on the same bar in the same direction (two names, not on a reversal): they fill
+// together, each with its own stop and take-profit (a lot each), and each lot's close is its own trade record.
 using System;
 using System.Collections.Generic;
 
@@ -55,7 +57,7 @@ namespace NinjaTrader.Cbi
             throw new NotSupportedException();
         }
     }
-    public enum OrderState { Initialized, Submitted, Accepted, Working, Filled, Cancelled, Rejected }
+    public enum OrderState { Initialized, Submitted, Accepted, Working, PartFilled, Filled, Cancelled, Rejected }
     public enum ErrorCode { NoError, OrderRejected }
     public class Position
     {
@@ -74,7 +76,14 @@ namespace NinjaTrader.Cbi
     public class TradesPerformanceValues { public double CumProfit; }
     public class TradesPerformance { public TradesPerformanceValues Currency = new TradesPerformanceValues(); }
     // the closed trades, as NinjaTrader records them from executions: a position filled in parts is several trades
-    public class Execution { public DateTime Time; public string Name; }
+    public class Execution
+    {
+        public DateTime Time;
+        public string Name;
+        public Order Order;
+        public double Price;
+        public int Quantity;
+    }
     public class Trade { public double ProfitCurrency; public Execution Entry, Exit; public int Quantity; }
     public class TradeCollection
     {
@@ -83,20 +92,39 @@ namespace NinjaTrader.Cbi
         public int Count { get { return List.Count; } }
         public Trade this[int i] { get { return List[i]; } }
     }
-    public class SystemPerformance { public TradeCollection AllTrades = new TradeCollection(); }
-    public class Order { public string Name; }
+    public class SystemPerformance
+    {
+        public TradeCollection AllTrades = new TradeCollection();
+        public TradeCollection RealTimeTrades = new TradeCollection();  // the trades closed live
+    }
+    public class Order { public string Name; public OrderState OrderState; public int Quantity; }
     public class MasterInstrument
     {
         public double PointValue = 2.0, TickSize = 0.25;
         public double RoundToTickSize(double price) { return Math.Round(price / TickSize) * TickSize; }
     }
-    public class Instrument { public MasterInstrument MasterInstrument = new MasterInstrument(); }
+    public class Instrument
+    {
+        public MasterInstrument MasterInstrument = new MasterInstrument();
+        public string FullName = "MNQ 12-26";
+    }
 }
 
 namespace NinjaTrader.Data
 {
     public enum BarsPeriodType { Tick, Second, Minute, Day }
     public class BarsPeriod { public BarsPeriodType BarsPeriodType = BarsPeriodType.Minute; public int Value = 5; }
+    public class TradingHours
+    {
+        public string Name = "CME US Index Futures ETH";
+        public override string ToString() { return Name; }
+    }
+    public class Bars
+    {
+        public TradingHours TradingHours = new TradingHours();
+        internal int N;
+        public int Count { get { return N; } }
+    }
 }
 
 namespace NinjaTrader.NinjaScript
@@ -132,6 +160,7 @@ namespace NinjaTrader.NinjaScript
         public Calculate Calculate;
         public int BarsInProgress, CurrentBar = -1, BarsRequiredToTrade;
         public NinjaTrader.Data.BarsPeriod BarsPeriod = new NinjaTrader.Data.BarsPeriod();
+        public NinjaTrader.Data.Bars Bars = new NinjaTrader.Data.Bars();
         public NinjaTrader.Cbi.Instrument Instrument = new NinjaTrader.Cbi.Instrument();
         public double TickSize { get { return Instrument.MasterInstrument.TickSize; } }
         public Series<DateTime> Time = new Series<DateTime>();
@@ -139,6 +168,7 @@ namespace NinjaTrader.NinjaScript
             Close = new Series<double>();
         public Series<double>[] Values = new Series<double>[0];
         public readonly List<string> Printed = new List<string>();
+        internal int ThrowAt = -1;  // tests: the dashboard call throws on this bar (a runtime error inside OnBarUpdate)
         protected virtual void OnStateChange() { }
         protected virtual void OnBarUpdate() { }
         public void Print(object o) { Printed.Add(o == null ? "" : o.ToString()); }
@@ -163,6 +193,8 @@ namespace NinjaTrader.NinjaScript.DrawingTools
         public static readonly Dictionary<string, string> Texts = new Dictionary<string, string>();
         public static TextFixed TextFixed(NinjaScriptBase owner, string tag, string text, TextPosition textPosition)
         {
+            if (owner.CurrentBar == owner.ThrowAt)
+                throw new InvalidOperationException("test error on bar " + owner.CurrentBar);
             Texts[tag] = text;
             TextFixed t = new TextFixed();
             t.Text = text;
@@ -221,6 +253,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         public string SimLiqFile { get; set; }  // tests: the account's net liquidation at each bar, one per line
         public string SimWithdraw { get; set; }  // tests: "bar:amount": a payout leaves the account at that bar
         public int SimRealtimeFrom { get; set; }  // tests: the strategy goes live at this bar (0: never)
+        public int SimThrowAtBar { get { return ThrowAt; } set { ThrowAt = value; } }
         public string SimAccountName { get { return Account.Name; } set { Account.Name = value; } }
         public string SimUserDataDir
         {
@@ -241,23 +274,53 @@ namespace NinjaTrader.NinjaScript.Strategies
         readonly Dictionary<string, double> targets = new Dictionary<string, double>();
         readonly Dictionary<string, bool> stopInTicks = new Dictionary<string, bool>();
         readonly Dictionary<string, bool> targetInTicks = new Dictionary<string, bool>();
-        int pendDir, pendQty;
-        string pendName, pendExit;
-        string posName;
+
+        // the position: one lot per entry name (an entry and its own stop and take-profit, as NinjaTrader's
+        // per-entry Set orders); all the lots of a position fill together, at the same price
+        sealed class Lot { public string Name; public int Qty; public double Stop = double.NaN, Target = double.NaN; }
+        sealed class Pending { public int Dir, Qty; public string Name; public Order Order; }
+        readonly List<Lot> lots = new List<Lot>();
+        readonly List<Pending> pend = new List<Pending>();
+        string pendExit;
         int entryBar;
-        double stop = double.NaN, target = double.NaN;
 
         protected virtual void OnOrderUpdate(Order order, double limitPrice, double stopPrice, int quantity, int filled,
                                              double averageFillPrice, OrderState orderState, DateTime time,
                                              ErrorCode error, string comment) { }
+        protected virtual void OnExecutionUpdate(Execution execution, string executionId, double price, int quantity,
+                                                 MarketPosition marketPosition, string orderId, DateTime time) { }
+
+        // the entry order's life, as NinjaTrader reports it: Submitted, Accepted, Working at the call; Filled (and an
+        // execution) at the next bar's open. SimIgnoreEntriesAt: on these bars an entry is ignored (no order comes
+        // back, nothing is sent: NinjaTrader's managed-order rules); SimRejectEntriesAt: the broker rejects it.
+        public string SimIgnoreEntriesAt { get; set; }
+        public string SimRejectEntriesAt { get; set; }
+        int execs;
+        static bool At(string bars, int bar) { return bars != null && Array.IndexOf(bars.Split(','), bar.ToString()) >= 0; }
+        void Report(Order o, OrderState st, string comment)
+        {
+            o.OrderState = st;
+            OnOrderUpdate(o, 0, 0, o.Quantity, st == OrderState.Filled ? o.Quantity : 0, 0, st, Time[0],
+                          st == OrderState.Rejected ? ErrorCode.OrderRejected : ErrorCode.NoError, comment);
+        }
 
         public double GetCurrentBid() { return Close[0]; }
         public double GetCurrentAsk() { return Close[0]; }
 
+        static readonly string[] Entries = { "Long", "Short", "W Long", "W Short", "Long half", "Short half" };
         void Check(string signal)
         {
-            if (signal != "Long" && signal != "Short" && signal != "W Long" && signal != "W Short")
+            if (Array.IndexOf(Entries, signal) < 0)
                 throw new InvalidOperationException("unknown entry " + signal);
+        }
+
+        int Dir { get { return Position.MarketPosition == MarketPosition.Long ? 1 : Position.MarketPosition == MarketPosition.Short ? -1 : 0; } }
+
+        Lot LotOf(string name)
+        {
+            foreach (Lot x in lots)
+                if (x.Name == name) return x;
+            return null;
         }
 
         public void SetStopLoss(string fromEntrySignal, CalculationMode mode, double value, bool isSimulatedStop)
@@ -268,13 +331,14 @@ namespace NinjaTrader.NinjaScript.Strategies
             stops[fromEntrySignal] = value;
             stopInTicks[fromEntrySignal] = mode == CalculationMode.Ticks;
             OrderLog.Add(CurrentBar + ",SetStopLoss," + fromEntrySignal + "," + value.ToString("R") + "," + mode);
-            if (Position.MarketPosition != MarketPosition.Flat && posName == fromEntrySignal)
+            Lot lot = LotOf(fromEntrySignal);
+            if (lot != null)
             {
-                int d = Position.MarketPosition == MarketPosition.Long ? 1 : -1;
+                int d = Dir;
                 if (mode == CalculationMode.Ticks) value = Position.AveragePrice - d * value * TickSize;
                 if (RejectStopsAt != null && Array.IndexOf(RejectStopsAt.Split(','), CurrentBar.ToString()) >= 0)
                 {
-                    stop = double.NaN;  // the stop order is gone
+                    lot.Stop = double.NaN;  // the stop order is gone
                     Order rejected = new Order();
                     rejected.Name = "Stop loss";
                     OnOrderUpdate(rejected, 0, value, Position.Quantity, 0, 0, OrderState.Rejected, Time[0],
@@ -285,7 +349,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 }
                 if ((d > 0 && value >= Close[0]) || (d < 0 && value <= Close[0]))
                     throw new InvalidOperationException("bar " + CurrentBar + ": a stop at or past the price would be rejected");
-                stop = value;
+                lot.Stop = value;
             }
         }
 
@@ -297,35 +361,52 @@ namespace NinjaTrader.NinjaScript.Strategies
             targets[fromEntrySignal] = value;
             targetInTicks[fromEntrySignal] = mode == CalculationMode.Ticks;
             OrderLog.Add(CurrentBar + ",SetProfitTarget," + fromEntrySignal + "," + value.ToString("R") + "," + mode);
-            if (Position.MarketPosition != MarketPosition.Flat && posName == fromEntrySignal)
-            {
-                int d = Position.MarketPosition == MarketPosition.Long ? 1 : -1;
-                target = mode == CalculationMode.Ticks ? Position.AveragePrice + d * value * TickSize : value;
-            }
+            Lot lot = LotOf(fromEntrySignal);
+            if (lot != null)
+                lot.Target = mode == CalculationMode.Ticks ? Position.AveragePrice + Dir * value * TickSize : value;
         }
 
-        void Enter(int d, int qty, string name)
+        Order Enter(int d, int qty, string name)
         {
             Check(name);
             OrderLog.Add(CurrentBar + ",Enter," + name + "," + qty);
-            int real = Position.MarketPosition == MarketPosition.Long ? 1 : Position.MarketPosition == MarketPosition.Short ? -1 : 0;
+            if (At(SimIgnoreEntriesAt, CurrentBar))
+                return null;
+            int real = Dir;
             if (real == d && pendExit == null)
                 throw new InvalidOperationException("bar " + CurrentBar + ": entry while in a position");
-            if (pendName != null)
-                throw new InvalidOperationException("bar " + CurrentBar + ": two entries on one bar");
+            foreach (Pending x in pend)
+                if (x.Name == name || x.Dir != d)
+                    throw new InvalidOperationException("bar " + CurrentBar + ": two entries on one bar");
+            if (pend.Count > 0 && real == -d)
+                throw new InvalidOperationException("bar " + CurrentBar + ": two entries reversing a position");
             if (!stops.ContainsKey(name))
                 throw new InvalidOperationException("bar " + CurrentBar + ": entry without a stop");
-            pendDir = d; pendQty = qty; pendName = name;
+            Order o = new Order();
+            o.Name = name;
+            o.Quantity = qty;
+            Report(o, OrderState.Submitted, "");
+            if (At(SimRejectEntriesAt, CurrentBar))
+            {
+                Report(o, OrderState.Rejected, "the broker refused the entry");
+                return o;
+            }
+            Report(o, OrderState.Accepted, "");
+            Report(o, OrderState.Working, "");
+            Pending p = new Pending();
+            p.Dir = d; p.Qty = qty; p.Name = name; p.Order = o;
+            pend.Add(p);
+            return o;
         }
 
-        public void EnterLong(int quantity, string signalName) { Enter(1, quantity, signalName); }
-        public void EnterShort(int quantity, string signalName) { Enter(-1, quantity, signalName); }
+        public Order EnterLong(int quantity, string signalName) { return Enter(1, quantity, signalName); }
+        public Order EnterShort(int quantity, string signalName) { return Enter(-1, quantity, signalName); }
 
         void Exit(int d, string signalName, string fromEntrySignal)
         {
             if (fromEntrySignal != "") Check(fromEntrySignal);  // "": every entry
             OrderLog.Add(CurrentBar + ",Exit," + signalName + "," + fromEntrySignal);
-            int real = Position.MarketPosition == MarketPosition.Long ? 1 : Position.MarketPosition == MarketPosition.Short ? -1 : 0;
+            int real = Dir;
             if (real == d && RejectExitsAt != null && Array.IndexOf(RejectExitsAt.Split(','), CurrentBar.ToString()) >= 0)
             {
                 Order rejected = new Order();
@@ -334,82 +415,58 @@ namespace NinjaTrader.NinjaScript.Strategies
                               ErrorCode.OrderRejected, "the broker refused the exit");
                 return;  // the position stays open
             }
-            if (real == d && (fromEntrySignal == "" || posName == fromEntrySignal))
+            if (real == d && (fromEntrySignal == "" || (lots.Count == 1 && lots[0].Name == fromEntrySignal)))
                 pendExit = signalName;
         }
 
         public void ExitLong(string signalName, string fromEntrySignal) { Exit(1, signalName, fromEntrySignal); }
         public void ExitShort(string signalName, string fromEntrySignal) { Exit(-1, signalName, fromEntrySignal); }
 
-        // a limit exit for part of the position, working through the next bar only (a managed order not sent again at
-        // the next bar's close is cancelled, as NinjaTrader does); fills when a bar trades a tick through it, after the
-        // stop is checked, before the take-profit
-        int partQty, partDir;
-        double partPx = double.NaN;
-        string partName;
-        void ExitLimit(int d, int quantity, double limitPrice, string signalName, string fromEntrySignal)
+        // the strategy's closed trades, as NinjaTrader keeps them: all of them, and those closed live (RealTimeTrades)
+        void Record(Lot lot, int i, double price, string why, int parts)
         {
-            Check(fromEntrySignal);
-            OrderLog.Add(CurrentBar + ",ExitLimit," + signalName + "," + fromEntrySignal + "," + quantity + "," + limitPrice.ToString("R"));
-            int real = Position.MarketPosition == MarketPosition.Long ? 1 : Position.MarketPosition == MarketPosition.Short ? -1 : 0;
-            if (real != d || posName != fromEntrySignal || quantity <= 0 || quantity >= Position.Quantity)
-                return;
-            partQty = quantity; partDir = d; partPx = limitPrice; partName = signalName;
-        }
-        public void ExitLongLimit(int quantity, double limitPrice, string signalName, string fromEntrySignal)
-        {
-            ExitLimit(1, quantity, limitPrice, signalName, fromEntrySignal);
-        }
-        public void ExitShortLimit(int quantity, double limitPrice, string signalName, string fromEntrySignal)
-        {
-            ExitLimit(-1, quantity, limitPrice, signalName, fromEntrySignal);
-        }
-
-        void FillPart(int i, int qty, double price, string why)
-        {
-            int d = Position.MarketPosition == MarketPosition.Long ? 1 : -1;
+            int d = Dir;
             SimTrade t = new SimTrade();
             t.Direction = d; t.EntryBar = entryBar; t.Entry = Position.AveragePrice; t.ExitBar = i; t.Exit = price;
-            t.ExitName = why; t.EntryName = posName; t.Qty = qty;
-            t.Pnl = d * (price - t.Entry) * qty * Instrument.MasterInstrument.PointValue - 2 * CommissionPerSide * qty;
+            t.ExitName = why; t.EntryName = lot.Name; t.Qty = lot.Qty;
+            t.Pnl = d * (price - t.Entry) * lot.Qty * Instrument.MasterInstrument.PointValue - 2 * CommissionPerSide * lot.Qty;
             SimTrades.Add(t);
             SystemPerformance.AllTrades.TradesPerformance.Currency.CumProfit += t.Pnl;
-            Trade rec = new Trade();
-            rec.Quantity = qty; rec.ProfitCurrency = t.Pnl;
-            rec.Entry = new Execution(); rec.Entry.Time = Time[CurrentBar - entryBar]; rec.Entry.Name = posName;
-            rec.Exit = new Execution(); rec.Exit.Time = Time[CurrentBar - i]; rec.Exit.Name = why;
-            SystemPerformance.AllTrades.List.Add(rec);
-            Position.Quantity -= qty;
-        }
-
-        void Fill(int i, double price, string why)
-        {
-            int d = Position.MarketPosition == MarketPosition.Long ? 1 : -1;
-            SimTrade t = new SimTrade();
-            t.Direction = d; t.EntryBar = entryBar; t.Entry = Position.AveragePrice; t.ExitBar = i; t.Exit = price;
-            t.ExitName = why;
-            t.EntryName = posName;
-            t.Qty = Position.Quantity;
-            t.Pnl = d * (price - t.Entry) * Position.Quantity * Instrument.MasterInstrument.PointValue -
-                    2 * CommissionPerSide * Position.Quantity;
-            SimTrades.Add(t);
-            SystemPerformance.AllTrades.TradesPerformance.Currency.CumProfit += t.Pnl;
+            if (State == State.Realtime)
+                SystemPerformance.RealTimeTrades.TradesPerformance.Currency.CumProfit += t.Pnl;
             // NinjaTrader's trade records: one per entry execution; SimSplitFills fills each entry in two parts
-            int parts = SimSplitFills && Position.Quantity > 1 ? 2 : 1;
+            parts = parts == 2 && lot.Qty > 1 ? 2 : 1;
             for (int k = 0; k < parts; k++)
             {
                 Trade rec = new Trade();
-                rec.Quantity = parts == 1 ? Position.Quantity : (k == 0 ? Position.Quantity / 2 : Position.Quantity - Position.Quantity / 2);
-                rec.ProfitCurrency = t.Pnl * rec.Quantity / Position.Quantity;
+                rec.Quantity = parts == 1 ? lot.Qty : (k == 0 ? lot.Qty / 2 : lot.Qty - lot.Qty / 2);
+                rec.ProfitCurrency = t.Pnl * rec.Quantity / lot.Qty;
                 // Time[] counts bars ago, as NinjaTrader's does
-                rec.Entry = new Execution(); rec.Entry.Time = Time[CurrentBar - entryBar]; rec.Entry.Name = posName;
+                rec.Entry = new Execution(); rec.Entry.Time = Time[CurrentBar - entryBar]; rec.Entry.Name = lot.Name;
                 rec.Exit = new Execution(); rec.Exit.Time = Time[CurrentBar - i]; rec.Exit.Name = why;
                 SystemPerformance.AllTrades.List.Add(rec);
+                if (State == State.Realtime)
+                    SystemPerformance.RealTimeTrades.List.Add(rec);
             }
-            Position.MarketPosition = MarketPosition.Flat;
-            Position.Quantity = 0;
-            Position.AveragePrice = 0;
-            stop = target = double.NaN;
+        }
+
+        void CloseLot(Lot lot, int i, double price, string why)
+        {
+            Record(lot, i, price, why, SimSplitFills ? 2 : 1);
+            lots.Remove(lot);
+            Position.Quantity -= lot.Qty;
+            if (lots.Count == 0)
+            {
+                Position.MarketPosition = MarketPosition.Flat;
+                Position.Quantity = 0;
+                Position.AveragePrice = 0;
+            }
+        }
+
+        void Fill(int i, double price, string why)  // the whole position at market
+        {
+            foreach (Lot lot in new List<Lot>(lots))
+                CloseLot(lot, i, price, why);
         }
 
         public void Run(IList<DateTime> barEnds, IList<double> o, IList<double> h, IList<double> l, IList<double> c,
@@ -419,6 +476,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             OnStateChange();
             if (configure != null) configure(this);
             State = State.Configure; OnStateChange();
+            Bars.N = c.Count;  // all the bars loaded, as NinjaTrader's Bars.Count
             State = State.DataLoaded; OnStateChange();
             List<double> liqs = new List<double>();
             if (SimLiqFile != null)
@@ -472,63 +530,84 @@ namespace NinjaTrader.NinjaScript.Strategies
                 lastDay = nyStart.AddHours(6).Date;
                 // market orders from the last bar
                 if (pendExit != null && Position.MarketPosition != MarketPosition.Flat)
-                    Fill(i, o[i] - (Position.MarketPosition == MarketPosition.Long ? 1 : -1) * slip, pendExit);
+                    Fill(i, o[i] - Dir * slip, pendExit);
                 pendExit = null;
-                if (pendName != null && Position.MarketPosition != MarketPosition.Flat)  // a reversal
-                    Fill(i, o[i] - (Position.MarketPosition == MarketPosition.Long ? 1 : -1) * slip, "Close position");
-                if (pendName != null)
+                if (pend.Count > 0 && Position.MarketPosition != MarketPosition.Flat && Dir == -pend[0].Dir)  // a reversal
+                    Fill(i, o[i] - Dir * slip, "Close position");
+                if (pend.Count > 0)
                 {
-                    Position.MarketPosition = pendDir > 0 ? MarketPosition.Long : MarketPosition.Short;
-                    Position.Quantity = pendQty;
-                    Position.AveragePrice = o[i] + pendDir * slip;
-                    posName = pendName;
+                    int pd = pend[0].Dir;
+                    Position.MarketPosition = pd > 0 ? MarketPosition.Long : MarketPosition.Short;
+                    Position.AveragePrice = o[i] + pd * slip;
                     entryBar = i;
-                    stop = stops[pendName];
-                    if (stopInTicks[pendName]) stop = Position.AveragePrice - pendDir * stop * TickSize;
-                    target = targets.ContainsKey(pendName) ? targets[pendName] : double.NaN;
-                    if (targets.ContainsKey(pendName) && targetInTicks[pendName])
-                        target = Position.AveragePrice + pendDir * target * TickSize;
-                    pendName = null;
+                    foreach (Pending x in pend)
+                    {
+                        Lot lot = new Lot();
+                        lot.Name = x.Name; lot.Qty = x.Qty;
+                        lot.Stop = stops[x.Name];
+                        if (stopInTicks[x.Name]) lot.Stop = Position.AveragePrice - pd * lot.Stop * TickSize;
+                        if (targets.ContainsKey(x.Name))
+                            lot.Target = targetInTicks[x.Name] ? Position.AveragePrice + pd * targets[x.Name] * TickSize : targets[x.Name];
+                        lots.Add(lot);
+                        Position.Quantity += x.Qty;
+                    }
+                    foreach (Pending x in pend)
+                    {
+                        Report(x.Order, OrderState.Filled, "");
+                        Execution ex = new Execution();
+                        ex.Time = barEnds[i]; ex.Name = x.Name; ex.Order = x.Order; ex.Price = Position.AveragePrice;
+                        ex.Quantity = x.Qty;
+                        execs++;
+                        OnExecutionUpdate(ex, "x" + execs, ex.Price, ex.Quantity, Position.MarketPosition, "o" + execs, barEnds[i]);
+                    }
+                    pend.Clear();
                 }
-                // the attached stop and take-profit
+                // each lot's attached stop, then its take-profit
                 if (Position.MarketPosition != MarketPosition.Flat)
                 {
-                    int d = Position.MarketPosition == MarketPosition.Long ? 1 : -1;
-                    bool hit;
-                    double px;
-                    if (entryBar == i)
+                    int d = Dir;
+                    foreach (Lot lot in new List<Lot>(lots))
                     {
-                        hit = d > 0 ? l[i] <= stop : h[i] >= stop;
-                        px = (d > 0 ? Math.Min(o[i], stop) : Math.Max(o[i], stop)) - d * slip;
+                        double st = lot.Stop;
+                        bool hit;
+                        double px;
+                        if (entryBar == i)
+                        {
+                            hit = d > 0 ? l[i] <= st : h[i] >= st;
+                            px = (d > 0 ? Math.Min(o[i], st) : Math.Max(o[i], st)) - d * slip;
+                        }
+                        else if ((d > 0 && o[i] <= st) || (d < 0 && o[i] >= st))
+                        {
+                            hit = true;
+                            px = o[i] - d * slip;
+                        }
+                        else
+                        {
+                            hit = d > 0 ? l[i] <= st : h[i] >= st;
+                            px = st - d * slip;
+                        }
+                        if (hit)
+                            CloseLot(lot, i, px, "Stop loss");
                     }
-                    else if ((d > 0 && o[i] <= stop) || (d < 0 && o[i] >= stop))
-                    {
-                        hit = true;
-                        px = o[i] - d * slip;
-                    }
-                    else
-                    {
-                        hit = d > 0 ? l[i] <= stop : h[i] >= stop;
-                        px = stop - d * slip;
-                    }
-                    if (hit)
-                        Fill(i, px, "Stop loss");
-                    else
-                    {
-                        if (!double.IsNaN(partPx) && partDir == d &&
-                            ((d > 0 && h[i] >= partPx + TickSize) || (d < 0 && l[i] <= partPx - TickSize)))
-                            FillPart(i, partQty, partPx, partName);
-                        if (!double.IsNaN(target) && ((d > 0 && h[i] >= target + TickSize) || (d < 0 && l[i] <= target - TickSize)))
-                            Fill(i, target, "Profit target");
-                    }
+                    foreach (Lot lot in new List<Lot>(lots))
+                        if (!double.IsNaN(lot.Target) &&
+                            ((d > 0 && h[i] >= lot.Target + TickSize) || (d < 0 && l[i] <= lot.Target - TickSize)))
+                            CloseLot(lot, i, lot.Target, "Profit target");
                 }
-                partPx = double.NaN;  // a partial limit lives one bar unless sent again
                 if (newDay)  // after the day's first fills: an exit sent at the 16:00 close is the day before's
                 {
                     dayFirstBar = i;
                     dayStartCum = SystemPerformance.AllTrades.TradesPerformance.Currency.CumProfit;
                 }
-                OnBarUpdate();
+                try
+                {
+                    OnBarUpdate();
+                }
+                catch (Exception e)  // as NinjaTrader: logged, and the strategy is stopped
+                {
+                    Printed.Add("LOG: Error on calling 'OnBarUpdate' method on bar " + i + ": " + e.Message);
+                    break;
+                }
             }
             State = State.Terminated;
             OnStateChange();

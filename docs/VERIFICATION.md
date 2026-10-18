@@ -134,10 +134,10 @@ stops trailing during the evaluation); no daily loss limit; 30 calendar days; no
 - **Arm A, the current exit**: every setting at its default (bot 4 MNQ / $200 / 3 losers; breakout $400 / 1-10 MNQ /
   take-profit 8 stops; lock at 1R to entry + 2.5; take-profit 1.5 noise units; stop ratchet on; payout stop and
   evaluation target as default; daily gate off; `PartialAtR` 0).
-- **Arm B, half off at 1R**: the same, with `PartialAtR` 1: a limit for half the bot's contracts at the fill +/- 1R
-  (R = the initial risk, 25 points), sent at each bar's close while the full position is open (so it works from the
-  bar after the fill), the other half keeping every rule; R is never redefined. Verified trade for trade against the
-  research model with the same definition (`test_half_off_at_1r_matches_the_bot`, mutation-checked).
+- **Arm B, half off at 1R** (re-frozen in section 10: the first definition is withdrawn): the same, with
+  `PartialAtR` 1: half the bot's contracts are their own entry with the same stop and their own take-profit 1R from the
+  fill, R = the trade's initial risk (the bracket's stop distance), both Set orders sent with the entry. Verified per
+  position against the research model with the same definition (`test_half_off_at_1r_matches_the_bot`).
 - **Setup**: two simulation accounts used for nothing else (Sim101 for A; a new one, e.g. "SimHalf", for B: Control
   Center -> Accounts -> right-click -> Add simulation account), the same MNQ contract and data connection, each arm on
   its own 1-minute chart, Place orders on, evaluation mode (the Sim account names are not APEX-: FUNDED off).
@@ -151,3 +151,56 @@ stops trailing during the evaluation); no daily loss limit; 30 calendar days; no
 - **It is a pilot.** Twenty sessions cannot show a difference of the size the research found (half at 1R lowered the
   intraday drawdown 13-25% for 31-38% less net over years); the pilot checks that both arms trade as tested, and
   gives a first, uncertain read. Any decision needs the 20 sessions repeated, or more.
+
+## 10. The zero-trade run, and three corrections (D1-D4)
+
+**The zero-trade run (8/9-10/17/2026, 0 trades, $0): its cause is not known yet - unavailable.** The summary export
+has no settings, orders or log. Executed here: the code of that commit and the revised build both trade on the stand-in
+(52 trades each, +$3,567.60, index data 8/9-9/30), so the strategy's own logic does not block trades; the cause is in
+that run's settings, data or a NinjaTrader-side error. The strategy now prints its settings at the start and the
+step-by-step funnel at the end (docs/NINJATRADER.md, "No trades?"); the blocking condition comes from that output, run
+by the user with Diagnostics on. Executed on the stand-in, each zero-trade cause is named by the funnel's last line:
+orders off and the daily gate (step 4), a Lookback longer than the history (step 2), a bar size that doesn't divide 30
+(step 1), entries ignored or rejected (step 6), and a runtime error (printed, counted, the strategy stopped)
+(`test_funnel_names_the_step_a_zero_trade_run_stops_at`, `test_a_runtime_error_is_printed_and_counted`). With
+diagnostics on, the same orders and trades as off, and the counts close: every signal sent or blocked with a reason
+(`test_diagnostics_change_no_trade_and_the_counts_add_up`).
+
+**Corrections** (code repairs, not trading experiments; each with its test):
+1. **The half-off exit no longer uses a separate limit order beside the Set orders.** Before: `ExitLongLimit` for half
+   the position, sent at each bar's close, alongside the entry's `SetStopLoss`/`SetProfitTarget` for the whole position:
+   two exit orders for the same contracts (an overfill risk if both fill, and NinjaTrader's managed rules can ignore
+   or amend one). Now: the half is its own entry ("Long half" / "Short half") with its own Set stop and take-profit,
+   sent with the entry; the stop moves with the rest. Not used on a bot entry that reverses a breakout trade.
+2. **R is the trade's actual initial risk:** the bracket's stop distance from the fill (the closer of the line stop
+   and the cap), not the cap's fixed 25 points. The research model has the same definition (`partial_r="initial"`;
+   round 138 used the cap's R and is not rerun with this one: proposed, not executed).
+3. **Simulated history and live executions are kept apart.** The day's ledger (the daily gate, the dashboard, and now
+   the bot's own loser limit) reads the strategy's simulated fills in a backtest and in the history before going live
+   (`SystemPerformance.AllTrades`), and only the account's real fills live (`SystemPerformance.RealTimeTrades`), with
+   earlier live runs of the day kept in `live-day-<account>.txt` across a restart. The daily loss check live is still
+   the worse of that and the account's own realized P/L. The bot's loser limit used to count the engine's model
+   trades (which include today's simulated history once live, and know nothing of the half); it now counts the fills
+   (`test_live_gate_counts_live_fills_not_the_simulated_history`, `test_live_day_survives_a_restart`). Its effect on the
+   default settings' backtest, executed (stand-in, NQ 2015-03 to 2025-06, complete sessions, breakout on, $0.95 a
+   side; the previous commit against this one, nothing else changed; `verification/summary_nq_losers_from_fills.csv`):
+
+   | Slippage | Trades before -> after (dropped / added) | Net before -> after | Intraday drawdown before -> after | Evaluations passed |
+   |---|---|---|---|---|
+   | 0 ticks | 6,542 -> 6,578 (2 / 38) | $202,298.7 -> $202,634.1 (+$335.4) | $11,968.8 -> $12,535.6 | 34.6% -> 34.7% |
+   | 1 tick | 6,563 -> 6,566 (10 / 13) | $174,472.4 -> $173,746.1 (-$726.3) | $12,869.3 -> $13,195.7 | 33.3% -> 33.3% |
+   | 2 ticks | 6,556 -> 6,543 (27 / 14) | $146,863.6 -> $148,632.4 (+$1,768.8) | $13,329.8 -> $13,666.2 | 31.7% -> 32.0% |
+
+   The trades change where the model and the account disagree on a loser: mostly trades near zero, where the model's
+   costs ($0.62 a side, 1 tick) and the account's differ. It is a correction of what is counted, with this measured
+   side effect (no better or worse in a consistent direction; the drawdown is $327-567 higher in all three); it is not
+   offered as an improvement.
+
+**The forward test (section 9) is re-frozen at this commit**: Arm A unchanged in its settings; Arm B is the corrected
+half-off. Neither has started; the pilot starts only after the native checks below pass.
+
+**Native NinjaTrader verification - unavailable here** (no NinjaTrader): the procedure and what to expect are in
+docs/NINJATRADER.md, "Checking the corrections in NinjaTrader itself". Points that rest on NinjaTrader's documented
+behaviour, not observed: an ignored managed entry returns no order; two uniquely named entries in one bar are both
+accepted with EntriesPerDirection 1 and UniqueEntries; a Set order stored for an entry name that is flat is replaced by
+the next entry's own (sent before it); the trading-hours line prints the template's name.

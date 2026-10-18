@@ -196,6 +196,61 @@ stand-in for NinjaTrader, not on NinjaTrader. Watch it trade once in NinjaTrader
 **Strategy Analyzer** backtests it too (Slippage 1, Commission template on). Expect close to the Python numbers,
 not identical: NinjaTrader's historical fills differ from the worst-case fills the research uses.
 
+## No trades? Read the Output window (diagnostics)
+
+Every run prints its settings when it starts and a count of each step from bar to trade when it ends, in the
+**NinjaScript Output** window (New → NinjaScript Output; Strategy Analyzer runs print there too). Nothing in the
+diagnostics places, changes or blocks an order: the trades are the same with them on or off (tested).
+
+At the start, three `MNQ settings:` lines: the instrument, the bar type and size, how many bars were loaded, the
+trading-hours template, Calculate, the account and whether it was read as evaluation or funded, PlaceOrders, the
+contracts, Lookback, DailyLossLimit, DailyMaxLosers, PartialAtR, TightenOnly, UseBreakout, and the controls that
+behave differently in history (EvalTarget / PayoutStop and their "in history" switches, EvalFromAccount, StartBehavior,
+the session-close exit, BarsRequiredToTrade, TraceOrders, Diagnostics). A chart the strategy can't use, or Calculate
+not on bar close, is said there in capitals.
+
+At the end (`MNQ funnel, end of run:`; also `the history before going live` when it goes live):
+
+| Step | Counted | A zero here usually means |
+|---|---|---|
+| 1 bars loaded / used | bars the strategy saw, first and last; bars it could use | no data for the instrument or dates; a bar type or size that doesn't divide 30 minutes; Calculate not on bar close |
+| 2 engine ready | bars after 14 full sessions (Lookback) | fewer than Lookback full 09:30-16:00 sessions loaded (start the run later, or load more days) |
+| 3 signals | the bot's half-hour checks with a close past a line, and the breakout's level reached | no close past a line at any check (said with the count of checks) |
+| 4 passing the gates | signals sent as orders | PlaceOrders off; skip dates; the bot's own loser limit; the daily gate; the account's position not the strategy's; a payout day; the evaluation's target reached |
+| 5 entry orders submitted | entry calls made | - |
+| 6 accepted | entry orders NinjaTrader accepted | the entry call gave no order back (NinjaTrader ignored it: the TraceOrders line says why), or a rejection |
+| 7 filled | entry orders with an execution | cancelled before filling |
+| 8 completed trades | positions closed (NinjaTrader's trade records), and runtime errors | - |
+
+Each `blocked before step N` line gives a reason, how often, and its first three times (New York). The last line,
+`FUNNEL STOPS AT step N`, names the first empty step and what was recorded there. A runtime error is printed as it
+happens (`MNQ RUNTIME ERROR at the bar ending ...`, with its stack) and NinjaTrader then stops the strategy (its own
+line is in the **Log** tab of the Control Center).
+
+**The diagnostic copy:** the same run with **Diagnostics** on (group "6. Diagnostics"). It also turns on NinjaTrader's
+own order trace (TraceOrders: every order submitted, and every one ignored with the rule that ignored it), and prints
+a line for each order update (`MNQ order:`, rejections and errors included), each fill (`MNQ execution:`) and the
+first three of each blocked signal as it happens. Send back the Output window's text (right-click → Save as) and the
+Log tab (right-click → Save as, or a screenshot).
+
+## Checking the corrections in NinjaTrader itself (not done here: needs NinjaTrader)
+
+The stand-in tests prove the strategy's logic; these three checks prove NinjaTrader handles it the same way.
+
+1. **Compile and diagnostics.** NinjaScript Editor → open the strategy → F5: no errors. Strategy Analyzer, the run
+   that gave no trades, Diagnostics on: the settings lines, the funnel, and its `FUNNEL STOPS AT` line (or "every
+   step has entries").
+2. **Half off at 1R, two entries** (PartialAtR 1, Playback101, 1-minute chart, TraceOrders on through Diagnostics). On a
+   bot trade the Orders tab shows two entries the same minute ("Long" 2 and "Long half" 2, or the shorts), each with
+   its own stop and take-profit; the half's take-profit is the fill ± R, R = the stop's distance from the fill at entry
+   (not the $200 cap's 25 points unless the cap was the closer stop); no "Ignored" line in the Output for either entry;
+   when the half's take-profit fills, the other lot's stop and target stay for 2; at a stop both lots close. Not on a
+   bot entry that reverses a breakout trade (that entry is one lot).
+3. **Live accounting apart from the simulated history.** On Sim101 live: enable the strategy after a loser in today's
+   history with DailyMaxLosers 1: the dashboard reads "Today (live fills, both setups): 0 trades" and entries go on.
+   Close a live trade, disable and enable again: the Output says "Live day: N live trade record(s) of <today>", and the
+   dashboard counts them. Strategy Analyzer and Playback history read "Today (simulated fills, ...)".
+
 ## How it differs from the backtest (and the Pine script)
 
 - **Take-profit from the fill**, as a broker bracket is. The Pine script can only place it from the next bar. On
