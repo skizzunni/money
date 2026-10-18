@@ -25,8 +25,11 @@
 // 81), Days to load 30 or more (the noise needs 14 full sessions), Calculate on bar close.
 // See docs/NINJATRADER.md. Written in C# 5 for NinjaTrader 8's compiler.
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
+using System.IO;
 using System.Windows.Media;
 using NinjaTrader.Cbi;
 using NinjaTrader.Data;
@@ -65,6 +68,11 @@ namespace NinjaTrader.NinjaScript.Strategies
         int cycleQual, payoutsTaken;
         double cycleProfit, cycleBest, dayStartLiq = double.NaN;
         bool payoutToday;                // closing made today payout-eligible: flat, no more trades today
+        DateTime cycleDay = DateTime.MinValue;  // the trading day dayStartLiq is the start of
+        DateTime lastBarDay = DateTime.MinValue;  // the trading day of the bar before
+        double lastLiq = double.NaN;     // the account at the bar before (a payout leaving it shows as a drop)
+        double pendingPayout;            // asked for, not yet seen leaving the account: not in the balance
+        bool cycleLoaded, cycleFromFile, saveFailed;
         static readonly double[] PayoutCaps = { 1500, 1500, 2000, 2500, 2500, 3000 };
         DateTime evalStart = DateTime.MinValue;
         string lastSignal = "-";
@@ -128,6 +136,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 FundedCycleProfit = 0;
                 FundedBestDay = 0;
                 PayoutStopInHistory = false;
+                RememberPayoutCycle = true;
                 BreakoutTarget = 8;    // 8 x its stop = 2 x yesterday's range: a full bracket (docs/RESULTS.md round 130)
                 AccountStart = 50000;
 
@@ -220,48 +229,175 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         bool PayoutStopOn { get { return Funded && PayoutStop && (State == State.Realtime || PayoutStopInHistory); } }
 
-        // The funded account's payout cycle, from the account's net liquidation: at each day's 09:30 the day before is
-        // added to the cycle (and the cycle starts again after a payout day); at each bar, if closing now (with $10 to
-        // spare for the fill) would make today payout-eligible, today is a payout day: flat, no more trades
-        void PayoutCheck(DateTime nyStart)
+        // Apex's trading day, from a New York time: 18:00 to 17:00 the next day
+        static DateTime TradingDay(DateTime ny) { return ny.AddHours(6).Date; }
+
+        // The funded account's payout cycle, from the account's net liquidation: at each trading day's first bar the
+        // day before is added to the cycle (and the cycle starts again after a payout day); at each bar, if closing now
+        // (with $10 to spare for the fill) would make today payout-eligible, today is a payout day: flat, no more trades.
+        // A payout asked for is counted out of the balance until it is seen leaving the account (one bar's drop of 90%
+        // of it or more), and that drop is not a trading loss. The state is kept in a file, so a restart goes on from it.
+        void PayoutCheck(DateTime nyStart, DateTime prevBarDay)
         {
             if (!PayoutStopOn)
                 return;
+            if (!cycleLoaded)
+                LoadCycle();
             double liq = Account.Get(AccountItem.NetLiquidation, Currency.UsDollar);
-            int t = nyStart.Hour * 60 + nyStart.Minute;
-            if (t == NoiseEngine.RthOpen)
+            if (pendingPayout > 0 && !double.IsNaN(lastLiq) && lastLiq - liq >= 0.9 * pendingPayout)
             {
-                if (!double.IsNaN(dayStartLiq))
+                dayStartLiq -= pendingPayout;  // the payout left the account: not part of the day's result
+                pendingPayout = 0;
+            }
+            DateTime day = TradingDay(nyStart);
+            if (day != cycleDay)
+            {
+                // the day's start: now if this is its first bar on the chart; else (started during the day) the
+                // balance before today's trades, from the account's P/L for the day
+                double start = prevBarDay == day ? liq - Account.Get(AccountItem.RealizedProfitLoss, Currency.UsDollar) -
+                               Account.Get(AccountItem.UnrealizedProfitLoss, Currency.UsDollar) : liq;
+                if (!double.IsNaN(dayStartLiq) && cycleDay != DateTime.MinValue)
                 {
-                    double day = liq - dayStartLiq;
+                    double result = start - dayStartLiq;
                     if (payoutToday)
                     {
-                        payoutsTaken++;  // the payout was asked for after yesterday's close: a new cycle
+                        payoutsTaken++;  // the payout was asked for after the payout day's close: a new cycle
                         cycleQual = 0;
                         cycleProfit = 0;
                         cycleBest = 0;
                     }
                     else
                     {
-                        cycleQual += day >= 200 ? 1 : 0;
-                        cycleProfit += day;
-                        cycleBest = Math.Max(cycleBest, day);
+                        cycleQual += result >= 200 ? 1 : 0;
+                        cycleProfit += result;
+                        cycleBest = Math.Max(cycleBest, result);
                     }
+                    int missed = 0;
+                    for (DateTime d = cycleDay.AddDays(1); d < day; d = d.AddDays(1))
+                        missed += d.DayOfWeek == DayOfWeek.Saturday || d.DayOfWeek == DayOfWeek.Sunday ? 0 : 1;
+                    if (missed > 0)
+                        Say("cycle", "PAYOUT CYCLE: the strategy was off on " + missed + " weekday(s) before today; any " +
+                            "trading then is counted as part of " + cycleDay.ToString("yyyy-MM-dd") + ". If that is " +
+                            "wrong, enter the cycle in the settings (new settings replace the remembered state).");
                 }
-                dayStartLiq = liq;
+                cycleDay = day;
+                dayStartLiq = start;
                 payoutToday = false;
             }
+            lastLiq = liq;
             if (payoutToday || double.IsNaN(dayStartLiq) || payoutsTaken >= PayoutCaps.Length)
+            {
+                SaveCycle();
                 return;
-            double today = liq - dayStartLiq - 10, bal = liq - AccountStart - 10;
+            }
+            double today = liq - dayStartLiq - 10, bal = liq - AccountStart - pendingPayout - 10;
             double prof = cycleProfit + today, best = Math.Max(cycleBest, today);
             double amount = Math.Min(PayoutCaps[payoutsTaken], bal - 2100);
             if (today >= 200 && cycleQual + 1 >= 5 && bal >= 2600 && prof > 0 && best <= 0.5 * prof && amount >= 500)
             {
                 payoutToday = true;
-                Say("payout", "PAYOUT-ELIGIBLE: closing now makes today your " + (cycleQual + 1) + "th $200 day with the " +
+                pendingPayout = amount;
+                Say("payout","PAYOUT-ELIGIBLE: closing now makes today your " + (cycleQual + 1) + "th $200 day with the " +
                     "account " + Usd(bal) + " up. " + (PlaceOrders ? "Everything is closed" : "CLOSE EVERYTHING NOW") +
                     "; no more trades today. After the close, request your payout (about " + Usd(amount) + ").");
+            }
+            SaveCycle();
+        }
+
+        // ── The payout cycle's file: Documents\NinjaTrader 8\MnqNoiseMomentum\payout-cycle-<account>.txt
+        string CycleFile
+        {
+            get
+            {
+                string name = Account == null || string.IsNullOrEmpty(Account.Name) ? "account" : Account.Name;
+                foreach (char c in Path.GetInvalidFileNameChars())
+                    name = name.Replace(c, '_');
+                return Path.Combine(Path.Combine(NinjaTrader.Core.Globals.UserDataDir, "MnqNoiseMomentum"),
+                                    "payout-cycle-" + name + ".txt");
+            }
+        }
+
+        // the settings the remembered state started from: new settings replace it
+        string CycleSettings
+        {
+            get { return string.Join("|", FundedQualDays, F(FundedCycleProfit), F(FundedBestDay), FundedPayoutsTaken); }
+        }
+
+        static string F(double x) { return x.ToString("R", CultureInfo.InvariantCulture); }
+
+        static double D(Dictionary<string, string> kv, string key)
+        {
+            return kv.ContainsKey(key) ? double.Parse(kv[key], CultureInfo.InvariantCulture) : double.NaN;
+        }
+
+        void LoadCycle()
+        {
+            cycleLoaded = true;
+            if (!RememberPayoutCycle)
+                return;
+            try
+            {
+                if (!File.Exists(CycleFile))
+                    return;
+                Dictionary<string, string> kv = new Dictionary<string, string>();
+                foreach (string line in File.ReadAllLines(CycleFile))
+                {
+                    int eq = line.IndexOf('=');
+                    if (eq > 0)
+                        kv[line.Substring(0, eq)] = line.Substring(eq + 1);
+                }
+                if (!kv.ContainsKey("settings") || kv["settings"] != CycleSettings)
+                {
+                    Print("Payout cycle: the settings changed since " + CycleFile + " was written; starting from the settings.");
+                    return;
+                }
+                cycleQual = int.Parse(kv["qual"], CultureInfo.InvariantCulture);
+                payoutsTaken = int.Parse(kv["taken"], CultureInfo.InvariantCulture);
+                cycleProfit = D(kv, "profit");
+                cycleBest = D(kv, "best");
+                dayStartLiq = D(kv, "start");
+                lastLiq = D(kv, "last");
+                pendingPayout = D(kv, "pending");
+                payoutToday = kv["payoutToday"] == "1";
+                cycleDay = DateTime.ParseExact(kv["day"], "yyyy-MM-dd", CultureInfo.InvariantCulture);
+                cycleFromFile = true;
+                Print("Payout cycle: continuing from " + CycleFile);
+            }
+            catch (Exception e)
+            {
+                Print("Payout cycle: could not read " + CycleFile + " (" + e.Message + "); starting from the settings.");
+                cycleQual = FundedQualDays;
+                cycleProfit = FundedCycleProfit;
+                cycleBest = FundedBestDay;
+                payoutsTaken = FundedPayoutsTaken;
+                dayStartLiq = lastLiq = double.NaN;
+                pendingPayout = 0;
+                payoutToday = false;
+                cycleDay = DateTime.MinValue;
+            }
+        }
+
+        void SaveCycle()
+        {
+            if (!RememberPayoutCycle || cycleDay == DateTime.MinValue || saveFailed)
+                return;
+            try
+            {
+                string file = CycleFile, tmp = file + ".tmp";
+                Directory.CreateDirectory(Path.GetDirectoryName(file));
+                File.WriteAllText(tmp, "settings=" + CycleSettings + "\nqual=" + cycleQual + "\ntaken=" + payoutsTaken +
+                    "\nprofit=" + F(cycleProfit) + "\nbest=" + F(cycleBest) + "\nday=" + cycleDay.ToString("yyyy-MM-dd") +
+                    "\nstart=" + F(dayStartLiq) + "\nlast=" + F(lastLiq) + "\npending=" + F(pendingPayout) +
+                    "\npayoutToday=" + (payoutToday ? "1" : "0") + "\n");
+                if (File.Exists(file))
+                    File.Replace(tmp, file, null);
+                else
+                    File.Move(tmp, file);
+            }
+            catch (Exception e)
+            {
+                saveFailed = true;  // once: the payout stop goes on, only a restart would start from the settings
+                Print("Payout cycle: could not write " + CycleFile + " (" + e.Message + ").");
             }
         }
 
@@ -325,7 +461,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                       " full sessions; no trades until " + Lookback + ". Load more days."));
 
             boldMult = BoldDay(start) ? BoldSize : 1.0;
-            PayoutCheck(start);
+            PayoutCheck(start, lastBarDay);
+            lastBarDay = TradingDay(start);
             if (PlaceOrders)
                 ManageOrders(start, nOrders);
             Tell(nTrades, nOrders, nHeads);
@@ -786,7 +923,8 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (Funded && PayoutStop)
                 s += "Payout cycle: " + cycleQual + "/5 days of $200, " + Usd(cycleProfit) + " since the last payout, best day " +
                      Usd(cycleBest) + ", payouts taken " + payoutsTaken + (payoutToday ? " - PAYOUT DAY: request it after the close" :
-                     PayoutStopOn ? "" : " (works live)") + "\n";
+                     PayoutStopOn ? "" : " (works live)") + (pendingPayout > 0 ? ", " + Usd(pendingPayout) +
+                     " asked for, not yet out of the account" : "") + (cycleFromFile ? " (remembered)" : "") + "\n";
             if (!Funded && BoldFromDay > 0)
                 s += "Bold finish: " + (evalStart == DateTime.MinValue ? "set the evaluation's start date" :
                      "from " + evalStart.AddDays(BoldFromDay).ToString("yyyy-MM-dd") + ", " + BoldSize.ToString("0.#") + "x size" +
@@ -995,6 +1133,10 @@ namespace NinjaTrader.NinjaScript.Strategies
         [Range(0.0, 100000.0)]
         [Display(Name = "Funded: best day since the last payout, $", Order = 19, GroupName = "1. Account")]
         public double FundedBestDay { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Funded: remember the payout cycle in a file (a restart goes on from it; new settings above replace it)", Order = 20, GroupName = "1. Account")]
+        public bool RememberPayoutCycle { get; set; }
 
         [Browsable(false)]  // the tests turn it on: the payout stop in a historical run
         public bool PayoutStopInHistory { get; set; }

@@ -716,3 +716,172 @@ def test_funded_payout_stop(sim, tmp_path, state):
     import re
     taken = re.search(r"payouts taken (\d+)", dash)
     assert taken and int(taken.group(1)) == len(hits), (dash, len(hits))
+
+
+PAYOUT_CAPS = (1500, 1500, 2000, 2500, 2500, 3000)
+PAYOUT_PROPS = dict(Funded=True, PayoutStop=True, AccountStart=47600, RoundPrices=False)
+
+
+def scripted_account(bars, seed):
+    """An account path for the payout cycle's tests: each day a set result, reached in a straight line from the day's
+    start (so the day's best is at its close), whatever the strategy's own trades do."""
+    rng = np.random.default_rng(seed)
+    day = bars.index.tz_convert(NY).normalize()
+    liq, base = np.empty(len(bars)), 50000.0
+    for d in day.unique():
+        k = np.flatnonzero(day == d)
+        total = float(rng.choice([260.0, 240.0, -150.0, 310.0, 220.0, 120.0, -80.0, 420.0]))
+        liq[k] = base + total * np.arange(1, len(k) + 1) / len(k)
+        base += total
+    return liq
+
+
+def payout_replica(bars, liq, withdraw=None, state=(0, 0.0, 0.0, 0), start_bal=47600.0, naive=False):
+    """The payout cycle as the strategy keeps it, bar by bar: the bars at which closing makes the day
+    payout-eligible, and the cycle at the end (qual days, profit, best day, payouts taken). naive: as before the
+    payout asked for was tracked (a payout leaving the account is a losing day)."""
+    qual, prof, best, taken = state
+    tday = (bars.index.tz_convert(NY) + pd.Timedelta(hours=6)).normalize()
+    w_bar, w_amt = withdraw if withdraw else (len(liq), 0.0)
+    cday, start, last, pending, today_paid, hits = None, None, None, 0.0, False, []
+    for k in range(len(liq)):
+        x = liq[k] - (w_amt if k >= w_bar else 0.0)
+        if pending > 0 and last is not None and last - x >= 0.9 * pending:
+            start -= pending
+            pending = 0.0
+        if tday[k] != cday:
+            if cday is not None:
+                res = x - start
+                if today_paid:
+                    qual, prof, best, taken = 0, 0.0, 0.0, taken + 1
+                else:
+                    qual, prof, best = qual + (res >= 200), prof + res, max(best, res)
+            cday, start, today_paid = tday[k], x, False
+        last = x
+        if today_paid or taken >= 6:
+            continue
+        today, bal = x - start - 10, x - start_bal - pending - 10
+        amount = min(PAYOUT_CAPS[taken], bal - 2100)
+        if (today >= 200 and qual + 1 >= 5 and bal >= 2600 and prof + today > 0 and
+                max(best, today) <= 0.5 * (prof + today) and amount >= 500):
+            today_paid, pending = True, 0.0 if naive else amount
+            hits.append((k, float(amount)))
+    return hits, (qual, prof, best, taken)
+
+
+def payout_run(sim, bars, liq, tmp, n=None, **props):
+    """The strategy on the first n bars with the scripted account; the bars of its PAYOUT-ELIGIBLE alerts and its
+    payout-cycle dashboard line."""
+    n = len(bars) if n is None else n
+    liq_file = tmp / "liq.txt"
+    liq_file.write_text("\n".join(repr(float(x)) for x in liq[:n]) + "\n")
+    trades, orders, dash, printed = run_sim(sim, bars.iloc[:n], tmp, minutes=1, breakout=True, SimLiqFile=liq_file,
+                                            **{**PAYOUT_PROPS, **props})
+    idx = bars.index.tz_convert(NY)
+    stamps = {(t + pd.Timedelta(minutes=1)).tz_convert("Europe/London").strftime("%m/%d/%Y %H:%M:%S"): i
+              for i, t in enumerate(idx)}
+    hits = [stamps[p.partition("  ")[0]] for p in printed if "PAYOUT-ELIGIBLE" in p]
+    cycle = next((s for s in dash.split(" | ") if s.startswith("Payout cycle")), "")
+    return hits, cycle, printed
+
+
+def cycle_numbers(cycle):
+    import re
+    m = re.match(r"Payout cycle: (\d+)/5 days of \$200, (-?)\$(\d+) since the last payout, best day (-?)\$(\d+), "
+                 r"payouts taken (\d+)", cycle)
+    assert m, cycle
+    return int(m.group(1)), float(m.group(2) + m.group(3)), float(m.group(4) + m.group(5)), int(m.group(6))
+
+
+@pytest.fixture(scope="module")
+def payout_case():
+    bars = rth_minutes(40, 5)
+    liq = scripted_account(bars, 2)
+    first, _ = payout_replica(bars, liq)
+    assert len(first) >= 3, first
+    w_bar = first[0][0] + 2 * 390 + 100  # two days after the first payout day, mid-morning
+    withdraw = (int(w_bar), float(first[0][1]))
+    hits, end = payout_replica(bars, liq, withdraw)
+    return bars, liq, withdraw, hits, end
+
+
+def test_payout_cycle_on_a_scripted_account(sim, tmp_path, payout_case):
+    """Several payout cycles, a payout leaving the account two days after it was asked for: the strategy's payout
+    days are the replica's, the payout that left is not a losing day, and the cycle at the end is the replica's."""
+    bars, liq, withdraw, want, end = payout_case
+    hits, cycle, _ = payout_run(sim, bars, liq, tmp_path, PayoutStopInHistory=True,
+                                SimWithdraw=f"{withdraw[0]}:{withdraw[1]!r}")
+    assert hits == [k for k, _ in want], (hits, want)
+    qual, prof, best, taken = cycle_numbers(cycle)
+    assert (qual, taken) == (end[0], end[3]) and abs(prof - end[1]) <= 0.5 and abs(best - end[2]) <= 0.5, (cycle, end)
+    # with the payout never leaving, the same days: it was already out of the balance
+    same, _, _ = payout_run(sim, bars, liq, tmp_path, PayoutStopInHistory=True)
+    assert same == hits
+    # and had the strategy counted the payout leaving as a loss, a later payout day would move
+    lost, _ = payout_replica(bars, liq, withdraw, naive=True)
+    assert [k for k, _ in lost] != hits
+
+
+def restart_points(want, withdraw):
+    first = want[0][0]
+    day0 = first - first % 390
+    return {"before the payout, same day": day0 + 100, "after the payout, same day": first + 5,
+            "the next day's first bar": day0 + 390, "before the payout leaves": withdraw[0] - 50,
+            "after it left": withdraw[0] + 200, "a later cycle": want[1][0] + 30}
+
+
+@pytest.mark.parametrize("where", ["before the payout, same day", "after the payout, same day",
+                                   "the next day's first bar", "before the payout leaves", "after it left",
+                                   "a later cycle"])
+def test_payout_cycle_survives_a_restart(sim, tmp_path, payout_case, where):
+    """The strategy stopped at a bar and started again (the history replayed, live from that bar) goes on from its
+    file: the same payout days after the restart, and the same cycle at the end, as without the restart."""
+    bars, liq, withdraw, want, end = payout_case
+    s = restart_points(want, withdraw)[where]
+    w = f"{withdraw[0]}:{withdraw[1]!r}"
+    data = tmp_path / "nt8"
+    a_dir, b_dir = tmp_path / "a", tmp_path / "b"
+    a_dir.mkdir()
+    b_dir.mkdir()
+    hits_a, cycle_a, _ = payout_run(sim, bars, liq, a_dir, PayoutStopInHistory=True, SimWithdraw=w,
+                                    SimUserDataDir=tmp_path / "nt8-a")
+    payout_run(sim, bars, liq, b_dir, n=s, PayoutStopInHistory=True, SimWithdraw=w, SimUserDataDir=data)
+    assert list(data.glob("MnqNoiseMomentum/payout-cycle-Sim101.txt")), "the state is written"
+    hits_b, cycle_b, printed = payout_run(sim, bars, liq, b_dir, SimRealtimeFrom=s, SimWithdraw=w,
+                                          SimUserDataDir=data)
+    assert any("continuing from" in p for p in printed)
+    assert hits_b == [k for k in hits_a if k >= s], (hits_b, hits_a, s)
+    assert cycle_b.replace(" (remembered)", "") == cycle_a, (cycle_b, cycle_a)
+    assert "(remembered)" in cycle_b
+
+
+def test_payout_cycle_restart_without_the_file(sim, tmp_path, payout_case):
+    """New settings replace the remembered state; RememberPayoutCycle off: no file, a restart starts from the
+    settings."""
+    bars, liq, withdraw, want, _ = payout_case
+    s = want[0][0] + 390
+    data = tmp_path / "nt8"
+    payout_run(sim, bars, liq, tmp_path, n=s, PayoutStopInHistory=True, SimUserDataDir=data)
+    _, cycle, printed = payout_run(sim, bars, liq, tmp_path, SimRealtimeFrom=s, SimUserDataDir=data,
+                                   FundedQualDays=1)
+    assert any("the settings changed" in p for p in printed) and "(remembered)" not in cycle
+    off = tmp_path / "nt8-off"
+    payout_run(sim, bars, liq, tmp_path, n=s, PayoutStopInHistory=True, SimUserDataDir=off, RememberPayoutCycle=False)
+    assert not off.exists() or not list(off.rglob("*.txt"))
+
+
+def test_payout_cycle_days_the_strategy_was_off(sim, tmp_path, payout_case):
+    """Stopped on one day and started again two weekdays later, during the day: a warning, the day it missed counted
+    with the day before (fewer $200 days, never more), and the cycle's profit still the account's."""
+    bars, liq, _, want, _ = payout_case
+    first = want[0][0]
+    day_k = (first - first % 390) - 3 * 390  # three days before the first payout day
+    s_stop, s_start, n = day_k + 200, day_k + 2 * 390 + 120, day_k + 3 * 390
+    data = tmp_path / "nt8"
+    payout_run(sim, bars, liq, tmp_path, n=s_stop, PayoutStopInHistory=True, SimUserDataDir=data)
+    _, cycle, printed = payout_run(sim, bars, liq, tmp_path, n=n, SimRealtimeFrom=s_start, SimUserDataDir=data)
+    assert any("was off on 1 weekday(s)" in p for p in printed), printed[-5:]
+    _, ref = payout_run(sim, bars, liq, tmp_path, n=n, PayoutStopInHistory=True, SimUserDataDir=tmp_path / "ref")[:2]
+    q, p, _, t = cycle_numbers(cycle)
+    q_ref, p_ref, _, t_ref = cycle_numbers(ref)
+    assert t == t_ref and abs(p - p_ref) <= 0.5 and q <= q_ref, (cycle, ref)

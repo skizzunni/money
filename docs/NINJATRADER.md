@@ -78,7 +78,18 @@ account. Copy that account to others with a trade copier (Tradesyncer, or NinjaT
      is why it is off. Enter the cycle once: **payouts taken so far**, **$200 days since the last payout**, **profit
      since the last payout**, **best day since the last payout** (from Apex's dashboard), and **account's starting
      balance** 50,000. It keeps them up to date from the account each day and shows them on the dashboard ("Payout
-     cycle"); after a restart, copy the dashboard's numbers back into these settings. Live only.
+     cycle"). Live only.
+     **Remember the payout cycle in a file** (on by default): the cycle is saved after every bar to
+     `Documents\NinjaTrader 8\MnqNoiseMomentum\payout-cycle-<account>.txt`, so a restart (the same day, the next
+     morning, or during a day) goes on from it, with no re-typing; the dashboard then says "(remembered)". To correct
+     it, change any of the four cycle settings: new settings replace the remembered state. A payout you asked for is
+     counted out of the balance until it is seen leaving the account (one bar's drop of 90% of it or more), and that
+     drop is not counted as a losing day; the dashboard shows "$X asked for, not yet out of the account" until then
+     (if you asked for less than it said, or didn't ask, re-enter the cycle in the settings). If the strategy was off
+     on a weekday, it warns you: any trading that day is counted with the day before (fewer $200 days, never more),
+     so check the dashboard against Apex's and re-enter the cycle if they differ. Started during a day, it takes the
+     day's start from the account's P/L for the day (NinjaTrader's realized and unrealized P/L, which reset at each
+     trading day): check the dashboard once against Apex's the first time you do it.
    - **Evaluation: profit already made before this start:** 0 for a new evaluation. **If you restart the strategy in
      the middle of an evaluation, enter the evaluation's profit so far here** (from Apex's dashboard), or it will aim
      for $3,000 more. The dashboard shows "Evaluation: $X of $3,000" so you can check it matches.
@@ -194,7 +205,12 @@ not identical: NinjaTrader's historical fills differ from the worst-case fills t
   account: one "close everything" alert, no trade alerts after it, and the take-profit moved to the target's price.
 - The funded payout stop: the first bar at which closing makes the day payout-eligible, recomputed independently
   from the trades in three cycle states (one where the 50% rule binds), is the strategy's payout day; flat at once, no
-  entries after it that day.
+  entries after it that day. On a scripted account through four payout cycles, with a payout leaving the account two
+  days after it was asked for: every payout day and the cycle at the end equal a replica's (and differ from what
+  counting the payout as a losing day gives). Stopped and started again at six points (before and after a payout in
+  the same day, at a day's first bar, before and after the payout leaves, in a later cycle), it gives the same payout
+  days and the same cycle as running straight through; new settings replace the file; days it was off are warned of
+  and never add $200 days. Breaking any of these in the code (8 mutations) makes a test fail.
 - With the evaluation's target: every trade before the one that reaches it is unchanged, that one exits at the
   target's price (a bot trade or a breakout trade), the total is at least the target, and nothing trades after; not on
   the funded account, and not in a historical run.

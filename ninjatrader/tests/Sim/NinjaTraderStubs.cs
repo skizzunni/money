@@ -28,6 +28,8 @@ namespace NinjaTrader.Core
     public static class Globals
     {
         public static string InstallDir = @"C:\Program Files\NinjaTrader 8";
+        // Documents\NinjaTrader 8; here a fresh folder for each run, unless the test gives one (SimUserDataDir)
+        public static string UserDataDir = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "nt8-" + Guid.NewGuid().ToString("N"));
         public static GeneralOptions GeneralOptions = new GeneralOptions();
     }
 }
@@ -38,14 +40,18 @@ namespace NinjaTrader.Cbi
     public enum PerformanceUnit { Currency, Percent, Pips, Points, Ticks }
     public enum AccountItem { CashValue, NetLiquidation, RealizedProfitLoss, UnrealizedProfitLoss }
     public enum Currency { UsDollar }
-    // the account the strategy runs on: its net liquidation is $50,000 + the strategy's P/L, or SimNetLiq when set
+    // the account the strategy runs on: its net liquidation is $50,000 + the strategy's P/L, or SimNetLiq when set, or
+    // SimLiqFile's; its realized / unrealized P/L are the trading day's (from 18:00 New York)
     public class Account
     {
-        internal Func<double> Value;
+        public string Name = "Sim101";
+        internal Func<double> Value, Realized, Unrealized;
         public double Get(AccountItem item, Currency currency)
         {
-            if (item != AccountItem.NetLiquidation) throw new NotSupportedException();
-            return Value();
+            if (item == AccountItem.NetLiquidation) return Value();
+            if (item == AccountItem.RealizedProfitLoss) return Realized();
+            if (item == AccountItem.UnrealizedProfitLoss) return Unrealized();
+            throw new NotSupportedException();
         }
     }
     public enum OrderState { Initialized, Submitted, Accepted, Working, Filled, Cancelled, Rejected }
@@ -178,6 +184,15 @@ namespace NinjaTrader.NinjaScript.Strategies
         public SystemPerformance SystemPerformance = new SystemPerformance();
         public Account Account = new Account();
         public double SimNetLiq { get; set; }  // tests: the account's net liquidation, whatever the strategy did
+        public string SimLiqFile { get; set; }  // tests: the account's net liquidation at each bar, one per line
+        public string SimWithdraw { get; set; }  // tests: "bar:amount": a payout leaves the account at that bar
+        public int SimRealtimeFrom { get; set; }  // tests: the strategy goes live at this bar (0: never)
+        public string SimAccountName { get { return Account.Name; } set { Account.Name = value; } }
+        public string SimUserDataDir
+        {
+            get { return NinjaTrader.Core.Globals.UserDataDir; }
+            set { NinjaTrader.Core.Globals.UserDataDir = value; }
+        }
 
         // the fill model
         public double CommissionPerSide = 0.62;
@@ -305,20 +320,56 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (configure != null) configure(this);
             State = State.Configure; OnStateChange();
             State = State.DataLoaded; OnStateChange();
+            List<double> liqs = new List<double>();
+            if (SimLiqFile != null)
+                foreach (string line in System.IO.File.ReadAllLines(SimLiqFile))
+                    liqs.Add(double.Parse(line, System.Globalization.CultureInfo.InvariantCulture));
+            int withdrawBar = int.MaxValue;
+            double withdrawAmount = 0;
+            if (SimWithdraw != null)
+            {
+                string[] w = SimWithdraw.Split(':');
+                withdrawBar = int.Parse(w[0]);
+                withdrawAmount = double.Parse(w[1], System.Globalization.CultureInfo.InvariantCulture);
+            }
+            int dayFirstBar = 0;
+            double dayStartCum = 0;
+            Func<double> open = delegate
+            {
+                return Position.MarketPosition == MarketPosition.Flat ? 0 :
+                    Position.GetUnrealizedProfitLoss(PerformanceUnit.Currency, Close[0]);
+            };
             Account.Value = delegate
             {
+                double out_ = CurrentBar >= withdrawBar ? withdrawAmount : 0;
+                if (SimLiqFile != null) return liqs[CurrentBar] - out_;
                 if (SimNetLiq > 0) return SimNetLiq;
-                double open = Position.MarketPosition == MarketPosition.Flat ? 0 :
-                    Position.GetUnrealizedProfitLoss(PerformanceUnit.Currency, Close[0]);
-                return 50000 + SystemPerformance.AllTrades.TradesPerformance.Currency.CumProfit + open;
+                return 50000 + SystemPerformance.AllTrades.TradesPerformance.Currency.CumProfit + open() - out_;
             };
+            Account.Realized = delegate
+            {
+                if (SimLiqFile != null) return liqs[CurrentBar] - liqs[dayFirstBar];  // all of it closed
+                return SystemPerformance.AllTrades.TradesPerformance.Currency.CumProfit - dayStartCum;
+            };
+            Account.Unrealized = delegate { return SimLiqFile != null ? 0 : open(); };
+            TimeZoneInfo ny = TimeZoneInfo.FindSystemTimeZoneById("America/New_York");
+            DateTime lastDay = DateTime.MinValue;
             State = State.Historical; OnStateChange();
             double slip = SlippageTicks * TickSize;
             for (int i = 0; i < c.Count; i++)
             {
+                if (SimRealtimeFrom > 0 && i == SimRealtimeFrom)
+                {
+                    State = State.Transition; OnStateChange();
+                    State = State.Realtime; OnStateChange();
+                }
                 Time.Add(barEnds[i]); Open.Add(o[i]); High.Add(h[i]); Low.Add(l[i]); Close.Add(c[i]);
                 CurrentBar = Time.Current = Open.Current = High.Current = Low.Current = Close.Current = i;
                 foreach (Series<double> v in Values) v.Current = i;
+                DateTime nyStart = TimeZoneInfo.ConvertTime(barEnds[i], NinjaTrader.Core.Globals.GeneralOptions.TimeZoneInfo, ny)
+                    .AddMinutes(-BarsPeriod.Value);
+                bool newDay = nyStart.AddHours(6).Date != lastDay;  // the trading day starts at 18:00 New York
+                lastDay = nyStart.AddHours(6).Date;
                 // market orders from the last bar
                 if (pendExit != null && Position.MarketPosition != MarketPosition.Flat)
                     Fill(i, o[i] - (Position.MarketPosition == MarketPosition.Long ? 1 : -1) * slip, pendExit);
@@ -364,6 +415,11 @@ namespace NinjaTrader.NinjaScript.Strategies
                         Fill(i, px, "Stop loss");
                     else if (!double.IsNaN(target) && ((d > 0 && h[i] >= target + TickSize) || (d < 0 && l[i] <= target - TickSize)))
                         Fill(i, target, "Profit target");
+                }
+                if (newDay)  // after the day's first fills: an exit sent at the 16:00 close is the day before's
+                {
+                    dayFirstBar = i;
+                    dayStartCum = SystemPerformance.AllTrades.TradesPerformance.Currency.CumProfit;
                 }
                 OnBarUpdate();
             }
