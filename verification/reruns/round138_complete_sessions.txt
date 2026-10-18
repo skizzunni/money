@@ -1,0 +1,27 @@
+
+2011-2018
+      exit    net $  trades  $ a trade  winners %  avg win  avg loss  closed DD  intraday DD  net / intraday DD  worst day  losing streak  top-5 share %  months up %  net, +2 ticks  account net $/wk at $100
+lock (now) 130692.6    4384       29.8       49.9    277.3    -217.0    19516.3      21428.5                6.1    -1474.9             13           13.9         65.6       114388.6                      64.7
+  trail 1R  97363.3    5173       18.8       50.3    250.0    -215.3    10060.3      10424.2                9.3    -1009.8             13           15.9         65.6        77952.3                      61.2
+half at 1R  86479.9    4405       19.6       50.6    252.2    -218.8    15480.2      16352.4                5.3    -1397.9             13           17.9         62.5        70091.9                      61.1
+
+2019-2025
+      exit    net $  trades  $ a trade  winners %  avg win  avg loss  closed DD  intraday DD  net / intraday DD  worst day  losing streak  top-5 share %  months up %  net, +2 ticks  account net $/wk at $100
+lock (now) 140476.9    3454       40.7       49.5    306.3    -220.0     7251.4       9071.4               15.5    -1042.4             10           13.9         75.7       128159.9                      39.7
+  trail 1R  80969.8    4082       19.8       50.0    256.6    -217.0     7946.8       8180.3                9.9    -1042.4             10           17.5         67.6        66219.8                      32.6
+half at 1R  94392.0    3479       27.1       50.5    271.4    -222.4     7219.6       7738.2               12.2    -1042.4             10           14.6         71.6        81975.0                      46.1
+
+Jul 2025-Aug 2026
+      exit  net $  trades  $ a trade  winners %  avg win  avg loss  closed DD  intraday DD  net / intraday DD  worst day  losing streak  top-5 share %  months up %  net, +2 ticks  account net $/wk at $100
+lock (now) 3337.4     662        5.0       49.2    246.1    -228.8    10167.0      10602.8                0.3     -942.6              9          359.7         60.0          971.4                     -29.1
+  trail 1R 1679.8     764        2.2       49.7    233.0    -226.2     9086.8       9372.8                0.2     -886.4              9          501.3         33.3        -1089.2                     -19.7
+half at 1R 2306.4     664        3.5       49.8    238.4    -230.1     8111.2       8295.0                0.3     -758.4              9          359.9         40.0          -67.6                     -27.5
+
+NQ 2015-2024
+      exit    net $  trades  $ a trade  winners %  avg win  avg loss  closed DD  intraday DD  net / intraday DD  worst day  losing streak  top-5 share %  months up %  net, +2 ticks  account net $/wk at $100
+lock (now) 174029.7    6226       28.0       49.8    276.7    -218.8    11209.5      12005.5               14.5    -1061.1             11           11.4         66.9       151292.7                      34.4
+  trail 1R  89444.3    7289       12.3       50.1    239.9    -216.0    11051.5      11754.1                7.6    -1061.1             11           17.6         63.6        62551.3                      16.7
+half at 1R 121024.2    6280       19.3       50.8    252.5    -221.3     8817.9       8975.1               13.5    -1061.1             10           13.0         65.3        98071.2                      27.3
+trail 1R: account more in all four: False; intraday DD no larger in 4 of 4 -> NOT ADOPTED
+half at 1R: account more in all four: False; intraday DD no larger in 4 of 4 -> NOT ADOPTED
+exit 0

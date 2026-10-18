@@ -56,6 +56,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         bool exitRejected;          // one of the strategy's own exits was rejected: sent again at the next bar
         double lastStop = double.NaN;  // TightenOnly: the bot's stop so far in this trade
         double entryStopPts = double.NaN;  // the bot's bracket stop, points from the fill
+        int botEntryQty;                 // the bot's contracts at entry (the partial exit closes half of them)
         bool evalDone;              // the evaluation's target was reached: everything closed, no new trades
         double profitBase;          // the strategy's closed P/L when it went live (the history before doesn't count)
         const double EvalBuffer = 25.0;  // $ past the target, for the closing fees and a tick
@@ -153,6 +154,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 TightenOnly = true;    // the stop never moves back toward the price (docs/RESULTS.md round 139)
                 DailyMaxLosers = 0;    // shared daily gate, both setups (docs/VERIFICATION.md): off by default
                 DailyLossLimit = 0;
+                PartialAtR = 0;        // half off at 1R: frozen for the forward test, off by default
                 BreakoutTarget = 8;    // 8 x its stop = 2 x yesterday's range: a full bracket (docs/RESULTS.md round 130)
                 AccountStart = 50000;
 
@@ -706,6 +708,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 else
                     EnterShort(BotQty, ShortName);
                 botSent = true;
+                botEntryQty = BotQty;
                 owner = Bot;
                 realLocked = false;
                 closingRejected = false;
@@ -799,6 +802,18 @@ namespace NinjaTrader.NinjaScript.Strategies
             }
             if (!double.IsNaN(tp))
                 SetProfitTarget(name2, CalculationMode.Price, RoundTarget(real, tp));
+            // the partial exit (off by default; docs/VERIFICATION.md): while the full position is open, a limit for half
+            // the contracts at the fill +/- PartialAtR x R (R: the initial risk in points), sent at each bar's close,
+            // so it works from the bar after the fill
+            if (PartialAtR > 0 && botEntryQty >= 2 && Position.Quantity == botEntryQty)
+            {
+                double rPts = MaxLoss / Qty / settings.PointValue;
+                double pp = RoundTarget(real, avg + real * PartialAtR * rPts);
+                if (real > 0)
+                    ExitLongLimit(botEntryQty / 2, pp, "Partial", LongName);
+                else
+                    ExitShortLimit(botEntryQty / 2, pp, "Partial", ShortName);
+            }
         }
 
         // Points from the fill at which `qty` contracts take the evaluation to its target (NaN: off)
@@ -1360,6 +1375,11 @@ namespace NinjaTrader.NinjaScript.Strategies
         [NinjaScriptProperty]
         [Display(Name = "Stop only ever tightens (never moves back toward the price; round 139)", Order = 21, GroupName = "1. Account")]
         public bool TightenOnly { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0.0, 10.0)]
+        [Display(Name = "Bot: close half at this many R from the fill (R = the initial risk; 0 = off)", Order = 24, GroupName = "1. Account")]
+        public double PartialAtR { get; set; }
 
         [NinjaScriptProperty]
         [Range(0, 100)]

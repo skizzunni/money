@@ -1150,3 +1150,20 @@ def test_daily_gate_loss_limit_both_setups(sim, tmp_path):
             assert realized - risk >= -500 - 1e-6, (seed, o, realized, risk)
         stopped += sum("could take today past the $500 loss limit" in p for p in printed)
     assert stopped, "the gate stopped some entries"
+
+
+@pytest.mark.parametrize("funded", [False, True])
+def test_half_off_at_1r_matches_the_bot(sim, tmp_path, funded):
+    """The frozen forward-test alternative (docs/VERIFICATION.md): a limit for half the bot's contracts at the fill
+    +/- 1R (25 points), working from the bar after the fill; the rest keeps every rule. The strategy's account trades
+    (the half and the rest as separate records) equal the Python bot's with the same definition, and it fills."""
+    parts = 0
+    for seed in (3, 5, 9):
+        bars = synth_bars(sessions=90, seed=seed)
+        trades, orders, _, _ = run_sim(sim, bars, tmp_path, Funded=funded, RoundPrices=False, PartialAtR=1.0)
+        assert_strategy_matches(trades, run(bars, account(funded, partial_at=1.0, partial_next_bar=True)))
+        parts += sum(t[5] == "Partial" for t in trades)
+        for t in trades:
+            if t[5] == "Partial":  # the half: 2 of 4 contracts, 25 points from the fill
+                assert math.isclose(abs(float(t[4]) - float(t[2])), 25.0)
+    assert parts, "the half was taken on these bars"

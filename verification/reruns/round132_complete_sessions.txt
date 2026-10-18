@@ -1,0 +1,27 @@
+
+2011-2018
+payout stop  starts  $ a week per slot  median $ a week  paid at all %  evals a slot  funded a slot  slots for $1,500  break-even eval fee $  funded day mean $  funded day sd $
+        off    2036              63.70            57.69          79.22          7.21           2.32             23.55                 434.09              46.29           484.34
+         on    2036              76.71            82.15          89.93          7.50           2.42             19.56                 506.42              46.29           484.34
+
+2019-2025
+payout stop  starts  $ a week per slot  median $ a week  paid at all %  evals a slot  funded a slot  slots for $1,500  break-even eval fee $  funded day mean $  funded day sd $
+        off    1621              42.35            28.85          60.95          8.88           2.88             35.42                 222.37              42.18           483.55
+         on    1621              51.05            39.54          68.48          8.52           2.74             29.38                 286.06              42.18           483.55
+
+Jul 2025-Aug 2026
+payout stop  starts  $ a week per slot  median $ a week  paid at all %  evals a slot  funded a slot  slots for $1,500  break-even eval fee $  funded day mean $  funded day sd $
+        off      63                0.0              0.0            0.0         16.65           2.65               inf                 -12.58              -6.12           375.26
+         on      63                0.0              0.0            0.0         16.65           2.65               inf                 -12.58              -6.12           375.26
+
+NQ 2015-2024
+payout stop  starts  $ a week per slot  median $ a week  paid at all %  evals a slot  funded a slot  slots for $1,500  break-even eval fee $  funded day mean $  funded day sd $
+        off    2421              43.22            28.85          71.09          8.63           3.12             34.71                 231.94              44.22           511.56
+         on    2421              52.58            38.63          77.53          8.96           3.28             28.53                 276.18              44.22           511.56
+
+One account's bound: the daily mean needed for a 20% / 50% chance of failing at the measured spread
+2011-2018: mean $46, sd $484, fail ~45%; $300 a day at a 20% fail chance needs sd <= $863; at this sd: $94/day (20%), $41/day (50%)
+2019-2025: mean $42, sd $484, fail ~49%; $300 a day at a 20% fail chance needs sd <= $863; at this sd: $94/day (20%), $41/day (50%)
+Jul 2025-Aug 2026: mean $-6, sd $375, fail ~100%; $300 a day at a 20% fail chance needs sd <= $863; at this sd: $57/day (20%), $24/day (50%)
+NQ 2015-2024: mean $44, sd $512, fail ~51%; $300 a day at a 20% fail chance needs sd <= $863; at this sd: $105/day (20%), $45/day (50%)
+exit 0

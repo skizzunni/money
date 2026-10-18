@@ -1,0 +1,36 @@
+
+2011-2018
+    setup  starts  paid $/wk  evals  funded accts  net $/wk at $50  net $/wk at $100  net $/wk at $200
+      now    2036       83.4    7.7           2.6             72.1              64.7              49.9
+   W $100    2036       70.4    7.0           2.4             59.9              53.1              39.6
+   W $300    2036       92.0    7.9           2.6             80.4              72.7              57.5
+ 3 losers    2036       95.1    6.6           2.1             85.6              79.3              66.7
+eval lock    2036       78.6    7.8           2.4             67.4              59.9              44.8
+
+2019-2025
+    setup  starts  paid $/wk  evals  funded accts  net $/wk at $50  net $/wk at $100  net $/wk at $200
+      now    1621       59.3    8.0           2.7             47.4              39.7              24.2
+   W $100    1621       50.8    9.0           2.9             37.7              29.0              11.7
+   W $300    1621       61.7    8.9           3.1             48.4              39.8              22.6
+ 3 losers    1621       55.7    9.8           3.5             41.0              31.5              12.7
+eval lock    1621       78.1    8.9           2.9             65.1              56.5              39.3
+
+Jul 2025-Aug 2026
+    setup  starts  paid $/wk  evals  funded accts  net $/wk at $50  net $/wk at $100  net $/wk at $200
+      now      63        0.0   13.0           2.7            -16.6             -29.1             -54.1
+   W $100      63       28.8   14.0           2.7             11.3              -2.1             -29.0
+   W $300      63       28.8   13.2           2.8             11.9              -0.7             -26.1
+ 3 losers      63        0.0   13.0           2.7            -16.6             -29.1             -54.1
+eval lock      63       28.8   14.3           2.8             10.9              -2.9             -30.4
+
+NQ 2015-2024
+    setup  starts  paid $/wk  evals  funded accts  net $/wk at $50  net $/wk at $100  net $/wk at $200
+      now    2421       58.4    9.9           3.2             43.9              34.4              15.3
+   W $100    2421       46.5    9.0           3.0             33.3              24.6               7.3
+   W $300    2421       67.3   10.0           3.4             52.5              42.9              23.6
+ 3 losers    2421       61.5   10.2           4.1             45.4              35.6              16.1
+eval lock    2421       69.4   10.3           3.2             54.5              44.6              24.7
+
+pick on 2011-18: 3 losers
+NOT ADOPTED
+exit 0

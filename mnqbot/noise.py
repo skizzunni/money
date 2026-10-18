@@ -95,6 +95,7 @@ class NoiseConfig:
     trail_points: float = 0.0
     partial_at: float = 0.0
     partial_frac: float = 0.5
+    partial_next_bar: bool = False  # the part's limit works from the bar after the fill (as NinjaTrader can send it)
 
 
 @dataclass
@@ -246,7 +247,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             if hit:
                 close_pos(i, price, reason)
                 events.append((i, "EXIT"))
-            if pos and rest == 1.0 and cfg.partial_at > 0 and not math.isnan(r_pts):  # research: part at +partial_at R
+            if (pos and rest == 1.0 and cfg.partial_at > 0 and not math.isnan(r_pts)  # research: part at +partial_at R
+                    and not (cfg.partial_next_bar and entry_bar == i)):
                 pt = (entry_px if entry_bar != i else est_px) + pos * cfg.partial_at * r_pts
                 if (pos > 0 and h[i] >= pt + cfg.tick) or (pos < 0 and l[i] <= pt - cfg.tick):
                     close_part(i, pt)

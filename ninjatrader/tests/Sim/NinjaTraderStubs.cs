@@ -341,6 +341,47 @@ namespace NinjaTrader.NinjaScript.Strategies
         public void ExitLong(string signalName, string fromEntrySignal) { Exit(1, signalName, fromEntrySignal); }
         public void ExitShort(string signalName, string fromEntrySignal) { Exit(-1, signalName, fromEntrySignal); }
 
+        // a limit exit for part of the position, working through the next bar only (a managed order not sent again at
+        // the next bar's close is cancelled, as NinjaTrader does); fills when a bar trades a tick through it, after the
+        // stop is checked, before the take-profit
+        int partQty, partDir;
+        double partPx = double.NaN;
+        string partName;
+        void ExitLimit(int d, int quantity, double limitPrice, string signalName, string fromEntrySignal)
+        {
+            Check(fromEntrySignal);
+            OrderLog.Add(CurrentBar + ",ExitLimit," + signalName + "," + fromEntrySignal + "," + quantity + "," + limitPrice.ToString("R"));
+            int real = Position.MarketPosition == MarketPosition.Long ? 1 : Position.MarketPosition == MarketPosition.Short ? -1 : 0;
+            if (real != d || posName != fromEntrySignal || quantity <= 0 || quantity >= Position.Quantity)
+                return;
+            partQty = quantity; partDir = d; partPx = limitPrice; partName = signalName;
+        }
+        public void ExitLongLimit(int quantity, double limitPrice, string signalName, string fromEntrySignal)
+        {
+            ExitLimit(1, quantity, limitPrice, signalName, fromEntrySignal);
+        }
+        public void ExitShortLimit(int quantity, double limitPrice, string signalName, string fromEntrySignal)
+        {
+            ExitLimit(-1, quantity, limitPrice, signalName, fromEntrySignal);
+        }
+
+        void FillPart(int i, int qty, double price, string why)
+        {
+            int d = Position.MarketPosition == MarketPosition.Long ? 1 : -1;
+            SimTrade t = new SimTrade();
+            t.Direction = d; t.EntryBar = entryBar; t.Entry = Position.AveragePrice; t.ExitBar = i; t.Exit = price;
+            t.ExitName = why; t.EntryName = posName; t.Qty = qty;
+            t.Pnl = d * (price - t.Entry) * qty * Instrument.MasterInstrument.PointValue - 2 * CommissionPerSide * qty;
+            SimTrades.Add(t);
+            SystemPerformance.AllTrades.TradesPerformance.Currency.CumProfit += t.Pnl;
+            Trade rec = new Trade();
+            rec.Quantity = qty; rec.ProfitCurrency = t.Pnl;
+            rec.Entry = new Execution(); rec.Entry.Time = Time[CurrentBar - entryBar]; rec.Entry.Name = posName;
+            rec.Exit = new Execution(); rec.Exit.Time = Time[CurrentBar - i]; rec.Exit.Name = why;
+            SystemPerformance.AllTrades.List.Add(rec);
+            Position.Quantity -= qty;
+        }
+
         void Fill(int i, double price, string why)
         {
             int d = Position.MarketPosition == MarketPosition.Long ? 1 : -1;
@@ -472,9 +513,16 @@ namespace NinjaTrader.NinjaScript.Strategies
                     }
                     if (hit)
                         Fill(i, px, "Stop loss");
-                    else if (!double.IsNaN(target) && ((d > 0 && h[i] >= target + TickSize) || (d < 0 && l[i] <= target - TickSize)))
-                        Fill(i, target, "Profit target");
+                    else
+                    {
+                        if (!double.IsNaN(partPx) && partDir == d &&
+                            ((d > 0 && h[i] >= partPx + TickSize) || (d < 0 && l[i] <= partPx - TickSize)))
+                            FillPart(i, partQty, partPx, partName);
+                        if (!double.IsNaN(target) && ((d > 0 && h[i] >= target + TickSize) || (d < 0 && l[i] <= target - TickSize)))
+                            Fill(i, target, "Profit target");
+                    }
                 }
+                partPx = double.NaN;  // a partial limit lives one bar unless sent again
                 if (newDay)  // after the day's first fills: an exit sent at the 16:00 close is the day before's
                 {
                     dayFirstBar = i;
