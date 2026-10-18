@@ -245,6 +245,47 @@ These are adjustments to fixed trades. They are not reruns.
   - DEC26 for September 11 to October 16;
   - so the stand-in can be reconciled on the same bars.
 
+## 4b. Native cost runs, 9/11 to 10/17 - executed by the user in NinjaTrader; reconciled here
+
+**What was run:** four Strategy Analyzer runs on MNQ DEC26, 9/11/2026 to 10/17/2026, commission on, slippage 0 / 1 /
+1 / 2 (the 1-tick run appears twice in the Output). The code is this commit's: the settings line shows "shorts True".
+Files are in `verification/native_costs_sep11/`.
+
+**The window:**
+- Every run loaded bars from 9/10 18:01. The engine was ready only at **9/30 16:00**: the first 14 sessions (9/11 to
+  9/30) went to warm-up.
+- So all four runs trade **10/1 to 10/16 only**: 12 sessions, 28 trades, 103 contracts.
+- To trade from 9/11, the run must start 14 sessions earlier: **8/21/2026**. Count only the trades from 9/11.
+
+**Reconciled:**
+- At 0 ticks the 28 trades are **exactly the reference's October trades**: same entries, exits, contracts, and $2,678.50
+  before costs.
+- The October noise uses the same 14 sessions (9/11 to 9/30) in both runs. A short run started at the roll date
+  reproduces the long one.
+
+| Slippage | Gross | Commission | Net | Max drawdown (NT) |
+|---|---:|---:|---:|---:|
+| 0 | $2,678.50 | $195.70 | $2,482.80 | $2,675.20 |
+| 1 tick | $2,629.50 | $195.70 | $2,433.80 | $2,709.20 |
+| 2 ticks | $2,579.50 | $195.70 | $2,383.80 | $2,744.20 |
+
+- **Commission:** $195.70 = 103 contracts × $1.90, charged once.
+
+**Where NinjaTrader put the slippage** (per-fill comparison, 1 tick against 0):
+- **Market entries:** slipped, 27 of 28. One was not; it is presumably bounded by its bar.
+- **16:00 market exits:** slipped, 3 of 3.
+- **Stop-loss exits:** not slipped, 18 of 21 at an unchanged price.
+- **Take-profits:** never slipped. They move only because they are set in ticks from the slipped fill.
+
+**So NinjaTrader's slippage setting costs about $0.50 a contract a tick here, roughly half of what a stop-filled
+strategy pays live.** The stand-in slips every stop as well, so the stand-in's slippage runs (section 4) are the more
+conservative ones. A conservative check on NinjaTrader's numbers is to deduct another tick a contract on every
+stop-loss exit.
+
+**Where the reference's after-roll profit came from:**
+- 9/11 to 9/30: 38 trades, +$8,435 before costs. This window is not covered by these four runs.
+- 10/1 to 10/16: 28 trades, +$2,678.50.
+
 ## 5. Not started (brief steps 5-11) - proposed
 
 The following were not started; the brief asked for sections 1-4 first:
