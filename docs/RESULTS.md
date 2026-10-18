@@ -2395,6 +2395,28 @@ payout stop on, net of $100 an evaluation). Fixed before running.
   risk. On the account it still nets more a week (evaluations pass sooner), which is why round 134 kept it.
 - Every period here was used by earlier rounds; no data before 16 October 2026 is untouched.
 
+## Round one hundred and thirty-eight: the lock's giveback, and two other exits (the audit's stages 7-8)
+
+`research/exits.py`; the two exits are research-only options in `mnqbot/noise.py` (tests in `tests/test_noise.py`),
+the whole strategy re-run for each. **The giveback is the lock as designed**: once a trade is 1R up (25 points in
+the evaluation) its stop moves to entry + 2.5 and stays there unless the line or the take-profit ends the trade first.
+In the export, trade #50 reached $738 of open profit and closed at +$10.40 on that stop: no delayed update, no
+mismatch between model and fills. Defined before running: **trail 1R** (once the lock arms, the stop also sits 25
+points behind the best price since the entry, from the next bar, never loosening) and **half at 1R** (half the
+contracts close at a limit 25 points from the fill; the rest keeps every rule; R not redefined; one trade). Bar: more
+on the account in all four periods and an intraday drawdown no larger in three.
+
+| Account net $ a week at $100 (intraday DD; net) | 2011-18 | 2019-25 | Jul 2025-Aug 2026 | NQ 2015-24 |
+|---|---|---|---|---|
+| **lock (now)** | **$69.6** ($18,556; $145,240) | **$42.4** ($13,041; $131,071) | **$3.6** ($10,061; $19,329) | **$31.5** ($12,925; $169,996) |
+| trail 1R | $64.1 ($11,899; $101,695) | $34.2 ($15,326; $71,424) | -$8.1 ($8,496; $13,776) | $16.6 ($12,287; $84,872) |
+| half at 1R | $66.6 ($15,604; $93,790) | $45.7 ($11,283; $81,308) | -$12.7 ($7,741; $13,077) | $22.0 ($9,719; $116,858) |
+
+**Neither adopted.** Both keep more of the small trades' open profit and win slightly more often (50-51%), and both
+cut the large winners the strategy lives on: net falls 29-50%. Half at 1R lowers the intraday drawdown in all four
+periods (by 13-25%) for 31-38% less net: a trade of profit for smoothness, not an improvement; on the account it nets
+more only on 2019-25. The trail lowers the drawdown in three periods and nets less on the account in all four.
+
 ## The first run in NinjaTrader itself: Strategy Analyzer, September 8 to October 16, 2026
 
 The user ran the strategy in NinjaTrader's Strategy Analyzer on real MNQ DEC26 1-minute data (18 Aug - 17 Oct 2026,
@@ -2528,6 +2550,7 @@ python research/slot_eval.py nsx1m_scaled.pkl nq1m_scaled.pkl          # breakou
 python research/slot_funded.py nsx1m_scaled.pkl nq1m_scaled.pkl        # funded settings per week (none adopted)
 python research/vol_target.py nsx1m_scaled.pkl nq1m_scaled.pkl         # volatility-targeted size (not adopted)
 python research/components.py nsx1m_scaled.pkl nq1m_scaled.pkl         # the breakout's place (stays, shorts too)
+python research/exits.py nsx1m_scaled.pkl nq1m_scaled.pkl              # trail / half at 1R vs the lock (lock stays)
 python research/nt_run_check.py data/nt_strategy_analyzer_2026-08-18_10-17.csv  # the NinjaTrader run
 ```
 

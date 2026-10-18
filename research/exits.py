@@ -76,8 +76,8 @@ def build(bars, trades, risk):
         d, p, q = merged.get(t.entry_bar, (leg[0], 0.0, M.BOTQ))
         merged[t.entry_bar] = (d, p + leg[5], q)
     q_at = {w["a"]: w["q"] for day in cands for w in day}
-    out = list(merged.values()) + [(leg[0], leg[5], q_at[leg[1]]) for leg in legs[len(trades):]]
-    return legs, sorted(out, key=lambda x: x[0])
+    out = list(merged.items()) + [(leg[1], (leg[0], leg[5], q_at[leg[1]])) for leg in legs[len(trades):]]
+    return legs, [v for _, v in sorted(out, key=lambda x: x[0])]  # in time order (entry bar)
 
 
 def job(args):

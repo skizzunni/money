@@ -62,8 +62,8 @@ def build(bars, bot, which, risk):
     finally:
         C.RISK = old
     q_at = {w["a"]: w["q"] for day in cands for w in day}
-    trades = [(leg[0], leg[5], M.BOTQ if k < len(bot) else q_at[leg[1]]) for k, leg in enumerate(legs)]
-    return legs, trades
+    trades = [(leg[1], leg[0], leg[5], M.BOTQ if k < len(bot) else q_at[leg[1]]) for k, leg in enumerate(legs)]
+    return legs, [t[1:] for t in sorted(trades, key=lambda t: t[0])]  # in time order (entry bar)
 
 
 def stats(legs, trades, first, last):

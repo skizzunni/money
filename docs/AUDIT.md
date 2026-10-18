@@ -71,3 +71,105 @@ strategy's own C# code runs on those bars in the stand-in (`ninjatrader/tests/Si
 
 Not repaired, and why: 1 (needs an execution ledger, stage 4), 2 and 3 (trading-rule questions, stage 6), 4 and 10
 (exit design, stages 7-8).
+
+## Stage 4: execution ledger and a shared risk gate (not built yet)
+
+What exists: the dashboard and alerts are driven by the strategy's model (concern 1); NinjaTrader's own Orders,
+Executions and Strategy Performance tabs are the execution record. What a ledger would add, and why it is not built in
+this pass: reconciling model vs fills needs NinjaTrader's execution events (`OnExecutionUpdate`, partial fills,
+commissions), which the stand-in does not model, so it could not be tested here; an untested ledger is worse than
+none. Specification for the next pass, from the brief: trades defined from flat to flat on executions; losers and
+realized $ for the trading day (reset at 18:00 New York, kept in the payout-cycle file across restarts); one gate in
+front of both entry paths (bot and breakout, reversals included) that checks actual losers today, realized loss +
+open risk + risk reserved by working entries against a daily budget, the 10 MNQ limit and an unresolved
+mismatch (repair 6 already blocks entries on a mismatch). Default off, then tested as a trading change (it changes
+which trades happen).
+
+## Stage 5: sizing
+
+| Item | Finding | Class |
+|---|---|---|
+| MNQ point value / tick | read from the instrument (`Instrument.MasterInstrument.PointValue`, `TickSize`): $2 / 0.25 points ($0.50) | confirmed from source |
+| Bot | fixed 4 MNQ; the $200 cap becomes 25 points (`MaxLoss / Qty / PointValue`), from the fill | confirmed |
+| Breakout | contracts = floor(risk / (stop points x $2)), 1-10; **one contract is forced when it costs between 1x and 1.5x the budget** (only above 1.5x is the trade skipped) | confirmed from source (`MnqNoiseEngine.cs` 487-497 and `research/combo_more.py`); a trading-rule question, logged for a test |
+| Costs in the budget | the budgets cover price risk only; fees ($1.90 a contract round trip here) and slippage come on top: worst bot loss in the export $209.60 on $200, worst breakout $409.50 on $400 | confirmed by the export |
+| Adverse entry fill | the stop is placed in ticks from the actual fill, so the points at risk stay the same and the $ risk moves only with slippage on the stop | confirmed from source |
+| Bold finish | contracts x2.5 with stops unchanged in points: $ risk x2.5; off by default and off in all research here | confirmed |
+
+## Stage 9: intrabar behaviour and failure cases
+
+| Case | Covered by | Mechanism |
+|---|---|---|
+| Lock trigger then reversal in the same minute | stand-in tests (the lock works from the next bar), research model the same | 1-minute bars, bar-close decisions |
+| Stop and target in one bar | stand-in and research: the stop counts first (conservative) | 1-minute bars |
+| Gap through a stop | stand-in: fills at the open less a tick | 1-minute bars |
+| Partial entry fills / partial exits | **not tested** (the stand-in fills whole orders); NinjaTrader's `PerEntryExecution` attaches a stop and target to each part | needs Playback |
+| Breakout-to-bot handoff, same and opposite direction | stand-in parity tests (`test_breakout_in_the_bots_gaps`) | 1-minute bars |
+| Rejected protective order / rejected emergency exit | stand-in tests (repair 7) | injected rejections |
+| Account / strategy disagreement | stand-in tests (repair 6) | injected foreign position |
+| Connection loss / restart with a position | stand-in: restart mid-evaluation (target from the account), payout cycle across restarts; **not tested**: NinjaTrader's recalculation itself | needs Playback |
+| Early close / daylight-saving change | early close: skip dates + backstop (repair 8, unverifiable here); DST: New York time from the platform's time zone, tested with bars stamped in London time | stand-in |
+| Daily limits with orders pending | the loser limit is checked at the signal; entries are market orders (no resting entry orders) | confirmed from source |
+
+The strategy needs `Calculate.OnBarClose`; it refuses to trade otherwise. NinjaTrader's Tick Replay and "High"
+order-fill resolution change how historical fills are simulated inside a bar; neither was used in the user's run
+(Standard fill resolution). None of the tests here establishes intrabar fill order: every result assumes the stop
+first when a bar reaches both.
+
+## Stage 11: validation, honestly
+
+- No data before 16 October 2026 is untouched: 2011-18 was the development set; 2019-25, NQ 2015-24 and July 2025 -
+  August 2026 have all been used by earlier rounds (135+ rounds in total; all are listed in RESULTS.md), and the
+  user's September - October run has now been looked at. The only clean test is forward: weeks after 16 October 2026.
+- The September - October run in numbers: 29 sessions, $320 a day ($1,599 a week). Resampling whole trading days
+  (20,000 draws) gives a 90% range of **$93 to $3,250 a week**, and 3.7% of draws at or below zero. The 16-year
+  average for the same settings is about $407 a week of trading P/L (before the account's rules): well inside that
+  range. Six weeks cannot tell a better strategy from a good stretch.
+
+## Stages 6-8: trading experiments (RESULTS.md rounds 137-138)
+
+- **The breakout stays, with its shorts** (round 137): the account nets more with it in every period; dropping the
+  shorts nets less in every period (the export's 8 shorts, 7 losers, were a small sample). Its $400 risk in the
+  evaluation is mostly exposure: at the bot's $200 the return per unit of intraday drawdown is about the same.
+- **The lock stays** (round 138): the export's giveback is the lock as designed. A 1R trail and half-at-1R both win
+  slightly more often and both cut the big winners (net -29% to -50%); half at 1R lowers the intraday drawdown in every
+  period for about a third less net.
+
+## Stage 10: the account's rules, separately
+
+The Strategy Analyzer does not apply the account's rules (target and payout stop act live only). They are replayed
+on the trades in research: the export through the 50K intraday-trail evaluation (`research/nt_run_check.py`: passes 21
+Sep from an 8 Sep start; 14 of 21 start days pass, 7 bust), and 16 years through evaluation and funded account
+(`research/slot_size.py` and the rounds above: $2,000 drawdown trailing open-profit peaks, close at $3,000, 30 days;
+funded: threshold stops at +$100, $1,000 daily loss tier, five $200 days, $52,600, 50% rule, caps; payout eligible,
+asked for and left the account are separate events in the strategy since repair 128/132). The rules come from
+third-party summaries of Apex's help center (its site is blocked here); the evaluation's lack of a daily loss limit
+is quoted from Apex's own help center in search results.
+
+## Stage 12: decisions
+
+| Candidate | Decision | Why |
+|---|---|---|
+| Repairs 6, 7, 9 (guard from the first bar, exit retry, honest alerts) | **kept** | defects confirmed from source, each with a failing-then-passing test |
+| Repair 8 (session-close backstop) | kept, **unverified** | NinjaTrader's trading-hours behaviour can't run here; check in Playback |
+| Breakout (and its shorts) | **retain** | round 137 |
+| Breakout at $400 vs $200 | retain $400 for the account; know it is exposure | rounds 134, 137 |
+| Lock vs 1R trail | **reject** the trail | round 138 |
+| Lock vs half at 1R | reject as the default; **an option** if lower drawdown matters more than profit | round 138 |
+| Tighten-only stop (concern 10) | **continue investigating** | not yet tested on the current strategy |
+| Breakout's forced 1-contract rule (stage 5) | **continue investigating** | a rule change, not tested |
+| Execution ledger and shared gate (stage 4) | **build next**, test in Playback | needs NinjaTrader's execution events |
+| 6 MNQ evaluation, funded breakout $300 | continue (round 133, 135 near-misses) | not the pre-registered picks |
+
+**Forward test, defined before it starts**: the strategy on Sim101 with live data, orders on, from the first session
+after it is installed, for 20 sessions or 60 trades, whichever is later. Each day: export the executions and the
+1-minute bars; every trade re-run from those bars in the stand-in must match entry and exit within a tick and P/L
+within fees, and every entry alert must match an order. **Stop at once** on: a position without a stop, an execution
+the replay can't explain, a day losing more than $1,100, or a drawdown of $2,000 from the high (what would end an
+evaluation). Judge the result against the bootstrap range above, not a single number.
+
+## Still missing from the user (the minimum)
+
+1. The 1-minute MNQ DEC26 bars of the run (Tools -> Historical Data -> Export) - to reproduce the run trade by trade.
+2. NinjaTrader's version (Help -> About) and the chart's trading-hours template.
+3. A Playback run with orders on - to check the backstop, partial fills and a restart on NinjaTrader itself.
