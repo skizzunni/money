@@ -58,6 +58,7 @@ def w_candidates(bars, reverse, mgmt=None):
     o, h, lo, c = (bars[x].to_numpy(float) for x in ("open", "high", "low", "close"))
     starts = np.flatnonzero(tmin == 570)
     out, prev_rng = [], None
+    skip = set(T.incomplete_sessions(bars).split(",")) - {""}
     for n, a in enumerate(starts):
         b = starts[n + 1] if n + 1 < len(starts) else len(bars)
         b = a + int(np.searchsorted(day[a:b], day[a], side="right"))
@@ -65,6 +66,8 @@ def w_candidates(bars, reverse, mgmt=None):
         prev_rng = h[a:b].max() - lo[a:b].min()
         if rng is None or rng <= 0 or n == 0 or day[starts[n - 1]].month != day[a].month:
             continue
+        if day[a].strftime("%Y-%m-%d") in skip:
+            continue  # MNQ_COMPLETE_ONLY: no breakout on a session with incomplete data
         up, dn = o[a] + C.K * rng, o[a] - C.K * rng
         dist = C.S * rng
         q = math.floor(C.RISK / (dist * C.PV))

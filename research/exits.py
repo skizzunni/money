@@ -43,8 +43,9 @@ EXITS = {"lock (now)": {}, "trail 1R": {"trail_points": 25.0}, "half at 1R": {"p
 
 
 def bot(bars, losers, lock_at, lock_plus, extra):
-    cfg = NoiseConfig(qty=1, max_loss_per_trade=T.CAP * A.PV, max_losers=losers, fed_dates=A.FED, skip_dates="",
-                      target_on_fill_bar=True, lock_at=lock_at, lock_plus=lock_plus, **extra)
+    cfg = NoiseConfig(qty=1, max_loss_per_trade=T.CAP * A.PV, max_losers=losers, fed_dates=A.FED,
+                      skip_dates=T.incomplete_sessions(bars), target_on_fill_bar=True, lock_at=lock_at,
+                      lock_plus=lock_plus, **extra)
     return run(bars, cfg, minutes=1).trades
 
 

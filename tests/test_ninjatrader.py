@@ -1055,3 +1055,98 @@ def test_tighten_only_matches_the_bot_and_changes_trades(sim, tmp_path, funded):
         assert_strategy_matches(off, run(bars, NoiseConfig(**cfg, target_on_fill_bar=True)))
         changed += on != off
     assert changed, "the tighten-only rule changed some trade"
+
+
+def stop_sequences(trades, orders, tick=0.25):
+    """Per account position of the bot: the stop prices the strategy sent, in order, from the bracket sent with the
+    entry (ticks from the fill) to the last change before the exit."""
+    out = []
+    for d, eb, en, xb, *_ in trades:
+        d, eb, en, xb = int(d), int(eb), float(en), int(xb)
+        name = "Long" if d > 0 else "Short"
+        sent = [o for o in orders if o[1] == "SetStopLoss" and o[2] == name and eb - 1 <= int(o[0]) < xb]
+        prices = []
+        for o in sent:
+            v = float(o[3])
+            prices.append(en - d * v * tick if o[4] == "Ticks" else v)
+        if prices:
+            out.append((d, prices))
+    return out
+
+
+@pytest.mark.parametrize("funded", [False, True])
+def test_stop_ratchet_within_a_position(sim, tmp_path, funded):
+    """The ratchet, as defined (docs/VERIFICATION.md): within one position a long's stop never decreases and a
+    short's never increases, from the bracket sent with the entry to the exit - checked on every stop order the
+    strategy sent; with the setting off the same bars do show a stop moving back (the check can fail)."""
+    loosened_off = 0
+    for seed in (3, 5, 9):
+        bars = synth_bars(sessions=90, seed=seed)
+        trades, orders, _, _ = run_sim(sim, bars, tmp_path, Funded=funded, RoundPrices=False)
+        bot = [t for t in trades if t[5] not in ("Breakout: bot first",)]
+        for d, prices in stop_sequences(bot, orders):
+            steps = np.diff(prices) * d
+            assert (steps >= -1e-9).all(), (seed, d, prices)
+        trades2, orders2, _, _ = run_sim(sim, bars, tmp_path, Funded=funded, RoundPrices=False, TightenOnly=False)
+        loosened_off += sum(bool((np.diff(p) * d < -1e-9).any()) for d, p in stop_sequences(trades2, orders2))
+    assert loosened_off, "with the ratchet off, some stop moved back (the check is not vacuous)"
+
+
+def _day_of(bars):
+    return bars.index.tz_convert(NY).normalize()
+
+
+def test_daily_ledger_from_fills_counts_positions_not_fills(sim, tmp_path):
+    """The dashboard's 'Today (fills)' is built from NinjaTrader's trade records: it equals the day's trades, and a
+    position filled in two parts (two records) is still one trade and at most one loser; the trades don't change."""
+    bars = rth_minutes(40, 5)
+    trades, _, dash, _ = run_sim(sim, bars, tmp_path, minutes=1, breakout=True)
+    split, _, dash2, _ = run_sim(sim, bars, tmp_path, minutes=1, breakout=True, SimSplitFills=True)
+    assert split == trades
+    day = _day_of(bars)
+    last = day[-1]
+    today = [t for t in trades if day[int(t[3])] == last]  # closed today (the ledger's definition)
+    pnl = sum(float(t[6]) for t in today)
+    want = (f"Today (fills, both setups): {len(today)} trades, {'-' if pnl < 0 else ''}${abs(pnl):.0f}, "
+            f"{sum(float(t[6]) < 0 for t in today)} losers")
+    line = next(s for s in dash.split(" | ") if s.startswith("Today (fills"))
+    line2 = next(s for s in dash2.split(" | ") if s.startswith("Today (fills"))
+    assert line == want == line2, (line, want, line2)
+
+
+def test_daily_gate_max_losers_both_setups(sim, tmp_path):
+    """DailyMaxLosers 2: once the day has two losing trades, bot's or breakout's, no entry from either setup."""
+    blocked = 0
+    for seed in (3, 5, 9):
+        bars = rth_minutes(40, seed)
+        ref, ref_orders, _, _ = run_sim(sim, bars, tmp_path, minutes=1, breakout=True)
+        trades, orders, _, printed = run_sim(sim, bars, tmp_path, minutes=1, breakout=True, DailyMaxLosers=2)
+        day = _day_of(bars)
+        for d in sorted({day[int(t[3])] for t in trades}):
+            losers = sorted(int(t[3]) for t in trades if day[int(t[3])] == d and float(t[6]) < 0)
+            if len(losers) >= 2:
+                after = [o for o in orders if o[1] == "Enter" and day[int(o[0])] == d and int(o[0]) >= losers[1]]
+                assert not after, (seed, d, after)
+        blocked += sum("NOT sent by the strategy: today's 2 losing trades" in p for p in printed)
+        assert len([o for o in orders if o[1] == "Enter"]) <= len([o for o in ref_orders if o[1] == "Enter"])
+    assert blocked, "the gate stopped some entries"
+
+
+def test_daily_gate_loss_limit_both_setups(sim, tmp_path):
+    """DailyLossLimit $500: no entry (bot or breakout) whose planned risk - its stop distance plus a tick a side,
+    times its contracts, times $2 - could take the day's realized P/L below -$500."""
+    stopped = 0
+    for seed in (3, 5, 9):
+        bars = rth_minutes(40, seed)
+        trades, orders, _, printed = run_sim(sim, bars, tmp_path, minutes=1, breakout=True, DailyLossLimit=500)
+        day = _day_of(bars)
+        for k, o in enumerate(orders):
+            if o[1] != "Enter":
+                continue
+            e, name, q = int(o[0]), o[2], int(o[3])
+            ticks = float(next(x for x in reversed(orders[:k]) if x[1] == "SetStopLoss" and x[2] == name)[3])
+            risk = (ticks * 0.25 + 0.5) * q * 2.0
+            realized = sum(float(t[6]) for t in trades if day[int(t[3])] == day[e] and int(t[3]) <= e)
+            assert realized - risk >= -500 - 1e-6, (seed, o, realized, risk)
+        stopped += sum("could take today past the $500 loss limit" in p for p in printed)
+    assert stopped, "the gate stopped some entries"

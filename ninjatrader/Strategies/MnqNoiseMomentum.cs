@@ -151,6 +151,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 PayoutStopInHistory = false;
                 RememberPayoutCycle = true;
                 TightenOnly = true;    // the stop never moves back toward the price (docs/RESULTS.md round 139)
+                DailyMaxLosers = 0;    // shared daily gate, both setups (docs/VERIFICATION.md): off by default
+                DailyLossLimit = 0;
                 BreakoutTarget = 8;    // 8 x its stop = 2 x yesterday's range: a full bracket (docs/RESULTS.md round 130)
                 AccountStart = 50000;
 
@@ -520,6 +522,61 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         // ── Orders on the account
 
+        // The trading day's closed trades from NinjaTrader's own trade records (built from executions): one position
+        // filled in parts is several records with the same entry, counted here as one trade. Trading day: from 18:00
+        // New York. Strategy-level: the strategy's trades only (in a backtest, and live since the strategy started).
+        void TodayLedger(DateTime nyNow, out int trades, out int losers, out double realized)
+        {
+            trades = losers = 0;
+            realized = 0.0;
+            DateTime day = TradingDay(nyNow);
+            TimeZoneInfo platform = NinjaTrader.Core.Globals.GeneralOptions.TimeZoneInfo ?? TimeZoneInfo.Local;
+            Dictionary<string, double> byPosition = new Dictionary<string, double>();
+            for (int k = SystemPerformance.AllTrades.Count - 1; k >= 0; k--)
+            {
+                Trade tr = SystemPerformance.AllTrades[k];
+                DateTime exitNy = TimeZoneInfo.ConvertTime(DateTime.SpecifyKind(tr.Exit.Time, DateTimeKind.Unspecified),
+                                                           platform, newYork);
+                if (TradingDay(exitNy) != day)
+                    break;
+                string key = tr.Entry.Time.Ticks + "|" + tr.Entry.Name;
+                double v;
+                byPosition[key] = (byPosition.TryGetValue(key, out v) ? v : 0.0) + tr.ProfitCurrency;
+                realized += tr.ProfitCurrency;
+            }
+            foreach (double pnl in byPosition.Values)
+            {
+                trades++;
+                if (pnl < 0)
+                    losers++;
+            }
+        }
+
+        // The shared daily gate in front of both entry paths (bot and breakout): "" to go, else why not. No entry once
+        // the day has DailyMaxLosers losing trades (both setups); none whose planned risk (stop distance x contracts x
+        // $2, plus a tick a side) could take the day's realized loss past DailyLossLimit. Live, the realized loss is
+        // the worse of the strategy's and the account's own for the day.
+        string RiskGate(DateTime nyNow, double plannedRisk)
+        {
+            if (DailyMaxLosers <= 0 && DailyLossLimit <= 0)
+                return "";
+            int n, losers;
+            double realized;
+            TodayLedger(nyNow, out n, out losers, out realized);
+            if (State == State.Realtime && Account != null)
+                realized = Math.Min(realized, Account.Get(AccountItem.RealizedProfitLoss, Currency.UsDollar));
+            if (DailyMaxLosers > 0 && losers >= DailyMaxLosers)
+                return "today's " + losers + " losing trades reach the daily limit (both setups)";
+            if (DailyLossLimit > 0 && realized - plannedRisk < -DailyLossLimit)
+                return "its risk (" + Usd(plannedRisk) + ") could take today past the " + Usd(DailyLossLimit) + " loss limit";
+            return "";
+        }
+
+        double PlannedRisk(double stopPoints, int qty)
+        {
+            return (stopPoints + 2 * TickSize) * qty * settings.PointValue;
+        }
+
         // Live: the account's own position in MNQ against the strategy's. They differ after a restart with a position
         // left open (NinjaTrader cancels a disabled strategy's stop and target), a trade placed by hand, or a fill the
         // strategy missed. Apart at a bar close: no new entries (no doubling up) until they agree again; apart at two
@@ -618,7 +675,15 @@ namespace NinjaTrader.NinjaScript.Strategies
             // gets its stop and take-profit on the right side, the same distances away.
             // The bot comes first: an open breakout trade is closed in the same direction's case, reversed by the entry
             // itself in the other.
+            string gate = "";
             if (!blocked && engine.Orders.Count > nOrders && (real == 0 || owner == Breakout))
+            {
+                NoiseOrder go = engine.Orders[engine.Orders.Count - 1];
+                gate = RiskGate(start, PlannedRisk(go.Direction * (go.Expected - go.Stop), BotQty));
+                if (gate.Length > 0)
+                    notSent = gate;
+            }
+            if (!blocked && gate.Length == 0 && engine.Orders.Count > nOrders && (real == 0 || owner == Breakout))
             {
                 NoiseOrder o = engine.Orders[engine.Orders.Count - 1];
                 string name = o.Direction > 0 ? LongName : ShortName;
@@ -648,7 +713,11 @@ namespace NinjaTrader.NinjaScript.Strategies
             }
 
             // the breakout: its stop in ticks from the fill, out at 16:00 (above); nothing else to manage
-            if (!blocked && williams.Signal != 0 && real == 0)
+            string wgate = !blocked && williams.Signal != 0 && real == 0 ?
+                RiskGate(start, PlannedRisk(williams.StopPoints, BreakoutQty)) : "";
+            if (wgate.Length > 0)
+                notSent = wgate;
+            if (!blocked && wgate.Length == 0 && williams.Signal != 0 && real == 0)
             {
                 string wname = williams.Signal > 0 ? WLongName : WShortName;
                 int wq = BreakoutQty;
@@ -1033,6 +1102,15 @@ namespace NinjaTrader.NinjaScript.Strategies
             string s = "MNQ Noise Momentum v1.6: " + Book + ", " + Qty + " MNQ, " + Usd(MaxLoss) + " max loss, " + MaxLosers +
                        " losers a day\n";
             s += "Account: " + Book + " (from " + accountTypeFrom + ")\n";
+            if (PlaceOrders && engine.BarTime != DateTime.MinValue)
+            {
+                int ln, ll;
+                double lr;
+                TodayLedger(engine.BarTime, out ln, out ll, out lr);
+                s += "Today (fills, both setups): " + ln + " trades, " + Usd(lr) + ", " + ll + " losers" +
+                     (DailyMaxLosers > 0 || DailyLossLimit > 0 ? " - daily gate: " + (DailyMaxLosers > 0 ? DailyMaxLosers + " losers" : "") +
+                      (DailyMaxLosers > 0 && DailyLossLimit > 0 ? ", " : "") + (DailyLossLimit > 0 ? Usd(DailyLossLimit) : "") : "") + "\n";
+            }
             s += "Orders: " + (PlaceOrders ? "ON (the strategy trades this account)" : "OFF (alerts only)") + "\n";
             if (PlaceOrders && mismatchBars >= 2)
                 s += "ACCOUNT POSITION MISMATCH: the account holds " + Signed(PositionAccount) + " MNQ, the strategy " +
@@ -1282,6 +1360,16 @@ namespace NinjaTrader.NinjaScript.Strategies
         [NinjaScriptProperty]
         [Display(Name = "Stop only ever tightens (never moves back toward the price; round 139)", Order = 21, GroupName = "1. Account")]
         public bool TightenOnly { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, 100)]
+        [Display(Name = "Daily gate, both setups: no entry after this many losing trades today (0 = off)", Order = 22, GroupName = "1. Account")]
+        public int DailyMaxLosers { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0.0, 100000.0)]
+        [Display(Name = "Daily gate, both setups: no entry whose risk could take today's loss past this, $ (0 = off)", Order = 23, GroupName = "1. Account")]
+        public double DailyLossLimit { get; set; }
 
         [NinjaScriptProperty]
         [Display(Name = "Funded: remember the payout cycle in a file (a restart goes on from it; new settings above replace it)", Order = 20, GroupName = "1. Account")]

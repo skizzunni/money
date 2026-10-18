@@ -73,7 +73,16 @@ namespace NinjaTrader.Cbi
     // SystemPerformance.AllTrades.TradesPerformance.Currency.CumProfit: the closed trades' net P/L, fees included
     public class TradesPerformanceValues { public double CumProfit; }
     public class TradesPerformance { public TradesPerformanceValues Currency = new TradesPerformanceValues(); }
-    public class TradeCollection { public TradesPerformance TradesPerformance = new TradesPerformance(); }
+    // the closed trades, as NinjaTrader records them from executions: a position filled in parts is several trades
+    public class Execution { public DateTime Time; public string Name; }
+    public class Trade { public double ProfitCurrency; public Execution Entry, Exit; public int Quantity; }
+    public class TradeCollection
+    {
+        public TradesPerformance TradesPerformance = new TradesPerformance();
+        internal readonly List<Trade> List = new List<Trade>();
+        public int Count { get { return List.Count; } }
+        public Trade this[int i] { get { return List[i]; } }
+    }
     public class SystemPerformance { public TradeCollection AllTrades = new TradeCollection(); }
     public class Order { public string Name; }
     public class MasterInstrument
@@ -208,6 +217,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             }
         }
         public double SimNetLiq { get; set; }  // tests: the account's net liquidation, whatever the strategy did
+        public bool SimSplitFills { get; set; }  // tests: each entry fills in two executions (two trade records)
         public string SimLiqFile { get; set; }  // tests: the account's net liquidation at each bar, one per line
         public string SimWithdraw { get; set; }  // tests: "bar:amount": a payout leaves the account at that bar
         public int SimRealtimeFrom { get; set; }  // tests: the strategy goes live at this bar (0: never)
@@ -343,6 +353,18 @@ namespace NinjaTrader.NinjaScript.Strategies
                     2 * CommissionPerSide * Position.Quantity;
             SimTrades.Add(t);
             SystemPerformance.AllTrades.TradesPerformance.Currency.CumProfit += t.Pnl;
+            // NinjaTrader's trade records: one per entry execution; SimSplitFills fills each entry in two parts
+            int parts = SimSplitFills && Position.Quantity > 1 ? 2 : 1;
+            for (int k = 0; k < parts; k++)
+            {
+                Trade rec = new Trade();
+                rec.Quantity = parts == 1 ? Position.Quantity : (k == 0 ? Position.Quantity / 2 : Position.Quantity - Position.Quantity / 2);
+                rec.ProfitCurrency = t.Pnl * rec.Quantity / Position.Quantity;
+                // Time[] counts bars ago, as NinjaTrader's does
+                rec.Entry = new Execution(); rec.Entry.Time = Time[CurrentBar - entryBar]; rec.Entry.Name = posName;
+                rec.Exit = new Execution(); rec.Exit.Time = Time[CurrentBar - i]; rec.Exit.Name = why;
+                SystemPerformance.AllTrades.List.Add(rec);
+            }
             Position.MarketPosition = MarketPosition.Flat;
             Position.Quantity = 0;
             Position.AveragePrice = 0;

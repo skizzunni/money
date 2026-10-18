@@ -118,20 +118,53 @@ def metrics(tr, bars):
             "eval timeout %": 100 * res["timeout"] / total}
 
 
+def incomplete_sessions(bars):
+    """Sessions whose 09:30-16:00 data ends before 15:59 or misses minutes (half days, holidays, data holes)."""
+    m = bars.index.tz_convert(NY)
+    t = (m.hour * 60 + m.minute).to_numpy()
+    day = m.normalize()
+    inside = (t >= 570) & (t < 960)
+    n = pd.Series(inside, index=day).groupby(level=0).sum()
+    return sorted(d.strftime("%Y-%m-%d") for d in n[n < 390].index)
+
+
+DEFAULT_SKIP = ("2026-01-01,2026-01-19,2026-02-16,2026-04-03,2026-05-25,2026-06-19,2026-07-03,2026-09-07,"
+                "2026-11-26,2026-11-27,2026-12-24,2026-12-25,2027-01-01,2027-01-18,2027-02-15,2027-03-26,"
+                "2027-05-31,2027-06-18,2027-07-05,2027-09-06,2027-11-25,2027-11-26,2027-12-24")
+
+
 def main() -> None:
+    """argv: dll_original dll_revised bars.pkl first last out.csv [treatment: none | complete] [trades_dir]"""
     dll_o, dll_r, data, first, last, out = sys.argv[1:7]
+    treatment = sys.argv[7] if len(sys.argv) > 7 else "none"
+    trades_dir = Path(sys.argv[8]) if len(sys.argv) > 8 else None
     bars = rth(pd.read_pickle(data))
     m = bars.index.tz_convert(NY)
     bars = bars[(m >= pd.Timestamp(first, tz=NY)) & (m < pd.Timestamp(last, tz=NY) + pd.Timedelta(days=1))]
     tmp = Path(tempfile.mkdtemp())
     csv = tmp / "bars.csv"
     write_bars(bars, csv)
+    skip = incomplete_sessions(bars)
+    extra = {"SkipDates": DEFAULT_SKIP + "," + ",".join(skip)} if treatment == "complete" else {}
+    print(f"treatment: {treatment}; incomplete sessions: {len(skip)}" +
+          (" (no new trades on them)" if treatment == "complete" else " (traded as they are)"))
     jobs = [(code, dll, brk, slip) for code, dll in (("original", dll_o), ("revised", dll_r))
             for brk in (True, False) for slip in (0, 1, 2)]
 
     def one(job):
         code, dll, brk, slip = job
-        tr = run(dll, csv, UseBreakout=brk, SimSlippageTicks=slip, SimCommissionPerSide=0.95)
+        props = {"UseBreakout": brk, "SimSlippageTicks": slip, "SimCommissionPerSide": 0.95, **extra}
+        tr = run(dll, csv, **props)
+        if trades_dir is not None:
+            trades_dir.mkdir(parents=True, exist_ok=True)
+            name = f"{code}_breakout-{'on' if brk else 'off'}_slip{slip}"
+            when = bars.index.tz_convert(NY)
+            tr.assign(entry_time=when[tr.eb.to_numpy()].strftime("%Y-%m-%d %H:%M"),
+                      exit_time=when[tr.xb.to_numpy()].strftime("%Y-%m-%d %H:%M")).to_csv(
+                trades_dir / f"{name}.csv", index=False)
+            (trades_dir / f"{name}.config.txt").write_text(
+                "\n".join(f"{k}={v}" for k, v in {"dll": dll, "bars": data, "first": first, "last": last,
+                                                   "treatment": treatment, **props}.items()) + "\n")
         return {"code": code, "breakout": "on" if brk else "off", "slippage ticks": slip, **metrics(tr, bars)}
 
     with ThreadPoolExecutor(max_workers=4) as pool:

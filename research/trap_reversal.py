@@ -67,9 +67,23 @@ def rule_name(rule):
     return f"N={n if n else 'any'} {stop} {k:.0f}R"
 
 
+def incomplete_sessions(bars):
+    """Sessions whose 09:30-16:00 data ends early or misses minutes (half days, holidays, data holes), as
+    "YYYY-MM-DD,..." - traded on only when MNQ_COMPLETE_ONLY is not set (the audit's data treatment)."""
+    import os
+    if os.environ.get("MNQ_COMPLETE_ONLY") != "1":
+        return ""
+    m = bars.index.tz_convert(A.NY)
+    t = (m.hour * 60 + m.minute).to_numpy()
+    inside = (t >= 570) & (t < 960)
+    n = pd.Series(inside, index=m.normalize()).groupby(level=0).sum()
+    return ",".join(d.strftime("%Y-%m-%d") for d in n[n < 390].index)
+
+
 def bot_trades(bars, losers, lock_at, lock_plus):
-    cfg = NoiseConfig(qty=1, max_loss_per_trade=CAP * A.PV, max_losers=losers, fed_dates=A.FED, skip_dates="",
-                      target_on_fill_bar=True, lock_at=lock_at, lock_plus=lock_plus)
+    cfg = NoiseConfig(qty=1, max_loss_per_trade=CAP * A.PV, max_losers=losers, fed_dates=A.FED,
+                      skip_dates=incomplete_sessions(bars), target_on_fill_bar=True, lock_at=lock_at,
+                      lock_plus=lock_plus)
     return run(bars, cfg, minutes=1).trades
 
 
