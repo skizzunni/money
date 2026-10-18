@@ -2094,6 +2094,16 @@ sessions at least as often, all three periods):
 $200 pays the most in all three periods; $300 brings the first payout sooner but busts more funded accounts later.
 **The setting stays.**
 
+## Round one hundred and twenty-two: the bot's funded settings with the breakout on the account
+
+`research/funded_bot.py`: funded contracts 3 / 4 / 5 x losers 2 / 3 x lock (0.5, +6.25) or (1.0, +2.5), the breakout
+and the evaluation as now; pick the most paid per evaluation on 2011-18, adopted if it pays more and brings a first
+payout within 20 sessions at least as often on 2019-25 and NQ. The pick (3 MNQ, 3 losers, lock 0.5 / +6.25: $1,472)
+pays $739 / $652 against $727 / $690 and pays out within 20 sessions less often: **not adopted.** For the record, 3 MNQ
+with the rest as now pays the most on the two later sets ($839 / $818, 2011-18 $1,238 against $1,268) with fewer funded
+busts, but the first payout comes later (3.3 / 3.5% within 20 sessions against 4.4 / 4.0%), against the user's
+two-week goal. **The funded setting stays.**
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
@@ -2208,6 +2218,7 @@ python research/touch_size.py nsx1m_scaled.pkl nq1m_scaled.pkl        # smaller 
 python research/edge_hours.py nsx1m_scaled.pkl nq1m_scaled.pkl        # after the close, before the open (nothing)
 python research/overnight_range.py nsx1m_scaled.pkl nq1m_scaled.pkl   # a breakout of the overnight range (no)
 python research/funded_w.py nsx1m_scaled.pkl nq1m_scaled.pkl          # the breakout's risk on the funded side ($200 stays)
+python research/funded_bot.py nsx1m_scaled.pkl nq1m_scaled.pkl        # the bot's funded settings with the breakout (stay)
 ```
 
 The raw data isn't stored in this repo.
