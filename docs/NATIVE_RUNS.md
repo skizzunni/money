@@ -180,7 +180,7 @@ These confirm the switches and the warm-up trade by trade. The summaries already
 | Data holes | 5/22 to 6/26 (24 sessions, no bars at all); 8/31 (no 09:30 bar) |
 | Short sessions | 9/7 (Labor Day, early close; also on the skip list) |
 | First tested session | 6/29 |
-| Tested period | 6/29 to 10/16, about 74 sessions, July included |
+| Tested period | 6/29 to 10/16: 77 sessions with data (7/3 and 9/7 holidays, 8/31 missing), July included |
 
 **6/29 is the first session after the hole:** its "yesterday" is 5/21. Results are reported with it and, separately
 and retrospectively, without it (`native_abc.py <folder> - 2026-06-29`).
