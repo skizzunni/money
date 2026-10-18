@@ -2000,6 +2000,26 @@ together, and the current size sits near the best balance between them for this 
 start the strategy on the day the evaluation is bought. With 60 or 90 days instead (a scratch check), the cushion rules
 are still mixed: better on 2011-18, worse in 2019-25.
 
+## Round one hundred and sixteen: the source paper's VWAP trailing stop, on the bot as it trades now
+
+How the two parts have done year by year first ($ a week at the evaluation's settings, index data): the bot from
+-$41 (2013) to +$668 (2022), weak in 2013, 2017 and 2025 (+$17; NQ -$99), strong in 2026 so far (+$474); the breakout
+-$94 to +$147, no trend. No sign of decay, but lumpy years: an evaluation started in a bad year mostly fails.
+
+`research/vwap_stop.py`, with `mnqbot.noise`'s research-only `vwap_stop` (off by default; not in the Pine script or
+NinjaTrader): the bot's stop is also never looser than the day's VWAP (volume-weighted on NQ, time-weighted on the
+index data, which has no volume), as of the last half-hour check or the last bar. Only tested before on the bot's
+first version over 3 3/4 years (the second round, S2b). Bar: more $ a week, pass rate and payouts no lower, all three.
+
+| | $ a week, 2011-18 / 2019-25 / Jul 2025-Aug 2026 / NQ | Pass % | Bust % | Paid per evaluation |
+|---|---|---|---|---|
+| Now | 316 / 311 / 242 / 288 | 26.4 / 21.7 / 24.5 / 22.7 | 60 / 61 / 69 / 67 | $1,268 / $727 / $31 / $690 |
+| VWAP at the checks | 315 / 283 / 268 / 292 | 27.5 / 22.1 / 23.1 / 24.4 | 57 / 60 / 68 / 64 | $1,320 / $706 / $31 / $785 |
+| VWAP every bar | 312 / 284 / 269 / 292 | 27.3 / 22.5 / 23.1 / 24.2 | 58 / 59 / 68 / 64 | $1,322 / $700 / $31 / $785 |
+
+A little safer (more passes and fewer busts on the three main sets), but $28 a week less in 2019-25 and less paid per
+evaluation there, and fewer passes in the newest 13 months. **Not adopted.**
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
@@ -2108,6 +2128,7 @@ python research/eval_lock_w.py nsx1m_scaled.pkl nq1m_scaled.pkl       # the eval
 python research/day_giveback.py nsx1m_scaled.pkl nq1m_scaled.pkl      # a daily give-back stop (no)
 python research/overnight_early.py nsx1m_scaled.pkl nq1m_scaled.pkl   # overnight 18:00-02:00 (passes; recent data no)
 python research/cushion_size.py nsx1m_scaled.pkl nq1m_scaled.pkl      # smaller size on a thin cushion (no)
+python research/vwap_stop.py nsx1m_scaled.pkl nq1m_scaled.pkl         # the paper's VWAP trailing stop (no)
 ```
 
 The raw data isn't stored in this repo.

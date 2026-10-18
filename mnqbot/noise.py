@@ -83,6 +83,10 @@ class NoiseConfig:
     # the take-profit also works on the fill bar, from the expected fill, as a bracket sent with the entry does
     # (the NinjaTrader strategy); off: from the bar after the fill, as the Pine script places it
     target_on_fill_bar: bool = False
+    # research only (round 116), not in the Pine script or NinjaTrader: the paper's VWAP trailing stop. "checks": the
+    # stop is also never looser than the day's VWAP as of the last check (long: max(stop, VWAP)); "bars": as of the
+    # last bar's close. Volume-weighted typical price from 09:30; time-weighted where the data has no volume.
+    vwap_stop: str = ""
 
 
 @dataclass
@@ -144,6 +148,9 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
     losers_today = 0  # losing trades closed today
     locked = False  # the trade has reached the lock trigger (a broker's auto-breakeven)
     held, held_why = math.nan, ""  # tighten_only: the tightest stop so far in this trade, and what set it
+    vol = bars["volume"].to_numpy(float) if "volume" in bars else np.zeros(len(bars))
+    pv_sum = v_sum = 0.0  # today's volume-weighted (or time-weighted) typical price, from 09:30
+    vwap_now = vwap_used = math.nan
     pending: tuple[str, int] | None = None  # ("entry", direction) or ("close", 0), filled at the next open
     trades: list[NoiseTrade] = []
     events: list[tuple[int, str]] = []
@@ -192,6 +199,9 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                 cap = base - pos * cfg.max_loss_per_trade / cfg.qty / cfg.point_value
                 if (pos > 0 and cap > line) or (pos < 0 and cap < line):
                     line, reason = cap, "Max loss"
+            if cfg.vwap_stop and not math.isnan(vwap_used):  # the paper's trailing stop
+                if (pos > 0 and vwap_used > line) or (pos < 0 and vwap_used < line):
+                    line, reason = vwap_used, "VWAP"
             if locked:  # a small win locked in: the stop at the entry plus lock_plus
                 lk = entry_px + pos * cfg.lock_plus
                 if (pos > 0 and lk > line) or (pos < 0 and lk < line):
@@ -227,6 +237,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             events.append((i, "EXIT"))
 
         if t_min == RTH_OPEN:
+            pv_sum = v_sum = 0.0
+            vwap_now = vwap_used = math.nan
             prev_close = last_rth_close
             day_open = o[i]
             losers_today = 0
@@ -236,10 +248,19 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             fed_today = cfg.fed_no_shorts and t.strftime("%Y-%m-%d") in cfg.fed_dates
         if in_rth:
             last_rth_close = c[i]
+            if cfg.vwap_stop:
+                w = vol[i] if vol[i] > 0 else 1.0
+                pv_sum += w * (h[i] + l[i] + c[i]) / 3
+                v_sum += w
+                vwap_now = pv_sum / v_sum
+                if cfg.vwap_stop == "bars":
+                    vwap_used = vwap_now
 
         if in_rth and not math.isnan(day_open) and FIRST_CHECK <= end <= LAST_CHECK and (end - FIRST_CHECK) % STEP == 0:
             k = (end - FIRST_CHECK) // STEP
             today[k] = abs(c[i] / day_open - 1)
+            if cfg.vwap_stop == "checks":
+                vwap_used = vwap_now
             if filled >= lb_n and not math.isnan(prev_close):
                 s = 0.0
                 for d in range(lb_n):  # same summation order as the Pine loop
