@@ -656,3 +656,63 @@ def test_alerts_only_take_profit_at_the_evaluation_target(sim, tmp_path):
     px = float(msg.split("take-profit to ")[1].split(" ")[0].rstrip("."))
     assert abs(abs(px - closes[stamp]) - 9.375) <= 0.25, (first, closes[stamp])
     assert not any("EVALUATION TARGET REACHED" in p for p in printed)
+
+
+def account_equity(bars, trades):
+    """The stand-in's net liquidation at each bar's close: $50,000 + closed P/L + open P/L."""
+    c = bars.close.to_numpy(float)
+    eq = np.full(len(c), 50000.0)
+    for d, eb, en, xb, ex, _, pnl in trades:
+        d, eb, xb, en, ex, pnl = int(d), int(eb), int(xb), float(en), float(ex), float(pnl)
+        per = d * (ex - en) * 2.0 - 1.24
+        q = round(pnl / per) if abs(per) > 1e-9 else 1
+        eq[xb:] += pnl
+        eq[eb:xb] += d * (c[eb:xb] - en) * 2.0 * q
+    return eq
+
+
+@pytest.mark.parametrize("state", [(4, 2000.0, 400.0), (4, 1600.0, 1500.0), (2, 900.0, 300.0)])
+def test_funded_payout_stop(sim, tmp_path, state):
+    """Funded, the payout stop on, the cycle state given, the account $2,500 up: the first bar at which closing (with
+    $10 to spare) makes the day payout-eligible (the cycle's $200 days, the account $2,600 up, no day over half the
+    cycle), recomputed here from the trades, is the payout day: flat at once, no more entries that day."""
+    qual0, prof0, best0 = state
+    bars = rth_minutes(40, 5)
+    props = dict(Funded=True, PayoutStop=True, PayoutStopInHistory=True, FundedQualDays=qual0, FundedCycleProfit=prof0,
+                 FundedBestDay=best0, AccountStart=47500, RoundPrices=False)
+    trades, orders, dash, printed = run_sim(sim, bars, tmp_path, minutes=1, breakout=True, **props)
+    idx = bars.index.tz_convert(NY)
+    stamps = {(t + pd.Timedelta(minutes=1)).tz_convert("Europe/London").strftime("%m/%d/%Y %H:%M:%S"): i
+              for i, t in enumerate(idx)}
+    hits = [stamps[p.partition("  ")[0]] for p in printed if "PAYOUT-ELIGIBLE" in p]
+    eq = account_equity(bars, trades)
+    tmin = (idx.hour * 60 + idx.minute).to_numpy()
+    # the replica: the cycle rolls at each 09:30 (the day before added), eligibility at each bar after
+    qual, prof, best, start, expected = qual0, prof0, best0, None, None
+    for k in range(len(idx)):
+        if tmin[k] == 570:
+            if start is not None:
+                day = eq[k] - eq[start]
+                qual += day >= 200
+                prof += day
+                best = max(best, day)
+            start = k
+        if start is None:
+            continue
+        today, bal = eq[k] - eq[start] - 10, eq[k] - 47500 - 10
+        if (today >= 200 and qual + 1 >= 5 and bal >= 2600 and prof + today > 0 and
+                max(best, today) <= 0.5 * (prof + today) and min(1500, bal - 2100) >= 500):
+            expected = k
+            break
+    if expected is None:
+        assert not hits, "no bar was eligible"
+        return
+    assert hits and hits[0] == expected, (hits[:1], expected)
+    i = hits[0]
+    day = idx[i].normalize()
+    assert not [o for o in orders if o[1] == "Enter" and int(o[0]) >= i and idx[int(o[0])].normalize() == day]
+    open_then = [t for t in trades if int(t[1]) <= i < int(t[3])]
+    assert all(int(t[3]) == i + 1 and t[5] == "Payout-eligible" for t in open_then), open_then
+    import re
+    taken = re.search(r"payouts taken (\d+)", dash)
+    assert taken and int(taken.group(1)) == len(hits), (dash, len(hits))

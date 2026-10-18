@@ -22,9 +22,9 @@ Every requirement from the conversation, its status and the evidence. Status: **
 | 7 | More trades a week; no days without trading | done | ~12 trades a week (bot + breakout, round 101) against ~8 for the bot alone |
 | 8 | Pass the evaluation more often | done (improved) | Close-at-target: 35-37% passed over 16 years (was 22-26%), 27.9% in the newest 13 months (round 124); bold finish option: about 39% (round 129, off by default) |
 | 9 | More money per evaluation (the six payouts) | done (improved) | $1,163-1,835 paid per evaluation (was $690-1,268), round 124 |
-| 10 | More likely to win than lose; more winning streaks | partly | 49-50% of trades win; locks raise it to 53-54% but cost payouts (rounds 103, 112); red days ~half |
+| 10 | More likely to win than lose; more winning streaks | partly | 49-50% of trades win; locks raise it to 53-55% and cut red days 5-7 points but cost payouts, re-tested with close-at-target (rounds 103, 112, 131) |
 | 11 | $1,500 a week (at one point $500 a day) | not met | ~$300 a week at 4 MNQ over 16 years. More size busts the $2,000 trail first (rounds 63, 76, 102, 125); no independent edge found that holds in 2025-26 (rounds 104-120) |
-| 12 | First payout within two weeks | not met | 0.2-0.6% of funded accounts pay within 10 sessions (needs ~$1,300 a week). Stopping when payout-eligible doubles it within 20 sessions (round 128), not built: it needs Apex's payout state |
+| 12 | First payout within two weeks | partly | 0.2-0.6% of funded accounts pay within 10 sessions (needs ~$1,300 a week). The payout stop (round 128) doubles the first payout within 20 sessions (8.8% against 4.4% in 2019-25); built as an option, off by default (it pays 18% less on 2011-18), the cycle's state entered once and kept from the account; tested against a replica |
 | 13 | Profit uncapped, only losses capped | done | No daily profit cap anywhere; loss caps per trade and per day (losers) |
 | 14 | "A little riskier but don't be stupid" | done | Bold finish only adds size when a timeout (= a failed evaluation) is the alternative; off by default |
 
@@ -33,15 +33,15 @@ Every requirement from the conversation, its status and the evidence. Status: **
 | # | Requirement | Status | Evidence |
 |---|---|---|---|
 | 15 | NinjaTrader 8 files that compile and run | done | C# 5, compiled with no warnings against the stand-in; the user ran earlier versions |
-| 16 | Backtested with 0 errors; the strategy trades what was tested | done | 91 NinjaTrader tests: the bot, the breakout (take-profit 8 and 1 stops), the cut / reversal, close-at-target, bold finish, rejected stops, alerts only; mutation checks |
+| 16 | Backtested with 0 errors; the strategy trades what was tested | done | 94 NinjaTrader tests: the bot, the breakout (take-profit 8 and 1 stops), the cut / reversal, close-at-target, bold finish, the payout stop, rejected stops, alerts only; mutation checks |
 | 17 | Alerts complete enough to trade by hand | done | Follow-the-alerts test: the manual trader's trades equal the strategy's, to the cent |
 | 18 | Clear setup instructions | done | `docs/NINJATRADER.md`: install, settings, "Trading it by hand on Apex", Playback check |
 | 19 | Verified in NinjaTrader itself (not just the stand-in) | open (user) | Needs NinjaTrader: a Playback run as in the guide; the stand-in can't prove NinjaTrader's own fills |
 
 ## Open items and next steps
 
-1. Make round 128 usable: the strategy can track its own daily P/L per payout cycle (saved to a file) with the user
-   entering the cycle's state once, then stop for the day when payout-eligible as an option.
+1. Done: the payout stop is an option (round 128). Still open: the cycle state survives a restart only if the
+   dashboard's numbers are copied back into the settings (no file is written).
 2. Re-check the overnight 18:00-02:00 long as more real nights come in (passed 2011-25, lost in 2025-26).
 3. Allow `apextraderfunding.com` (user) so the rules above can be read at the source.
 4. A Playback run in NinjaTrader with Place orders off: check the alerts arrive and match the chart.

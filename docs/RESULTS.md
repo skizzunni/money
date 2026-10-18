@@ -2221,6 +2221,16 @@ prices, its exits and "first close the breakout"), and close-at-target had no ma
 net liquidation: the take-profit moved to the target's price, then "close everything now"). It also found a rounding
 bug: take-profits placed by price were rounded toward the price (up to a tick less than tested); now away from it.
 
+## Round one hundred and thirty-one: the breakout's lock again, for more winning trades
+
+`research/w_lock_target.py`, with close-at-target and the 8R take-profit (adopted if more winners and pass rate within
+0.5 points and 97% of the payouts in all three periods): a lock at 0.5R makes 53-55% of trades winners (49-50% now) and
+red days 42-48% (49-55%), but pays $1,568 / $1,377 / $770 per evaluation against $1,810 / $1,414 / $1,138; at 1R the
+same, weaker. **Not adopted**: more winning trades cost payouts on this account.
+
+The funded payout stop of round 128 is now in the NinjaTrader strategy as an option, off by default ("Funded: stop for
+the day once closing makes it payout-eligible"), verified against an independent replica of the cycle's rules.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
@@ -2344,6 +2354,7 @@ python research/payout_buffer.py nsx1m_scaled.pkl nq1m_scaled.pkl     # when to 
 python research/payout_lock.py nsx1m_scaled.pkl nq1m_scaled.pkl       # stop when payout-eligible (faster, not more)
 python research/bold_finish.py nsx1m_scaled.pkl nq1m_scaled.pkl       # bolder near the evaluation's end (option, off)
 python research/w_bracket.py nsx1m_scaled.pkl nq1m_scaled.pkl         # a take-profit for the breakout (8 stops)
+python research/w_lock_target.py nsx1m_scaled.pkl nq1m_scaled.pkl     # the breakout's lock for more winners (no)
 ```
 
 The raw data isn't stored in this repo.

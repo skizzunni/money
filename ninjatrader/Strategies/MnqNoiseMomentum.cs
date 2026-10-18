@@ -19,6 +19,8 @@
 //     before the strategy goes live); it counts the strategy's own P/L from then, plus "evaluation profit so far".
 //   * optional, off by default (round 129): from a chosen day of the evaluation's 30, bigger size (2.5x: the bot at
 //     10 MNQ), since an evaluation that runs out of time has failed anyway.
+//   * optional, off by default (round 128): on the funded account, everything closed and no more trades that day the
+//     moment closing makes the day payout-eligible (the payout cycle's state entered once, then kept from the account).
 // Setup: 1-minute MNQ chart (the lock arms within the minute: more winners than on 5 minutes, docs/RESULTS.md round
 // 81), Days to load 30 or more (the noise needs 14 full sessions), Calculate on bar close.
 // See docs/NINJATRADER.md. Written in C# 5 for NinjaTrader 8's compiler.
@@ -59,6 +61,11 @@ namespace NinjaTrader.NinjaScript.Strategies
         double wStop = double.NaN, wTarget = double.NaN;
         bool wPending;                                            // told this bar; it fills at the next bar's open
         double wTargetPts = double.NaN;  // the breakout trade's own take-profit, points from the fill
+        // the funded account's payout cycle (round 128): since the last payout, kept from the account day by day
+        int cycleQual, payoutsTaken;
+        double cycleProfit, cycleBest, dayStartLiq = double.NaN;
+        bool payoutToday;                // closing made today payout-eligible: flat, no more trades today
+        static readonly double[] PayoutCaps = { 1500, 1500, 2000, 2500, 2500, 3000 };
         DateTime evalStart = DateTime.MinValue;
         string lastSignal = "-";
         string headsUp = "";
@@ -115,6 +122,12 @@ namespace NinjaTrader.NinjaScript.Strategies
                 EvalStartDate = "";
                 BoldFromDay = 0;
                 BoldSize = 2.5;
+                PayoutStop = false;
+                FundedPayoutsTaken = 0;
+                FundedQualDays = 0;
+                FundedCycleProfit = 0;
+                FundedBestDay = 0;
+                PayoutStopInHistory = false;
                 BreakoutTarget = 8;    // 8 x its stop = 2 x yesterday's range: a full bracket (docs/RESULTS.md round 130)
                 AccountStart = 50000;
 
@@ -151,6 +164,10 @@ namespace NinjaTrader.NinjaScript.Strategies
                 ws.MaxQty = BreakoutMaxQty;
                 ws.PointValue = settings.PointValue;
                 williams = new WilliamsBreakout(ws);
+                cycleQual = FundedQualDays;
+                cycleProfit = FundedCycleProfit;
+                cycleBest = FundedBestDay;
+                payoutsTaken = FundedPayoutsTaken;
                 DateTime d0;
                 if (DateTime.TryParseExact(EvalStartDate ?? "", "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture,
                                            System.Globalization.DateTimeStyles.None, out d0))
@@ -199,6 +216,53 @@ namespace NinjaTrader.NinjaScript.Strategies
                 return double.NaN;
             double need = EvalTarget + EvalBuffer - EvalClosed;
             return Position.AveragePrice + d * need / (Position.Quantity * settings.PointValue);
+        }
+
+        bool PayoutStopOn { get { return Funded && PayoutStop && (State == State.Realtime || PayoutStopInHistory); } }
+
+        // The funded account's payout cycle, from the account's net liquidation: at each day's 09:30 the day before is
+        // added to the cycle (and the cycle starts again after a payout day); at each bar, if closing now (with $10 to
+        // spare for the fill) would make today payout-eligible, today is a payout day: flat, no more trades
+        void PayoutCheck(DateTime nyStart)
+        {
+            if (!PayoutStopOn)
+                return;
+            double liq = Account.Get(AccountItem.NetLiquidation, Currency.UsDollar);
+            int t = nyStart.Hour * 60 + nyStart.Minute;
+            if (t == NoiseEngine.RthOpen)
+            {
+                if (!double.IsNaN(dayStartLiq))
+                {
+                    double day = liq - dayStartLiq;
+                    if (payoutToday)
+                    {
+                        payoutsTaken++;  // the payout was asked for after yesterday's close: a new cycle
+                        cycleQual = 0;
+                        cycleProfit = 0;
+                        cycleBest = 0;
+                    }
+                    else
+                    {
+                        cycleQual += day >= 200 ? 1 : 0;
+                        cycleProfit += day;
+                        cycleBest = Math.Max(cycleBest, day);
+                    }
+                }
+                dayStartLiq = liq;
+                payoutToday = false;
+            }
+            if (payoutToday || double.IsNaN(dayStartLiq) || payoutsTaken >= PayoutCaps.Length)
+                return;
+            double today = liq - dayStartLiq - 10, bal = liq - AccountStart - 10;
+            double prof = cycleProfit + today, best = Math.Max(cycleBest, today);
+            double amount = Math.Min(PayoutCaps[payoutsTaken], bal - 2100);
+            if (today >= 200 && cycleQual + 1 >= 5 && bal >= 2600 && prof > 0 && best <= 0.5 * prof && amount >= 500)
+            {
+                payoutToday = true;
+                Say("payout", "PAYOUT-ELIGIBLE: closing now makes today your " + (cycleQual + 1) + "th $200 day with the " +
+                    "account " + Usd(bal) + " up. " + (PlaceOrders ? "Everything is closed" : "CLOSE EVERYTHING NOW") +
+                    "; no more trades today. After the close, request your payout (about " + Usd(amount) + ").");
+            }
         }
 
         // The bold finish: on in the evaluation from day BoldFromDay of its 30 (counted from EvalStartDate), until passed
@@ -261,6 +325,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                       " full sessions; no trades until " + Lookback + ". Load more days."));
 
             boldMult = BoldDay(start) ? BoldSize : 1.0;
+            PayoutCheck(start);
             if (PlaceOrders)
                 ManageOrders(start, nOrders);
             Tell(nTrades, nOrders, nHeads);
@@ -285,6 +350,14 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (real != 0 && (endMin == NoiseEngine.RthClose || !inRth || tMin == NoiseEngine.RthOpen))
             {
                 Flatten(real, "Flat 16:00");
+                return;
+            }
+
+            // the funded account's payout day (round 128): flat, no more trades today
+            if (payoutToday)
+            {
+                if (real != 0)
+                    Flatten(real, "Payout-eligible");
                 return;
             }
 
@@ -509,8 +582,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 string be = double.IsNaN(engine.LockPoints) ? "" :
                     ", breakeven: at " + P(o.Expected + o.Direction * engine.LockPoints) + " the stop moves to " +
                     P(o.Expected + o.Direction * LockPlus);
-                if (!PlaceOrders && evalDone)
-                    continue;  // the evaluation is passed: no new trades
+                if (!PlaceOrders && (evalDone || payoutToday))
+                    continue;  // the evaluation is passed, or today is a payout day: no new trades
                 string first = "";
                 if (!PlaceOrders && wDir != 0)
                 {
@@ -538,7 +611,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             }
             if (!PlaceOrders)
                 TellManual();
-            if (UseBreakout && williams.Signal != 0 && !(PlaceOrders ? evalDone : evalDone || wDir != 0))
+            if (UseBreakout && williams.Signal != 0 && !payoutToday && !(PlaceOrders ? evalDone : evalDone || wDir != 0))
             {
                 int d = williams.Signal;
                 string side = d > 0 ? "BUY" : "SELL";
@@ -710,6 +783,10 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (!Funded && EvalTarget > 0)
                 s += "Evaluation: " + Usd(EvalShown) + " of " + Usd(EvalTarget) + (evalDone ? " - TARGET REACHED, no new trades" :
                      EvalTargetOn ? " (everything closes at the target)" : " (target close works live)") + "\n";
+            if (Funded && PayoutStop)
+                s += "Payout cycle: " + cycleQual + "/5 days of $200, " + Usd(cycleProfit) + " since the last payout, best day " +
+                     Usd(cycleBest) + ", payouts taken " + payoutsTaken + (payoutToday ? " - PAYOUT DAY: request it after the close" :
+                     PayoutStopOn ? "" : " (works live)") + "\n";
             if (!Funded && BoldFromDay > 0)
                 s += "Bold finish: " + (evalStart == DateTime.MinValue ? "set the evaluation's start date" :
                      "from " + evalStart.AddDays(BoldFromDay).ToString("yyyy-MM-dd") + ", " + BoldSize.ToString("0.#") + "x size" +
@@ -894,6 +971,33 @@ namespace NinjaTrader.NinjaScript.Strategies
         [Range(1.0, 5.0)]
         [Display(Name = "Evaluation: bold finish size, x (2.5: the bot at 10 MNQ)", Order = 13, GroupName = "1. Account")]
         public double BoldSize { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Funded: stop for the day once closing makes it payout-eligible (round 128)", Order = 15, GroupName = "1. Account")]
+        public bool PayoutStop { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, 6)]
+        [Display(Name = "Funded: payouts taken so far", Order = 16, GroupName = "1. Account")]
+        public int FundedPayoutsTaken { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, 100)]
+        [Display(Name = "Funded: $200 days since the last payout", Order = 17, GroupName = "1. Account")]
+        public int FundedQualDays { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(-100000.0, 100000.0)]
+        [Display(Name = "Funded: profit since the last payout, $", Order = 18, GroupName = "1. Account")]
+        public double FundedCycleProfit { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0.0, 100000.0)]
+        [Display(Name = "Funded: best day since the last payout, $", Order = 19, GroupName = "1. Account")]
+        public double FundedBestDay { get; set; }
+
+        [Browsable(false)]  // the tests turn it on: the payout stop in a historical run
+        public bool PayoutStopInHistory { get; set; }
 
         [NinjaScriptProperty]
         [Range(0.0, 50.0)]

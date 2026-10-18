@@ -69,6 +69,16 @@ account. Copy that account to others with a trade copier (Tradesyncer, or NinjaT
      1.4-3.5 points more evaluations (about 39% instead of 35-37%) and paid 4-12% more per evaluation, but in the newest
      13 months slightly fewer (27.6% against 27.9%), which is why it is off unless you turn it on. Only in the
      evaluation, never on the funded account.
+   - **Funded: stop for the day once closing makes it payout-eligible** (off by default; round 128): on the funded
+     account, the moment closing everything would make today count toward a payout that is then allowed (five $200
+     days since the last payout, the account $2,600 up, no day above half the cycle's profit, at least $500 to take),
+     the strategy closes everything (or, orders off, tells you to), takes no more trades that day and tells you to
+     request the payout after the close. Over 16 years it brought the first payout within 20 sessions twice as often
+     (8.8% against 4.4% in 2019-25) and paid slightly more in total on the later data, but 18% less on 2011-18, which
+     is why it is off. Enter the cycle once: **payouts taken so far**, **$200 days since the last payout**, **profit
+     since the last payout**, **best day since the last payout** (from Apex's dashboard), and **account's starting
+     balance** 50,000. It keeps them up to date from the account each day and shows them on the dashboard ("Payout
+     cycle"); after a restart, copy the dashboard's numbers back into these settings. Live only.
    - **Evaluation: profit already made before this start:** 0 for a new evaluation. **If you restart the strategy in
      the middle of an evaluation, enter the evaluation's profit so far here** (from Apex's dashboard), or it will aim
      for $3,000 more. The dashboard shows "Evaluation: $X of $3,000" so you can check it matches.
@@ -182,6 +192,9 @@ not identical: NinjaTrader's historical fills differ from the worst-case fills t
   the cent, evaluation and funded, with the breakout's take-profit at 8 stops and at 1 stop (so its fills are covered);
   removing the MOVE STOP alerts or the breakout's 16:00 alert makes it fail. The evaluation's target from the
   account: one "close everything" alert, no trade alerts after it, and the take-profit moved to the target's price.
+- The funded payout stop: the first bar at which closing makes the day payout-eligible, recomputed independently
+  from the trades in three cycle states (one where the 50% rule binds), is the strategy's payout day; flat at once, no
+  entries after it that day.
 - With the evaluation's target: every trade before the one that reaches it is unchanged, that one exits at the
   target's price (a bot trade or a breakout trade), the total is at least the target, and nothing trades after; not on
   the funded account, and not in a historical run.
