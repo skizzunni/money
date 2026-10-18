@@ -41,6 +41,13 @@ account. Copy that account to others with a trade copier (Tradesyncer, or NinjaT
      (Rounds 107-108 in [RESULTS.md](RESULTS.md) compare the two plans.)
    - **Place orders:** on = the strategy trades; off = alerts only.
    - **Evaluation: close everything at this profit:** $3,000 (the 50K evaluation's target; 0 = off).
+   - **Evaluation: bold finish** (off by default; round 129, [RESULTS.md](RESULTS.md)): an evaluation that runs out of
+     its 30 days has failed anyway, so late in it more size gives up nothing. Set **the day it was bought** and **bold
+     finish from day** 20 to switch it on: from that day, until the target, the bot trades 2.5x its contracts (10 MNQ,
+     Apex's limit) and the breakout 2.5x its own (at most 10), with the same stops in points. Over 16 years it passed
+     1.4-3.5 points more evaluations (about 39% instead of 35-37%) and paid 4-12% more per evaluation, but in the newest
+     13 months slightly fewer (27.6% against 27.9%), which is why it is off unless you turn it on. Only in the
+     evaluation, never on the funded account.
    - **Evaluation: profit already made before this start:** 0 for a new evaluation. **If you restart the strategy in
      the middle of an evaluation, enter the evaluation's profit so far here** (from Apex's dashboard), or it will aim
      for $3,000 more. The dashboard shows "Evaluation: $X of $3,000" so you can check it matches.

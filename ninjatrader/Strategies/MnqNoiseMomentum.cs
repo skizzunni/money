@@ -17,6 +17,8 @@
 //     account is $3,000 up (closed + open), which passes it; the take-profit of the trade in progress sits at that
 //     price when it is the closer one. No new trades after that. Live only (not in backtests or the history loaded
 //     before the strategy goes live); it counts the strategy's own P/L from then, plus "evaluation profit so far".
+//   * optional, off by default (round 129): from a chosen day of the evaluation's 30, bigger size (2.5x: the bot at
+//     10 MNQ), since an evaluation that runs out of time has failed anyway.
 // Setup: 1-minute MNQ chart (the lock arms within the minute: more winners than on 5 minutes, docs/RESULTS.md round
 // 81), Days to load 30 or more (the noise needs 14 full sessions), Calculate on bar close.
 // See docs/NINJATRADER.md. Written in C# 5 for NinjaTrader 8's compiler.
@@ -48,6 +50,9 @@ namespace NinjaTrader.NinjaScript.Strategies
         bool evalDone;              // the evaluation's target was reached: everything closed, no new trades
         double profitBase;          // the strategy's closed P/L when it went live (the history before doesn't count)
         const double EvalBuffer = 25.0;  // $ past the target, for the closing fees and a tick
+        const int ApexMaxQty = 10;       // MNQ on a 50K Apex account
+        double boldMult = 1.0;           // today's size multiple (the bold finish), set at each bar
+        DateTime evalStart = DateTime.MinValue;
         string lastSignal = "-";
         string headsUp = "";
 
@@ -100,6 +105,9 @@ namespace NinjaTrader.NinjaScript.Strategies
                 EvalTarget = 3000;
                 EvalProfitSoFar = 0;
                 EvalTargetInHistory = false;
+                EvalStartDate = "";
+                BoldFromDay = 0;
+                BoldSize = 2.5;
 
                 AddPlot(Brushes.Teal, "Upper noise line");
                 AddPlot(Brushes.Maroon, "Lower noise line");
@@ -134,6 +142,10 @@ namespace NinjaTrader.NinjaScript.Strategies
                 ws.MaxQty = BreakoutMaxQty;
                 ws.PointValue = settings.PointValue;
                 williams = new WilliamsBreakout(ws);
+                DateTime d0;
+                if (DateTime.TryParseExact(EvalStartDate ?? "", "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture,
+                                           System.Globalization.DateTimeStyles.None, out d0))
+                    evalStart = d0;
             }
             else if (State == State.Realtime)
                 profitBase = SystemPerformance.AllTrades.TradesPerformance.Currency.CumProfit;
@@ -167,6 +179,25 @@ namespace NinjaTrader.NinjaScript.Strategies
                 return double.NaN;
             double need = EvalTarget + EvalBuffer - EvalClosed;
             return Position.AveragePrice + d * need / (Position.Quantity * settings.PointValue);
+        }
+
+        // The bold finish: on in the evaluation from day BoldFromDay of its 30 (counted from EvalStartDate), until passed
+        bool BoldDay(DateTime nyStart)
+        {
+            return !Funded && BoldFromDay > 0 && BoldSize > 1 && !evalDone && evalStart != DateTime.MinValue &&
+                   (nyStart.Date - evalStart.Date).Days >= BoldFromDay;
+        }
+
+        // Contracts for a new entry: as set, or the bold finish's multiple of them, within Apex's 10 MNQ
+        int BotQty { get { return boldMult > 1 ? Math.Min(ApexMaxQty, Math.Max(1, (int)Math.Round(Qty * boldMult))) : Qty; } }
+
+        int BreakoutQty
+        {
+            get
+            {
+                if (boldMult <= 1) return williams.Qty;
+                return Math.Min(Math.Min(BreakoutMaxQty, ApexMaxQty), Math.Max(1, (int)Math.Floor(williams.Qty * boldMult)));
+            }
         }
 
         int RealDir
@@ -209,6 +240,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                       " (no: skip date)" : "") : "loading history, " + engine.SessionsLoaded + "/" + Lookback +
                       " full sessions; no trades until " + Lookback + ". Load more days."));
 
+            boldMult = BoldDay(start) ? BoldSize : 1.0;
             if (PlaceOrders)
                 ManageOrders(start, nOrders);
             Tell(nTrades, nOrders, nHeads);
@@ -272,15 +304,15 @@ namespace NinjaTrader.NinjaScript.Strategies
                 }
                 SetStopLoss(name, CalculationMode.Ticks, StopTicks(o.Direction * (o.Expected - o.Stop)), false);
                 double tpPts = double.IsNaN(o.Target) ? double.NaN : o.Direction * (o.Target - o.Expected);
-                double evalPts = EvalPoints(Qty);
+                double evalPts = EvalPoints(BotQty);
                 if (!double.IsNaN(evalPts) && (double.IsNaN(tpPts) || evalPts < tpPts))
                     tpPts = evalPts;
                 if (!double.IsNaN(tpPts))
                     SetProfitTarget(name, CalculationMode.Ticks, TargetTicks(tpPts));
                 if (o.Direction > 0)
-                    EnterLong(Qty, LongName);
+                    EnterLong(BotQty, LongName);
                 else
-                    EnterShort(Qty, ShortName);
+                    EnterShort(BotQty, ShortName);
                 owner = Bot;
                 realLocked = false;
                 closingRejected = false;
@@ -291,14 +323,15 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (williams.Signal != 0 && real == 0)
             {
                 string wname = williams.Signal > 0 ? WLongName : WShortName;
+                int wq = BreakoutQty;
                 SetStopLoss(wname, CalculationMode.Ticks, StopTicks(williams.StopPoints), false);
-                double wEval = EvalPoints(williams.Qty);
+                double wEval = EvalPoints(wq);
                 if (!double.IsNaN(wEval))
                     SetProfitTarget(wname, CalculationMode.Ticks, TargetTicks(wEval));
                 if (williams.Signal > 0)
-                    EnterLong(williams.Qty, wname);
+                    EnterLong(wq, wname);
                 else
-                    EnterShort(williams.Qty, wname);
+                    EnterShort(wq, wname);
                 owner = Breakout;
                 return;
             }
@@ -444,7 +477,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 string be = double.IsNaN(engine.LockPoints) ? "" :
                     ", breakeven: at " + P(o.Expected + o.Direction * engine.LockPoints) + " the stop moves to " +
                     P(o.Expected + o.Direction * LockPlus);
-                Say("entry", side + " " + Qty + " MNQ (" + Account + ") at market. Price " + P(Close[0]) + ". Stop " + P(o.Stop) +
+                Say("entry", side + " " + BotQty + " MNQ (" + Account + ") at market. Price " + P(Close[0]) + ". Stop " + P(o.Stop) +
                     (double.IsNaN(o.Target) ? "" : ", take-profit " + P(o.Target)) + be +
                     (PlaceOrders ? ". The strategy placed it." : ". Place it now (orders are off)."));
             }
@@ -464,7 +497,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 string side = williams.Signal > 0 ? "BUY" : "SELL";
                 lastSignal = "Breakout " + side + " " + NoiseEngine.Hhmm(engine.BarTime.Hour * 60 + engine.BarTime.Minute + minutes) +
                              " @ " + P(Close[0]);
-                Say("breakout", "BREAKOUT " + side + " " + williams.Qty + " MNQ (" + Account + ") at market. Price " + P(Close[0]) +
+                Say("breakout", "BREAKOUT " + side + " " + BreakoutQty + " MNQ (" + Account + ") at market. Price " + P(Close[0]) +
                     " is past " + P(williams.Signal > 0 ? williams.Up : williams.Down) + ". Stop " + P(williams.StopPoints) +
                     " points from the fill, out at 16:00" + (PlaceOrders ? ". The strategy placed it." :
                     ". Place it now (orders are off); close it if the bot signals before 16:00."));
@@ -518,6 +551,10 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (!Funded && EvalTarget > 0)
                 s += "Evaluation: " + Usd(EvalClosed) + " of " + Usd(EvalTarget) + (evalDone ? " - TARGET REACHED, no new trades" :
                      EvalTargetOn ? " (everything closes at the target)" : " (target close works live)") + "\n";
+            if (!Funded && BoldFromDay > 0)
+                s += "Bold finish: " + (evalStart == DateTime.MinValue ? "set the evaluation's start date" :
+                     "from " + evalStart.AddDays(BoldFromDay).ToString("yyyy-MM-dd") + ", " + BoldSize.ToString("0.#") + "x size" +
+                     (boldMult > 1 ? " - ON TODAY (" + BotQty + " MNQ)" : "")) + "\n";
             if (UseBreakout)
                 s += "Breakout: " + (double.IsNaN(williams.Up) ? "" : P(williams.Up) + " / " + P(williams.Down) + ", ") +
                      williams.Status + "\n";
@@ -684,6 +721,20 @@ namespace NinjaTrader.NinjaScript.Strategies
         [Range(-100000.0, 100000.0)]
         [Display(Name = "Evaluation: profit already made before this start, $", Order = 10, GroupName = "1. Account")]
         public double EvalProfitSoFar { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Evaluation: the day it was bought (yyyy-MM-dd), for the bold finish", Order = 11, GroupName = "1. Account")]
+        public string EvalStartDate { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, 30)]
+        [Display(Name = "Evaluation: bold finish from this day of the 30 (0 = off; 20 tested)", Order = 12, GroupName = "1. Account")]
+        public int BoldFromDay { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(1.0, 5.0)]
+        [Display(Name = "Evaluation: bold finish size, x (2.5: the bot at 10 MNQ)", Order = 13, GroupName = "1. Account")]
+        public double BoldSize { get; set; }
 
         [Browsable(false)]  // the tests turn it on: the evaluation's target in a historical run
         public bool EvalTargetInHistory { get; set; }

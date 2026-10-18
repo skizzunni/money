@@ -494,3 +494,33 @@ def test_evaluation_target_on_a_breakout_trade(sim, tmp_path):
                 break
             peak = max(peak, cum + fav, cum + float(base[k][6]))
     assert hits, "a breakout trade reached the target on some seed"
+
+
+def test_bold_finish(sim, tmp_path):
+    """From day 20 of the evaluation, 2.5x size (bot 10 MNQ, the breakout's contracts x2.5 within 10); before, the same
+    trades; never on the funded account."""
+    bars = rth_minutes(60, 5)
+    day0 = bars.index.tz_convert(NY)[0].strftime("%Y-%m-%d")
+    bold = dict(EvalStartDate=day0, BoldFromDay=20, BoldSize=2.5)
+    base, b_orders, _, _ = run_sim(sim, bars, tmp_path, minutes=1, breakout=True, RoundPrices=False)
+    got, orders, dash, printed = run_sim(sim, bars, tmp_path, minutes=1, breakout=True, RoundPrices=False, **bold)
+    idx = bars.index.tz_convert(NY)
+    cut = pd.Timestamp(day0, tz=NY) + pd.Timedelta(days=20)
+    first_bold = next(k for k, t in enumerate(base) if idx[int(t[1])] >= cut)
+    assert got[:first_bold] == base[:first_bold], "the same trades before the bold days"
+    base_q = {o[0]: int(o[3]) for o in b_orders if o[1] == "Enter"}
+    n_bot = n_w = 0
+    for o in orders:
+        if o[1] != "Enter" or idx[int(o[0])] < cut:
+            continue
+        if o[2].startswith("W"):
+            n_w += 1
+            assert int(o[3]) == min(10, max(1, math.floor(base_q.get(o[0], int(o[3])) * 2.5))), o
+        else:
+            n_bot += 1
+            assert int(o[3]) == 10, o
+    assert n_bot and n_w, (n_bot, n_w)
+    assert "Bold finish: from" in dash and any("BUY 10 MNQ" in p or "SELL 10 MNQ" in p for p in printed)
+    funded, _, _, _ = run_sim(sim, bars, tmp_path, minutes=1, breakout=True, RoundPrices=False, Funded=True)
+    funded_b, _, _, _ = run_sim(sim, bars, tmp_path, minutes=1, breakout=True, RoundPrices=False, Funded=True, **bold)
+    assert funded == funded_b, "not on the funded account"
