@@ -2163,6 +2163,40 @@ often, but passes fewer evaluations on NQ and in the newest months (and lost on 
 Paid per evaluation moves by about +/-2% ($1,822-1,864 against $1,835 on 2011-18; $1,305-1,338 against $1,349 in
 2019-25) and the first payout comes later. **Ask as soon as it's allowed (as now).**
 
+## Round one hundred and twenty-eight: stop for the day the moment closing makes the funded account payout-eligible
+
+`research/payout_lock.py`: the funded counterpart of round 124 (closing at the minute's worst equity less $10, when
+that leaves the day meeting every payout condition). Bar: more paid per evaluation in all three periods and a first
+payout within 20 sessions at least as often.
+
+| | Paid per evaluation, 2011-18 / 2019-25 / NQ / July 2025-Aug 2026 | First payout within 20 sessions |
+|---|---|---|
+| Now | $1,835 / $1,349 / $1,163 / $36 | 9.9 / 4.4 / 4.0 / 3.1% |
+| Close when payout-eligible | $1,506 / $1,389 / $1,174 / $76 | 13.8 / 8.8 / 8.2 / 7.2% |
+
+The first payout comes twice as often within 20 sessions everywhere, and the total is up on the three later sets but
+down 18% on 2011-18: **not adopted.** It would also need the strategy to know Apex's payout state (qualifying days,
+the cycle's profit), which it can't read from the account.
+
+## Round one hundred and twenty-nine: an evaluation that runs out of time has failed, so play bolder near the end
+
+`research/bold_finish.py`. A timeout and a bust are the same outcome for the user, so late in the 30 days an
+evaluation that hasn't passed gives up nothing by taking more risk (bold play against a deadline). With close-at-
+target; adopted if more passes in all three periods and the newest 13 months and at least as much paid.
+
+| | Pass %, 2011-18 / 2019-25 / NQ / newest | Out of time % | Paid per evaluation |
+|---|---|---|---|
+| Now | 35.4 / 37.1 / 34.5 / 27.9 | 11 / 14 / 8 / 4 | $1,835 / $1,349 / $1,163 |
+| From day 20, 2x | 38.8 / 39.9 / 36.1 / 25.2 | 2 / 2 / 1 / 1 | $1,933 / $1,479 / $1,253 |
+| From day 20, 2.5x (10 MNQ) | 38.7 / 39.3 / 35.9 / 27.6 | 1 / 1 / 0 / 1 | $1,946 / $1,435 / $1,252 |
+| From day 24, 2x | 38.0 / 40.0 / 36.2 / 25.2 | 4 / 5 / 2 / 2 | $1,892 / $1,484 / $1,252 |
+| From day 24, 2.5x | 38.7 / 40.6 / 36.4 / 26.2 | 2 / 3 / 1 / 1 | $1,917 / $1,509 / $1,265 |
+| 2x within $1,000 of the target | 35.8 / 37.4 / 33.8 / 27.2 | 10 / 13 / 7 / 3 | $1,889 / $1,387 / $1,196 |
+
+Every late rule passes 1.4-3.5 points more and pays 4-12% more on the three long periods, as the argument predicts,
+but none passes more in the newest 13 months (few timeouts there to convert: 4%). **Not adopted by the bar; built in
+as an option, off by default** ("Evaluation: from day 20, 2.5x size"), for the user to switch on.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
@@ -2283,6 +2317,8 @@ python research/pass_lock.py nsx1m_scaled.pkl nq1m_scaled.pkl         # close ev
 python research/pass_lock_size.py nsx1m_scaled.pkl nq1m_scaled.pkl    # the evaluation's size with it (4 MNQ stays)
 python research/retest_lock.py nsx1m_scaled.pkl nq1m_scaled.pkl       # the near-misses with close-at-target (no)
 python research/payout_buffer.py nsx1m_scaled.pkl nq1m_scaled.pkl     # when to ask for a payout (as soon as allowed)
+python research/payout_lock.py nsx1m_scaled.pkl nq1m_scaled.pkl       # stop when payout-eligible (faster, not more)
+python research/bold_finish.py nsx1m_scaled.pkl nq1m_scaled.pkl       # bolder near the evaluation's end (option, off)
 ```
 
 The raw data isn't stored in this repo.
