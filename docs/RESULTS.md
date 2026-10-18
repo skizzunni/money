@@ -2036,6 +2036,14 @@ adopted if pass rate and payouts no lower and one higher on 2019-25 and NQ):
 Dropping the shorts cuts red days by eight points but pays less. (Half risk barely changes anything: most breakout
 trades are 1 MNQ already.) **Not adopted.**
 
+## The wick cue on the bot as it trades now
+
+Round 75's wick cue (the signal bar closes in its half away from the trade) was found on 5-minute bars, before the
+1-minute chart, the take-profit and the lock. Measured on the bot now (the five 1-minute bars up to the check as the
+signal bar; 4 MNQ, $200): wick trades $52.0 / $44.7 / $38.5 / $38.4 a trade against $13.7 / $20.6 / $25.4 / $17.8 for
+the others (2011-18 / 2019-25 / July 2025-2026 / NQ), the difference t 2.72 / 1.36 / 0.33 / 1.54. The other trades
+make money too and the gap has shrunk to noise in the newest data: cutting them would mostly give up profit. No round.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
