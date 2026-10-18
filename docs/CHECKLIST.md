@@ -39,6 +39,32 @@ Every requirement from the conversation, its status and the evidence. Status: **
 | 19 | Verified in NinjaTrader itself (not just the stand-in) | open (user) | Needs NinjaTrader: a Playback run as in the guide; the stand-in can't prove NinjaTrader's own fills |
 | 20 | One account, one platform, one dashboard ("ONE ACCOUNT. ONE PLATFORM.") | done | Everything that trades runs in the one NinjaTrader strategy on the one Apex account: orders with brackets, both setups, evaluation or funded read from the account's name (no switch to flip), the evaluation's target from the account's balance, the payout cycle kept in a file, the position guard, the on-chart dashboard and alerts (`test_account_type_from_the_account_name` and the tests above). Outside it, only what Apex's website alone does: buying the evaluation, requesting a payout (the strategy says when and about how much) |
 
+## Can the targets be reached on one 50K account? The arithmetic
+
+The account's binding limit is the $2,000 drawdown trailing the highest equity. A strategy whose day has mean m and
+standard deviation s (both scale with size; their ratio, the daily Sharpe m / s, does not) ends the account with
+probability about exp(-2 m 2000 / s^2) before drifting away from it. Size only chooses where on that line you sit:
+
+| Daily Sharpe | $300 a day ($1,500 a week): sd, chance of failing | $560 a day (first payout in ~2 weeks): sd, chance of failing |
+|---|---|---|
+| **0.09 (this strategy, 2011-25)** | $3,333, **~90%** | $6,222, **~94%** |
+| 0.20 | $1,500, ~59% | $2,800, ~75% |
+| 0.35 | $857, ~20% | $1,600, ~42% |
+| 0.50 | $600, ~4% | $1,120, ~17% |
+
+- **$1,500 a week** is $300 a day of trading profit (payouts are withdrawals of profit), on top of the first cycle's
+  $3,600 cushion ($52,600 balance + the $1,500 payout over $52,100). Reaching it with even odds needs a daily Sharpe
+  around 0.3, more than three times this strategy's; nothing in 136 rounds tested above about 0.1.
+- **The first payout within two weeks** means passing the $3,000 evaluation and then five $200 days to $52,600 (no
+  day over half the cycle's profit) inside ~10 sessions: about $5,600 in 10 days, $560 a day.
+- **The 10 MNQ limit** caps the size: at 10 MNQ a 30-point day is $600. The drawdown, not the contract limit, binds
+  first at this strategy's Sharpe.
+- **Apex's payout rules** cap one funded account at $13,000 in six payouts ($1,500, $1,500, $2,000, $2,500, $2,500,
+  $3,000), each needing five $200 days: the most a perfect record could take is about $1,500-3,000 a week, so the
+  rules themselves allow the target; the strategy's return for its risk does not.
+- **More than 50% winners** is possible on its own (a lock that takes small wins early: 53-55%, rounds 103, 112, 131)
+  but it cut the money paid every time it was tested, because the winners it cuts short are the big trend days.
+
 ## Open items and next steps
 
 1. Done: the payout stop is an option (round 128), its cycle remembered in a file across restarts, and a payout
