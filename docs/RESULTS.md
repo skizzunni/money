@@ -2197,6 +2197,30 @@ Every late rule passes 1.4-3.5 points more and pays 4-12% more on the three long
 but none passes more in the newest 13 months (few timeouts there to convert: 4%). **Not adopted by the bar; built in
 as an option, off by default** ("Evaluation: from day 20, 2.5x size"), for the user to switch on.
 
+## Round one hundred and thirty: a take-profit for the breakout, and the manual mode verified
+
+Apex bans automation (third-party summaries checked October 2026), so trading this on Apex means Place orders off and
+clicking the alerts; several 2026 summaries also say every order needs a stop AND a take-profit. `research/w_bracket.py`:
+the breakout's take-profit at 4, 6 or 8 times its stop (pick the nearest within 0.5 points of pass rate and 97% of the
+payouts of none in all three periods, else 8 as the compliance minimum):
+
+| Breakout take-profit | Pass %, 2011-18 / 2019-25 / NQ / newest | Paid per evaluation |
+|---|---|---|
+| None | 35.4 / 37.1 / 34.5 / 27.9 | $1,835 / $1,349 / $1,163 |
+| 4 stops | 34.7 / 36.8 / 34.4 / 27.6 | $1,630 / $1,301 / $1,126 |
+| 6 stops | 35.7 / 36.5 / 34.6 / 27.9 | $1,841 / $1,373 / $1,177 |
+| 8 stops | 35.2 / 36.5 / 34.4 / 27.9 | $1,810 / $1,414 / $1,138 |
+
+6 and 8 miss the 0.5-point rule by 0.1 in 2019-25, so **8 stops** (2x yesterday's range), as the rule says: results
+essentially unchanged, and every trade carries a full bracket. In the strategy as "Breakout: take-profit" (8).
+
+The alerts-only mode was audited by following it: a test trader who does only what the alert lines say ends up with
+exactly the strategy's own trades. It found three gaps, now fixed: the bot's stop and take-profit moves weren't
+announced (now MOVE STOP / MOVE TAKE-PROFIT), the breakout's alert gave its stop in points and no exit alerts (now
+prices, its exits and "first close the breakout"), and close-at-target had no manual form (now from the account's
+net liquidation: the take-profit moved to the target's price, then "close everything now"). It also found a rounding
+bug: take-profits placed by price were rounded toward the price (up to a tick less than tested); now away from it.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
@@ -2319,6 +2343,7 @@ python research/retest_lock.py nsx1m_scaled.pkl nq1m_scaled.pkl       # the near
 python research/payout_buffer.py nsx1m_scaled.pkl nq1m_scaled.pkl     # when to ask for a payout (as soon as allowed)
 python research/payout_lock.py nsx1m_scaled.pkl nq1m_scaled.pkl       # stop when payout-eligible (faster, not more)
 python research/bold_finish.py nsx1m_scaled.pkl nq1m_scaled.pkl       # bolder near the evaluation's end (option, off)
+python research/w_bracket.py nsx1m_scaled.pkl nq1m_scaled.pkl         # a take-profit for the breakout (8 stops)
 ```
 
 The raw data isn't stored in this repo.

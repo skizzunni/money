@@ -52,6 +52,13 @@ namespace NinjaTrader.NinjaScript.Strategies
         const double EvalBuffer = 25.0;  // $ past the target, for the closing fees and a tick
         const int ApexMaxQty = 10;       // MNQ on a 50K Apex account
         double boldMult = 1.0;           // today's size multiple (the bold finish), set at each bar
+        // alerts-only mode (orders off, the user clicks): what the user's account should hold, so the alerts can say
+        // when to move a stop, take a target or close
+        double saidStop = double.NaN, saidTarget = double.NaN;   // the bot's stop / take-profit last announced
+        int wDir, wQty;                                           // the breakout trade the user was told to take
+        double wStop = double.NaN, wTarget = double.NaN;
+        bool wPending;                                            // told this bar; it fills at the next bar's open
+        double wTargetPts = double.NaN;  // the breakout trade's own take-profit, points from the fill
         DateTime evalStart = DateTime.MinValue;
         string lastSignal = "-";
         string headsUp = "";
@@ -108,6 +115,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 EvalStartDate = "";
                 BoldFromDay = 0;
                 BoldSize = 2.5;
+                BreakoutTarget = 8;    // 8 x its stop = 2 x yesterday's range: a full bracket (docs/RESULTS.md round 130)
+                AccountStart = 50000;
 
                 AddPlot(Brushes.Teal, "Upper noise line");
                 AddPlot(Brushes.Maroon, "Lower noise line");
@@ -162,7 +171,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         double LockAt { get { return Funded ? FundedLockAt : EvalLockAt; } }
         double LockPlus { get { return Funded ? FundedLockPlus : EvalLockPlus; } }
         int MaxLosers { get { return Funded ? FundedMaxLosers : EvalMaxLosers; } }
-        string Account { get { return Funded ? "Funded" : "Evaluation"; } }
+        string Book { get { return Funded ? "Funded" : "Evaluation"; } }  // not "Account": that is NinjaTrader's
 
         // The evaluation's target: on in the evaluation, live (or in the tests)
         bool EvalTargetOn { get { return !Funded && EvalTarget > 0 && (State == State.Realtime || EvalTargetInHistory); } }
@@ -170,6 +179,17 @@ namespace NinjaTrader.NinjaScript.Strategies
         double EvalClosed  // the evaluation's closed profit, $
         {
             get { return EvalProfitSoFar + SystemPerformance.AllTrades.TradesPerformance.Currency.CumProfit - profitBase; }
+        }
+
+        // The evaluation's profit for the dashboard: the strategy's own when it trades, the account's when it only alerts
+        double EvalShown
+        {
+            get
+            {
+                if (!PlaceOrders && EvalTargetOn)
+                    return Account.Get(AccountItem.NetLiquidation, Currency.UsDollar) - AccountStart;
+                return EvalClosed;
+            }
         }
 
         // The price at which the position in progress takes the evaluation to its target (NaN: no position)
@@ -235,7 +255,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (UseBreakout)
                 williams.OnBar(start, Open[0], High[0], Low[0], free);
             if (start.Hour * 60 + start.Minute == NoiseEngine.RthOpen)  // once a day in the Output window, chart or not
-                Print(start.ToString("yyyy-MM-dd") + " MNQ Noise Momentum (" + Account + ", " + Qty + " MNQ, orders " +
+                Print(start.ToString("yyyy-MM-dd") + " MNQ Noise Momentum (" + Book + ", " + Qty + " MNQ, orders " +
                       (PlaceOrders ? "ON" : "OFF") + "): " + (engine.Ready ? "ready, trading today" + (engine.SkipToday ?
                       " (no: skip date)" : "") : "loading history, " + engine.SessionsLoaded + "/" + Lookback +
                       " full sessions; no trades until " + Lookback + ". Load more days."));
@@ -325,9 +345,13 @@ namespace NinjaTrader.NinjaScript.Strategies
                 string wname = williams.Signal > 0 ? WLongName : WShortName;
                 int wq = BreakoutQty;
                 SetStopLoss(wname, CalculationMode.Ticks, StopTicks(williams.StopPoints), false);
+                double wPts = BreakoutTarget > 0 ? BreakoutTarget * williams.StopPoints : double.NaN;
                 double wEval = EvalPoints(wq);
-                if (!double.IsNaN(wEval))
-                    SetProfitTarget(wname, CalculationMode.Ticks, TargetTicks(wEval));
+                if (!double.IsNaN(wEval) && (double.IsNaN(wPts) || wEval < wPts))
+                    wPts = wEval;
+                if (!double.IsNaN(wPts))
+                    SetProfitTarget(wname, CalculationMode.Ticks, TargetTicks(wPts));
+                wTargetPts = BreakoutTarget > 0 ? BreakoutTarget * williams.StopPoints : double.NaN;
                 if (williams.Signal > 0)
                     EnterLong(wq, wname);
                 else
@@ -336,14 +360,22 @@ namespace NinjaTrader.NinjaScript.Strategies
                 return;
             }
 
-            if (real != 0 && owner == Breakout && EvalTargetOn)  // the breakout's target: the evaluation's, from the real fill
+            if (real != 0 && owner == Breakout && EvalTargetOn)  // the breakout's target: the nearer of its own and the evaluation's
             {
                 double wt = EvalTargetPrice(real);
                 double pxw = Close[0];
                 if ((real > 0 && wt <= pxw) || (real < 0 && wt >= pxw))
+                {
                     Flatten(real, "Evaluation target");
-                else
-                    SetProfitTarget(real > 0 ? WLongName : WShortName, CalculationMode.Price, RoundTarget(real, wt));
+                    return;
+                }
+                if (!double.IsNaN(wTargetPts))
+                {
+                    double own = Position.AveragePrice + real * wTargetPts;
+                    if ((real > 0 && own < wt) || (real < 0 && own > wt))
+                        wt = own;
+                }
+                SetProfitTarget(real > 0 ? WLongName : WShortName, CalculationMode.Price, RoundTarget(real, wt));
                 return;
             }
             if (real == 0 || owner != Bot)
@@ -429,7 +461,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         double RoundTarget(int d, double price)
         {
-            return RoundStop(-d, price);
+            return RoundStop(d, price);  // away from the price: up for a long's take-profit, down for a short's
         }
 
         double StopTicks(double points)  // whole ticks, rounded down: never past the max loss
@@ -477,9 +509,21 @@ namespace NinjaTrader.NinjaScript.Strategies
                 string be = double.IsNaN(engine.LockPoints) ? "" :
                     ", breakeven: at " + P(o.Expected + o.Direction * engine.LockPoints) + " the stop moves to " +
                     P(o.Expected + o.Direction * LockPlus);
-                Say("entry", side + " " + BotQty + " MNQ (" + Account + ") at market. Price " + P(Close[0]) + ". Stop " + P(o.Stop) +
-                    (double.IsNaN(o.Target) ? "" : ", take-profit " + P(o.Target)) + be +
-                    (PlaceOrders ? ". The strategy placed it." : ". Place it now (orders are off)."));
+                if (!PlaceOrders && evalDone)
+                    continue;  // the evaluation is passed: no new trades
+                string first = "";
+                if (!PlaceOrders && wDir != 0)
+                {
+                    first = "First CLOSE the breakout " + (wDir > 0 ? "long" : "short") + " at market (the bot comes first). ";
+                    wDir = 0;
+                    wPending = false;
+                }
+                Say("entry", first + side + " " + BotQty + " MNQ (" + Book + ") at market. Price " + P(Close[0]) + ". Stop " +
+                    P(RoundStop(o.Direction, o.Stop)) + (double.IsNaN(o.Target) ? "" : ", take-profit " +
+                    P(RoundTarget(o.Direction, o.Target))) + be +
+                    (PlaceOrders ? ". The strategy placed it." : ". Place it now (orders are off) with that stop and take-profit."));
+                saidStop = RoundStop(o.Direction, o.Stop);
+                saidTarget = double.IsNaN(o.Target) ? double.NaN : RoundTarget(o.Direction, o.Target);
             }
             for (int k = nTrades; k < engine.Trades.Count; k++)
             {
@@ -492,15 +536,30 @@ namespace NinjaTrader.NinjaScript.Strategies
                     Say("exit", (t.Reason == "Target" ? "TARGET: " : "EXIT: ") + "the " + side + " closed at " + P(t.Exit) +
                         " (" + Why(t.Reason) + "), " + Usd(t.Pnl) + ".");
             }
-            if (UseBreakout && williams.Signal != 0)
+            if (!PlaceOrders)
+                TellManual();
+            if (UseBreakout && williams.Signal != 0 && !(PlaceOrders ? evalDone : evalDone || wDir != 0))
             {
-                string side = williams.Signal > 0 ? "BUY" : "SELL";
+                int d = williams.Signal;
+                string side = d > 0 ? "BUY" : "SELL";
+                double fill = Close[0] + d * TickSize;  // the expected fill: the next bar's open, a tick of slippage
+                double st = RoundStop(d, fill - d * williams.StopPoints);
+                double tp = BreakoutTarget > 0 ? RoundTarget(d, fill + d * BreakoutTarget * williams.StopPoints) : double.NaN;
                 lastSignal = "Breakout " + side + " " + NoiseEngine.Hhmm(engine.BarTime.Hour * 60 + engine.BarTime.Minute + minutes) +
                              " @ " + P(Close[0]);
-                Say("breakout", "BREAKOUT " + side + " " + BreakoutQty + " MNQ (" + Account + ") at market. Price " + P(Close[0]) +
-                    " is past " + P(williams.Signal > 0 ? williams.Up : williams.Down) + ". Stop " + P(williams.StopPoints) +
-                    " points from the fill, out at 16:00" + (PlaceOrders ? ". The strategy placed it." :
-                    ". Place it now (orders are off); close it if the bot signals before 16:00."));
+                Say("breakout", "BREAKOUT " + side + " " + BreakoutQty + " MNQ (" + Book + ") at market. Price " + P(Close[0]) +
+                    " is past " + P(d > 0 ? williams.Up : williams.Down) + ". Stop " + P(st) + " (" + P(williams.StopPoints) +
+                    " points from the fill)" + (double.IsNaN(tp) ? "" : ", take-profit " + P(tp)) + ", out at 16:00" +
+                    (PlaceOrders ? ". The strategy placed it." :
+                     ". Place it now (orders are off) with that stop and take-profit; close it if the bot signals."));
+                if (!PlaceOrders)
+                {
+                    wDir = d;
+                    wQty = BreakoutQty;
+                    wStop = st;
+                    wTarget = tp;
+                    wPending = true;
+                }
             }
             int endMin = engine.BarTime.Hour * 60 + engine.BarTime.Minute + minutes;
             if (endMin >= NoiseEngine.FirstCheck && (endMin - NoiseEngine.FirstCheck) % NoiseEngine.Step == 0)
@@ -531,9 +590,109 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         string stopWhy;
 
+        // Alerts-only mode, the evaluation's target: the price at which `qty` contracts held in direction d take the account
+        // (its net liquidation, open P/L included) to the target + $25 (NaN: off)
+        double ManualEvalPrice(int d, int qty)
+        {
+            if (!EvalTargetOn || evalDone || qty <= 0)
+                return double.NaN;
+            double profit = Account.Get(AccountItem.NetLiquidation, Currency.UsDollar) - AccountStart;
+            return Close[0] + d * (EvalTarget + EvalBuffer - profit) / (qty * settings.PointValue);
+        }
+
+        static double Nearer(int d, double a, double b)  // the take-profit nearer the price (NaN: the other one)
+        {
+            if (double.IsNaN(a)) return b;
+            if (double.IsNaN(b)) return a;
+            return d > 0 ? Math.Min(a, b) : Math.Max(a, b);
+        }
+
+        // Alerts-only mode: tell the user each change the tested strategy would make to what they hold
+        void TellManual()
+        {
+            int endMin = engine.BarTime.Hour * 60 + engine.BarTime.Minute + minutes;
+            // the bot's stop and take-profit, as the tested strategy moves them (the line at the checks, the lock)
+            if (engine.Position != 0)
+            {
+                int d = engine.Position;
+                string why;
+                double st = engine.StopNow(out why);
+                if (!double.IsNaN(st))
+                {
+                    st = RoundStop(d, st);
+                    if (double.IsNaN(saidStop) || Math.Abs(st - saidStop) >= TickSize / 2)
+                    {
+                        Say("move", "MOVE STOP: the " + (d > 0 ? "long" : "short") + "'s stop to " + P(st) + " (" + Why(why) + ").");
+                        saidStop = st;
+                    }
+                }
+                double tp = Nearer(d, engine.TargetNow(), ManualEvalPrice(d, BotQty));
+                if (!double.IsNaN(tp))
+                {
+                    tp = RoundTarget(d, tp);
+                    if (double.IsNaN(saidTarget) || Math.Abs(tp - saidTarget) >= TickSize / 2)
+                    {
+                        Say("move", "MOVE TAKE-PROFIT: the " + (d > 0 ? "long" : "short") + "'s take-profit to " + P(tp) + ".");
+                        saidTarget = tp;
+                    }
+                }
+            }
+            else if (engine.PendingEntry == 0)
+                saidStop = saidTarget = double.NaN;
+
+            // the breakout trade the user was told to take: its stop, its take-profit, 16:00
+            if (wDir != 0 && !wPending)
+            {
+                double near = Nearer(wDir, wTarget, ManualEvalPrice(wDir, wQty));
+                if (!double.IsNaN(near) && (double.IsNaN(wTarget) || Math.Abs(near - wTarget) >= TickSize / 2))
+                {
+                    near = RoundTarget(wDir, near);
+                    Say("move", "MOVE TAKE-PROFIT: the breakout " + (wDir > 0 ? "long" : "short") + "'s take-profit to " +
+                        P(near) + " (it takes the evaluation to its target).");
+                    wTarget = near;
+                }
+            }
+            if (wDir != 0)
+            {
+                if (wPending)
+                    wPending = false;  // it filled at this bar's open
+                else if ((wDir > 0 && Low[0] <= wStop) || (wDir < 0 && High[0] >= wStop))
+                {
+                    Say("bexit", "BREAKOUT EXIT: the breakout " + (wDir > 0 ? "long" : "short") + "'s stop " + P(wStop) +
+                        " was reached. If it didn't fill, close it now.");
+                    wDir = 0;
+                }
+                else if (!double.IsNaN(wTarget) && ((wDir > 0 && High[0] >= wTarget + TickSize) ||
+                                                   (wDir < 0 && Low[0] <= wTarget - TickSize)))
+                {
+                    Say("bexit", "BREAKOUT TARGET: the breakout " + (wDir > 0 ? "long" : "short") + "'s take-profit " +
+                        P(wTarget) + " was reached.");
+                    wDir = 0;
+                }
+                if (wDir != 0 && endMin >= NoiseEngine.RthClose)
+                {
+                    Say("flat", "FLAT: close the breakout " + (wDir > 0 ? "long" : "short") + " at market (16:00 close).");
+                    wDir = 0;
+                }
+            }
+
+            // the evaluation's target, from the account itself (live): close everything, no new trades
+            if (EvalTargetOn && !evalDone)
+            {
+                double profit = Account.Get(AccountItem.NetLiquidation, Currency.UsDollar) - AccountStart;
+                if (profit >= EvalTarget)
+                {
+                    evalDone = true;
+                    wDir = 0;
+                    Say("evaltarget", "EVALUATION TARGET REACHED: the account is " + Usd(profit) + " up. CLOSE EVERYTHING NOW " +
+                        "at market and take no more trades: the evaluation is passed.");
+                }
+            }
+        }
+
         string Dashboard()
         {
-            string s = "MNQ Noise Momentum v1.6: " + Account + ", " + Qty + " MNQ, " + Usd(MaxLoss) + " max loss, " + MaxLosers +
+            string s = "MNQ Noise Momentum v1.6: " + Book + ", " + Qty + " MNQ, " + Usd(MaxLoss) + " max loss, " + MaxLosers +
                        " losers a day\n";
             s += "Orders: " + (PlaceOrders ? "ON (the strategy trades this account)" : "OFF (alerts only)") + "\n";
             if (minutes != 1)
@@ -549,7 +708,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (engine.SkipToday) s += "Today is on the skip list: no new trades.\n";
             if (engine.FedToday) s += "Fed day: no shorts before 14:00.\n";
             if (!Funded && EvalTarget > 0)
-                s += "Evaluation: " + Usd(EvalClosed) + " of " + Usd(EvalTarget) + (evalDone ? " - TARGET REACHED, no new trades" :
+                s += "Evaluation: " + Usd(EvalShown) + " of " + Usd(EvalTarget) + (evalDone ? " - TARGET REACHED, no new trades" :
                      EvalTargetOn ? " (everything closes at the target)" : " (target close works live)") + "\n";
             if (!Funded && BoldFromDay > 0)
                 s += "Bold finish: " + (evalStart == DateTime.MinValue ? "set the evaluation's start date" :
@@ -735,6 +894,16 @@ namespace NinjaTrader.NinjaScript.Strategies
         [Range(1.0, 5.0)]
         [Display(Name = "Evaluation: bold finish size, x (2.5: the bot at 10 MNQ)", Order = 13, GroupName = "1. Account")]
         public double BoldSize { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0.0, 50.0)]
+        [Display(Name = "Breakout: take-profit, x its stop distance (0 = none)", Order = 6, GroupName = "5. Breakout")]
+        public double BreakoutTarget { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(1000.0, 1000000.0)]
+        [Display(Name = "Evaluation: account's starting balance, $ (alerts-only mode reads the account against it)", Order = 14, GroupName = "1. Account")]
+        public double AccountStart { get; set; }
 
         [Browsable(false)]  // the tests turn it on: the evaluation's target in a historical run
         public bool EvalTargetInHistory { get; set; }

@@ -10,10 +10,31 @@ account. Copy that account to others with a trade copier (Tradesyncer, or NinjaT
 
 `ninjatrader/tests/` is only for the tests here. Don't copy it into NinjaTrader.
 
-> **Apex and automation.** Apex's rules (4.0, March 2026) say no automation or algorithms on any account,
-> evaluations included, and that orders must be placed by hand. With **Place orders** on, this strategy is an
-> automated system. Apex can close the accounts and keep the fees. With **Place orders** off it only alerts, and you
-> click. That's your decision; read Apex's current rules before you switch it on there.
+> **Apex and automation.** Apex's rules (4.0, March 2026; third-party summaries checked October 2026 agree) say no
+> bots, NinjaTrader strategies or alert-to-order services may place trades on evaluations or Performance Accounts.
+> With **Place orders** on, this strategy is an automated system, and Apex can close the account and keep the fees.
+> **To stay within Apex's rules, set Place orders off and click the trades yourself**, as "Trading it by hand on
+> Apex" below describes: the alerts then tell you every order the strategy would place, and a test checks that doing
+> exactly what they say gives the strategy's own trades. Several 2026 summaries also say every order must carry a
+> stop-loss and a take-profit: every trade here has both (the breakout's take-profit is 8x its stop).
+
+## Trading it by hand on Apex (Place orders off)
+
+1. Set **Place orders** off, **Evaluation: account's starting balance** 50,000 (the evaluation's), and leave the rest
+   as below. Keep the strategy running on the chart all session with sound on.
+2. In your order entry (Chart Trader or SuperDOM), have an ATM strategy with a stop and a target, so each order goes
+   in with both. When an alert says **BUY / SELL n MNQ at market ... Stop X, take-profit Y**: buy or sell n MNQ at
+   market and set the stop at X and the target at Y (or, the same thing, the distances from your fill).
+3. **MOVE STOP** / **MOVE TAKE-PROFIT**: drag your stop or target to the price it names (the line stop moves at the
+   half hours, the lock moves it to entry + 2.5 / + 6.25; the take-profit moves with the noise and, in the
+   evaluation, to the price that takes the account to $3,000). If a moved stop would be past the price, close at market.
+4. **BREAKOUT BUY / SELL ... Stop X, take-profit Y**: the same, for the breakout trade. **First CLOSE the breakout** on
+   a bot alert: close it at market, then take the bot's trade. **BREAKOUT EXIT / TARGET**: it should have filled; if
+   not, close it.
+5. **FLAT**: close everything at market (16:00 New York).
+6. **EVALUATION TARGET REACHED: CLOSE EVERYTHING NOW**: the account (net liquidation, read from NinjaTrader live) is
+   $3,000 up: close everything; the strategy gives no more trade alerts. Then switch FUNDED ACCOUNT on.
+7. Bold finish (if you switched it on): from its day, the alerts say 10 MNQ for the bot; trade what they say.
 
 ## Install
 
@@ -85,7 +106,8 @@ needs more days loaded.
 - **The breakout, in the bot's gaps** (on by default; round 101, [RESULTS.md](RESULTS.md)): Larry Williams'
   volatility breakout. Its levels are today's 09:30 open ± half of yesterday's 09:30–16:00 range. The first 1-minute
   bar from 09:30 to 15:00 that reaches one buys (or sells) at market at the next minute's open, with a stop a quarter
-  of yesterday's range from the fill, sized to $200 of risk (1 to 10 MNQ), out at 16:00. One a day at most. It's taken
+  of yesterday's range from the fill and a take-profit 8 stops away (2x yesterday's range; round 130, so every trade
+  carries a full bracket), sized to $200 of risk (1 to 10 MNQ), out at 16:00. One a day at most. It's taken
   only while the bot is flat, and the bot always comes first: if the bot signals while the breakout trade is open,
   the breakout trade is closed at market and the bot's entry goes in on the same bar (opposite directions: the bot's
   entry reverses the position). No breakout trade on the skip dates, or until the bot's 14 sessions are loaded.
@@ -100,7 +122,9 @@ needs more days loaded.
 - **A rejected order:** if the broker rejects the stop while you're in a trade, the strategy closes the position at
   market at once, so it's never left without a stop, and the Alerts window says so.
 - **Alerts** (Alerts window, with sound; also in the Output window): heads-up five minutes before a likely signal,
-  BUY/SELL with stop, take-profit and breakeven prices, exits with the reason and P/L, and the 16:00 flat.
+  BUY/SELL with stop, take-profit and breakeven prices, and with orders off every change to make by hand: MOVE STOP,
+  MOVE TAKE-PROFIT, the breakout's entry with its stop and take-profit prices, its exit, "first close the breakout",
+  the 16:00 flat, and the evaluation's target (see "Trading it by hand on Apex").
 
 ## Before real money: run it in Playback
 
@@ -153,6 +177,11 @@ not identical: NinjaTrader's historical fills differ from the worst-case fills t
 - With the breakout on, on random 1-minute sessions (evaluation and funded, three seeds): **the account's trades
   are `research/combo_priority.py`'s, trade for trade**: the bot's trades all kept, the breakout's only in its
   gaps, cut or reversed at the bot's next entry, stopped, or flat at 16:00, with the same prices, sizes and P/L.
+- **Alerts only:** a simulated trader who does nothing but what the alert lines say (market orders the bar after,
+  the stop and take-profit they name, moved when told) ends up with exactly the trades the strategy places itself, to
+  the cent, evaluation and funded, with the breakout's take-profit at 8 stops and at 1 stop (so its fills are covered);
+  removing the MOVE STOP alerts or the breakout's 16:00 alert makes it fail. The evaluation's target from the
+  account: one "close everything" alert, no trade alerts after it, and the take-profit moved to the target's price.
 - With the evaluation's target: every trade before the one that reaches it is unchanged, that one exits at the
   target's price (a bot trade or a breakout trade), the total is at least the target, and nothing trades after; not on
   the funded account, and not in a historical run.

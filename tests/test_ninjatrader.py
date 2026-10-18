@@ -378,27 +378,30 @@ def rth_minutes(sessions: int, seed: int) -> pd.DataFrame:
     return df
 
 
-def combo_reference(bars: pd.DataFrame, funded: bool):
+def combo_reference(bars: pd.DataFrame, funded: bool, target_r: float = 8.0):
     """The bot's trades and the breakout's in its gaps, as research/combo_priority.py trades them; the breakout from
     the bot's fifteenth session (the strategy waits for its 14 sessions of history) and not on the skip dates."""
     bot = [(t.entry_bar, t.exit_bar, t.direction, t.entry, t.exit, t.pnl, t.reason)
            for t in run(bars, account(funded), minutes=1).trades]
     idx = bars.index.tz_convert(NY)
     first = sorted(set(idx.normalize()))[14]
-    w = [leg for leg in combo_live.williams_legs(bars, month_skip=False, skip_dates=NoiseConfig().skip_dates.split(","))
+    w = [leg for leg in combo_live.williams_legs(bars, month_skip=False, skip_dates=NoiseConfig().skip_dates.split(","),
+                                                 target_r=target_r)
          if idx[leg[0]] >= first]
     legs = combo_priority.priority(bars, [b[:6] + (4,) for b in bot], w)
     why = {b[0]: b[6] for b in bot}
     return sorted((a, b, d, en, ex, pnl, why.get(a, "breakout")) for a, b, d, en, ex, pnl, _ in legs)
 
 
+@pytest.mark.parametrize("target_r", [8.0, 1.0])
 @pytest.mark.parametrize("funded", [False, True])
 @pytest.mark.parametrize("seed", [3, 5, 9])
-def test_breakout_in_the_bots_gaps(sim, tmp_path, seed, funded):
+def test_breakout_in_the_bots_gaps(sim, tmp_path, seed, funded, target_r):
     bars = rth_minutes(60, seed)
-    trades, orders, _, _ = run_sim(sim, bars, tmp_path, minutes=1, breakout=True, Funded=funded, RoundPrices=False)
+    trades, orders, _, _ = run_sim(sim, bars, tmp_path, minutes=1, breakout=True, Funded=funded, RoundPrices=False,
+                                   BreakoutTarget=target_r)
     last_day = bars.index.tz_convert(NY).normalize()[-1]
-    ref = [r for r in combo_reference(bars, funded) if bars.index.tz_convert(NY)[r[0]].normalize() < last_day]
+    ref = [r for r in combo_reference(bars, funded, target_r) if bars.index.tz_convert(NY)[r[0]].normalize() < last_day]
     trades = [t for t in trades if bars.index.tz_convert(NY)[int(t[1])].normalize() < last_day]
     assert len(trades) == len(ref), (len(trades), len(ref))
     kinds = set()
@@ -407,13 +410,15 @@ def test_breakout_in_the_bots_gaps(sim, tmp_path, seed, funded):
         assert (int(rd), int(ra)) == (d, a), (row, (a, b, d, en, ex, pnl, why))
         if why == "breakout":
             kinds.add("cut" if rwhy == "Breakout: bot first" else "reversed" if rwhy == "Close position" else rwhy)
-            # a stop fills in its bar; a 16:00 exit and a cut fill at the next bar's open
-            assert int(rb) == b + (rwhy != "Stop loss"), (row, b)
+            # a stop or a take-profit fills in its bar; a 16:00 exit and a cut fill at the next bar's open
+            assert int(rb) == b + (rwhy not in ("Stop loss", "Profit target")), (row, b)
         else:
             assert int(rb) == b + (why in TIME_EXITS), (row, b, why)
         assert same(ren, en) and same(rex, ex), (row, en, ex)
         assert math.isclose(float(rpnl), pnl, abs_tol=1e-6), (row, pnl)
-    assert {"Stop loss", "Flat 16:00"} <= kinds, kinds
+    assert {"Stop loss", "Flat 16:00"} <= kinds or target_r < 2, kinds
+    if target_r < 2:
+        assert "Profit target" in kinds, kinds
     assert "cut" in kinds or "reversed" in kinds, kinds
     sizes = {int(o[3]) for o in orders if o[1] == "Enter" and o[2].startswith("W")}
     assert sizes and all(1 <= q <= 10 for q in sizes)
@@ -524,3 +529,130 @@ def test_bold_finish(sim, tmp_path):
     funded, _, _, _ = run_sim(sim, bars, tmp_path, minutes=1, breakout=True, RoundPrices=False, Funded=True)
     funded_b, _, _, _ = run_sim(sim, bars, tmp_path, minutes=1, breakout=True, RoundPrices=False, Funded=True, **bold)
     assert funded == funded_b, "not on the funded account"
+
+
+# ── Alerts only (orders off: the user clicks, as Apex's no-automation rule requires): a trader who does exactly what
+# the alerts say ends up with the strategy's own trades
+def follow_alerts(bars, printed, minutes=1):
+    """A manual trader on the stand-in's fill model, doing only what the alert lines say: a market order the bar after
+    an alert, the stop and take-profit it names attached from the fill, moved when told."""
+    import re
+    from zoneinfo import ZoneInfo
+
+    london = ZoneInfo("Europe/London")
+    ends = {}
+    for i, t in enumerate(bars.index.tz_convert(NY)):
+        ends[(t + pd.Timedelta(minutes=minutes)).tz_convert(london).strftime("%m/%d/%Y %H:%M:%S")] = i
+    by_bar = {}
+    for line in printed:
+        stamp, _, msg = line.partition("  ")
+        if stamp in ends:
+            by_bar.setdefault(ends[stamp], []).append(msg)
+    o, h, lo = bars.open.to_numpy(float), bars.high.to_numpy(float), bars.low.to_numpy(float)
+    c = bars.close.to_numpy(float)
+    tick = 0.25
+    pos = None  # dict(d, q, entry, bar, stop, tp)
+    pend_exit, pend_entry, trades = False, None, []
+
+    def close(i, px):
+        nonlocal pos
+        trades.append((pos["d"], pos["bar"], pos["entry"], i, px,
+                       round(pos["d"] * (px - pos["entry"]) * 2.0 * pos["q"] - 1.24 * pos["q"], 6)))
+        pos = None
+
+    num = r"(-?\d+(?:\.\d+)?)"
+    for i in range(len(c)):
+        if pend_exit and pos:
+            close(i, o[i] - pos["d"] * tick)
+        pend_exit = False
+        if pend_entry:
+            d, q, st, tp = pend_entry
+            if pos:  # a reversal: the old position goes first
+                close(i, o[i] - pos["d"] * tick)
+            pos = dict(d=d, q=q, entry=o[i] + d * tick, bar=i, stop=st, tp=tp)
+            pend_entry = None
+        if pos:
+            d, st, tp = pos["d"], pos["stop"], pos["tp"]
+            if pos["bar"] == i:
+                hit, px = (lo[i] <= st, min(o[i], st) - tick) if d > 0 else (h[i] >= st, max(o[i], st) + tick)
+            elif (d > 0 and o[i] <= st) or (d < 0 and o[i] >= st):
+                hit, px = True, o[i] - d * tick
+            else:
+                hit, px = (lo[i] <= st if d > 0 else h[i] >= st), st - d * tick
+            if hit:
+                close(i, px)
+            elif tp is not None and ((d > 0 and h[i] >= tp + tick) or (d < 0 and lo[i] <= tp - tick)):
+                close(i, tp)
+        for msg in by_bar.get(i, []):
+            m = re.search(r"(BUY|SELL) (\d+) MNQ .*?Stop " + num + r".*?(?:take-profit " + num + ")?[,.]", msg)
+            if ("BUY" in msg or "SELL" in msg) and "at market" in msg and m and "HEADS-UP" not in msg:
+                if msg.startswith("First CLOSE") and pos:
+                    pend_exit = True
+                d = 1 if m.group(1) == "BUY" else -1
+                tp = re.search(r"take-profit " + num, msg)
+                pend_entry = (d, int(m.group(2)), float(m.group(3)), float(tp.group(1)) if tp else None)
+                if pos and pos["d"] == d and not msg.startswith("First CLOSE"):
+                    pend_exit = True
+            elif msg.startswith("MOVE STOP") and pos:
+                pos["stop"] = float(re.search(r"stop to " + num, msg).group(1))
+                if (pos["d"] > 0 and pos["stop"] >= c[i]) or (pos["d"] < 0 and pos["stop"] <= c[i]):
+                    pend_exit = True  # a stop past the price can't rest: out at market
+            elif msg.startswith("MOVE TAKE-PROFIT") and pos:
+                pos["tp"] = float(re.search(r"take-profit to " + num, msg).group(1))
+            elif msg.startswith("FLAT") and pos:
+                pend_exit = True
+    return trades
+
+
+@pytest.mark.parametrize("target_r", [8.0, 1.0])
+@pytest.mark.parametrize("seed", [3, 5, 9])
+@pytest.mark.parametrize("funded", [False, True])
+def test_alerts_only_trader_matches_the_strategy(sim, tmp_path, seed, funded, target_r):
+    bars = rth_minutes(50, seed)
+    auto, _, _, _ = run_sim(sim, bars, tmp_path, minutes=1, breakout=True, Funded=funded, EvalTarget=0,
+                            BreakoutTarget=target_r)
+    _, orders, dash, printed = run_sim(sim, bars, tmp_path, minutes=1, breakout=True, Funded=funded, EvalTarget=0,
+                                       PlaceOrders=False, BreakoutTarget=target_r)
+    assert not [o for o in orders if o[1] == "Enter"], "alerts only: no orders"
+    manual = follow_alerts(bars, printed)
+    last = bars.index.tz_convert(NY).normalize()[-1]
+    keep = [t for t in auto if bars.index.tz_convert(NY)[int(t[1])].normalize() < last]
+    manual = [t for t in manual if bars.index.tz_convert(NY)[t[1]].normalize() < last]
+    assert len(manual) == len(keep), (len(manual), len(keep))
+    for m, a in zip(manual, keep, strict=True):
+        assert (m[0], m[1], m[3]) == (int(a[0]), int(a[1]), int(a[3])), (m, a)
+        assert math.isclose(m[2], float(a[2]), abs_tol=1e-6) and math.isclose(m[4], float(a[4]), abs_tol=1e-6), (m, a)
+        assert math.isclose(m[5], float(a[6]), abs_tol=1e-4), (m, a)
+
+
+def test_alerts_only_evaluation_target(sim, tmp_path):
+    """Alerts only, live: once the account itself is $3,000 up, one alert to close everything, no trade alerts after."""
+    bars = rth_minutes(40, 3)
+    _, _, _, before = run_sim(sim, bars, tmp_path, minutes=1, breakout=True, PlaceOrders=False,
+                              EvalTargetInHistory=True, SimNetLiq=52990)
+    assert not any("EVALUATION TARGET REACHED" in p for p in before)
+    _, _, dash, printed = run_sim(sim, bars, tmp_path, minutes=1, breakout=True, PlaceOrders=False,
+                                  EvalTargetInHistory=True, SimNetLiq=53000)
+    hit = [k for k, p in enumerate(printed) if "EVALUATION TARGET REACHED" in p]
+    assert len(hit) == 1 and "CLOSE EVERYTHING NOW" in printed[hit[0]]
+    later = printed[hit[0] + 1:]
+    assert not [p for p in later if "at market. Price" in p], "no trade alerts after the target"
+    assert "TARGET REACHED" in dash and "$3,000 of $3,000" not in dash and "$3000 of $3000" in dash
+
+
+def test_alerts_only_take_profit_at_the_evaluation_target(sim, tmp_path):
+    """Alerts only, live, the account $2,950 up: a position's take-profit is moved to the price that brings it to the
+    target ($3,000 + $25: $75 to go, 4 MNQ = 9.375 points from the price), when that is nearer than its own."""
+    bars = rth_minutes(40, 3)
+    _, _, _, printed = run_sim(sim, bars, tmp_path, minutes=1, breakout=True, PlaceOrders=False,
+                               EvalTargetInHistory=True, SimNetLiq=52950)
+    moves = [p for p in printed if "MOVE TAKE-PROFIT" in p]
+    assert moves, "the take-profit is moved to the target's price"
+    stamps = bars.index.tz_convert(NY).map(lambda t: (t + pd.Timedelta(minutes=1)).tz_convert("Europe/London")
+                                            .strftime("%m/%d/%Y %H:%M:%S"))
+    closes = dict(zip(stamps, bars.close, strict=True))
+    first = moves[0]
+    stamp, _, msg = first.partition("  ")
+    px = float(msg.split("take-profit to ")[1].split(" ")[0].rstrip("."))
+    assert abs(abs(px - closes[stamp]) - 9.375) <= 0.25, (first, closes[stamp])
+    assert not any("EVALUATION TARGET REACHED" in p for p in printed)

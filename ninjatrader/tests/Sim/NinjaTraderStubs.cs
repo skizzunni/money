@@ -36,6 +36,18 @@ namespace NinjaTrader.Cbi
 {
     public enum MarketPosition { Flat, Long, Short }
     public enum PerformanceUnit { Currency, Percent, Pips, Points, Ticks }
+    public enum AccountItem { CashValue, NetLiquidation, RealizedProfitLoss, UnrealizedProfitLoss }
+    public enum Currency { UsDollar }
+    // the account the strategy runs on: its net liquidation is $50,000 + the strategy's P/L, or SimNetLiq when set
+    public class Account
+    {
+        internal Func<double> Value;
+        public double Get(AccountItem item, Currency currency)
+        {
+            if (item != AccountItem.NetLiquidation) throw new NotSupportedException();
+            return Value();
+        }
+    }
     public enum OrderState { Initialized, Submitted, Accepted, Working, Filled, Cancelled, Rejected }
     public enum ErrorCode { NoError, OrderRejected }
     public class Position
@@ -164,6 +176,8 @@ namespace NinjaTrader.NinjaScript.Strategies
         public RealtimeErrorHandling RealtimeErrorHandling;
         public Position Position = new Position();
         public SystemPerformance SystemPerformance = new SystemPerformance();
+        public Account Account = new Account();
+        public double SimNetLiq { get; set; }  // tests: the account's net liquidation, whatever the strategy did
 
         // the fill model
         public double CommissionPerSide = 0.62;
@@ -291,6 +305,13 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (configure != null) configure(this);
             State = State.Configure; OnStateChange();
             State = State.DataLoaded; OnStateChange();
+            Account.Value = delegate
+            {
+                if (SimNetLiq > 0) return SimNetLiq;
+                double open = Position.MarketPosition == MarketPosition.Flat ? 0 :
+                    Position.GetUnrealizedProfitLoss(PerformanceUnit.Currency, Close[0]);
+                return 50000 + SystemPerformance.AllTrades.TradesPerformance.Currency.CumProfit + open;
+            };
             State = State.Historical; OnStateChange();
             double slip = SlippageTicks * TickSize;
             for (int i = 0; i < c.Count; i++)

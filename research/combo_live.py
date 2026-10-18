@@ -49,10 +49,12 @@ def bot_legs(bars, losers, lock_at, lock_plus):
     return [(t.entry_bar, t.exit_bar, t.direction, t.entry, t.exit, t.pnl, 4) for t in res.trades]
 
 
-def williams_legs(bars, month_skip=True, skip_dates=()):
+def williams_legs(bars, month_skip=True, skip_dates=(), target_r=None):
     """One Williams trade a session at most: (start bar, end bar, direction, entry, exit, pnl $, contracts).
     month_skip: no trade on the first session of a month (the rescaled index data's gap); skip_dates: no trade on
-    these days (yyyy-mm-dd; the NinjaTrader strategy's holiday and half-day list)."""
+    these days (yyyy-mm-dd; the NinjaTrader strategy's holiday and half-day list). target_r: a take-profit that many
+    stop distances from the fill (filled at its price once a bar trades a tick through it, the stop first in a bar
+    reaching both), as the NinjaTrader strategy's (round 130); None: none."""
     skip = {pd.Timestamp(x) for x in skip_dates}
     idx = bars.index.tz_convert(A.NY)
     tmin = (idx.hour * 60 + idx.minute).to_numpy()
@@ -91,10 +93,14 @@ def williams_legs(bars, month_skip=True, skip_dates=()):
             stop = entry - d * dist
             last = b - 1 if tmin[b - 1] < 960 else b - 2  # the 15:59 bar
             x, px = last, c[last] - d * TICK
+            tp = entry + d * target_r * dist if target_r else None
             for m in range(e, last + 1):
                 if (d > 0 and lo[m] <= stop) or (d < 0 and h[m] >= stop):
                     px = (min(o[m], stop) if d > 0 else max(o[m], stop)) - d * TICK
                     x = m
+                    break
+                if tp is not None and ((d > 0 and h[m] >= tp + TICK) or (d < 0 and lo[m] <= tp - TICK)):
+                    px, x = tp, m
                     break
             out.append((e, x, d, entry, px, q * (d * (px - entry) * PV - FEE), q))
             break
