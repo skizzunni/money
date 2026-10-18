@@ -65,6 +65,9 @@ account. Copy that account to others with a trade copier (Tradesyncer, or NinjaT
      loss and loser limit in the settings. For a **50K EOD Trail** evaluation set the evaluation side to **6 MNQ,
      $300, 3 losers** instead (3 x $300 stays under that plan's $1,000 daily loss limit).
      (Rounds 107-108 in [RESULTS.md](RESULTS.md) compare the two plans.)
+   - **Stop only ever tightens** (on; round 139): in a trade the stop moves only toward the price, never back,
+     even when the noise line steps back at a half hour (it does in about 29% of half-hour steps). More money a
+     week on the account in every period tested, the drawdown slightly smaller.
    - **Place orders:** on = the strategy trades (the default); off = alerts only. With orders on, live, the strategy
      compares the account's own MNQ position with its own at every bar close. If they differ for two bar closes (a
      position left open when the strategy was disabled or restarted, since NinjaTrader then cancels its stop and

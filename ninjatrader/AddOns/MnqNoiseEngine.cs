@@ -30,6 +30,7 @@ namespace NinjaTrader.NinjaScript.AddOns.MnqBot
         public double LockAt = 1.0;          // in max losses of profit; then the stop moves to entry + LockPlus
         public double LockPlus = 2.5;        // points
         public int MaxLosers = 4;            // no new entries after this many losers today; 0 = no limit
+        public bool TightenOnly = false;     // in a trade the stop never moves back toward the price (round 139)
     }
 
     public sealed class NoiseTrade
@@ -79,6 +80,8 @@ namespace NinjaTrader.NinjaScript.AddOns.MnqBot
         double dayOpen = double.NaN, prevClose = double.NaN, lastRthClose = double.NaN;
         int pendingKind, pendingDir;  // pendingKind 1: entry in pendingDir, 2: close; filled at the next bar's open
         double estPx = double.NaN;
+        double held = double.NaN;     // TightenOnly: the stop so far in this trade, and what set it
+        string heldWhy = "";
 
         public readonly List<NoiseTrade> Trades = new List<NoiseTrade>();
         public readonly List<NoiseEvent> Events = new List<NoiseEvent>();
@@ -152,6 +155,11 @@ namespace NinjaTrader.NinjaScript.AddOns.MnqBot
                 double lk = EntryPrice + p * s.LockPlus;
                 if ((p > 0 && lk > line) || (p < 0 && lk < line)) { line = lk; reason = "Lock"; }
             }
+            if (s.TightenOnly && !double.IsNaN(held) && ((p > 0 && held > line) || (p < 0 && held < line)))
+            {
+                line = held;
+                reason = heldWhy;
+            }
             return line;
         }
 
@@ -216,6 +224,8 @@ namespace NinjaTrader.NinjaScript.AddOns.MnqBot
             DayTrades++;
             Position = 0;
             Locked = false;
+            held = double.NaN;
+            heldWhy = "";
         }
 
         void Event(int i, string action)
@@ -266,6 +276,16 @@ namespace NinjaTrader.NinjaScript.AddOns.MnqBot
                 {
                     double lk = EntryPrice + p * s.LockPlus;
                     if ((p > 0 && lk > line) || (p < 0 && lk < line)) { line = lk; reason = "Lock"; }
+                }
+                if (s.TightenOnly)  // the stop placed with the entry is only ever tightened
+                {
+                    if (EntryBar != i && !double.IsNaN(held) && ((p > 0 && held > line) || (p < 0 && held < line)))
+                    {
+                        line = held;
+                        reason = heldWhy;
+                    }
+                    held = line;
+                    heldWhy = reason;
                 }
                 bool hit;
                 double price;

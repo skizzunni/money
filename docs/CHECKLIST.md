@@ -2,7 +2,7 @@
 
 Every requirement from the conversation, its status and the evidence. Status: **done** (verified), **partly**
 (improved, the stated goal not reached), **not met** (with why and what would change it), **open** (being worked on),
-**blocked** (needs something only the user can do). Last updated: October 18, 2026 (rounds through 136).
+**blocked** (needs something only the user can do). Last updated: October 18, 2026 (rounds through 139).
 
 ## The account and its rules
 

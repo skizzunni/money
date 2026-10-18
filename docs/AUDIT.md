@@ -156,8 +156,8 @@ is quoted from Apex's own help center in search results.
 | Breakout at $400 vs $200 | retain $400 for the account; know it is exposure | rounds 134, 137 |
 | Lock vs 1R trail | **reject** the trail | round 138 |
 | Lock vs half at 1R | reject as the default; **an option** if lower drawdown matters more than profit | round 138 |
-| Tighten-only stop (concern 10) | **continue investigating** | not yet tested on the current strategy |
-| Breakout's forced 1-contract rule (stage 5) | **continue investigating** | a rule change, not tested |
+| Tighten-only stop (concern 10) | **adopted, built in** | round 139: more on the account in all four periods, drawdown slightly smaller in all four; parity-tested on and off |
+| Breakout's forced 1-contract rule (stage 5) | **keep the rule** | round 139: skipping those trades nets less on the account in three periods |
 | Execution ledger and shared gate (stage 4) | **build next**, test in Playback | needs NinjaTrader's execution events |
 | 6 MNQ evaluation, funded breakout $300 | continue (round 133, 135 near-misses) | not the pre-registered picks |
 

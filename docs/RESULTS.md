@@ -2417,6 +2417,24 @@ cut the large winners the strategy lives on: net falls 29-50%. Half at 1R lowers
 periods (by 13-25%) for 31-38% less net: a trade of profit for smoothness, not an improvement; on the account it nets
 more only on 2019-25. The trail lowers the drawdown in three periods and nets less on the account in all four.
 
+## Round one hundred and thirty-nine: a stop that only tightens, and the breakout's over-budget contract
+
+`research/exits2.py`, the two rule changes the audit logged (docs/AUDIT.md: concern 10, the line stop stepping back
+toward the price in 28.8% of half-hour steps; stage 5, one breakout contract forced when it costs 1-1.5x its budget),
+judged as round 138. Account net $ a week at $100 (intraday drawdown):
+
+| | 2011-18 | 2019-25 | Jul 2025-Aug 2026 | NQ 2015-24 |
+|---|---|---|---|---|
+| now | $69.6 ($18,556) | $42.4 ($13,041) | $3.6 ($10,061) | $31.5 ($12,925) |
+| **tighten-only stop** | **$71.6** ($18,231) | **$44.9** ($13,006) | **$3.8** ($9,976) | **$37.5** ($12,779) |
+| skip an over-budget breakout | $65.2 ($19,032) | $36.9 ($12,819) | $3.8 ($10,061) | $29.9 ($11,943) |
+
+**Adopted: the stop only ever tightens.** More on the account in all four periods, the intraday drawdown slightly
+smaller in all four; the trading total itself barely moves (+$1,104, -$927, -$2,616, -$721). A small, consistent gain
+and a safer rule (a stop never moves back toward the price), not a new edge. Built into the NinjaTrader strategy and
+its engine ("Stop only ever tightens", on), verified trade for trade against the research model with it on and off,
+and the rule changes trades on the test bars. Skipping the over-budget breakout trade: not adopted.
+
 ## The first run in NinjaTrader itself: Strategy Analyzer, September 8 to October 16, 2026
 
 The user ran the strategy in NinjaTrader's Strategy Analyzer on real MNQ DEC26 1-minute data (18 Aug - 17 Oct 2026,
@@ -2551,6 +2569,7 @@ python research/slot_funded.py nsx1m_scaled.pkl nq1m_scaled.pkl        # funded 
 python research/vol_target.py nsx1m_scaled.pkl nq1m_scaled.pkl         # volatility-targeted size (not adopted)
 python research/components.py nsx1m_scaled.pkl nq1m_scaled.pkl         # the breakout's place (stays, shorts too)
 python research/exits.py nsx1m_scaled.pkl nq1m_scaled.pkl              # trail / half at 1R vs the lock (lock stays)
+python research/exits2.py nsx1m_scaled.pkl nq1m_scaled.pkl             # tighten-only stop (adopted)
 python research/nt_run_check.py data/nt_strategy_analyzer_2026-08-18_10-17.csv  # the NinjaTrader run
 ```
 

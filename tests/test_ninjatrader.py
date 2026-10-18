@@ -208,8 +208,8 @@ def run_sim(sim, bars: pd.DataFrame, tmp: Path, minutes: int = 5, breakout: bool
 
 TIME_EXITS = ("16:00 close", "Session ended")
 # the switch: a 50K evaluation trades 4 MNQ, $200, 3 losers a day; funded 4 MNQ, $200, 2 losers, the lock at 0.5 / +6.25
-ACCOUNTS = {False: dict(qty=4, max_loss_per_trade=200.0, max_losers=3),
-            True: dict(qty=4, max_loss_per_trade=200.0, max_losers=2, lock_at=0.5, lock_plus=6.25)}
+ACCOUNTS = {False: dict(qty=4, max_loss_per_trade=200.0, max_losers=3, tighten_only=True),
+            True: dict(qty=4, max_loss_per_trade=200.0, max_losers=2, lock_at=0.5, lock_plus=6.25, tighten_only=True)}
 
 
 def account(funded: bool, **kw) -> NoiseConfig:
@@ -1039,3 +1039,19 @@ def test_a_rejected_exit_is_sent_again(sim, tmp_path, refusals):
     assert closed.get(b + refusals + 1) == "Close: retry", (b, refusals, closed)
     assert sum("The exit is sent again at the next bar" in p for p in printed) == refusals
     assert sum("EXIT REJECTED, SENT AGAIN" in p for p in printed) == refusals
+
+
+@pytest.mark.parametrize("funded", [False, True])
+def test_tighten_only_matches_the_bot_and_changes_trades(sim, tmp_path, funded):
+    """Round 139: with the stop only ever tightening, the strategy's account trades are the Python bot's with
+    tighten_only, and with it off, the bot's without; the rule binds (the two differ) on these bars."""
+    changed = 0
+    for seed in (3, 5, 9):
+        bars = synth_bars(sessions=90, seed=seed)
+        on, _, _, _ = run_sim(sim, bars, tmp_path, Funded=funded, RoundPrices=False)
+        off, _, _, _ = run_sim(sim, bars, tmp_path, Funded=funded, RoundPrices=False, TightenOnly=False)
+        assert_strategy_matches(on, run(bars, account(funded)))
+        cfg = ACCOUNTS[funded] | {"tighten_only": False}
+        assert_strategy_matches(off, run(bars, NoiseConfig(**cfg, target_on_fill_bar=True)))
+        changed += on != off
+    assert changed, "the tighten-only rule changed some trade"

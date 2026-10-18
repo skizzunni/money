@@ -54,6 +54,8 @@ namespace NinjaTrader.NinjaScript.Strategies
         bool realLocked;            // the real position reached the lock trigger
         bool closingRejected;       // a rejection already sent the position to market
         bool exitRejected;          // one of the strategy's own exits was rejected: sent again at the next bar
+        double lastStop = double.NaN;  // TightenOnly: the bot's stop so far in this trade
+        double entryStopPts = double.NaN;  // the bot's bracket stop, points from the fill
         bool evalDone;              // the evaluation's target was reached: everything closed, no new trades
         double profitBase;          // the strategy's closed P/L when it went live (the history before doesn't count)
         const double EvalBuffer = 25.0;  // $ past the target, for the closing fees and a tick
@@ -148,6 +150,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 FundedBestDay = 0;
                 PayoutStopInHistory = false;
                 RememberPayoutCycle = true;
+                TightenOnly = true;    // the stop never moves back toward the price (docs/RESULTS.md round 139)
                 BreakoutTarget = 8;    // 8 x its stop = 2 x yesterday's range: a full bracket (docs/RESULTS.md round 130)
                 AccountStart = 50000;
 
@@ -173,6 +176,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 settings.LockAt = LockAt;
                 settings.LockPlus = LockPlus;
                 settings.MaxLosers = MaxLosers;
+                settings.TightenOnly = TightenOnly;
                 settings.Lookback = Lookback;
                 settings.FedNoShorts = FedNoShorts;
                 settings.SkipDates = SkipDates ?? "";
@@ -555,6 +559,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 closingRejected = false;
                 exitRejected = false;
                 owner = Nobody;
+                lastStop = double.NaN;
             }
             else if (exitRejected)
             {
@@ -623,6 +628,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                     else ExitShort("Breakout: bot first", WShortName);
                 }
                 SetStopLoss(name, CalculationMode.Ticks, StopTicks(o.Direction * (o.Expected - o.Stop)), false);
+                entryStopPts = StopTicks(o.Direction * (o.Expected - o.Stop)) * TickSize;
+                lastStop = double.NaN;
                 double tpPts = double.IsNaN(o.Target) ? double.NaN : o.Direction * (o.Target - o.Expected);
                 double evalPts = EvalPoints(BotQty);
                 if (!double.IsNaN(evalPts) && (double.IsNaN(tpPts) || evalPts < tpPts))
@@ -691,6 +698,14 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (double.IsNaN(stop))
                 return;
             stop = RoundStop(real, stop);
+            if (TightenOnly)  // never back toward the price: the tighter of this and the stop it already had
+            {
+                if (double.IsNaN(lastStop) && !double.IsNaN(entryStopPts))
+                    lastStop = avg - real * entryStopPts;  // the bracket sent with the entry
+                if (!double.IsNaN(lastStop) && ((real > 0 && lastStop > stop) || (real < 0 && lastStop < stop)))
+                    stop = lastStop;
+                lastStop = stop;
+            }
             double px = Close[0];
             if (State == State.Realtime)
                 px = real > 0 ? Math.Min(px, GetCurrentBid()) : Math.Max(px, GetCurrentAsk());
@@ -1263,6 +1278,10 @@ namespace NinjaTrader.NinjaScript.Strategies
         [Range(0.0, 100000.0)]
         [Display(Name = "Funded: best day since the last payout, $", Order = 19, GroupName = "1. Account")]
         public double FundedBestDay { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Stop only ever tightens (never moves back toward the price; round 139)", Order = 21, GroupName = "1. Account")]
+        public bool TightenOnly { get; set; }
 
         [NinjaScriptProperty]
         [Display(Name = "Funded: remember the payout cycle in a file (a restart goes on from it; new settings above replace it)", Order = 20, GroupName = "1. Account")]
