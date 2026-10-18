@@ -1,0 +1,206 @@
+diff --git a/ninjatrader/AddOns/MnqNoiseEngine.cs b/ninjatrader/AddOns/MnqNoiseEngine.cs
+index 061bb0b..2ce8ec9 100644
+--- a/ninjatrader/AddOns/MnqNoiseEngine.cs
++++ b/ninjatrader/AddOns/MnqNoiseEngine.cs
+@@ -29,6 +29,8 @@ namespace NinjaTrader.NinjaScript.AddOns.MnqBot
+         public double TakeProfit = 1.5;      // noise units from the fill; 0 = off
+         public double LockAt = 1.0;          // in max losses of profit; then the stop moves to entry + LockPlus
+         public double LockPlus = 2.5;        // points
++        public double Lock2At = 0.0;         // second lock step, in max losses of profit (0 = off); then the stop moves
++        public double Lock2Plus = 0.0;       // to entry + this many points (docs/DEVELOPMENT.md)
+         public int MaxLosers = 4;            // no new entries after this many losers today; 0 = no limit
+         public bool TightenOnly = false;     // in a trade the stop never moves back toward the price (round 139)
+     }
+@@ -95,7 +97,7 @@ namespace NinjaTrader.NinjaScript.AddOns.MnqBot
+         public double EntryPrice;
+         public int EntryBar;
+         public double Upper = double.NaN, Lower = double.NaN, Sigma = double.NaN;
+-        public bool Locked, SkipToday, FedToday;
++        public bool Locked, Locked2, SkipToday, FedToday;
+         public int LosersToday;
+         public double DayPnl;              // closed P/L today, $
+         public int DayTrades;
+@@ -127,6 +129,10 @@ namespace NinjaTrader.NinjaScript.AddOns.MnqBot
+         public int PendingEntry { get { return pendingKind == 1 ? pendingDir : 0; } }
+         public int SessionsLoaded { get { return Math.Min(filled, s.Lookback); } }
+         public double CapPoints { get { return s.MaxLoss > 0 ? s.MaxLoss / s.Qty / s.PointValue : double.NaN; } }
++        public double Lock2Points
++        {
++            get { return s.Lock2At > 0 && s.MaxLoss > 0 ? s.Lock2At * s.MaxLoss / s.Qty / s.PointValue : double.NaN; }
++        }
+         public double LockPoints
+         {
+             get { return s.LockAt > 0 && s.MaxLoss > 0 ? s.LockAt * s.MaxLoss / s.Qty / s.PointValue : double.NaN; }
+@@ -162,6 +168,11 @@ namespace NinjaTrader.NinjaScript.AddOns.MnqBot
+                 double lk = EntryPrice + p * s.LockPlus;
+                 if ((p > 0 && lk > line) || (p < 0 && lk < line)) { line = lk; reason = "Lock"; }
+             }
++            if (Locked2)
++            {
++                double lk2 = EntryPrice + p * s.Lock2Plus;
++                if ((p > 0 && lk2 > line) || (p < 0 && lk2 < line)) { line = lk2; reason = "Lock"; }
++            }
+             if (s.TightenOnly && !double.IsNaN(held) && ((p > 0 && held > line) || (p < 0 && held < line)))
+             {
+                 line = held;
+@@ -231,6 +242,7 @@ namespace NinjaTrader.NinjaScript.AddOns.MnqBot
+             DayTrades++;
+             Position = 0;
+             Locked = false;
++            Locked2 = false;
+             held = double.NaN;
+             heldWhy = "";
+         }
+@@ -284,6 +296,11 @@ namespace NinjaTrader.NinjaScript.AddOns.MnqBot
+                     double lk = EntryPrice + p * s.LockPlus;
+                     if ((p > 0 && lk > line) || (p < 0 && lk < line)) { line = lk; reason = "Lock"; }
+                 }
++                if (Locked2)
++                {
++                    double lk2 = EntryPrice + p * s.Lock2Plus;
++                    if ((p > 0 && lk2 > line) || (p < 0 && lk2 < line)) { line = lk2; reason = "Lock"; }
++                }
+                 if (s.TightenOnly)  // the stop placed with the entry is only ever tightened
+                 {
+                     if (EntryBar != i && !double.IsNaN(held) && ((p > 0 && held > line) || (p < 0 && held < line)))
+@@ -333,6 +350,12 @@ namespace NinjaTrader.NinjaScript.AddOns.MnqBot
+                 double trigger = s.LockAt * s.MaxLoss / s.Qty / s.PointValue;
+                 Locked = Position * ((Position > 0 ? h : l) - EntryPrice) >= trigger;
+             }
++            if (Position != 0 && !Locked2 && s.Lock2At > 0 && s.MaxLoss > 0)
++            {
++                // the second step arms the same way, at Lock2At max losses of profit, from the next bar
++                double trigger2 = s.Lock2At * s.MaxLoss / s.Qty / s.PointValue;
++                Locked2 = Position * ((Position > 0 ? h : l) - EntryPrice) >= trigger2;
++            }
+ 
+             if (Position != 0 && (!inRth || tMin == RthOpen))  // a session ended early (half day, data gap)
+             {
+diff --git a/ninjatrader/Strategies/MnqNoiseMomentum.cs b/ninjatrader/Strategies/MnqNoiseMomentum.cs
+index a60ba41..412288a 100644
+--- a/ninjatrader/Strategies/MnqNoiseMomentum.cs
++++ b/ninjatrader/Strategies/MnqNoiseMomentum.cs
+@@ -53,6 +53,7 @@ namespace NinjaTrader.NinjaScript.Strategies
+         int minutes;
+         bool badChart;
+         bool realLocked;            // the real position reached the lock trigger
++        bool realLocked2;           // ... and the second lock step's (SecondLockAt; off by default)
+         bool closingRejected;       // a rejection already sent the position to market
+         bool exitRejected;          // one of the strategy's own exits was rejected: sent again at the next bar
+         double lastStop = double.NaN;  // TightenOnly: the bot's stop so far in this trade
+@@ -167,6 +168,8 @@ namespace NinjaTrader.NinjaScript.Strategies
+                 DailyMaxLosers = 0;    // shared daily gate, both setups (docs/VERIFICATION.md): off by default
+                 DailyLossLimit = 0;
+                 PartialAtR = 0;        // half off at 1R: frozen for the forward test, off by default
++                SecondLockAt = 0;      // second lock step (candidate B2, docs/DEVELOPMENT.md): off by default
++                SecondLockPlus = 25;
+                 Diagnostics = false;
+                 BreakoutTarget = 8;    // 8 x its stop = 2 x yesterday's range: a full bracket (docs/RESULTS.md round 130)
+                 AccountStart = 50000;
+@@ -197,6 +200,8 @@ namespace NinjaTrader.NinjaScript.Strategies
+                 settings.StopBuffer = StopBuffer;
+                 settings.LockAt = LockAt;
+                 settings.LockPlus = LockPlus;
++                settings.Lock2At = SecondLockAt;
++                settings.Lock2Plus = SecondLockPlus;
+                 settings.MaxLosers = MaxLosers;
+                 settings.TightenOnly = TightenOnly;
+                 settings.Lookback = Lookback;
+@@ -803,6 +808,7 @@ namespace NinjaTrader.NinjaScript.Strategies
+             if (real == 0)
+             {
+                 realLocked = false;
++                realLocked2 = false;
+                 closingRejected = false;
+                 exitRejected = false;
+                 owner = Nobody;
+@@ -913,6 +919,7 @@ namespace NinjaTrader.NinjaScript.Strategies
+                 botSent = true;
+                 owner = Bot;
+                 realLocked = false;
++                realLocked2 = false;
+                 closingRejected = false;
+                 return;
+             }
+@@ -965,6 +972,9 @@ namespace NinjaTrader.NinjaScript.Strategies
+             double lockPts = engine.LockPoints;
+             if (!realLocked && !double.IsNaN(lockPts))
+                 realLocked = real * ((real > 0 ? High[0] : Low[0]) - avg) >= lockPts;
++            double lock2Pts = engine.Lock2Points;
++            if (!realLocked2 && !double.IsNaN(lock2Pts))
++                realLocked2 = real * ((real > 0 ? High[0] : Low[0]) - avg) >= lock2Pts;
+             double stop = RealStop(real, avg);
+             if (double.IsNaN(stop))
+                 return;
+@@ -1031,6 +1041,11 @@ namespace NinjaTrader.NinjaScript.Strategies
+                 double cap = avg - d * MaxLoss / Qty / settings.PointValue;
+                 if ((d > 0 && cap > line) || (d < 0 && cap < line)) line = cap;
+             }
++            if (realLocked2)
++            {
++                double lk2 = avg + d * SecondLockPlus;
++                if ((d > 0 && lk2 > line) || (d < 0 && lk2 < line)) line = lk2;
++            }
+             if (realLocked)
+             {
+                 double lk = avg + d * LockPlus;
+@@ -1272,7 +1287,8 @@ namespace NinjaTrader.NinjaScript.Strategies
+             Print("MNQ settings: account " + (Account == null ? "none" : Account.Name) + ", " + Book + " (from " +
+                   accountTypeFrom + "), PlaceOrders " + PlaceOrders + ", " + Qty + " MNQ, max loss " + Usd(MaxLoss) +
+                   ", losers " + MaxLosers + ", Lookback " + Lookback + ", DailyLossLimit " + DailyLossLimit +
+-                  ", DailyMaxLosers " + DailyMaxLosers + ", PartialAtR " + PartialAtR + ", TightenOnly " + TightenOnly +
++                  ", DailyMaxLosers " + DailyMaxLosers + ", PartialAtR " + PartialAtR + ", SecondLock " + SecondLockAt + "/" +
++                  SecondLockPlus + ", TightenOnly " + TightenOnly +
+                   ", UseBreakout " + UseBreakout + " (risk " + Usd(Funded ? BreakoutRisk : EvalBreakoutRisk) + ", shorts " +
+                   BreakoutShorts + ")");
+             Print("MNQ settings: history controls: EvalTarget " + EvalTarget + " in history " + EvalTargetInHistory +
+@@ -1814,6 +1830,16 @@ namespace NinjaTrader.NinjaScript.Strategies
+         [Display(Name = "Bot: close half at this many R from the fill (R = the initial risk; 0 = off)", Order = 24, GroupName = "1. Account")]
+         public double PartialAtR { get; set; }
+ 
++        [NinjaScriptProperty]
++        [Range(0.0, 20.0)]
++        [Display(Name = "Second lock: at this many max losses of profit (0 = off; candidate B2: 2)", Order = 8, GroupName = "2. Exits")]
++        public double SecondLockAt { get; set; }
++
++        [NinjaScriptProperty]
++        [Range(0.0, 500.0)]
++        [Display(Name = "Second lock: moves the stop to entry + points (candidate B2: 25)", Order = 9, GroupName = "2. Exits")]
++        public double SecondLockPlus { get; set; }
++
+         [NinjaScriptProperty]
+         [Range(0, 100)]
+         [Display(Name = "Daily gate, both setups: no entry after this many losing trades today (0 = off)", Order = 22, GroupName = "1. Account")]
+diff --git a/tests/test_ninjatrader.py b/tests/test_ninjatrader.py
+index 76f64ad..1b9fadd 100644
+--- a/tests/test_ninjatrader.py
++++ b/tests/test_ninjatrader.py
+@@ -1339,3 +1339,28 @@ def test_breakout_shorts_off_removes_only_the_breakout_shorts(sim, tmp_path, see
+     off = named({"UseBreakout": True, "BreakoutShorts": False})
+     assert any(x[-1] == "W Short" for x in base)
+     assert off == [x for x in base if x[-1] != "W Short"]
++
++
++@pytest.mark.parametrize("seed", [3, 5])
++def test_second_lock_step(sim, tmp_path, seed):
++    """Candidate B2 (docs/DEVELOPMENT.md): off (0, the default) the trades are the control's exactly; at 2 / 25, once a
++    position's best point reaches 50 points (2 max losses of 4 MNQ at $200) by a bar's close, every later stop exit
++    is at entry + 25 or better (less a tick of slippage), and the change does alter trades."""
++    bars = rth_minutes(40, seed)
++    base, _, _, _ = run_sim(sim, bars, tmp_path, minutes=1, breakout=False, RoundPrices=False)
++    off, _, _, _ = run_sim(sim, bars, tmp_path, minutes=1, breakout=False, RoundPrices=False, SecondLockAt=0)
++    on, _, _, printed = run_sim(sim, bars, tmp_path, minutes=1, breakout=False, RoundPrices=False, SecondLockAt=2,
++                                SecondLockPlus=25)
++    assert off == base and on != base
++    assert any("SecondLock 2/25" in p for p in printed if p.startswith("MNQ settings:"))
++    h, lo = bars.high.to_numpy(float), bars.low.to_numpy(float)
++    checked = 0
++    for d, eb, en, xb, ex, why, _ in on:
++        d, eb, xb, en, ex = int(d), int(eb), int(xb), float(en), float(ex)
++        if why != "Stop loss" or xb <= eb:
++            continue
++        best = (h[eb:xb].max() - en) if d > 0 else (en - lo[eb:xb].min())
++        if best >= 50:
++            checked += 1
++            assert d * (ex - en) >= 25 - 0.25 - 1e-9, (d, eb, en, xb, ex, best)
++    assert checked, "some trades reached the second step on these bars"

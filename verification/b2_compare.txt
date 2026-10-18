@@ -1,0 +1,25 @@
+done development: NQ 2015-03..2020-12: first counted session 2015-03-02, 52 sessions with missing minutes
+done validation: NQ 2021-01..2025-06: first counted session 2021-01-04, 42 sessions with missing minutes
+done validation: index 2025-07..2026-09: first counted session 2025-07-01, 53 sessions with missing minutes
+
+development: NQ 2015-03..2020-12
+         arm  slippage  trades   net $  profit factor  avg win  avg loss  closed DD  losing streak  worst day  eval starts  pass  fail  expired  seq-dependent  unresolved  pass %  fail %  median days to pass back-to-back pass/fail/expired
+   control B         1    2743 62455.2            1.2    240.1    -202.5    13170.8             11     -628.8         1505   461   877      152              0          15    30.9    58.9                 12.0                       40/79/14
+   control B         2    2727 51094.8            1.2    240.1    -204.1    14870.8             11     -634.8         1505   435   911      144              0          15    29.2    61.1                 11.0                       39/83/12
+candidate B2         1    2941 58570.4            1.2    234.2    -202.8    10186.4             11     -628.8         1505   450   814      226              0          15    30.2    54.6                 14.0                       36/66/17
+candidate B2         2    2922 49108.8            1.2    235.3    -204.4    12584.4             11     -634.8         1505   413   880      197              0          15    27.7    59.1                 14.0                       32/78/13
+
+validation: NQ 2021-01..2025-06
+         arm  slippage  trades   net $  profit factor  avg win  avg loss  closed DD  losing streak  worst day  eval starts  pass  fail  expired  seq-dependent  unresolved  pass %  fail %  median days to pass back-to-back pass/fail/expired
+   control B         1    2253 48719.2            1.2    246.1    -204.3    10410.4              9     -628.8         1157   374   723       42              0          18    32.8    63.5                 11.0                        39/82/4
+   control B         2    2246 40662.4            1.2    244.4    -206.5    11115.2              9     -634.8         1157   362   733       43              0          19    31.8    64.4                 11.0                        37/83/4
+candidate B2         1    2474 32813.6            1.1    228.9    -204.5     9185.2              9     -628.8         1157   278   740      118              0          21    24.5    65.1                 12.5                        24/67/8
+candidate B2         2    2460 24486.0            1.1    228.4    -206.7     9477.6              9     -634.8         1157   280   750      106              0          21    24.6    66.0                 13.0                        24/70/8
+
+validation: index 2025-07..2026-09
+         arm  slippage  trades  net $  profit factor  avg win  avg loss  closed DD  losing streak  worst day  eval starts  pass  fail  expired  seq-dependent  unresolved  pass %  fail %  median days to pass back-to-back pass/fail/expired
+   control B         1     492 3278.8            1.1    208.7    -205.5     9911.6              7     -628.8          323    68   201       48              0           6    21.5    63.4                 10.0                         5/15/5
+   control B         2     487 2292.8            1.0    210.2    -206.8    10349.2              7     -634.8          323    56   216       45              0           6    17.7    68.1                  9.0                         5/15/5
+candidate B2         1     510 5712.0            1.1    229.8    -205.7     8907.6              7     -628.8          323    54   171       92              0           6    17.0    53.9                  9.0                          4/9/8
+candidate B2         2     506 4124.4            1.1    230.3    -207.1     9618.8              7     -634.8          323    54   175       88              0           6    17.0    55.2                  9.0                         4/10/7
+exit 0
