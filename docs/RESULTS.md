@@ -2323,6 +2323,23 @@ funded account" 300) and is to be re-tested on new weeks before it becomes the d
 on the same side (more risk on the breakout, more size in the evaluation): taken together that is a pattern, but each
 was found on data already used several times, which is why none is adopted after the fact.
 
+## Round one hundred and thirty-six: volatility-targeted size
+
+`research/vol_target.py`. Moreira and Muir (2017): scale exposure by the inverse of recent volatility. Each session's
+size multiple = (median of the 14-session average range over all earlier sessions) / (the last 14 sessions' average
+range), clipped; the whole day scaled, evaluation and funded; bar as rounds 133-135.
+
+| Net $ a week at $100 (funded day Sharpe) | 2011-18 | 2019-25 | Jul 2025-Aug 2026 | NQ 2015-24 |
+|---|---|---|---|---|
+| now | $69.6 (0.095) | $42.4 (0.080) | $3.6 (0.023) | $31.5 (0.084) |
+| vol, 0.5-1.0x | $61.2 (0.101) | $31.0 (0.085) | $5.4 (0.021) | $30.5 (0.086) |
+| vol, 0.75-1.25x | $60.2 (0.098) | $37.7 (0.084) | -$4.1 (0.025) | $27.7 (0.085) |
+| vol, 0.5-1.5x | $65.2 (0.099) | $39.9 (0.086) | -$2.7 (0.024) | $30.1 (0.084) |
+
+**Not adopted** (the pick is the current setting). Volatility targeting lifts the return for the risk by about 6%
+(0.095 to 0.101 a day), against the roughly 3x the $1,500 a week would need (docs/CHECKLIST.md, "the arithmetic"), and
+the smaller average size nets less a week. The strategy's daily Sharpe is set by its edge, not by how it is sized.
+
 ## A check on real MNQ futures data, September 21 to October 15, 2026
 
 Yahoo's last 60 days of MNQ 5-minute bars (from 7 August 2026) let the Python reference run on real futures prices ([`research/yahoo_forward.py`](../research/yahoo_forward.py)). From 21 September, the first day with 14 sessions of history, it reproduces the TradingView trade log a user sent for 12 and 14 October: the same trades, entries within a tick or two, the take-profits at +$3,067 and +$3,771 against TradingView's +$3,067.60 and +$3,767.60. Most of October is newer than any data used in the rounds above.
@@ -2451,6 +2468,7 @@ python research/accounts_needed.py nsx1m_scaled.pkl nq1m_scaled.pkl 260 # $ a we
 python research/slot_size.py nsx1m_scaled.pkl nq1m_scaled.pkl          # sizes judged per week (6 MNQ eval: setting, not default)
 python research/slot_eval.py nsx1m_scaled.pkl nq1m_scaled.pkl          # breakout $400 in the evaluation (adopted)
 python research/slot_funded.py nsx1m_scaled.pkl nq1m_scaled.pkl        # funded settings per week (none adopted)
+python research/vol_target.py nsx1m_scaled.pkl nq1m_scaled.pkl         # volatility-targeted size (not adopted)
 ```
 
 The raw data isn't stored in this repo.

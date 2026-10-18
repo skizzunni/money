@@ -2,7 +2,7 @@
 
 Every requirement from the conversation, its status and the evidence. Status: **done** (verified), **partly**
 (improved, the stated goal not reached), **not met** (with why and what would change it), **open** (being worked on),
-**blocked** (needs something only the user can do). Last updated: October 18, 2026 (rounds through 135).
+**blocked** (needs something only the user can do). Last updated: October 18, 2026 (rounds through 136).
 
 ## The account and its rules
 
@@ -86,7 +86,7 @@ probability about exp(-2 m 2000 / s^2) before drifting away from it. Size only c
 
 ## Failed approaches (and why), so they are not repeated
 
-Sizing up on any signal (busts the trail: 63, 76, 102, 111, 125); safety rules that cut risk (give-back stop, thin
+Sizing up on any signal (busts the trail: 63, 76, 102, 111, 125); volatility-targeted size (+6% Sharpe, less a week: 136); safety rules that cut risk (give-back stop, thin
 cushion, locks: time runs out instead: 103, 112, 113, 115, 118); new setups that held in history but not in 2025-26
 (overnight drift 104-106, 114; overnight-range breakout 120; gap and go 71-72); filters (wick, touch, shorts: 76-77,
 117, 118). The method errors found and fixed: passes counted only at a trade's close (124); the same-minute high/low
