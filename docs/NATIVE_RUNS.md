@@ -140,3 +140,112 @@ None is expected, because nothing trades before the engine is ready.
 2. Rerun 8/9 to 10/17 with that run's settings. Those settings must come from the user: a screenshot or template, if
    one survives.
 3. Send its Output and Log tab.
+
+## 6. Status of the nine runs, and B frozen
+
+**The nine runs are completed** (docs/REFERENCE.md section 4c), but they were started on 9/11, not 8/20, so they
+cover 10/1 to 10/16 (12 sessions).
+
+**B leads at every slippage:**
+
+| Slippage | B net | A net | B drawdown | A drawdown | B / A longest losing streak |
+|---|---:|---:|---:|---:|---|
+| 1 tick | $4,646.00 | $2,433.80 | $828.00 | $2,709.20 | 3 / 7 |
+
+The whole difference is eight breakout trades.
+
+**B, frozen as a candidate** (no filter, exit, size or momentum-long change on this sample):
+- **Code:** the two files at the sha256 in section 0.
+- **Settings:** section 1's, with "Breakout in the bot's gaps" off ("Breakout shorts" is then unused).
+
+**Still to collect for these nine runs:**
+- each run's Trades export;
+- the B and C runs' Output;
+- the settings screenshots.
+
+These confirm the switches and the warm-up trade by trade. The summaries already agree with them (section 4c).
+
+## 7. Next: A and B over the longest native MNQ history (proposed; the user runs)
+
+**Runs:** A_L1 and B_L1 (1 tick), then A_L0, B_L0, A_L2, B_L2. Section 1's settings, except Start and End.
+- **Start 1/1/2026, End 10/17/2026:** the same request as the 172-trade reference.
+- **Commission on.**
+
+**What that loads** (known from the reference's Output; each run's own Output confirms it):
+
+| Item | Value |
+|---|---|
+| First bar | 5/3/2026 18:01 New York (no MNQ DEC26 data before) |
+| Warm-up | 5/4 to 5/21 (14 sessions); engine ready 5/21 16:00 |
+| Data holes | 5/22 to 6/26 (24 sessions, no bars at all); 8/31 (no 09:30 bar) |
+| Short sessions | 9/7 (Labor Day, early close; also on the skip list) |
+| First tested session | 6/29 |
+| Tested period | 6/29 to 10/16, about 74 sessions, July included |
+
+**6/29 is the first session after the hole:** its "yesterday" is 5/21. Results are reported with it and, separately
+and retrospectively, without it (`native_abc.py <folder> - 2026-06-29`).
+
+**Contract:** MNQ DEC26 throughout, as in the reference. Before the 9/10 roll that is the deferred contract, not the
+one an account would have traded. To check that this does not drive the result, add one more A/B pair (L1 only) on
+NinjaTrader's merged series (Tools → Options → Market Data → Merge policy "Merge back adjusted", same instrument).
+Report which is which.
+
+**Files per run:** as in section 3 (output, summary, trades, settings). Name them A_L1_output.txt etc.
+
+**Reported** (`native_abc.py`), A beside B:
+- net after costs;
+- monthly results, July included;
+- losing streaks;
+- closed-trade drawdown;
+- intraday risk, estimated from each trade's MAE;
+- worst day;
+- components;
+- slippage sensitivity.
+
+Then the Apex 50K evaluation replay: $3,000 target, $2,000 intraday trailing loss, 30 calendar days, every start
+date, overlapping and so not independent. Passes, fails and expirations are reported separately from the continuous
+profit.
+
+**If B's advantage disappears over this period, that is reported plainly, and B is not adopted.**
+
+## 8. Then: a forward simulation, defined now (starts only after section 7)
+
+**Accounts and code:**
+- **Arms:** A and B as frozen, each on its own simulation account: "SimA" and "SimB", created in the Control Center
+  under Accounts.
+- **Start balance:** $50,000 each.
+- **Commission:** a template of $0.95 a side assigned to both accounts.
+- **Code:** the section 0 files. No edit, recompile or setting change during the test.
+
+**Settings:** section 1's, plus:
+- **Place orders on.**
+- **EvalTarget 0 in both arms.** The test measures continuous performance; the evaluation's target would stop an arm
+  partway.
+- **FUNDED off.**
+- **1-minute MNQ front-month chart per arm, same data connection.** At the December roll, both arms switch to MAR27
+  after the same session's close.
+
+**Duration:**
+- **Pilot: 20 sessions.** Checks operation only: fills, stops present, flat by 16:00, Output and executions
+  reconciling.
+- **Decision review: after 40 sessions, and at least 60 completed positions in A.**
+
+**Daily reconciliation:**
+- each arm's Executions export and Output;
+- every position has a stop from its fill;
+- the account and strategy positions agree;
+- every execution is explained by an Output line.
+
+**Stop the test only for an operational fault:**
+- a position without a stop;
+- an execution the Output does not explain;
+- a runtime error or a disabled strategy;
+- an account/strategy mismatch.
+
+It is never stopped because one arm looks better.
+
+**Decided now:**
+- **B is retained over A** only if, after 40 sessions, B's net after costs is at least A's **and** B's closed-trade
+  drawdown is no larger.
+- Otherwise the result is insufficient evidence, and A stays the reference.
+- Either way it is a small sample. It is an operational and directional check, not proof of a live edge.

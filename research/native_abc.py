@@ -1,6 +1,6 @@
 """The nine native NinjaTrader runs A / B / C x slippage 0 / 1 / 2 (docs/NATIVE_RUNS.md), compared.
 
-    python research/native_abc.py <folder> [<out.csv>]
+    python research/native_abc.py <folder> [<out.csv>] [<flag days, yyyy-mm-dd,...>]
 
 The folder holds, per run (A_S0 ... C_S2): <run>_output.txt (its own NinjaScript Output), <run>_trades.csv (the
 Strategy Analyzer's Trades export) and <run>_summary.csv. Checked first, per run: the code's settings lines are the
@@ -12,7 +12,9 @@ positions and contracts, profit factor, $ a position, average win / loss, closed
 an intraday estimate (closed equity before each trade less its MAE: the trade's worst point, from NinjaTrader's own
 MAE), losing streak, worst day, components (entry name), months, the largest winners' share; and between runs: the
 cost of each tick of slippage, and which entries differ between configurations (expected: B = A's momentum trades,
-C = A without its "W Short" trades; any other difference is listed).
+C = A without its "W Short" trades; any other difference is listed). Flag days (e.g. the first session after a data
+hole, whose "yesterday" is weeks old): every run is also measured without the trades entered on them, a retrospective
+data-quality view reported beside the full one, never instead of it. Months: net after costs by exit month.
 """
 from __future__ import annotations
 
@@ -93,7 +95,8 @@ def keys(t: pd.DataFrame) -> set:
 
 def main() -> None:
     folder = Path(sys.argv[1])
-    out = Path(sys.argv[2]) if len(sys.argv) > 2 else None
+    out = Path(sys.argv[2]) if len(sys.argv) > 2 and sys.argv[2] != "-" else None
+    flag = pd.to_datetime(sys.argv[3].split(",")) if len(sys.argv) > 3 else pd.DatetimeIndex([])
     have = [r for r in RUNS if (folder / f"{r}_trades.csv").exists()]
     missing = [r for r in RUNS if r not in have]
     if missing:
@@ -124,10 +127,19 @@ def main() -> None:
             print(f"{r}: {len(early)} trades before the eligible period (not counted): {early.entry_time.min()}")
         rows.append({"run": r, **metrics(t[~t.index.isin(early.index)])})
     df = pd.DataFrame(rows).set_index("run")
+    eligible = {r: trades[r][trades[r].entry_time >= start] if pd.notna(start) else trades[r] for r in have}
     pd.set_option("display.width", 300)
     pd.set_option("display.max_columns", 40)
     print("\n== Per run, eligible period, after commission")
     print(df.round(1).T.to_string())
+    if len(flag):
+        print(f"\n== Without trades entered on the flag days {[d.date() for d in flag]} (retrospective view)")
+        print(pd.DataFrame({r: metrics(t[~t.entry_time.dt.normalize().isin(flag)]) for r, t in eligible.items()})
+              .round(1).loc[["positions", "net $", "closed DD", "intraday DD (MAE est.)", "losing streak",
+                             "worst day"]].to_string())
+    print("\n== Net $ after costs by exit month")
+    print(pd.DataFrame({r: t.groupby(t.exit_time.dt.to_period("M")).net.sum() for r, t in eligible.items()})
+          .fillna(0).round(1).to_string())
     print("\n== Slippage: net $ change per configuration")
     for c in "ABC":
         if all(f"{c}_S{s}" in df.index for s in (0, 1, 2)):

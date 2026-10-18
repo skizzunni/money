@@ -286,6 +286,62 @@ stop-loss exit.
 - 9/11 to 9/30: 38 trades, +$8,435 before costs. This window is not covered by these four runs.
 - 10/1 to 10/16: 28 trades, +$2,678.50.
 
+## 4c. Native A / B / C, 9 runs - executed by the user in NinjaTrader; COMPLETED (for the period traded)
+
+**Files:** the nine summaries are in `verification/native_abc_sep11/`. The A runs' Output is in
+`verification/native_costs_sep11/`. The B and C runs' Output and the Trades exports of all nine were not received.
+
+**The period traded:**
+- Every summary reads **Start 9/11/2026**, End 10/17/2026. The runs were started on 9/11, not on 8/20 as in
+  docs/NATIVE_RUNS.md.
+- Warm-up therefore took 9/11 to 9/30. The A runs' Output says "engine ready ... from 2026-09-30 16:00".
+- **The comparison covers 10/1 to 10/16:**
+  - 12 sessions;
+  - trades on 9 of them;
+  - first entry 10/1 10:02, last exit 10/16 13:34 (A runs).
+- B and C started the same day with the same data, so they have the same warm-up. Confirming it from their own Output
+  needs those files.
+
+| Run | Positions | Net after commission | Commission | Max drawdown (NT, closed) | Longest losing streak | Long / short net |
+|---|---:|---:|---:|---:|---:|---|
+| A_S0 | 28 | $2,482.80 | $195.70 | $2,675.20 | 7 | −$1,330.50 / $3,813.30 |
+| A_S1 | 28 | $2,433.80 | $195.70 | $2,709.20 | 7 | −$1,340.00 / $3,773.80 |
+| A_S2 | 28 | $2,383.80 | $195.70 | $2,744.20 | 7 | −$1,350.50 / $3,734.30 |
+| B_S0 | 20 | $4,684.00 | $152.00 | $818.00 | 3 | −$622.80 / $5,306.80 |
+| B_S1 | 20 | $4,646.00 | $152.00 | $828.00 | 3 | −$628.80 / $5,274.80 |
+| B_S2 | 20 | $4,608.00 | $152.00 | $838.00 | 3 | −$634.80 / $5,242.80 |
+| C_S0 | 24 | $3,976.30 | $167.20 | $1,390.60 | 5 | −$1,330.50 / $5,306.80 |
+| C_S1 | 24 | $3,934.80 | $167.20 | $1,401.60 | 5 | −$1,340.00 / $5,274.80 |
+| C_S2 | 24 | $3,892.30 | $167.20 | $1,413.60 | 5 | −$1,350.50 / $5,242.80 |
+
+**The switches did what they should** (checked from the summaries; trade by trade needs the Trades exports):
+- **B equals A's momentum trades:**
+  - A's 20 momentum trades have the same count and net as B's: 3 long at −$622.80 and 17 short at $5,306.80, at
+    0 ticks.
+  - B's drawdown, $818.00, is exactly the drawdown of A's momentum trades alone, recomputed from A's trades.
+- **C equals A without its 4 breakout shorts:**
+  - 28 − 4 = 24 positions.
+  - A_S0 − C_S0 = −$1,493.50, which is those 4 trades' −$1,465.00 plus $28.50 commission.
+- **No entry opportunity changed between configurations.** Removing the breakout did not add or move any momentum
+  trade, as the stand-in predicted: the momentum bot always comes first.
+
+**Why B leads here:**
+- Eight breakout trades (4 long, 4 short, 23 contracts) lost $2,157.50 before costs, $2,201.20 after, in 12 sessions.
+- B is A without them. Nothing else differs.
+
+**Slippage:** each tick costs A $49, B $38 and C $41.50 here. NinjaTrader slips the market entries and exits but
+mostly not the stops (section 4b), so these figures understate live costs. They are not extrapolated beyond these 28
+trades.
+
+**Status:**
+- **B is the leading candidate from this sample, not an established strategy.**
+- **B is frozen.** Same code and settings as A, with "Breakout in the bot's gaps" off; nothing else changed.
+  docs/NATIVE_RUNS.md section 6.
+- **What the longer evidence says so far:**
+  - Over the 172-trade run (6/29 to 10/16, no costs), the breakout lost $2,913.50 before costs, which agrees with B.
+  - Over ten years of NQ on the stand-in (section 4), the breakout added $55,700-64,300, which disagrees.
+  - The longer native comparison (docs/NATIVE_RUNS.md section 7) decides between them.
+
 ## 5. Not started (brief steps 5-11) - proposed
 
 The following were not started; the brief asked for sections 1-4 first:
