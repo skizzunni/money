@@ -1,0 +1,66 @@
+config,slippage,start,fully observed,outcome,sequencing-dependent,possible outcomes,calendar days,sessions,intraday DD,room refusals,halted,trades
+2 B-protected,1,2026-07-20,True,expired,False,expired,,,1610.1499999999996,13,True,18
+2 B-protected,1,2026-07-21,True,expired,False,expired,,,1610.1499999999996,13,True,18
+2 B-protected,1,2026-07-22,True,expired,False,expired,,,1610.1499999999996,13,True,18
+2 B-protected,1,2026-07-23,True,expired,False,expired,,,1610.1499999999996,13,True,18
+2 B-protected,1,2026-07-24,True,expired,False,expired,,,1612.0499999999997,12,True,18
+2 B-protected,1,2026-07-27,True,expired,False,expired,,,1612.0500000000002,15,True,15
+2 B-protected,1,2026-07-28,True,expired,False,expired,,,1263.3000000000002,0,False,21
+2 B-protected,1,2026-07-29,True,expired,False,expired,,,913.2,0,False,19
+2 B-protected,1,2026-07-30,True,expired,False,expired,,,1005.7500000000007,0,False,19
+2 B-protected,1,2026-07-31,True,expired,False,expired,,,1005.7500000000007,0,False,16
+2 B-protected,1,2026-08-03,True,expired,False,expired,,,1005.7500000000007,0,False,16
+2 B-protected,1,2026-08-04,True,expired,False,expired,,,939.4499999999998,0,False,11
+2 B-protected,1,2026-08-05,True,expired,False,expired,,,1253.85,0,False,11
+2 B-protected,1,2026-08-06,True,expired,False,expired,,,1411.0500000000002,0,False,12
+2 B-protected,1,2026-08-07,True,expired,False,expired,,,1411.0500000000002,0,False,12
+2 B-protected,1,2026-08-10,True,expired,False,expired,,,1450.95,0,False,14
+2 B-protected,1,2026-08-11,True,expired,False,expired,,,1450.95,0,False,14
+2 B-protected,1,2026-08-12,True,expired,False,expired,,,1450.95,0,False,14
+2 B-protected,1,2026-08-13,True,expired,False,expired,,,1450.95,0,False,14
+2 B-protected,1,2026-08-14,True,expired,False,expired,,,1357.8,0,False,11
+2 B-protected,1,2026-08-17,True,expired,False,expired,,,1357.8,0,False,17
+2 B-protected,1,2026-08-18,True,expired,False,expired,,,1357.8,0,False,20
+2 B-protected,1,2026-08-19,True,expired,False,expired,,,1357.8,0,False,20
+2 B-protected,1,2026-08-20,True,expired,False,expired,,,1357.8,0,False,20
+2 B-protected,1,2026-08-21,True,expired,False,expired,,,1357.8,0,False,20
+2 B-protected,1,2026-08-24,True,expired,False,expired,,,1357.8,0,False,28
+2 B-protected,1,2026-08-25,True,pass,False,pass,30.0,22.0,1253.7,0,False,26
+2 B-protected,1,2026-08-26,True,pass,False,pass,29.0,21.0,1253.7,0,False,26
+2 B-protected,1,2026-08-27,True,pass,False,pass,28.0,20.0,1253.7,0,False,26
+2 B-protected,1,2026-08-28,True,pass,False,pass,27.0,19.0,936.0,0,False,25
+2 B-protected,1,2026-08-31,True,pass,False,pass,24.0,18.0,609.3,0,False,23
+2 B-protected,1,2026-09-01,True,pass,False,pass,23.0,17.0,609.3,0,False,23
+2 B-protected,1,2026-09-02,True,pass,False,pass,22.0,16.0,609.3,0,False,23
+2 B-protected,1,2026-09-03,True,pass,False,pass,21.0,15.0,609.3,0,False,23
+2 B-protected,1,2026-09-04,True,pass,False,pass,19.0,13.0,609.3,0,False,20
+2 B-protected,1,2026-09-07,True,pass,False,pass,16.0,12.0,609.3,0,False,16
+2 B-protected,1,2026-09-08,True,pass,False,pass,15.0,11.0,609.3,0,False,16
+2 B-protected,1,2026-09-09,True,pass,False,pass,14.0,10.0,609.3000000000002,0,False,14
+2 B-protected,1,2026-09-10,True,pass,False,pass,13.0,9.0,609.3000000000002,0,False,14
+2 B-protected,1,2026-09-11,True,pass,False,pass,12.0,8.0,609.3000000000002,0,False,14
+2 B-protected,1,2026-09-14,True,pass,False,pass,9.0,7.0,609.3000000000002,0,False,14
+2 B-protected,1,2026-09-15,True,pass,False,pass,8.0,6.0,609.3000000000002,0,False,14
+2 B-protected,1,2026-09-16,True,pass,False,pass,8.0,6.0,603.6000000000001,0,False,12
+2 B-protected,1,2026-09-17,True,pass,False,pass,7.0,5.0,603.5999999999995,0,False,9
+2 B-protected,1,2026-09-18,False,pass,False,pass,6.0,4.0,603.5999999999995,0,False,9
+2 B-protected,1,2026-09-21,False,pass,False,pass,3.0,3.0,603.5999999999995,0,False,9
+2 B-protected,1,2026-09-22,False,pass,False,pass,23.0,17.0,1213.7999999999993,0,False,22
+2 B-protected,1,2026-09-23,False,pass,False,pass,22.0,16.0,1213.8000000000002,0,False,20
+2 B-protected,1,2026-09-24,False,pass,False,pass,23.0,17.0,1213.8000000000002,0,False,21
+2 B-protected,1,2026-09-25,False,pass,False,pass,22.0,16.0,1213.8000000000002,0,False,21
+2 B-protected,1,2026-09-28,False,pass,False,pass,19.0,15.0,1213.8000000000002,0,False,21
+2 B-protected,1,2026-09-29,False,unresolved (data ends),False,unresolved (data ends),,,1182.9,0,False,19
+2 B-protected,1,2026-09-30,False,unresolved (data ends),False,unresolved (data ends),,,1182.9,0,False,19
+2 B-protected,1,2026-10-01,False,unresolved (data ends),False,unresolved (data ends),,,848.6499999999999,0,False,16
+2 B-protected,1,2026-10-02,False,unresolved (data ends),False,unresolved (data ends),,,848.6499999999999,0,False,16
+2 B-protected,1,2026-10-05,False,unresolved (data ends),False,unresolved (data ends),,,848.6499999999999,0,False,16
+2 B-protected,1,2026-10-06,False,pass,False,pass,11.0,9.0,848.6500000000001,0,False,13
+2 B-protected,1,2026-10-07,False,pass,False,pass,10.0,8.0,848.6500000000001,0,False,13
+2 B-protected,1,2026-10-08,False,pass,False,pass,9.0,7.0,848.6500000000001,0,False,13
+2 B-protected,1,2026-10-09,False,pass,False,pass,8.0,6.0,848.6500000000001,0,False,9
+2 B-protected,1,2026-10-12,False,pass,False,pass,5.0,5.0,848.6500000000001,0,False,9
+2 B-protected,1,2026-10-13,False,unresolved (data ends),False,unresolved (data ends),,,583.5,0,False,8
+2 B-protected,1,2026-10-14,False,unresolved (data ends),False,unresolved (data ends),,,583.5,0,False,8
+2 B-protected,1,2026-10-15,False,unresolved (data ends),False,unresolved (data ends),,,327.9,0,False,4
+2 B-protected,1,2026-10-16,False,unresolved (data ends),False,unresolved (data ends),,,327.9,0,False,4

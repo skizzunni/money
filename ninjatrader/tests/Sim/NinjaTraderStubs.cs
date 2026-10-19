@@ -119,6 +119,25 @@ namespace NinjaTrader.Data
         public string Name = "CME US Index Futures ETH";
         public override string ToString() { return Name; }
     }
+    // the session's actual end (platform time): 17:00 New York (CME ETH), or SimEarlyClose's ("yyyy-MM-dd HH:mm" New York)
+    public class SessionIterator
+    {
+        public static readonly Dictionary<DateTime, DateTime> EarlyClose = new Dictionary<DateTime, DateTime>();
+        public DateTime ActualSessionBegin, ActualSessionEnd;
+        public SessionIterator(Bars bars) { }
+        public bool GetNextSession(DateTime time, bool includesEndTimeStamp)
+        {
+            TimeZoneInfo ny = TimeZoneInfo.FindSystemTimeZoneById("America/New_York");
+            TimeZoneInfo platform = NinjaTrader.Core.Globals.GeneralOptions.TimeZoneInfo;
+            DateTime t = TimeZoneInfo.ConvertTime(time, platform, ny);
+            DateTime end = t.Hour >= 17 ? t.Date.AddDays(1).AddHours(17) : t.Date.AddHours(17);
+            DateTime early;
+            if (EarlyClose.TryGetValue(end.Date, out early)) end = early;
+            ActualSessionEnd = TimeZoneInfo.ConvertTime(end, ny, platform);
+            ActualSessionBegin = TimeZoneInfo.ConvertTime(end.Date.AddDays(-1).AddHours(18), ny, platform);
+            return true;
+        }
+    }
     public class Bars
     {
         public TradingHours TradingHours = new TradingHours();
@@ -254,6 +273,18 @@ namespace NinjaTrader.NinjaScript.Strategies
         public string SimWithdraw { get; set; }  // tests: "bar:amount": a payout leaves the account at that bar
         public int SimRealtimeFrom { get; set; }  // tests: the strategy goes live at this bar (0: never)
         public int SimThrowAtBar { get { return ThrowAt; } set { ThrowAt = value; } }
+        public string SimEarlyClose  // tests: "yyyy-MM-dd HH:mm,..." New York: sessions ending early
+        {
+            get { return ""; }
+            set
+            {
+                foreach (string x in value.Split(','))
+                {
+                    DateTime t = DateTime.ParseExact(x.Trim(), "yyyy-MM-dd HH:mm", System.Globalization.CultureInfo.InvariantCulture);
+                    NinjaTrader.Data.SessionIterator.EarlyClose[t.Date] = t;
+                }
+            }
+        }
         public string SimAccountName { get { return Account.Name; } set { Account.Name = value; } }
         public string SimUserDataDir
         {

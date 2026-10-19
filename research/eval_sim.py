@@ -93,9 +93,15 @@ def _order(path, kind_of_bar):
 
 def evaluate(trs, start_bar, end_bar, day_of, path, dll=0.0):
     """One evaluation from start_bar to end_bar (exclusive) along a path. Returns (outcome, bar, max drawdown)."""
+    return evaluate_detail(trs, start_bar, end_bar, day_of, path, dll)[:3]
+
+
+def evaluate_detail(trs, start_bar, end_bar, day_of, path, dll=0.0):
+    """evaluate(), also returning the equity at the outcome and the index of the trade it came in (None: after it)."""
     e = peak = dd = 0.0
+    ti = None
     day_start, cur_day, paused = 0.0, -1, False
-    for eb, xb, d, q, en, ex, kind, pnl, bo, bh, bl in trs:
+    for ti, (eb, xb, d, q, en, ex, kind, pnl, bo, bh, bl) in enumerate(trs):
         if eb < start_bar:
             continue
         if eb >= end_bar:
@@ -118,11 +124,11 @@ def evaluate(trs, start_bar, end_bar, day_of, path, dll=0.0):
             for px in prices:
                 eq = base + d * (px - en) * mult
                 if eq >= tgt:
-                    return "pass", bar, dd
+                    return "pass", bar, dd, tgt, ti
                 peak = max(peak, eq)
                 dd = max(dd, peak - eq)
                 if eq <= peak - TRAIL:
-                    return "fail", bar, dd
+                    return "fail", bar, dd, eq, ti
                 if dll > 0 and eq <= day_start - dll:  # sensitivity: the day's loss limit closes and pauses the day
                     e = day_start - dll
                     paused = stopped = True
@@ -133,19 +139,19 @@ def evaluate(trs, start_bar, end_bar, day_of, path, dll=0.0):
             continue
         e += pnl  # the exit fill, both commissions charged
         if e >= TARGET:
-            return "pass", xb, dd
+            return "pass", xb, dd, e, None
         peak = max(peak, e)
         dd = max(dd, peak - e)
         if e <= peak - TRAIL:
-            return "fail", xb, dd
-    return ("expired" if end_bar < 10**12 else "open"), None, dd
+            return "fail", xb, dd, e, None
+    return ("expired" if end_bar < 10**12 else "open"), None, dd, e, None
 
 
-def run_windows(trs, sessions, first_ok, day_of, bar_day, dll=0.0, chain=False):
+def run_windows(trs, sessions, first_ok, day_of, bar_day, dll=0.0, chain=False, limit=None):
     rows = []
     s = first_ok
     last_day = sessions[-1]
-    while s < len(sessions):
+    while s < len(sessions) and (limit is None or len(rows) < limit):
         d0 = sessions[s]
         end_day = d0 + pd.Timedelta(days=DAYS)
         start_bar = int(np.searchsorted(bar_day, d0))
