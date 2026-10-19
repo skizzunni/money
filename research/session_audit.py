@@ -2,6 +2,7 @@
 
     python research/session_audit.py <NinjaScript_Output.txt> <MNQ_09-26.Last.txt> <MNQ_12-26.Last.txt> <out.csv>
         [--no-open yyyy-mm-dd,...] [--hole yyyy-mm-dd:yyyy-mm-dd] [--warmup yyyy-mm-dd:yyyy-mm-dd]
+    python research/session_audit.py <NinjaScript_Output.txt> <out.csv>   (an Output with "C session" lines)
 
 The calendar (sessions with 09:30-16:00 data) comes from the user's MNQ exports; --no-open lists sessions the run's own
 data lacks the 09:30 bar for, --hole a range with no bars at all, --warmup the engine's warm-up sessions (all from the
@@ -39,8 +40,27 @@ def calendar(sep_path, dec_path):
     return days
 
 
+SESSION = re.compile(r"C session (\d{4}-\d\d-\d\d): ([^;]+); (\d+) minutes.*?entries (\d+), not taken (.*)")
+
+
+def from_session_lines(text, out_path):
+    """A run whose Output has candidate C's per-session lines (C2 onward): classified by the strategy itself."""
+    rows = [{"session": m.group(1), "status": m.group(2), "minutes": int(m.group(3)), "entries": int(m.group(4)),
+             "not taken": m.group(5)} for m in (SESSION.search(x) for x in text) if m]
+    df = pd.DataFrame(rows)
+    df.to_csv(out_path, index=False)
+    elig = df[~df.status.isin(["warm-up", "skip date"])]
+    print(df.status.str.split(":").str[0].value_counts().to_string())
+    n = len(elig)
+    print(f"eligible sessions {n}; entries {elig.entries.sum()}: {elig.entries.sum() / n:.2f} per session; "
+          f"zero-entry sessions {(elig.entries == 0).mean():.0%}")
+
+
 def main():
     args = sys.argv[1:]
+    if len(args) == 2:  # <Output> <out.csv>: the Output's own session lines
+        from_session_lines(Path(args[0]).read_text(errors="replace").splitlines(), Path(args[1]))
+        return
     opts = {k: v for k, v in zip(args[4::2], args[5::2], strict=False)}
     out_path, text = Path(args[3]), Path(args[0]).read_text(errors="replace").splitlines()
     data_days = calendar(args[1], args[2])

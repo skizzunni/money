@@ -30,9 +30,10 @@ import controlled as K  # noqa: E402
 import eval_sim as E  # noqa: E402
 import runner_compare as RC  # noqa: E402
 
-C_CONFIGS = {"C0": {"SignalsFromModel": True, "PassOnRealizedOnly": False},
-             "C1a": {"SignalsFromModel": False, "PassOnRealizedOnly": False},
-             "C1": {"SignalsFromModel": False, "PassOnRealizedOnly": True}}
+C_CONFIGS = {"C0": {"SignalsFromModel": True, "PassOnRealizedOnly": False, "ReserveRoomShare": 0.5},
+             "C1a": {"SignalsFromModel": False, "PassOnRealizedOnly": False, "ReserveRoomShare": 0.5},
+             "C1": {"SignalsFromModel": False, "PassOnRealizedOnly": True, "ReserveRoomShare": 0.5},
+             "C2": {"SignalsFromModel": False, "PassOnRealizedOnly": True, "ReserveRoomShare": 1.0}}
 CONTINUOUS = {"EvalTarget": 0, "EvalTrail": 100000, "AccountReserve": 0}
 OUTCOMES = RC.OUTCOMES
 
@@ -109,10 +110,10 @@ def stats(tr, mk, eligible, slip):
     }, tr
 
 
-def continuous(mk, dll, whole, extra, eligible, slips):
+def continuous(mk, dll, whole, extra, eligible, slips, configs=("B", "C0", "C1"), pair=("C1", "C0")):
     out, trades = [], {}
     for slip in slips:
-        for cfg in ("B", "C0", "C1"):
+        for cfg in configs:
             p = props_for(cfg, slip, extra)
             if cfg != "B":
                 p.update(CONTINUOUS)
@@ -122,7 +123,8 @@ def continuous(mk, dll, whole, extra, eligible, slips):
             out.append({"config": cfg, "slippage": slip, **s, "checks refused": refused})
             trades[(cfg, slip)] = tr
         # the trades C1 has and C0 has not ("recovered"), and the reverse
-        for a, b, label in (("C1", "C0", "recovered (C1 not C0)"), ("C0", "C1", "displaced (C0 not C1)")):
+        new, old = pair
+        for a, b, label in ((new, old, f"recovered ({new} not {old})"), (old, new, f"displaced ({old} not {new})")):
             ta, tb = trades[(a, slip)], trades[(b, slip)]
             keys = set(zip(tb.eb, tb.d, strict=True))
             extra_tr = ta[[(e, d) not in keys for e, d in zip(ta.eb, ta.d, strict=True)]]
@@ -133,8 +135,9 @@ def continuous(mk, dll, whole, extra, eligible, slips):
     return pd.DataFrame(out), trades
 
 
-def replay(mk, dll, whole, extra, configs, slips, workers=4):
+def replay(mk, dll, whole, extra, configs, slips, eligible, workers=4, pair=None):
     sessions, bar_day = mk.sessions, mk.bar_day
+    elig = set(eligible)
     starts = list(range(mk.first_ok, len(sessions)))
     tmp = Path(tempfile.mkdtemp())
     cache_dir = Path(os.environ["RUNNER_CACHE"]) if os.environ.get("RUNNER_CACHE") else None
@@ -169,8 +172,27 @@ def replay(mk, dll, whole, extra, configs, slips, workers=4):
             inside = [(t, why) for t, why in checks if mk.t[sb] <= t < end_t]
             w["halted"] = w["outcome"] == "expired" and bool(inside) and inside[-1][1] == "account reserve room"
             w["trades"] = int(((tr.eb >= sb) & (tr.eb < eb_)).sum())
+            # the evaluation to its outcome: its result, its trades, and its eligible sessions
+            complete = bool(w["fully observed"])
+            outc, at, _, eq, ti = E.evaluate_detail(trs, sb, eb_ if complete else 10**12, mk.day_of, "worst mix")
+            win = tr[(tr.eb >= sb) & (tr.eb < (eb_ if complete else 10**12))]
+            if at is not None:
+                win = win[win.eb <= at].copy()
+                if ti is not None and ti in win.index:
+                    win.loc[ti, "pnl"] = eq - win.drop(index=ti).pnl.sum()
+            w["result $"] = eq
+            last_day = bar_day[at] if at is not None else (d0 + pd.Timedelta(days=E.DAYS - 1))
+            days = [d for d in sessions[(sessions >= d0) & (sessions <= last_day)] if d in elig]
+            per = pd.Series(1, index=bar_day[win.eb.to_numpy(dtype=int)]).groupby(level=0).sum()
+            per = per.reindex(days, fill_value=0) if days else per.iloc[:0]
+            w["eligible sessions to outcome"] = len(days)
+            w["entries to outcome"] = int(per.sum())
+            w["zero-entry sessions"] = int((per == 0).sum())
             rows.append({"config": cfg, "slippage": slip, **w})
+            kept[(cfg, slip, s)] = win[["eb", "d", "pnl"]]
         return pd.DataFrame(rows)
+
+    kept = {}
 
     with ThreadPoolExecutor(max_workers=workers) as pool:
         frames = list(pool.map(job, [(c, s) for c in configs for s in slips]))
@@ -188,6 +210,23 @@ def replay(mk, dll, whole, extra, configs, slips, workers=4):
                 picks.append(i)
                 nxt = st + pd.Timedelta(days=E.DAYS)
         ind = fo.reset_index(drop=True).loc[picks]
+        cfg, slip = w.config.iloc[0], w.slippage.iloc[0]
+        extra_rows = {}
+        if pair is not None and cfg == pair[0]:
+            index_of = {sessions[x].date(): x for x in starts}
+            for label, subset in (("all", fo), ("non-overlapping", ind)):
+                add = rem = 0.0
+                n_add = n_rem = 0
+                for st in subset.start:
+                    a, b = kept[(pair[0], slip, index_of[st])], kept[(pair[1], slip, index_of[st])]
+                    ka, kb = set(zip(a.eb, a.d, strict=True)), set(zip(b.eb, b.d, strict=True))
+                    only_a = a[[(e, d) not in kb for e, d in zip(a.eb, a.d, strict=True)]]
+                    only_b = b[[(e, d) not in ka for e, d in zip(b.eb, b.d, strict=True)]]
+                    add, n_add = add + only_a.pnl.sum(), n_add + len(only_a)
+                    rem, n_rem = rem + only_b.pnl.sum(), n_rem + len(only_b)
+                extra_rows[f"{label} windows: trades only in {pair[0]} (n, net $)"] = f"{n_add}, {add:.0f}"
+                extra_rows[f"{label} windows: trades only in {pair[1]} (n, net $)"] = f"{n_rem}, {rem:.0f}"
+        es = fo["eligible sessions to outcome"].sum()
         table.append({
             "config": w.config.iloc[0], "slippage": w.slippage.iloc[0], "full starts": len(fo),
             "full: pass / fail / expired": f"{c(fo, 'pass')} / {c(fo, 'fail')} / {c(fo, 'expired')}",
@@ -200,6 +239,10 @@ def replay(mk, dll, whole, extra, configs, slips, workers=4):
             "non-overlapping starts": len(ind),
             "non-overlapping: pass / fail / expired": f"{c(ind, 'pass')} / {c(ind, 'fail')} / {c(ind, 'expired')}",
             "late starts: pass / fail / expired / unresolved": " / ".join(str(c(late, x)) for x in OUTCOMES),
+            "full: mean result per evaluation $": fo["result $"].mean(),
+            "full: entries per eligible session to outcome": fo["entries to outcome"].sum() / es if es else np.nan,
+            "full: zero-entry sessions to outcome %": 100 * fo["zero-entry sessions"].sum() / es if es else np.nan,
+            **extra_rows,
         })
     return pd.DataFrame(table), pd.concat(frames)
 
@@ -208,12 +251,12 @@ def main():
     if sys.argv[1] == "mnq":
         mk = RC.mnq_market(sys.argv[2], sys.argv[3])
         dll, out = sys.argv[4], Path(sys.argv[5])
-        configs = ["B", "C0", "C1a", "C1"]
+        configs = os.environ.get("C_CONFIGS", "B,C1,C2").split(",")
     else:
         first, last = (sys.argv[5], sys.argv[6]) if len(sys.argv) > 6 else ("2015-03-01", "2025-06-30")
         mk = RC.nq_market(sys.argv[2], first, last)
         dll, out = sys.argv[3], Path(sys.argv[4])
-        configs = os.environ.get("C_CONFIGS", "B,C0,C1a,C1").split(",")
+        configs = os.environ.get("C_CONFIGS", "B,C1,C2").split(",")
     out.mkdir(parents=True, exist_ok=True)
     extra = {"SkipDates": mk.skip_dates} if mk.skip_dates else {}
     whole = Path(tempfile.mkdtemp()) / "bars.csv"
@@ -222,7 +265,8 @@ def main():
     opens = pd.DatetimeIndex(sorted(set(mk.bar_day[(mk.t.hour == 9) & (mk.t.minute == 30)])))
     eligible = pd.DatetimeIndex([d for d in opens if d >= mk.sessions[mk.first_ok] and d not in skip])
     slips = (1, 2)
-    cont, trades = continuous(mk, dll, whole, extra, eligible, slips)
+    pair = ("C2", "C1") if "C2" in configs else ("C1", "C0")
+    cont, trades = continuous(mk, dll, whole, extra, eligible, slips, ("B", *pair[::-1]), pair)
     cont.to_csv(out / "continuous.csv", index=False)
     for (cfg, slip), tr in trades.items():
         tr.to_csv(out / f"continuous_trades_{cfg}_{slip}t.csv", index=False)
@@ -230,7 +274,7 @@ def main():
     pd.set_option("display.max_colwidth", 300)
     print(f"eligible sessions {len(eligible)}: {eligible[0].date()}..{eligible[-1].date()}")
     print(cont.round(2).T.to_string())
-    rep, windows = replay(mk, dll, whole, extra, configs, slips)
+    rep, windows = replay(mk, dll, whole, extra, configs, slips, eligible, pair=pair if pair[1] in configs else None)
     rep.to_csv(out / "replay.csv", index=False)
     windows.to_csv(out / "replay_windows.csv", index=False)
     print(rep.round(1).T.to_string())
