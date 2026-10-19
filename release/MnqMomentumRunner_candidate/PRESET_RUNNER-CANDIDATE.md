@@ -1,8 +1,8 @@
 # Preset RUNNER-CANDIDATE: the runner candidate on a simulation account
 
 **For a native check or practice only:** a NinjaTrader simulation account, never a paid evaluation account. The
-comparison in `docs/RUNNER.md` decides whether this candidate is adopted. Frozen B (`MnqMomentumB_v1`) is unchanged
-and stays the comparison.
+comparison in `docs/RUNNER.md` **rejects this candidate** for the evaluation: this preset is for reproducing and
+checking that result. Frozen B (`MnqMomentumB_v1`) is unchanged and stays the reference.
 
 ## Account
 
