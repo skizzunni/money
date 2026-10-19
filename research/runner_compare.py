@@ -21,6 +21,8 @@ Trading statistics: back-to-back attempts (the next starts the session after an 
 its outcome; a position open at a pass or a breach ends there at the replay's equity ("Evaluation target (replay)" /
 "Liquidation (replay)").
 """
+import os
+import pickle
 import subprocess
 import sys
 import tempfile
@@ -100,8 +102,13 @@ def compare(mk, dll, out, slips=(1, 2), workers=4):
     K.write_bars(mk.bars, whole)
     extra = {"SkipDates": mk.skip_dates} if mk.skip_dates else {}
 
+    cache_dir = Path(os.environ["RUNNER_CACHE"]) if os.environ.get("RUNNER_CACHE") else None  # resumable runs
+
     def slice_run(cfg, slip, s):
         """The candidate for an evaluation starting at session s, on that start's slice; bars as in the whole file."""
+        key = cache_dir / f"{cfg.split()[0]}_{slip}_{sessions[s]:%Y%m%d}.pkl" if cache_dir else None
+        if key is not None and key.exists():
+            return pickle.loads(key.read_bytes())
         i0 = int(np.searchsorted(bar_day, sessions[s] - pd.Timedelta(days=WARMUP_DAYS)))
         i1 = int(np.searchsorted(bar_day, sessions[s] + pd.Timedelta(days=E.DAYS + 1)))
         csv = tmp / f"{cfg.split()[0]}_{slip}_{s}.csv"
@@ -111,6 +118,9 @@ def compare(mk, dll, out, slips=(1, 2), workers=4):
                                    **extra})
         csv.unlink()
         tr[["eb", "xb"]] += i0
+        if key is not None:
+            key.parent.mkdir(parents=True, exist_ok=True)
+            key.write_bytes(pickle.dumps((tr, skips)))
         return tr, skips
 
     def windows(tr, skips, s, slip):
