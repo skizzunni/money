@@ -53,7 +53,8 @@ def explain(run):
             m = C_LINE.search(x)
             if m:
                 w = m.group(3)
-                events.append((m.group(1), "taken" if w.startswith("entry sent") else w.split("not taken: ", 1)[1]))
+                why = "taken" if w.startswith("entry sent") else w.split("not taken: ", 1)[1].split(" [")[0]
+                events.append((m.group(1), why))
         out += [x for x in lines if x.startswith("C audit")]
     elif kind == "runner":
         for x in lines:

@@ -34,7 +34,7 @@ def checks(printed):
         if m:
             what = m.group(3)
             out.append((m.group(1), m.group(2), "taken" if what.startswith("entry sent") else
-                        what.split("not taken: ", 1)[1]))
+                        what.split("not taken: ", 1)[1].split(" [")[0]))
     return out
 
 
@@ -239,3 +239,52 @@ def test_remembered_pass_survives_a_restart(sim, tmp_path):  # noqa: F811
     _, orders, _, printed = cand(sim, bars, tmp_path, SimUserDataDir=folder, **common)
     assert not [e for e in entries(orders) if e[0] >= live]
     assert any("account state from" in p and "target reached" in p for p in printed)
+
+
+# ── C2: the entry budget uses the full room above the reserve (ReserveRoomShare 1); 0.5 is the earlier C1 rule
+DETAIL = re.compile(r"not taken: account reserve room \[room (-?[\d.]+), usable (-?[\d.]+), one contract ([\d.]+)\]")
+
+
+def test_room_share_changes_nothing_without_the_reserve(sim, tmp_path):  # noqa: F811
+    """G1: with no evaluation trail or reserve, the share of the room is never binding: identical trades."""
+    for seed in (3, 5):
+        bars = rth_minutes(40, seed)
+        a = cand(sim, bars, tmp_path, ReserveRoomShare=1.0, **NOACCOUNT)[0]
+        b = cand(sim, bars, tmp_path, ReserveRoomShare=0.5, **NOACCOUNT)[0]
+        assert a and a == b
+
+
+@pytest.mark.parametrize("seed", [3, 5, 9])
+def test_full_room_refuses_only_when_one_contract_does_not_fit(sim, tmp_path, seed):  # noqa: F811
+    """G2 on a tight account ($700 trail, $300 reserve): every refusal for room has usable room below one contract's
+    planned risk (with the full room, usable = room; with the earlier rule, half); the closed equity never ends below
+    its peak less the trail. (Entries can be fewer with the full room: a larger position near the reserve uses the room
+    sooner.)"""
+    bars = rth_minutes(60, seed)
+    tight = {**NOACCOUNT, "EvalTrail": 700, "AccountReserve": 300}
+    full, _, _, p_full = cand(sim, bars, tmp_path, ReserveRoomShare=1.0, **tight)
+    _, _, _, p_half = cand(sim, bars, tmp_path, ReserveRoomShare=0.5, **tight)
+    for printed, share in ((p_full, 1.0), (p_half, 0.5)):
+        details = [m for m in (DETAIL.search(p) for p in printed) if m]
+        assert details
+        for m in details:
+            room, usable, one = (float(m.group(k)) for k in (1, 2, 3))
+            assert usable < one and math.isclose(usable, room * share, abs_tol=0.011)
+    eq = np.cumsum([float(r[6]) for r in full])
+    assert (eq >= np.maximum.accumulate(np.maximum(eq, 0)) - 700).all()
+
+
+def test_one_line_per_session_and_its_status(sim, tmp_path):  # noqa: F811
+    bars = rth_minutes(40, 5)
+    _, orders, _, printed = cand(sim, bars, tmp_path, **NOACCOUNT)
+    sess = [p for p in printed if p.startswith("C session ")]
+    m, t = minutes_of(bars)
+    assert len(sess) == len(set(m.date))
+    assert sum(int(re.search(r"entries (\d+)", s).group(1)) for s in sess) == len(entries(orders))
+    for s in sess:
+        n = int(re.search(r"entries (\d+)", s).group(1))
+        q = int(re.search(r"qualifying (\d+)", s).group(1))
+        status = s.split(": ", 1)[1].split(";")[0]
+        assert (status == "active") == (n > 0)
+        assert status != "no qualifying setup" or q == 0
+    assert sum("warm-up" in s for s in sess) >= 14

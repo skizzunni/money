@@ -53,8 +53,8 @@ def main():
         m = LINE.search(x)
         if m:
             what = m.group(4)
-            checks.setdefault(pd.Timestamp(m.group(1)), []).append(
-                (m.group(2), m.group(3), "taken" if what.startswith("entry sent") else what.split("not taken: ", 1)[1]))
+            why = "taken" if what.startswith("entry sent") else what.split("not taken: ", 1)[1].split(" [")[0]
+            checks.setdefault(pd.Timestamp(m.group(1)), []).append((m.group(2), m.group(3), why))
     first = min([warm[0]] if warm else [min(data_days)])
     days = pd.bdate_range(first, max(data_days))
     rows = []

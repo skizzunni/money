@@ -53,7 +53,7 @@ def run(dll, csv, props):
         if x.startswith("P,C check "):
             head, what = x[len("P,C check "):].split(": ", 1)
             checks.append((pd.Timestamp(head[:16]), "taken" if what.startswith("entry sent") else
-                           what.split("not taken: ", 1)[-1]))
+                           what.split("not taken: ", 1)[-1].split(" [")[0]))
     audit = [x[2:] for x in lines if x.startswith("P,C audit")]
     return pd.DataFrame(rows, columns=["d", "eb", "en", "xb", "ex", "why", "pnl", "q"]), checks, audit
 

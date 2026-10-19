@@ -15,8 +15,8 @@
 //   risk per contract = stop distance x $2 + 2 x commission + a reserve of 2 ticks at entry and 2 at the stop
 //     (= 2 x points + $3.90 at $0.95 a side)
 //   contracts = floor(budget / risk per contract), at most 4; none fits: no trade
-//   budget = the smallest of $200, half the room above the account's reserve, and what is left of today's $400
-//     loss backstop
+//   budget = the smallest of $200, the room above the account's reserve line (ReserveRoomShare of it; 1 = all of it,
+//     so a planned stop-out ends at the reserve line at worst), and what is left of today's $400 loss backstop
 // Exits: B's, unchanged: the protective stop from the fill (the noise line and the 25-point cap), the lock (at +25
 // points the stop goes to entry + 2.5), the stop only ever tightens, the take-profit 1.5 noise units from the fill.
 // Also: flat by 15:55 New York (5 minutes before an earlier session end); the account reserve; the evaluation target.
@@ -29,8 +29,9 @@
 // Orders: a rejected order while in a position closes it at market, sent again at every bar until flat; a rejected
 // entry leaves no position. Live, the highest equity, the pass and today's losers are kept in a file (restarts), and the
 // threshold Apex shows can be entered.
-// Output: one line per check whose close is past a line (taken, or why not), and an audit at the end of the run (data
-// coverage, warm-up, first and last trades, signals, entries, refusals by reason, whether trading stopped).
+// Output: one line per check whose close is past a line (taken, or why not; a refusal for room gives the room and one
+// contract's planned risk), one line per session (its data, checks and outcome), and an audit at the end of the run
+// (data coverage, warm-up, first and last trades, signals, entries, refusals by reason, whether trading stopped).
 // These are planned limits: a gap or a failed order can exceed them.
 // Written in C# 5 for NinjaTrader 8's compiler.
 using System;
@@ -83,7 +84,9 @@ namespace NinjaTrader.NinjaScript.Strategies
         int bars, rthSessions, fullSessions, sessionBars, checks, crosses, qualifying, entries;
         DateTime firstBar = DateTime.MinValue, lastBar, readyAt = DateTime.MinValue, auditDay = DateTime.MinValue;
         DateTime lastEntrySignal = DateTime.MinValue;
-        bool sessionOpenBar;
+        bool sessionOpenBar, sessionSkip;
+        int sessChecks, sessNotReady, sessCross, sessQual, sessEntries;
+        readonly Dictionary<string, int> sessRefused = new Dictionary<string, int>();
         readonly Dictionary<string, int> refused = new Dictionary<string, int>();
         readonly List<string> sinceLastEntry = new List<string>();  // why each qualifying signal after the last entry was refused
 
@@ -126,6 +129,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 FedDates = NoiseEngine.FedDatesDefault;
                 RememberAccount = true;
                 CheckLines = true;
+                ReserveRoomShare = 1.0;
             }
             else if (State == State.DataLoaded)
             {
@@ -157,7 +161,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                       ", account " + (Account == null ? "none" : Account.Name) + ", PlaceOrders " + PlaceOrders +
                       ", SignalsFromModel " + SignalsFromModel + ", PassOnRealizedOnly " + PassOnRealizedOnly +
                       ", MaxRisk " + MaxRisk + ", MaxContracts " + MaxContracts + ", commission " + SizingCommission +
-                      ", reserve ticks " + ReserveTicks + ", target " + EvalTarget + ", trail " + EvalTrail + ", reserve " +
+                      ", reserve ticks " + ReserveTicks + ", room share " + ReserveRoomShare + ", target " + EvalTarget + ", trail " + EvalTrail + ", reserve " +
                       AccountReserve + ", daily backstop " + DailyLossBackstop + ", losers " + MaxLosingPositions +
                       ", flat at " + NoiseEngine.Hhmm(FlatMinute) + ", evaluation start " +
                       (evalStart == DateTime.MinValue ? "(the first bar)" : evalStart.ToString("yyyy-MM-dd")));
@@ -376,20 +380,45 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         void EndSession()
         {
-            if (sessionBars > 0) rthSessions++;
+            if (sessionBars > 0)
+            {
+                rthSessions++;
+                string why = "";
+                foreach (KeyValuePair<string, int> kv in sessRefused)
+                    why += (why.Length > 0 ? ", " : "") + kv.Key + " " + kv.Value;
+                string status = !sessionOpenBar ? "missing data (no 09:30 bar)" :
+                                sessChecks == 0 && sessNotReady > 0 ? "warm-up" :
+                                sessionSkip ? "skip date" :
+                                sessEntries > 0 ? "active" :
+                                sessQual == 0 ? "no qualifying setup" : "all refused: " + why;
+                if (CheckLines)
+                    Print("C session " + auditDay.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) + ": " + status + "; " +
+                          sessionBars + " minutes 09:30-16:00" + (sessionBars < 390 ? " (short)" : "") + ", checks " + sessChecks +
+                          ", past a line " + sessCross + ", qualifying " + sessQual + ", entries " + sessEntries +
+                          ", not taken " + (why.Length > 0 ? why : "none"));
+            }
             if (sessionBars >= 390 && sessionOpenBar) fullSessions++;
             sessionBars = 0;
-            sessionOpenBar = false;
+            sessionOpenBar = sessionSkip = false;
+            sessChecks = sessNotReady = sessCross = sessQual = sessEntries = 0;
+            sessRefused.Clear();
         }
 
         void Refuse(DateTime t, int dir, string why)
         {
+            Refuse(t, dir, why, "");
+        }
+
+        void Refuse(DateTime t, int dir, string why, string detail)
+        {
             int n;
             refused[why] = (refused.TryGetValue(why, out n) ? n : 0) + 1;
+            sessRefused[why] = (sessRefused.TryGetValue(why, out n) ? n : 0) + 1;
             sinceLastEntry.Add(why);
             notSent = why;
             if (CheckLines)
-                Print("C check " + Ts(t) + " " + (dir > 0 ? "long" : "short") + ": not taken: " + why);
+                Print("C check " + Ts(t) + " " + (dir > 0 ? "long" : "short") + ": not taken: " + why +
+                      (detail.Length > 0 ? " [" + detail + "]" : ""));
         }
 
         void Audit()
@@ -440,18 +469,23 @@ namespace NinjaTrader.NinjaScript.Strategies
             // the check: B's qualification from the lines, the close and the dates (not from the model's position)
             int signal = 0;
             string note = engine.CheckNote;
+            if (note == "not ready") sessNotReady++;
             if (note != "" && note != "not ready")
             {
                 checks++;
+                sessChecks++;
+                if (engine.SkipToday) sessionSkip = true;
                 int cross = Close[0] > engine.Upper ? 1 : Close[0] < engine.Lower ? -1 : 0;
                 if (cross != 0)
                 {
                     crosses++;
+                    sessCross++;
                     if (engine.SkipToday) { }
                     else if (cross < 0 && engine.FedToday && endMin < NoiseEngine.FedCutoff) { }
                     else
                     {
                         qualifying++;
+                        sessQual++;
                         signal = cross;
                     }
                 }
@@ -557,11 +591,16 @@ namespace NinjaTrader.NinjaScript.Strategies
             double room = closed - (peak - EvalTrail + AccountReserve);
             double dayNet = closed - dayStartEq;
             double dayRoom = DailyLossBackstop + dayNet;
-            double budget = Math.Min(MaxRisk, Math.Min(room / 2, dayRoom));
+            double roomBudget = room * ReserveRoomShare;
+            double budget = Math.Min(MaxRisk, Math.Min(roomBudget, dayRoom));
             int qty = (int)Math.Min(MaxContracts, Math.Floor(budget / rpc + 1e-9));
             if (qty < 1)
             {
-                Refuse(start, dir, room / 2 < rpc ? "account reserve room" : dayRoom < rpc ? "daily backstop" : "risk budget");
+                if (roomBudget < rpc)
+                    Refuse(start, dir, "account reserve room", "room " + F0(room) + ", usable " + F0(roomBudget) +
+                           ", one contract " + F0(rpc));
+                else
+                    Refuse(start, dir, dayRoom < rpc ? "daily backstop" : "risk budget");
                 return;
             }
             string name = dir > 0 ? LongName : ShortName;
@@ -579,6 +618,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 entryOrder = o;
             plannedStopPts = stopPts;
             entries++;
+            sessEntries++;
             sinceLastEntry.Clear();
             lastEntrySignal = start;
             if (CheckLines)
@@ -748,6 +788,11 @@ namespace NinjaTrader.NinjaScript.Strategies
         [Range(1, 20)]
         [Display(Name = "No entries after this many losing positions today", Order = 5, GroupName = "2. Account")]
         public int MaxLosingPositions { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0.1, 1.0)]
+        [Display(Name = "Share of the room above the reserve an entry may risk (1 = all)", Order = 11, GroupName = "2. Account")]
+        public double ReserveRoomShare { get; set; }
 
         [NinjaScriptProperty]
         [Range(1000.0, 1000000.0)]
