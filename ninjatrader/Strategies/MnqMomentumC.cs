@@ -15,8 +15,8 @@
 //   risk per contract = stop distance x $2 + 2 x commission + a reserve of 2 ticks at entry and 2 at the stop
 //     (= 2 x points + $3.90 at $0.95 a side)
 //   contracts = floor(budget / risk per contract), at most 4; none fits: no trade
-//   budget = the smallest of $200, the room above the account's reserve line (ReserveRoomShare of it; 1 = all of it,
-//     so a planned stop-out ends at the reserve line at worst), and what is left of today's $400 loss backstop
+//   budget = the smallest of $200, half the room above the account's reserve line (ReserveRoomShare 0.5; the full room,
+//     1.0, was tested and rejected: docs/FREQUENCY.md), and what is left of today's $400 loss backstop
 // Exits: B's, unchanged: the protective stop from the fill (the noise line and the 25-point cap), the lock (at +25
 // points the stop goes to entry + 2.5), the stop only ever tightens, the take-profit 1.5 noise units from the fill.
 // Also: flat by 15:55 New York (5 minutes before an earlier session end); the account reserve; the evaluation target.
@@ -129,7 +129,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 FedDates = NoiseEngine.FedDatesDefault;
                 RememberAccount = true;
                 CheckLines = true;
-                ReserveRoomShare = 1.0;
+                ReserveRoomShare = 0.5;  // C1, as tested; 1.0 (C2) was rejected: docs/FREQUENCY.md
             }
             else if (State == State.DataLoaded)
             {
@@ -791,7 +791,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         [NinjaScriptProperty]
         [Range(0.1, 1.0)]
-        [Display(Name = "Share of the room above the reserve an entry may risk (1 = all)", Order = 11, GroupName = "2. Account")]
+        [Display(Name = "Share of the room above the reserve an entry may risk (0.5 as tested)", Order = 11, GroupName = "2. Account")]
         public double ReserveRoomShare { get; set; }
 
         [NinjaScriptProperty]

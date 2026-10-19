@@ -7,7 +7,7 @@ for byte.
 
 | File | Goes to | sha256 |
 |---|---|---|
-| `bin/Custom/Strategies/MnqMomentumC.cs` | `Documents\NinjaTrader 8\bin\Custom\Strategies\` | `0047eb782c70bc81904dd99c029281bb894de9fa3d538c5e0327eb03bff2250e` |
+| `bin/Custom/Strategies/MnqMomentumC.cs` | `Documents\NinjaTrader 8\bin\Custom\Strategies\` | `8b5d0ef6c0f27fcb9b7710e06af8168ac9b617fbc72dc7559aea538817f70e6b` |
 | `bin/Custom/AddOns/MnqNoiseEngine.cs` | `Documents\NinjaTrader 8\bin\Custom\AddOns\` | `e5a1ec0cc18b15509828149ce8aa0e9c7a104a59aff0992190205c42f354deb7` (B's, unchanged) |
 
 **Dependencies:** none beyond these two files and NinjaTrader 8.

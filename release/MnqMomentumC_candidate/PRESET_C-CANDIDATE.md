@@ -48,6 +48,7 @@ checking that result natively. Frozen B (`MnqMomentumB_v1`) is unchanged and sta
 | Live: read the account's balance from the broker | **On** |
 | Live: remember the highest equity, the pass and today's losers in a file | **On** |
 | Live: the account's liquidation threshold now, $ | **0** on a fresh account; otherwise the threshold Apex shows |
+| Share of the room above the reserve an entry may risk | **0.5** (as tested; 1.0 was tested and rejected, docs/FREQUENCY.md) |
 
 **Group 3 (Entries, B's):** Skip dates and Fed dates at their defaults (to the end of 2027).
 
@@ -77,7 +78,9 @@ Same settings, with:
   PassOnRealizedOnly True, MaxRisk 200, MaxContracts 4".
 - **After 16:00:**
   - Save the NinjaScript Output as `C_<yyyy-mm-dd>_output.txt`. Every qualifying check has a line: "entry sent", or
-    "not taken: <reason>".
+    "not taken: <reason>". A refusal for room also gives the room and one contract's risk.
+  - Every session has a "C session" line: its status and its counts. `research/session_audit.py <Output> <out.csv>`
+    tabulates them.
   - Export the day's Executions.
 - **At the end of a run:** the "C audit" lines report:
   - data coverage, complete sessions and the warm-up;
