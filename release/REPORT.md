@@ -64,11 +64,13 @@ said it left most stops unslipped; that was a misreading, corrected in docs/MNQ_
 **The native fact that matters most:** in this same period, B's **closed-trade** drawdown at 4 MNQ reached
 $2,737-2,883, already more than the $2,000 the account allows. The intraday drawdown is at least as large.
 
-**Native, with intraday peaks (added after the MNQ bars arrived; docs/MNQ_NATIVE.md):**
-- **Data:** the traded contracts (09-26, then 12-26 from the 9/10 roll). The stand-in matched NinjaTrader on these
-  bars to the cent.
-- **Result, 7/20 to 10/16, 4 MNQ, 1 tick:** 39 pass / 10 fail / 14 expire of 63 overlapping starts; 4 / 1 / 1 back
-  to back.
+**The stand-in simulator on the user's MNQ bars, with intraday peaks** (added after the bars arrived; corrected
+accounting; docs/MNQ_NATIVE.md):
+- **Data:** the traded contracts (09-26, then 12-26 from the 9/10 roll).
+- **Native check:** NinjaTrader's own runs were reproduced only for the 20 October trades: all 20 exactly at 0 ticks;
+  19 of 20 at 1 and 2 ticks, with totals equal to the cent.
+- **Result, 44 fully observed starts (7/20 to 9/17), 4 MNQ, at 1 and at 2 ticks:** 24 pass / 6 fail / 14 expire.
+  Back to back: 4 / 1 / 1.
 - **Limits:** about 3 independent windows, and the period that chose B.
 
 **Not native, for context only (rescaled NQ and index data on the stand-in; not proof about MNQ):**
@@ -85,7 +87,7 @@ excessive failure risk:
    Smaller size does not fix that; it mostly runs out of time.
 2. **The native MNQ evidence is one 77-session stretch:** about 2-3 independent evaluation windows. Even there, B's
    closed drawdown went past the $2,000 trailing allowance.
-3. **On native MNQ with intraday peaks it passed more than it failed** (July to October 2026). But that is about
+3. **On the user's MNQ bars (the simulator, July to October 2026) it passed more than it failed.** But that is about
    3 independent windows from the period that selected it, against ten years of substitute data that say the
    opposite. It is not enough to establish a pass rate.
 

@@ -31,43 +31,50 @@
 The one difference (10/16 11:31, short) is a tick at entry and a tick at exit in opposite directions, so the dollars
 are the same.
 
-**The stand-in reproduces NinjaTrader on MNQ bars.**
+**Scope of this check:** it covers the 20 October trades (10/1 to 10/16). At 0 ticks all 20 match exactly; at 1 and
+2 ticks 19 of 20 match exactly and the totals match to the cent. It does not cover July to September: no native
+NinjaTrader run on 09-26 bars exists to compare against.
 
 **A correction follows from this.** NinjaTrader's slippage setting slips stop exits too. The earlier statement that it
 left most stops unslipped (docs/REFERENCE.md section 4b) misread fills whose stop is set in ticks from an
 already-slipped entry. It is corrected there and in `release/REPORT.md`.
 
-## Test 2: control B in the 50K evaluation on the traded contracts - executed
+## Test 2: control B in the 50K evaluation - executed (the stand-in simulator on the user's MNQ bars)
 
-`research/mnq_eval.py`.
+**This is the stand-in simulator running on the user's MNQ bars, not a NinjaTrader run.** NinjaTrader reproduced it
+only for the 20 October trades (test 1). Script: `research/mnq_eval.py`.
 
 **Setup:**
 - **Warm-up:** 6/29 to 7/17, the first 14 full sessions.
-- **Evaluation starts:** every session from 7/20; 63 resolved before the data ends on 10/16.
-- **Rules as in docs/EVALUATION.md:**
-  - $3,000 target (the strategy's own close at $3,025);
-  - $2,000 trail including unrealized peaks;
-  - 30 calendar days;
-  - minute equity, both orders of each bar.
-- **Costs:** $0.95 a side; slippage 1 and 2 ticks.
+- **Evaluation starts:** every session from 7/20. The 4- and 2-contract runs use identical start dates.
+- **Fully observed starts:** the 44 sessions from 7/20 to 9/17, whose 30 days end by 10/16. **Later starts** (9/18 to
+  10/16) are shown separately: they resolve only if the outcome came before the data ends.
 
-| Control B | Trades (7/20-10/16) | Net | Profit factor | Closed DD | Evaluations pass / fail / expired (of 63, overlapping) | Back to back pass / fail / expired | Median days to pass |
-|---|---:|---:|---:|---:|---|---|---:|
-| 4 MNQ / $200, 1 tick | 97 | $13,218.80 | 2.6 | $2,075.20 | 39 / 10 / 14 | 4 / 1 / 1 | 11 |
-| 4 MNQ / $200, 2 ticks | 97 | $13,030.80 | 2.5 | $2,099.20 | 37 / 12 / 14 | 4 / 2 / 1 (1 unresolved) | 9 |
-| 2 MNQ / $100, 1 tick | 97 | $6,609.40 | 2.6 | $1,037.60 | 18 / 0 / 30 (48 resolved) | 1 / 0 / 2 (1 unresolved) | 16.5 |
-| 2 MNQ / $100, 2 ticks | 97 | $6,515.40 | 2.5 | $1,049.60 | 18 / 0 / 30 (48 resolved) | 1 / 0 / 2 (1 unresolved) | 19.5 |
+**Accounting (corrected, docs/EVALUATION.md):**
+- Each position follows a valid price path, with nothing after an exit in its bar.
+- Stops crossed at the open fill there.
+- The trail is checked at every price point and after every commission.
+- Four valid paths are tried.
 
-- No outcome depended on the order of a bar's high and low.
-- The window-by-window results for 4 MNQ at 1 tick are in `verification/mnq_native_eval_windows_4mnq_1tick.csv`.
+| Control B | Net (7/20-10/16) | Profit factor | Closed DD | 44 fully observed starts: pass / fail / expired | Later starts (21): pass / fail / unresolved | Back to back pass / fail / expired / unresolved |
+|---|---:|---:|---:|---|---|---|
+| 4 MNQ / $200, 1 tick | $13,218.80 | 2.6 | $2,075.20 | 24 / 6 / 14 | 15 / 4 / 2 | 4 / 1 / 1 / 0 |
+| 4 MNQ / $200, 2 ticks | $13,030.80 | 2.5 | $2,099.20 | 24 / 6 / 14 | 13 / 6 / 2 | 4 / 2 / 1 / 1 |
+| 2 MNQ / $100, 1 tick | $6,609.40 | 2.6 | $1,037.60 | 14 / 0 / 30 | 4 / 0 / 17 | 1 / 0 / 2 / 1 |
+| 2 MNQ / $100, 2 ticks | $6,515.40 | 2.5 | $1,049.60 | 14 / 0 / 30 | 4 / 0 / 17 | 1 / 0 / 2 / 1 |
+
+- No window's outcome, or its day, depends on the order of prices inside a bar.
+- The outcome of every start, all four runs side by side: `verification/mnq_native_eval_by_start.csv`.
+- **The fixes changed no MNQ outcome.** The earlier replay's 63 resolved windows (39 pass / 10 fail / 14 expired at
+  4 MNQ, 1 tick) are the same 63 here (24 + 15 / 6 + 4 / 14).
 
 ## What it means
 
-**On the user's own MNQ, July to October 2026, control B passed the evaluation more often than it failed.** It
-passed 39 times against 10 at 1 tick, and 4 of 6 back to back.
+**On the user's MNQ bars, July to October 2026, the simulator's control B passed more often than it failed.** Of the
+44 fully observed starts at 4 MNQ: 24 passed, 6 failed and 14 expired (at both 1 and 2 ticks). Back to back: 4 of 6.
 
 **This is the most direct evidence so far, and also the weakest base for a decision:**
-- **It is about 3 independent 30-day windows.** The 63 starts overlap almost completely.
+- **It is about 3 independent 30-day windows.** The 44 fully observed starts overlap almost completely.
 - **It is the period whose results chose B over the combined strategy,** so it is development data, not validation.
 - **Over ten years of NQ (substitute, rescaled data), the same strategy and rules fail about twice as often as they
   pass** (docs/EVALUATION.md, docs/DEVELOPMENT.md).

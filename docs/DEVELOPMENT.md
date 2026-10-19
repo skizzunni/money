@@ -130,3 +130,10 @@ Passing reliably needs a much larger edge for the same risk. Neither the control
 
 **Rollover method:** each contract is used from the session after the previous one's roll date (8 days before
 expiry), and the roll is documented in the result.
+
+## 5. After the replay fix (October 19)
+
+The evaluation replay's accounting was corrected (docs/EVALUATION.md section 3).
+- Re-run with it, the control's counts move by at most a few windows.
+- The candidate B2 was rejected on net, profit factor and the evaluation alike. Its net and profit factor do not
+  depend on the replay, so the rejection stands.

@@ -19,10 +19,16 @@ close that leaves $3,000 or more closed is a pass. One evaluation per start sess
 overlap heavily (not independent trials); a second count runs them back to back (the next starts the session after
 an outcome).
 
-Equity is followed minute by minute through each open position: a bar's high and low (a stop exit's worst point is
-its fill, a take-profit's best is its fill, a market exit is its fill). A 1-minute bar does not say whether its high
-or low came first, so each bar is taken both ways; an evaluation whose outcome or day differs between the two is
-"sequencing-dependent" and reported apart, with the outcome under each.
+Equity is followed along a valid price path through each position (the stand-in's own fills decide entries and
+exits; the replay adds the account's view). The entry fills at its bar's open; within each bar the price goes from
+the open to one extreme, then the other, so a bar has two possible paths (favourable extreme first, or adverse
+first). A stop exit ends the path at its fill: on the favourable-first path the bar's favourable extreme comes before
+it, on the adverse-first path nothing after the open does. A take-profit ends it at its fill: the adverse extreme comes
+before it only on the adverse-first path. A market exit, or a stop crossed at the open, fills at the open and nothing
+later in that bar counts. Commission is charged at each fill; the trail is checked after every price point and every
+fill (so an exit commission can breach it). Each evaluation is replayed along four valid paths: every bar favourable
+first, every bar adverse first, and the two mixes worst and best for the trailing threshold. An evaluation whose
+outcome or outcome day differs between them is "sequencing-dependent", reported apart with its possible outcomes.
 """
 from __future__ import annotations
 
@@ -40,36 +46,56 @@ import controlled as K  # noqa: E402
 
 TARGET, TRAIL, BUFFER, DAYS, FEE = 3000.0, 2000.0, 25.0, 30, 0.95
 SIZES = {"4 MNQ / $200": {"EvalQty": 4, "EvalMaxLoss": 200}, "2 MNQ / $100": {"EvalQty": 2, "EvalMaxLoss": 100}}
+PATHS = ("favourable first", "adverse first", "worst mix", "best mix")
 
 
-def marks(tr, o, h, lo):
-    """Per trade: the bars it is open on, and the open P/L at each bar's best and worst point (commission of the
-    entry side charged), and its net result (both sides)."""
+def marks(tr, o, h, lo, slip_ticks):
+    """Per trade, what the replay needs: (entry bar, exit bar, direction, contracts, entry fill, exit fill, exit kind,
+    net P/L, the bars' open / high / low). Exit kinds: "open" (a market exit, or a stop crossed at the bar's open,
+    filled at the open), "stop", "target"."""
+    slip = 0.25 * slip_ticks
     out = []
     for r in tr.itertuples():
-        d, q, en = r.d, r.q, r.en
-        idx = np.arange(r.eb, r.xb + 1)
-        fav = (h[idx] if d > 0 else lo[idx]).astype(float)
-        adv = (lo[idx] if d > 0 else h[idx]).astype(float)
-        if r.why == "Stop loss":
-            adv[-1] = r.ex
-        elif r.why == "Profit target":
-            fav[-1] = r.ex
-        else:  # a market exit fills at its bar's open
-            fav[-1] = adv[-1] = r.ex
-        f = d * (fav - en) * q * 2.0 - FEE * q
-        a = d * (adv - en) * q * 2.0 - FEE * q
-        out.append((r.eb, r.xb, f, a, r.pnl, q))
+        d, xb = r.d, r.xb
+        if r.why == "Profit target":
+            kind = "target"
+        elif r.why == "Stop loss" and d * (o[xb] - d * slip - r.ex) > 1e-9:
+            kind = "stop"  # filled at the stop, inside the bar
+        else:
+            kind = "open"  # a market exit or a stop crossed at the open
+        idx = np.arange(r.eb, xb + 1)
+        out.append((r.eb, xb, d, r.q, r.en, r.ex, kind, r.pnl, o[idx], h[idx], lo[idx]))
     return out
 
 
-def evaluate(trs, start_bar, end_bar, day_of, worst, dll=0.0):
-    """One evaluation from start_bar, to end_bar (exclusive). worst: within a bar the order worse for the trader
-    (best point first, so the peak rises, then the worst; a breach beats a pass); else the better one."""
-    e = peak = 0.0
-    dd = 0.0
+def _bar_points(d, op, hi, lo_, first, last, kind, favourable_first):
+    """Prices the position passes through in one bar, in order, before its exit fill (if this is the exit bar)."""
+    fav, adv = (hi, lo_) if d > 0 else (lo_, hi)
+    pts = [] if first else [op]  # the entry bar starts at the entry fill itself
+    if not last:
+        return pts + ([fav, adv] if favourable_first else [adv, fav])
+    if kind == "open":
+        return []  # filled at the open: nothing in this bar counts after it
+    if kind == "stop":
+        return pts + ([fav] if favourable_first else [])
+    return pts + ([] if favourable_first else [adv])  # take-profit
+
+
+def _order(path, kind_of_bar):
+    """Favourable-first for this bar under the given path? kind_of_bar: None (no exit), "stop", "target", "open"."""
+    if path == "favourable first":
+        return True
+    if path == "adverse first":
+        return False
+    worst = path == "worst mix"  # a peak before the drop raises the threshold first; a dip before a target adds a low
+    return (kind_of_bar != "target") if worst else (kind_of_bar == "target")
+
+
+def evaluate(trs, start_bar, end_bar, day_of, path, dll=0.0):
+    """One evaluation from start_bar to end_bar (exclusive) along a path. Returns (outcome, bar, max drawdown)."""
+    e = peak = dd = 0.0
     day_start, cur_day, paused = 0.0, -1, False
-    for eb, xb, f, a, pnl, q in trs:
+    for eb, xb, d, q, en, ex, kind, pnl, bo, bh, bl in trs:
         if eb < start_bar:
             continue
         if eb >= end_bar:
@@ -78,33 +104,40 @@ def evaluate(trs, start_bar, end_bar, day_of, worst, dll=0.0):
             cur_day, day_start, paused = day_of[eb], e, False
         if paused:
             continue
-        tick = 0.25 * q * 2.0
-        for k in range(len(f)):
-            fe, ae = e + f[k], e + a[k]
-            hit_target = fe >= TARGET + BUFFER + tick
-            if worst:
-                p2 = max(peak, fe)
-                if ae <= p2 - TRAIL:
-                    return "fail", eb + k, max(dd, p2 - ae)
-                if hit_target:
-                    return "pass", eb + k, dd
-                peak = p2
-            else:
-                if hit_target:
-                    return "pass", eb + k, dd
-                if ae <= peak - TRAIL:
-                    return "fail", eb + k, max(dd, peak - ae)
-                peak = max(peak, fe)
-            dd = max(dd, peak - ae)
-            if dll > 0 and ae <= day_start - dll:  # sensitivity: the day's loss limit closes and pauses the day
-                e = day_start - dll
-                paused = True
+        mult = q * 2.0
+        tgt = TARGET + BUFFER + 0.25 * mult  # the strategy's own close: a limit filled a tick through
+        base = e - FEE * q  # entry commission charged at the fill
+        bar = eb
+        stopped = False
+        for k in range(len(bo)):
+            last = k == len(bo) - 1
+            kb = kind if last else None
+            prices = ([en] if k == 0 else []) + _bar_points(d, bo[k], bh[k], bl[k], k == 0, last, kind,
+                                                            _order(path, kb)) + ([ex] if last else [])
+            bar = eb + k
+            for px in prices:
+                eq = base + d * (px - en) * mult
+                if eq >= tgt:
+                    return "pass", bar, dd
+                peak = max(peak, eq)
+                dd = max(dd, peak - eq)
+                if eq <= peak - TRAIL:
+                    return "fail", bar, dd
+                if dll > 0 and eq <= day_start - dll:  # sensitivity: the day's loss limit closes and pauses the day
+                    e = day_start - dll
+                    paused = stopped = True
+                    break
+            if stopped:
                 break
-        else:
-            e += pnl
-            if e >= TARGET:
-                return "pass", xb, dd
+        if stopped:
             continue
+        e += pnl  # the exit fill, both commissions charged
+        if e >= TARGET:
+            return "pass", xb, dd
+        peak = max(peak, e)
+        dd = max(dd, peak - e)
+        if e <= peak - TRAIL:
+            return "fail", xb, dd
     return ("expired" if end_bar < 10**12 else "open"), None, dd
 
 
@@ -119,48 +152,52 @@ def run_windows(trs, sessions, first_ok, day_of, bar_day, dll=0.0, chain=False):
         end_bar = int(np.searchsorted(bar_day, end_day))
         complete = end_day <= last_day + pd.Timedelta(days=1)
         res = {}
-        for worst in (True, False):
-            out, at, dd = evaluate(trs, start_bar, end_bar if complete else 10**12, day_of, worst, dll)
-            if out == "open" or (out == "expired" and not complete):
+        for path in PATHS:
+            out, at, dd = evaluate(trs, start_bar, end_bar if complete else 10**12, day_of, path, dll)
+            if out == "open":
                 out = "unresolved (data ends)"
-            res[worst] = (out, at, dd)
-        (ow, aw, ddw), (ob, ab, _) = res[True], res[False]
-        same = ow == ob and (aw is None or bar_day[aw] == bar_day[ab])
-        when = aw if aw is not None else ab
-        rows.append({"start": d0.date(), "outcome worst-order": ow, "outcome best-order": ob,
-                     "sequencing-dependent": not same,
-                     "calendar days": (bar_day[aw] - d0).days + 1 if aw is not None else np.nan,
-                     "sessions": int(np.searchsorted(sessions, bar_day[aw]) - s + 1) if aw is not None else np.nan,
-                     "intraday DD": ddw})
+            res[path] = (out, bar_day[at] if at is not None else None, dd)
+        outs = {v[0] for v in res.values()}
+        days = {v[1] for v in res.values()}
+        w_out, w_day, w_dd = res["worst mix"]
+        rows.append({"start": d0.date(), "fully observed": complete, "outcome": w_out if len(outs) == 1 else
+                     "/".join(sorted(outs)), "sequencing-dependent": len(outs) > 1 or len(days) > 1,
+                     "possible outcomes": "/".join(sorted(outs)),
+                     "calendar days": (w_day - d0).days + 1 if w_day is not None else np.nan,
+                     "sessions": int(np.searchsorted(sessions, w_day) - s + 1) if w_day is not None else np.nan,
+                     "intraday DD": w_dd})
         if chain:
-            if ow == "expired" and ob == "expired":
+            if w_out == "expired":
                 s = int(np.searchsorted(sessions, end_day))
-            elif when is None:
+            elif w_day is None:
                 break
             else:
-                s = int(np.searchsorted(sessions, bar_day[when])) + 1
+                s = int(np.searchsorted(sessions, w_day)) + 1
         else:
             s += 1
     return pd.DataFrame(rows)
 
 
 def summarize(w, label):
+    """Counts of outcomes. A window whose outcome is the same on every path is counted under it (if only its day
+    differs, it is also counted as "day depends on path"); a window whose outcome differs is counted apart, with the
+    outcomes it can have."""
     n = len(w)
-    res = w[w["outcome worst-order"] != "unresolved (data ends)"]
-    det = res[~res["sequencing-dependent"]]
-    out = {"evaluations": n, "unresolved (data ends)": n - len(res),
-           "sequencing-dependent": int(res["sequencing-dependent"].sum())}
+    res = w[w["outcome"] != "unresolved (data ends)"]
+    certain = res[~res["outcome"].str.contains("/")]
+    uncertain = res[res["outcome"].str.contains("/")]
+    out = {"evaluations": n, "unresolved (data ends)": n - len(res), "outcome depends on path": len(uncertain),
+           "only the day depends on path": int(certain["sequencing-dependent"].sum())}
     for o in ("pass", "fail", "expired"):
-        out[o] = int((det["outcome worst-order"] == o).sum())
-    for o in ("pass", "fail", "expired"):
-        out[f"{o} % (worst order)"] = 100 * (res["outcome worst-order"] == o).mean() if len(res) else np.nan
-        out[f"{o} % (best order)"] = 100 * (res["outcome best-order"] == o).mean() if len(res) else np.nan
-    p = res[res["outcome worst-order"] == "pass"]
-    f = res[res["outcome worst-order"] == "fail"]
+        out[o] = int((certain["outcome"] == o).sum())
+        out[f"{o} %"] = 100 * out[o] / len(res) if len(res) else np.nan
+    out["path-dependent outcomes"] = uncertain["outcome"].value_counts().to_dict() if len(uncertain) else {}
+    p = certain[certain["outcome"] == "pass"]
+    f = certain[certain["outcome"] == "fail"]
+    e = certain[certain["outcome"] == "expired"]
     out["median days to pass"] = p["calendar days"].median()
     out["median days to fail"] = f["calendar days"].median()
     out["passes before 7th session"] = int((p["sessions"] < 7).sum())
-    e = res[res["outcome worst-order"] == "expired"]
     out["intraday DD, passes: median / max"] = f"{p['intraday DD'].median():.0f} / {p['intraday DD'].max():.0f}"
     out["intraday DD, expired: median / max"] = f"{e['intraday DD'].median():.0f} / {e['intraday DD'].max():.0f}"
     return {"case": label, **out}
@@ -188,7 +225,7 @@ def main() -> None:
         size, props, slip = args
         tr = K.run(dll_, csv, UseBreakout=False, SimSlippageTicks=slip, SimCommissionPerSide=FEE, SkipDates=skip,
                    **props)
-        trs = marks(tr, o, h, lo)
+        trs = marks(tr, o, h, lo, slip)
         rows = []
         for dll, chain in ((0.0, False), (0.0, True), (1000.0, False)):
             w = run_windows(trs, sessions, first_ok, day_of, bar_day, dll, chain)

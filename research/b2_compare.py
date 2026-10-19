@@ -64,14 +64,14 @@ def run_period(dll, label, pkl, first, last):
              "profit factor": wins.sum() / -losses.sum(), "avg win": wins.mean(), "avg loss": losses.mean(),
              "closed DD": float((eq.cummax().clip(lower=0) - eq).max()), "losing streak": best,
              "worst day": day.min()}
-        trs = E.marks(tr, o, h, lo_)
+        trs = E.marks(tr, o, h, lo_, slip)
         w = E.run_windows(trs, sessions, first_ok, day_of, bar_day)
         s = E.summarize(w, "")
         wb = E.run_windows(trs, sessions, first_ok, day_of, bar_day, chain=True)
         sb = E.summarize(wb, "")
         r.update({"eval starts": s["evaluations"], "pass": s["pass"], "fail": s["fail"], "expired": s["expired"],
-                  "seq-dependent": s["sequencing-dependent"], "unresolved": s["unresolved (data ends)"],
-                  "pass %": s["pass % (worst order)"], "fail %": s["fail % (worst order)"],
+                  "path-dependent": s["outcome depends on path"], "unresolved": s["unresolved (data ends)"],
+                  "pass %": s["pass %"], "fail %": s["fail %"],
                   "median days to pass": s["median days to pass"],
                   "back-to-back pass/fail/expired": f"{sb['pass']}/{sb['fail']}/{sb['expired']}"})
         return r

@@ -82,16 +82,24 @@ unlike NinjaTrader's setting.
   they are few.
 - Windows whose 30 days run past the data are "unresolved".
 
-## 3. Results - executed
+## 3. Results - executed (re-run with the corrected accounting, October 19)
+
+**The corrected accounting** (`tests/test_eval_sim.py`):
+- prices after an exit in its bar no longer count;
+- a stop crossed at the open fills there;
+- the trail is checked after every fill and commission;
+- four valid intrabar paths are tried.
+
+The counts below are from the corrected replay. They differ from the first version by at most a few windows.
 
 **NQ 2015-2025 (rescaled), 2,648 start dates (overlapping):**
 
 | Case | Pass | Fail | Expired | Unresolved | Median days to pass / fail | Intraday DD of passes, median / max |
 |---|---:|---:|---:|---:|---|---|
-| 4 MNQ / $200, 1 tick | 831 (31.6%) | 1,596 (60.7%) | 203 (7.7%) | 18 | 11 / 14 | $1,288 / $1,993 |
-| 4 MNQ / $200, 2 ticks | 793 (30.2%) | 1,640 (62.4%) | 196 (7.5%) | 19 | 11 / 13 | $1,307 / $1,980 |
-| 2 MNQ / $100, 1 tick | 202 (7.7%) | 386 (14.7%) | 2,039 (77.6%) | 21 | 21 / 22 | $819 / $1,954 |
-| 2 MNQ / $100, 2 ticks | 182 (6.9%) | 407 (15.5%) | 2,038 (77.6%) | 21 | 22 / 22 | $824 / $1,992 |
+| 4 MNQ / $200, 1 tick | 830 (31.6%) | 1,595 (60.6%) | 203 (7.7%) | 18 (+2 path-dependent) | 11 / 14 | see the .txt |
+| 4 MNQ / $200, 2 ticks | 787 (29.9%) | 1,638 (62.3%) | 196 (7.5%) | 19 (+8 path-dependent: pass or fail) | 11 / 13 | see the .txt |
+| 2 MNQ / $100, 1 tick | 201 (7.7%) | 386 (14.7%) | 2,039 (77.6%) | 21 (+1 path-dependent) | 21 / 22 | see the .txt |
+| 2 MNQ / $100, 2 ticks | 182 (6.9%) | 397 (15.1%) | 2,038 (77.6%) | 21 (+10 path-dependent: expiry or fail) | 22 / 22 | see the .txt |
 
 **Back to back on NQ:**
 
@@ -106,8 +114,8 @@ unlike NinjaTrader's setting.
 
 | Case | Pass | Fail | Expired | Unresolved | Median days to pass / fail |
 |---|---:|---:|---:|---:|---|
-| 4 MNQ / $200, 1 tick | 68 (22.7%) | 186 (62.0%) | 46 (15.3%) | 6 | 10 / 15 |
-| 4 MNQ / $200, 2 ticks | 56 (18.7%) | 201 (67.0%) | 43 (14.3%) | 6 | 9 / 16 |
+| 4 MNQ / $200, 1 tick | 68 (22.7%) | 185 (61.7%) | 46 (15.3%) | 6 (+1 path-dependent) | 10 / 15 |
+| 4 MNQ / $200, 2 ticks | 56 (18.7%) | 197 (65.7%) | 43 (14.3%) | 6 (+4 path-dependent: expiry or fail) | 9 / 16 |
 | 2 MNQ / $100, 1 tick | 10 (3.5%) | 12 (4.2%) | 264 (92.3%) | 20 | 17.5 / 28 |
 | 2 MNQ / $100, 2 ticks | 10 (3.5%) | 12 (4.2%) | 264 (92.3%) | 20 | 17.5 / 28 |
 
