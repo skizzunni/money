@@ -309,7 +309,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         // the position: one lot per entry name (an entry and its own stop and take-profit, as NinjaTrader's
         // per-entry Set orders); all the lots of a position fill together, at the same price
         sealed class Lot { public string Name; public int Qty; public double Stop = double.NaN, Target = double.NaN; }
-        sealed class Pending { public int Dir, Qty; public string Name; public Order Order; }
+        sealed class Pending { public int Dir, Qty, Bar; public string Name; public Order Order; }
         readonly List<Lot> lots = new List<Lot>();
         readonly List<Pending> pend = new List<Pending>();
         string pendExit;
@@ -326,6 +326,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         // back, nothing is sent: NinjaTrader's managed-order rules); SimRejectEntriesAt: the broker rejects it.
         public string SimIgnoreEntriesAt { get; set; }
         public string SimRejectEntriesAt { get; set; }
+        public int SimHoldEntryBars { get; set; }  // tests: an entry stays working this many more bars before it fills
         int execs;
         static bool At(string bars, int bar) { return bars != null && Array.IndexOf(bars.Split(','), bar.ToString()) >= 0; }
         void Report(Order o, OrderState st, string comment)
@@ -425,7 +426,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             Report(o, OrderState.Accepted, "");
             Report(o, OrderState.Working, "");
             Pending p = new Pending();
-            p.Dir = d; p.Qty = qty; p.Name = name; p.Order = o;
+            p.Dir = d; p.Qty = qty; p.Name = name; p.Order = o; p.Bar = CurrentBar;
             pend.Add(p);
             return o;
         }
@@ -563,9 +564,10 @@ namespace NinjaTrader.NinjaScript.Strategies
                 if (pendExit != null && Position.MarketPosition != MarketPosition.Flat)
                     Fill(i, o[i] - Dir * slip, pendExit);
                 pendExit = null;
-                if (pend.Count > 0 && Position.MarketPosition != MarketPosition.Flat && Dir == -pend[0].Dir)  // a reversal
+                bool due = pend.Count > 0 && i > pend[0].Bar + SimHoldEntryBars;
+                if (due && Position.MarketPosition != MarketPosition.Flat && Dir == -pend[0].Dir)  // a reversal
                     Fill(i, o[i] - Dir * slip, "Close position");
-                if (pend.Count > 0)
+                if (due)
                 {
                     int pd = pend[0].Dir;
                     Position.MarketPosition = pd > 0 ? MarketPosition.Long : MarketPosition.Short;

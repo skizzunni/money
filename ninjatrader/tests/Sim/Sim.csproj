@@ -17,5 +17,6 @@
     <Compile Include="../../AddOns/MnqNoiseEngine.cs" />
     <Compile Include="../../Strategies/MnqNoiseMomentum.cs" />
     <Compile Include="../../Strategies/MnqMomentumRunner.cs" />
+    <Compile Include="../../Strategies/MnqMomentumC.cs" />
   </ItemGroup>
 </Project>
