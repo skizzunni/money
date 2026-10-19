@@ -203,7 +203,7 @@ def compare(mk, dll, out, slips=(1, 2), workers=4):
         for p in pnl:
             run_ = run_ + 1 if p < 0 else 0
             streak = max(streak, run_)
-        exit_day = bar_day[ch.xb.to_numpy()]
+        exit_day = bar_day[ch.xb.to_numpy(dtype=int)]
         day = pnl.groupby(exit_day).sum()
         per = pnl.groupby(exit_day.to_period(mk.period)).sum()
         fmt = "%b" if mk.period == "M" else "%Y"
