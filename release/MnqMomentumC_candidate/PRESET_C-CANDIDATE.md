@@ -1,8 +1,8 @@
 # Preset C-CANDIDATE: candidate C on a simulation account
 
 **For a native check or practice only:** a NinjaTrader simulation account, never a paid evaluation account. The
-pre-registered comparison in `docs/CANDIDATE_C.md` decides adoption. Frozen B (`MnqMomentumB_v1`) is unchanged and
-stays the benchmark.
+pre-registered comparison in `docs/CANDIDATE_C.md` **rejects candidate C**: this preset is for reproducing and
+checking that result natively. Frozen B (`MnqMomentumB_v1`) is unchanged and stays the benchmark.
 
 ## Account
 

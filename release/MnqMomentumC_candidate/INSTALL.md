@@ -1,6 +1,7 @@
 # MNQ Momentum C (candidate): install (NinjaTrader 8)
 
-**Status:** a test candidate, built and tested on the stand-in simulator only. `docs/CANDIDATE_C.md` holds its
+**Status:** a test candidate, **rejected** by its pre-registered comparison; built and tested on the stand-in
+simulator only. `docs/CANDIDATE_C.md` holds its
 pre-registered criteria and the result. It installs next to frozen B without changing B: the AddOn is B's file, byte
 for byte.
 
