@@ -1,0 +1,158 @@
+diff -ru /home/user/money/ninjatrader/AddOns/MnqNoiseEngine.cs ninjatrader/AddOns/MnqNoiseEngine.cs
+--- /home/user/money/ninjatrader/AddOns/MnqNoiseEngine.cs	2026-10-18 21:03:32.724352916 +0000
++++ ninjatrader/AddOns/MnqNoiseEngine.cs	2026-10-20 02:29:08.414386298 +0000
+@@ -29,6 +29,8 @@
+         public double TakeProfit = 1.5;      // noise units from the fill; 0 = off
+         public double LockAt = 1.0;          // in max losses of profit; then the stop moves to entry + LockPlus
+         public double LockPlus = 2.5;        // points
++        public double NoiseLockAt = 0.0;     // candidate B3: at this many noise units of profit (0 = off) the stop moves
++        public double NoiseLockKeep = 0.5;   // to entry + this many noise units (docs/B_BREACHES.md)
+         public int MaxLosers = 4;            // no new entries after this many losers today; 0 = no limit
+         public bool TightenOnly = false;     // in a trade the stop never moves back toward the price (round 139)
+     }
+@@ -95,7 +97,7 @@
+         public double EntryPrice;
+         public int EntryBar;
+         public double Upper = double.NaN, Lower = double.NaN, Sigma = double.NaN;
+-        public bool Locked, SkipToday, FedToday;
++        public bool Locked, NoiseLocked, SkipToday, FedToday;
+         public int LosersToday;
+         public double DayPnl;              // closed P/L today, $
+         public int DayTrades;
+@@ -162,6 +164,11 @@
+                 double lk = EntryPrice + p * s.LockPlus;
+                 if ((p > 0 && lk > line) || (p < 0 && lk < line)) { line = lk; reason = "Lock"; }
+             }
++            if (NoiseLocked && !double.IsNaN(Sigma))
++            {
++                double nk = EntryPrice * (1 + p * s.NoiseLockKeep * Sigma);
++                if ((p > 0 && nk > line) || (p < 0 && nk < line)) { line = nk; reason = "Lock"; }
++            }
+             if (s.TightenOnly && !double.IsNaN(held) && ((p > 0 && held > line) || (p < 0 && held < line)))
+             {
+                 line = held;
+@@ -231,6 +238,7 @@
+             DayTrades++;
+             Position = 0;
+             Locked = false;
++            NoiseLocked = false;
+             held = double.NaN;
+             heldWhy = "";
+         }
+@@ -284,6 +292,11 @@
+                     double lk = EntryPrice + p * s.LockPlus;
+                     if ((p > 0 && lk > line) || (p < 0 && lk < line)) { line = lk; reason = "Lock"; }
+                 }
++                if (NoiseLocked && !double.IsNaN(Sigma))
++                {
++                    double nk = EntryPrice * (1 + p * s.NoiseLockKeep * Sigma);
++                    if ((p > 0 && nk > line) || (p < 0 && nk < line)) { line = nk; reason = "Lock"; }
++                }
+                 if (s.TightenOnly)  // the stop placed with the entry is only ever tightened
+                 {
+                     if (EntryBar != i && !double.IsNaN(held) && ((p > 0 && held > line) || (p < 0 && held < line)))
+@@ -333,6 +346,11 @@
+                 double trigger = s.LockAt * s.MaxLoss / s.Qty / s.PointValue;
+                 Locked = Position * ((Position > 0 ? h : l) - EntryPrice) >= trigger;
+             }
++            if (Position != 0 && !NoiseLocked && s.NoiseLockAt > 0 && !double.IsNaN(Sigma))
++            {
++                // armed the same way, at NoiseLockAt noise units of profit (the take-profit's units), from the next bar
++                NoiseLocked = Position * ((Position > 0 ? h : l) - EntryPrice) >= s.NoiseLockAt * Sigma * EntryPrice;
++            }
+ 
+             if (Position != 0 && (!inRth || tMin == RthOpen))  // a session ended early (half day, data gap)
+             {
+--- /home/user/money/ninjatrader/Strategies/MnqNoiseMomentum.cs	2026-10-18 21:03:32.724352916 +0000
++++ ninjatrader/Strategies/MnqNoiseMomentum.cs	2026-10-20 02:29:08.416441180 +0000
+@@ -53,6 +53,7 @@
+         int minutes;
+         bool badChart;
+         bool realLocked;            // the real position reached the lock trigger
++        bool realNoiseLocked;       // ... and candidate B3's noise lock (NoiseLockAt; off by default)
+         bool closingRejected;       // a rejection already sent the position to market
+         bool exitRejected;          // one of the strategy's own exits was rejected: sent again at the next bar
+         double lastStop = double.NaN;  // TightenOnly: the bot's stop so far in this trade
+@@ -166,7 +167,9 @@
+                 TightenOnly = true;    // the stop never moves back toward the price (docs/RESULTS.md round 139)
+                 DailyMaxLosers = 0;    // shared daily gate, both setups (docs/VERIFICATION.md): off by default
+                 DailyLossLimit = 0;
+-                PartialAtR = 0;        // half off at 1R: frozen for the forward test, off by default
++                PartialAtR = 0;
++                NoiseLockAt = 0;       // candidate B3 (docs/B_BREACHES.md): off by default
++                NoiseLockKeep = 0.5;        // half off at 1R: frozen for the forward test, off by default
+                 Diagnostics = false;
+                 BreakoutTarget = 8;    // 8 x its stop = 2 x yesterday's range: a full bracket (docs/RESULTS.md round 130)
+                 AccountStart = 50000;
+@@ -197,6 +200,8 @@
+                 settings.StopBuffer = StopBuffer;
+                 settings.LockAt = LockAt;
+                 settings.LockPlus = LockPlus;
++                settings.NoiseLockAt = NoiseLockAt;
++                settings.NoiseLockKeep = NoiseLockKeep;
+                 settings.MaxLosers = MaxLosers;
+                 settings.TightenOnly = TightenOnly;
+                 settings.Lookback = Lookback;
+@@ -803,6 +808,7 @@
+             if (real == 0)
+             {
+                 realLocked = false;
++                realNoiseLocked = false;
+                 closingRejected = false;
+                 exitRejected = false;
+                 owner = Nobody;
+@@ -913,6 +919,7 @@
+                 botSent = true;
+                 owner = Bot;
+                 realLocked = false;
++                realNoiseLocked = false;
+                 closingRejected = false;
+                 return;
+             }
+@@ -965,6 +972,8 @@
+             double lockPts = engine.LockPoints;
+             if (!realLocked && !double.IsNaN(lockPts))
+                 realLocked = real * ((real > 0 ? High[0] : Low[0]) - avg) >= lockPts;
++            if (!realNoiseLocked && NoiseLockAt > 0 && !double.IsNaN(engine.Sigma))
++                realNoiseLocked = real * ((real > 0 ? High[0] : Low[0]) - avg) >= NoiseLockAt * engine.Sigma * avg;
+             double stop = RealStop(real, avg);
+             if (double.IsNaN(stop))
+                 return;
+@@ -1036,6 +1045,11 @@
+                 double lk = avg + d * LockPlus;
+                 if ((d > 0 && lk > line) || (d < 0 && lk < line)) line = lk;
+             }
++            if (realNoiseLocked && !double.IsNaN(engine.Sigma))
++            {
++                double nk = avg * (1 + d * NoiseLockKeep * engine.Sigma);
++                if ((d > 0 && nk > line) || (d < 0 && nk < line)) line = nk;
++            }
+             return line;
+         }
+ 
+@@ -1272,7 +1286,7 @@
+             Print("MNQ settings: account " + (Account == null ? "none" : Account.Name) + ", " + Book + " (from " +
+                   accountTypeFrom + "), PlaceOrders " + PlaceOrders + ", " + Qty + " MNQ, max loss " + Usd(MaxLoss) +
+                   ", losers " + MaxLosers + ", Lookback " + Lookback + ", DailyLossLimit " + DailyLossLimit +
+-                  ", DailyMaxLosers " + DailyMaxLosers + ", PartialAtR " + PartialAtR + ", TightenOnly " + TightenOnly +
++                  ", DailyMaxLosers " + DailyMaxLosers + ", PartialAtR " + PartialAtR + ", NoiseLock " + NoiseLockAt + "/" + NoiseLockKeep + ", TightenOnly " + TightenOnly +
+                   ", UseBreakout " + UseBreakout + " (risk " + Usd(Funded ? BreakoutRisk : EvalBreakoutRisk) + ", shorts " +
+                   BreakoutShorts + ")");
+             Print("MNQ settings: history controls: EvalTarget " + EvalTarget + " in history " + EvalTargetInHistory +
+@@ -1815,6 +1829,16 @@
+         public double PartialAtR { get; set; }
+ 
+         [NinjaScriptProperty]
++        [Range(0.0, 10.0)]
++        [Display(Name = "Noise lock: at this many noise units of profit (0 = off; candidate B3: 1.0)", Order = 8, GroupName = "2. Exits")]
++        public double NoiseLockAt { get; set; }
++
++        [NinjaScriptProperty]
++        [Range(0.0, 10.0)]
++        [Display(Name = "Noise lock: moves the stop to entry + this many noise units (candidate B3: 0.5)", Order = 9, GroupName = "2. Exits")]
++        public double NoiseLockKeep { get; set; }
++
++        [NinjaScriptProperty]
+         [Range(0, 100)]
+         [Display(Name = "Daily gate, both setups: no entry after this many losing trades today (0 = off)", Order = 22, GroupName = "1. Account")]
+         public int DailyMaxLosers { get; set; }

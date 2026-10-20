@@ -1,0 +1,48 @@
+                           0        1        2        3
+arm                        B       B3        B       B3
+slippage                   1        1        2        2
+eligible sessions         64       64       64       64
+trades                    97      104       97      104
+trades / session        1.52     1.62     1.52     1.62
+net $                13218.8  14295.6  13030.8  14097.6
+profit factor           2.58     2.62     2.54     2.59
+win %                  58.76    59.62    58.76    58.65
+avg win                379.0   372.56    377.1   376.86
+avg loss              -209.6   -209.6   -211.6  -206.76
+intraday DD $         2612.8   2311.2   2652.8   2335.2
+losing streak              6        6        6        6
+worst day $           -628.8   -628.8   -634.8   -634.8
+net / intraday DD       5.06     6.19     4.91     6.04
+eval full starts          44       44       44       44
+pass                      24       24       24       24
+fail                       6        6        6        6
+expired                   14       14       14       14
+path-dependent             0        0        0        0
+pass %                 54.55    54.55    54.55    54.55
+fail %                 13.64    13.64    13.64    13.64
+median days to pass     13.5     13.5     13.5     13.5
+             net $                            net / intraday DD                  
+slippage         1                 2                          1           2      
+arm              B       B3        B       B3                 B    B3     B    B3
+part                                                                             
+7/20-8/31   2992.4   3776.8   2906.4   3688.8              1.15  1.63  1.10  1.58
+9/1-10/16  10226.4  10518.8  10124.4  10408.8              4.55  4.68  4.46  4.58
+all        13218.8  14295.6  13030.8  14097.6              5.06  6.19  4.91  6.04
+
+slippage 1: paired fully observed starts (B -> B3)
+B3       expired  fail  pass
+B                           
+expired       14     0     0
+fail           0     6     0
+pass           0     0    24
+later starts (13): B {'pass': 13}, B3 {'pass': 13}
+changed trades 5: winners sacrificed (B3 made less) 0, $0.00 (B made $0.00 on them, B3 $0.00); B3 made more 5, +$1,454.00; knock-on: B only 0 $0.00, B3 only 7 $-377.20
+
+slippage 2: paired fully observed starts (B -> B3)
+B3       expired  fail  pass
+B                           
+expired       14     0     0
+fail           0     6     0
+pass           0     0    24
+later starts (13): B {'pass': 13}, B3 {'pass': 13}
+changed trades 5: winners sacrificed (B3 made less) 0, $0.00 (B made $0.00 on them, B3 $0.00); B3 made more 5, +$1,460.00; knock-on: B only 0 $0.00, B3 only 7 $-393.20
