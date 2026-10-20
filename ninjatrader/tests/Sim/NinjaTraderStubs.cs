@@ -57,7 +57,7 @@ namespace NinjaTrader.Cbi
             throw new NotSupportedException();
         }
     }
-    public enum OrderState { Initialized, Submitted, Accepted, Working, PartFilled, Filled, Cancelled, Rejected }
+    public enum OrderState { Initialized, Submitted, Accepted, Working, PartFilled, Filled, CancelPending, Cancelled, Rejected }
     public enum ErrorCode { NoError, OrderRejected }
     public class Position
     {
@@ -313,7 +313,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             public string Name; public int Qty; public double Stop = double.NaN, Target = double.NaN;
             public Order Order; public int FirstBar = -1, FirstQty, SecondBar = -1;  // an entry filled in two parts
         }
-        sealed class Pending { public int Dir, Qty, Bar; public string Name; public Order Order; public bool Partial, FirstDone; }
+        sealed class Pending { public int Dir, Qty, Bar, CancelAt = -1; public string Name; public Order Order; public bool Partial, FirstDone; }
         readonly List<Lot> lots = new List<Lot>();
         readonly List<Pending> pend = new List<Pending>();
         string pendExit;
@@ -336,6 +336,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         public int SimPartialEntryAt { get; set; }
         public int SimPartialFirstQty { get; set; }
         public int SimPartialDelayBars { get; set; }
+        public int SimCancelDelayBars { get; set; }  // tests: a cancellation is confirmed this many bars after the request
         int orderSeq;
 
         public void CancelOrder(Order order)
@@ -344,8 +345,16 @@ namespace NinjaTrader.NinjaScript.Strategies
             for (int k = pend.Count - 1; k >= 0; k--)
                 if (pend[k].Order == order)
                 {
-                    pend.RemoveAt(k);
-                    Report(order, OrderState.Cancelled, "");
+                    if (SimCancelDelayBars > 0)
+                    {
+                        pend[k].CancelAt = CurrentBar + SimCancelDelayBars;
+                        Report(order, OrderState.CancelPending, "");
+                    }
+                    else
+                    {
+                        pend.RemoveAt(k);
+                        Report(order, OrderState.Cancelled, "");
+                    }
                 }
         }
         int execs;
@@ -588,6 +597,14 @@ namespace NinjaTrader.NinjaScript.Strategies
                     .AddMinutes(-BarsPeriod.Value);
                 bool newDay = nyStart.AddHours(6).Date != lastDay;  // the trading day starts at 18:00 New York
                 lastDay = nyStart.AddHours(6).Date;
+                // cancellations confirmed now
+                for (int k = pend.Count - 1; k >= 0; k--)
+                    if (pend[k].CancelAt >= 0 && i >= pend[k].CancelAt)
+                    {
+                        Order co = pend[k].Order;
+                        pend.RemoveAt(k);
+                        Report(co, OrderState.Cancelled, "");
+                    }
                 // market orders from the last bar
                 if (pendExit != null && Position.MarketPosition != MarketPosition.Flat)
                     Fill(i, o[i] - Dir * slip, pendExit);

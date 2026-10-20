@@ -29,8 +29,9 @@
 // Orders: a rejected order while in a position closes it at market, sent again at every bar until flat; a rejected
 // entry leaves no position. A partly filled entry's remainder is tracked until it fills or is cancelled; it is
 // cancelled if the position closes first, or at the flat time. Losing positions are counted by their entry order,
-// not by fill times. The highest equity also takes the best price of a bar in which a position closed, as if it came
-// before the exit (the bar's order of prices is unknown; this is the cautious assumption for the trailing threshold). Live, the highest equity, the pass and today's losers are kept in a file (restarts), and the
+// not by fill times. A position's equity history ends at its exit: a take-profit or an opening-gap stop adds nothing
+// after the fill; for a stop filled inside a bar, whose best price may have come before or after it, the protective
+// highest equity (used for the reserve) counts that price and the determined one does not; both are reported. Live, the highest equity, the pass and today's losers are kept in a file (restarts), and the
 // threshold Apex shows can be entered.
 // Output: one line per check whose close is past a line (taken, or why not; a refusal for room gives the room and one
 // contract's planned risk), one line per session (its data, checks and outcome), and an audit at the end of the run
@@ -73,11 +74,13 @@ namespace NinjaTrader.NinjaScript.Strategies
         bool mustClose;                      // an order was rejected: close at market, again at every bar until flat
         Order entryOrder;                    // an entry sent and not yet filled, cancelled or rejected (a part-filled
                                              // entry stays here until its remainder fills or is cancelled)
-        bool entryPartFilled;
+        bool entryPartFilled, cancelSent;
         int tradesAtLastBar;                 // trade records already seen, for a position that closed within a bar
 
         // the account
-        double peak = double.NaN;            // highest equity since the evaluation start (unrealized included)
+        double peak = double.NaN;            // highest equity since the evaluation start (unrealized included), protective:
+                                             // a bar's best price counts when it may have come before a stop in the bar
+        double peakLow = double.NaN;         // the same, counting only prices known to have come before each exit
         bool passed;
         DateTime evalStart = DateTime.MinValue;
         DateTime lastDay = DateTime.MinValue;
@@ -292,7 +295,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         void LoadAccount()
         {
             // going live: the account's own numbers, not the simulated history's
-            peak = double.NaN;
+            peak = peakLow = double.NaN;
             passed = false;
             lastDay = DateTime.MinValue;
             dayLosers = 0;
@@ -307,6 +310,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                     string[] kv = line.Split('=');
                     if (kv.Length != 2) continue;
                     if (kv[0] == "peak") peak = double.Parse(kv[1], CultureInfo.InvariantCulture);
+                    else if (kv[0] == "peakDetermined") peakLow = double.Parse(kv[1], CultureInfo.InvariantCulture);
                     else if (kv[0] == "passed") passed = kv[1] == "1";
                     else if (kv[0] == "day") lastDay = DateTime.ParseExact(kv[1], "yyyy-MM-dd", CultureInfo.InvariantCulture);
                     else if (kv[0] == "losers") dayLosers = int.Parse(kv[1], CultureInfo.InvariantCulture);
@@ -326,7 +330,8 @@ namespace NinjaTrader.NinjaScript.Strategies
             try
             {
                 Directory.CreateDirectory(Path.GetDirectoryName(AccountFile));
-                File.WriteAllText(AccountFile, "peak=" + peak.ToString("R", CultureInfo.InvariantCulture) + "\npassed=" + (passed ? "1" : "0") +
+                File.WriteAllText(AccountFile, "peak=" + peak.ToString("R", CultureInfo.InvariantCulture) +
+                    "\npeakDetermined=" + peakLow.ToString("R", CultureInfo.InvariantCulture) + "\npassed=" + (passed ? "1" : "0") +
                     "\nday=" + lastDay.ToString("yyyy-MM-dd") + "\nlosers=" + dayLosers + "\ndayStart=" +
                     dayStartEq.ToString("R", CultureInfo.InvariantCulture) + "\n");
             }
@@ -452,7 +457,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 stopped = (allRoom ? "STOPPED: " : "") + sinceLastEntry.Count + " qualifying signal(s) after the last entry (" +
                           Ts(lastEntrySignal) + "), none taken" + (allRoom ? ", all for lack of room above the reserve" : "");
             }
-            Print("C audit: " + stopped + "; highest equity " + F0(peak) + ", equity " + F0(Closed()));
+            Print("C audit: " + stopped + "; highest equity " + F0(peak) + " (determined " + F0(peakLow) +
+                  "; the difference is bars' best prices that may have come before a stop in them), equity " + F0(Closed()));
         }
 
         protected override void OnBarUpdate()
@@ -512,8 +518,13 @@ namespace NinjaTrader.NinjaScript.Strategies
             double now = d == 0 ? 0 : OpenAt(Close[0]);
             if (double.IsNaN(peak)) peak = Math.Max(0, closed);
             peak = Math.Max(peak, Math.Max(closed + best, closed));
-            // a position that closed during this bar at its stop or take-profit (perhaps opened in it too): its best
-            // price in this bar counts as reached before the exit. Market exits fill at the bar's open, before the rest.
+            if (double.IsNaN(peakLow)) peakLow = Math.Max(0, closed);
+            peakLow = Math.Max(peakLow, Math.Max(closed + best, closed));
+            // A position that closed during this bar. Its equity history ends at its exit:
+            //   take-profit: its best price before the exit is the exit itself (realized; prices beyond came after);
+            //   a stop the bar opened past, or a market exit: filled at the open, nothing later in the bar counts;
+            //   a stop filled inside the bar: the bar's open is certain; its best price may have come before the stop
+            //   or after it (bars carry no order). The determined peak takes the open, the protective one the best price.
             int nRec = SystemPerformance.AllTrades.Count;
             double later = 0;
             for (int k = tradesAtLastBar; k < nRec; k++) later += SystemPerformance.AllTrades[k].ProfitCurrency;
@@ -531,18 +542,24 @@ namespace NinjaTrader.NinjaScript.Strategies
                     cost += tr.Entry.Price * tr.Quantity;
                     profit += tr.ProfitCurrency;
                 }
-                bool intrabar = first.Exit.Name == "Stop loss" || first.Exit.Name == "Profit target";
-                bool counted = evalStart == DateTime.MinValue || ToNy(first.Entry.Time).Date >= evalStart;
                 int td = first.Entry.Name == ShortName ? -1 : 1;
-                if (intrabar && counted && q > 0)
-                    peak = Math.Max(peak, closed - later + td * ((td > 0 ? High[0] : Low[0]) - cost / q) * q * pv -
-                                          2 * SizingCommission * q);
+                bool counted = evalStart == DateTime.MinValue || ToNy(first.Entry.Time).Date >= evalStart;
+                bool gapped = !double.IsNaN(lastStop) && td * (Open[0] - lastStop) <= 0;
+                if (first.Exit.Name == "Stop loss" && !gapped && counted && q > 0)
+                {
+                    double before = closed - later, avg = cost / q, fees = 2 * SizingCommission * q;
+                    peakLow = Math.Max(peakLow, before + td * (Open[0] - avg) * q * pv - fees);
+                    peak = Math.Max(peak, before + td * ((td > 0 ? High[0] : Low[0]) - avg) * q * pv - fees);
+                }
                 later -= profit;
                 g = h;
             }
             tradesAtLastBar = SystemPerformance.AllTrades.Count;
             if (LiquidationThreshold > 0)  // the threshold Apex shows: the highest equity is at least it + the trail
+            {
                 peak = Math.Max(peak, LiquidationThreshold - AccountStart + EvalTrail);
+                peakLow = Math.Max(peakLow, LiquidationThreshold - AccountStart + EvalTrail);
+            }
             DayLedger(start, closed);
             int flatBy = FlatBy(Time[0]);
             bool inRth = tMin >= NoiseEngine.RthOpen && endMin <= NoiseEngine.RthClose;
@@ -554,13 +571,13 @@ namespace NinjaTrader.NinjaScript.Strategies
                 Print("C: evaluation target reached on realized net profit " + F0(closed) + " at " + Ts(start) + "; no more entries.");
             }
             if (d == 0) mustClose = false;
-            if (d == 0 && entryOrder != null && (entryPartFilled || endMin >= flatBy))
+            if (d == 0 && entryOrder != null && !cancelSent && (entryPartFilled || endMin >= flatBy))
             {
-                Print("C: the entry's unfilled " + (entryPartFilled ? "remainder" : "order") + " is cancelled at " + Ts(start) +
+                // the guard stays until NinjaTrader confirms the cancellation (or a fill or a rejection)
+                Print("C: cancelling the entry's unfilled " + (entryPartFilled ? "remainder" : "order") + " at " + Ts(start) +
                       (entryPartFilled ? " (the position closed before it filled)" : " (the flat time)") + ".");
+                cancelSent = true;
                 CancelOrder(entryOrder);
-                entryOrder = null;
-                entryPartFilled = false;
             }
             if (d != 0 && mustClose)
             {
@@ -753,13 +770,17 @@ namespace NinjaTrader.NinjaScript.Strategies
                 {
                     if (entryOrder == null || entryOrder == order)
                     {
+                        if (orderState == OrderState.Cancelled)
+                            Print("C: the entry order's cancellation is confirmed.");
                         entryOrder = null;
-                        entryPartFilled = false;
+                        entryPartFilled = cancelSent = false;
                     }
                 }
                 else
                 {
-                    entryOrder = order;  // working, or part filled: the remainder is still to come
+                    // working, part filled, or a cancel pending: the order is live until a final state is confirmed
+                    if (entryOrder != order) cancelSent = false;
+                    entryOrder = order;
                     if (orderState == OrderState.PartFilled) entryPartFilled = true;
                 }
             }

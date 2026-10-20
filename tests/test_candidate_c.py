@@ -324,7 +324,8 @@ def test_partly_filled_entry_remainder_is_tracked_and_cancelled_if_the_position_
     cancels = [int(o[0]) for o in orders if o[1] == "Cancel"]
     assert cancels and cancels[0] >= x, (cancels, x)
     assert not [o for o in orders if o[1] == "Enter" and b < int(o[0]) < cancels[0]]
-    assert any("remainder is cancelled" in p for p in printed)
+    assert any("cancelling the entry's unfilled remainder" in p for p in printed)
+    assert any("cancellation is confirmed" in p for p in printed)
     sent = {int(o[0]) + 1 for o in orders if o[1] == "Enter"}
     assert all(int(r[1]) in sent for r in trades), "every position comes from an entry the strategy sent"
 
@@ -352,31 +353,84 @@ def test_a_losing_position_filled_in_two_parts_counts_once(sim, tmp_path):  # no
     assert int(re.search(r"losing positions (\d+)", line).group(1)) == losers
 
 
-def test_unrealized_peak_inside_the_exit_bar_is_captured(sim, tmp_path):  # noqa: F811
-    """The first position fills on a bar that then runs 200 points its way and closes at the take-profit inside that
-    same bar. The earlier rule never saw it open at a bar's close, so its highest equity stopped at the realized
-    profit; C counts the bar's best price as reached before the exit (the cautious assumption for the trail)."""
+PEAKS = re.compile(r"highest equity (-?[\d.]+) \(determined (-?[\d.]+);")
+
+
+def _first_trade_case(sim, tmp_path, shape):  # noqa: F811
+    """The first position's fill bar (and the next) reshaped; nothing after; returns the trade and C's two peaks."""
     bars = rth_minutes(40, 3)
     _, orders, _, _ = cand(sim, bars, tmp_path, **NOACCOUNT)
     b, name, q, _ = entries(orders)[0]
     d = 1 if name == "Long" else -1
-    f = b + 1  # the fill bar
+    f = b + 1
     bars = bars.copy()
-    o = bars.open.iloc[f]
-    if d > 0:
-        bars.iloc[f, bars.columns.get_loc("high")] = o + 200
-        bars.iloc[f, bars.columns.get_loc("low")] = o
-    else:
-        bars.iloc[f, bars.columns.get_loc("low")] = o - 200
-        bars.iloc[f, bars.columns.get_loc("high")] = o
-    bars = bars.iloc[:f + 5]  # nothing after it: the run's highest equity is this position's
+    o = float(bars.open.iloc[f])
+    for k, (op, best, worst, close) in shape(o, d).items():  # prices as (open, best, worst, close) for side d
+        hi, lo = (best, worst) if d > 0 else (worst, best)
+        bars.iloc[f + k, [bars.columns.get_loc(c) for c in ("open", "high", "low", "close")]] = [op, hi, lo, close]
+    bars = bars.iloc[:f + 3]
     trades, _, _, printed = cand(sim, bars, tmp_path, **NOACCOUNT)
-    first = trades[0]
-    assert int(first[1]) == f and int(first[3]) == f and first[5] == "Profit target", first
-    en = float(first[2])
-    extreme = o + 200 if d > 0 else o - 200
-    bound = d * (extreme - en) * q * 2.0 - 2 * FEE * q
-    assert bound > float(first[6]) + 100  # far beyond the realized profit
-    audit = next(p for p in printed if "highest equity" in p)
-    peak = float(re.search(r"highest equity (-?[\d.]+)", audit).group(1))
-    assert peak >= bound - 0.01, (peak, bound)
+    m = PEAKS.search(next(p for p in printed if "highest equity" in p))
+    return trades[0], q, d, o, float(m.group(1)), float(m.group(2))
+
+
+def eq(d, px, en, q):
+    return d * (px - en) * q * 2.0 - 2 * FEE * q
+
+
+def test_peak_take_profit_excludes_prices_after_the_fill(sim, tmp_path):  # noqa: F811
+    """Fill bar: opens at o, runs 200 points the trade's way, the take-profit fills on the way. Prices beyond the
+    target come after the exit: the highest equity is the realized profit, exactly."""
+    t, q, d, o, peak, low = _first_trade_case(sim, tmp_path, lambda o, d: {0: (o, o + d * 200, o, o + d * 200)})
+    assert t[5] == "Profit target" and t[1] == t[3]
+    assert math.isclose(peak, float(t[6]), abs_tol=0.006) and math.isclose(low, float(t[6]), abs_tol=0.006)
+
+
+def test_peak_opening_gap_stop_excludes_the_bars_later_extremes(sim, tmp_path):  # noqa: F811
+    """Fill bar quiet (best o + 2); the next bar opens 40 points against the trade, past its stop, then runs 100 points
+    its way. The stop fills at the open; that bar's later prices are after the exit. Expected highest equity: the fill
+    bar's best, open P/L with both commissions."""
+    t, q, d, o, peak, low = _first_trade_case(sim, tmp_path, lambda o, d: {
+        0: (o, o + d * 2, o - d * 1, o + d * 1), 1: (o - d * 40, o + d * 100, o - d * 41, o - d * 40)})
+    assert t[5] == "Stop loss" and int(t[3]) == int(t[1]) + 1
+    expected = max(0.0, eq(d, o + d * 2, float(t[2]), q))
+    assert math.isclose(peak, expected, abs_tol=0.006) and math.isclose(low, expected, abs_tol=0.006)
+
+
+def test_peak_stop_inside_a_bar_is_reported_as_bounds(sim, tmp_path):  # noqa: F811
+    """The next bar opens at o + 1, reaches o + 15 and o - 40 (its stop): the order is unknown. Determined: the open
+    (and the fill bar's best); protective (used for the reserve): the bar's best, o + 15."""
+    t, q, d, o, peak, low = _first_trade_case(sim, tmp_path, lambda o, d: {
+        0: (o, o + d * 2, o - d * 1, o + d * 1), 1: (o + d * 1, o + d * 15, o - d * 40, o - d * 39)})
+    assert t[5] == "Stop loss" and int(t[3]) == int(t[1]) + 1
+    en = float(t[2])
+    determined = max(0.0, eq(d, o + d * 2, en, q), eq(d, o + d * 1, en, q))
+    assert math.isclose(low, determined, abs_tol=0.006), (low, determined)
+    assert math.isclose(peak, max(determined, eq(d, o + d * 15, en, q)), abs_tol=0.006)
+
+
+def test_pending_guard_holds_until_the_cancellation_is_confirmed(sim, tmp_path):  # noqa: F811
+    """A part-filled entry's remainder is cancelled once the position closes, and the broker confirms it 90 bars
+    later: until then every qualifying check is refused 'pending entry order' and no entry is sent."""
+    hit = 0
+    for seed in (3, 5, 9, 11):
+        bars = rth_minutes(40, seed)
+        _, ref, _, _ = cand(sim, bars, tmp_path, **NOACCOUNT)
+        for b, _, q, _ in entries(ref)[:6]:
+            if q < 2:
+                continue
+            _, orders, _, printed = cand(sim, bars, tmp_path, SimPartialEntryAt=b, SimPartialFirstQty=1,
+                                         SimPartialDelayBars=-1, SimCancelDelayBars=90, **NOACCOUNT)
+            cancel = [int(o[0]) for o in orders if o[1] == "Cancel"]
+            if not cancel:
+                continue
+            c0 = cancel[0]
+            assert not [o for o in orders if o[1] == "Enter" and c0 <= int(o[0]) < c0 + 90]
+            m, _ = minutes_of(bars)
+            lo_t = m[c0].strftime("%Y-%m-%d %H:%M")
+            hi_t = m[min(c0 + 89, len(m) - 1)].strftime("%Y-%m-%d %H:%M")
+            window = [p for p in printed if p.startswith("C check ") and lo_t <= p[8:24] < hi_t]
+            assert all("pending entry order" in p for p in window if "not taken" in p or "entry sent" in p)
+            hit += sum("pending entry order" in p for p in window)
+            assert any("cancellation is confirmed" in p for p in printed)
+    assert hit, "some qualifying check fell inside a pending cancellation"

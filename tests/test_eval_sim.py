@@ -71,3 +71,16 @@ def test_a_pass_at_the_strategys_own_target_close():
     t = trade(0, 1, 4, 1000.0, 990.0, "stop", [(1000, 1001, 999), (1001, hi, 990)])
     out = outcomes([t])
     assert out["favourable first"] == "pass" and out["adverse first"] == "open"
+
+
+def test_a_high_after_a_take_profit_does_not_count():
+    """Long 4 MNQ from 1000, take-profit filled at 1100 in a bar whose high is 1600. Prices beyond the target come after
+    the exit: equity peaks at the fill (+$792.40 after both commissions), never at the high, which would have been
+    +$4,796.20 and a pass. On every path the evaluation is still open."""
+    t = trade(0, 1, 4, 1000.0, 1100.0, "target", [(1000, 1001, 999), (1010, 1600, 1009)])
+    assert abs(t[7] - 792.4) < 1e-9
+    out = outcomes([t])
+    assert set(out.values()) == {"open"}, out
+    for p in E.PATHS:
+        _, _, dd, eq, _ = E.evaluate_detail([t], 0, 10**12, DAY, p)
+        assert abs(eq - 792.4) < 1e-9
