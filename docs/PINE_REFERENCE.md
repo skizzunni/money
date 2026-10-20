@@ -86,3 +86,164 @@ meet it.
   - losing positions are counted by the entry order's identity, not by fill timestamps;
   - an unrealized peak reached in a bar where the position exits is captured.
 - **Unchanged:** C's rules, settings and exits otherwise.
+
+---
+
+# Results (October 20, 2026; after the criteria above were committed in c875fcd)
+
+**What ran where:**
+- **NinjaTrader:** nothing new in this round. The only native runs are the earlier ones: B's, and C's 1/1 to 10/18 run.
+  The latest summary sent (`162245e3-...08-56_PM.csv`) is byte-identical to that C run's summary
+  (sha256 `dd47bf8d...`).
+- **Everything below** is the Pine source in the repo's interpreter, the NinjaTrader code in the stand-in simulator,
+  or the Python reference, as labelled.
+
+## 1. The reference reproduced (MNQ traded contracts, 5-minute bars, 6/29 to 10/16; `verification/pine_reference/`)
+
+| R4, 1 tick | Pine source (interpreter) | Python reference | NinjaTrader code (stand-in) |
+|---|---|---|---|
+| Trades, net | 111, $4,150.79 | 111, $4,150.79 | 111, $2,961.20 |
+| Agreement | Identical, trade for trade | Identical | 54 identical; the other 57 explained below |
+
+**Every Pine/NinjaTrader mismatch has a cause** (`joined_*_pine_vs_nt.csv` lists each trade with its category).
+
+R4, 1 tick:
+
+| Category | Trades | NinjaTrader minus Pine |
+|---|---:|---:|
+| A: 16:00 exit, Pine at the 15:55 close, NinjaTrader at the next bar's open | 5 | $0.00 |
+| B: same price, named differently (Pine "Lock", NinjaTrader "Stop passed") | 7 | $0.00 |
+| C: fill-bar max-loss stop from the expected fill (Pine) or the actual fill (NinjaTrader) | 33 | −$1,195.42 |
+| D: stop or target rounded to a tick in NinjaTrader | 12 | +$5.83 |
+| Unexplained | 0 | |
+
+**Other runs:**
+- **R4 at 2 ticks, and R2:** the same categories. A few "knock-on" trades follow an earlier differing exit that day.
+  There are 0 unexplained.
+- **Pine against Python at 2 ticks:** they differ on 49 exits. Pine's fill-bar stop uses the signal close + 1 tick
+  whatever the slippage; the reference uses the slippage.
+- **Category C is the material one.** Pine's chart backtest measures the first bar's max-loss stop from a price the
+  live order never gets. On these bars that flatters Pine by about $11 a trade. NinjaTrader's bracket, from the actual
+  fill, is what a live order does.
+
+**Not done:** a TradingView-run List of Trades joined to a native NinjaTrader run of the same preset. It needs the
+user's two exports (requested once below).
+
+## 2. R2 (two losses) against R4 (four) - full NinjaTrader-strategy runs, stand-in
+
+**Data:**
+- **MNQ:** 64 eligible sessions, 7/20 to 10/16/2026 (development data, examined before).
+- **NQ:** 2015-03 to 2025-06, rescaled (examined before), 2,571 eligible sessions.
+- $0.95 a side.
+
+| | MNQ R4, 1 t / 2 t | MNQ R2, 1 t / 2 t | NQ R4, 1 t / 2 t | NQ R2, 1 t / 2 t |
+|---|---|---|---|---|
+| Trades per eligible session | 1.73 / 1.70 | 1.09 / 1.06 | 2.10 / 2.08 | 1.43 / 1.41 |
+| Sessions with 0 / 1 / 2 / 3+ trades | 58 / 5 / 3 / 34 % | 58 / 5 / 17 / 20 % | 42 / 13 / 9 / 36 % | 42 / 13 / 24 / 22 % |
+| Net; per eligible session | $2,961, $46 / $3,042, $48 | $562, $9 / $1,122, $18 | $45,153, $17.56 / $34,018, $13.23 | $34,068, $13.25 / $25,818, $10.04 |
+| Profit factor; expectancy a trade | 1.64, $26.68 / 1.63 | 1.19, $8.03 / 1.37 | 1.19, $8.37 / 1.14 | 1.21, $9.27 / 1.16 |
+| Largest 5 winners' share of net | 147% / 143% | 552% / 295% | 21% / 28% | 27% / 35% |
+| Intraday drawdown; net ÷ it | $1,684, 1.76 / $1,877, 1.62 | $1,936, 0.29 / $1,981, 0.57 | $5,973, 7.56 / $6,070, 5.60 | $4,975, 6.85 / $5,364, 4.81 |
+| Losing streak; worst day | 11, −$299 / 12, −$303 | 12, −$150 / 13, −$152 | 23, −$299 / 23, −$303 | 15, −$150 / 17, −$152 |
+| Long; short (1 tick) | $216 (PF 1.08); $2,745 (2.35) | −$822 (0.44); $1,384 (1.91) | $24,939 (1.22); $20,213 (1.16) | $22,549 (1.29); $11,519 (1.14) |
+| Evaluation: pass / breach / expired | 1 / 0 / 43 (both) | 0 / 0 / 44 (both) | 221 / 344 / 1,977; 205 / 401 / 1,924 | 74 / 63 / 2,489; 65 / 69 / 2,490 |
+| Chance of passing | 2.3% | 0% | 8.4% / 7.8% | 2.8% / 2.5% |
+| Trades the 2-loss limit removes | | 41: **+$2,399** / +$1,920 | | 1,717: **+$11,084** / +$8,200 |
+
+**Periods:**
+- **MNQ months, R4 at 1 tick:** Jul −$640, Aug +$335, Sep +$1,350, Oct +$1,916.
+- **MNQ months, R2 at 1 tick:** Jul −$431, Aug −$565, Sep +$726, Oct +$833.
+- **NQ years:** R2 beats R4 in 4 of 11 years at both slippages (2017, 2019, 2024, 2025).
+- **2023 to 2025-06** (the span of the quoted tests): R2 $5,804 (PF 1.16) against R4 $4,845 (PF 1.09).
+- **2025 to June:** R2 +$141, R4 −$128.
+- So the quoted tests' result does show here for 2023-2025, but not over the whole decade, and not on MNQ in 2026.
+
+**The evaluation at these settings:** 2 MNQ with $70 risked a trade rarely makes $3,000 in 30 days, so almost every
+start expires. Path-dependent NQ windows (99 R4 and 15 R2 at 1 tick) are counted apart.
+
+## 3. Against the criteria
+
+| Criterion | Result |
+|---|---|
+| Q1: R2 net positive at 1 and 2 ticks, MNQ and NQ | Pass |
+| Q2: R2 net ÷ intraday drawdown higher than R4's | **Fail** (MNQ 0.29 vs 1.76, 0.57 vs 1.62; NQ 6.85 vs 7.56, 4.81 vs 5.60) |
+| Q3: the trades the limit removes are net negative | **Fail**: they made +$2,399 / +$1,920 (MNQ) and +$11,084 / +$8,200 (NQ) |
+| Q4: R2's chance of passing ≥ R4's, breaches no more | **Fail** on passes (MNQ 0 vs 1; NQ 2.8% vs 8.4%, 2.5% vs 7.8%); breaches are fewer |
+| Q5: R2 ahead in ≥ 7 of 11 NQ years | **Fail** (4) |
+
+## 4. Candidate C's shutdown, as separate outcomes (MNQ, 44 fully observed starts; `outcomes_by_start.csv`)
+
+| | Passed | Breached | Expired, still able to trade | Unable to fund another trade under the reserve, then expired |
+|---|---:|---:|---:|---:|
+| Frozen B, 1 and 2 ticks | 24 | 6 | 14 | 0 |
+| C, 1 and 2 ticks | 18 | 0 | 20 | 6 |
+
+**How the outcomes line up:**
+- The six starts B breached (7/20 to 7/27) are the six in which C became unable to fund a trade.
+- The real trailing threshold was kept: highest equity including open P/L, never reset.
+- On NQ (earlier round), C had 1,202 accounts unable to fund a trade out of 2,641 starts; B breached 1,602.
+
+**C's execution fixes** (each with a test that fails without it):
+- a partly filled entry's remainder stays tracked and is cancelled if the position closes first;
+- losing positions are counted by entry order, so a position filled in two parts counts once;
+- a peak reached inside the bar in which a position exits at its stop or target is captured.
+
+They changed no outcome in the MNQ replay.
+
+## 5. Historical fill assumptions and what stays uncertain
+
+- **Stand-in simulator (NinjaTrader code):**
+  - Market orders fill at the next bar's open ± slippage.
+  - Stops fill at the stop ± slippage, or at the open if the bar opens past it.
+  - Take-profits fill when the bar trades a tick through. When a bar reaches both, the stop comes first.
+  - A bracket sent with the entry can fill on the fill bar.
+  - On MNQ 12-26 it reproduced native NinjaTrader for B: 20 of 20 trades at 0 ticks, 19 of 20 at 1-2 ticks, totals to
+    the cent.
+- **Pine interpreter (the .pine source):**
+  - Market orders fill at the next bar's open ± slippage.
+  - On the fill bar only the stop is checked (worst case).
+  - Limits fill a tick through (`backtest_fill_limits_assumption = 1`). No bar magnifier.
+- **Evaluation replay:**
+  - Each bar is tried in four intrabar orders. A window whose outcome depends on the order is reported apart.
+- **Unresolved:**
+  - The order of the high and the low inside a 1- or 5-minute bar is unknown.
+  - The stand-in takes the stop first.
+  - C counts a bar's best price as reached before an exit in that bar. That is the cautious choice for the trailing
+    threshold, and it can overstate the threshold's rise.
+  - No native NinjaTrader run of the 5-minute reference exists yet, so its fills are the stand-in's until one does.
+
+## 6. Verdict
+
+**The two-loss limit is rejected; R4 stays the Pine reference.**
+- **Improved:**
+  - the worst day ($150 against $300);
+  - the NQ losing streak (15 against 23);
+  - fewer evaluation breaches;
+  - a slightly higher profit factor on NQ;
+  - better results in 2023 to 2025.
+- **Deteriorated:**
+  - net profit (MNQ −81% at 1 tick, NQ −25%);
+  - net relative to intraday drawdown (on both data sets);
+  - the chance of passing (NQ 8.4% → 2.8%);
+  - frequency (1.73 → 1.09 trades per eligible session on MNQ).
+  - The trades it removes were winners on balance.
+
+**Against the user's requirements:**
+- **R4 (the reference):**
+  - It has positive expectancy after costs: $26.68 a trade on MNQ (development data), $8.37 on NQ.
+  - It averages 1.7-2.1 trades per eligible session, slightly above the preferred 1-2, but in bursts: 42-58% of
+    sessions have none and about a third have 3 or more.
+  - At 2 MNQ it is not an evaluation strategy: 1 pass in 44 MNQ starts, 8.4% on NQ, most expiring.
+- **Frozen B** (4 MNQ, $200, 1-minute) remains the stronger NinjaTrader version for the evaluation: 24 of 44 MNQ starts
+  passed, 31.6% on NQ, but 61% of its NQ evaluations breach.
+- **Nothing here meets all the requirements.** The references are kept unchanged; no weaker replacement is offered.
+
+## 7. Needed from the user (once)
+
+For the TradingView-to-NinjaTrader trade-by-trade reconciliation:
+1. **TradingView:** the Strategy Tester's **List of Trades** export, with a screenshot of the inputs and properties.
+   - Pine v1.5 on MNQ1! (or MNQZ2026), 5 minutes, preset R4 (`release/PineReference_v1.5/PRESETS.md`), 7/1 to
+     10/17/2026.
+   - If your saved inputs differ from R4, export with your saved inputs instead.
+2. **NinjaTrader:** the Strategy Analyzer **Trades** export and the NinjaScript Output for the same dates, preset
+   PINE-REF-4L, slippage 1.

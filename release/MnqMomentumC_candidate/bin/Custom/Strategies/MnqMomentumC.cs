@@ -27,7 +27,10 @@
 //   only when realized net profit (the account's cash, or the closed trades) reaches the target, and only then does
 //   the strategy stop (PassOnRealizedOnly = false restores the earlier rule, for comparison only).
 // Orders: a rejected order while in a position closes it at market, sent again at every bar until flat; a rejected
-// entry leaves no position. Live, the highest equity, the pass and today's losers are kept in a file (restarts), and the
+// entry leaves no position. A partly filled entry's remainder is tracked until it fills or is cancelled; it is
+// cancelled if the position closes first, or at the flat time. Losing positions are counted by their entry order,
+// not by fill times. The highest equity also takes the best price of a bar in which a position closed, as if it came
+// before the exit (the bar's order of prices is unknown; this is the cautious assumption for the trailing threshold). Live, the highest equity, the pass and today's losers are kept in a file (restarts), and the
 // threshold Apex shows can be entered.
 // Output: one line per check whose close is past a line (taken, or why not; a refusal for room gives the room and one
 // contract's planned risk), one line per session (its data, checks and outcome), and an audit at the end of the run
@@ -68,7 +71,10 @@ namespace NinjaTrader.NinjaScript.Strategies
         double lastStop = double.NaN;        // the stop so far: it only tightens
         bool locked;
         bool mustClose;                      // an order was rejected: close at market, again at every bar until flat
-        Order entryOrder;                    // an entry sent and not yet filled, cancelled or rejected
+        Order entryOrder;                    // an entry sent and not yet filled, cancelled or rejected (a part-filled
+                                             // entry stays here until its remainder fills or is cancelled)
+        bool entryPartFilled;
+        int tradesAtLastBar;                 // trade records already seen, for a position that closed within a bar
 
         // the account
         double peak = double.NaN;            // highest equity since the evaluation start (unrealized included)
@@ -259,7 +265,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             {
                 Trade tr = src[k];
                 if (TradingDay(ToNy(tr.Exit.Time)) != day) break;
-                string key = tr.Entry.Time.Ticks + "|" + tr.Entry.Name;
+                string key = PositionKey(tr);
                 double v;
                 pos[key] = (pos.TryGetValue(key, out v) ? v : 0) + tr.ProfitCurrency;
             }
@@ -395,7 +401,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                     Print("C session " + auditDay.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) + ": " + status + "; " +
                           sessionBars + " minutes 09:30-16:00" + (sessionBars < 390 ? " (short)" : "") + ", checks " + sessChecks +
                           ", past a line " + sessCross + ", qualifying " + sessQual + ", entries " + sessEntries +
-                          ", not taken " + (why.Length > 0 ? why : "none"));
+                          ", losing positions " + dayLosers + ", not taken " + (why.Length > 0 ? why : "none"));
             }
             if (sessionBars >= 390 && sessionOpenBar) fullSessions++;
             sessionBars = 0;
@@ -506,6 +512,35 @@ namespace NinjaTrader.NinjaScript.Strategies
             double now = d == 0 ? 0 : OpenAt(Close[0]);
             if (double.IsNaN(peak)) peak = Math.Max(0, closed);
             peak = Math.Max(peak, Math.Max(closed + best, closed));
+            // a position that closed during this bar at its stop or take-profit (perhaps opened in it too): its best
+            // price in this bar counts as reached before the exit. Market exits fill at the bar's open, before the rest.
+            int nRec = SystemPerformance.AllTrades.Count;
+            double later = 0;
+            for (int k = tradesAtLastBar; k < nRec; k++) later += SystemPerformance.AllTrades[k].ProfitCurrency;
+            int g = tradesAtLastBar;
+            while (g < nRec)
+            {
+                Trade first = SystemPerformance.AllTrades[g];
+                string key = PositionKey(first);
+                double q = 0, cost = 0, profit = 0;
+                int h = g;
+                for (; h < nRec && PositionKey(SystemPerformance.AllTrades[h]) == key; h++)
+                {
+                    Trade tr = SystemPerformance.AllTrades[h];
+                    q += tr.Quantity;
+                    cost += tr.Entry.Price * tr.Quantity;
+                    profit += tr.ProfitCurrency;
+                }
+                bool intrabar = first.Exit.Name == "Stop loss" || first.Exit.Name == "Profit target";
+                bool counted = evalStart == DateTime.MinValue || ToNy(first.Entry.Time).Date >= evalStart;
+                int td = first.Entry.Name == ShortName ? -1 : 1;
+                if (intrabar && counted && q > 0)
+                    peak = Math.Max(peak, closed - later + td * ((td > 0 ? High[0] : Low[0]) - cost / q) * q * pv -
+                                          2 * SizingCommission * q);
+                later -= profit;
+                g = h;
+            }
+            tradesAtLastBar = SystemPerformance.AllTrades.Count;
             if (LiquidationThreshold > 0)  // the threshold Apex shows: the highest equity is at least it + the trail
                 peak = Math.Max(peak, LiquidationThreshold - AccountStart + EvalTrail);
             DayLedger(start, closed);
@@ -519,6 +554,14 @@ namespace NinjaTrader.NinjaScript.Strategies
                 Print("C: evaluation target reached on realized net profit " + F0(closed) + " at " + Ts(start) + "; no more entries.");
             }
             if (d == 0) mustClose = false;
+            if (d == 0 && entryOrder != null && (entryPartFilled || endMin >= flatBy))
+            {
+                Print("C: the entry's unfilled " + (entryPartFilled ? "remainder" : "order") + " is cancelled at " + Ts(start) +
+                      (entryPartFilled ? " (the position closed before it filled)" : " (the flat time)") + ".");
+                CancelOrder(entryOrder);
+                entryOrder = null;
+                entryPartFilled = false;
+            }
             if (d != 0 && mustClose)
             {
                 Print(Time[0] + "  the position is closed again at market after a rejected order.");
@@ -692,6 +735,13 @@ namespace NinjaTrader.NinjaScript.Strategies
             return Math.Max(1, Math.Floor(points / TickSize + 1e-7));
         }
 
+        // the position a trade record belongs to: its entry order (a position filled in parts has several records)
+        static string PositionKey(Trade tr)
+        {
+            return tr.Entry.Order != null && !string.IsNullOrEmpty(tr.Entry.Order.OrderId)
+                ? "order " + tr.Entry.Order.OrderId : tr.Entry.Time.Ticks + "|" + tr.Entry.Name;
+        }
+
         protected override void OnOrderUpdate(Order order, double limitPrice, double stopPrice, int quantity, int filled,
                                               double averageFillPrice, OrderState orderState, DateTime time,
                                               ErrorCode error, string comment)
@@ -701,12 +751,17 @@ namespace NinjaTrader.NinjaScript.Strategies
             {
                 if (orderState == OrderState.Filled || orderState == OrderState.Cancelled || orderState == OrderState.Rejected)
                 {
-                    if (entryOrder == null || entryOrder == order) entryOrder = null;
+                    if (entryOrder == null || entryOrder == order)
+                    {
+                        entryOrder = null;
+                        entryPartFilled = false;
+                    }
                 }
-                else if (orderState != OrderState.PartFilled)
-                    entryOrder = order;
                 else
-                    entryOrder = null;  // part filled: the position exists and is managed at its filled quantity
+                {
+                    entryOrder = order;  // working, or part filled: the remainder is still to come
+                    if (orderState == OrderState.PartFilled) entryPartFilled = true;
+                }
             }
             if (orderState != OrderState.Rejected) return;
             Print(Time[0] + "  ORDER REJECTED: " + order.Name + " (" + comment + ").");
