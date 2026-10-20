@@ -1,0 +1,74 @@
+eb,xb_pine,d,en_pine,ex_pine,pnl_pine,why_pine,en_nt,xb_nt,ex_nt,why_nt,pnl_nt,entry time,result,category
+1403,1415,-1,28881.25,28876.61146723696,14.754131052165757,Back inside,28881.25,1415.0,28876.5,Stop loss,15.2,2026-07-23 11:00,differs: exit price,D: the same stop or target rounded to a tick in NinjaTrader
+1470,1470,-1,28607.5,28625.0,-73.8,Max loss,28607.5,1470.0,28625.25,Stop loss,-74.8,2026-07-24 10:00,differs: exit price,"C: fill-bar max-loss stop, Pine from the expected fill, NinjaTrader from the actual"
+1476,1481,-1,28676.0,28673.75,5.2,Lock,28676.0,1481.0,28673.75,Stop loss,5.2,2026-07-24 10:30,match,match
+1524,1541,-1,28621.75,28568.0,211.2,16:00 close,28621.75,1542.0,28568.0,Flat 16:00,211.2,2026-07-24 14:30,differs: exit bar,"A: 16:00 exit, Pine at the 15:55 close, NinjaTrader at the next bar's open"
+1555,1555,-1,28370.25,28388.25,-75.8,Max loss,28370.25,1555.0,28388.0,Stop loss,-74.8,2026-07-27 10:30,differs: exit price,"C: fill-bar max-loss stop, Pine from the expected fill, NinjaTrader from the actual"
+1561,1562,-1,28454.25,28452.0,5.2,Lock,28454.25,1562.0,28452.0,Stop loss,5.2,2026-07-27 11:00,match,match
+1567,1572,-1,28357.0,28354.75,5.2,Lock,28357.0,1572.0,28354.75,Stop loss,5.2,2026-07-27 11:30,match,match
+1573,1573,-1,28346.75,28364.5,-74.8,Max loss,28346.75,1573.0,28364.5,Stop loss,-74.8,2026-07-27 12:00,match,match
+1628,1628,-1,27947.0,27968.0,-87.8,Max loss,27947.0,1628.0,27964.75,Stop loss,-74.8,2026-07-28 10:00,differs: exit price,"C: fill-bar max-loss stop, Pine from the expected fill, NinjaTrader from the actual"
+1634,1634,-1,27990.5,28008.25,-74.8,Max loss,27990.5,1634.0,28008.25,Stop loss,-74.8,2026-07-28 10:30,match,match
+1755,1755,-1,28007.25,28023.75,-69.8,Max loss,28007.25,1755.0,28025.0,Stop loss,-74.8,2026-07-29 14:00,differs: exit price,"C: fill-bar max-loss stop, Pine from the expected fill, NinjaTrader from the actual"
+1773,1773,-1,27995.5,28013.0,-73.8,Max loss,27995.5,1773.0,28013.25,Stop loss,-74.8,2026-07-29 15:30,differs: exit price,"C: fill-bar max-loss stop, Pine from the expected fill, NinjaTrader from the actual"
+1786,1786,1,28435.25,28418.25,-71.8,Max loss,28435.25,1786.0,28417.5,Stop loss,-74.8,2026-07-30 10:00,differs: exit price,"C: fill-bar max-loss stop, Pine from the expected fill, NinjaTrader from the actual"
+1792,1792,1,28510.75,28492.75,-75.8,Max loss,28510.75,1792.0,28493.0,Stop loss,-74.8,2026-07-30 10:30,differs: exit price,"C: fill-bar max-loss stop, Pine from the expected fill, NinjaTrader from the actual"
+1944,1944,1,28909.0,28896.25,-54.8,Max loss,28909.0,1944.0,28891.25,Stop loss,-74.8,2026-08-03 10:00,differs: exit price,"C: fill-bar max-loss stop, Pine from the expected fill, NinjaTrader from the actual"
+1950,1993,1,28963.0,29237.355043581712,1093.6201743268496,Target,28963.0,1950.0,28945.25,Stop loss,-74.8,2026-08-03 10:30,"differs: exit bar, exit price, exit kind","C: fill-bar max-loss stop, Pine from the expected fill, NinjaTrader from the actual"
+1998,2001,1,29176.5,29178.75,5.2,Lock,,,,,,2026-08-03 14:30,only in pine,knock-on: an earlier exit that day differs
+2004,2005,1,29192.25,29194.5,5.2,Lock,,,,,,2026-08-03 15:00,only in pine,knock-on: an earlier exit that day differs
+2010,2014,1,29197.5,29179.75,-74.8,Max loss,,,,,,2026-08-03 15:30,only in pine,knock-on: an earlier exit that day differs
+2023,2023,1,29751.5,29736.0,-65.8,Max loss,29751.5,2023.0,29733.75,Stop loss,-74.8,2026-08-04 10:00,differs: exit price,"C: fill-bar max-loss stop, Pine from the expected fill, NinjaTrader from the actual"
+2029,2029,1,29843.5,29826.0,-73.8,Max loss,29843.5,2029.0,29825.75,Stop loss,-74.8,2026-08-04 10:30,differs: exit price,"C: fill-bar max-loss stop, Pine from the expected fill, NinjaTrader from the actual"
+2576,2576,1,30460.5,30442.75,-74.8,Max loss,30460.5,2576.0,30442.75,Stop loss,-74.8,2026-08-13 10:00,match,match
+2582,2584,1,30517.75,30520.0,5.2,Lock,30517.75,2584.0,30520.0,Stop loss,5.2,2026-08-13 10:30,match,match
+2588,2589,1,30484.0,30483.25,-6.8,Lock,30484.0,2589.0,30483.25,Stop passed,-6.8,2026-08-13 11:00,differs: exit kind,"B: same exit price, named differently (Pine 'Lock', NinjaTrader 'Stop passed')"
+3129,3133,-1,29306.25,29304.0,5.2,Lock,29306.25,3133.0,29304.0,Stop loss,5.2,2026-08-24 10:00,match,match
+3135,3135,-1,29296.5,29313.75,-72.8,Max loss,29296.5,3135.0,29314.25,Stop loss,-74.8,2026-08-24 10:30,differs: exit price,"C: fill-bar max-loss stop, Pine from the expected fill, NinjaTrader from the actual"
+3141,3145,-1,29367.25,29365.0,5.2,Lock,29367.25,3145.0,29365.0,Stop loss,5.2,2026-08-24 11:00,match,match
+3396,3412,1,29888.25,29895.058131989594,23.432527958374703,Back inside,29888.25,3412.0,29895.25,Stop loss,24.2,2026-08-27 12:30,differs: exit price,D: the same stop or target rounded to a tick in NinjaTrader
+3457,3457,1,30080.75,30063.5,-72.8,Max loss,30080.75,3457.0,30063.0,Stop loss,-74.8,2026-08-28 11:00,differs: exit price,"C: fill-bar max-loss stop, Pine from the expected fill, NinjaTrader from the actual"
+3475,3475,-1,29773.0,29790.75,-74.8,Max loss,29773.0,3475.0,29790.75,Stop loss,-74.8,2026-08-28 12:30,match,match
+3761,3761,1,29617.0,29599.25,-74.8,Max loss,29617.0,3761.0,29599.25,Stop loss,-74.8,2026-09-03 10:00,match,match
+3767,3767,1,29627.5,29610.25,-72.8,Max loss,29627.5,3767.0,29609.75,Stop loss,-74.8,2026-09-03 10:30,differs: exit price,"C: fill-bar max-loss stop, Pine from the expected fill, NinjaTrader from the actual"
+3840,3840,1,29975.75,29958.25,-73.8,Max loss,29975.75,3840.0,29958.0,Stop loss,-74.8,2026-09-04 10:00,differs: exit price,"C: fill-bar max-loss stop, Pine from the expected fill, NinjaTrader from the actual"
+3961,3965,-1,29787.5,29785.25,5.2,Lock,29787.5,3965.0,29785.25,Stop loss,5.2,2026-09-08 10:00,match,match
+3967,3968,-1,29800.75,29807.25,-29.8,Lock,29800.75,3968.0,29807.25,Stop passed,-29.8,2026-09-08 10:30,differs: exit kind,"B: same exit price, named differently (Pine 'Lock', NinjaTrader 'Stop passed')"
+4362,4366,-1,29326.25,29223.941823699664,405.43270520134246,Target,29326.25,4366.0,29223.75,Profit target,406.2,2026-09-15 10:30,differs: exit price,D: the same stop or target rounded to a tick in NinjaTrader
+4368,4368,-1,29239.75,29257.5,-74.8,Max loss,29239.75,4368.0,29257.5,Stop loss,-74.8,2026-09-15 11:00,match,match
+4374,4375,-1,29291.25,29289.0,5.2,Lock,29291.25,4375.0,29289.0,Stop loss,5.2,2026-09-15 11:30,match,match
+4380,4384,-1,29277.25,29275.0,5.2,Lock,29277.25,4384.0,29275.0,Stop loss,5.2,2026-09-15 12:00,match,match
+4386,4387,-1,29284.25,29286.25,-11.8,Lock,29284.25,4387.0,29286.25,Stop passed,-11.8,2026-09-15 12:30,differs: exit kind,"B: same exit price, named differently (Pine 'Lock', NinjaTrader 'Stop passed')"
+4435,4435,1,29479.5,29461.5,-75.8,Max loss,29479.5,4435.0,29461.75,Stop loss,-74.8,2026-09-16 10:00,differs: exit price,"C: fill-bar max-loss stop, Pine from the expected fill, NinjaTrader from the actual"
+4447,4450,1,29499.25,29501.5,5.2,Lock,29499.25,4450.0,29501.5,Stop loss,5.2,2026-09-16 11:00,match,match
+4453,4453,1,29507.0,29489.25,-74.8,Max loss,29507.0,4453.0,29489.25,Stop loss,-74.8,2026-09-16 11:30,match,match
+4672,4673,1,30416.75,30417.25,-1.7999999999999998,Lock,30416.75,4673.0,30417.25,Stop passed,-1.7999999999999998,2026-09-21 10:00,differs: exit kind,"B: same exit price, named differently (Pine 'Lock', NinjaTrader 'Stop passed')"
+4678,4680,1,30519.0,30521.25,5.2,Lock,30519.0,4680.0,30521.25,Stop loss,5.2,2026-09-21 10:30,match,match
+4684,4702,1,30551.0,30697.664799408994,582.8591976359778,Target,30551.0,4702.0,30697.75,Profit target,583.2,2026-09-21 11:00,differs: exit price,D: the same stop or target rounded to a tick in NinjaTrader
+4708,4715,1,30680.75,30675.25,-25.8,Lock,30680.75,4715.0,30675.25,Stop passed,-25.8,2026-09-21 13:00,differs: exit kind,"B: same exit price, named differently (Pine 'Lock', NinjaTrader 'Stop passed')"
+4751,4751,1,30930.0,30912.5,-73.8,Max loss,30930.0,4751.0,30912.25,Stop loss,-74.8,2026-09-22 10:00,differs: exit price,"C: fill-bar max-loss stop, Pine from the expected fill, NinjaTrader from the actual"
+4757,4758,1,30961.5,30963.75,5.2,Lock,30961.5,4758.0,30963.75,Stop loss,5.2,2026-09-22 10:30,match,match
+4763,4763,1,30925.25,30907.5,-74.8,Max loss,30925.25,4763.0,30907.5,Stop loss,-74.8,2026-09-22 11:00,match,match
+4830,4830,-1,30846.25,30864.0,-74.8,Max loss,30846.25,4830.0,30864.0,Stop loss,-74.8,2026-09-23 10:00,match,match
+4836,4836,-1,30679.0,30696.5,-73.8,Max loss,30679.0,4836.0,30696.75,Stop loss,-74.8,2026-09-23 10:30,differs: exit price,"C: fill-bar max-loss stop, Pine from the expected fill, NinjaTrader from the actual"
+5073,5076,-1,30547.25,30359.59780249468,746.8087900212734,Target,30547.25,5076.0,30359.5,Profit target,747.2,2026-09-28 10:30,differs: exit price,D: the same stop or target rounded to a tick in NinjaTrader
+5079,5079,-1,30409.5,30427.25,-74.8,Max loss,30409.5,5079.0,30427.25,Stop loss,-74.8,2026-09-28 11:00,match,match
+5085,5086,-1,30494.0,30494.5,-5.8,Lock,30494.0,5086.0,30494.5,Stop passed,-5.8,2026-09-28 11:30,differs: exit kind,"B: same exit price, named differently (Pine 'Lock', NinjaTrader 'Stop passed')"
+5225,5227,1,30841.25,30843.5,5.2,Lock,30841.25,5227.0,30843.5,Stop loss,5.2,2026-09-30 10:00,match,match
+5231,5231,1,30828.0,30809.75,-76.8,Max loss,30828.0,5231.0,30810.25,Stop loss,-74.8,2026-09-30 10:30,differs: exit price,"C: fill-bar max-loss stop, Pine from the expected fill, NinjaTrader from the actual"
+5237,5237,1,30844.0,30826.0,-75.8,Max loss,30844.0,5237.0,30826.25,Stop loss,-74.8,2026-09-30 11:00,differs: exit price,"C: fill-bar max-loss stop, Pine from the expected fill, NinjaTrader from the actual"
+5468,5468,1,31233.25,31215.5,-74.8,Max loss,31233.25,5468.0,31215.5,Stop loss,-74.8,2026-10-05 10:30,match,match
+5474,5475,1,31248.25,31230.5,-74.8,Max loss,31248.25,5475.0,31230.5,Stop loss,-74.8,2026-10-05 11:00,match,match
+5735,5737,-1,31000.75,30998.5,5.2,Lock,31000.75,5737.0,30998.5,Stop loss,5.2,2026-10-08 13:00,match,match
+5741,5741,-1,30838.75,30857.0,-76.8,Max loss,30838.75,5741.0,30856.5,Stop loss,-74.8,2026-10-08 13:30,differs: exit price,"C: fill-bar max-loss stop, Pine from the expected fill, NinjaTrader from the actual"
+5747,5748,-1,30900.5,30898.25,5.2,Lock,30900.5,5748.0,30898.25,Stop loss,5.2,2026-10-08 14:00,match,match
+5753,5770,-1,30999.25,30974.75,94.2,16:00 close,30999.25,5771.0,30975.0,Flat 16:00,93.2,2026-10-08 14:30,"differs: exit bar, exit price","A: 16:00 exit, Pine at the 15:55 close, NinjaTrader at the next bar's open"
+5857,5878,-1,30960.5,30956.759309633937,11.162761464252252,Back inside,30960.5,5878.0,30956.75,Stop loss,11.2,2026-10-12 10:00,differs: exit price,D: the same stop or target rounded to a tick in NinjaTrader
+5887,5887,-1,30924.25,30942.0,-74.8,Max loss,30924.25,5887.0,30942.0,Stop loss,-74.8,2026-10-12 12:30,match,match
+5893,5893,-1,30881.5,30899.25,-74.8,Max loss,30881.5,5893.0,30899.25,Stop loss,-74.8,2026-10-12 13:00,match,match
+6033,6041,-1,30393.25,30239.33224007374,611.8710397050338,Target,30393.25,6041.0,30239.25,Profit target,612.2,2026-10-14 11:30,differs: exit price,D: the same stop or target rounded to a tick in NinjaTrader
+6045,6046,-1,30231.25,30242.25,-47.8,Lock,30231.25,6046.0,30242.25,Stop passed,-47.8,2026-10-14 12:30,differs: exit kind,"B: same exit price, named differently (Pine 'Lock', NinjaTrader 'Stop passed')"
+6051,6075,-1,30295.25,30106.263800635363,752.1447974585492,Target,30295.25,6075.0,30106.25,Profit target,752.2,2026-10-14 13:00,differs: exit price,D: the same stop or target rounded to a tick in NinjaTrader
+6081,6081,-1,30193.0,30210.75,-74.8,Max loss,30193.0,6081.0,30210.75,Stop loss,-74.8,2026-10-14 15:30,match,match
+6173,6173,-1,29837.0,29854.0,-71.8,Max loss,29837.0,6173.0,29854.75,Stop loss,-74.8,2026-10-16 10:00,differs: exit price,"C: fill-bar max-loss stop, Pine from the expected fill, NinjaTrader from the actual"
+6179,6179,-1,29815.0,29833.0,-75.8,Max loss,29815.0,6179.0,29832.75,Stop loss,-74.8,2026-10-16 10:30,differs: exit price,"C: fill-bar max-loss stop, Pine from the expected fill, NinjaTrader from the actual"
