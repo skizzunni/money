@@ -97,7 +97,7 @@ namespace NinjaTrader.Cbi
         public TradeCollection AllTrades = new TradeCollection();
         public TradeCollection RealTimeTrades = new TradeCollection();  // the trades closed live
     }
-    public class Order { public string Name; public OrderState OrderState; public int Quantity; }
+    public class Order { public string Name, OrderId; public OrderState OrderState; public int Quantity; }
     public class MasterInstrument
     {
         public double PointValue = 2.0, TickSize = 0.25;
@@ -308,8 +308,12 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         // the position: one lot per entry name (an entry and its own stop and take-profit, as NinjaTrader's
         // per-entry Set orders); all the lots of a position fill together, at the same price
-        sealed class Lot { public string Name; public int Qty; public double Stop = double.NaN, Target = double.NaN; }
-        sealed class Pending { public int Dir, Qty, Bar; public string Name; public Order Order; }
+        sealed class Lot
+        {
+            public string Name; public int Qty; public double Stop = double.NaN, Target = double.NaN;
+            public Order Order; public int FirstBar = -1, FirstQty, SecondBar = -1;  // an entry filled in two parts
+        }
+        sealed class Pending { public int Dir, Qty, Bar; public string Name; public Order Order; public bool Partial, FirstDone; }
         readonly List<Lot> lots = new List<Lot>();
         readonly List<Pending> pend = new List<Pending>();
         string pendExit;
@@ -327,6 +331,23 @@ namespace NinjaTrader.NinjaScript.Strategies
         public string SimIgnoreEntriesAt { get; set; }
         public string SimRejectEntriesAt { get; set; }
         public int SimHoldEntryBars { get; set; }  // tests: an entry stays working this many more bars before it fills
+        // tests: the entry sent on bar SimPartialEntryAt fills SimPartialFirstQty contracts at once and the rest
+        // SimPartialDelayBars bars later (-1: never; it stays working until the strategy cancels it)
+        public int SimPartialEntryAt { get; set; }
+        public int SimPartialFirstQty { get; set; }
+        public int SimPartialDelayBars { get; set; }
+        int orderSeq;
+
+        public void CancelOrder(Order order)
+        {
+            OrderLog.Add(CurrentBar + ",Cancel," + (order == null ? "" : order.Name));
+            for (int k = pend.Count - 1; k >= 0; k--)
+                if (pend[k].Order == order)
+                {
+                    pend.RemoveAt(k);
+                    Report(order, OrderState.Cancelled, "");
+                }
+        }
         int execs;
         static bool At(string bars, int bar) { return bars != null && Array.IndexOf(bars.Split(','), bar.ToString()) >= 0; }
         void Report(Order o, OrderState st, string comment)
@@ -417,6 +438,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             Order o = new Order();
             o.Name = name;
             o.Quantity = qty;
+            o.OrderId = "E" + (++orderSeq);
             Report(o, OrderState.Submitted, "");
             if (At(SimRejectEntriesAt, CurrentBar))
             {
@@ -427,6 +449,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             Report(o, OrderState.Working, "");
             Pending p = new Pending();
             p.Dir = d; p.Qty = qty; p.Name = name; p.Order = o; p.Bar = CurrentBar;
+            p.Partial = SimPartialEntryAt > 0 && CurrentBar == SimPartialEntryAt && qty > SimPartialFirstQty && SimPartialFirstQty > 0;
             pend.Add(p);
             return o;
         }
@@ -467,15 +490,20 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (State == State.Realtime)
                 SystemPerformance.RealTimeTrades.TradesPerformance.Currency.CumProfit += t.Pnl;
             // NinjaTrader's trade records: one per entry execution; SimSplitFills fills each entry in two parts
-            parts = parts == 2 && lot.Qty > 1 ? 2 : 1;
+            parts = lot.SecondBar >= 0 ? 2 : parts == 2 && lot.Qty > 1 ? 2 : 1;
             for (int k = 0; k < parts; k++)
             {
                 Trade rec = new Trade();
-                rec.Quantity = parts == 1 ? lot.Qty : (k == 0 ? lot.Qty / 2 : lot.Qty - lot.Qty / 2);
+                if (lot.SecondBar >= 0)  // filled in two parts at different bars: a record each, with its own time
+                    rec.Quantity = k == 0 ? lot.FirstQty : lot.Qty - lot.FirstQty;
+                else
+                    rec.Quantity = parts == 1 ? lot.Qty : (k == 0 ? lot.Qty / 2 : lot.Qty - lot.Qty / 2);
                 rec.ProfitCurrency = t.Pnl * rec.Quantity / lot.Qty;
+                int eb = lot.SecondBar >= 0 ? (k == 0 ? lot.FirstBar : lot.SecondBar) : entryBar;
                 // Time[] counts bars ago, as NinjaTrader's does
-                rec.Entry = new Execution(); rec.Entry.Time = Time[CurrentBar - entryBar]; rec.Entry.Name = lot.Name;
-                rec.Exit = new Execution(); rec.Exit.Time = Time[CurrentBar - i]; rec.Exit.Name = why;
+                rec.Entry = new Execution(); rec.Entry.Time = Time[CurrentBar - eb]; rec.Entry.Name = lot.Name;
+                rec.Entry.Order = lot.Order; rec.Entry.Price = t.Entry;
+                rec.Exit = new Execution(); rec.Exit.Time = Time[CurrentBar - i]; rec.Exit.Name = why; rec.Exit.Price = price;
                 SystemPerformance.AllTrades.List.Add(rec);
                 if (State == State.Realtime)
                     SystemPerformance.RealTimeTrades.List.Add(rec);
@@ -567,6 +595,50 @@ namespace NinjaTrader.NinjaScript.Strategies
                 bool due = pend.Count > 0 && i > pend[0].Bar + SimHoldEntryBars;
                 if (due && Position.MarketPosition != MarketPosition.Flat && Dir == -pend[0].Dir)  // a reversal
                     Fill(i, o[i] - Dir * slip, "Close position");
+                if (due && pend[0].Partial && !pend[0].FirstDone && Position.MarketPosition == MarketPosition.Flat)
+                {
+                    Pending x = pend[0];
+                    int pd = x.Dir;
+                    Position.MarketPosition = pd > 0 ? MarketPosition.Long : MarketPosition.Short;
+                    Position.AveragePrice = o[i] + pd * slip;
+                    entryBar = i;
+                    Lot lot = new Lot();
+                    lot.Name = x.Name; lot.Qty = SimPartialFirstQty; lot.Order = x.Order; lot.FirstBar = i;
+                    lot.FirstQty = SimPartialFirstQty;
+                    lot.Stop = stops[x.Name];
+                    if (stopInTicks[x.Name]) lot.Stop = Position.AveragePrice - pd * lot.Stop * TickSize;
+                    if (targets.ContainsKey(x.Name))
+                        lot.Target = targetInTicks[x.Name] ? Position.AveragePrice + pd * targets[x.Name] * TickSize : targets[x.Name];
+                    lots.Add(lot);
+                    Position.Quantity = SimPartialFirstQty;
+                    x.Qty -= SimPartialFirstQty;
+                    x.FirstDone = true;
+                    x.Bar = SimPartialDelayBars < 0 ? int.MaxValue / 2 : i + SimPartialDelayBars - 1 - SimHoldEntryBars;
+                    Report(x.Order, OrderState.PartFilled, "");
+                    Execution ex = new Execution();
+                    ex.Time = barEnds[i]; ex.Name = x.Name; ex.Order = x.Order; ex.Price = Position.AveragePrice;
+                    ex.Quantity = SimPartialFirstQty;
+                    execs++;
+                    OnExecutionUpdate(ex, "x" + execs, ex.Price, ex.Quantity, Position.MarketPosition, "o" + execs, barEnds[i]);
+                    due = false;
+                }
+                else if (due && pend[0].FirstDone && Position.MarketPosition != MarketPosition.Flat && Dir == pend[0].Dir)
+                {
+                    Pending x = pend[0];  // the remainder joins the open position
+                    Lot lot = lots[0];
+                    double px = o[i] + x.Dir * slip;
+                    Position.AveragePrice = (Position.AveragePrice * Position.Quantity + px * x.Qty) / (Position.Quantity + x.Qty);
+                    lot.Qty += x.Qty;
+                    lot.SecondBar = i;
+                    Position.Quantity += x.Qty;
+                    Report(x.Order, OrderState.Filled, "");
+                    Execution ex = new Execution();
+                    ex.Time = barEnds[i]; ex.Name = x.Name; ex.Order = x.Order; ex.Price = px; ex.Quantity = x.Qty;
+                    execs++;
+                    OnExecutionUpdate(ex, "x" + execs, ex.Price, ex.Quantity, Position.MarketPosition, "o" + execs, barEnds[i]);
+                    pend.Clear();
+                    due = false;
+                }
                 if (due)
                 {
                     int pd = pend[0].Dir;
@@ -576,7 +648,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                     foreach (Pending x in pend)
                     {
                         Lot lot = new Lot();
-                        lot.Name = x.Name; lot.Qty = x.Qty;
+                        lot.Name = x.Name; lot.Qty = x.Qty; lot.Order = x.Order;
                         lot.Stop = stops[x.Name];
                         if (stopInTicks[x.Name]) lot.Stop = Position.AveragePrice - pd * lot.Stop * TickSize;
                         if (targets.ContainsKey(x.Name))

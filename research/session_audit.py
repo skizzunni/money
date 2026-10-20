@@ -40,7 +40,8 @@ def calendar(sep_path, dec_path):
     return days
 
 
-SESSION = re.compile(r"C session (\d{4}-\d\d-\d\d): ([^;]+); (\d+) minutes.*?entries (\d+), not taken (.*)")
+SESSION = re.compile(r"C session (\d{4}-\d\d-\d\d): ([^;]+); (\d+) minutes.*?entries (\d+),"
+                     r"(?: losing positions \d+,)? not taken (.*)")
 
 
 def from_session_lines(text, out_path):

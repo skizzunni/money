@@ -288,3 +288,95 @@ def test_one_line_per_session_and_its_status(sim, tmp_path):  # noqa: F811
         assert (status == "active") == (n > 0)
         assert status != "no qualifying setup" or q == 0
     assert sum("warm-up" in s for s in sess) >= 14
+
+
+# ── Execution correctness: a part-filled entry's remainder, positions counted by entry order, peaks inside a bar
+def qty_of(row):
+    d, en, ex, pnl = int(row[0]), float(row[2]), float(row[4]), float(row[6])
+    per = d * (ex - en) * 2.0 - 2 * FEE
+    return round(pnl / per) if abs(per) > 1e-9 else None
+
+
+def _entry_with_qty(sim, tmp_path, at_least=2, min_bars=0, losing=None):  # noqa: F811
+    for seed in (3, 5, 9, 11):
+        bars = rth_minutes(40, seed)
+        trades, orders, _, _ = cand(sim, bars, tmp_path, **NOACCOUNT)
+        for b, _, q, _ in entries(orders):
+            row = next((r for r in trades if int(r[1]) == b + 1), None)
+            if row is None or q < at_least or int(row[3]) - int(row[1]) < min_bars:
+                continue
+            if losing is not None and (float(row[6]) < 0) != losing:
+                continue
+            return bars, b, q, row
+    raise AssertionError("no such entry")
+
+
+def test_partly_filled_entry_remainder_is_tracked_and_cancelled_if_the_position_closes_first(sim, tmp_path):  # noqa: F811
+    """1 of the entry's contracts fills; the rest never does. The remainder stays tracked (no other entry is sent while
+    it works), and when the 1-contract position closes the remainder is cancelled, so it can never open a late,
+    unplanned position."""
+    bars, b, q, _ = _entry_with_qty(sim, tmp_path)
+    trades, orders, _, printed = cand(sim, bars, tmp_path, SimPartialEntryAt=b, SimPartialFirstQty=1,
+                                      SimPartialDelayBars=-1, **NOACCOUNT)
+    row = next(r for r in trades if int(r[1]) == b + 1)
+    assert qty_of(row) == 1
+    x = int(row[3])
+    cancels = [int(o[0]) for o in orders if o[1] == "Cancel"]
+    assert cancels and cancels[0] >= x, (cancels, x)
+    assert not [o for o in orders if o[1] == "Enter" and b < int(o[0]) < cancels[0]]
+    assert any("remainder is cancelled" in p for p in printed)
+    sent = {int(o[0]) + 1 for o in orders if o[1] == "Enter"}
+    assert all(int(r[1]) in sent for r in trades), "every position comes from an entry the strategy sent"
+
+
+def test_remainder_that_fills_later_joins_the_position(sim, tmp_path):  # noqa: F811
+    bars, b, q, _ = _entry_with_qty(sim, tmp_path, min_bars=5)
+    trades, orders, _, _ = cand(sim, bars, tmp_path, SimPartialEntryAt=b, SimPartialFirstQty=1, SimPartialDelayBars=2,
+                                **NOACCOUNT)
+    row = next(r for r in trades if int(r[1]) == b + 1)
+    assert qty_of(row) == q
+    assert not [o for o in orders if o[1] == "Enter" and b < int(o[0]) <= b + 3]
+    assert not [o for o in orders if o[1] == "Cancel"]
+
+
+def test_a_losing_position_filled_in_two_parts_counts_once(sim, tmp_path):  # noqa: F811
+    """A losing position whose contracts filled two bars apart has two trade records with different entry times; the
+    day's losing-position count (from the entry order) counts it once."""
+    bars, b, q, _ = _entry_with_qty(sim, tmp_path, min_bars=5, losing=True)
+    trades, _, _, printed = cand(sim, bars, tmp_path, SimPartialEntryAt=b, SimPartialFirstQty=1, SimPartialDelayBars=2,
+                                 **NOACCOUNT)
+    m, _ = minutes_of(bars)
+    day = m[b].date()
+    losers = sum(1 for r in trades if m[int(r[3])].date() == day and float(r[6]) < 0)
+    line = next(p for p in printed if p.startswith(f"C session {day:%Y-%m-%d}:"))
+    assert int(re.search(r"losing positions (\d+)", line).group(1)) == losers
+
+
+def test_unrealized_peak_inside_the_exit_bar_is_captured(sim, tmp_path):  # noqa: F811
+    """The first position fills on a bar that then runs 200 points its way and closes at the take-profit inside that
+    same bar. The earlier rule never saw it open at a bar's close, so its highest equity stopped at the realized
+    profit; C counts the bar's best price as reached before the exit (the cautious assumption for the trail)."""
+    bars = rth_minutes(40, 3)
+    _, orders, _, _ = cand(sim, bars, tmp_path, **NOACCOUNT)
+    b, name, q, _ = entries(orders)[0]
+    d = 1 if name == "Long" else -1
+    f = b + 1  # the fill bar
+    bars = bars.copy()
+    o = bars.open.iloc[f]
+    if d > 0:
+        bars.iloc[f, bars.columns.get_loc("high")] = o + 200
+        bars.iloc[f, bars.columns.get_loc("low")] = o
+    else:
+        bars.iloc[f, bars.columns.get_loc("low")] = o - 200
+        bars.iloc[f, bars.columns.get_loc("high")] = o
+    bars = bars.iloc[:f + 5]  # nothing after it: the run's highest equity is this position's
+    trades, _, _, printed = cand(sim, bars, tmp_path, **NOACCOUNT)
+    first = trades[0]
+    assert int(first[1]) == f and int(first[3]) == f and first[5] == "Profit target", first
+    en = float(first[2])
+    extreme = o + 200 if d > 0 else o - 200
+    bound = d * (extreme - en) * q * 2.0 - 2 * FEE * q
+    assert bound > float(first[6]) + 100  # far beyond the realized profit
+    audit = next(p for p in printed if "highest equity" in p)
+    peak = float(re.search(r"highest equity (-?[\d.]+)", audit).group(1))
+    assert peak >= bound - 0.01, (peak, bound)

@@ -1,0 +1,66 @@
+start,B 1t,B 2t,C1 1t,C1 2t
+2026-07-20,breached,breached,"unable to fund another trade (reserve), expired","unable to fund another trade (reserve), expired"
+2026-07-21,breached,breached,"unable to fund another trade (reserve), expired","unable to fund another trade (reserve), expired"
+2026-07-22,breached,breached,"unable to fund another trade (reserve), expired","unable to fund another trade (reserve), expired"
+2026-07-23,breached,breached,"unable to fund another trade (reserve), expired","unable to fund another trade (reserve), expired"
+2026-07-24,breached,breached,"unable to fund another trade (reserve), expired","unable to fund another trade (reserve), expired"
+2026-07-27,breached,breached,"unable to fund another trade (reserve), expired","unable to fund another trade (reserve), expired"
+2026-07-28,passed,passed,"expired, still able to trade","expired, still able to trade"
+2026-07-29,passed,passed,"expired, still able to trade","expired, still able to trade"
+2026-07-30,passed,passed,"expired, still able to trade","expired, still able to trade"
+2026-07-31,passed,passed,"expired, still able to trade","expired, still able to trade"
+2026-08-03,passed,passed,"expired, still able to trade","expired, still able to trade"
+2026-08-04,"expired, still able to trade","expired, still able to trade","expired, still able to trade","expired, still able to trade"
+2026-08-05,"expired, still able to trade","expired, still able to trade","expired, still able to trade","expired, still able to trade"
+2026-08-06,"expired, still able to trade","expired, still able to trade","expired, still able to trade","expired, still able to trade"
+2026-08-07,"expired, still able to trade","expired, still able to trade","expired, still able to trade","expired, still able to trade"
+2026-08-10,"expired, still able to trade","expired, still able to trade","expired, still able to trade","expired, still able to trade"
+2026-08-11,"expired, still able to trade","expired, still able to trade","expired, still able to trade","expired, still able to trade"
+2026-08-12,"expired, still able to trade","expired, still able to trade","expired, still able to trade","expired, still able to trade"
+2026-08-13,"expired, still able to trade","expired, still able to trade","expired, still able to trade","expired, still able to trade"
+2026-08-14,"expired, still able to trade","expired, still able to trade","expired, still able to trade","expired, still able to trade"
+2026-08-17,"expired, still able to trade","expired, still able to trade","expired, still able to trade","expired, still able to trade"
+2026-08-18,"expired, still able to trade","expired, still able to trade","expired, still able to trade","expired, still able to trade"
+2026-08-19,"expired, still able to trade","expired, still able to trade","expired, still able to trade","expired, still able to trade"
+2026-08-20,"expired, still able to trade","expired, still able to trade","expired, still able to trade","expired, still able to trade"
+2026-08-21,"expired, still able to trade","expired, still able to trade","expired, still able to trade","expired, still able to trade"
+2026-08-24,passed,passed,"expired, still able to trade","expired, still able to trade"
+2026-08-25,passed,passed,passed,passed
+2026-08-26,passed,passed,passed,passed
+2026-08-27,passed,passed,passed,passed
+2026-08-28,passed,passed,passed,passed
+2026-08-31,passed,passed,passed,passed
+2026-09-01,passed,passed,passed,passed
+2026-09-02,passed,passed,passed,passed
+2026-09-03,passed,passed,passed,passed
+2026-09-04,passed,passed,passed,passed
+2026-09-07,passed,passed,passed,passed
+2026-09-08,passed,passed,passed,passed
+2026-09-09,passed,passed,passed,passed
+2026-09-10,passed,passed,passed,passed
+2026-09-11,passed,passed,passed,passed
+2026-09-14,passed,passed,passed,passed
+2026-09-15,passed,passed,passed,passed
+2026-09-16,passed,passed,passed,passed
+2026-09-17,passed,passed,passed,passed
+2026-09-18,passed,passed,passed,passed
+2026-09-21,passed,passed,passed,passed
+2026-09-22,passed,passed,passed,passed
+2026-09-23,breached,breached,passed,passed
+2026-09-24,breached,breached,passed,passed
+2026-09-25,breached,breached,passed,passed
+2026-09-28,breached,breached,passed,passed
+2026-09-29,passed,breached,unfinished (data ends),unfinished (data ends)
+2026-09-30,passed,breached,unfinished (data ends),unfinished (data ends)
+2026-10-01,passed,passed,unfinished (data ends),unfinished (data ends)
+2026-10-02,passed,passed,unfinished (data ends),unfinished (data ends)
+2026-10-05,passed,passed,unfinished (data ends),unfinished (data ends)
+2026-10-06,passed,passed,passed,passed
+2026-10-07,passed,passed,passed,passed
+2026-10-08,passed,passed,passed,passed
+2026-10-09,passed,passed,passed,passed
+2026-10-12,passed,passed,passed,passed
+2026-10-13,passed,passed,unfinished (data ends),unfinished (data ends)
+2026-10-14,passed,passed,unfinished (data ends),unfinished (data ends)
+2026-10-15,unfinished (data ends),unfinished (data ends),unfinished (data ends),unfinished (data ends)
+2026-10-16,unfinished (data ends),unfinished (data ends),unfinished (data ends),unfinished (data ends)
