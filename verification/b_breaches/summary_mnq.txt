@@ -1,0 +1,11 @@
+fully observed starts: 44
+pass: 24
+fail: 6
+expired: 14
+episodes (distinct breach trades): 2
+fall: give-back %: 52.8
+fall: losers after the peak %: 53.9
+fall: the breach trade's open loss %: 9.9
+fall: winners after the peak %: -16.6
+peak trade best, noise units: median / share >= 1.0: 1.46 / 67%
+losers after the peak within 1 minute %: 100.0
