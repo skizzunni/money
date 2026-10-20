@@ -1,0 +1,18 @@
+
+slippage 0: native 119 trades $13,175.60; stand-in (from 6/29) 98 trades $13,471.20
+   period 6/29-7/17 stand-in warming up; native trades 21; stand-in trades 0; same entry minute 0; identical (entry and exit price, exit minute) 0; same points and exit minute 0; native net $ -285.6; stand-in net $ 0.0
+   period 7/20-9/10 different contracts; native trades 48; stand-in trades 48; same entry minute 48; identical (entry and exit price, exit minute) 0; same points and exit minute 48; native net $ 3325.2; stand-in net $ 3325.2
+   period 9/11-9/30 same bars, mixed noise history; native trades 30; stand-in trades 30; same entry minute 30; identical (entry and exit price, exit minute) 24; same points and exit minute 24; native net $ 5452.0; stand-in net $ 5462.0
+   period 10/1-10/16 identical bars and history; native trades 20; stand-in trades 20; same entry minute 20; identical (entry and exit price, exit minute) 20; same points and exit minute 20; native net $ 4684.0; stand-in net $ 4684.0
+
+slippage 1: native 118 trades $12,889.20; stand-in (from 6/29) 97 trades $13,218.80
+   period 6/29-7/17 stand-in warming up; native trades 21; stand-in trades 0; same entry minute 0; identical (entry and exit price, exit minute) 0; same points and exit minute 0; native net $ -329.6; stand-in net $ 0.0
+   period 7/20-9/10 different contracts; native trades 48; stand-in trades 48; same entry minute 48; identical (entry and exit price, exit minute) 0; same points and exit minute 47; native net $ 3229.2; stand-in net $ 3227.2
+   period 9/11-9/30 same bars, mixed noise history; native trades 29; stand-in trades 29; same entry minute 29; identical (entry and exit price, exit minute) 21; same points and exit minute 21; native net $ 5343.6; stand-in net $ 5345.6
+   period 10/1-10/16 identical bars and history; native trades 20; stand-in trades 20; same entry minute 20; identical (entry and exit price, exit minute) 19; same points and exit minute 20; native net $ 4646.0; stand-in net $ 4646.0
+
+slippage 2: native 118 trades $12,663.20; stand-in (from 6/29) 97 trades $13,030.80
+   period 6/29-7/17 stand-in warming up; native trades 21; stand-in trades 0; same entry minute 0; identical (entry and exit price, exit minute) 0; same points and exit minute 0; native net $ -377.6; stand-in net $ 0.0
+   period 7/20-9/10 different contracts; native trades 48; stand-in trades 48; same entry minute 48; identical (entry and exit price, exit minute) 0; same points and exit minute 46; native net $ 3137.2; stand-in net $ 3129.2
+   period 9/11-9/30 same bars, mixed noise history; native trades 29; stand-in trades 29; same entry minute 29; identical (entry and exit price, exit minute) 20; same points and exit minute 20; native net $ 5295.6; stand-in net $ 5293.6
+   period 10/1-10/16 identical bars and history; native trades 20; stand-in trades 20; same entry minute 20; identical (entry and exit price, exit minute) 19; same points and exit minute 20; native net $ 4608.0; stand-in net $ 4608.0

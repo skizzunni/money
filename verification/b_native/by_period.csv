@@ -1,0 +1,13 @@
+slippage,period,native trades,stand-in trades,same entry minute,"identical (entry and exit price, exit minute)",same points and exit minute,native net $,stand-in net $
+0,6/29-7/17 stand-in warming up,21,0,0,0,0,-285.6,0.0
+0,7/20-9/10 different contracts,48,48,48,0,48,3325.2,3325.2
+0,"9/11-9/30 same bars, mixed noise history",30,30,30,24,24,5452.0,5462.0
+0,10/1-10/16 identical bars and history,20,20,20,20,20,4684.0,4684.0
+1,6/29-7/17 stand-in warming up,21,0,0,0,0,-329.6,0.0
+1,7/20-9/10 different contracts,48,48,48,0,47,3229.2,3227.2
+1,"9/11-9/30 same bars, mixed noise history",29,29,29,21,21,5343.6,5345.6
+1,10/1-10/16 identical bars and history,20,20,20,19,20,4646.0,4646.0
+2,6/29-7/17 stand-in warming up,21,0,0,0,0,-377.6,0.0
+2,7/20-9/10 different contracts,48,48,48,0,46,3137.2,3129.2
+2,"9/11-9/30 same bars, mixed noise history",29,29,29,20,20,5295.6,5293.6
+2,10/1-10/16 identical bars and history,20,20,20,19,20,4608.0,4608.0

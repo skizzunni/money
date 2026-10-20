@@ -67,7 +67,7 @@ On identical 5-minute MNQ bars, these explain every mismatch between the Pine so
 |---|---|---|
 | A | 16:00 exit: Pine closes at the 15:55 bar's close; NinjaTrader's market exit fills at the next bar's open | Small |
 | B | Same exit price, named differently: Pine "Lock"; NinjaTrader "Stop passed" | Name only |
-| C | Fill-bar max-loss stop: Pine measures it from the expected fill (signal close ± 1 tick); NinjaTrader's bracket from the actual fill | The large one: about −$11 a trade for NinjaTrader on these bars |
+| C | Fill-bar max-loss stop: Pine measures it from the expected fill (signal close ± 1 tick); NinjaTrader's bracket from the actual fill | Either way, depending on the bars. At 1 tick: 13 trades better and 20 worse for NinjaTrader, −$1,195 in all, of which −$1,168 is one trade (8/3 10:30, a low exactly at NinjaTrader's stop). At 2 ticks: 30 better, 11 worse. |
 | D | NinjaTrader rounds stops and targets to a tick | Cents |
 
 **Also:** at 2 ticks of slippage, Pine's fill-bar stop still uses 1 tick for the expected fill.

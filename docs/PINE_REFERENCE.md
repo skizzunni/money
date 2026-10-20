@@ -123,8 +123,40 @@ R4, 1 tick:
 - **Pine against Python at 2 ticks:** they differ on 49 exits. Pine's fill-bar stop uses the signal close + 1 tick
   whatever the slippage; the reference uses the slippage.
 - **Category C is the material one.** Pine's chart backtest measures the first bar's max-loss stop from a price the
-  live order never gets. On these bars that flatters Pine by about $11 a trade. NinjaTrader's bracket, from the actual
-  fill, is what a live order does.
+  live order never gets. NinjaTrader's bracket, from the actual fill, is what a live order does. Whether that helps
+  or hurts either platform depends on the bars (section 1b). An earlier version of this line said it "flatters Pine
+  by about $11 a trade": that was the total divided by the trades, and one trade makes almost all of it.
+
+## 1b. Which differences are structural and which depend on the bars (`research/pine_nt_structure.py`, `structure.csv`)
+
+"NinjaTrader better / worse" counts the trades whose P/L is higher / lower in NinjaTrader than in Pine.
+
+| Category, R4 | 1 tick: trades; better / worse; net | 2 ticks: trades; better / worse; net | Kind |
+|---|---|---|---|
+| A: 16:00 exit timing | 5; 1 / 2; $0.00 | 4; 1 / 1; +$1.00 | Structural timing; the sign depends on the 16:00 bar's open |
+| B: name only | 7; 0 / 0; $0.00 | 6; 0 / 0; $0.00 | Structural; no money |
+| C: fill-bar stop from the expected or the actual fill | 33; **13 / 20**; −$1,195.42 | 41; **30 / 11**; −$1,307.43 | Structural rule; **the outcome depends on the bars** |
+| D: tick rounding | 12; 12 / 0; +$5.83 | 13; 13 / 0; +$6.32 | Structural, always NinjaTrader's way here, cents |
+
+**Category C in detail:**
+- **One trade carries the total:** 2026-08-03 10:30, long, −$1,168.42 at 1 tick.
+  - The signal bar closed at 28,962.25, so Pine expected a fill at 28,962.50 and put its stop 17.5 points below, at
+    28,945.00.
+  - The next bar opened a tick higher, at 28,962.75. With a tick of slippage NinjaTrader filled at 28,963.00, so its
+    stop sat at 28,945.50.
+  - The fill bar's low was **exactly 28,945.50**. NinjaTrader was stopped (−$74.80). Pine's stop, two ticks lower,
+    was not touched, and its trade ran to the target (+$1,093.62).
+- **Without that trade, category C nets −$27.00 at 1 tick and −$138.00 at 2 ticks** across 32 and 40 trades.
+- **By month, at 1 tick:** July +$6, August −$1,201, September $0, October $0.
+- **At 2 ticks most C trades go NinjaTrader's way** (30 of 41): the further the fill from Pine's expected fill, the
+  further away NinjaTrader's stop.
+
+**So the Pine-vs-NinjaTrader gap is not "Pine is optimistic":**
+- The rule difference is structural and always present.
+- Its direction on a given trade depends on where the fill bar's low or high falls against two stop levels a few ticks
+  apart. On these 111 trades it hinged on one bar.
+- R2's runs show the same pattern (`structure.csv`): one trade gives −$1,168.42 of C's −$1,198.42, and knock-on
+  trades follow from it.
 
 **Not done:** a TradingView-run List of Trades joined to a native NinjaTrader run of the same preset. It needs the
 user's two exports (requested once below).
