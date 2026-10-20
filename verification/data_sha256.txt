@@ -1,2 +1,4 @@
 89c0b157f826853f9ffa7e3e22e4e08f3e4b31d5e1492824ffc06a35fc083328  nq1m_scaled.pkl
 59af44b3567b060ac0ea4feb9032ea9c8536519e55220977c5c1fa83145d983d  nsx1m_scaled.pkl
+bddc9a524d7e6d888b8fc70d5ad90eb6669f56136c8bfe554bb391ca41def607  MNQ_09-26.Last.txt (the user's NinjaTrader export)
+6a1cfb2150af6c41c831a1dbd5fb07231e6d6b8671c17b44b47f9c9843b343da  MNQ_12-26.Last.txt (the user's NinjaTrader export)
