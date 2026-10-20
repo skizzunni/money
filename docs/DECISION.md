@@ -201,3 +201,21 @@ B's sizing is 4 MNQ × 25 points × $2 = $200 at the max-loss stop.
 **Data:**
 - MNQ exports: the user's own, not in the repository; `verification/data_sha256.txt`.
 - NQ: Hugging Face `mdelcristo/NQ-F_1min_OHLCV_Parquet`.
+
+## Addendum (October 21, 2026): candidates D, D + E1 and D + E2
+
+Built and tested as pre-registered (docs/CANDIDATE_D.md).
+
+**The build:**
+- A shared position manager: two MNQ within $125 all-in or no trade, a fee-aware breakeven, exactly half at +2R, a
+  trailing runner, 15:55 flat, three campaigns a day.
+- Sleeves: noise momentum, the Williams breakout and a causal sweep/reversal sequence.
+- The NinjaScript and Python agree position by position on the NinjaTrader stand-in.
+
+**Result: all three rejected on NQ** (2 ticks):
+- 0 of 123 non-overlapping evaluations passed; all expired;
+- profit factor 1.07-1.09;
+- 0.10 trades a session.
+- The $125 two-contract rule with structural stops turns down 97% of the signals.
+
+**Frozen B v1.1 stays the reference.** Nothing was retuned.

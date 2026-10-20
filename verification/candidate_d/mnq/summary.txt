@@ -1,0 +1,72 @@
+mnq: 62 eligible sessions 2026-07-20..2026-10-16; 62 starts, 3 non-overlapping; data to 2026-10-16
+candidate                                                                      B                                 D                              D+E1                              D+E2                      B                                 D                              D+E1                              D+E2
+slippage                                                                       2                                 2                                 2                                 2                      3                                 3                                 3                                 3
+positions                                                                     97                                 6                                 6                                 6                     97                                 6                                 6                                 6
+net $                                                                    13030.8                              77.2                              77.2                              77.2                11606.8                              68.2                              68.2                              68.2
+expectancy $                                                          134.338144                         12.866667                         12.866667                         12.866667             119.657732                         11.366667                         11.366667                         11.366667
+expectancy R                                                            0.671691                          0.214768                          0.214768                          0.214768               0.598289                          0.199159                          0.199159                          0.199159
+avg win R                                                               1.885509                          1.507695                          1.507695                          1.507695                1.81825                          2.249245                          2.249245                          2.249245
+avg loss R                                                                -1.058                         -1.078158                         -1.078158                         -1.078158                 -1.068                         -0.825885                         -0.825885                         -0.825885
+win rate %                                                             58.762887                              50.0                              50.0                              50.0              57.731959                         33.333333                         33.333333                         33.333333
+scratches %                                                            35.051546                         16.666667                         16.666667                         16.666667              35.051546                         16.666667                         16.666667                         16.666667
+win rate excl. scratches %                                             36.507937                              40.0                              40.0                              40.0              34.920635                              40.0                              40.0                              40.0
+profit factor                                                           2.539556                          1.239454                          1.239454                          1.239454                2.32534                          1.207169                          1.207169                          1.207169
+intraday DD $                                                             2652.8                             440.2                             440.2                             440.2                 2692.8                             447.2                             447.2                             447.2
+net / intraday DD                                                       4.912093                          0.175375                          0.175375                          0.175375               4.310309                          0.152504                          0.152504                          0.152504
+5 largest winners, share of net %                                       73.48743                         517.61658                         517.61658                         517.61658               82.50336                        582.697947                        582.697947                        582.697947
+trades / eligible session                                               1.564516                          0.096774                          0.096774                          0.096774               1.564516                          0.096774                          0.096774                          0.096774
+zero-trade sessions %                                                  56.451613                         91.935484                         91.935484                         91.935484              56.451613                         91.935484                         91.935484                         91.935484
+sessions with 0/1/2/3 entries %                                  56 / 5 / 5 / 10                    92 / 6 / 2 / 0                    92 / 6 / 2 / 0                    92 / 6 / 2 / 0        56 / 5 / 5 / 10                    92 / 6 / 2 / 0                    92 / 6 / 2 / 0                    92 / 6 / 2 / 0
+overruns                                                                     n/a                                 1                                 1                                 1                    n/a                                 2                                 2                                 2
+worst overrun $                                                              n/a                              -2.0                              -2.0                              -2.0                    n/a                              -4.0                              -4.0                              -4.0
+by year                                                              2026 +13031                          2026 +77                          2026 +77                          2026 +77            2026 +11607                          2026 +68                          2026 +68                          2026 +68
+by sleeve                                                          B 97 / +13031  noise 5 / +170; williams 1 / -93  noise 5 / +170; williams 1 / -93  noise 5 / +170; williams 1 / -93          B 97 / +11607  noise 5 / +163; williams 1 / -95  noise 5 / +163; williams 1 / -95  noise 5 / +163; williams 1 / -95
+non-overlapping: pass / breach / expired / path-dependent     1 / 1 / 1 / 0 of 3                0 / 0 / 3 / 0 of 3                0 / 0 / 3 / 0 of 3                0 / 0 / 3 / 0 of 3     1 / 1 / 1 / 0 of 3                0 / 0 / 3 / 0 of 3                0 / 0 / 3 / 0 of 3                0 / 0 / 3 / 0 of 3
+overlapping: pass / breach / expired / path-dependent      23 / 6 / 13 / 0 of 42              0 / 0 / 42 / 0 of 42              0 / 0 / 42 / 0 of 42              0 / 0 / 42 / 0 of 42  23 / 6 / 13 / 0 of 42              0 / 0 / 42 / 0 of 42              0 / 0 / 42 / 0 of 42              0 / 0 / 42 / 0 of 42
+reserve halts                                                0 (no reserve rule)               0 (no reserve rule)               0 (no reserve rule)               0 (no reserve rule)    0 (no reserve rule)               0 (no reserve rule)               0 (no reserve rule)               0 (no reserve rule)
+candidate  slippage gate                        measure threshold      result verdict
+        B         2   G1           evaluation pass rate    >= 60%   33.333333    FAIL
+        B         2   G2                         expiry    <= 15%   33.333333    FAIL
+        B         2   G3          worst window drawdown <= $1,500 2074.200000    FAIL
+        B         2   G4 win rate (completed positions)    >= 50%   58.762887    PASS
+        B         2   G5                  profit factor   >= 1.35    2.539556    PASS
+        D         2   G1           evaluation pass rate    >= 60%    0.000000    FAIL
+        D         2   G2                         expiry    <= 15%  100.000000    FAIL
+        D         2   G3          worst window drawdown <= $1,500  381.300000    PASS
+        D         2   G4 win rate (completed positions)    >= 50%   50.000000    PASS
+        D         2   G5                  profit factor   >= 1.35    1.239454    FAIL
+     D+E1         2   G1           evaluation pass rate    >= 60%    0.000000    FAIL
+     D+E1         2   G2                         expiry    <= 15%  100.000000    FAIL
+     D+E1         2   G3          worst window drawdown <= $1,500  381.300000    PASS
+     D+E1         2   G4 win rate (completed positions)    >= 50%   50.000000    PASS
+     D+E1         2   G5                  profit factor   >= 1.35    1.239454    FAIL
+     D+E2         2   G1           evaluation pass rate    >= 60%    0.000000    FAIL
+     D+E2         2   G2                         expiry    <= 15%  100.000000    FAIL
+     D+E2         2   G3          worst window drawdown <= $1,500  381.300000    PASS
+     D+E2         2   G4 win rate (completed positions)    >= 50%   50.000000    PASS
+     D+E2         2   G5                  profit factor   >= 1.35    1.239454    FAIL
+        B         3   G1           evaluation pass rate    >= 60%   33.333333    FAIL
+        B         3   G2                         expiry    <= 15%   33.333333    FAIL
+        B         3   G3          worst window drawdown <= $1,500 2106.200000    FAIL
+        B         3   G4 win rate (completed positions)    >= 50%   57.731959    PASS
+        B         3   G5                  profit factor   >= 1.35    2.325340    PASS
+        D         3   G1           evaluation pass rate    >= 60%    0.000000    FAIL
+        D         3   G2                         expiry    <= 15%  100.000000    FAIL
+        D         3   G3          worst window drawdown <= $1,500  387.300000    PASS
+        D         3   G4 win rate (completed positions)    >= 50%   33.333333    FAIL
+        D         3   G5                  profit factor   >= 1.35    1.207169    FAIL
+     D+E1         3   G1           evaluation pass rate    >= 60%    0.000000    FAIL
+     D+E1         3   G2                         expiry    <= 15%  100.000000    FAIL
+     D+E1         3   G3          worst window drawdown <= $1,500  387.300000    PASS
+     D+E1         3   G4 win rate (completed positions)    >= 50%   33.333333    FAIL
+     D+E1         3   G5                  profit factor   >= 1.35    1.207169    FAIL
+     D+E2         3   G1           evaluation pass rate    >= 60%    0.000000    FAIL
+     D+E2         3   G2                         expiry    <= 15%  100.000000    FAIL
+     D+E2         3   G3          worst window drawdown <= $1,500  387.300000    PASS
+     D+E2         3   G4 win rate (completed positions)    >= 50%   33.333333    FAIL
+     D+E2         3   G5                  profit factor   >= 1.35    1.207169    FAIL
+ slippage from   to  new positions  new net $  new E positions  displaced positions  displaced net $  displaced profitable  displaced profit $
+        2    D D+E1              0          0                0                    0                0                     0                   0
+        2 D+E1 D+E2              0          0                0                    0                0                     0                   0
+        3    D D+E1              0          0                0                    0                0                     0                   0
+        3 D+E1 D+E2              0          0                0                    0                0                     0                   0

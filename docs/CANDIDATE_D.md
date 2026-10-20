@@ -283,3 +283,138 @@ untouched.
    - The results are the Python model's, parity-checked against the strategy's code on the NinjaTrader stand-in.
    - The preset includes the Strategy Analyzer and Playback settings for the user's native check: a granular fill
      resolution and a Playback forward run. Tick Replay alone does not establish fill accuracy.
+
+---
+
+# Results (October 21, 2026; after this pre-registration was committed in d35c6c0)
+
+**What ran where:**
+- **Python model:** `mnqbot/candidate_d.py`. Every result below is the Python model's on NQ and MNQ.
+- **NinjaScript:** `MnqCandidateD.cs` was held to the model on the NinjaTrader stand-in; native NinjaTrader has not run
+  it:
+  - identical, position by position, on the user's MNQ bars (full electronic session) for D, D+E1 and D+E2, at $125
+    and at a $2,000 coverage budget, and on synthetic sequences checked against hand-computed values
+    (`tests/test_candidate_d.py`);
+  - every decision unchanged when later bars are removed.
+- **Frozen B:** its own NinjaScript on the stand-in.
+- **The replay:** `research/eval_d.py`, checked against `research/eval_sim.py` on B (same outcome for every start).
+- No forward simulation has run.
+- Files: `verification/candidate_d/nq/` and `verification/candidate_d/mnq/`:
+  - `comparison.csv`, `gates.csv`, `increments.csv`;
+  - `ledger.csv.gz`: every position with its contracts;
+  - `windows_*`: every start's outcome.
+
+## NQ (deciding)
+
+**Coverage:**
+- 2015-03-02 to 2025-06-30: 2,571 eligible sessions.
+- 124 non-overlapping 30-day starts, 123 of them fully observed; 2,552 fully observed overlapping starts.
+- Development data.
+
+### Gates (2 ticks, the base)
+
+| Gate | Threshold | D | D + E1 | D + E2 | (frozen B, the reference) |
+|---|---|---:|---:|---:|---:|
+| G1 pass rate | ≥ 60% | 0.0% **FAIL** | 0.0% **FAIL** | 0.0% **FAIL** | 27.6% FAIL |
+| G2 expiry | ≤ 15% | 100% **FAIL** | 100% **FAIL** | 100% **FAIL** | 6.5% pass |
+| G3 worst window drawdown | ≤ $1,500 | $602.55 pass | $602.55 pass | $602.55 pass | $2,171.00 FAIL |
+| G4 win rate | ≥ 50% | 50.9% pass | 50.9% pass | 50.6% pass | 50.0% pass |
+| G5 profit factor | ≥ 1.35 | 1.09 **FAIL** | 1.08 **FAIL** | 1.07 **FAIL** | 1.18 FAIL |
+
+**At 3 ticks (the stress):**
+- G4 also fails: 28.3%, 27.9% and 27.9%.
+- G5 falls to 1.06, 1.05 and 1.04.
+
+### Continuous results (2 ticks; 3 ticks in parentheses)
+
+| | D | D + E1 | D + E2 | Frozen B |
+|---|---:|---:|---:|---:|
+| Positions | 269 | 269 | 269 | 4,938 |
+| Trades per eligible session | 0.10 | 0.10 | 0.10 | 1.92 |
+| Zero-trade sessions | 91% | 91% | 91% | 42% |
+| Sessions with 0 / 1 / 2 / 3 entries | 91 / 7 / 1 / 0 % | 91 / 7 / 1 / 0 % | 91 / 8 / 1 / 0 % | 42 / 14 / 10 / 12 % |
+| Net after costs | $1,086 ($801) | $922 ($637) | $810 ($525) | $91,575 ($73,310) |
+| Expectancy a position | $4.04, +0.011R | $3.43, +0.004R | $3.01, +0.000R | $18.54 |
+| Average win / loss | +1.03R / −1.05R | +1.02R / −1.05R | +1.03R / −1.05R | |
+| Win rate; scratches; win rate without scratches | 50.9%; 24.2%; 36.8% | 50.9%; 24.5%; 36.5% | 50.6%; 24.2%; 36.3% | 50.0%; 40.2%; 17.1% |
+| Profit factor | 1.09 | 1.08 | 1.07 | 1.18 |
+| Intraday drawdown; net ÷ it | $1,722; 0.63 | $1,722; 0.54 | $1,722; 0.47 | $14,935; 6.13 |
+| 5 largest winners' share of net | 157% | 185% | 211% | 21% |
+| Evaluation, non-overlapping: pass / breach / expired | 0 / 0 / 123 | 0 / 0 / 123 | 0 / 0 / 123 | 34 / 81 / 8 |
+| Evaluation, overlapping | 0 / 0 / 2,552 | 0 / 0 / 2,552 | 0 / 0 / 2,552 | 745 / 1,586 / 212 (9 path-dependent) |
+| Reserve halts | 0 (no reserve rule) | 0 | 0 | 0 |
+| Overruns of the $125 plan (worst beyond the plan) | 37 (−$11.00) | 37 | 37 | n/a |
+
+**D by year** (2 ticks): 2015 −$283, 2016 −$561, 2017 +$1,823, 2018 +$80, 2019 +$571, 2020 −$197, 2021 −$315,
+2022 no position, 2023 −$28, 2024 −$154, 2025 +$149.
+
+**By sleeve:**
+- noise: 214 positions, −$836;
+- Williams: 55 positions, +$1,922.
+
+**Why so few trades.** The $125 rule rejects nearly every signal:
+
+| Sleeve | Signals (the D + E2 run, NQ, 2 ticks) | Taken | Skipped: does not fit $125 | Median R, taken | Median R, skipped |
+|---|---:|---:|---:|---:|---:|
+| Noise (qualifying checks) | 8,783 | 214 | 8,569 | 24.25 points | 137.75 points |
+| Williams | 1,822 | 54 | 1,768 | 21.63 | 86.00 |
+| E (decisions) | 2,041 | 3 | 2,011 (+5 room, +8 time) | 23.50 | 116.75 |
+
+- Two contracts within $125 all-in allow at most 29.25 points of R.
+- At NQ's 2015-2025 volatility rescaled to a 30,661 level, the structural stops are 3 to 5 times that.
+- Tightening them or trading one contract would break the user's rules, so the signals are skipped.
+
+**The sleeves' increments and the trades they displace** (2 ticks):
+- **D → D + E1:**
+  - one E position, +$0.20;
+  - it displaced one profitable Williams position, +$163.70.
+- **D + E1 → D + E2:**
+  - one session-pool E position, −$111.80;
+  - it displaced the +$0.20 E position.
+- More signal sources added no diversification here: almost every E decision failed the budget.
+
+**Breakeven and partial exits do not make a winning majority:**
+- At 2 ticks, the fee-aware breakeven exit nets +$0.20 a position, and 24% of positions are such scratches. Without
+  them the win rate is 36.8%.
+- At 3 ticks the same exits net −$0.80, and the win rate falls to 28%.
+- The half filled at +2R in 25% of D's positions.
+
+## MNQ (the execution check; not deciding)
+
+**Coverage:**
+- 7/20 to 10/16/2026: 62 eligible sessions.
+- 3 non-overlapping starts (the 9/18 window counts as observed, its end falling on a weekend); 42 overlapping.
+
+| 2 ticks (3) | D | D + E1 | D + E2 | Frozen B |
+|---|---:|---:|---:|---:|
+| Positions | 6 | 6 | 6 | 97 |
+| Net | $77.20 ($68.20) | $77.20 | $77.20 | $13,030.80 ($11,606.80) |
+| Profit factor | 1.24 | 1.24 | 1.24 | 2.54 |
+| Win rate | 50% (33%) | 50% | 50% | 58.8% |
+| Non-overlapping: pass / breach / expired | 0 / 0 / 3 | 0 / 0 / 3 | 0 / 0 / 3 | 1 / 1 / 1 |
+| Overlapping | 0 / 0 / 42 | 0 / 0 / 42 | 0 / 0 / 42 | 23 / 6 / 13 |
+
+**No E position on MNQ:** all 50 E decisions failed the budget, with a median R of 139 points.
+
+## Verdict: D, D + E1 and D + E2 are rejected. Frozen B (v1.1) stays the reference.
+
+**What failed, at the deciding 2 ticks on NQ:**
+- **G1:** 0 passes in 123 non-overlapping windows.
+- **G2:** every window expired.
+- **G5:** profit factor 1.09 / 1.08 / 1.07.
+- G3 and G4 passed. G4 passed only because breakeven scratches count as wins: they are 24% of positions, and the win
+  rate is 37% without them. G4 fails at 3 ticks.
+
+**The participation goal (1-3 clear trades a day when opportunities exist) is not met:** 0.10 a session, with 91% of
+sessions empty. The opportunities exist (8,783 noise checks, 1,822 Williams triggers, 2,041 E decisions); the $125
+two-contract rule turns down 97% of them.
+
+**This is a finding about the combination of rules, not a tuning target.**
+- With structural stops kept, two contracts and $125 cannot be traded at today's NQ/MNQ volatility often enough to
+  reach $3,000 in 30 days.
+- Under the pre-registration nothing is retuned on this data. Changing the budget, the size rule or the stops would be
+  a new candidate, pre-registered on its own.
+
+**Frozen B, the reference, does not pass these gates either:**
+- G1 27.6%; G3 $2,171; G5 1.18.
+- It was never claimed to. It remains the reference because no candidate has cleared the requirements.

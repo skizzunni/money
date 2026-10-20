@@ -6,6 +6,7 @@
 - `ninjatrader/Strategies/MnqNoiseMomentum.cs` (B)
 - `ninjatrader/Strategies/MnqMomentumC.cs`
 - `ninjatrader/Strategies/MnqMomentumRunner.cs`
+- `ninjatrader/Strategies/MnqCandidateD.cs` (candidates D / E)
 - `ninjatrader/AddOns/MnqNoiseEngine.cs`
 - `pine/reference/mnq_noise_momentum_v1.5_user.pine`
 
@@ -32,6 +33,7 @@
 | MnqMomentumC.cs | `1a5142c233ae50b56357557f3c584c0f2eb9a71ddc62f0f7a3390bfdcb914fe0` | Current; the candidate was not promoted | `ninjatrader/` |
 | MnqMomentumC.cs, earlier | `0047eb78…`, `843e1fda…`, `8b5d0ef6…`, `8fdff8ac…`, `0f90ae88…` | Retired (docs/FIXES_2026-10-20.md section 1) | git history |
 | MnqMomentumRunner.cs | `f5d983b0b17af18cc71602d0f8eb686a38e692ee49ec65c6cc0bf2e4afc24ff9` | Current; the candidate was rejected | `ninjatrader/` |
+| MnqCandidateD.cs | `bf19d2ab4b76df43a970b6d7c93889101e1302e8572d4c16d9d2fa7d73273e4b` | Current; candidates D, D + E1, D + E2 rejected (docs/CANDIDATE_D.md) | `ninjatrader/` |
 | mnq_noise_momentum_v1.5_user.pine | `cd44ee68d575e74019cd308f1079838a2b5cb7453d8b7c40473436c59b851975` | The Pine reference, unchanged | `pine/reference/` |
 
 **The B v1 package (`release/MnqMomentumB_v1.zip`) is removed:** v1.1 replaced it. Only one version of each

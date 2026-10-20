@@ -1,0 +1,5 @@
+slippage,from,to,new positions,new net $,new E positions,displaced positions,displaced net $,displaced profitable,displaced profit $
+2,D,D+E1,0,0,0,0,0,0,0
+2,D+E1,D+E2,0,0,0,0,0,0,0
+3,D,D+E1,0,0,0,0,0,0,0
+3,D+E1,D+E2,0,0,0,0,0,0,0
