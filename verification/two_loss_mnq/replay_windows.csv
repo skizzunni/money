@@ -1,0 +1,261 @@
+start,fully observed,outcome,sequencing-dependent,possible outcomes,calendar days,sessions,intraday DD,settings,slippage
+2026-07-20,True,expired,False,expired,,,1683.5999999999995,R4,1
+2026-07-21,True,expired,False,expired,,,1683.5999999999995,R4,1
+2026-07-22,True,expired,False,expired,,,1683.5999999999995,R4,1
+2026-07-23,True,expired,False,expired,,,1683.5999999999995,R4,1
+2026-07-24,True,expired,False,expired,,,1515.9999999999995,R4,1
+2026-07-27,True,expired,False,expired,,,1482.7999999999997,R4,1
+2026-07-28,True,expired,False,expired,,,1317.6,R4,1
+2026-07-29,True,expired,False,expired,,,1317.5999999999997,R4,1
+2026-07-30,True,expired,False,expired,,,852.0999999999999,R4,1
+2026-07-31,True,expired,False,expired,,,852.0999999999996,R4,1
+2026-08-03,True,expired,False,expired,,,852.0999999999996,R4,1
+2026-08-04,True,expired,False,expired,,,852.0999999999992,R4,1
+2026-08-05,True,expired,False,expired,,,783.1999999999999,R4,1
+2026-08-06,True,expired,False,expired,,,783.1999999999999,R4,1
+2026-08-07,True,expired,False,expired,,,783.1999999999999,R4,1
+2026-08-10,True,expired,False,expired,,,783.1999999999999,R4,1
+2026-08-11,True,expired,False,expired,,,783.1999999999999,R4,1
+2026-08-12,True,expired,False,expired,,,783.1999999999999,R4,1
+2026-08-13,True,expired,False,expired,,,783.1999999999999,R4,1
+2026-08-14,True,expired,False,expired,,,763.8,R4,1
+2026-08-17,True,expired,False,expired,,,763.8,R4,1
+2026-08-18,True,expired,False,expired,,,763.8,R4,1
+2026-08-19,True,expired,False,expired,,,763.8,R4,1
+2026-08-20,True,expired,False,expired,,,763.8,R4,1
+2026-08-21,True,expired,False,expired,,,763.8,R4,1
+2026-08-24,True,expired,False,expired,,,763.8,R4,1
+2026-08-25,True,expired,False,expired,,,781.3999999999996,R4,1
+2026-08-26,True,expired,False,expired,,,781.3999999999996,R4,1
+2026-08-27,True,expired,False,expired,,,781.3999999999996,R4,1
+2026-08-28,True,expired,False,expired,,,781.3999999999999,R4,1
+2026-08-31,True,expired,False,expired,,,781.3999999999997,R4,1
+2026-09-01,True,expired,False,expired,,,781.3999999999997,R4,1
+2026-09-02,True,expired,False,expired,,,781.3999999999997,R4,1
+2026-09-03,True,expired,False,expired,,,781.3999999999997,R4,1
+2026-09-04,True,expired,False,expired,,,781.3999999999999,R4,1
+2026-09-07,True,expired,False,expired,,,781.3999999999995,R4,1
+2026-09-08,True,expired,False,expired,,,781.3999999999995,R4,1
+2026-09-09,True,expired,False,expired,,,857.7999999999994,R4,1
+2026-09-10,True,expired,False,expired,,,857.7999999999994,R4,1
+2026-09-11,True,expired,False,expired,,,857.7999999999994,R4,1
+2026-09-14,True,expired,False,expired,,,972.299999999999,R4,1
+2026-09-15,True,expired,False,expired,,,1008.199999999999,R4,1
+2026-09-16,True,expired,False,expired,,,1008.1999999999997,R4,1
+2026-09-17,True,pass,False,pass,30.0,22.0,1008.199999999999,R4,1
+2026-09-18,False,pass,False,pass,29.0,21.0,1008.199999999999,R4,1
+2026-09-21,False,pass,False,pass,26.0,20.0,1008.199999999999,R4,1
+2026-09-22,False,unresolved (data ends),False,unresolved (data ends),,,1008.2,R4,1
+2026-09-23,False,unresolved (data ends),False,unresolved (data ends),,,1008.1999999999999,R4,1
+2026-09-24,False,unresolved (data ends),False,unresolved (data ends),,,1008.1999999999998,R4,1
+2026-09-25,False,unresolved (data ends),False,unresolved (data ends),,,1008.1999999999998,R4,1
+2026-09-28,False,unresolved (data ends),False,unresolved (data ends),,,1008.1999999999998,R4,1
+2026-09-29,False,unresolved (data ends),False,unresolved (data ends),,,1008.1999999999998,R4,1
+2026-09-30,False,unresolved (data ends),False,unresolved (data ends),,,1008.1999999999998,R4,1
+2026-10-01,False,unresolved (data ends),False,unresolved (data ends),,,727.8,R4,1
+2026-10-02,False,unresolved (data ends),False,unresolved (data ends),,,727.8,R4,1
+2026-10-05,False,unresolved (data ends),False,unresolved (data ends),,,727.8,R4,1
+2026-10-06,False,unresolved (data ends),False,unresolved (data ends),,,727.8,R4,1
+2026-10-07,False,unresolved (data ends),False,unresolved (data ends),,,727.8,R4,1
+2026-10-08,False,unresolved (data ends),False,unresolved (data ends),,,727.8,R4,1
+2026-10-09,False,unresolved (data ends),False,unresolved (data ends),,,727.8,R4,1
+2026-10-12,False,unresolved (data ends),False,unresolved (data ends),,,727.8,R4,1
+2026-10-13,False,unresolved (data ends),False,unresolved (data ends),,,406.0,R4,1
+2026-10-14,False,unresolved (data ends),False,unresolved (data ends),,,406.0,R4,1
+2026-10-15,False,unresolved (data ends),False,unresolved (data ends),,,406.0,R4,1
+2026-10-16,False,unresolved (data ends),False,unresolved (data ends),,,406.0,R4,1
+2026-07-20,True,expired,False,expired,,,1485.1999999999998,R2,1
+2026-07-21,True,expired,False,expired,,,1485.1999999999998,R2,1
+2026-07-22,True,expired,False,expired,,,1485.1999999999998,R2,1
+2026-07-23,True,expired,False,expired,,,1485.1999999999998,R2,1
+2026-07-24,True,expired,False,expired,,,1317.6,R2,1
+2026-07-27,True,expired,False,expired,,,1391.5999999999997,R2,1
+2026-07-28,True,expired,False,expired,,,1285.5999999999997,R2,1
+2026-07-29,True,expired,False,expired,,,1285.5999999999997,R2,1
+2026-07-30,True,expired,False,expired,,,845.0999999999997,R2,1
+2026-07-31,True,expired,False,expired,,,585.5000000000001,R2,1
+2026-08-03,True,expired,False,expired,,,585.5000000000001,R2,1
+2026-08-04,True,expired,False,expired,,,537.9000000000001,R2,1
+2026-08-05,True,expired,False,expired,,,610.5,R2,1
+2026-08-06,True,expired,False,expired,,,685.3,R2,1
+2026-08-07,True,expired,False,expired,,,685.3,R2,1
+2026-08-10,True,expired,False,expired,,,725.2,R2,1
+2026-08-11,True,expired,False,expired,,,725.2,R2,1
+2026-08-12,True,expired,False,expired,,,725.2,R2,1
+2026-08-13,True,expired,False,expired,,,725.2,R2,1
+2026-08-14,True,expired,False,expired,,,725.2,R2,1
+2026-08-17,True,expired,False,expired,,,744.8,R2,1
+2026-08-18,True,expired,False,expired,,,744.8,R2,1
+2026-08-19,True,expired,False,expired,,,744.8,R2,1
+2026-08-20,True,expired,False,expired,,,744.8,R2,1
+2026-08-21,True,expired,False,expired,,,744.8,R2,1
+2026-08-24,True,expired,False,expired,,,744.8,R2,1
+2026-08-25,True,expired,False,expired,,,705.4000000000001,R2,1
+2026-08-26,True,expired,False,expired,,,705.4000000000001,R2,1
+2026-08-27,True,expired,False,expired,,,705.4000000000001,R2,1
+2026-08-28,True,expired,False,expired,,,493.6,R2,1
+2026-08-31,True,expired,False,expired,,,454.80000000000007,R2,1
+2026-09-01,True,expired,False,expired,,,454.80000000000007,R2,1
+2026-09-02,True,expired,False,expired,,,454.80000000000007,R2,1
+2026-09-03,True,expired,False,expired,,,454.80000000000007,R2,1
+2026-09-04,True,expired,False,expired,,,454.7999999999999,R2,1
+2026-09-07,True,expired,False,expired,,,499.0999999999997,R2,1
+2026-09-08,True,expired,False,expired,,,499.0999999999997,R2,1
+2026-09-09,True,expired,False,expired,,,638.5999999999996,R2,1
+2026-09-10,True,expired,False,expired,,,638.5999999999996,R2,1
+2026-09-11,True,expired,False,expired,,,638.5999999999996,R2,1
+2026-09-14,True,expired,False,expired,,,638.5999999999996,R2,1
+2026-09-15,True,expired,False,expired,,,644.5999999999993,R2,1
+2026-09-16,True,expired,False,expired,,,644.5999999999998,R2,1
+2026-09-17,True,expired,False,expired,,,644.5999999999993,R2,1
+2026-09-18,False,unresolved (data ends),False,unresolved (data ends),,,644.5999999999993,R2,1
+2026-09-21,False,unresolved (data ends),False,unresolved (data ends),,,644.5999999999993,R2,1
+2026-09-22,False,unresolved (data ends),False,unresolved (data ends),,,644.6,R2,1
+2026-09-23,False,unresolved (data ends),False,unresolved (data ends),,,644.6000000000001,R2,1
+2026-09-24,False,unresolved (data ends),False,unresolved (data ends),,,644.5999999999999,R2,1
+2026-09-25,False,unresolved (data ends),False,unresolved (data ends),,,644.5999999999999,R2,1
+2026-09-28,False,unresolved (data ends),False,unresolved (data ends),,,644.5999999999999,R2,1
+2026-09-29,False,unresolved (data ends),False,unresolved (data ends),,,644.6,R2,1
+2026-09-30,False,unresolved (data ends),False,unresolved (data ends),,,644.6,R2,1
+2026-10-01,False,unresolved (data ends),False,unresolved (data ends),,,583.4,R2,1
+2026-10-02,False,unresolved (data ends),False,unresolved (data ends),,,583.4,R2,1
+2026-10-05,False,unresolved (data ends),False,unresolved (data ends),,,583.4,R2,1
+2026-10-06,False,unresolved (data ends),False,unresolved (data ends),,,583.4000000000001,R2,1
+2026-10-07,False,unresolved (data ends),False,unresolved (data ends),,,583.4000000000001,R2,1
+2026-10-08,False,unresolved (data ends),False,unresolved (data ends),,,583.4000000000001,R2,1
+2026-10-09,False,unresolved (data ends),False,unresolved (data ends),,,583.4,R2,1
+2026-10-12,False,unresolved (data ends),False,unresolved (data ends),,,583.4,R2,1
+2026-10-13,False,unresolved (data ends),False,unresolved (data ends),,,388.9999999999999,R2,1
+2026-10-14,False,unresolved (data ends),False,unresolved (data ends),,,388.9999999999999,R2,1
+2026-10-15,False,unresolved (data ends),False,unresolved (data ends),,,264.7,R2,1
+2026-10-16,False,unresolved (data ends),False,unresolved (data ends),,,264.7,R2,1
+2026-07-20,True,expired,False,expired,,,1876.7999999999997,R4,2
+2026-07-21,True,expired,False,expired,,,1876.7999999999997,R4,2
+2026-07-22,True,expired,False,expired,,,1876.7999999999997,R4,2
+2026-07-23,True,expired,False,expired,,,1876.7999999999997,R4,2
+2026-07-24,True,expired,False,expired,,,1706.1999999999996,R4,2
+2026-07-27,True,expired,False,expired,,,1587.9999999999995,R4,2
+2026-07-28,True,expired,False,expired,,,1329.6,R4,2
+2026-07-29,True,expired,False,expired,,,1329.5999999999997,R4,2
+2026-07-30,True,expired,False,expired,,,868.1000000000001,R4,2
+2026-07-31,True,expired,False,expired,,,868.0999999999996,R4,2
+2026-08-03,True,expired,False,expired,,,868.0999999999996,R4,2
+2026-08-04,True,expired,False,expired,,,868.0999999999992,R4,2
+2026-08-05,True,expired,False,expired,,,799.1999999999999,R4,2
+2026-08-06,True,expired,False,expired,,,799.1999999999999,R4,2
+2026-08-07,True,expired,False,expired,,,799.1999999999999,R4,2
+2026-08-10,True,expired,False,expired,,,799.1999999999999,R4,2
+2026-08-11,True,expired,False,expired,,,799.1999999999999,R4,2
+2026-08-12,True,expired,False,expired,,,799.1999999999999,R4,2
+2026-08-13,True,expired,False,expired,,,799.1999999999999,R4,2
+2026-08-14,True,expired,False,expired,,,775.8,R4,2
+2026-08-17,True,expired,False,expired,,,775.8,R4,2
+2026-08-18,True,expired,False,expired,,,775.8,R4,2
+2026-08-19,True,expired,False,expired,,,775.8,R4,2
+2026-08-20,True,expired,False,expired,,,775.8,R4,2
+2026-08-21,True,expired,False,expired,,,775.8,R4,2
+2026-08-24,True,expired,False,expired,,,775.8,R4,2
+2026-08-25,True,expired,False,expired,,,733.4,R4,2
+2026-08-26,True,expired,False,expired,,,733.4,R4,2
+2026-08-27,True,expired,False,expired,,,733.4,R4,2
+2026-08-28,True,expired,False,expired,,,565.0,R4,2
+2026-08-31,True,expired,False,expired,,,562.8,R4,2
+2026-09-01,True,expired,False,expired,,,562.8,R4,2
+2026-09-02,True,expired,False,expired,,,562.8,R4,2
+2026-09-03,True,expired,False,expired,,,562.8,R4,2
+2026-09-04,True,expired,False,expired,,,562.7999999999998,R4,2
+2026-09-07,True,expired,False,expired,,,726.2999999999995,R4,2
+2026-09-08,True,expired,False,expired,,,726.2999999999995,R4,2
+2026-09-09,True,expired,False,expired,,,868.7999999999995,R4,2
+2026-09-10,True,expired,False,expired,,,868.7999999999995,R4,2
+2026-09-11,True,expired,False,expired,,,868.7999999999995,R4,2
+2026-09-14,True,expired,False,expired,,,992.299999999999,R4,2
+2026-09-15,True,expired,False,expired,,,1029.199999999999,R4,2
+2026-09-16,True,expired,False,expired,,,1029.199999999999,R4,2
+2026-09-17,True,pass,False,pass,30.0,22.0,1029.199999999999,R4,2
+2026-09-18,False,pass,False,pass,29.0,21.0,1029.199999999999,R4,2
+2026-09-21,False,pass,False,pass,26.0,20.0,1029.199999999999,R4,2
+2026-09-22,False,unresolved (data ends),False,unresolved (data ends),,,1029.2,R4,2
+2026-09-23,False,unresolved (data ends),False,unresolved (data ends),,,1029.1999999999998,R4,2
+2026-09-24,False,unresolved (data ends),False,unresolved (data ends),,,1029.1999999999998,R4,2
+2026-09-25,False,unresolved (data ends),False,unresolved (data ends),,,1029.1999999999998,R4,2
+2026-09-28,False,unresolved (data ends),False,unresolved (data ends),,,1029.1999999999998,R4,2
+2026-09-29,False,unresolved (data ends),False,unresolved (data ends),,,1029.1999999999996,R4,2
+2026-09-30,False,unresolved (data ends),False,unresolved (data ends),,,1029.1999999999996,R4,2
+2026-10-01,False,unresolved (data ends),False,unresolved (data ends),,,734.8,R4,2
+2026-10-02,False,unresolved (data ends),False,unresolved (data ends),,,734.8,R4,2
+2026-10-05,False,unresolved (data ends),False,unresolved (data ends),,,734.8,R4,2
+2026-10-06,False,unresolved (data ends),False,unresolved (data ends),,,734.8,R4,2
+2026-10-07,False,unresolved (data ends),False,unresolved (data ends),,,734.8,R4,2
+2026-10-08,False,unresolved (data ends),False,unresolved (data ends),,,734.8,R4,2
+2026-10-09,False,unresolved (data ends),False,unresolved (data ends),,,734.8,R4,2
+2026-10-12,False,unresolved (data ends),False,unresolved (data ends),,,734.8,R4,2
+2026-10-13,False,unresolved (data ends),False,unresolved (data ends),,,406.0,R4,2
+2026-10-14,False,unresolved (data ends),False,unresolved (data ends),,,406.0,R4,2
+2026-10-15,False,unresolved (data ends),False,unresolved (data ends),,,406.0,R4,2
+2026-10-16,False,unresolved (data ends),False,unresolved (data ends),,,406.0,R4,2
+2026-07-20,True,expired,False,expired,,,1514.6,R2,2
+2026-07-21,True,expired,False,expired,,,1514.6,R2,2
+2026-07-22,True,expired,False,expired,,,1514.6,R2,2
+2026-07-23,True,expired,False,expired,,,1514.6,R2,2
+2026-07-24,True,expired,False,expired,,,1343.9999999999998,R2,2
+2026-07-27,True,expired,False,expired,,,1300.5999999999997,R2,2
+2026-07-28,True,expired,False,expired,,,1298.5999999999997,R2,2
+2026-07-29,True,expired,False,expired,,,1298.5999999999997,R2,2
+2026-07-30,True,expired,False,expired,,,861.0999999999997,R2,2
+2026-07-31,True,expired,False,expired,,,599.5000000000001,R2,2
+2026-08-03,True,expired,False,expired,,,599.5000000000001,R2,2
+2026-08-04,True,expired,False,expired,,,549.9000000000001,R2,2
+2026-08-05,True,expired,False,expired,,,618.5,R2,2
+2026-08-06,True,expired,False,expired,,,694.3,R2,2
+2026-08-07,True,expired,False,expired,,,694.3,R2,2
+2026-08-10,True,expired,False,expired,,,735.2,R2,2
+2026-08-11,True,expired,False,expired,,,735.2,R2,2
+2026-08-12,True,expired,False,expired,,,735.2,R2,2
+2026-08-13,True,expired,False,expired,,,735.2,R2,2
+2026-08-14,True,expired,False,expired,,,735.2,R2,2
+2026-08-17,True,expired,False,expired,,,757.8,R2,2
+2026-08-18,True,expired,False,expired,,,757.8,R2,2
+2026-08-19,True,expired,False,expired,,,757.8,R2,2
+2026-08-20,True,expired,False,expired,,,757.8,R2,2
+2026-08-21,True,expired,False,expired,,,757.8,R2,2
+2026-08-24,True,expired,False,expired,,,757.8,R2,2
+2026-08-25,True,expired,False,expired,,,715.4000000000001,R2,2
+2026-08-26,True,expired,False,expired,,,715.4000000000001,R2,2
+2026-08-27,True,expired,False,expired,,,715.4000000000001,R2,2
+2026-08-28,True,expired,False,expired,,,501.6,R2,2
+2026-08-31,True,expired,False,expired,,,433.1999999999997,R2,2
+2026-09-01,True,expired,False,expired,,,433.1999999999997,R2,2
+2026-09-02,True,expired,False,expired,,,433.1999999999997,R2,2
+2026-09-03,True,expired,False,expired,,,433.1999999999997,R2,2
+2026-09-04,True,expired,False,expired,,,433.1999999999997,R2,2
+2026-09-07,True,expired,False,expired,,,503.0999999999997,R2,2
+2026-09-08,True,expired,False,expired,,,503.0999999999997,R2,2
+2026-09-09,True,expired,False,expired,,,645.5999999999997,R2,2
+2026-09-10,True,expired,False,expired,,,645.5999999999997,R2,2
+2026-09-11,True,expired,False,expired,,,645.5999999999997,R2,2
+2026-09-14,True,expired,False,expired,,,645.5999999999997,R2,2
+2026-09-15,True,expired,False,expired,,,658.5999999999995,R2,2
+2026-09-16,True,expired,False,expired,,,658.5999999999993,R2,2
+2026-09-17,True,expired,False,expired,,,658.5999999999995,R2,2
+2026-09-18,False,unresolved (data ends),False,unresolved (data ends),,,658.5999999999995,R2,2
+2026-09-21,False,unresolved (data ends),False,unresolved (data ends),,,658.5999999999995,R2,2
+2026-09-22,False,unresolved (data ends),False,unresolved (data ends),,,658.6,R2,2
+2026-09-23,False,unresolved (data ends),False,unresolved (data ends),,,658.6000000000001,R2,2
+2026-09-24,False,unresolved (data ends),False,unresolved (data ends),,,658.6,R2,2
+2026-09-25,False,unresolved (data ends),False,unresolved (data ends),,,658.6,R2,2
+2026-09-28,False,unresolved (data ends),False,unresolved (data ends),,,658.6,R2,2
+2026-09-29,False,unresolved (data ends),False,unresolved (data ends),,,658.6,R2,2
+2026-09-30,False,unresolved (data ends),False,unresolved (data ends),,,658.6,R2,2
+2026-10-01,False,unresolved (data ends),False,unresolved (data ends),,,587.4,R2,2
+2026-10-02,False,unresolved (data ends),False,unresolved (data ends),,,587.4,R2,2
+2026-10-05,False,unresolved (data ends),False,unresolved (data ends),,,587.4,R2,2
+2026-10-06,False,unresolved (data ends),False,unresolved (data ends),,,587.4000000000001,R2,2
+2026-10-07,False,unresolved (data ends),False,unresolved (data ends),,,587.4000000000001,R2,2
+2026-10-08,False,unresolved (data ends),False,unresolved (data ends),,,587.4000000000001,R2,2
+2026-10-09,False,unresolved (data ends),False,unresolved (data ends),,,587.4,R2,2
+2026-10-12,False,unresolved (data ends),False,unresolved (data ends),,,587.4,R2,2
+2026-10-13,False,unresolved (data ends),False,unresolved (data ends),,,388.9999999999999,R2,2
+2026-10-14,False,unresolved (data ends),False,unresolved (data ends),,,388.9999999999999,R2,2
+2026-10-15,False,unresolved (data ends),False,unresolved (data ends),,,265.7,R2,2
+2026-10-16,False,unresolved (data ends),False,unresolved (data ends),,,265.7,R2,2
