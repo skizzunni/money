@@ -336,3 +336,47 @@ def test_account_highest_equity_survives_a_restart(sim, tmp_path):  # noqa: F811
     assert float(saved[0]) > 50000
     out = stand_in(sim, frame.iloc[:5], tmp_path, **props)
     assert f"D account: highest equity {float(saved[0]):.2f}" in out
+
+
+# ---- rescaled NQ: levels carried across a month boundary ------------------------------------------------------
+def _scaled(frame: pd.DataFrame, month: str, k: float) -> pd.DataFrame:
+    f = frame.copy()
+    f["scale"] = 1.0
+    m = f.index.strftime("%Y-%m") == month
+    f.loc[m, ["open", "high", "low", "close"]] *= k
+    f.loc[m, "scale"] = k
+    return f
+
+
+def _moved(frame: pd.DataFrame, a: str, b: str) -> pd.DataFrame:
+    """The same bars with day a moved to 2026-03-31 and day b to 2026-04-01 (a month boundary between them)."""
+    idx = frame.index.strftime("%Y-%m-%d")
+    out = frame.copy()
+    new = [t.replace(month=3, day=31) if d == a else t.replace(month=4, day=1)
+           for t, d in zip(frame.index, idx, strict=True)]
+    out.index = pd.DatetimeIndex(new)
+    return out
+
+
+@pytest.mark.parametrize("which", ["williams", "sweep"])
+def test_levels_cross_a_rescaled_month_boundary(which):
+    """The previous session's range (Williams) and the previous-day low, swings and ATR (the sweep) carried into a month
+    whose prices are scaled by 2 (and its scale column 2) give the same positions at prices 2x the unscaled ones."""
+    if which == "williams":
+        b, kw = williams_setup(117), {"noise": False, "williams": True}
+        # 1100 is under the up level (1118.5, or 2237 scaled) but over an unconverted one (2120 + 58.5 = 2178.5)
+        b.bar("2026-03-11", "09:45", 1060, 1100, 1060, 1062)
+        b.bar("2026-03-11", "10:01", 1119, 1125, 1118, 1124).hold("2026-03-11", "10:02", "15:59", 1124.0)
+    else:
+        b, kw = sweep_day()[0], {"noise": False, "williams": False, "e1": True}
+    base = _moved(b.frame(), "2026-03-10", "2026-03-11")
+    cfg = DConfig(budget=10_000.0, **kw)
+    one = run(base.assign(scale=1.0), cfg).campaigns
+    two = run(_scaled(base, "2026-04", 2.0), cfg).campaigns
+    assert len(one) == len(two) == 1
+    a, z = one[0], two[0]
+    assert (a.sleeve, a.d, a.signal_bar, [x.fill_bar for x in a.lots]) == \
+           (z.sleeve, z.d, z.signal_bar, [x.fill_bar for x in z.lots])
+    tol = 1e-9 if which == "williams" else 0.25 + 1e-9  # an ATR-based stop rounds to the tick after scaling
+    assert abs(z.expected - 2 * a.expected) <= 1e-9 and abs(z.stop0 - 2 * a.stop0) <= tol
+    assert abs(z.r - 2 * a.r) <= tol
