@@ -30,9 +30,10 @@ COLS = ["sleeve", "d", "kind", "signal_bar", "entry_bar", "exit_bar", "runner_fi
 
 
 def nt_positions(dll, csv, cfg_kw, budget, slip=2, extra=()):
-    props = {"UseNoise": cfg_kw.get("noise", True), "UseWilliams": cfg_kw.get("williams", True), "UseE1": bool(cfg_kw.get("e1")), "UseE2": bool(cfg_kw.get("e2")),
-             "RiskBudget": budget, "SimSlippageTicks": slip, "SimCommissionPerSide": 0.95, "SimExitExecutions": True,
-             "EvalTarget": 0, "EvalTrail": 0, "NfpDates": NFP, **dict(extra)}
+    props = {"UseNoise": cfg_kw.get("noise", True), "UseWilliams": cfg_kw.get("williams", True),
+             "UseE1": bool(cfg_kw.get("e1")), "UseE2": bool(cfg_kw.get("e2")), "RiskBudget": budget,
+             "SimSlippageTicks": slip, "SimCommissionPerSide": 0.95, "SimExitExecutions": True, "EvalTarget": 0,
+             "EvalTrail": 0, "NfpDates": NFP, **dict(extra)}
     r = subprocess.run([K.DOTNET, str(dll), str(csv), "1", "Strategy=D", *[f"{k}={v}" for k, v in props.items()]],
                        capture_output=True, text=True, env=K.ENV)
     if r.returncode:
