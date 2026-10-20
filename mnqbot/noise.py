@@ -31,6 +31,9 @@ Rules, New York time, on any chart whose bar length divides 30 minutes:
     14:00 (10:00-13:30), when fed_no_shorts is on. In check mode a reversal to short there is a plain exit.
   * Everything is closed at the 16:00 close. If a session ends early (half day, data gap), a position
     still open is closed at the close of the first bar outside 09:30-16:00 or of the next 09:30 bar.
+  * nt_execution and round_prices (off by default) switch to the NinjaTrader strategy's execution instead: the
+    bracket measured from the actual fill, the 16:00 exit at the next bar's open, a passed stop as a market exit,
+    prices on the tick grid. With both on it matches MnqNoiseMomentum.cs trade for trade (docs/PARITY.md).
 """
 from __future__ import annotations
 
@@ -102,6 +105,15 @@ class NoiseConfig:
     # take-profit measured from the real fill and working from the fill bar, as the NinjaTrader strategy sends it: the
     # half as its own entry with its own take-profit
     partial_r: str = "cap"
+    # NinjaTrader's execution (the MnqNoiseMomentum strategy as it sends its orders; docs/PARITY.md), off by default
+    # so the Pine script's rules stay the default. nt_execution: the bracket sent with the entry is measured at the
+    # signal from the expected fill (stop: the closer of the line stop and the max loss; take-profit) and placed that
+    # many points from the actual fill; a stop the last bar's close has already passed is a market exit at this bar's
+    # open ("Stop passed"); the 16:00 exit is a market order filled at the next bar's open. round_prices: orders on
+    # the tick grid, the bracket's stop distance rounded down and its take-profit distance up, a moving stop rounded
+    # toward the price and a take-profit away from it (NinjaTrader's RoundPrices, on there by default).
+    nt_execution: bool = False
+    round_prices: bool = False
 
 
 @dataclass
@@ -170,6 +182,25 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
     if cfg.partial_r not in ("cap", "initial"):
         raise ValueError(f"partial_r must be 'cap' or 'initial', not {cfg.partial_r!r}")
     r_next = r_trade = math.nan  # partial_r "initial": the pending entry's initial risk, and the open trade's
+    # nt_execution: the pending entry's bracket (points from the fill: stop, take-profit; what the stop is), and the
+    # open trade's
+    br_next: tuple[float, float, str] = (math.nan, math.nan, "")
+    br_trade: tuple[float, float, str] = (math.nan, math.nan, "")
+    tick = cfg.tick
+
+    def ticks_down(points: float) -> float:
+        return max(tick, math.floor(points / tick + 1e-7) * tick) if cfg.round_prices else points
+
+    def ticks_up(points: float) -> float:
+        return max(tick, math.ceil(points / tick - 1e-7) * tick) if cfg.round_prices and points == points else points
+
+    def on_grid(d: int, price: float) -> float:
+        """A long's stop and take-profit both round up (the stop toward the price, the take-profit away from it), a
+        short's both down: a loss never goes past the max loss, a target never takes less than tested."""
+        if not cfg.round_prices or math.isnan(price):
+            return price
+        n = price / tick
+        return (math.ceil(n - 1e-7) if d > 0 else math.floor(n + 1e-7)) * tick
     vol = bars["volume"].to_numpy(float) if "volume" in bars else np.zeros(len(bars))
     pv_sum = v_sum = 0.0  # today's volume-weighted (or time-weighted) typical price, from 09:30
     vwap_now = vwap_used = math.nan
@@ -181,8 +212,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
     headsups: list[tuple[int, int]] = []
 
     def open_pos(i: int, d: int) -> None:
-        nonlocal pos, entry_px, entry_bar, r_trade
-        pos, entry_px, entry_bar, r_trade = d, o[i] + d * slip, i, r_next
+        nonlocal pos, entry_px, entry_bar, r_trade, br_trade
+        pos, entry_px, entry_bar, r_trade, br_trade = d, o[i] + d * slip, i, r_next, br_next
 
     def close_pos(i: int, price: float, reason: str) -> None:
         nonlocal pos, held, locked, losers_today, rest, part_pnl, best
@@ -213,6 +244,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             pending = None
             if kind == "close" and pos:
                 close_pos(i, o[i] - pos * slip, "Back inside")
+            elif kind == "flat" and pos:  # nt_execution: the 16:00 market exit
+                close_pos(i, o[i] - pos * slip, "16:00 close")
             elif kind == "entry":
                 if pos == -d:
                     close_pos(i, o[i] - pos * slip, "reversed")
@@ -241,11 +274,18 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                     tr = best - pos * cfg.trail_points
                     if (pos > 0 and tr > line) or (pos < 0 and tr < line):
                         line, reason = tr, "Trail"
+            if cfg.nt_execution:
+                if entry_bar == i:  # the bracket sent with the entry, points from the actual fill
+                    line, reason = entry_px - pos * br_trade[0], br_trade[2]
+                else:
+                    line = on_grid(pos, line)
             if cfg.tighten_only:  # the broker's stop is placed with the entry and only ever tightened
                 if entry_bar != i and ((pos > 0 and held > line) or (pos < 0 and held < line)):
                     line, reason = held, held_why
                 held, held_why = line, reason
-            if entry_bar == i:  # a stop attached to the entry can fill on the fill bar itself
+            if cfg.nt_execution and entry_bar != i and pos * (c[i - 1] - line) <= 0:
+                hit, price, reason = True, o[i] - pos * slip, "Stop passed"  # sent at the last close, filled now
+            elif entry_bar == i:  # a stop attached to the entry can fill on the fill bar itself
                 hit = l[i] <= line if pos > 0 else h[i] >= line
                 price = (min(o[i], line) if pos > 0 else max(o[i], line)) - pos * slip
             elif (pos > 0 and o[i] <= line) or (pos < 0 and o[i] >= line):  # the line moved past the price, or a gap
@@ -267,6 +307,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                 pass
             elif cfg.take_profit > 0 and (entry_bar != i or cfg.target_on_fill_bar):  # the take-profit limit
                 tp = (entry_px if entry_bar != i else est_px) * (1 + pos * cfg.take_profit * sigma)
+                if cfg.nt_execution:
+                    tp = entry_px + pos * br_trade[1] if entry_bar == i else on_grid(pos, tp)
                 if (pos > 0 and h[i] >= tp + cfg.tick) or (pos < 0 and l[i] <= tp - cfg.tick):
                     close_pos(i, tp, "Target")
                     events.append((i, "TARGET"))
@@ -342,12 +384,16 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                     stop = tp = math.nan
                     if use_stop:  # the bracket: the closer of the line stop and the max loss, and the take-profit
                         stop = upper * (1 - cfg.stop_buffer * sigma) if d > 0 else lower * (1 + cfg.stop_buffer * sigma)
+                        at_line = stop
                         if cfg.max_loss_per_trade > 0:
                             cap = est_px - d * cfg.max_loss_per_trade / cfg.qty / cfg.point_value
                             stop = max(stop, cap) if d > 0 else min(stop, cap)
                         if cfg.take_profit > 0:
                             tp = est_px * (1 + d * cfg.take_profit * sigma)
                     r_next = abs(est_px - stop) if use_stop else math.nan
+                    if use_stop:
+                        why = "Max loss" if stop != at_line else "Back inside"
+                        br_next = (ticks_down(d * (est_px - stop)), ticks_up(d * (tp - est_px)), why)
                     orders.append((i, d, est_px, stop, tp))
 
         # heads-up: five minutes before a check, flat, and the close already past that check's line (round fifty)
@@ -366,7 +412,10 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                 headsups.append((i, -1))
 
         if in_rth and end == RTH_CLOSE:
-            if pos:
+            if pos and cfg.nt_execution:
+                pending = ("flat", 0)  # a market order, filled at the next bar's open
+                events.append((i, "FLAT"))
+            elif pos:
                 close_pos(i, c[i] - pos * slip, "16:00 close")
                 events.append((i, "FLAT"))
             if not math.isnan(day_open) and not any(math.isnan(x) for x in today):
