@@ -1,0 +1,4 @@
+slippage ticks,role,trades,net $,profit factor,intraday DD $,net / intraday DD,worst day $,months,44 starts: pass / breach / expired,path-dependent
+1,reference,97,13218.8,2.58,2612.8,5.06,-628.8,Jul -328 Aug +3320 Sep +5580 Oct +4646,24 / 6 / 14,0
+2,base,97,13030.8,2.54,2652.8,4.91,-634.8,Jul -374 Aug +3280 Sep +5516 Oct +4608,24 / 6 / 14,0
+3,stress,97,11606.8,2.33,2692.8,4.31,-640.8,Jul -420 Aug +3240 Sep +4216 Oct +4570,24 / 6 / 14,0

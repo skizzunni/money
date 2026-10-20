@@ -122,6 +122,8 @@ All figures are the **stand-in simulator's**. No NinjaTrader run of candidate C 
 
 ## The 40-trade native run (1/1 to 10/17, summary `2d625b0f-...11-09_PM.csv`)
 
+**It ran at 0 ticks of slippage. Nothing is tuned against it** (docs/FIXES_2026-10-20.md section 3).
+
 **Only its summary was provided, so this is inferred, not confirmed from its Output.**
 - **Which strategy:** almost certainly the rejected runner.
   - Commission is $199.50 for 40 trades: 105 contracts at $1.90, about 2.6 a trade. B always trades 4.

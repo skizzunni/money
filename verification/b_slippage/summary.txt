@@ -1,0 +1,12 @@
+                                                                         0                                       1                                       2
+slippage ticks                                                           1                                       2                                       3
+role                                                             reference                                    base                                  stress
+trades                                                                  97                                      97                                      97
+net $                                                              13218.8                                 13030.8                                 11606.8
+profit factor                                                         2.58                                    2.54                                    2.33
+intraday DD $                                                       2612.8                                  2652.8                                  2692.8
+net / intraday DD                                                     5.06                                    4.91                                    4.31
+worst day $                                                         -628.8                                  -634.8                                  -640.8
+months                              Jul -328 Aug +3320 Sep +5580 Oct +4646  Jul -374 Aug +3280 Sep +5516 Oct +4608  Jul -420 Aug +3240 Sep +4216 Oct +4570
+44 starts: pass / breach / expired                             24 / 6 / 14                             24 / 6 / 14                             24 / 6 / 14
+path-dependent                                                           0                                       0                                       0

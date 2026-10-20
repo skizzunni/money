@@ -150,8 +150,11 @@ B's sizing is 4 MNQ × 25 points × $2 = $200 at the max-loss stop.
 - **Frozen B is the recommended configuration, unchanged.**
   - Its software is verified against native NinjaTrader on the period behind its results.
   - It is profitable after costs on MNQ (development data) and on the NQ proxy.
-  - **Adopt it for simulation-account forward testing only:** `release/MnqMomentumB_v1/PRESET_B-PRACTICE-v1.md`;
-    validation in the Strategy Analyzer with `PRESET_B-NATIVE-v1.md`.
+  - **Adopt it for simulation-account forward testing only.** Use v1.1 (docs/FIXES_2026-10-20.md): the same trading
+    logic, with realtime errors no longer ignored.
+    - On a simulation account: `release/MnqMomentumB_v1.1/PRESET_B-PRACTICE-v1.1.md`.
+    - Validation in the Strategy Analyzer: `PRESET_B-NATIVE-v1.1.md`, at 2 ticks base and 3 stress.
+  - **At 3 ticks of slippage** it still made $11,606.80 on MNQ, with the evaluation outcomes unchanged.
   - **It is not adopted as an evaluation strategy.** Suitability is not established: about 3 independent MNQ windows,
     against a breach rate twice the pass rate on ten years of NQ.
 - **The Pine v1.5 four-loss reference (R4) stays the Pine reference, unchanged.**
@@ -168,17 +171,18 @@ B's sizing is 4 MNQ × 25 points × $2 = $200 at the max-loss stop.
 
 | File | sha256 |
 |---|---|
-| `Strategies/MnqNoiseMomentum.cs` | `1fbdcea05fd1f5403bfbc7c798e8bf83f93ccdf1dade3ec0f2724d552c744bd3` |
+| `Strategies/MnqNoiseMomentum.cs`, v1.1 (current) | `d1a4f8633c0d630edabd02ed59b8be0425eda581ab322873db58ecc8cbd26a35` |
+| `Strategies/MnqNoiseMomentum.cs`, v1 (reconciled with native) | `1fbdcea05fd1f5403bfbc7c798e8bf83f93ccdf1dade3ec0f2724d552c744bd3` |
 | `AddOns/MnqNoiseEngine.cs` | `e5a1ec0cc18b15509828149ce8aa0e9c7a104a59aff0992190205c42f354deb7` |
 
-- Packaged in `release/MnqMomentumB_v1.zip`, with INSTALL, both presets and SHA256SUMS. Nothing else is needed in
-  NinjaTrader.
+- Packaged in `release/MnqMomentumB_v1.1.zip` (and v1 in `release/MnqMomentumB_v1.zip`), each with INSTALL, both
+  presets and SHA256SUMS. Nothing else is needed in NinjaTrader. Install one version only.
 
 **Other code:**
 - **Pine reference:** `pine/reference/mnq_noise_momentum_v1.5_user.pine`, sha256
   `cd44ee68d575e74019cd308f1079838a2b5cb7453d8b7c40473436c59b851975` (`release/PineReference_v1.5.zip`).
 - **Candidate C:** `release/MnqMomentumC_candidate.zip`; `MnqMomentumC.cs` sha256
-  `0f90ae8836b94383c0d545468d732ecaab8504297d328a1551bef394716dad19`.
+  `1a5142c233ae50b56357557f3c584c0f2eb9a71ddc62f0f7a3390bfdcb914fe0`.
 - **B3 (rejected):** `verification/candidate_b3.patch` against B's two files.
 
 **Research:**

@@ -1339,3 +1339,15 @@ def test_breakout_shorts_off_removes_only_the_breakout_shorts(sim, tmp_path, see
     off = named({"UseBreakout": True, "BreakoutShorts": False})
     assert any(x[-1] == "W Short" for x in base)
     assert off == [x for x in base if x[-1] != "W Short"]
+
+
+@pytest.mark.parametrize("name", ["MnqNoiseMomentum", "MnqMomentumC", "MnqMomentumRunner"])
+def test_realtime_errors_are_never_ignored(name):
+    """docs/FIXES_2026-10-20.md: no strategy ignores realtime errors. A rejection reaches the strategy's own
+    OnOrderUpdate handling (it re-sends or flattens); any other error stops the strategy, cancels its orders and closes
+    the position."""
+    src = (NT / "Strategies" / f"{name}.cs").read_text()
+    assert "RealtimeErrorHandling.IgnoreAllErrors" not in src
+    assert src.count("RealtimeErrorHandling = RealtimeErrorHandling.StopCancelCloseIgnoreRejects;") == 1
+    handler = src[src.index("protected override void OnOrderUpdate"):]
+    assert "OrderState.Rejected" in handler[:4000]

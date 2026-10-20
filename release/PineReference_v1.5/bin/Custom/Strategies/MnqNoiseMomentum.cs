@@ -117,7 +117,9 @@ namespace NinjaTrader.NinjaScript.Strategies
                 ExitOnSessionCloseSeconds = 60;
                 BarsRequiredToTrade = 0;               // the engine waits for its own 14 sessions
                 StartBehavior = StartBehavior.WaitUntilFlat;
-                RealtimeErrorHandling = RealtimeErrorHandling.IgnoreAllErrors;  // OnOrderUpdate flattens on a rejected stop
+                // a rejection reaches OnOrderUpdate, which re-sends or flattens; any other realtime error stops the
+                // strategy, cancels its orders and closes the position (never ignored)
+                RealtimeErrorHandling = RealtimeErrorHandling.StopCancelCloseIgnoreRejects;
                 TraceOrders = false;
                 IsInstantiatedOnEachOptimizationIteration = true;
 

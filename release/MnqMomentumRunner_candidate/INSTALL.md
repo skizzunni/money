@@ -6,7 +6,7 @@ byte.
 
 | File | Goes to | sha256 |
 |---|---|---|
-| `bin/Custom/Strategies/MnqMomentumRunner.cs` | `Documents\NinjaTrader 8\bin\Custom\Strategies\` | `bda14f5a82075266901b80d58a7dc7a400302809739f4c9421243a3908372b1e` |
+| `bin/Custom/Strategies/MnqMomentumRunner.cs` | `Documents\NinjaTrader 8\bin\Custom\Strategies\` | `f5d983b0b17af18cc71602d0f8eb686a38e692ee49ec65c6cc0bf2e4afc24ff9` |
 | `bin/Custom/AddOns/MnqNoiseEngine.cs` | `Documents\NinjaTrader 8\bin\Custom\AddOns\` | `e5a1ec0cc18b15509828149ce8aa0e9c7a104a59aff0992190205c42f354deb7` (B's, unchanged) |
 
 1. Copy both files to the folders above. If B is installed, the AddOn file is already there and identical.

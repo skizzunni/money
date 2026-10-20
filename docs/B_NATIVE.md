@@ -62,6 +62,10 @@ run before it is adopted, because this reconciliation covers B's code paths only
 
 ## 3. The exact preset: B-NATIVE-v1 (the reconciled configuration)
 
+**Since superseded for any account by B v1.1** (`release/MnqMomentumB_v1.1/PRESET_B-NATIVE-v1.1.md`). v1.1 has the
+same trading logic, does not ignore realtime errors, and uses 2 ticks as the base slippage and 3 as the stress
+(docs/FIXES_2026-10-20.md). The preset below is v1's, as reconciled.
+
 **Code.** The two files, unchanged (`release/MnqMomentumB_v1/SHA256SUMS.txt`):
 - `Strategies/MnqNoiseMomentum.cs`, sha256 `1fbdcea05fd1f5403bfbc7c798e8bf83f93ccdf1dade3ec0f2724d552c744bd3`
 - `AddOns/MnqNoiseEngine.cs`, sha256 `e5a1ec0cc18b15509828149ce8aa0e9c7a104a59aff0992190205c42f354deb7`

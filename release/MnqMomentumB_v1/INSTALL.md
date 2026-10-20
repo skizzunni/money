@@ -1,5 +1,9 @@
 # MNQ Momentum B, v1: install (NinjaTrader 8)
 
+**Superseded for any account by `release/MnqMomentumB_v1.1`.** v1.1 has the same trading logic and does not ignore
+realtime errors. v1 is kept as the code reconciled with native NinjaTrader (docs/B_NATIVE.md). Install only one of the
+two: both define `class MnqNoiseMomentum`.
+
 This package holds the complete strategy: two source files, no other dependency. It is the code that ran in the
 native NinjaTrader tests (commit 2ae30ae; unchanged since).
 

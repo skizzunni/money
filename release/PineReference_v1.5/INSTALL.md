@@ -5,7 +5,7 @@ The reference as it is. Nothing here is a new strategy.
 | File | What it is | sha256 |
 |---|---|---|
 | `pine/mnq_noise_momentum_v1.5_user.pine` | The user's exact Pine script (v1.5; = repo commit 5e092d0) | `cd44ee68d575e74019cd308f1079838a2b5cb7453d8b7c40473436c59b851975` |
-| `bin/Custom/Strategies/MnqNoiseMomentum.cs` | NinjaTrader strategy: frozen B's code, run at the Pine settings | `1fbdcea05fd1f5403bfbc7c798e8bf83f93ccdf1dade3ec0f2724d552c744bd3` |
+| `bin/Custom/Strategies/MnqNoiseMomentum.cs` | NinjaTrader strategy: frozen B's code, run at the Pine settings | `d1a4f8633c0d630edabd02ed59b8be0425eda581ab322873db58ecc8cbd26a35` (B v1.1) |
 | `bin/Custom/AddOns/MnqNoiseEngine.cs` | Its rules engine, frozen | `e5a1ec0cc18b15509828149ce8aa0e9c7a104a59aff0992190205c42f354deb7` |
 
 **Dependencies:** none beyond NinjaTrader 8, or TradingView for the Pine file. The two .cs files are the same as in

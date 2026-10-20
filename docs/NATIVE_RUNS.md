@@ -134,6 +134,13 @@ None is expected, because nothing trades before the engine is ready.
   that is inferred, not confirmed.
 - A run of newer code says nothing about what made the old one fail.
 
+**Tested since (docs/FIXES_2026-10-20.md section 2):**
+- Commit 5c7626a's code on the user's MNQ bars from 8/9 (simulator) took 83 trades. The engine was ready, with the
+  first entry on 8/28. So "warm-up never completed" is ruled out on these bars.
+- With Place orders Off it takes exactly 0 trades.
+- A non-minute series, or Calculate not "On bar close", also gives 0 trades ("... Not trading.").
+- Which of these it was needs the run's Output.
+
 **To resolve it** (proposed, not started):
 1. Build commit 5c7626a's two files with the diagnostics added and no other change (a separate build, not the frozen
    one above).
