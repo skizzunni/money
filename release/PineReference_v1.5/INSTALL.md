@@ -9,7 +9,7 @@ The reference as it is. Nothing here is a new strategy.
 | `bin/Custom/AddOns/MnqNoiseEngine.cs` | Its rules engine, frozen | `e5a1ec0cc18b15509828149ce8aa0e9c7a104a59aff0992190205c42f354deb7` |
 
 **Dependencies:** none beyond NinjaTrader 8, or TradingView for the Pine file. The two .cs files are the same as in
-`MnqMomentumB_v1`; installing either package installs the same code.
+`MnqMomentumB_v1.1`; installing either package installs the same code.
 
 **Steps:**
 1. **TradingView:** Pine Editor → paste the .pine file → Add to chart → set the inputs from `PRESETS.md`.

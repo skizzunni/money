@@ -2,7 +2,7 @@
 
 **For a native check or practice only:** a NinjaTrader simulation account, never a paid evaluation account. The
 comparison in `docs/RUNNER.md` **rejects this candidate** for the evaluation: this preset is for reproducing and
-checking that result. Frozen B (`MnqMomentumB_v1`) is unchanged and stays the reference.
+checking that result. Frozen B (now `MnqMomentumB_v1.1`, the same trading logic) is unchanged and stays the reference.
 
 ## Account
 

@@ -2,7 +2,7 @@
 
 **For a native check or practice only:** a NinjaTrader simulation account, never a paid evaluation account. The
 pre-registered comparison in `docs/CANDIDATE_C.md` **rejects candidate C**: this preset is for reproducing and
-checking that result natively. Frozen B (`MnqMomentumB_v1`) is unchanged and stays the benchmark.
+checking that result natively. Frozen B (now `MnqMomentumB_v1.1`, the same trading logic) is unchanged and stays the benchmark.
 
 ## Account
 

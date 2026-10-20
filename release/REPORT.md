@@ -1,7 +1,7 @@
 # MNQ Momentum B v1: results and readiness (October 18, 2026)
 
 **B** = the strategy with the breakout off: momentum only, 4 MNQ, $200 max loss a trade, 3 losers a day, lock at 25
-points to entry + 2.5, take-profit 1.5 noise units, flat by 16:00. Code: `MnqMomentumB_v1` (sha256 in `INSTALL.md`).
+points to entry + 2.5, take-profit 1.5 noise units, flat by 16:00. Code: `MnqMomentumB_v1.1` (v1's trading logic; sha256 in docs/VERSIONS.md).
 
 ## What was tested natively in NinjaTrader (run by the user; analysed from its own files)
 

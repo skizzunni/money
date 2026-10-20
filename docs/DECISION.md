@@ -175,8 +175,8 @@ B's sizing is 4 MNQ × 25 points × $2 = $200 at the max-loss stop.
 | `Strategies/MnqNoiseMomentum.cs`, v1 (reconciled with native) | `1fbdcea05fd1f5403bfbc7c798e8bf83f93ccdf1dade3ec0f2724d552c744bd3` |
 | `AddOns/MnqNoiseEngine.cs` | `e5a1ec0cc18b15509828149ce8aa0e9c7a104a59aff0992190205c42f354deb7` |
 
-- Packaged in `release/MnqMomentumB_v1.1.zip` (and v1 in `release/MnqMomentumB_v1.zip`), each with INSTALL, both
-  presets and SHA256SUMS. Nothing else is needed in NinjaTrader. Install one version only.
+- Packaged in `release/MnqMomentumB_v1.1.zip`, with INSTALL, both presets and SHA256SUMS. Nothing else is needed in
+  NinjaTrader. v1 is in git history (docs/VERSIONS.md).
 
 **Other code:**
 - **Pine reference:** `pine/reference/mnq_noise_momentum_v1.5_user.pine`, sha256

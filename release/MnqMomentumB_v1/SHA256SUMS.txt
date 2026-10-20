@@ -1,3 +1,0 @@
-1fbdcea05fd1f5403bfbc7c798e8bf83f93ccdf1dade3ec0f2724d552c744bd3  bin/Custom/Strategies/MnqNoiseMomentum.cs
-e5a1ec0cc18b15509828149ce8aa0e9c7a104a59aff0992190205c42f354deb7  bin/Custom/AddOns/MnqNoiseEngine.cs
-aaf39bcc59d119b6607f4e8c69e3fc00083d3e0058465867511a0deb59a0c035  PRESET_B-NATIVE-v1.md
