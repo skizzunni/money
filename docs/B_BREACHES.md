@@ -124,3 +124,87 @@ back. On NQ, most of it is ordinary full-size losers. One episode is all the MNQ
 - a native NinjaTrader run of B3 reconciled as in docs/B_NATIVE.md;
 - a forward test.
 - The MNQ test period contains the episode the change was drawn from.
+
+# 3. Results (executed after the pre-registration, commit 01b7401)
+
+**Code check:**
+- With NoiseLockAt 0, B3's simulator reproduces frozen B trade for trade (97 of 97, MNQ, 1 tick).
+- The patch is `verification/candidate_b3.patch`. Results are in `verification/b3_mnq/` (primary) and
+  `verification/b3_nq_supplementary/`.
+- **All of these are simulator results. B3 has had no native NinjaTrader run.**
+
+## MNQ (primary): 64 eligible sessions, 7/20 to 10/16
+
+| | B, 1 tick | B3, 1 tick | B, 2 ticks | B3, 2 ticks |
+|---|---:|---:|---:|---:|
+| Trades; per eligible session | 97; 1.52 | 104; 1.62 | 97; 1.52 | 104; 1.62 |
+| Net after costs | $13,218.80 | $14,295.60 | $13,030.80 | $14,097.60 |
+| 7/20-8/31 / 9/1-10/16 | $2,992 / $10,226 | $3,777 / $10,519 | $2,906 / $10,124 | $3,689 / $10,409 |
+| Profit factor | 2.58 | 2.62 | 2.54 | 2.59 |
+| Intraday drawdown (open P/L) | $2,612.80 | $2,311.20 | $2,652.80 | $2,335.20 |
+| Net ÷ intraday drawdown | 5.06 | 6.19 | 4.91 | 6.04 |
+| 44 paired starts: pass / breach / expired | 24 / 6 / 14 | **24 / 6 / 14** | 24 / 6 / 14 | **24 / 6 / 14** |
+| 13 later starts (9/1-9/17): pass | 13 | 13 | 13 | 13 |
+
+**Every start has the same outcome in both arms, at both slippages.** (The later part has 13 starts: 9/7 has bars and
+counts as a session. The pre-registration said 12.)
+
+**Trades changed (1 tick):**
+- **Five exits changed, all for the better:** +$1,454.00.
+  - 7/23 11:00: +$30.40 → +$440.40
+  - 7/24 10:30: +$10.40 → +$384.40
+  - 9/8 10:00: +$10.40 → +$298.40
+  - 9/23 11:00: +$412.40 → +$566.40 (B held it to 16:00)
+  - 10/12 10:00: +$98.40 → +$326.40
+- **Winners sacrificed on MNQ: none.**
+- **Knock-on:** 7 trades taken only by B3 (its earlier exits freed the strategy to enter again): −$377.20, including
+  two −$209.60 losers on 10/12.
+
+**Why the breaches stayed** (`verification/b3_mnq/breach_sequences_B3_1t.csv`):
+- Keeping +$410 on 7/23 and +$374 on 7/24 raised the account's equity.
+- The next open profit then set a **new, higher peak**: $1,793 instead of $1,310. That was the 7/27 11:30 short, at
+  0.70 noise units, below the lock's trigger.
+- The same eight $209.60 stops followed, and the account breached in the same trade (7/30 11:00).
+- On an intraday trail, profit kept before the peak moves the threshold up by the same amount. Only what happens after
+  the last peak decides.
+
+## NQ (supplementary; rescaled NQ priced at MNQ's $2 a point, not MNQ results): 2015-03 to 2025-06, 2,571 sessions
+
+| | B, 1 tick | B3, 1 tick | B, 2 ticks | B3, 2 ticks |
+|---|---:|---:|---:|---:|
+| Net | $111,174 | $106,298 | $91,757 | $89,339 |
+| Profit factor | 1.22 | 1.21 | 1.18 | 1.17 |
+| Intraday drawdown | $13,444 | $14,468 | $15,146 | $15,595 |
+| Net ÷ intraday drawdown | 8.27 | 7.35 | 6.06 | 5.73 |
+| Years with a higher net ÷ intraday DD (of 11) | | 6 | | 6 |
+| 2,641 starts: pass / breach / expired | 834 / 1,602 / 203 | 849 / 1,579 / 211 | 794 / 1,643 / 196 | 808 / 1,612 / 212 |
+
+**Paired starts at 1 tick:**
+- 68 went from breach to pass, 53 from pass to breach;
+- 17 from expired to breach, 24 from breach to expired.
+
+**Trades changed at 1 tick:**
+- **Winners sacrificed:** 86 trades, −$66,110. B made $112,410 on them; B3 made $46,300.
+- **B3 made more on** 137 trades: +$52,894.
+- **Knock-on:** +$5,804 net.
+
+## Against the criteria
+
+| # | Criterion | Result |
+|---|---|---|
+| 1 | MNQ net ≥ B, all and 9/1-10/16, 1 and 2 ticks | Met (+$1,077 / +$1,067; later part +$292 / +$284) |
+| 2 | MNQ net ÷ intraday DD higher, 1 and 2 ticks | Met (6.19 vs 5.06; 6.04 vs 4.91) |
+| 3 | MNQ: fewer breaches and passes no fewer | **Failed:** 6 breaches in both arms, 24 passes in both, at both slippages |
+| 4 | Frequency ≥ 95% of B's | Met (1.62 vs 1.52) |
+| 5 | NQ does not contradict | **Failed:** net ÷ intraday DD lower over the whole period (7.35 vs 8.27; 5.73 vs 6.06); 6 of 11 years. Passes +0.6 points and breaches −0.9 points. |
+
+## Verdict: B3 is rejected. Frozen B is unchanged.
+
+- **On MNQ, B3 makes more money for less intraday drawdown.** It does not change a single evaluation outcome, so it does
+  not address what breaches B.
+- **On NQ it gives up more in sacrificed winners than it keeps,** the same pattern as every earlier give-back rule.
+- **What the diagnosis leaves:**
+  - B's MNQ breaches are a cluster of full-size losers after the last peak;
+  - the earlier countermeasures to that (round 78's filters, round 115's cushion sizing) traded breaches for
+    expirations.
+- **No further candidate is proposed from this one MNQ episode.**

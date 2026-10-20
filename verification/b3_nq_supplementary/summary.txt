@@ -1,0 +1,59 @@
+                            0         1        2        3
+arm                         B        B3        B       B3
+slippage                    1         1        2        2
+eligible sessions        2571      2571     2571     2571
+trades                   4996      5136     4973     5108
+trades / session         1.94       2.0     1.93     1.99
+net $                111174.4  106298.4  91757.2  89339.2
+profit factor            1.22      1.21     1.18     1.17
+win %                   50.56     50.68    50.01    50.16
+avg win                242.83    238.71   241.99   238.79
+avg loss              -203.32   -203.34  -205.18   -205.2
+intraday DD $         13444.4   14467.6  15146.4  15594.8
+losing streak              11        11       11       11
+worst day $            -628.8    -628.8   -634.8   -634.8
+net / intraday DD        8.27      7.35     6.06     5.73
+eval full starts         2641      2641     2641     2641
+pass                      834       849      794      808
+fail                     1602      1579     1643     1612
+expired                   203       211      196      212
+path-dependent              2         2        8        9
+pass %                  31.58     32.15    30.06    30.59
+fail %                  60.66     59.79    62.21    61.04
+median days to pass      11.0      12.0     11.0     12.0
+             net $                             net / intraday DD                  
+slippage         1                  2                          1           2      
+arm              B        B3        B       B3                 B    B3     B    B3
+part                                                                              
+2015       11595.2   12471.6  10102.4  10948.8              1.66  1.83  1.37  1.50
+2016       11897.2    8266.4  10683.6   7030.4              1.96  1.44  1.76  1.17
+2017        1512.8    1465.2   -978.4   -314.8              0.20  0.19 -0.13 -0.04
+2018       25527.6   29533.6  24814.8  28366.4              3.57  4.37  3.36  4.07
+2019        6843.6    4601.6   3575.6   1911.6              1.11  0.74  0.52  0.28
+2020        5078.8    2592.4   2896.8    598.0              0.38  0.19  0.21  0.04
+2021       20888.4   22661.6  19556.0  21301.2              2.78  2.97  2.55  2.74
+2022       21281.2   15330.0  17599.2  13220.0              2.68  2.06  2.14  1.71
+2023         670.0    1864.8   -913.6    275.2              0.07  0.21 -0.09  0.03
+2024        8752.8   10116.0   8310.4   9639.6              1.12  2.26  1.02  1.99
+2025       -2873.2   -2604.8  -3889.6  -3637.2             -0.28 -0.27 -0.37 -0.36
+all       111174.4  106298.4  91757.2  89339.2              8.27  7.35  6.06  5.73
+
+slippage 1: paired fully observed starts (B -> B3)
+B3            expired  expired/fail  fail  fail/pass  pass
+B                                                         
+expired           174             0    17          0    12
+expired/fail        0             1     0          0     0
+fail               24             0  1509          1    68
+fail/pass           0             0     0          0     1
+pass               13             0    53          0   768
+changed trades 223: winners sacrificed (B3 made less) 86, $-66,110.00 (B made $112,410.40 on them, B3 $46,300.40); B3 made more 137, +$52,894.00; knock-on: B only 65 $-1,268.00, B3 only 205 $7,072.00
+
+slippage 2: paired fully observed starts (B -> B3)
+B3            expired  expired/fail  fail  fail/pass  pass
+B                                                         
+expired           172             0    11          0    13
+expired/fail        1             1     0          0     0
+fail               23             0  1544          2    74
+fail/pass           0             0     0          6     0
+pass               16             0    57          0   721
+changed trades 220: winners sacrificed (B3 made less) 83, $-62,114.00 (B made $106,891.20 on them, B3 $44,777.20); B3 made more 137, +$52,930.00; knock-on: B only 66 $-1,603.60, B3 only 201 $5,162.40
