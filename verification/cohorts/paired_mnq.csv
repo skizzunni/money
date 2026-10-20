@@ -1,0 +1,131 @@
+start,fully observed,R4,R2,slippage,status
+2026-07-20,True,expired,expired,1,fully observed
+2026-07-21,True,expired,expired,1,fully observed
+2026-07-22,True,expired,expired,1,fully observed
+2026-07-23,True,expired,expired,1,fully observed
+2026-07-24,True,expired,expired,1,fully observed
+2026-07-27,True,expired,expired,1,fully observed
+2026-07-28,True,expired,expired,1,fully observed
+2026-07-29,True,expired,expired,1,fully observed
+2026-07-30,True,expired,expired,1,fully observed
+2026-07-31,True,expired,expired,1,fully observed
+2026-08-03,True,expired,expired,1,fully observed
+2026-08-04,True,expired,expired,1,fully observed
+2026-08-05,True,expired,expired,1,fully observed
+2026-08-06,True,expired,expired,1,fully observed
+2026-08-07,True,expired,expired,1,fully observed
+2026-08-10,True,expired,expired,1,fully observed
+2026-08-11,True,expired,expired,1,fully observed
+2026-08-12,True,expired,expired,1,fully observed
+2026-08-13,True,expired,expired,1,fully observed
+2026-08-14,True,expired,expired,1,fully observed
+2026-08-17,True,expired,expired,1,fully observed
+2026-08-18,True,expired,expired,1,fully observed
+2026-08-19,True,expired,expired,1,fully observed
+2026-08-20,True,expired,expired,1,fully observed
+2026-08-21,True,expired,expired,1,fully observed
+2026-08-24,True,expired,expired,1,fully observed
+2026-08-25,True,expired,expired,1,fully observed
+2026-08-26,True,expired,expired,1,fully observed
+2026-08-27,True,expired,expired,1,fully observed
+2026-08-28,True,expired,expired,1,fully observed
+2026-08-31,True,expired,expired,1,fully observed
+2026-09-01,True,expired,expired,1,fully observed
+2026-09-02,True,expired,expired,1,fully observed
+2026-09-03,True,expired,expired,1,fully observed
+2026-09-04,True,expired,expired,1,fully observed
+2026-09-07,True,expired,expired,1,fully observed
+2026-09-08,True,expired,expired,1,fully observed
+2026-09-09,True,expired,expired,1,fully observed
+2026-09-10,True,expired,expired,1,fully observed
+2026-09-11,True,expired,expired,1,fully observed
+2026-09-14,True,expired,expired,1,fully observed
+2026-09-15,True,expired,expired,1,fully observed
+2026-09-16,True,expired,expired,1,fully observed
+2026-09-17,True,pass,expired,1,fully observed
+2026-09-18,False,pass,unresolved (data ends),1,excluded: the 30-day window runs past the end of the data
+2026-09-21,False,pass,unresolved (data ends),1,excluded: the 30-day window runs past the end of the data
+2026-09-22,False,unresolved (data ends),unresolved (data ends),1,excluded: the 30-day window runs past the end of the data
+2026-09-23,False,unresolved (data ends),unresolved (data ends),1,excluded: the 30-day window runs past the end of the data
+2026-09-24,False,unresolved (data ends),unresolved (data ends),1,excluded: the 30-day window runs past the end of the data
+2026-09-25,False,unresolved (data ends),unresolved (data ends),1,excluded: the 30-day window runs past the end of the data
+2026-09-28,False,unresolved (data ends),unresolved (data ends),1,excluded: the 30-day window runs past the end of the data
+2026-09-29,False,unresolved (data ends),unresolved (data ends),1,excluded: the 30-day window runs past the end of the data
+2026-09-30,False,unresolved (data ends),unresolved (data ends),1,excluded: the 30-day window runs past the end of the data
+2026-10-01,False,unresolved (data ends),unresolved (data ends),1,excluded: the 30-day window runs past the end of the data
+2026-10-02,False,unresolved (data ends),unresolved (data ends),1,excluded: the 30-day window runs past the end of the data
+2026-10-05,False,unresolved (data ends),unresolved (data ends),1,excluded: the 30-day window runs past the end of the data
+2026-10-06,False,unresolved (data ends),unresolved (data ends),1,excluded: the 30-day window runs past the end of the data
+2026-10-07,False,unresolved (data ends),unresolved (data ends),1,excluded: the 30-day window runs past the end of the data
+2026-10-08,False,unresolved (data ends),unresolved (data ends),1,excluded: the 30-day window runs past the end of the data
+2026-10-09,False,unresolved (data ends),unresolved (data ends),1,excluded: the 30-day window runs past the end of the data
+2026-10-12,False,unresolved (data ends),unresolved (data ends),1,excluded: the 30-day window runs past the end of the data
+2026-10-13,False,unresolved (data ends),unresolved (data ends),1,excluded: the 30-day window runs past the end of the data
+2026-10-14,False,unresolved (data ends),unresolved (data ends),1,excluded: the 30-day window runs past the end of the data
+2026-10-15,False,unresolved (data ends),unresolved (data ends),1,excluded: the 30-day window runs past the end of the data
+2026-10-16,False,unresolved (data ends),unresolved (data ends),1,excluded: the 30-day window runs past the end of the data
+2026-07-20,True,expired,expired,2,fully observed
+2026-07-21,True,expired,expired,2,fully observed
+2026-07-22,True,expired,expired,2,fully observed
+2026-07-23,True,expired,expired,2,fully observed
+2026-07-24,True,expired,expired,2,fully observed
+2026-07-27,True,expired,expired,2,fully observed
+2026-07-28,True,expired,expired,2,fully observed
+2026-07-29,True,expired,expired,2,fully observed
+2026-07-30,True,expired,expired,2,fully observed
+2026-07-31,True,expired,expired,2,fully observed
+2026-08-03,True,expired,expired,2,fully observed
+2026-08-04,True,expired,expired,2,fully observed
+2026-08-05,True,expired,expired,2,fully observed
+2026-08-06,True,expired,expired,2,fully observed
+2026-08-07,True,expired,expired,2,fully observed
+2026-08-10,True,expired,expired,2,fully observed
+2026-08-11,True,expired,expired,2,fully observed
+2026-08-12,True,expired,expired,2,fully observed
+2026-08-13,True,expired,expired,2,fully observed
+2026-08-14,True,expired,expired,2,fully observed
+2026-08-17,True,expired,expired,2,fully observed
+2026-08-18,True,expired,expired,2,fully observed
+2026-08-19,True,expired,expired,2,fully observed
+2026-08-20,True,expired,expired,2,fully observed
+2026-08-21,True,expired,expired,2,fully observed
+2026-08-24,True,expired,expired,2,fully observed
+2026-08-25,True,expired,expired,2,fully observed
+2026-08-26,True,expired,expired,2,fully observed
+2026-08-27,True,expired,expired,2,fully observed
+2026-08-28,True,expired,expired,2,fully observed
+2026-08-31,True,expired,expired,2,fully observed
+2026-09-01,True,expired,expired,2,fully observed
+2026-09-02,True,expired,expired,2,fully observed
+2026-09-03,True,expired,expired,2,fully observed
+2026-09-04,True,expired,expired,2,fully observed
+2026-09-07,True,expired,expired,2,fully observed
+2026-09-08,True,expired,expired,2,fully observed
+2026-09-09,True,expired,expired,2,fully observed
+2026-09-10,True,expired,expired,2,fully observed
+2026-09-11,True,expired,expired,2,fully observed
+2026-09-14,True,expired,expired,2,fully observed
+2026-09-15,True,expired,expired,2,fully observed
+2026-09-16,True,expired,expired,2,fully observed
+2026-09-17,True,pass,expired,2,fully observed
+2026-09-18,False,pass,unresolved (data ends),2,excluded: the 30-day window runs past the end of the data
+2026-09-21,False,pass,unresolved (data ends),2,excluded: the 30-day window runs past the end of the data
+2026-09-22,False,unresolved (data ends),unresolved (data ends),2,excluded: the 30-day window runs past the end of the data
+2026-09-23,False,unresolved (data ends),unresolved (data ends),2,excluded: the 30-day window runs past the end of the data
+2026-09-24,False,unresolved (data ends),unresolved (data ends),2,excluded: the 30-day window runs past the end of the data
+2026-09-25,False,unresolved (data ends),unresolved (data ends),2,excluded: the 30-day window runs past the end of the data
+2026-09-28,False,unresolved (data ends),unresolved (data ends),2,excluded: the 30-day window runs past the end of the data
+2026-09-29,False,unresolved (data ends),unresolved (data ends),2,excluded: the 30-day window runs past the end of the data
+2026-09-30,False,unresolved (data ends),unresolved (data ends),2,excluded: the 30-day window runs past the end of the data
+2026-10-01,False,unresolved (data ends),unresolved (data ends),2,excluded: the 30-day window runs past the end of the data
+2026-10-02,False,unresolved (data ends),unresolved (data ends),2,excluded: the 30-day window runs past the end of the data
+2026-10-05,False,unresolved (data ends),unresolved (data ends),2,excluded: the 30-day window runs past the end of the data
+2026-10-06,False,unresolved (data ends),unresolved (data ends),2,excluded: the 30-day window runs past the end of the data
+2026-10-07,False,unresolved (data ends),unresolved (data ends),2,excluded: the 30-day window runs past the end of the data
+2026-10-08,False,unresolved (data ends),unresolved (data ends),2,excluded: the 30-day window runs past the end of the data
+2026-10-09,False,unresolved (data ends),unresolved (data ends),2,excluded: the 30-day window runs past the end of the data
+2026-10-12,False,unresolved (data ends),unresolved (data ends),2,excluded: the 30-day window runs past the end of the data
+2026-10-13,False,unresolved (data ends),unresolved (data ends),2,excluded: the 30-day window runs past the end of the data
+2026-10-14,False,unresolved (data ends),unresolved (data ends),2,excluded: the 30-day window runs past the end of the data
+2026-10-15,False,unresolved (data ends),unresolved (data ends),2,excluded: the 30-day window runs past the end of the data
+2026-10-16,False,unresolved (data ends),unresolved (data ends),2,excluded: the 30-day window runs past the end of the data
