@@ -97,7 +97,13 @@ namespace NinjaTrader.Cbi
         public TradeCollection AllTrades = new TradeCollection();
         public TradeCollection RealTimeTrades = new TradeCollection();  // the trades closed live
     }
-    public class Order { public string Name, OrderId; public OrderState OrderState; public int Quantity; }
+    public class Order
+    {
+        public string Name, OrderId, FromEntrySignal = "";
+        public OrderState OrderState;
+        public int Quantity;
+        public double LimitPrice;
+    }
     public class MasterInstrument
     {
         public double PointValue = 2.0, TickSize = 0.25;
@@ -312,10 +318,21 @@ namespace NinjaTrader.NinjaScript.Strategies
         {
             public string Name; public int Qty; public double Stop = double.NaN, Target = double.NaN;
             public Order Order; public int FirstBar = -1, FirstQty, SecondBar = -1;  // an entry filled in two parts
+            public int LimitFillBar = -1;  // filled by a limit order on this bar: its take-profit works from the next bar
         }
-        sealed class Pending { public int Dir, Qty, Bar, CancelAt = -1; public string Name; public Order Order; public bool Partial, FirstDone; }
+        sealed class Pending
+        {
+            public int Dir, Qty, Bar, CancelAt = -1; public string Name; public Order Order; public bool Partial, FirstDone;
+            public double Limit = double.NaN;  // a limit entry's price (NaN: a market entry)
+        }
         readonly List<Lot> lots = new List<Lot>();
         readonly List<Pending> pend = new List<Pending>();
+        readonly List<Pending> pendLimit = new List<Pending>();  // limit entries, each working until filled or cancelled
+        // tests: the exits report executions too (as NinjaTrader's do; off by default, the older strategies' runs)
+        public bool SimExitExecutions { get; set; }
+        // tests: the limit entry with this name may fill only from SimLimitDelayBars bars after it was sent (-1: never)
+        public string SimLimitDelayName { get; set; }
+        public int SimLimitDelayBars { get; set; }
         string pendExit;
         int entryBar;
 
@@ -342,20 +359,21 @@ namespace NinjaTrader.NinjaScript.Strategies
         public void CancelOrder(Order order)
         {
             OrderLog.Add(CurrentBar + ",Cancel," + (order == null ? "" : order.Name));
-            for (int k = pend.Count - 1; k >= 0; k--)
-                if (pend[k].Order == order)
-                {
-                    if (SimCancelDelayBars > 0)
+            foreach (List<Pending> list in new[] { pend, pendLimit })
+                for (int k = list.Count - 1; k >= 0; k--)
+                    if (list[k].Order == order)
                     {
-                        pend[k].CancelAt = CurrentBar + SimCancelDelayBars;
-                        Report(order, OrderState.CancelPending, "");
+                        if (SimCancelDelayBars > 0)
+                        {
+                            list[k].CancelAt = CurrentBar + SimCancelDelayBars;
+                            Report(order, OrderState.CancelPending, "");
+                        }
+                        else
+                        {
+                            list.RemoveAt(k);
+                            Report(order, OrderState.Cancelled, "");
+                        }
                     }
-                    else
-                    {
-                        pend.RemoveAt(k);
-                        Report(order, OrderState.Cancelled, "");
-                    }
-                }
         }
         int execs;
         static bool At(string bars, int bar) { return bars != null && Array.IndexOf(bars.Split(','), bar.ToString()) >= 0; }
@@ -466,6 +484,73 @@ namespace NinjaTrader.NinjaScript.Strategies
         public Order EnterLong(int quantity, string signalName) { return Enter(1, quantity, signalName); }
         public Order EnterShort(int quantity, string signalName) { return Enter(-1, quantity, signalName); }
 
+        // a limit entry: works from the next bar until it fills or its cancellation is confirmed; fills at the limit
+        // once price trades a tick through it, or at the open when a bar opens at or past it; no slippage
+        Order EnterLimit(int d, int qty, double limit, string name)
+        {
+            Check(name);
+            OrderLog.Add(CurrentBar + ",EnterLimit," + name + "," + qty + "," + limit.ToString("R"));
+            if (Dir != 0 && Dir != d)
+                throw new InvalidOperationException("bar " + CurrentBar + ": a limit entry against the position");
+            foreach (Pending x in pendLimit)
+                if (x.Name == name || x.Dir != d)
+                    throw new InvalidOperationException("bar " + CurrentBar + ": two limit entries with one name or two directions");
+            if (!stops.ContainsKey(name))
+                throw new InvalidOperationException("bar " + CurrentBar + ": entry without a stop");
+            Order o = new Order();
+            o.Name = name; o.Quantity = qty; o.LimitPrice = limit; o.OrderId = "L" + (++orderSeq);
+            Report(o, OrderState.Submitted, "");
+            Report(o, OrderState.Accepted, "");
+            Report(o, OrderState.Working, "");
+            Pending p = new Pending();
+            p.Dir = d; p.Qty = qty; p.Name = name; p.Order = o; p.Bar = CurrentBar; p.Limit = limit;
+            pendLimit.Add(p);
+            return o;
+        }
+
+        public Order EnterLongLimit(int quantity, double limitPrice, string signalName) { return EnterLimit(1, quantity, limitPrice, signalName); }
+        public Order EnterShortLimit(int quantity, double limitPrice, string signalName) { return EnterLimit(-1, quantity, limitPrice, signalName); }
+
+        void FillLimits(int i, double o, double h, double l)
+        {
+            foreach (Pending x in new List<Pending>(pendLimit))
+            {
+                if (x.Bar >= i || (x.CancelAt >= 0 && i >= x.CancelAt))
+                    continue;
+                if (SimLimitDelayName != null && x.Name == SimLimitDelayName &&
+                    (SimLimitDelayBars < 0 || i < x.Bar + SimLimitDelayBars))
+                    continue;
+                int d = x.Dir;
+                double px;
+                if (d * (x.Limit - o) >= 0) px = o;  // it opens at or past the limit
+                else if ((d > 0 && l <= x.Limit - TickSize) || (d < 0 && h >= x.Limit + TickSize)) px = x.Limit;
+                else continue;
+                if (Position.MarketPosition == MarketPosition.Flat)
+                {
+                    Position.MarketPosition = d > 0 ? MarketPosition.Long : MarketPosition.Short;
+                    Position.AveragePrice = px;
+                    Position.Quantity = 0;
+                    entryBar = i;
+                }
+                else
+                    Position.AveragePrice = (Position.AveragePrice * Position.Quantity + px * x.Qty) / (Position.Quantity + x.Qty);
+                Lot lot = new Lot();
+                lot.Name = x.Name; lot.Qty = x.Qty; lot.Order = x.Order; lot.LimitFillBar = i;
+                lot.Stop = stops[x.Name];
+                if (stopInTicks[x.Name]) lot.Stop = px - d * lot.Stop * TickSize;
+                if (targets.ContainsKey(x.Name))
+                    lot.Target = targetInTicks[x.Name] ? px + d * targets[x.Name] * TickSize : targets[x.Name];
+                lots.Add(lot);
+                Position.Quantity += x.Qty;
+                pendLimit.Remove(x);
+                Report(x.Order, OrderState.Filled, "");
+                Execution ex = new Execution();
+                ex.Time = Time[0]; ex.Name = x.Name; ex.Order = x.Order; ex.Price = px; ex.Quantity = x.Qty;
+                execs++;
+                OnExecutionUpdate(ex, "x" + execs, px, x.Qty, Position.MarketPosition, "o" + execs, Time[0]);
+            }
+        }
+
         void Exit(int d, string signalName, string fromEntrySignal)
         {
             if (fromEntrySignal != "") Check(fromEntrySignal);  // "": every entry
@@ -529,6 +614,15 @@ namespace NinjaTrader.NinjaScript.Strategies
                 Position.MarketPosition = MarketPosition.Flat;
                 Position.Quantity = 0;
                 Position.AveragePrice = 0;
+            }
+            if (SimExitExecutions)
+            {
+                Order xo = new Order();
+                xo.Name = why; xo.FromEntrySignal = lot.Name; xo.Quantity = lot.Qty; xo.OrderState = OrderState.Filled;
+                Execution ex = new Execution();
+                ex.Time = Time[0]; ex.Name = why; ex.Order = xo; ex.Price = price; ex.Quantity = lot.Qty;
+                execs++;
+                OnExecutionUpdate(ex, "x" + execs, price, lot.Qty, Position.MarketPosition, "o" + execs, Time[0]);
             }
         }
 
@@ -603,6 +697,13 @@ namespace NinjaTrader.NinjaScript.Strategies
                     {
                         Order co = pend[k].Order;
                         pend.RemoveAt(k);
+                        Report(co, OrderState.Cancelled, "");
+                    }
+                for (int k = pendLimit.Count - 1; k >= 0; k--)
+                    if (pendLimit[k].CancelAt >= 0 && i >= pendLimit[k].CancelAt)
+                    {
+                        Order co = pendLimit[k].Order;
+                        pendLimit.RemoveAt(k);
                         Report(co, OrderState.Cancelled, "");
                     }
                 // market orders from the last bar
@@ -684,6 +785,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                     }
                     pend.Clear();
                 }
+                FillLimits(i, o[i], h[i], l[i]);
                 // each lot's attached stop, then its take-profit
                 if (Position.MarketPosition != MarketPosition.Flat)
                 {
@@ -712,7 +814,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                             CloseLot(lot, i, px, "Stop loss");
                     }
                     foreach (Lot lot in new List<Lot>(lots))
-                        if (!double.IsNaN(lot.Target) &&
+                        if (!double.IsNaN(lot.Target) && lot.LimitFillBar != i &&
                             ((d > 0 && h[i] >= lot.Target + TickSize) || (d < 0 && l[i] <= lot.Target - TickSize)))
                             CloseLot(lot, i, lot.Target, "Profit target");
                 }
