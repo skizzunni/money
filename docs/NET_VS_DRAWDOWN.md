@@ -160,6 +160,38 @@ year's configuration is chosen from earlier years only.
 - **MNQ does not confirm the improvement.** Its 62 sessions hold 2 FOMC trades and 42 breakout trades, too few to
   settle it either way.
 
+## 4b. The newest data: NSX, July 2025 to September 2026 (none of tonight's choices saw it)
+
+**The data:**
+- The NSX Nasdaq-100 1-minute series runs past the NQ file's June 2025 end. It was month-rescaled like NQ, with its
+  factors rebuilt from the raw histdata files.
+- **It is a faithful proxy for MNQ:**
+  - over 7/20-9/30/2026, B made $7,584 on NSX and $8,423 on the user's MNQ;
+  - the daily correlation is 0.96.
+
+| NSX 2025-07 to 2026-09 | 2t net | 2t intraday DD | **2t net ÷ DD** | 3t net ÷ DD |
+|---|---:|---:|---:|---:|
+| Frozen B | $2,276 | $10,860 | **0.21** | 0.09 |
+| B + 2 MNQ pre-FOMC | $690 | $11,766 | 0.06 | −0.05 |
+| B + breakout $200 | $2,390 | $9,492 | 0.25 | 0.10 |
+| B + breakout $400 | $4,123 | $10,295 | 0.40 | 0.23 |
+| B + breakout $600 | $5,749 | $12,474 | 0.46 | 0.31 |
+| **BWF: breakout $200 + 2 pre-FOMC, one account** | $1,857 | $11,318 | **0.16** | 0.04 |
+
+**What it shows:**
+- **On the newest 15 months the objective is not met by anything tested:** net was a fifth of the drawdown or less.
+- **B itself:**
+  - B lost about $4,700 from July 2025 to July 2026 (−$3,984 in August 2025 alone), then made $7,904 in August and
+    September 2026.
+  - The user's MNQ export (7/20-10/16/2026) covers that good stretch only.
+- **The breakout** still added: every weight raised net and the ratio.
+- **The pre-FOMC drift lost:** 10 announcements, net −$1,588 at 2 MNQ, 4 up and 6 down.
+  - It had been weak in 2015-2019 too. Its 2020-2025 strength did not carry on.
+  - BWF is therefore worse than B here: 0.16 against 0.21.
+- **These are holdout results.** Choosing a configuration from them now (breakout $600 without the FOMC leg, the
+  best row here) would fit the holdout. The walk-forward rule's choice was made before this data was seen, and that
+  choice is BWF.
+
 ## 5. Verdict and what to run
 
 **The result for the objective:**
@@ -172,6 +204,8 @@ year's configuration is chosen from earlier years only.
 - Every half and both slippages improve.
 
 **What is not established:**
+- **The newest 15 months** (section 4b): BWF did worse than B. The FOMC leg lost, and nothing reached a net above
+  its drawdown.
 - **MNQ:** it is worse there, on too little data to tell.
 - **Native NinjaTrader:** it has not run the breakout settings or MnqFomcDrift.
 - **Every year:** not every year is profitable.

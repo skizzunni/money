@@ -1,6 +1,7 @@
 """Net and gross profit against the maximum drawdown: frozen B and variants of its own settings, on the stand-in.
 
-    python research/ratio_study.py <out folder> <B sim.dll> nq=<pkl> [adj=<pkl>] [mnq=<sep>,<dec>] [variants=a,b]
+    python research/ratio_study.py <out folder> <B sim.dll> nq=<pkl> [raw=<folder>] [first=<date>] [last=<date>]
+                                   [adj=<pkl>] [mnq=<sep>,<dec>] [variants=a,b]
 
 For each variant (B's NinjaScript, MnqNoiseMomentum.cs, with property overrides), each data set and 2 / 3 ticks: net,
 gross profit and loss, the closed-trade and the intraday maximum drawdown (open P/L at each minute's worst, as
@@ -72,7 +73,8 @@ def main() -> None:
     out.mkdir(parents=True, exist_ok=True)
     data = {}
     if "nq" in opts:
-        data["nq"] = ED.nq_bars(opts["nq"], opts.get("raw", ""))
+        data["nq"] = ED.nq_bars(opts["nq"], opts.get("raw", ""), opts.get("first", "2015-03-01"),
+                                opts.get("last", "2025-06-30"))
     if "adj" in opts:
         data["adj"] = ED.nq_bars(opts["adj"], "")
     if "mnq" in opts:
