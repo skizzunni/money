@@ -31,6 +31,11 @@ VARIANTS = {
     "B + W risk 200": {"UseBreakout": True, "EvalBreakoutRisk": 200},
     "B + W risk 600": {"UseBreakout": True, "EvalBreakoutRisk": 600},
     "B + W risk 800": {"UseBreakout": True, "EvalBreakoutRisk": 800},
+    # B's own daily gate across both setups (DailyLossLimit: no entry whose planned risk could take the day's realized
+    # loss past it), on B + breakout $200
+    "B + W risk 200 day limit 400": {"UseBreakout": True, "EvalBreakoutRisk": 200, "DailyLossLimit": 400},
+    "B + W risk 200 day limit 600": {"UseBreakout": True, "EvalBreakoutRisk": 200, "DailyLossLimit": 600},
+    "B + W risk 200 day limit 1000": {"UseBreakout": True, "EvalBreakoutRisk": 200, "DailyLossLimit": 1000},
 }
 FIRST = {"nq": "2015-03-01", "adj": "2015-03-01", "mnq": "2026-07-20"}
 HALVES = {"nq": (("2015-2019", "2015-03-01", "2020-01-01"), ("2020-2025", "2020-01-01", "2026-01-01")),
