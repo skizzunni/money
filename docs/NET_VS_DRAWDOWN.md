@@ -1,5 +1,40 @@
 # Net and gross profit against the maximum drawdown (October 21, 2026, overnight)
 
+## Summary (read this first)
+
+**Already true of frozen B over the long run:**
+- 2011-2026: net 7.5 times its worst drawdown; gross profit far more.
+
+**The improvement found and kept: BWF** (`release/MnqPortfolioBWF_candidate/`):
+- frozen B, unchanged;
+- its own Williams breakout in the gaps at $200 risk (a setting, no new code);
+- a new, separate pre-FOMC drift strategy at 2 MNQ.
+
+**What it did** (2 ticks):
+
+| | Frozen B | BWF |
+|---|---:|---:|
+| Net ÷ max drawdown, 2011-2026 | 7.5 | **12.5** |
+| Net ÷ max drawdown, NQ walk-forward 2017-2025 | 4.7 | **12.1** |
+| Gross ÷ max drawdown, NQ walk-forward 2017-2025 | 33 | **65** |
+| Chance that net exceeds the max drawdown within 1 / 3 / 5 years (bootstrap) | 52% / 73% / 86% | **65% / 89% / 96%** |
+
+**Not achieved, and not hidden:**
+- **On the newest 15 months** (July 2025 to September 2026) nothing tested made more than half its drawdown. BWF did
+  slightly worse than B there (0.16 against 0.21), and is in an open drawdown since February 2025.
+- **In 2011-2014** the improvement was neutral.
+- **On MNQ (62 sessions) and in native NinjaTrader** it is unconfirmed.
+- **No configuration makes every year, or every month, net far above its drawdown.** That property holds over years.
+
+**Rejected tonight, each on data it was not chosen on:**
+- volatility-scaled contracts;
+- an overnight long;
+- the turn of the month;
+- daily loss limits;
+- a long-only breakout;
+- the pre-holiday drift.
+
+
 **The user's objective:**
 > "make the total net profit and gross far exceed the maximum drawdown … only that."
 
@@ -315,6 +350,18 @@ the FOMC leg is new evidence):
 - **A cap on size in extreme volatility would not reach them,** so it was not tested.
 - **The portfolio is in its second-deepest drawdown now,** open since February 2025. Anyone starting it today starts
   inside that episode, and its end is unknown.
+
+**Who lost in the two deepest:**
+
+| Episode | Bot (B) | Breakout | Pre-FOMC |
+|---|---:|---:|---:|
+| 2025-02 to 2026-07 | −$11,840 (550 trades) | −$449 (182) | −$1,510 (12) |
+| 2011-08 to 2012-04 | −$9,070 (300 trades) | −$3,252 (68) | −$1,937 (6) |
+
+- **The bot carries them.** In those stretches all three legs lost together: their low correlation holds on average,
+  not in every regime.
+- **In 2025-2026 the bot was about break-even before costs.** Its 550 trades paid about $8,600 in commission and
+  2 ticks of slippage (4 MNQ × ($1.90 + 2 × 2 × $0.50) = $15.60 a trade).
 
 ## 5. Verdict and what to run
 
