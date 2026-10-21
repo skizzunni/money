@@ -35,8 +35,18 @@
 - the turn of the month;
 - daily loss limits;
 - a long-only breakout;
-- the pre-holiday drift.
+- the pre-holiday drift;
+- an equity-curve filter;
+- 2 or 4 bot losers a day instead of 3.
 
+**Not knife-edges** (sensitivity, nothing re-chosen):
+- the breakout's level and stop;
+- the bot's line stop;
+- the FOMC leg's timing and size.
+- The bot's take-profit is a local peak: ±0.25 noise unit costs about a fifth of the ratio.
+
+**The figure to trust most** is the 14-year walk-forward: **8.5 against 6.6** at 2 ticks, and **10.2 against 4.7**
+at 3. The others are partly in-sample: the NQ-only walk-forward chose with the years where the breakout worked best.
 
 **The user's objective:**
 > "make the total net profit and gross far exceed the maximum drawdown … only that."
