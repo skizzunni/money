@@ -273,6 +273,29 @@ the FOMC leg is new evidence):
   - The rule's 14:00 to 13:55 window is mid-range, at t 2.61.
   - This is a sensitivity check, not a selection: the rule is unchanged.
 
+## 4e. How likely "net far above drawdown" is, by horizon
+
+**The method:**
+- A block bootstrap of the 2011-2026 daily P/L: 20-session blocks, so losing streaks stay together. 4,000 paths a
+  horizon, 2 ticks.
+- `verification/net_vs_dd/bootstrap_horizons_2t.csv`.
+
+| Horizon | Portfolio | P(net > 0) | P(net > max DD) | P(net > 2 × DD) | P(net > 3 × DD) | Median net ÷ DD | Median DD |
+|---|---|---:|---:|---:|---:|---:|---:|
+| 1 year | Frozen B | 80% | 52% | 32% | 19% | 1.09 | $6,742 |
+| 1 year | **BWF** | 89% | **65%** | 44% | 28% | 1.70 | $6,642 |
+| 3 years | Frozen B | 93% | 73% | 52% | 34% | 2.08 | $10,601 |
+| 3 years | **BWF** | 98% | **89%** | 73% | 58% | 3.43 | $9,578 |
+| 5 years | Frozen B | 97% | 86% | 69% | 50% | 3.02 | $12,394 |
+| 5 years | **BWF** | 100% | **96%** | 89% | 77% | 4.96 | $11,155 |
+
+**Reading it:**
+- **Net far above the maximum drawdown is a property of years, not months.** Over one year even BWF ends below its
+  own drawdown about one time in three.
+- **BWF raises every probability, at a slightly lower drawdown.**
+- **The bootstrap assumes the next years resemble 2011-2026.** The latest 15 months (section 4b) were worse than this
+  sample's typical year.
+
 ## 5. Verdict and what to run
 
 **The result for the objective:**

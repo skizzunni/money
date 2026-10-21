@@ -1,0 +1,7 @@
+portfolio,horizon,P(net>0),P(net>DD),P(net>2xDD),P(net>3xDD),median net/DD,median DD
+frozen B,1y,80%,52%,32%,19%,1.09,6742
+frozen B,3y,93%,73%,52%,34%,2.08,10601
+frozen B,5y,97%,86%,69%,50%,3.02,12394
+BWF,1y,89%,65%,44%,28%,1.7,6642
+BWF,3y,98%,89%,73%,58%,3.43,9578
+BWF,5y,100%,96%,89%,77%,4.96,11155
