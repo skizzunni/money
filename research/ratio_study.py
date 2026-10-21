@@ -36,6 +36,9 @@ VARIANTS = {
     "B + W risk 200 day limit 400": {"UseBreakout": True, "EvalBreakoutRisk": 200, "DailyLossLimit": 400},
     "B + W risk 200 day limit 600": {"UseBreakout": True, "EvalBreakoutRisk": 200, "DailyLossLimit": 600},
     "B + W risk 200 day limit 1000": {"UseBreakout": True, "EvalBreakoutRisk": 200, "DailyLossLimit": 1000},
+    # the breakout long only (BreakoutShorts off)
+    "B + W risk 200 long only": {"UseBreakout": True, "EvalBreakoutRisk": 200, "BreakoutShorts": False},
+    "B + W risk 600 long only": {"UseBreakout": True, "EvalBreakoutRisk": 600, "BreakoutShorts": False},
 }
 FIRST = {"nq": "2015-03-01", "adj": "2015-03-01", "mnq": "2026-07-20"}
 HALVES = {"nq": (("2015-2019", "2015-03-01", "2020-01-01"), ("2020-2025", "2020-01-01", "2026-01-01")),
