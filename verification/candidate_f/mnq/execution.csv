@@ -1,0 +1,11 @@
+book,slippage,positions,sweep positions,stop passed (positions),stop passed net $,contracts closed at an open beyond their stop,one contract of two,overruns
+D,2,6,0,1,208.2,0,0,1
+D,3,6,0,1,207.2,0,0,2
+D+F1,2,6,0,1,208.2,0,0,1
+D+F1,3,6,0,1,207.2,0,0,2
+D+F2,2,7,1,2,292.4,0,0,1
+D+F2,3,7,1,2,290.9,0,0,2
+F1 only,2,0,0,0,0.0,0,0,0
+F1 only,3,0,0,0,0.0,0,0,0
+F2 only,2,1,1,1,84.19999999999999,0,0,0
+F2 only,3,1,1,1,83.69999999999999,0,0,0

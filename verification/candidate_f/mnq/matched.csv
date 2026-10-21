@@ -1,0 +1,19 @@
+set,stop,positions,initial-stop exits %,+1R reached %,+2R (half) %,win rate %,net $,expectancy $,median R,declared cost % of risk (median),realized cost % of risk (median),stop passed,gap through stop,slippage
+all matched,E stop,10,10.0,40.0,0.0,40.0,-2284.0,-228.4,164.75,0.8824704184704115,0.8824704184704185,0.0,0.0,2
+all matched,F stop,10,30.0,70.0,40.0,70.0,122.99999999999989,12.299999999999988,40.0,3.625000000000007,3.625,3.0,0.0,2
+all matched,"F stopped out, E succeeded (diagnostic)",0,,,,,,,,,,,,2
+"matched, affordable under both",E stop,0,,,,,0.0,,,,,0.0,0.0,2
+"matched, affordable under both",F stop,0,,,,,0.0,,,,,0.0,0.0,2
+"matched, affordable under both","F stopped out, E succeeded (diagnostic)",0,,,,,,,,,,,,2
+"matched, F executable",E stop,3,0.0,100.0,0.0,100.0,0.6000000000000005,0.20000000000000018,173.25,0.8369408369408303,0.836940836940837,0.0,0.0,2
+"matched, F executable",F stop,3,0.0,100.0,100.0,100.0,252.59999999999997,84.19999999999999,17.25,8.405797101449272,6.956521739130435,3.0,0.0,2
+"matched, F executable","F stopped out, E succeeded (diagnostic)",0,,,,,,,,,,,,2
+all matched,E stop,10,10.0,40.0,0.0,0.0,-2294.0,-229.4,164.75,0.8824704184704115,1.0346204906204908,0.0,0.0,3
+all matched,F stop,10,30.0,70.0,40.0,40.0,114.99999999999989,11.49999999999999,40.0,3.625000000000007,4.25,3.0,0.0,3
+all matched,"F stopped out, E succeeded (diagnostic)",0,,,,,,,,,,,,3
+"matched, affordable under both",E stop,0,,,,,0.0,,,,,0.0,0.0,3
+"matched, affordable under both",F stop,0,,,,,0.0,,,,,0.0,0.0,3
+"matched, affordable under both","F stopped out, E succeeded (diagnostic)",0,,,,,,,,,,,,3
+"matched, F executable",E stop,3,0.0,100.0,0.0,0.0,-2.3999999999999995,-0.7999999999999998,173.25,0.8369408369408303,0.9812409812409812,0.0,0.0,3
+"matched, F executable",F stop,3,0.0,100.0,100.0,100.0,251.09999999999997,83.69999999999999,17.25,8.405797101449272,7.681159420289855,3.0,0.0,3
+"matched, F executable","F stopped out, E succeeded (diagnostic)",0,,,,,,,,,,,,3

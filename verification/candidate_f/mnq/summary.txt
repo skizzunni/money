@@ -1,0 +1,92 @@
+mnq: 62 eligible sessions 2026-07-20..2026-10-16; 62 starts, 3 non-overlapping; data to 2026-10-16
+candidate                                                                      B                                 D                              D+F1                                         D+F2               F1 only               F2 only                      B                                 D                              D+F1                                         D+F2               F1 only               F2 only
+slippage                                                                       2                                 2                                 2                                            2                     2                     2                      3                                 3                                 3                                            3                     3                     3
+positions                                                                     97                                 6                                 6                                            7                     0                     1                     97                                 6                                 6                                            7                     0                     1
+net $                                                                    13030.8                              77.2                              77.2                                        161.4                   0.0                  84.2                11606.8                              68.2                              68.2                                        151.9                   0.0                  83.7
+expectancy $                                                          134.338144                         12.866667                         12.866667                                    23.057143                   NaN                  84.2             119.657732                         11.366667                         11.366667                                         21.7                   NaN                  83.7
+expectancy R                                                            0.671691                          0.214768                          0.214768                                     0.358414                   NaN               1.22029               0.598289                          0.199159                          0.199159                                     0.343999                   NaN              1.213043
+avg win R                                                               1.885509                          1.507695                          1.507695                                     1.435844                   NaN               1.22029                1.81825                          2.249245                          2.249245                                     1.903845                   NaN              1.213043
+avg loss R                                                                -1.058                         -1.078158                         -1.078158                                    -1.078158                   NaN                   NaN                 -1.068                         -0.825885                         -0.825885                                    -0.825885                   NaN                   NaN
+win rate %                                                             58.762887                              50.0                              50.0                                    57.142857                   NaN                 100.0              57.731959                         33.333333                         33.333333                                    42.857143                   NaN                 100.0
+scratches %                                                            35.051546                         16.666667                         16.666667                                    14.285714                   NaN                   0.0              35.051546                         16.666667                         16.666667                                    14.285714                   NaN                   0.0
+win rate excl. scratches %                                             36.507937                              40.0                              40.0                                         50.0                   NaN                 100.0              34.920635                              40.0                              40.0                                         50.0                   NaN                 100.0
+profit factor                                                           2.539556                          1.239454                          1.239454                                      1.50062                   inf                   inf                2.32534                          1.207169                          1.207169                                     1.461422                   inf                   inf
+intraday DD $                                                             2652.8                             440.2                             440.2                                        440.2                   0.0                 100.0                 2692.8                             447.2                             447.2                                        447.2                   0.0                 100.0
+net / intraday DD                                                       4.912093                          0.175375                          0.175375                                     0.366652                   NaN                 0.842               4.310309                          0.152504                          0.152504                                     0.339669                   NaN                 0.837
+5 largest winners, share of net %                                       73.48743                         517.61658                         517.61658                                   299.752169                   NaN                 100.0               82.50336                        582.697947                        582.697947                                   316.721527                   NaN                 100.0
+trades / eligible session                                               1.564516                          0.096774                          0.096774                                     0.112903                   0.0              0.016129               1.564516                          0.096774                          0.096774                                     0.112903                   0.0              0.016129
+zero-trade sessions %                                                  56.451613                         91.935484                         91.935484                                    90.322581                 100.0             98.387097              56.451613                         91.935484                         91.935484                                    90.322581                 100.0             98.387097
+sessions with 0/1/2/3 entries %                                  56 / 5 / 5 / 10                    92 / 6 / 2 / 0                    92 / 6 / 2 / 0                               90 / 8 / 2 / 0       100 / 0 / 0 / 0        98 / 2 / 0 / 0        56 / 5 / 5 / 10                    92 / 6 / 2 / 0                    92 / 6 / 2 / 0                               90 / 8 / 2 / 0       100 / 0 / 0 / 0        98 / 2 / 0 / 0
+overruns                                                                     n/a                                 1                                 1                                            1                     0                     0                    n/a                                 2                                 2                                            2                     0                     0
+worst overrun $                                                              n/a                              -2.0                              -2.0                                         -2.0                   0.0                   0.0                    n/a                              -4.0                              -4.0                                         -4.0                   0.0                   0.0
+by year                                                              2026 +13031                          2026 +77                          2026 +77                                    2026 +161                                    2026 +84            2026 +11607                          2026 +68                          2026 +68                                    2026 +152                                    2026 +84
+by sleeve                                                          B 97 / +13031  noise 5 / +170; williams 1 / -93  noise 5 / +170; williams 1 / -93  F 1 / +84; noise 5 / +170; williams 1 / -93                                   F 1 / +84          B 97 / +11607  noise 5 / +163; williams 1 / -95  noise 5 / +163; williams 1 / -95  F 1 / +84; noise 5 / +163; williams 1 / -95                                   F 1 / +84
+non-overlapping: pass / breach / expired / path-dependent     1 / 1 / 1 / 0 of 3                0 / 0 / 3 / 0 of 3                0 / 0 / 3 / 0 of 3                           0 / 0 / 3 / 0 of 3    0 / 0 / 3 / 0 of 3    0 / 0 / 3 / 0 of 3     1 / 1 / 1 / 0 of 3                0 / 0 / 3 / 0 of 3                0 / 0 / 3 / 0 of 3                           0 / 0 / 3 / 0 of 3    0 / 0 / 3 / 0 of 3    0 / 0 / 3 / 0 of 3
+overlapping: pass / breach / expired / path-dependent      23 / 6 / 13 / 0 of 42              0 / 0 / 42 / 0 of 42              0 / 0 / 42 / 0 of 42                         0 / 0 / 42 / 0 of 42  0 / 0 / 42 / 0 of 42  0 / 0 / 42 / 0 of 42  23 / 6 / 13 / 0 of 42              0 / 0 / 42 / 0 of 42              0 / 0 / 42 / 0 of 42                         0 / 0 / 42 / 0 of 42  0 / 0 / 42 / 0 of 42  0 / 0 / 42 / 0 of 42
+reserve halts                                                0 (no reserve rule)               0 (no reserve rule)               0 (no reserve rule)                          0 (no reserve rule)   0 (no reserve rule)   0 (no reserve rule)    0 (no reserve rule)               0 (no reserve rule)               0 (no reserve rule)                          0 (no reserve rule)   0 (no reserve rule)   0 (no reserve rule)
+candidate  slippage gate                        measure threshold      result verdict
+        B         2   G1           evaluation pass rate    >= 60%   33.333333    FAIL
+        B         2   G2                         expiry    <= 15%   33.333333    FAIL
+        B         2   G3          worst window drawdown <= $1,500 2074.200000    FAIL
+        B         2   G4 win rate (completed positions)    >= 50%   58.762887    PASS
+        B         2   G5                  profit factor   >= 1.35    2.539556    PASS
+        D         2   G1           evaluation pass rate    >= 60%    0.000000    FAIL
+        D         2   G2                         expiry    <= 15%  100.000000    FAIL
+        D         2   G3          worst window drawdown <= $1,500  381.300000    PASS
+        D         2   G4 win rate (completed positions)    >= 50%   50.000000    PASS
+        D         2   G5                  profit factor   >= 1.35    1.239454    FAIL
+     D+F1         2   G1           evaluation pass rate    >= 60%    0.000000    FAIL
+     D+F1         2   G2                         expiry    <= 15%  100.000000    FAIL
+     D+F1         2   G3          worst window drawdown <= $1,500  381.300000    PASS
+     D+F1         2   G4 win rate (completed positions)    >= 50%   50.000000    PASS
+     D+F1         2   G5                  profit factor   >= 1.35    1.239454    FAIL
+     D+F2         2   G1           evaluation pass rate    >= 60%    0.000000    FAIL
+     D+F2         2   G2                         expiry    <= 15%  100.000000    FAIL
+     D+F2         2   G3          worst window drawdown <= $1,500  381.300000    PASS
+     D+F2         2   G4 win rate (completed positions)    >= 50%   57.142857    PASS
+     D+F2         2   G5                  profit factor   >= 1.35    1.500620    PASS
+  F1 only         2   G1           evaluation pass rate    >= 60%    0.000000    FAIL
+  F1 only         2   G2                         expiry    <= 15%  100.000000    FAIL
+  F1 only         2   G3          worst window drawdown <= $1,500    0.000000    PASS
+  F1 only         2   G4 win rate (completed positions)    >= 50%         NaN    FAIL
+  F1 only         2   G5                  profit factor   >= 1.35         inf    PASS
+  F2 only         2   G1           evaluation pass rate    >= 60%    0.000000    FAIL
+  F2 only         2   G2                         expiry    <= 15%  100.000000    FAIL
+  F2 only         2   G3          worst window drawdown <= $1,500  100.000000    PASS
+  F2 only         2   G4 win rate (completed positions)    >= 50%  100.000000    PASS
+  F2 only         2   G5                  profit factor   >= 1.35         inf    PASS
+        B         3   G1           evaluation pass rate    >= 60%   33.333333    FAIL
+        B         3   G2                         expiry    <= 15%   33.333333    FAIL
+        B         3   G3          worst window drawdown <= $1,500 2106.200000    FAIL
+        B         3   G4 win rate (completed positions)    >= 50%   57.731959    PASS
+        B         3   G5                  profit factor   >= 1.35    2.325340    PASS
+        D         3   G1           evaluation pass rate    >= 60%    0.000000    FAIL
+        D         3   G2                         expiry    <= 15%  100.000000    FAIL
+        D         3   G3          worst window drawdown <= $1,500  387.300000    PASS
+        D         3   G4 win rate (completed positions)    >= 50%   33.333333    FAIL
+        D         3   G5                  profit factor   >= 1.35    1.207169    FAIL
+     D+F1         3   G1           evaluation pass rate    >= 60%    0.000000    FAIL
+     D+F1         3   G2                         expiry    <= 15%  100.000000    FAIL
+     D+F1         3   G3          worst window drawdown <= $1,500  387.300000    PASS
+     D+F1         3   G4 win rate (completed positions)    >= 50%   33.333333    FAIL
+     D+F1         3   G5                  profit factor   >= 1.35    1.207169    FAIL
+     D+F2         3   G1           evaluation pass rate    >= 60%    0.000000    FAIL
+     D+F2         3   G2                         expiry    <= 15%  100.000000    FAIL
+     D+F2         3   G3          worst window drawdown <= $1,500  387.300000    PASS
+     D+F2         3   G4 win rate (completed positions)    >= 50%   42.857143    FAIL
+     D+F2         3   G5                  profit factor   >= 1.35    1.461422    PASS
+  F1 only         3   G1           evaluation pass rate    >= 60%    0.000000    FAIL
+  F1 only         3   G2                         expiry    <= 15%  100.000000    FAIL
+  F1 only         3   G3          worst window drawdown <= $1,500    0.000000    PASS
+  F1 only         3   G4 win rate (completed positions)    >= 50%         NaN    FAIL
+  F1 only         3   G5                  profit factor   >= 1.35         inf    PASS
+  F2 only         3   G1           evaluation pass rate    >= 60%    0.000000    FAIL
+  F2 only         3   G2                         expiry    <= 15%  100.000000    FAIL
+  F2 only         3   G3          worst window drawdown <= $1,500  100.000000    PASS
+  F2 only         3   G4 win rate (completed positions)    >= 50%  100.000000    PASS
+  F2 only         3   G5                  profit factor   >= 1.35         inf    PASS
+ slippage from   to  new positions  new net $  new sweep positions  displaced positions  displaced net $  displaced profitable  displaced profit $
+        2    D D+F1              0        0.0                    0                    0                0                     0                   0
+        2 D+F1 D+F2              1       84.2                    1                    0                0                     0                   0
+        3    D D+F1              0        0.0                    0                    0                0                     0                   0
+        3 D+F1 D+F2              1       83.7                    1                    0                0                     0                   0

@@ -1,0 +1,56 @@
+
+D+F1: 8 sweep decisions
+class
+newly affordable under F    5
+affordable under neither    3
+executable under E: 0  under F: 5
+book outcome              skipped: budget  taken: unfilled (ran away)
+class                                                                
+affordable under neither                3                           0
+newly affordable under F                0                           5
+median R, in window: E 117.125  F 14.75
+
+D+F2: 44 sweep decisions
+class
+affordable under neither    26
+newly affordable under F    18
+executable under E: 0  under F: 16
+book outcome              displaced: priority  skipped: budget  skipped: room  taken: filled  taken: unfilled (ran away)
+class                                                                                                                   
+affordable under neither                    0               26              0              0                           0
+newly affordable under F                    5                0              2              1                          10
+median R, in window: E 147.625  F 34.25
+
+matched entries (isolated replays)
+                           set                                    stop  positions  initial-stop exits %  +1R reached %  +2R (half) %  win rate %   net $  expectancy $  median R  declared cost % of risk (median)  realized cost % of risk (median)  stop passed  gap through stop  slippage
+                   all matched                                  E stop         10                  10.0           40.0           0.0        40.0 -2284.0        -228.4    164.75                          0.882470                          0.882470          0.0               0.0         2
+                   all matched                                  F stop         10                  30.0           70.0          40.0        70.0   123.0          12.3     40.00                          3.625000                          3.625000          3.0               0.0         2
+                   all matched F stopped out, E succeeded (diagnostic)          0                   NaN            NaN           NaN         NaN     NaN           NaN       NaN                               NaN                               NaN          NaN               NaN         2
+matched, affordable under both                                  E stop          0                   NaN            NaN           NaN         NaN     0.0           NaN       NaN                               NaN                               NaN          0.0               0.0         2
+matched, affordable under both                                  F stop          0                   NaN            NaN           NaN         NaN     0.0           NaN       NaN                               NaN                               NaN          0.0               0.0         2
+matched, affordable under both F stopped out, E succeeded (diagnostic)          0                   NaN            NaN           NaN         NaN     NaN           NaN       NaN                               NaN                               NaN          NaN               NaN         2
+         matched, F executable                                  E stop          3                   0.0          100.0           0.0       100.0     0.6           0.2    173.25                          0.836941                          0.836941          0.0               0.0         2
+         matched, F executable                                  F stop          3                   0.0          100.0         100.0       100.0   252.6          84.2     17.25                          8.405797                          6.956522          3.0               0.0         2
+         matched, F executable F stopped out, E succeeded (diagnostic)          0                   NaN            NaN           NaN         NaN     NaN           NaN       NaN                               NaN                               NaN          NaN               NaN         2
+                   all matched                                  E stop         10                  10.0           40.0           0.0         0.0 -2294.0        -229.4    164.75                          0.882470                          1.034620          0.0               0.0         3
+                   all matched                                  F stop         10                  30.0           70.0          40.0        40.0   115.0          11.5     40.00                          3.625000                          4.250000          3.0               0.0         3
+                   all matched F stopped out, E succeeded (diagnostic)          0                   NaN            NaN           NaN         NaN     NaN           NaN       NaN                               NaN                               NaN          NaN               NaN         3
+matched, affordable under both                                  E stop          0                   NaN            NaN           NaN         NaN     0.0           NaN       NaN                               NaN                               NaN          0.0               0.0         3
+matched, affordable under both                                  F stop          0                   NaN            NaN           NaN         NaN     0.0           NaN       NaN                               NaN                               NaN          0.0               0.0         3
+matched, affordable under both F stopped out, E succeeded (diagnostic)          0                   NaN            NaN           NaN         NaN     NaN           NaN       NaN                               NaN                               NaN          NaN               NaN         3
+         matched, F executable                                  E stop          3                   0.0          100.0           0.0         0.0    -2.4          -0.8    173.25                          0.836941                          0.981241          0.0               0.0         3
+         matched, F executable                                  F stop          3                   0.0          100.0         100.0       100.0   251.1          83.7     17.25                          8.405797                          7.681159          3.0               0.0         3
+         matched, F executable F stopped out, E succeeded (diagnostic)          0                   NaN            NaN           NaN         NaN     NaN           NaN       NaN                               NaN                               NaN          NaN               NaN         3
+
+execution counts
+   book  slippage  positions  sweep positions  stop passed (positions)  stop passed net $  contracts closed at an open beyond their stop  one contract of two  overruns
+      D         2          6                0                        1              208.2                                              0                    0         1
+      D         3          6                0                        1              207.2                                              0                    0         2
+   D+F1         2          6                0                        1              208.2                                              0                    0         1
+   D+F1         3          6                0                        1              207.2                                              0                    0         2
+   D+F2         2          7                1                        2              292.4                                              0                    0         1
+   D+F2         3          7                1                        2              290.9                                              0                    0         2
+F1 only         2          0                0                        0                0.0                                              0                    0         0
+F1 only         3          0                0                        0                0.0                                              0                    0         0
+F2 only         2          1                1                        1               84.2                                              0                    0         0
+F2 only         3          1                1                        1               83.7                                              0                    0         0

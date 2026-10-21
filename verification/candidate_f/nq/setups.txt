@@ -1,0 +1,64 @@
+
+D+F1: 431 sweep decisions
+class
+newly affordable under F     278
+affordable under neither     150
+affordable under both          2
+excluded: decision window      1
+executable under E: 2  under F: 274
+book outcome               displaced: position  displaced: priority  skipped: budget  skipped: decision window  skipped: room  taken: filled  taken: unfilled (ran away)
+class                                                                                                                                                                   
+affordable under both                        0                    0                0                         0              0              0                           2
+affordable under neither                     2                    0              148                         0              0              0                           0
+excluded: decision window                    0                    0                0                         1              0              0                           0
+newly affordable under F                     3                   21                0                         0              5             35                         214
+median R, in window: E 110.625  F 21.125
+
+D+F2: 2060 sweep decisions
+class
+newly affordable under F     1326
+affordable under neither      716
+affordable under both          10
+excluded: decision window       8
+executable under E: 5  under F: 1072
+book outcome               displaced: position  displaced: priority  skipped: budget  skipped: decision window  skipped: room  taken: filled  taken: unfilled (ran away)
+class                                                                                                                                                                   
+affordable under both                        0                    3                0                         0              1              0                           6
+affordable under neither                     3                    2              711                         0              0              0                           0
+excluded: decision window                    0                    0                0                         8              0              0                           0
+newly affordable under F                     5                  473                0                         0            258             62                         528
+median R, in window: E 115.75  F 20.5
+
+matched entries (isolated replays)
+                           set                                    stop  positions  initial-stop exits %  +1R reached %  +2R (half) %  win rate %   net $  expectancy $  median R  declared cost % of risk (median)  realized cost % of risk (median)  stop passed  gap through stop  slippage
+                   all matched                                  E stop        472             35.805085      45.974576     18.220339   54.237288 15549.9     32.944703    132.00                          1.098485                          1.066267          0.0               0.0         2
+                   all matched                                  F stop        472             53.601695      45.550847     27.754237   44.491525  7665.9     16.241314     39.25                          3.694268                          3.582090         18.0               1.0         2
+                   all matched F stopped out, E succeeded (diagnostic)        105                   NaN            NaN           NaN         NaN     NaN           NaN       NaN                               NaN                               NaN          NaN               NaN         2
+matched, affordable under both                                  E stop          0                   NaN            NaN           NaN         NaN     0.0           NaN       NaN                               NaN                               NaN          0.0               0.0         2
+matched, affordable under both                                  F stop          0                   NaN            NaN           NaN         NaN     0.0           NaN       NaN                               NaN                               NaN          0.0               0.0         2
+matched, affordable under both F stopped out, E succeeded (diagnostic)          0                   NaN            NaN           NaN         NaN     NaN           NaN       NaN                               NaN                               NaN          NaN               NaN         2
+         matched, F executable                                  E stop        115             44.347826      41.739130     20.000000   46.956522   211.5      1.839130     85.50                          1.695906                          1.543408          0.0               0.0         2
+         matched, F executable                                  F stop        115             60.869565      39.130435     24.347826   34.782609 -1021.0     -8.878261     15.00                          9.666667                          9.508197         15.0               0.0         2
+         matched, F executable F stopped out, E succeeded (diagnostic)         32                   NaN            NaN           NaN         NaN     NaN           NaN       NaN                               NaN                               NaN          NaN               NaN         2
+                   all matched                                  E stop        472             35.805085      45.974576     18.220339   35.805085 15120.9     32.035805    132.00                          1.098485                          1.248762          0.0               0.0         3
+                   all matched                                  F stop        472             53.601695      45.550847     27.754237   27.966102  7259.4     15.380085     39.25                          3.694268                          4.023669         18.0               1.0         3
+                   all matched F stopped out, E succeeded (diagnostic)         75                   NaN            NaN           NaN         NaN     NaN           NaN       NaN                               NaN                               NaN          NaN               NaN         3
+matched, affordable under both                                  E stop          0                   NaN            NaN           NaN         NaN     0.0           NaN       NaN                               NaN                               NaN          0.0               0.0         3
+matched, affordable under both                                  F stop          0                   NaN            NaN           NaN         NaN     0.0           NaN       NaN                               NaN                               NaN          0.0               0.0         3
+matched, affordable under both F stopped out, E succeeded (diagnostic)          0                   NaN            NaN           NaN         NaN     NaN           NaN       NaN                               NaN                               NaN          NaN               NaN         3
+         matched, F executable                                  E stop        115             44.347826      41.739130     20.000000   30.434783   108.0      0.939130     85.50                          1.695906                          1.780105          0.0               0.0         3
+         matched, F executable                                  F stop        115             60.869565      39.130435     24.347826   24.347826 -1122.0     -9.756522     15.00                          9.666667                         11.147541         15.0               0.0         3
+         matched, F executable F stopped out, E succeeded (diagnostic)         21                   NaN            NaN           NaN         NaN     NaN           NaN       NaN                               NaN                               NaN          NaN               NaN         3
+
+execution counts
+   book  slippage  positions  sweep positions  stop passed (positions)  stop passed net $  contracts closed at an open beyond their stop  one contract of two  overruns
+      D         2        272                0                       10              937.0                                              6                    0        38
+      D         3        272                0                       10              923.0                                              6                    0        96
+   D+F1         2        306               35                       13              982.6                                              6                    0        38
+   D+F1         3        306               35                       13              966.1                                              6                    0       116
+   D+F2         2        333               62                       16             1176.2                                              6                    0        38
+   D+F2         3        333               62                       16             1158.2                                              6                    0       137
+F1 only         2         35               35                        3               45.6                                              0                    0         0
+F1 only         3         35               35                        3               43.1                                              0                    0        20
+F2 only         2         62               62                        6              239.2                                              0                    0         0
+F2 only         3         62               62                        6              235.2                                              0                    0        41

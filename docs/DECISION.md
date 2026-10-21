@@ -219,3 +219,26 @@ Built and tested as pre-registered (docs/CANDIDATE_D.md).
 - The $125 two-contract rule with structural stops turns down 97% of the signals.
 
 **Frozen B v1.1 stays the reference.** Nothing was retuned.
+
+## Addendum (October 21, 2026): candidate F
+
+Pre-registered (docs/CANDIDATE_F.md, 7176271) before any F code. Built and frozen with hashes (a975289) before any F
+result.
+
+**The single change from E:** the sweep setup's initial stop at the selected FVG's far boundary ∓ 2 ticks, instead of
+the sweep extreme.
+
+**Result: rejected on NQ** (2 ticks; D + F1 and D + F2):
+- G1 0 of 123 windows passed; G2 123 of 123 expired; G4 48.8% / 46.7%; G5 1.05 / 0.98. All four fail.
+- G3 passes ($603 / $653).
+
+**Affordability went up, the trading did not improve:**
+- Executable setups rose from 2 to 274 (E1 pools) and from 5 to 1,072 (with the session pools).
+- But most limits were cancelled when price ran +2R (in F's small R) before the retrace.
+- F added only 35 / 62 positions, and they lose before and after costs: PF 0.73 / 0.47, 60-68% stopped at the
+  initial stop.
+- The combined net fell from $1,086 (D) to $631 / −$358.
+
+**The roll-adjusted NQ series (docs/NQ_ROLLS.md) changes no F or D verdict.**
+
+**Frozen B v1.1 stays the reference.** Nothing was retuned, and no further variation was launched.

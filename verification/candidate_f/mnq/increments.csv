@@ -1,0 +1,5 @@
+slippage,from,to,new positions,new net $,new sweep positions,displaced positions,displaced net $,displaced profitable,displaced profit $
+2,D,D+F1,0,0.0,0,0,0,0,0
+2,D+F1,D+F2,1,84.19999999999999,1,0,0,0,0
+3,D,D+F1,0,0.0,0,0,0,0,0
+3,D+F1,D+F2,1,83.69999999999999,1,0,0,0,0
