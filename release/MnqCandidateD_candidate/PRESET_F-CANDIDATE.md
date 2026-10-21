@@ -44,6 +44,7 @@ These are as PRESET_D-CANDIDATE.md:
 | 4 | Evaluation target / trailing drawdown, $ | 3000 / 2000 on an account; **0 / 0 in the Strategy Analyzer** (the replay applies the account) | same |
 | 4 | Account starting balance; remember the highest equity | 50000; On | same |
 | 4 | Place orders | On | On |
+| 4 | Print refusals (the daily opportunity audit) | On | On |
 
 **The F alone diagnostics:**
 - noise and Williams off;

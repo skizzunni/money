@@ -333,6 +333,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 AccountStart = 50000;
                 RememberAccount = true;
                 PlaceOrders = true;
+                AuditOutput = true;
             }
             else if (State == State.DataLoaded)
             {
@@ -438,6 +439,19 @@ namespace NinjaTrader.NinjaScript.Strategies
             }
             if (allowed && !Exposed && !Pending && !inCampaign && PlaceOrders)
                 TryEnter(isCheck, end, tmin, day, c);
+            else if (AuditOutput && UseNoise && isCheck && !engine.SkipToday && (c > engine.Upper ||
+                     (c < engine.Lower && !(engine.FedToday && end < NoiseEngine.FedCutoff))))
+                Refusal("noise", c > engine.Upper ? 1 : -1, Exposed ? "blocked: position" : Pending || inCampaign ?
+                        "blocked: pending order" : dayCount >= MaxCampaigns ? "blocked: daily entry budget exhausted" :
+                        "blocked: after the entry window");
+        }
+
+        // The daily opportunity audit's refusal lines (docs/DAILY_AUDIT.md), comparable with research/daily_audit.py;
+        // nothing here changes a decision
+        void Refusal(string sleeve, int d, string why)
+        {
+            if (AuditOutput)
+                Print("D refusal," + Time[0].ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture) + "," + sleeve + "," + d + "," + why);
         }
 
         void Manage(int tmin, string day, double h, double l, double c)
@@ -525,20 +539,20 @@ namespace NinjaTrader.NinjaScript.Strategies
             foreach (SweepEngine.Decision dec in sweep.Decisions)
             {
                 int d = dec.D;
-                if (end < 585 || end > 900) continue;
+                if (end < 585 || end > 900) { Refusal("sweep", d, "not qualified: decision window"); continue; }
                 double lim = d > 0 ? FloorTick(dec.Limit) : CeilTick(dec.Limit);
                 double stop = SweepStop == SweepStopReference.FvgFarEdge ? Away(d, dec.Far - d * 2 * TickSize)
                                                                           : Away(d, dec.Extreme - d * 0.1 * dec.Atr);
                 double r = d * (lim - stop);
                 double planned = 2 * (r * pv + 2 * SizingCommission + AllowanceLimitTicks * TickSize * pv);
-                if (r <= 0 || planned > RiskBudget + 1e-9) continue;
+                if (r <= 0 || planned > RiskBudget + 1e-9) { Refusal("sweep", d, "unaffordable"); continue; }
                 double need = PartialR * r + 1.45, room = double.NaN;
                 foreach (double x in sweep.RoomLevels(d))
                 {
                     double dist = d * (x - lim);
                     if (dist > 0 && (double.IsNaN(room) || dist < room)) room = dist;
                 }
-                if (!double.IsNaN(room) && room < need) continue;
+                if (!double.IsNaN(room) && room < need) { Refusal("sweep", d, "not qualified: room"); continue; }
                 Submit((SweepStop == SweepStopReference.FvgFarEdge ? "F:" : "E:") + dec.Pool, d, "limit", lim, stop, r, planned, day);
                 return;
             }
@@ -550,7 +564,10 @@ namespace NinjaTrader.NinjaScript.Strategies
             double r = d * (c - stop);
             double planned = 2 * (r * pv + 2 * SizingCommission + AllowanceMarketTicks * TickSize * pv);
             if (r <= 0 || planned > RiskBudget + 1e-9)
+            {
+                Refusal(sleeve, d, "unaffordable");
                 return false;
+            }
             Submit(sleeve, d, "market", c, stop, r, planned, day);
             return true;
         }
@@ -815,6 +832,10 @@ namespace NinjaTrader.NinjaScript.Strategies
         [NinjaScriptProperty]
         [Display(Name = "Place orders", Order = 5, GroupName = "4. Account")]
         public bool PlaceOrders { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Print refusals (the daily opportunity audit)", Order = 6, GroupName = "4. Account")]
+        public bool AuditOutput { get; set; }
         #endregion
     }
 }

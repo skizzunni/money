@@ -36,6 +36,7 @@
 | 4 | Evaluation target / trailing drawdown, $ | 3000 / 2000 on an account; **0 / 0 in the Strategy Analyzer** (the replay applies the account) | same | same |
 | 4 | Account starting balance; remember the highest equity | 50000; On | same | same |
 | 4 | Place orders | On | On | On |
+| 4 | Print refusals (the daily opportunity audit) | On | On | On |
 
 ## What was compared, and how to check it natively
 
