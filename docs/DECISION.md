@@ -248,7 +248,7 @@ the sweep extreme.
 **The user's new objective:** net and gross far above the maximum drawdown, and only that. The whole study is in
 docs/NET_VS_DRAWDOWN.md.
 
-**Frozen B already meets it over the long run:** 2011-2026, net is 7.5 times its maximum drawdown.
+**Frozen B already meets it over the long run:** 2011-2026, net is 6.9 times its maximum intraday drawdown.
 
 **Kept, as a candidate for a simulation account: BWF** (`release/MnqPortfolioBWF_candidate/`):
 - frozen B, unchanged;
@@ -257,7 +257,8 @@ docs/NET_VS_DRAWDOWN.md.
 
 | | Frozen B | BWF |
 |---|---:|---:|
-| Net ÷ max drawdown, 2011-2026 | 7.5 | 12.5 |
+| Net ÷ max intraday drawdown, 2011-2026 | 6.9 | 11.4 |
+| Gross profit ÷ max intraday drawdown, 2011-2026 | 46 | 67 |
 | Net ÷ max drawdown, NQ walk-forward 2017-2025 | 4.7 | 12.1 |
 | Chance that net exceeds the max drawdown within 1 / 3 / 5 years | 52 / 73 / 86% | 65 / 89 / 96% |
 
