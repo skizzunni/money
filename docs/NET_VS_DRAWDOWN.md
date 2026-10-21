@@ -265,6 +265,11 @@ the FOMC leg is new evidence):
   market.
 - **The evidence for it is borderline.** It earns its place by paying in years when B is weak (2020), not by being
   reliable.
+- **Its timing is not a knife-edge.** Sixteen entry and exit times were tried: entry at 10:00, 14:00, 15:00 or 18:00 the
+  day before; exit at 10:00, 13:00, 13:30 or 13:55 on the day.
+  - All 16 are positive over 2011-2026, t 2.02 to 3.35.
+  - The rule's 14:00 to 13:55 window is mid-range, at t 2.61.
+  - This is a sensitivity check, not a selection: the rule is unchanged.
 
 ## 5. Verdict and what to run
 
