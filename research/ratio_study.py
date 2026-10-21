@@ -47,6 +47,11 @@ VARIANTS = {
     # the bot's losers a day (EvalMaxLosers, frozen at 3)
     "B + W200 losers 2": {"UseBreakout": True, "EvalBreakoutRisk": 200, "EvalMaxLosers": 2},
     "B + W200 losers 4": {"UseBreakout": True, "EvalBreakoutRisk": 200, "EvalMaxLosers": 4},
+    # sensitivity of the bot's take-profit (1.5 noise units) and line stop (0.24), on B + breakout $200
+    "B + W200 tp 1.25": {"UseBreakout": True, "EvalBreakoutRisk": 200, "TakeProfit": 1.25},
+    "B + W200 tp 1.75": {"UseBreakout": True, "EvalBreakoutRisk": 200, "TakeProfit": 1.75},
+    "B + W200 line 0.18": {"UseBreakout": True, "EvalBreakoutRisk": 200, "StopBuffer": 0.18},
+    "B + W200 line 0.30": {"UseBreakout": True, "EvalBreakoutRisk": 200, "StopBuffer": 0.30},
 }
 FIRST = {"nq": "2015-03-01", "adj": "2015-03-01", "mnq": "2026-07-20"}
 HALVES = {"nq": (("2015-2019", "2015-03-01", "2020-01-01"), ("2020-2025", "2020-01-01", "2026-01-01")),
