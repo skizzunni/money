@@ -337,6 +337,14 @@ the FOMC leg is new evidence):
   market.
 - **The evidence for it is borderline.** It earns its place by paying in years when B is weak (2020), not by being
   reliable.
+- **Its size** (on B + breakout $200, 2011-2026, closed-day):
+
+  | Pre-FOMC MNQ | 0 | 1 | **2** | 3 | 4 | 6 |
+  |---|---:|---:|---:|---:|---:|---:|
+  | Net ÷ DD | 10.34 | 12.17 | **12.46** | 12.17 | 11.56 | 10.11 |
+
+  - 2 is near the peak. The menu's ceiling of 2 hid nothing better.
+  - Above 3 the drawdown grows faster than the net, and the newest months turn negative.
 - **Its timing is not a knife-edge.** Sixteen entry and exit times were tried: entry at 10:00, 14:00, 15:00 or 18:00 the
   day before; exit at 10:00, 13:00, 13:30 or 13:55 on the day.
   - All 16 are positive over 2011-2026, t 2.02 to 3.35.
