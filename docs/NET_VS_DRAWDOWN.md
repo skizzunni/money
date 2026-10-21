@@ -3,7 +3,7 @@
 ## Summary (read this first)
 
 **Already true of frozen B over the long run:**
-- 2011-2026: net 7.5 times its worst drawdown; gross profit far more.
+- 2011-2026: net 6.9 times its worst intraday drawdown ($125,688 against $18,157); gross profit 46 times.
 
 **The improvement found and kept: BWF** (`release/MnqPortfolioBWF_candidate/`):
 - frozen B, unchanged;
@@ -14,7 +14,9 @@
 
 | | Frozen B | BWF |
 |---|---:|---:|
-| Net ÷ max drawdown, 2011-2026 | 7.5 | **12.5** |
+| Net ÷ max intraday drawdown (open P/L at each minute's worst), 2011-2026 | 6.9 | **11.4** |
+| Gross profit ÷ max intraday drawdown, 2011-2026 | 46 | **67** |
+| Net ÷ max closed-day drawdown, 2011-2026 | 7.5 | 12.5 |
 | Net ÷ max drawdown, NQ walk-forward 2017-2025 | 4.7 | **12.1** |
 | Gross ÷ max drawdown, NQ walk-forward 2017-2025 | 33 | **65** |
 | Chance that net exceeds the max drawdown within 1 / 3 / 5 years (bootstrap) | 52% / 73% / 86% | **65% / 89% / 96%** |
@@ -322,6 +324,15 @@ the FOMC leg is new evidence):
   - All 16 are positive over 2011-2026, t 2.02 to 3.35.
   - The rule's 14:00 to 13:55 window is mid-range, at t 2.61.
   - This is a sensitivity check, not a selection: the rule is unchanged.
+
+**The whole record at the minute level** (open P/L at each minute's worst price, chained across NSX, NQ and NSX):
+
+| 2011-2026 | Net | Gross profit | Max intraday DD (trough) | **Net ÷ DD** | Gross ÷ DD |
+|---|---:|---:|---:|---:|---:|
+| Frozen B, 2 ticks | $125,688 | $836,287 | $18,157 (2026-01-29) | **6.92** | 46.1 |
+| **BWF, 2 ticks** | $185,446 | $1,094,195 | $16,239 (2026-07-29) | **11.42** | **67.4** |
+| Frozen B, 3 ticks | $97,261 | $818,622 | $20,002 (2026-01-29) | 4.86 | 40.9 |
+| **BWF, 3 ticks** | $154,455 | $1,075,117 | $18,844 (2012-04-09) | **8.20** | 57.1 |
 
 ## 4e. How likely "net far above drawdown" is, by horizon
 

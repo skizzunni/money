@@ -100,6 +100,7 @@ def main() -> None:
         csv = Path(tempfile.mkdtemp()) / f"{kind}.csv"
         K.write_bars(rth, csv)
         rth_of[kind] = rth
+        rth.to_pickle(out / f"rth_{kind}.pkl")  # the bars the trades eb / xb index (for research/portfolio_dd.py)
         slips = tuple(int(x) for x in opts.get("slips", "2,3").split(","))
         jobs += [(n, VARIANTS[n], kind, slip, str(csv), skip, dll) for n in names for slip in slips]
     with ProcessPoolExecutor(max_workers=4) as ex:

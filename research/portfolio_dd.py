@@ -63,6 +63,8 @@ def minute_equity(timeline: pd.DatetimeIndex, legs: list[pd.DataFrame]) -> tuple
 
 
 def bw_leg(folder: Path, name: str, slip: int, rth: pd.DataFrame, years) -> pd.DataFrame:
+    """B (+ breakout) trades of a research/ratio_study.py run. rth must be the very bars that run traded (its
+    rth_<kind>.pkl): eb / xb are positions in them, and bars built from another start date shift every one."""
     tr = pd.read_csv(folder / f"trades_nq_{name.replace(' ', '_')}_{slip}t.csv", parse_dates=["day"])
     tr = tr[tr.day.dt.year.isin(years)]
     lo, hi, t = rth.low.to_numpy(float), rth.high.to_numpy(float), rth.index
