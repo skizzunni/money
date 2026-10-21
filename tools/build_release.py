@@ -32,6 +32,11 @@ PACKAGES = {
         "code": {STRAT + "MnqNoiseMomentum.cs": B, ADDON: ENGINE},
         "docs": ["INSTALL.md", "PRESET_BW.md"],
     },
+    "MnqPortfolioBWF_candidate": {
+        "code": {STRAT + "MnqNoiseMomentum.cs": B, ADDON: ENGINE,
+                 STRAT + "MnqFomcDrift.cs": "ninjatrader/Strategies/MnqFomcDrift.cs"},
+        "docs": ["INSTALL.md", "PRESET_BWF.md"],
+    },
     "PineReference_v1.5": {
         "code": {STRAT + "MnqNoiseMomentum.cs": B, ADDON: ENGINE,
                  "pine/mnq_noise_momentum_v1.5_user.pine": "pine/reference/mnq_noise_momentum_v1.5_user.pine"},

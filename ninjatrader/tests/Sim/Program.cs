@@ -34,14 +34,15 @@ static class Program
         // (Strategies/MnqMomentumC.cs); otherwise B
         bool runner = Array.IndexOf(args, "Strategy=Runner") >= 0, cand = Array.IndexOf(args, "Strategy=C") >= 0;
         bool candD = Array.IndexOf(args, "Strategy=D") >= 0;  // candidates D / E (Strategies/MnqCandidateD.cs)
+        bool fomc = Array.IndexOf(args, "Strategy=FOMC") >= 0;  // the pre-FOMC drift (Strategies/MnqFomcDrift.cs)
         Strategy s = runner ? (Strategy)new MnqMomentumRunner() : cand ? (Strategy)new MnqMomentumC() :
-                     candD ? (Strategy)new MnqCandidateD() : new MnqNoiseMomentum();
+                     candD ? (Strategy)new MnqCandidateD() : fomc ? (Strategy)new MnqFomcDrift() : new MnqNoiseMomentum();
         s.BarsPeriod.Value = minutes;
         s.Run(t, o, h, l, c, delegate (Strategy x)
         {
             for (int a = 2; a < args.Length; a++)
             {
-                if (args[a] == "Strategy=Runner" || args[a] == "Strategy=C" || args[a] == "Strategy=D") continue;
+                if (args[a] == "Strategy=Runner" || args[a] == "Strategy=C" || args[a] == "Strategy=D" || args[a] == "Strategy=FOMC") continue;
                 string[] kv = args[a].Split(new[] { '=' }, 2);
                 PropertyInfo pi = s.GetType().GetProperty(kv[0]);  // the strategy's, or the stand-in's
                 if (pi == null) throw new ArgumentException("unknown property " + kv[0]);

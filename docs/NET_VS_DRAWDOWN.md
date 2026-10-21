@@ -101,7 +101,85 @@ year's configuration is chosen from earlier years only.
 - 2020, 2023 and 2025 stay weak for both.
 - **Both streams are trend-following, so choppy years hurt both.** No stream tested so far profits in those years.
 
-## 4. Verdict and what to run
+## 4. A third stream: the pre-FOMC drift
+
+**What it is:**
+- Long MNQ from 14:00 on the weekday before each scheduled FOMC announcement to 13:55 on the day, out before the
+  statement.
+- Lucca & Moench (2015) found it on 1994-2011 data, so 2015-2025 is after its publication.
+- `ninjatrader/Strategies/MnqFomcDrift.cs` and `mnqbot/fomc.py` agree trade for trade on the stand-in: on the user's
+  MNQ bars, and on synthetic sessions with hand-computed values (`tests/test_fomc_drift.py`).
+- **The candidates fixed beforehand:** the turn-of-month long (t 0.70 / 0.99, failed) and the pre-FOMC drift.
+
+| Pre-FOMC, 1 MNQ, 2 ticks | Trades | $ a trade | t | Win % | Worst |
+|---|---:|---:|---:|---:|---:|
+| 2015-2019 | 40 | +$41 | 0.79 | 52% | −$777 |
+| 2020-2025 | 43 | +$290 | 2.66 | 65% | −$1,023 |
+
+- It was weak after publication and strong since 2020.
+- Over 83 trades it never came within 2.7% of a 4% catastrophe stop.
+
+**Added to B and its breakout** (minute equity on the full electronic session; net ÷ intraday DD):
+
+| | 2015-19, 2t | 2020-25, 2t | 2015-19, 3t | 2020-25, 3t | 2015-2025, 2t |
+|---|---:|---:|---:|---:|---:|
+| Frozen B | 5.43 | 3.16 | 3.40 | 2.58 | 6.17 |
+| B + 2 MNQ pre-FOMC | 6.22 | 6.88 | 4.35 | 5.78 | 11.32 |
+| B + breakout $600 | 9.36 | 4.39 | 6.76 | 3.53 | 13.13 |
+| B + breakout $600 + 2 pre-FOMC | 11.22 | 7.07 | 7.93 | 6.17 | 17.18 |
+| **B + breakout $200 + 2 pre-FOMC** | 9.60 | **7.71** | 7.25 | **6.73** | 15.31 |
+
+**The walk-forward portfolio, out of sample** (`research/wf_portfolio.py`):
+- **The menu, fixed before running:** breakout off / $200 / $400 / $600 / $800 × 0 / 1 / 2 MNQ pre-FOMC.
+- Each year it was chosen on every earlier year.
+- **The choices:** $200 and 2 MNQ in most years, never B alone. For 2026: $200 and 2 MNQ, at both 2 and 3 ticks.
+
+| 2017-2025, NQ | Net | Gross profit | Intraday max DD | **Net ÷ DD** | **Gross ÷ DD** |
+|---|---:|---:|---:|---:|---:|
+| **Walk-forward portfolio, 2 ticks** | $126,944 | $682,703 | $10,475 | **12.1** | **65.2** |
+| Frozen B, 2 ticks | $69,198 | $490,630 | $14,837 | 4.7 | 33.1 |
+| **Walk-forward portfolio, 3 ticks** | $103,508 | $668,102 | $11,844 | **8.7** | **56.4** |
+| Frozen B, 3 ticks | $56,499 | $484,346 | $15,719 | 3.6 | 30.8 |
+
+**One account.**
+- Live, B blocks its entries while the account's position differs from its own, that is, while the FOMC position is
+  held.
+- The trades it would skip lost $8,573 over 2015-2025 (106 trades). On one account the 2015-2025 figure is 16.2
+  against 15.3 (2 ticks) and 13.7 against 12.9 (3 ticks).
+- This was found, not chosen. It is reported as the live behaviour.
+
+**MNQ 2026** (62 sessions; the execution check, not deciding):
+
+| 2 ticks | Net | Intraday DD | Net ÷ DD |
+|---|---:|---:|---:|
+| Frozen B | $13,031 | $2,339 | 5.6 |
+| B + breakout $200 | $12,614 | $2,850 | 4.4 |
+| **B + breakout $200 + 2 pre-FOMC, one account** | $12,911 | $3,365 | 3.8 |
+
+- The two 2026 announcements in the sample gave −$1,062 (7/29) and +$718 (9/16).
+- **MNQ does not confirm the improvement.** Its 62 sessions hold 2 FOMC trades and 42 breakout trades, too few to
+  settle it either way.
+
+## 5. Verdict and what to run
+
+**The result for the objective:**
+- **BWF:** frozen B + its breakout in the gaps at $200 + the pre-FOMC drift at 2 MNQ
+  (`release/MnqPortfolioBWF_candidate/`).
+- On NQ, out of sample by walk-forward (2017-2025):
+  - net is **12.1 times** the worst intraday drawdown (frozen B: 4.7) at 2 ticks, and **8.7 times** (B: 3.6) at 3;
+  - gross profit is **65 times** the drawdown (B: 33).
+- Over the whole 2015-2025 record the same portfolio has 15.3-16.2 (B: 6.2).
+- Every half and both slippages improve.
+
+**What is not established:**
+- **MNQ:** it is worse there, on too little data to tell.
+- **Native NinjaTrader:** it has not run the breakout settings or MnqFomcDrift.
+- **Every year:** not every year is profitable.
+- **The FOMC drift's future:** a published effect can fade, as this one did in 2015-2019.
+- **It is a candidate for a simulation account,** run beside B on the same sessions.
+
+### The earlier step (kept for the record): BW
+
 
 **BW** (frozen B + its breakout in the gaps at $600 risk; `release/MnqMomentumBW_candidate/PRESET_BW.md`):
 - On ten years of NQ it raises net ÷ maximum drawdown from 6.1 to 12.9 (2 ticks) and from 4.6 to 9.8 (3 ticks). It
