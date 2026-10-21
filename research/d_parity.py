@@ -3,8 +3,8 @@
     python research/d_parity.py <bars.pkl> <sim.dll> [budget ...]
 
 Both on the same bars (full electronic session), $0.95 a side, 2 ticks, the strategy's default date lists, NFP dates
-from research/nfp_dates.csv. Configurations: D, D + E1, D + E2, at each budget given (default 125). Prints, per
-configuration, the positions on each side and the first differences.
+from research/nfp_dates.csv. Configurations: D, D + E1, D + E2, D + F1, D + F2 and the sweep sleeves alone, at each
+budget given (default 125). Prints, per configuration, the positions on each side and the first differences.
 """
 from __future__ import annotations
 
@@ -24,7 +24,10 @@ from mnqbot.noise import FED_DATES, SKIP_DATES  # noqa: E402
 
 NFP = ",".join(pd.read_csv(Path(__file__).with_name("nfp_dates.csv")).date)
 CONFIGS = {"D": {}, "D+E1": {"e1": True}, "D+E2": {"e1": True, "e2": True},
-           "E only (code coverage)": {"noise": False, "williams": False, "e1": True, "e2": True}}
+           "E only (code coverage)": {"noise": False, "williams": False, "e1": True, "e2": True},
+           # candidate F (docs/CANDIDATE_F.md): E's chain with the stop at the FVG's far edge
+           "D+F1": {"e1": True, "e_stop": "fvg"}, "D+F2": {"e1": True, "e2": True, "e_stop": "fvg"},
+           "F only (code coverage)": {"noise": False, "williams": False, "e1": True, "e2": True, "e_stop": "fvg"}}
 COLS = ["sleeve", "d", "kind", "signal_bar", "entry_bar", "exit_bar", "runner_fill", "runner_exit", "runner_why",
         "half_fill", "half_exit", "half_why", "stop0", "r", "planned", "pnl"]
 
@@ -32,6 +35,7 @@ COLS = ["sleeve", "d", "kind", "signal_bar", "entry_bar", "exit_bar", "runner_fi
 def nt_positions(dll, csv, cfg_kw, budget, slip=2, extra=()):
     props = {"UseNoise": cfg_kw.get("noise", True), "UseWilliams": cfg_kw.get("williams", True),
              "UseE1": bool(cfg_kw.get("e1")), "UseE2": bool(cfg_kw.get("e2")), "RiskBudget": budget,
+             "SweepStop": "FvgFarEdge" if cfg_kw.get("e_stop") == "fvg" else "SweepExtreme",
              "SimSlippageTicks": slip, "SimCommissionPerSide": 0.95, "SimExitExecutions": True, "EvalTarget": 0,
              "EvalTrail": 0, "NfpDates": NFP, **dict(extra)}
     r = subprocess.run([K.DOTNET, str(dll), str(csv), "1", "Strategy=D", *[f"{k}={v}" for k, v in props.items()]],

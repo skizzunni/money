@@ -30,6 +30,9 @@ using NinjaTrader.NinjaScript.AddOns.MnqBot;
 
 namespace NinjaTrader.NinjaScript.Strategies
 {
+    // The sweep setups' initial stop (docs/CANDIDATE_F.md): E's sweep extreme - 0.1 ATR, or F's FVG far edge - 2 ticks.
+    public enum SweepStopReference { SweepExtreme, FvgFarEdge }
+
     // Sleeve E's causal sequence (docs/CANDIDATE_D.md section 3), fed every 1-minute bar.
     public sealed class SweepEngine
     {
@@ -41,7 +44,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         public sealed class Decision
         {
-            public string Pool; public int D, Fvg, Pen, Bos; public double Limit, Extreme, Atr, Ref, Level;
+            public string Pool; public int D, Fvg, Pen, Bos; public double Limit, Far, Extreme, Atr, Ref, Level;
         }
 
         static readonly string[] E1 = { "PDL", "PDH", "PWL", "PWH" };
@@ -54,7 +57,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         double co, ch, cl, cc;
         bool building;
         readonly List<double[]> swingHi = new List<double[]>(), swingLo = new List<double[]>();  // formation, confirmation, price
-        readonly List<double[]> fvgBull = new List<double[]>(), fvgBear = new List<double[]>();  // k, edge
+        readonly List<double[]> fvgBull = new List<double[]>(), fvgBear = new List<double[]>();  // k, proximal edge, far edge
         double atr = double.NaN, prevC = double.NaN;
         readonly List<double> trSeed = new List<double>();
         string sess;
@@ -117,8 +120,8 @@ namespace NinjaTrader.NinjaScript.Strategies
             }
             if (b >= 2)
             {
-                if (l > fb[b - 2][1]) fvgBull.Add(new double[] { b, l });
-                if (h < fb[b - 2][2]) fvgBear.Add(new double[] { b, h });
+                if (l > fb[b - 2][1]) fvgBull.Add(new double[] { b, l, fb[b - 2][1] });
+                if (h < fb[b - 2][2]) fvgBear.Add(new double[] { b, h, fb[b - 2][2] });
             }
             Advance(b);
         }
@@ -161,7 +164,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                     {
                         s.State = "dead";
                         Decision dec = new Decision();
-                        dec.Pool = s.Pool; dec.D = d; dec.Limit = pick[1]; dec.Fvg = (int)pick[0]; dec.Extreme = s.Extreme;
+                        dec.Pool = s.Pool; dec.D = d; dec.Limit = pick[1]; dec.Far = pick[2]; dec.Fvg = (int)pick[0]; dec.Extreme = s.Extreme;
                         dec.Atr = atr; dec.Pen = s.Pen; dec.Bos = s.Bos; dec.Ref = s.Ref; dec.Level = s.Level;
                         Decisions.Add(dec);
                     }
@@ -311,6 +314,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 UseWilliams = true;
                 UseE1 = false;
                 UseE2 = false;
+                SweepStop = SweepStopReference.SweepExtreme;
                 RiskBudget = 125;
                 SizingCommission = 0.95;
                 AllowanceMarketTicks = 4;
@@ -361,7 +365,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 Print("D settings: " + Instrument.FullName + ", " + BarsPeriod.Value + " " + BarsPeriod.BarsPeriodType +
                       ", account " + (Account == null ? "none" : Account.Name) + ", PlaceOrders " + PlaceOrders +
                       ", sleeves " + (UseNoise ? "noise " : "") + (UseWilliams ? "Williams " : "") + (UseE1 ? "E1 " : "") +
-                      (UseE2 ? "E2 " : "") + ", budget " + RiskBudget + ", commission " + SizingCommission + ", allowance " +
+                      (UseE2 ? "E2 " : "") + ", sweep stop " + SweepStop + ", budget " + RiskBudget + ", commission " + SizingCommission + ", allowance " +
                       AllowanceMarketTicks + "/" + AllowanceLimitTicks + " ticks, breakeven +" + BreakevenOffset + ", half at " +
                       PartialR + "R, trail " + TrailR + "R, campaigns " + MaxCampaigns + ", target " + EvalTarget + ", trail $" + EvalTrail);
                 if (BarsPeriod.BarsPeriodType != BarsPeriodType.Minute || BarsPeriod.Value != 1)
@@ -523,7 +527,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 int d = dec.D;
                 if (end < 585 || end > 900) continue;
                 double lim = d > 0 ? FloorTick(dec.Limit) : CeilTick(dec.Limit);
-                double stop = Away(d, dec.Extreme - d * 0.1 * dec.Atr);
+                double stop = SweepStop == SweepStopReference.FvgFarEdge ? Away(d, dec.Far - d * 2 * TickSize)
+                                                                          : Away(d, dec.Extreme - d * 0.1 * dec.Atr);
                 double r = d * (lim - stop);
                 double planned = 2 * (r * pv + 2 * SizingCommission + AllowanceLimitTicks * TickSize * pv);
                 if (r <= 0 || planned > RiskBudget + 1e-9) continue;
@@ -534,7 +539,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                     if (dist > 0 && (double.IsNaN(room) || dist < room)) room = dist;
                 }
                 if (!double.IsNaN(room) && room < need) continue;
-                Submit("E:" + dec.Pool, d, "limit", lim, stop, r, planned, day);
+                Submit((SweepStop == SweepStopReference.FvgFarEdge ? "F:" : "E:") + dec.Pool, d, "limit", lim, stop, r, planned, day);
                 return;
             }
         }
@@ -573,7 +578,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 halfOrder = d > 0 ? EnterLongLimit(1, price, HalfName) : EnterShortLimit(1, price, HalfName);
             }
             Print(Time[0] + "  D entry " + sleeve + " " + (d > 0 ? "long" : "short") + " " + kind + " at " + F(price) +
-                  ", stop " + F(stop) + ", R " + F(r) + " points, planned risk $" + F(planned));
+                  ", stop " + F(stop) + ", R " + F(r) + " points, price risk $" + F(r * pv * 2) + ", planned risk $" + F(planned));
         }
 
         protected override void OnOrderUpdate(Order order, double limitPrice, double stopPrice, int quantity, int filled,
@@ -721,6 +726,10 @@ namespace NinjaTrader.NinjaScript.Strategies
         [NinjaScriptProperty]
         [Display(Name = "Sleeve: sweep reversal, + session pools (E2)", Order = 4, GroupName = "1. Sleeves")]
         public bool UseE2 { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Sweep initial stop: sweep extreme (E) or FVG far edge + 2 ticks (F)", Order = 5, GroupName = "1. Sleeves")]
+        public SweepStopReference SweepStop { get; set; }
 
         [NinjaScriptProperty]
         [Range(1, 10000)]

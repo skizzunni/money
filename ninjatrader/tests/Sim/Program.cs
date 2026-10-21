@@ -45,7 +45,8 @@ static class Program
                 string[] kv = args[a].Split(new[] { '=' }, 2);
                 PropertyInfo pi = s.GetType().GetProperty(kv[0]);  // the strategy's, or the stand-in's
                 if (pi == null) throw new ArgumentException("unknown property " + kv[0]);
-                pi.SetValue(x, Convert.ChangeType(kv[1], pi.PropertyType, CultureInfo.InvariantCulture));
+                pi.SetValue(x, pi.PropertyType.IsEnum ? Enum.Parse(pi.PropertyType, kv[1])
+                                                      : Convert.ChangeType(kv[1], pi.PropertyType, CultureInfo.InvariantCulture));
             }
         });
         foreach (SimTrade x in s.SimTrades)

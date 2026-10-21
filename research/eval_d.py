@@ -1,7 +1,10 @@
-"""Candidates D, D + E1, D + E2 against frozen B, as pre-registered in docs/CANDIDATE_D.md (sections 4 and 5).
+"""Candidates D, D + E1, D + E2 against frozen B, as pre-registered in docs/CANDIDATE_D.md (sections 4 and 5); with
+--f, candidate F (docs/CANDIDATE_F.md): D, D + F1, D + F2, F1 alone and F2 alone, the same way.
 
-    python research/eval_d.py nq <nq1m_scaled.pkl> <nq1m raw folder> <B sim.dll> <out folder>
-    python research/eval_d.py mnq <MNQ_09-26.Last.txt> <MNQ_12-26.Last.txt> <B sim.dll> <out folder>
+    python research/eval_d.py nq <nq1m_scaled.pkl> <nq1m raw folder> <B sim.dll> <out folder> [--f]
+    python research/eval_d.py mnq <MNQ_09-26.Last.txt> <MNQ_12-26.Last.txt> <B sim.dll> <out folder> [--f]
+
+A pickle that has its own "scale" column (research/nq_rolls.py's roll-adjusted series) is used as it is.
 
 NQ decides the gates; MNQ is the execution check. Candidates: the Python model (mnqbot/candidate_d.py, held to the
 NinjaScript by tests/test_candidate_d.py) on the full electronic session; frozen B: its NinjaScript on the stand-in, on
@@ -41,6 +44,11 @@ NY = "America/New_York"
 TARGET, BUFFER, TRAIL, DAYS, FEE, PV, TICK = 3000.0, 25.0, 2000.0, 30, 0.95, 2.0, 0.25
 PATHS = ("favourable first", "adverse first", "worst mix", "best mix")
 CANDIDATES = {"D": {}, "D+E1": {"e1": True}, "D+E2": {"e1": True, "e2": True}}
+STAGES = (("D", "D+E1"), ("D+E1", "D+E2"))
+F_CANDIDATES = {"D": {}, "D+F1": {"e1": True, "e_stop": "fvg"}, "D+F2": {"e1": True, "e2": True, "e_stop": "fvg"},
+                "F1 only": {"noise": False, "williams": False, "e1": True, "e_stop": "fvg"},
+                "F2 only": {"noise": False, "williams": False, "e1": True, "e2": True, "e_stop": "fvg"}}
+F_STAGES = (("D", "D+F1"), ("D+F1", "D+F2"))
 HERE = Path(__file__).resolve().parent
 FOMC = frozenset(pd.read_csv(HERE / "fomc_dates.csv").date)
 NFP = frozenset(pd.read_csv(HERE / "nfp_dates.csv").date)
@@ -318,6 +326,8 @@ def nq_bars(pkl: str, raw_folder: str, first: str = "2015-03-01", last: str = "2
     s = pd.read_pickle(pkl)
     lo = pd.Timestamp(first, tz=NY) - pd.Timedelta(days=35)
     s = s[(s.index >= lo) & (s.index < pd.Timestamp(last, tz=NY) + pd.Timedelta(days=1))]
+    if "scale" in s.columns:  # the roll-adjusted series carries its own month factors (research/nq_rolls.py)
+        return s[["open", "high", "low", "close", "scale"]]
     files = sorted(glob.glob(f"{raw_folder}/*.parquet"))
     raw = pd.concat([pd.read_parquet(f, columns=["timestamp", "close"]) for f in files])
     raw.index = pd.to_datetime(raw.timestamp, utc=True).dt.tz_convert(NY)
@@ -347,7 +357,7 @@ def run_candidate(args):
     bars = pd.read_pickle(path)
     cfg = DConfig(slippage_ticks=slip, skip_dates=skip, fed_dates=FOMC, nfp_dates=NFP, **kw)
     m = run(bars, cfg)
-    return name, slip, m.campaigns, m.log
+    return name, slip, m.campaigns, m.log, m.sweep_seen
 
 
 def run_b(dll, rth: pd.DataFrame, slip: int, skip: frozenset) -> pd.DataFrame:
@@ -363,20 +373,24 @@ class Shim:  # a model-like holder for positions_from_model
 
 
 def main():
-    kind, out = sys.argv[1], Path(sys.argv[-1])
+    use_f = "--f" in sys.argv
+    argv = [a for a in sys.argv if a != "--f"]
+    kind, out = argv[1], Path(argv[-1])
+    candidates, stages = (F_CANDIDATES, F_STAGES) if use_f else (CANDIDATES, STAGES)
     out.mkdir(parents=True, exist_ok=True)
     if kind == "nq":
-        bars = nq_bars(sys.argv[2], sys.argv[3])
-        dll, first = sys.argv[4], pd.Timestamp("2015-03-01")
+        bars = nq_bars(argv[2], argv[3])
+        dll, first = argv[4], pd.Timestamp("2015-03-01")
     else:
-        bars = mnq_series(sys.argv[2], sys.argv[3])
-        dll, first = sys.argv[4], pd.Timestamp("2026-07-20")
+        bars = mnq_series(argv[2], argv[3])
+        dll, first = argv[4], pd.Timestamp("2026-07-20")
     skip = skip_set(bars)
     pkl = out / "bars.pkl"
     bars.to_pickle(pkl)
-    jobs = [(n, kw, slip, str(pkl), skip) for slip in (2, 3) for n, kw in CANDIDATES.items()]
-    with ProcessPoolExecutor(max_workers=min(6, os.cpu_count() or 2)) as ex:
+    jobs = [(n, kw, slip, str(pkl), skip) for slip in (2, 3) for n, kw in candidates.items()]
+    with ProcessPoolExecutor(max_workers=min(10, os.cpu_count() or 2)) as ex:
         results = list(ex.map(run_candidate, jobs))
+    pd.to_pickle({"results": results, "skip": skip, "candidates": candidates}, out / "runs.pkl")
     o, h, l = (bars[c].to_numpy(float) for c in ("open", "high", "low"))
     bar_day = (bars.index + pd.Timedelta(hours=6)).tz_localize(None).normalize()  # the trading day (18:00 start)
     rth = K.rth(bars[["open", "high", "low", "close"]])
@@ -389,7 +403,7 @@ def main():
     non = non_overlapping(starts)
     rows, gate_rows, ledgers = [], [], {}
     sets: dict = {}
-    for name, slip, campaigns, _ in results:
+    for name, slip, campaigns, _, _ in results:
         pos = positions_from_model(Shim(campaigns), o, slip * TICK)
         pos = [p for p in pos if bar_day[p.first] >= first]
         sets[(name, slip)] = pos
@@ -427,21 +441,22 @@ def main():
         for p in pos:
             led.append({"candidate": name, "slippage": slip, "sleeve": p.sleeve, "d": p.d,
                         "entry_day": days[p.first].date(), "first_bar": p.first, "last_bar": p.last,
-                        "contracts": sum(x.qty for x in p.lots), "R $": p.r_dollars, "planned $": p.planned,
+                        "contracts": sum(x.qty for x in p.lots), "price risk $": p.r_dollars,
+                        "planned $": p.planned,
                         "pnl $": p.pnl, "overrun": p.pnl < -p.planned - 1e-9,
                         "lots": "; ".join(f"{x.qty}@{x.fill}->{x.exit} ({x.exit_kind})" for x in p.lots)})
     pd.DataFrame(led).to_csv(out / "ledger.csv", index=False)
     # each sleeve's increment and the trades it displaces (profitable trades of the earlier stage not taken later)
     disp = []
     for slip in (2, 3):
-        for a, b in (("D", "D+E1"), ("D+E1", "D+E2")):
+        for a, b in stages:
             ka = {(p.first, p.sleeve): p for p in sets[(a, slip)]}
             kb = {(p.first, p.sleeve): p for p in sets[(b, slip)]}
             gone = [p for k, p in ka.items() if k not in kb]
             new = [p for k, p in kb.items() if k not in ka]
             disp.append({"slippage": slip, "from": a, "to": b, "new positions": len(new),
                          "new net $": sum(p.pnl for p in new),
-                         "new E positions": sum(p.sleeve.startswith("E") for p in new),
+                         "new sweep positions": sum(p.sleeve[:2] in ("E:", "F:") for p in new),
                          "displaced positions": len(gone), "displaced net $": sum(p.pnl for p in gone),
                          "displaced profitable": sum(p.pnl > 0 for p in gone),
                          "displaced profit $": sum(p.pnl for p in gone if p.pnl > 0)})

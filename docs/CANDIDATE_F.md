@@ -288,4 +288,54 @@ including open P/L, 30 calendar days, four intrabar orders.
 
 ## Frozen sources
 
-*(Recorded in the commit after the parity extension, before any F result on the evaluation data.)*
+**Recorded after the parity extension and before any F result on the evaluation data was viewed.**
+- No D + F or F run on NQ or on the MNQ execution-check data had been made when this was committed.
+- The MNQ parity tests run the F configurations on the user's MNQ fixture, but they only compare the two
+  implementations field by field.
+
+**Code and configuration (sha256):**
+
+| File | sha256 |
+|---|---|
+| `mnqbot/candidate_d.py` (the model; `DConfig.e_stop`, `sweep_prices`, `room_ok`) | `7deeb8b206d8127fd70f13d0014ecdf6e3a5326aedf20ba9beaef28913cbbb05` |
+| `ninjatrader/Strategies/MnqCandidateD.cs` (`SweepStop`) | `88fa86ba71ce353cc554a51143183509bed55f154ebb789eb2fea9d0cc5164e3` |
+| `ninjatrader/AddOns/MnqNoiseEngine.cs` (unchanged) | `e5a1ec0cc18b15509828149ce8aa0e9c7a104a59aff0992190205c42f354deb7` |
+| `ninjatrader/tests/Sim/NinjaTraderStubs.cs` (unchanged) | `2a9d61bbca64bbed4ad2c0f04e98143e4d448cb748e38e64db4437b8c9b4dc5a` |
+| `ninjatrader/tests/Sim/Program.cs` (enum properties) | `ecf597d0a263bf069c9b8703e0f2b7ad3c652850878efd16b157cea846d42c62` |
+| `research/eval_d.py` (`--f`: `F_CANDIDATES`, `F_STAGES`) | `11ff5aa1174705e4a3c58802c546ce7e4e561171b0129e60fb467d99c06031ee` |
+| `research/f_setups.py` (setup ledger, matched entries, execution counts) | `7a3d92f159db9ff0acbbc0c69a2254dccea51c58434477e7da2ca8c7e18fcb59` |
+| `research/d_parity.py` (F configurations) | `7479ae34c099f017180996805fcfc22609a49fa85b114d1bdaba560b2eeb1113` |
+| `research/nq_rolls.py` | `6e34689c19cc49d388fb8050132b49c11bda2621b87ea79921983e29c27d6b13` |
+| `tests/test_candidate_f.py` | `9870a857d358fc248d4e9dbff91d824ecd0418c78c3795bf0b48d6f4d1d0f08e` |
+| `tests/test_candidate_d.py` | `636a9bef009fd4a3f3054c38da1462a3400dc11b64c02e7d44006d07adf5f69a` |
+| `release/MnqCandidateD_candidate/PRESET_F-CANDIDATE.md` | `3545d5f58faec6d70067ffdc4d7c63c14d40799ac374be8acae3ae1184b16eaf` |
+| `release/MnqCandidateD_candidate.zip` | `e997bc06a7254cbf9b3fc55ff912c5a34e5a4b8a669bd644e9b9d3ee7b217b3a` |
+| `research/fomc_dates.csv` / `research/nfp_dates.csv` | `da11aadf…` / `20c7ed23…` |
+
+**The configurations** (`research/eval_d.py`, `F_CANDIDATES`; all with the `DConfig` defaults, $125, 2 / 3 ticks):
+
+| Book | Configuration |
+|---|---|
+| D | `{}` |
+| D+F1 | `{"e1": True, "e_stop": "fvg"}` |
+| D+F2 | `{"e1": True, "e2": True, "e_stop": "fvg"}` |
+| F1 only | `{"noise": False, "williams": False, "e1": True, "e_stop": "fvg"}` |
+| F2 only | `{"noise": False, "williams": False, "e1": True, "e2": True, "e_stop": "fvg"}` |
+
+The NinjaScript equivalent is the same switches with `SweepStop=FvgFarEdge` (PRESET_F-CANDIDATE.md).
+
+**Data (sha256):**
+
+| Data | sha256 |
+|---|---|
+| NQ, deciding: `nq1m_scaled.pkl` | `89c0b157f826853f9ffa7e3e22e4e08f3e4b31d5e1492824ffc06a35fc083328` |
+| NQ, roll sensitivity: `nq1m_scaled_roll_adjusted.pkl` | `0a61966cb3a527ad0287615e5a5ab029feccf957709d8417e85eecfe5e899e7d` |
+| MNQ: `MNQ_09-26.Last.txt` / `MNQ_12-26.Last.txt` (the user's exports) | `bddc9a52…` / `6a1cfb21…` |
+| Frozen B on the stand-in: the B v1.1 `Sim.dll` used for D/E | `3fffd5d0e1cdb43f5de3f88239635b92052d4d7b70e9676e93e2f3a76f573cd1` |
+
+**Parity evidence at this commit:**
+- `tests/test_candidate_d.py` (22 tests) and `tests/test_candidate_f.py` (15) all pass: 43 of 43.
+- The MNQ parity covers seven configurations (D, D + E1, D + E2, E only, D + F1, D + F2, F only) × $125 and $2,000:
+  14 of 14 identical position by position.
+- The D/E results are unchanged by the extension. The E tests, and the E configurations' MNQ parity, give the same
+  positions as before.

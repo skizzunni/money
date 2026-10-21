@@ -90,6 +90,10 @@ class DConfig:
     limit_minutes: int = 30
     limit_cancel_end: int = 930  # a pending limit is cancelled at the close of the bar ending 15:30
     room_cost: float = 1.45  # points: the round-trip cost allowance for the room test
+    # the sweep setups' initial stop (docs/CANDIDATE_F.md): "extreme" (E: the sweep extreme - 0.1 ATR) or "fvg" (F: the
+    # selected FVG's far boundary - 2 ticks)
+    e_stop: str = "extreme"
+    fvg_stop_ticks: int = 2
 
 
 @dataclass
@@ -225,8 +229,8 @@ class Sweep:
         self.cur = None  # the five-minute bar being built: [key, o, h, l, c]
         self.swing_hi: list[tuple[int, int, float]] = []  # (formation, confirmation, price)
         self.swing_lo: list[tuple[int, int, float]] = []
-        self.fvg_bull: list[tuple[int, float]] = []  # (k, proximal edge low[k])
-        self.fvg_bear: list[tuple[int, float]] = []  # (k, proximal edge high[k])
+        self.fvg_bull: list[tuple[int, float, float]] = []  # (k, proximal edge low[k], far edge high[k-2])
+        self.fvg_bear: list[tuple[int, float, float]] = []  # (k, proximal edge high[k], far edge low[k-2])
         self.atr = math.nan
         self.tr_seed: list[float] = []
         self.prev_c = math.nan
@@ -271,9 +275,9 @@ class Sweep:
                 self.swing_lo.append((j, b, lj))
         if b >= 2:
             if l > self.fb[b - 2][1]:
-                self.fvg_bull.append((b, l))
+                self.fvg_bull.append((b, l, self.fb[b - 2][1]))
             if h < self.fb[b - 2][2]:
-                self.fvg_bear.append((b, h))
+                self.fvg_bear.append((b, h, self.fb[b - 2][2]))
         self._advance(b)
 
     def _advance(self, b: int) -> None:
@@ -308,12 +312,13 @@ class Sweep:
             if s["state"] == "fvg":
                 gaps = self.fvg_bull if d > 0 else self.fvg_bear
                 pick = None
-                for k, edge in gaps:
+                for k, edge, far in gaps:
                     if k - 2 >= s["pen"] and k <= b and (pick is None or k > pick[0]):
-                        pick = (k, edge)
+                        pick = (k, edge, far)
                 if pick is not None:
                     s["state"] = "dead"
-                    self.decisions.append({"pool": s["pool"], "d": d, "limit_raw": pick[1], "fvg": pick[0],
+                    self.decisions.append({"pool": s["pool"], "d": d, "limit_raw": pick[1], "far_raw": pick[2],
+                                           "fvg": pick[0],
                                            "extreme_raw": s["extreme"], "atr_raw": self.atr, "pen": s["pen"],
                                            "bos": s["bos"], "ref_raw": s["ref"], "level_raw": s["level"]})
                 elif b >= s["bos"] + cfg.fvg_after_bos:
@@ -395,6 +400,28 @@ class Sweep:
         return [self.pools[n] for n, pd_ in self.pools_on if pd_ == -d and n in self.pools]
 
 
+def sweep_prices(dec: dict, scale: float, cfg: DConfig, mode: str | None = None) -> tuple[float, float, float, float]:
+    """A sweep decision's limit, initial stop, R (points) and planned all-in risk ($, both contracts), in the decision
+    bar's prices. mode: "extreme" (E) or "fvg" (F); default the configuration's. Both round the stop away from the
+    entry, the limit down for a long and up for a short."""
+    d = dec["d"]
+    lim = (floor_tick if d > 0 else ceil_tick)(dec["limit_raw"] * scale)
+    if (mode or cfg.e_stop) == "fvg":
+        stop = away(d, dec["far_raw"] * scale - d * cfg.fvg_stop_ticks * TICK)
+    else:
+        stop = away(d, (dec["extreme_raw"] - d * cfg.atr_mult * dec["atr_raw"]) * scale)
+    r = d * (lim - stop)
+    planned = cfg.qty * (r * PV + 2 * cfg.commission + cfg.allowance_limit * TICK * PV)
+    return lim, stop, r, planned
+
+
+def room_ok(d: int, lim: float, r: float, levels_raw: list[float], scale: float, cfg: DConfig) -> bool:
+    """The room test: the nearest opposing pool beyond the limit at least 2R + 1.45 points away (none: no limit)."""
+    rooms = [d * (x * scale - lim) for x in levels_raw]
+    rooms = [x for x in rooms if x > 0]
+    return not rooms or min(rooms) >= cfg.partial_r * r + cfg.room_cost
+
+
 class Model:
     """The strategy and the stand-in's fill model, bar by bar."""
 
@@ -417,6 +444,8 @@ class Model:
         self.half_filled = False
         self.stop = math.nan
         self.log: list[tuple] = []  # every decision: (bar, what, detail)
+        self.sweep_seen: list[tuple] = []  # every sweep decision: (bar, scale, decision, its room levels raw)
+        self.prefix = "F:" if cfg.e_stop == "fvg" else "E:"
 
     # ---- the stand-in's fills ---------------------------------------------------------------------------------
     def _close(self, lot: Lot, i: int, px: float, why: str) -> None:
@@ -552,29 +581,31 @@ class Model:
                 self.log.append((i, "skip", name, r, planned))
                 continue
             self._submit(i, name, d, "market", c, stop, r, planned, day)
+            self._displaced(i, self.sweep.decisions if self.sweep is not None else [], "priority")
             return
         if self.sweep is not None:
             end = tmin + 1
-            for dec in self.sweep.decisions:
+            for n, dec in enumerate(self.sweep.decisions):
                 d = dec["d"]
                 if not (cfg.decide_first <= end <= cfg.decide_last) or day in cfg.skip_dates:
                     self.log.append((i, "skip", dec["pool"], "time"))
                     continue
-                lim = (floor_tick if d > 0 else ceil_tick)(dec["limit_raw"] * scale)
-                stop = away(d, (dec["extreme_raw"] - d * cfg.atr_mult * dec["atr_raw"]) * scale)
-                r = d * (lim - stop)
-                planned = cfg.qty * (r * PV + 2 * cfg.commission + cfg.allowance_limit * TICK * PV)
+                lim, stop, r, planned = sweep_prices(dec, scale, cfg)
                 if r <= 0 or planned > cfg.budget + 1e-9:
                     self.log.append((i, "skip", dec["pool"], r, planned))
                     continue
-                need = cfg.partial_r * r + cfg.room_cost
-                rooms = [d * (x * scale - lim) for x in self.sweep.room_levels(d)]
-                rooms = [x for x in rooms if x > 0]
-                if rooms and min(rooms) < need:
+                if not room_ok(d, lim, r, self.sweep.room_levels(d), scale, cfg):
                     self.log.append((i, "skip", dec["pool"], "room"))
                     continue
-                self._submit(i, "E:" + dec["pool"], d, "limit", lim, stop, r, planned, day)
+                self._submit(i, self.prefix + dec["pool"], d, "limit", lim, stop, r, planned, day)
+                self._displaced(i, self.sweep.decisions[n + 1:], "priority")
                 return
+
+    def _displaced(self, i: int, decisions: list, why: str) -> None:
+        """Sweep decisions not considered (a log entry only): an entry taken first on this bar ("priority"), or no
+        entry allowed ("position", "campaigns", "closed")."""
+        for dec in decisions:
+            self.log.append((i, "skip", dec["pool"], why))
 
     def _submit(self, i, sleeve, d, kind, price, stop, r, planned, day) -> None:
         self.camp = Campaign(sleeve, d, i, price, stop, r, planned, kind, day)
@@ -597,7 +628,9 @@ class Model:
             e_day = day not in cfg.skip_dates and day not in cfg.fed_dates and day not in cfg.nfp_dates
             self.sweep.on_bar(t, tmin, day, o, h, l, c, scale, e_day)
             for dec in self.sweep.decisions:
-                self.log.append((i, "E decision", dec["pool"], dec["limit_raw"], dec["extreme_raw"], dec["atr_raw"]))
+                self.log.append((i, "E decision", dec["pool"], dec["limit_raw"], dec["extreme_raw"], dec["atr_raw"],
+                                 dec["far_raw"]))
+                self.sweep_seen.append((i, scale, dec, self.sweep.room_levels(dec["d"])))
         if self.lots:
             self._manage(i, tmin, day, h, l, c)
         if self.pend and self.camp is not None and not self.lots:
@@ -607,6 +640,10 @@ class Model:
             self.log.append((i, "cancel", "partial"))
         if allowed and not self.lots and not self.pend and self.camp is None:
             self._try_enter(i, tmin, day, c, scale)
+        elif self.sweep is not None and self.sweep.decisions:
+            busy = self.lots or self.pend or self.camp is not None or not flat_now
+            why = "position" if busy else "campaigns" if self.day_count >= cfg.max_campaigns else "closed"
+            self._displaced(i, self.sweep.decisions, why)
 
 
 def run(bars: pd.DataFrame, cfg: DConfig) -> Model:
@@ -632,7 +669,7 @@ def ledger(m: Model, idx) -> pd.DataFrame:
                      "signal_time": idx[c.signal_bar], "entry_bar": first, "entry_time": idx[first],
                      "exit_bar": last, "exit_time": idx[last], "contracts": sum(lt.qty for lt in c.lots),
                      "fill": c.lots[0].fill, "expected": c.expected, "stop0": c.stop0, "r_points": c.r,
-                     "planned_risk": c.planned,
+                     "price_risk": c.r * PV * m.cfg.qty, "planned_risk": c.planned,
                      "runner_exit": run_.exit if run_ else math.nan, "runner_why": run_.why if run_ else "",
                      "half_exit": half.exit if half else math.nan, "half_why": half.why if half else "",
                      "pnl": c.pnl, "r_multiple": c.pnl / c.planned if c.planned else math.nan,
