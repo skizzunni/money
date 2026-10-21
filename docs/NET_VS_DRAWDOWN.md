@@ -241,6 +241,8 @@ Every neighbour beats B in every period and at both slippages.
 - **It is a faithful proxy for MNQ:**
   - over 7/20-9/30/2026, B made $7,584 on NSX and $8,423 on the user's MNQ;
   - the daily correlation is 0.96.
+  - the breakout's trades match too: over the same weeks, its 30 NSX breakout days were all MNQ breakout days, in
+    the same direction, with a daily correlation of 0.93 (MNQ had 3 more).
 
 | NSX 2025-07 to 2026-09 | 2t net | 2t intraday DD | **2t net ÷ DD** | 3t net ÷ DD |
 |---|---:|---:|---:|---:|
