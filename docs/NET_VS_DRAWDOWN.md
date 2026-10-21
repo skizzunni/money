@@ -19,6 +19,7 @@
 | Net ÷ max closed-day drawdown, 2011-2026 | 7.5 | 12.5 |
 | Net ÷ max drawdown, NQ walk-forward 2017-2025 | 4.7 | **12.1** |
 | Gross ÷ max drawdown, NQ walk-forward 2017-2025 | 33 | **65** |
+| Net ÷ max closed-day drawdown, walk-forward 2013-2026 (out of sample, 14 years) | 6.6 | **8.5** (3 ticks: 4.7 against **10.2**) |
 | Chance that net exceeds the max drawdown within 1 / 3 / 5 years (bootstrap) | 52% / 73% / 86% | **65% / 89% / 96%** |
 
 **Not achieved, and not hidden:**
@@ -350,6 +351,26 @@ the FOMC leg is new evidence):
 | **BWF, 2 ticks** | $185,446 | $1,094,195 | $16,239 (2026-07-29) | **11.42** | **67.4** |
 | Frozen B, 3 ticks | $97,261 | $818,622 | $20,002 (2026-01-29) | 4.86 | 40.9 |
 | **BWF, 3 ticks** | $154,455 | $1,075,117 | $18,844 (2012-04-09) | **8.20** | 57.1 |
+
+**The most conservative figure: walk-forward over the whole record, 2013-2026.**
+- **The menu:** breakout off / $200 / $400 / $600 × 0 / 1 / 2 MNQ pre-FOMC.
+- History from 2011. Each year from 2013 is chosen only from earlier years: 14 years traded out of sample.
+
+| 2013-2026, closed-day | Net | Max DD | **Net ÷ DD** | Positive years |
+|---|---:|---:|---:|---:|
+| Walk-forward, 2 ticks | $124,495 | $14,688 | **8.48** | 11 of 14 |
+| Frozen B, 2 ticks | $110,387 | | 6.62 | 10 of 14 |
+| Walk-forward, 3 ticks | $153,576 | $15,128 | **10.15** | 11 of 14 |
+| Frozen B, 3 ticks | $86,324 | | 4.66 | 10 of 14 |
+
+**The choices:**
+- At 2 ticks, with 2011-2014 in its history (where the breakout did not help), the rule kept B alone with 1-2 MNQ
+  pre-FOMC until 2020. It added the breakout in 2020-2021, and again for 2026 ($200, 2 MNQ, the preset).
+- At 3 ticks it held the breakout from 2015.
+
+**The honest size of the gain:**
+- It is about +28% at 2 ticks and about +118% at 3 ticks, out of sample.
+- The in-sample whole-record figures (11.4 against 6.9) overstate it at 2 ticks.
 
 ## 4e. How likely "net far above drawdown" is, by horizon
 
