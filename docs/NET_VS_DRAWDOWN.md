@@ -258,6 +258,13 @@ the FOMC leg is new evidence):
 - The gain is concentrated in 2015-2024. It is neutral in 2011-2014 and absent in the latest 15 months.
 - **The preset is BWF at $200:** the rule's choice on the longest history at the base cost.
 
+**The pre-FOMC drift over all 16 years** (1 MNQ, 2 ticks):
+- 125 announcements: +$108.70 a trade, t 2.11, 54% winners.
+- Positive in 10 of 16 years. Most of it comes from 2020 (+$3,696) and 2022 (+$6,083), years when the Fed drove the
+  market.
+- **The evidence for it is borderline.** It earns its place by paying in years when B is weak (2020), not by being
+  reliable.
+
 ## 5. Verdict and what to run
 
 **The result for the objective:**
