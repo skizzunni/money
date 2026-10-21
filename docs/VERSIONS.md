@@ -7,6 +7,7 @@
 - `ninjatrader/Strategies/MnqMomentumC.cs`
 - `ninjatrader/Strategies/MnqMomentumRunner.cs`
 - `ninjatrader/Strategies/MnqCandidateD.cs` (candidates D / E / F)
+- `ninjatrader/Strategies/MnqFomcDrift.cs` (the pre-FOMC drift, part of the BWF portfolio)
 - `ninjatrader/AddOns/MnqNoiseEngine.cs`
 - `pine/reference/mnq_noise_momentum_v1.5_user.pine`
 
@@ -34,6 +35,7 @@
 | MnqMomentumC.cs, earlier | `0047eb78…`, `843e1fda…`, `8b5d0ef6…`, `8fdff8ac…`, `0f90ae88…` | Retired (docs/FIXES_2026-10-20.md section 1) | git history |
 | MnqMomentumRunner.cs | `f5d983b0b17af18cc71602d0f8eb686a38e692ee49ec65c6cc0bf2e4afc24ff9` | Current; the candidate was rejected | `ninjatrader/` |
 | MnqCandidateD.cs | `88fa86ba71ce353cc554a51143183509bed55f154ebb789eb2fea9d0cc5164e3` | Current; candidates D, D + E1, D + E2 rejected (docs/CANDIDATE_D.md); the `SweepStop` setting added for candidate F, rejected (docs/CANDIDATE_F.md). With SweepStop = SweepExtreme it trades as `bf19d2ab…` did | `ninjatrader/` |
+| MnqFomcDrift.cs | `d825232380645465f89b36e71c05f445b68df124a9231047e7d8bec7a90d368f` | Current; the pre-FOMC leg of the BWF candidate (docs/NET_VS_DRAWDOWN.md), held to mnqbot/fomc.py by tests/test_fomc_drift.py | `ninjatrader/` |
 | mnq_noise_momentum_v1.5_user.pine | `cd44ee68d575e74019cd308f1079838a2b5cb7453d8b7c40473436c59b851975` | The Pine reference, unchanged | `pine/reference/` |
 
 **The B v1 package (`release/MnqMomentumB_v1.zip`) is removed:** v1.1 replaced it. Only one version of each
