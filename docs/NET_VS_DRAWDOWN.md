@@ -296,6 +296,26 @@ the FOMC leg is new evidence):
 - **The bootstrap assumes the next years resemble 2011-2026.** The latest 15 months (section 4b) were worse than this
   sample's typical year.
 
+## 4f. BWF's drawdowns are slow grinds, and one is open now
+
+**BWF's largest drawdown episodes, 2011-2026** (closed-day, 2 ticks):
+
+| Peak | Trough | Recovered | Depth |
+|---|---|---|---:|
+| 2011-08-02 | 2012-04-09 | 2012-05-21 | $14,886 |
+| **2025-02-27** | **2026-07-29** | **not yet (data to 2026-09-30)** | **$13,950** |
+| 2013-06-19 | 2013-09-04 | 2014-02-06 | $8,661 |
+| 2011-03-08 | 2011-06-15 | 2011-08-01 | $7,343 |
+| 2023-01-23 | 2023-03-20 | 2023-11-10 | $6,988 |
+| 2014-10-09 | 2015-03-13 | 2015-05-06 | $6,876 |
+| 2017-07-10 | 2017-10-04 | 2018-01-22 | $6,669 |
+| 2020-02-21 (Covid) | 2020-04-06 | 2020-07-27 | $6,587 |
+
+- **The deep drawdowns are months of choppy, trendless trading,** not crashes. The 2020 crash is eighth.
+- **A cap on size in extreme volatility would not reach them,** so it was not tested.
+- **The portfolio is in its second-deepest drawdown now,** open since February 2025. Anyone starting it today starts
+  inside that episode, and its end is unknown.
+
 ## 5. Verdict and what to run
 
 **The result for the objective:**
