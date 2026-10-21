@@ -28,6 +28,10 @@ PACKAGES = {
         "code": {STRAT + "MnqNoiseMomentum.cs": B, ADDON: ENGINE},
         "docs": ["INSTALL.md", "PRESET_B-PRACTICE-v1.1.md", "PRESET_B-NATIVE-v1.1.md"],
     },
+    "MnqMomentumBW_candidate": {
+        "code": {STRAT + "MnqNoiseMomentum.cs": B, ADDON: ENGINE},
+        "docs": ["INSTALL.md", "PRESET_BW.md"],
+    },
     "PineReference_v1.5": {
         "code": {STRAT + "MnqNoiseMomentum.cs": B, ADDON: ENGINE,
                  "pine/mnq_noise_momentum_v1.5_user.pine": "pine/reference/mnq_noise_momentum_v1.5_user.pine"},
