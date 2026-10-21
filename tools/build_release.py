@@ -32,10 +32,9 @@ PACKAGES = {
         "code": {STRAT + "MnqNoiseMomentum.cs": B, ADDON: ENGINE},
         "docs": ["INSTALL.md", "PRESET_BW.md"],
     },
-    "MnqPortfolioBWF_candidate": {
-        "code": {STRAT + "MnqNoiseMomentum.cs": B, ADDON: ENGINE,
-                 STRAT + "MnqFomcDrift.cs": "ninjatrader/Strategies/MnqFomcDrift.cs"},
-        "docs": ["INSTALL.md", "PRESET_BWF.md", "FOMC_DATES_2011-2027.txt"],
+    "MnqFomcDrift_experiment": {
+        "code": {STRAT + "MnqFomcDrift.cs": "ninjatrader/Strategies/MnqFomcDrift.cs", ADDON: ENGINE},
+        "docs": ["INSTALL.md", "PRESET_FOMC-EXPERIMENT.md", "FOMC_DATES_2011-2027.txt"],
     },
     "PineReference_v1.5": {
         "code": {STRAT + "MnqNoiseMomentum.cs": B, ADDON: ENGINE,

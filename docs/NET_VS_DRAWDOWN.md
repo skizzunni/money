@@ -1,11 +1,20 @@
-# Net and gross profit against the maximum drawdown (October 21, 2026, overnight)
+# Net and gross profit against the maximum drawdown (October 21, 2026, overnight): a side study
+
+> **Scope note (October 21, evening; the user's correction):**
+> - This was a side study of net against drawdown. It is **not** the main deliverable, which is the daily MNQ
+>   strategy (2-3 qualified entry campaigns per eligible session, at most 3, under the shared $125 rules;
+>   docs/CANDIDATE_D.md, docs/CANDIDATE_F.md, docs/DAILY_AUDIT.md).
+> - **The pre-FOMC drift is a separate experiment** (docs/FOMC_EXPERIMENT.md). The combined "BWF" package that put
+>   it beside the main bot has been removed.
+> - **BW** (frozen B + its breakout) does not follow the daily strategy's $125 two-contract rules either. It stays a
+>   research result only.
 
 ## Summary (read this first)
 
 **Already true of frozen B over the long run:**
 - 2011-2026: net 6.9 times its worst intraday drawdown ($125,688 against $18,157); gross profit 46 times.
 
-**The improvement found and kept: BWF** (`release/MnqPortfolioBWF_candidate/`):
+**The improvement found in this side study: BWF** (its combined package has been removed; FOMC is a separate experiment):
 - frozen B, unchanged;
 - its own Williams breakout in the gaps at $200 risk (a setting, no new code);
 - a new, separate pre-FOMC drift strategy at 2 MNQ.

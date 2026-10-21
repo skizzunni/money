@@ -250,7 +250,7 @@ docs/NET_VS_DRAWDOWN.md.
 
 **Frozen B already meets it over the long run:** 2011-2026, net is 6.9 times its maximum intraday drawdown.
 
-**Kept, as a candidate for a simulation account: BWF** (`release/MnqPortfolioBWF_candidate/`):
+**A side-study result, not the main deliverable: BWF** (its combined package has since been removed; see the scope correction below):
 - frozen B, unchanged;
 - its own breakout in the gaps at $200 (a setting);
 - a new pre-FOMC drift strategy at 2 MNQ (`MnqFomcDrift.cs`, held to `mnqbot/fomc.py` trade for trade).
@@ -277,3 +277,19 @@ docs/NET_VS_DRAWDOWN.md.
 - the pre-holiday drift.
 
 **Frozen B v1.1 stays the reference.** BWF runs beside it on simulation.
+
+## Scope correction (October 21, 2026, evening)
+
+**The main deliverable is the daily MNQ strategy:**
+- 2-3 qualified entry campaigns per eligible session, at most 3, no forced trades;
+- under the shared rules: $125 planned risk including declared costs, two contracts or skip, fee-aware breakeven at
+  +1R, half at +2R, an uncapped trailing runner, no daily P&L cap or loser cutoff, 15:55 flat.
+
+**What changed:**
+- The FOMC drift is a separate experiment (docs/FOMC_EXPERIMENT.md, `release/MnqFomcDrift_experiment/`).
+- The combined BWF package is removed.
+- The net-vs-drawdown study is relabelled a side study.
+
+**The daily candidate:**
+- The last preregistered daily candidate authorized is F (docs/CANDIDATE_F.md), and its verdict (rejected) stands.
+- Its daily opportunity audit and the comparison with frozen B are in docs/DAILY_AUDIT.md.
