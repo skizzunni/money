@@ -1,0 +1,9 @@
+config,net,closed-day DD,net/DD,positive years
+B + 0 FOMC,97261,18519,5.25,11 of 16
+B + 2 FOMC,124179,16930,7.34,12 of 16
+B + W risk 200 + 0 FOMC,127537,16530,7.72,11 of 16
+B + W risk 200 + 2 FOMC,154455,17935,8.61,13 of 16
+B + Williams in the gaps + 0 FOMC,157882,19535,8.08,11 of 16
+B + Williams in the gaps + 2 FOMC,184800,20105,9.19,13 of 16
+B + W risk 600 + 0 FOMC,195316,23213,8.41,11 of 16
+B + W risk 600 + 2 FOMC,222234,24857,8.94,13 of 16

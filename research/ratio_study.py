@@ -95,7 +95,7 @@ def main() -> None:
         rth = rth_of[kind]
         day = rth.index.tz_localize(None).normalize()
         tr = tr.assign(day=day[tr.eb.to_numpy()])
-        tr = tr[tr.day >= pd.Timestamp(FIRST[kind])]
+        tr = tr[tr.day >= pd.Timestamp(opts.get("first", FIRST[kind]) if kind == "nq" else FIRST[kind])]
         tr.to_csv(out / f"trades_{kind}_{name.replace(' ', '_')}_{slip}t.csv", index=False)
         rows.append({"variant": name, "data": kind, "slippage": slip, "period": "all", **summary(tr, rth)})
         for label, a, b in HALVES[kind]:

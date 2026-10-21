@@ -227,12 +227,43 @@ year's configuration is chosen from earlier years only.
 - 2025 lost for both, and its drawdown is the record's largest.
 - 2026's portfolio drawdown is twice B's: the FOMC leg's losses in March and July.
 
+## 4d. Four earlier years: NSX 2011-2014, and the whole 2011-2026 record
+
+**NSX 2011-2014** (a caveat: B and its breakout were built on NSX 2011-2018, so these years are in-sample for them;
+the FOMC leg is new evidence):
+
+| 2 ticks, closed-day DD | Net | DD | Net ÷ DD |
+|---|---:|---:|---:|
+| Frozen B | $31,836 | $12,289 | 2.59 |
+| B + breakout $200 | $38,159 | $15,310 | 2.49 |
+| B + breakout $600 | $54,063 | $21,878 | 2.47 |
+| B + breakout $200 + 2 pre-FOMC | $38,644 | $14,886 | 2.60 |
+
+- Here the breakout adds net in proportion to the drawdown, so it does not raise the ratio.
+- The FOMC leg was flat: 32 announcements, +$485.
+
+**The whole record, 2011-01 to 2026-09** (`verification/net_vs_dd/record_2011_2026_*t.csv`):
+
+| | 2t net | 2t DD | **2t net ÷ DD** | **3t net ÷ DD** | Positive years (2t) |
+|---|---:|---:|---:|---:|---:|
+| Frozen B | $125,688 | $16,670 | **7.54** | 5.25 | 12 of 16 |
+| B + 2 pre-FOMC | $152,855 | $15,059 | 10.15 | 7.34 | 12 of 16 |
+| B + breakout $200 | $158,279 | $15,310 | 10.34 | 7.72 | 14 of 16 |
+| **B + breakout $200 + 2 pre-FOMC (BWF)** | **$185,446** | **$14,886** | **12.46** | **8.61** | 13 of 16 |
+| B + breakout $400 + 2 pre-FOMC | $219,442 | $17,664 | 12.42 | 9.19 | 13 of 16 |
+| B + breakout $600 + 2 pre-FOMC | $259,526 | $22,163 | 11.71 | 8.94 | 13 of 16 |
+
+**Where the gain comes from:**
+- Every combination beats frozen B over the 16 years, at 2 and at 3 ticks.
+- The gain is concentrated in 2015-2024. It is neutral in 2011-2014 and absent in the latest 15 months.
+- **The preset is BWF at $200:** the rule's choice on the longest history at the base cost.
+
 ## 5. Verdict and what to run
 
 **The result for the objective:**
 - **BWF:** frozen B + its breakout in the gaps + the pre-FOMC drift at 2 MNQ
-  (`release/MnqPortfolioBWF_candidate/`). The breakout is at $600: the walk-forward rule's choice with all data to
-  2026-09. With NQ alone, to 2025-06, it was $200.
+  (`release/MnqPortfolioBWF_candidate/`). The breakout is at $200: the rule's choice on the longest history (2011-2026)
+  at the base cost (section 4d). With 2015-2026 it would be $600, within noise of it.
 - On NQ, out of sample by walk-forward (2017-2025):
   - net is **12.1 times** the worst intraday drawdown (frozen B: 4.7) at 2 ticks, and **8.7 times** (B: 3.6) at 3;
   - gross profit is **65 times** the drawdown (B: 33).
