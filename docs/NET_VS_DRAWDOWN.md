@@ -261,6 +261,9 @@ Every neighbour beats B in every period and at both slippages.
 - **The pre-FOMC drift lost:** 10 announcements, net −$1,588 at 2 MNQ, 4 up and 6 down.
   - It had been weak in 2015-2019 too. Its 2020-2025 strength did not carry on.
   - BWF is therefore worse than B here: 0.16 against 0.21.
+- **A data caveat:** NSX timestamps are an hour off between the US and European clock changes in March (docs/NQ_ROLLS.md).
+  The March FOMC trades on NSX (e.g. 2026-03-18, −$1,202) may therefore be timed an hour off. The timing sensitivity
+  (section 4) shows an hour either way changes little.
 - **These are holdout results.** Choosing a configuration from them now (breakout $600 without the FOMC leg, the
   best row here) would fit the holdout. The walk-forward rule's choice was made before this data was seen, and that
   choice is BWF.
