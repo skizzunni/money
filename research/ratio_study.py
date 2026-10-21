@@ -39,6 +39,11 @@ VARIANTS = {
     # the breakout long only (BreakoutShorts off)
     "B + W risk 200 long only": {"UseBreakout": True, "EvalBreakoutRisk": 200, "BreakoutShorts": False},
     "B + W risk 600 long only": {"UseBreakout": True, "EvalBreakoutRisk": 600, "BreakoutShorts": False},
+    # sensitivity of the breakout's levels (BreakoutK, default 0.5) and stop (BreakoutStop, default 0.25), at $200
+    "B + W200 k 0.4": {"UseBreakout": True, "EvalBreakoutRisk": 200, "BreakoutK": 0.4},
+    "B + W200 k 0.6": {"UseBreakout": True, "EvalBreakoutRisk": 200, "BreakoutK": 0.6},
+    "B + W200 stop 0.20": {"UseBreakout": True, "EvalBreakoutRisk": 200, "BreakoutStop": 0.2},
+    "B + W200 stop 0.30": {"UseBreakout": True, "EvalBreakoutRisk": 200, "BreakoutStop": 0.3},
 }
 FIRST = {"nq": "2015-03-01", "adj": "2015-03-01", "mnq": "2026-07-20"}
 HALVES = {"nq": (("2015-2019", "2015-03-01", "2020-01-01"), ("2020-2025", "2020-01-01", "2026-01-01")),
