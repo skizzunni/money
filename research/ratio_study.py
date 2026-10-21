@@ -1,7 +1,7 @@
 """Net and gross profit against the maximum drawdown: frozen B and variants of its own settings, on the stand-in.
 
     python research/ratio_study.py <out folder> <B sim.dll> nq=<pkl> [raw=<folder>] [first=<date>] [last=<date>]
-                                   [adj=<pkl>] [mnq=<sep>,<dec>] [variants=a,b]
+                                   [adj=<pkl>] [mnq=<sep>,<dec>] [variants=a,b] [slips=2,3]
 
 For each variant (B's NinjaScript, MnqNoiseMomentum.cs, with property overrides), each data set and 2 / 3 ticks: net,
 gross profit and loss, the closed-trade and the intraday maximum drawdown (open P/L at each minute's worst, as
@@ -100,7 +100,8 @@ def main() -> None:
         csv = Path(tempfile.mkdtemp()) / f"{kind}.csv"
         K.write_bars(rth, csv)
         rth_of[kind] = rth
-        jobs += [(n, VARIANTS[n], kind, slip, str(csv), skip, dll) for n in names for slip in (2, 3)]
+        slips = tuple(int(x) for x in opts.get("slips", "2,3").split(","))
+        jobs += [(n, VARIANTS[n], kind, slip, str(csv), skip, dll) for n in names for slip in slips]
     with ProcessPoolExecutor(max_workers=4) as ex:
         results = list(ex.map(one, jobs))
     rows, years = [], []
