@@ -5,7 +5,7 @@
 | | Strategy | Chart | Settings |
 |---|---|---|---|
 | 1 | `MnqNoiseMomentum` (frozen B v1.1's file, unchanged) | MNQ front month, 1 Minute, CME US Index Futures ETH, 45 days | As PRESET_B-PRACTICE-v1.1 / PRESET_B-NATIVE-v1.1, except: **Breakout in the bot's gaps = On**, **Risk a trade in the evaluation, $ = 200**, **Evaluation: close everything at this profit = 0 (off)** |
-| 2 | `MnqFomcDrift` (new) | the same instrument, 1 Minute, **ETH**, 10 days | **Contracts 2**; catastrophe stop 4%; FOMC dates: the default list (2026-2027 scheduled announcements); **Exit on session close Off** (it holds overnight) |
+| 2 | `MnqFomcDrift` (new) | the same instrument, 1 Minute, **ETH**, 10 days | **Contracts 2**; catastrophe stop 4%; FOMC dates: the default list (2026-2027 scheduled announcements; for a backtest before 2026 paste the line in `FOMC_DATES_2011-2027.txt`); **Exit on session close Off** (it holds overnight) |
 
 **One account or two:**
 - **Two accounts** (one for each strategy) reproduce the backtest exactly.
