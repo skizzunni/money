@@ -45,6 +45,10 @@ def third_friday(y: int, m: int) -> pd.Timestamp:
     return d + pd.Timedelta(days=14)
 
 
+def _largest(x: dict):
+    return max(x, key=lambda s: abs(np.nan_to_num(x[s])))
+
+
 def detect(raw: pd.DataFrame, nsx: pd.Series) -> pd.DataFrame:
     t = raw.index
     sess = (t + pd.Timedelta(hours=6)).normalize().tz_localize(None)
@@ -73,10 +77,7 @@ def detect(raw: pd.DataFrame, nsx: pd.Series) -> pd.DataFrame:
             mj = {b: np.log(fo[b] / nx.loc[first_t[b]]) - np.log(lc[a[b]] / nx.loc[last_t[a[b]]]) for b in cand}
             md = {b: eth.get(b, np.nan) - late.get(a[b], np.nan) for b in cand}
             rj = {b: rth.get(b, np.nan) - rth.get(a[b], np.nan) for b in cand}
-
-            def pick(x):
-                return max(x, key=lambda b: abs(np.nan_to_num(x[b])))
-            k = [pick(mj), pick(md), pick(rj)]
+            k = [_largest(mj), _largest(md), _largest(rj)]
             srt = sorted(abs(v) for v in mj.values())
             votes = pd.Series(k).value_counts()
             if votes.iloc[0] >= 2:
