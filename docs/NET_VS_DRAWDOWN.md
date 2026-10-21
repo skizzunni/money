@@ -115,6 +115,22 @@ year's configuration is chosen from earlier years only.
 
 Every neighbour beats B in every period and at both slippages.
 
+**The bot's own settings** (on B + breakout $200; sensitivity only;
+`verification/net_vs_dd/ratios_bot_sensitivity.csv`):
+
+| Bot | 2t: 2015-19 / 2020-25 / all | 3t: all |
+|---|---|---:|
+| Take-profit 1.5, line stop 0.24 (frozen) | 8.84 / 4.10 / 9.95 | 8.01 |
+| Line stop 0.18 | 8.47 / 4.07 / 9.79 | 7.93 |
+| Line stop 0.30 | 8.70 / 3.96 / 9.82 | 7.82 |
+| Take-profit 1.25 | 6.52 / 3.17 / 7.84 | 6.07 |
+| Take-profit 1.75 | 7.49 / 3.59 / 8.29 | 6.88 |
+
+- **The line stop is flat around its value.**
+- **The take-profit is a local peak:** ±0.25 noise units costs about a fifth of the ratio. It was chosen walk-forward
+  in an earlier round (round twenty-six).
+- Its neighbours still beat frozen B everywhere but one cell (1.25 at 3 ticks, 2020-25: 2.49 against 2.54).
+
 **Why the breakout helps:**
 - Its trades lose or win independently of B's: the daily P/L correlation is 0.03 on NQ.
 - It is positive on its own: 1,618 trades over 2015-2025, $31.80 a trade, t 2.69.
