@@ -242,3 +242,37 @@ the sweep extreme.
 **The roll-adjusted NQ series (docs/NQ_ROLLS.md) changes no F or D verdict.**
 
 **Frozen B v1.1 stays the reference.** Nothing was retuned, and no further variation was launched.
+
+## Addendum (October 21, 2026, overnight): net and gross profit against the maximum drawdown
+
+**The user's new objective:** net and gross far above the maximum drawdown, and only that. The whole study is in
+docs/NET_VS_DRAWDOWN.md.
+
+**Frozen B already meets it over the long run:** 2011-2026, net is 7.5 times its maximum drawdown.
+
+**Kept, as a candidate for a simulation account: BWF** (`release/MnqPortfolioBWF_candidate/`):
+- frozen B, unchanged;
+- its own breakout in the gaps at $200 (a setting);
+- a new pre-FOMC drift strategy at 2 MNQ (`MnqFomcDrift.cs`, held to `mnqbot/fomc.py` trade for trade).
+
+| | Frozen B | BWF |
+|---|---:|---:|
+| Net ÷ max drawdown, 2011-2026 | 7.5 | 12.5 |
+| Net ÷ max drawdown, NQ walk-forward 2017-2025 | 4.7 | 12.1 |
+| Chance that net exceeds the max drawdown within 1 / 3 / 5 years | 52 / 73 / 86% | 65 / 89 / 96% |
+
+**Not established:**
+- **The newest 15 months** (NSX, July 2025 to September 2026): BWF had 0.16 against B's 0.21, and is in an open
+  drawdown since February 2025.
+- **MNQ:** 62 sessions, worse there.
+- **Native NinjaTrader:** not run.
+
+**Rejected:**
+- volatility-scaled contracts;
+- an overnight long;
+- the turn of the month;
+- daily loss limits;
+- a long-only breakout;
+- the pre-holiday drift.
+
+**Frozen B v1.1 stays the reference.** BWF runs beside it on simulation.
