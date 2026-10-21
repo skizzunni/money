@@ -1,0 +1,7 @@
+book,slippage ticks,positions,net $,intraday DD $,net / intraday DD,average net trade $,profit factor,win rate %,campaigns a session (all eligible),0 campaigns %,1 campaigns %,2 campaigns %,3 campaigns %,more than 3 %,"evaluations, non-overlapping (pass / breach / expired / path-dependent)","evaluations, overlapping",G1 >= 60%,G2 <= 15%,"G3 <= $1,500",G4 >= 50%,G5 >= 1.35
+B,2,97,13030.8,2652.8,4.91,134.34,2.54,58.8,1.565,56.5,4.8,4.8,9.7,24.2,1 / 1 / 1 / 0 of 3,23 / 6 / 13 / 0 of 42,33.33 FAIL,33.33 FAIL,2074.20 FAIL,58.76 PASS,2.54 PASS
+B,3,97,11606.8,2692.8,4.31,119.66,2.33,57.7,1.565,56.5,4.8,4.8,9.7,24.2,1 / 1 / 1 / 0 of 3,23 / 6 / 13 / 0 of 42,33.33 FAIL,33.33 FAIL,2106.20 FAIL,57.73 PASS,2.33 PASS
+D+F1,2,6,77.2,440.2,0.18,12.87,1.24,50.0,0.097,91.9,6.5,1.6,0.0,0.0,0 / 0 / 3 / 0 of 3,0 / 0 / 42 / 0 of 42,0.00 FAIL,100.00 FAIL,381.30 PASS,50.00 PASS,1.24 FAIL
+D+F1,3,6,68.2,447.2,0.15,11.37,1.21,33.3,0.097,91.9,6.5,1.6,0.0,0.0,0 / 0 / 3 / 0 of 3,0 / 0 / 42 / 0 of 42,0.00 FAIL,100.00 FAIL,387.30 PASS,33.33 FAIL,1.21 FAIL
+D+F2,2,7,161.4,440.2,0.37,23.06,1.5,57.1,0.113,90.3,8.1,1.6,0.0,0.0,0 / 0 / 3 / 0 of 3,0 / 0 / 42 / 0 of 42,0.00 FAIL,100.00 FAIL,381.30 PASS,57.14 PASS,1.50 PASS
+D+F2,3,7,151.9,447.2,0.34,21.7,1.46,42.9,0.113,90.3,8.1,1.6,0.0,0.0,0 / 0 / 3 / 0 of 3,0 / 0 / 42 / 0 of 42,0.00 FAIL,100.00 FAIL,387.30 PASS,42.86 FAIL,1.46 PASS

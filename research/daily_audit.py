@@ -28,6 +28,38 @@ import eval_d as ED  # noqa: E402
 
 from mnqbot.candidate_d import RTH_OPEN, DConfig, Model  # noqa: E402
 
+
+def nyse_closed_or_early(first: str, last: str) -> frozenset:
+    """NYSE holidays and early closes (July 3, the day after Thanksgiving, December 24 on weekdays): sessions whose
+    09:30-16:00 minutes are short for that reason, not for missing data."""
+    from pandas.tseries.holiday import (
+        AbstractHolidayCalendar,
+        GoodFriday,
+        Holiday,
+        USLaborDay,
+        USMartinLutherKingJr,
+        USMemorialDay,
+        USPresidentsDay,
+        USThanksgivingDay,
+        nearest_workday,
+    )
+
+    class NYSE(AbstractHolidayCalendar):
+        rules = [Holiday("NY", month=1, day=1, observance=nearest_workday), USMartinLutherKingJr, USPresidentsDay,
+                 GoodFriday, USMemorialDay, Holiday("JT", month=6, day=19, start_date="2022-01-01",
+                                                    observance=nearest_workday),
+                 Holiday("ID", month=7, day=4, observance=nearest_workday), USLaborDay, USThanksgivingDay,
+                 Holiday("XM", month=12, day=25, observance=nearest_workday)]
+    days = set(NYSE().holidays(first, last).strftime("%Y-%m-%d"))
+    for y in range(int(first[:4]), int(last[:4]) + 1):
+        for d in (pd.Timestamp(y, 7, 3), pd.Timestamp(y, 12, 24)):
+            if d.weekday() < 5:
+                days.add(d.strftime("%Y-%m-%d"))
+        tg = USThanksgivingDay.dates(f"{y}-01-01", f"{y}-12-31")
+        if len(tg):
+            days.add((tg[0] + pd.Timedelta(days=1)).strftime("%Y-%m-%d"))
+    return frozenset(days)
+
 NY = "America/New_York"
 FIRST = {"mnq": "2026-07-20", "nq": "2015-03-01"}
 REASONS = ["unaffordable", "blocked: position", "blocked: pending order", "blocked: daily entry budget exhausted",
@@ -122,9 +154,12 @@ def main() -> None:
     books = sys.argv[5:] or ["D+F1", "D+F2"]
     out.mkdir(parents=True, exist_ok=True)
     bars = ED.mnq_series(a1, a2) if kind == "mnq" else ED.nq_bars(a1, a2)
-    missing = frozenset(K.incomplete_sessions(K.rth(bars[["open", "high", "low", "close"]])))
-    holiday = frozenset(K.DEFAULT_SKIP.split(","))
-    skip = holiday | missing
+    incomplete = frozenset(K.incomplete_sessions(K.rth(bars[["open", "high", "low", "close"]])))
+    named = frozenset(K.DEFAULT_SKIP.split(","))
+    calendar = nyse_closed_or_early("2010-01-01", "2027-12-31")
+    holiday = named | (incomplete & calendar)  # short for a holiday or an early close
+    missing = incomplete - holiday  # short for missing data
+    skip = holiday | missing  # the evaluation's skip set, unchanged
     summary = []
     for book in books:
         cfg = DConfig(slippage_ticks=2, skip_dates=skip, fed_dates=ED.FOMC, nfp_dates=ED.NFP, **ED.F_CANDIDATES[book])
