@@ -84,6 +84,7 @@ year's configuration is chosen from earlier years only.
 | B + breakout + 1 MNQ long overnight (18:00-09:30) | 11.00 against 11.42 (closed-day DD, roll-adjusted) | | | **rejected**: t 1.6 alone, lowers the whole-period ratio |
 | B + breakout, roll-adjusted NQ | 10.55 (B 6.43) | 8.48 (B 4.80) | | the result holds |
 | Breakout long only (its shorts off), $200 / $600 | 2011-2026 closed-day: 9.48 / 10.98 against 10.34 / 10.62 with shorts; lower in 2011-14, 2020-25 and 2025-26 | 6.76 / 8.59 against 7.72 / 8.41 | | **rejected**: mixed, mostly worse |
+| Equity-curve filter on BWF: no bot or breakout trading on a day when their last 20 / 60 / 120 sessions lost | 2011-2026 closed-day: 4.90 / 6.89 / 9.40 against 12.46 without; walk-forward choice 11.27 against 11.88 | 3.26 / 3.58 / 5.80 against 8.61 | | **rejected**: it stands aside before the rebounds |
 | Pre-holiday drift (Ariel 1990; long 2 MNQ from the 16:00 close two sessions before an NYSE holiday to the pre-holiday close), as a stream | discovery NQ 2015-19: t −0.09 (45 trades); 2020-25 t 2.08; NSX 2011-14 t 1.15; 2025-26 t 0.39 | | | **rejected** at discovery, by the protocol fixed before running |
 | B + breakout $200 with B's own daily loss gate at $400 / $600 / $1,000 (both setups) | 2011-2026 closed-day: 6.91 / 8.64 / 10.49 against 10.34 without | 5.88 / 6.38 / 7.83 against 7.72 | | **rejected**: tight limits cut the recoveries; $1,000 rarely binds |
 
