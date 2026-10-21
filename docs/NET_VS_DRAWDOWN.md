@@ -48,6 +48,7 @@ year's configuration is chosen from earlier years only.
 | Volatility-scaled contracts, on B + breakout $400 | 7.79 / 4.90 / 3.55 | 6.25 | 2.46 | **rejected** |
 | B + breakout + 1 MNQ long overnight (18:00-09:30) | 11.00 against 11.42 (closed-day DD, roll-adjusted) | | | **rejected**: t 1.6 alone, lowers the whole-period ratio |
 | B + breakout, roll-adjusted NQ | 10.55 (B 6.43) | 8.48 (B 4.80) | | the result holds |
+| B + breakout $200 with B's own daily loss gate at $400 / $600 / $1,000 (both setups) | 2011-2026 closed-day: 6.91 / 8.64 / 10.49 against 10.34 without | 5.88 / 6.38 / 7.83 against 7.72 | | **rejected**: tight limits cut the recoveries; $1,000 rarely binds |
 
 **What earlier rounds had already tested** (docs/RESULTS.md and the research notes), restated for this objective:
 - Regime, trend, spike and time filters: none held out of sample.
