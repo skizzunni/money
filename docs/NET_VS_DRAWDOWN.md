@@ -97,6 +97,20 @@ year's configuration is chosen from earlier years only.
 - None of them adds to the objective. The Williams breakout is the one documented positive stream that is
   nearly independent of B.
 
+**The breakout's settings are not a knife-edge** (NQ, $200; sensitivity only, the defaults are kept;
+`verification/net_vs_dd/ratios_breakout_sensitivity.csv`):
+
+| Breakout | 2t: 2015-19 / 2020-25 / all | 3t: all |
+|---|---|---:|
+| Frozen B (none) | 5.42 / 3.10 / 6.13 | 4.64 |
+| k 0.5, stop 0.25 (the defaults) | 8.84 / 4.10 / 9.95 | 8.01 |
+| k 0.4 | 8.76 / 3.82 / 9.02 | 7.33 |
+| k 0.6 | 6.96 / 3.86 / 8.67 | 6.87 |
+| stop 0.20 | 10.09 / 4.39 / 10.68 | 8.66 |
+| stop 0.30 | 9.25 / 4.49 / 10.33 | 8.40 |
+
+Every neighbour beats B in every period and at both slippages.
+
 **Why the breakout helps:**
 - Its trades lose or win independently of B's: the daily P/L correlation is 0.03 on NQ.
 - It is positive on its own: 1,618 trades over 2015-2025, $31.80 a trade, t 2.69.
