@@ -26,11 +26,15 @@ NY = "America/New_York"
 VARIANTS = {
     "B": {"UseBreakout": False},
     "B + Williams in the gaps": {"UseBreakout": True},
+    # the breakout's risk a trade (the evaluation setting EvalBreakoutRisk; default 400): its weight against the bot
+    "B + W risk 200": {"UseBreakout": True, "EvalBreakoutRisk": 200},
+    "B + W risk 600": {"UseBreakout": True, "EvalBreakoutRisk": 600},
+    "B + W risk 800": {"UseBreakout": True, "EvalBreakoutRisk": 800},
 }
 FIRST = {"nq": "2015-03-01", "adj": "2015-03-01", "mnq": "2026-07-20"}
 HALVES = {"nq": (("2015-2019", "2015-03-01", "2020-01-01"), ("2020-2025", "2020-01-01", "2026-01-01")),
           "adj": (("2015-2019", "2015-03-01", "2020-01-01"), ("2020-2025", "2020-01-01", "2026-01-01")),
-          "mnq": (("all", "2026-07-20", "2027-01-01"),)}
+          "mnq": ()}
 
 
 def drawdowns(tr: pd.DataFrame, bars: pd.DataFrame) -> tuple[float, float]:

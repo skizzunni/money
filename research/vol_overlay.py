@@ -36,9 +36,9 @@ def main() -> None:
     paths = dict(a.split("=", 1) for a in sys.argv[2:])
     rows = []
     for kind, path in paths.items():
-        bars = ED.mnq_series(*path.split(",")) if kind == "mnq" else ED.nq_bars(path, paths.get("raw", ""))
         if kind == "raw":
             continue
+        bars = ED.mnq_series(*path.split(",")) if kind == "mnq" else ED.nq_bars(path, paths.get("raw", ""))
         rth = K.rth(bars[["open", "high", "low", "close"]])
         q = sizes(rth)
         for f in sorted(folder.glob(f"trades_{kind}_*_[23]t.csv")):
