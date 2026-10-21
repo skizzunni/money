@@ -378,6 +378,20 @@ the FOMC leg is new evidence):
 - **In 2025-2026 the bot was about break-even before costs.** Its 550 trades paid about $8,600 in commission and
   2 ticks of slippage (4 MNQ × ($1.90 + 2 × 2 × $0.50) = $15.60 a trade).
 
+## 4g. What a tick of execution is worth
+
+**Net ÷ max drawdown** (closed-day; BWF on two accounts):
+
+| Slippage a side | Frozen B, 2011-2026 | BWF, 2011-2026 | Frozen B, 2025-07 to 2026-09 | BWF, 2025-07 to 2026-09 |
+|---|---:|---:|---:|---:|
+| 1 tick | 10.36 ($152,903) | **15.68** ($216,637) | 0.33 | 0.21 |
+| 2 ticks (base) | 7.54 ($125,688) | **12.46** ($185,446) | 0.22 | 0.08 |
+| 3 ticks | 5.25 ($97,261) | **8.61** ($154,455) | 0.09 | −0.06 |
+
+- **Each tick of slippage costs about a third of the long-run ratio.** Fill quality matters as much as any rule
+  tested tonight.
+- **It does not rescue the newest 15 months.**
+
 ## 5. Verdict and what to run
 
 **The result for the objective:**
