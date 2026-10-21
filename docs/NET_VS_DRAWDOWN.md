@@ -192,11 +192,47 @@ year's configuration is chosen from earlier years only.
   best row here) would fit the holdout. The walk-forward rule's choice was made before this data was seen, and that
   choice is BWF.
 
+## 4c. The walk-forward rule updated with the new data, and the whole record
+
+**The update:**
+- Appending the NSX holdout (2025-07 to 2026-09) to the history and re-running the same rule, the choice becomes
+  breakout **$600** and **2 MNQ** pre-FOMC, at both 2 and 3 ticks.
+- Over the full history its score is 14.1 (2 ticks) and 11.3 (3 ticks), on the closed-day drawdown.
+- This is the rule's own update, not a choice made from the holdout's best row: its best row was without the FOMC
+  leg.
+
+**The whole record, 2015-03 to 2026-09** (NQ, then NSX; 2 ticks; closed-day drawdown;
+`verification/net_vs_dd/years_2015_2026_B_vs_BWF600.csv`):
+
+| | Net | Max DD | **Net ÷ DD** | Positive years | Years with net > that year's DD |
+|---|---:|---:|---:|---:|---:|
+| Frozen B | $93,851 | $16,670 | **5.6** | 9 of 12 | 7 of 12 |
+| **B + breakout $600 + 2 MNQ pre-FOMC** | $204,977 | $14,556 | **14.1** | 11 of 12 | 8 of 12 |
+
+| Year | B net | B DD | Portfolio net | Portfolio DD |
+|---|---:|---:|---:|---:|
+| 2015 | 10,297 | 6,796 | 16,230 | 6,299 |
+| 2016 | 12,080 | 5,167 | 16,352 | 9,717 |
+| 2017 | −1,989 | 7,159 | 8,366 | 6,349 |
+| 2018 | 24,815 | 6,241 | 45,832 | 6,855 |
+| 2019 | 3,787 | 6,423 | 31,425 | 6,139 |
+| 2020 | 2,897 | 12,020 | 7,006 | 10,547 |
+| 2021 | 18,018 | 6,389 | 13,654 | 5,020 |
+| 2022 | 17,606 | 7,174 | 29,391 | 8,234 |
+| 2023 | −719 | 7,898 | 3,006 | 8,701 |
+| 2024 | 8,673 | 6,216 | 33,898 | 7,919 |
+| 2025 | −9,060 | 12,847 | −10,010 | 14,556 |
+| 2026 (to Sep) | 7,446 | 5,510 | 9,827 | 12,090 |
+
+- 2025 lost for both, and its drawdown is the record's largest.
+- 2026's portfolio drawdown is twice B's: the FOMC leg's losses in March and July.
+
 ## 5. Verdict and what to run
 
 **The result for the objective:**
-- **BWF:** frozen B + its breakout in the gaps at $200 + the pre-FOMC drift at 2 MNQ
-  (`release/MnqPortfolioBWF_candidate/`).
+- **BWF:** frozen B + its breakout in the gaps + the pre-FOMC drift at 2 MNQ
+  (`release/MnqPortfolioBWF_candidate/`). The breakout is at $600: the walk-forward rule's choice with all data to
+  2026-09. With NQ alone, to 2025-06, it was $200.
 - On NQ, out of sample by walk-forward (2017-2025):
   - net is **12.1 times** the worst intraday drawdown (frozen B: 4.7) at 2 ticks, and **8.7 times** (B: 3.6) at 3;
   - gross profit is **65 times** the drawdown (B: 33).

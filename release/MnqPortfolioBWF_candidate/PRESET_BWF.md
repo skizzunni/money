@@ -1,10 +1,10 @@
-# Preset BWF: frozen B + its Williams breakout ($200 risk) + the pre-FOMC drift (2 MNQ)
+# Preset BWF: frozen B + its Williams breakout ($600 risk) + the pre-FOMC drift (2 MNQ)
 
 **Two strategies on MNQ** (docs/NET_VS_DRAWDOWN.md section 5):
 
 | | Strategy | Chart | Settings |
 |---|---|---|---|
-| 1 | `MnqNoiseMomentum` (frozen B v1.1's file, unchanged) | MNQ front month, 1 Minute, CME US Index Futures ETH, 45 days | As PRESET_B-PRACTICE-v1.1 / PRESET_B-NATIVE-v1.1, except: **Breakout in the bot's gaps = On**, **Risk a trade in the evaluation, $ = 200**, **Evaluation: close everything at this profit = 0 (off)** |
+| 1 | `MnqNoiseMomentum` (frozen B v1.1's file, unchanged) | MNQ front month, 1 Minute, CME US Index Futures ETH, 45 days | As PRESET_B-PRACTICE-v1.1 / PRESET_B-NATIVE-v1.1, except: **Breakout in the bot's gaps = On**, **Risk a trade in the evaluation, $ = 600**, **Evaluation: close everything at this profit = 0 (off)** |
 | 2 | `MnqFomcDrift` (new) | the same instrument, 1 Minute, **ETH**, 10 days | **Contracts 2**; catastrophe stop 4%; FOMC dates: the default list (2026-2027 scheduled announcements); **Exit on session close Off** (it holds overnight) |
 
 **One account or two:**
@@ -17,10 +17,15 @@
   - **Either works.** In a Strategy Analyzer backtest the block does not apply: it is realtime only.
 
 **Why these sizes:**
-- Walk-forward over 2017-2025: each year, the breakout risk (off / 200 / 400 / 600 / 800) and the FOMC contracts
-  (0 / 1 / 2) with the best net ÷ drawdown over every earlier year were chosen.
-- The choice was $200 and 2 MNQ in 8 of 9 years at 2 ticks, and in 9 of 9 for the FOMC size at 3 ticks.
-- With all of 2015-2025 it is $200 and 2 MNQ for 2026, at both 2 and 3 ticks.
+- **The rule:** each year, the breakout risk (off / 200 / 400 / 600 / 800) and the FOMC contracts (0 / 1 / 2) with
+  the best net ÷ drawdown over all history to date (docs/NET_VS_DRAWDOWN.md).
+- **The rule's choices:**
+  - with NQ through 2025-06 it chose $200 and 2 MNQ;
+  - with the NSX holdout added (to 2026-09) it chooses **$600 and 2 MNQ**, at both 2 and 3 ticks, and that is this
+    preset;
+  - it is re-run with each new year of data.
+- **Over 2015-03 to 2026-09** (closed-day drawdown, 2 ticks): net $204,977 against a $14,556 maximum drawdown,
+  14.1 times; frozen B made $93,851 against $16,670, 5.6 times.
 
 **Checks:**
 - **MnqFomcDrift:**
