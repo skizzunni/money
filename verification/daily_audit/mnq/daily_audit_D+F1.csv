@@ -49,7 +49,7 @@ session,status,rth minutes (of 390),eth minutes,noise ready,Williams ready,E1 po
 2026-09-02,eligible,390,1380,True,True,True,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,True
 2026-09-03,eligible,390,1380,True,True,True,False,12,1,1,13,0,0,13,0,0,0,0,0,0,0,0,0,0,0,1,False
 2026-09-04,eligible,390,1380,True,True,True,True,1,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,False
-2026-09-07,missing data,210,1140,True,True,True,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,False
+2026-09-07,holiday or half day,210,1140,True,True,True,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,False
 2026-09-08,eligible,390,1380,True,True,True,False,2,1,1,3,0,2,1,0,0,0,0,0,0,0,0,0,0,0,1,False
 2026-09-09,eligible,390,1380,True,True,True,False,0,1,1,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,False
 2026-09-10,eligible,390,1380,True,True,True,False,0,1,1,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,False
