@@ -187,9 +187,11 @@ class Williams:
         self.up = self.down = math.nan
         self.signal = 0
         self.stop_pts = math.nan
+        self.raw = 0
 
     def on_bar(self, tmin: int, o: float, h: float, l: float, allowed: bool, scale: float) -> None:
         self.signal = 0
+        self.raw = 0  # this bar's level touch, allowed or not (2: both levels): the daily audit's raw setup
         if tmin == RTH_OPEN:
             if not math.isnan(self.hi_raw):
                 self.prev_raw = self.hi_raw - self.lo_raw
@@ -210,6 +212,7 @@ class Williams:
         if not hu and not hd:
             return
         self.done = True
+        self.raw = 2 if (hu and hd) else (1 if hu else -1)
         if hu and hd:
             return
         if not allowed:
@@ -246,6 +249,7 @@ class Sweep:
         self.used: set[str] = set()
         self.setups: list[dict] = []
         self.decisions: list[dict] = []
+        self.penetrations: list[tuple] = []
         self.active_day = False
 
     # ---- five-minute bars -------------------------------------------------------------------------------------
@@ -328,6 +332,7 @@ class Sweep:
     def on_bar(self, t: pd.Timestamp, tmin: int, day: str, o: float, h: float, l: float, c: float,
                scale: float, allowed_day: bool) -> None:
         self.decisions = []
+        self.penetrations = []  # (pool, d) penetrated on this bar: the daily audit's raw sweep setups
         ro, rh, rl, rc = o / scale, h / scale, l / scale, c / scale
         # the five-minute bucket: New York wall-clock minutes // 5 (as the NinjaScript computes it)
         wall = t.tz_localize(None) if t.tzinfo is not None else t
@@ -371,6 +376,7 @@ class Sweep:
                 lvl = self.pools[name] * scale
                 if (d > 0 and l <= lvl - TICK) or (d < 0 and h >= lvl + TICK):
                     self.used.add(name)
+                    self.penetrations.append((name, d))
                     self.setups.append({"pool": name, "d": d, "level": self.pools[name], "pen": len(self.fb),
                                         "extreme": rl if d > 0 else rh, "state": "reclaim", "ref": math.nan,
                                         "bos": -1})
@@ -444,6 +450,9 @@ class Model:
         self.half_filled = False
         self.stop = math.nan
         self.log: list[tuple] = []  # every decision: (bar, what, detail)
+        # the daily opportunity audit (docs/DAILY_AUDIT.md): (bar, sleeve, direction, outcome) for every raw setup;
+        # a record only, nothing here changes a decision
+        self.audit: list[tuple] = []
         self.sweep_seen: list[tuple] = []  # every sweep decision: (bar, scale, decision, its room levels raw)
         self.prefix = "F:" if cfg.e_stop == "fvg" else "E:"
 
@@ -573,14 +582,18 @@ class Model:
         if cfg.williams and self.wb.signal != 0:
             d = self.wb.signal
             cands.append(("williams", d, c - d * self.wb.stop_pts))
-        for name, d, structural in cands:
+        for n, (name, d, structural) in enumerate(cands):
             stop = away(d, structural)
             r = d * (c - stop)
             planned = cfg.qty * (r * PV + 2 * cfg.commission + cfg.allowance_market * TICK * PV)
             if r <= 0 or planned > cfg.budget + 1e-9:
                 self.log.append((i, "skip", name, r, planned))
+                self.audit.append((i, name, d, "unaffordable"))
                 continue
             self._submit(i, name, d, "market", c, stop, r, planned, day)
+            self.audit.append((i, name, d, "entered"))
+            for nm, dd, _ in cands[n + 1:]:
+                self.audit.append((i, nm, dd, "same-bar priority"))
             self._displaced(i, self.sweep.decisions if self.sweep is not None else [], "priority")
             return
         if self.sweep is not None:
@@ -589,15 +602,19 @@ class Model:
                 d = dec["d"]
                 if not (cfg.decide_first <= end <= cfg.decide_last) or day in cfg.skip_dates:
                     self.log.append((i, "skip", dec["pool"], "time"))
+                    self.audit.append((i, "sweep", d, "not qualified: decision window"))
                     continue
                 lim, stop, r, planned = sweep_prices(dec, scale, cfg)
                 if r <= 0 or planned > cfg.budget + 1e-9:
                     self.log.append((i, "skip", dec["pool"], r, planned))
+                    self.audit.append((i, "sweep", d, "unaffordable"))
                     continue
                 if not room_ok(d, lim, r, self.sweep.room_levels(d), scale, cfg):
                     self.log.append((i, "skip", dec["pool"], "room"))
+                    self.audit.append((i, "sweep", d, "not qualified: room"))
                     continue
                 self._submit(i, self.prefix + dec["pool"], d, "limit", lim, stop, r, planned, day)
+                self.audit.append((i, "sweep", d, "entered (limit placed)"))
                 self._displaced(i, self.sweep.decisions[n + 1:], "priority")
                 return
 
@@ -606,6 +623,19 @@ class Model:
         entry allowed ("position", "campaigns", "closed")."""
         for dec in decisions:
             self.log.append((i, "skip", dec["pool"], why))
+            self.audit.append((i, "sweep", dec["d"], "same-bar priority" if why == "priority" else self._blocked_why()))
+
+    def _blocked_why(self) -> str:
+        """Why a qualified setup could not be taken now (no entry allowed): the audit's refusal reason."""
+        if self.lots:
+            return "blocked: position"
+        if self.pend or self.camp is not None:
+            return "blocked: pending order"
+        if self.day_count >= self.cfg.max_campaigns:
+            return "blocked: daily entry budget exhausted"
+        if self.day in self.cfg.skip_dates:
+            return "skip day"
+        return "blocked: after the entry window"
 
     def _submit(self, i, sleeve, d, kind, price, stop, r, planned, day) -> None:
         self.camp = Campaign(sleeve, d, i, price, stop, r, planned, kind, day)
@@ -631,6 +661,7 @@ class Model:
                 self.log.append((i, "E decision", dec["pool"], dec["limit_raw"], dec["extreme_raw"], dec["atr_raw"],
                                  dec["far_raw"]))
                 self.sweep_seen.append((i, scale, dec, self.sweep.room_levels(dec["d"])))
+        self._audit_raw(i, day, c, allowed)
         if self.lots:
             self._manage(i, tmin, day, h, l, c)
         if self.pend and self.camp is not None and not self.lots:
@@ -638,12 +669,50 @@ class Model:
         elif self.pend and self.lots:  # one contract filled, the other still working: cancel it
             self.pend.clear()
             self.log.append((i, "cancel", "partial"))
-        if allowed and not self.lots and not self.pend and self.camp is None:
+        can_enter = allowed and not self.lots and not self.pend and self.camp is None
+        if can_enter:
             self._try_enter(i, tmin, day, c, scale)
-        elif self.sweep is not None and self.sweep.decisions:
+        else:
+            self._audit_blocked(i, day, c)
+        if not can_enter and self.sweep is not None and self.sweep.decisions:
             busy = self.lots or self.pend or self.camp is not None or not flat_now
             why = "position" if busy else "campaigns" if self.day_count >= cfg.max_campaigns else "closed"
             self._displaced(i, self.sweep.decisions, why)
+
+
+def _noise_signal(m: "Model", c: float) -> int:
+    nz = m.noise
+    if not (m.cfg.noise and nz.check_end and nz.ready):
+        return 0
+    return 1 if c > nz.upper else -1 if c < nz.lower else 0
+
+
+def _audit_raw(self, i: int, day: str, c: float, allowed: bool) -> None:
+    """Raw setups that never reach a decision: noise checks on skip days or FOMC-morning shorts, Williams bars touching
+    both levels, sweep penetrations."""
+    d = _noise_signal(self, c)
+    if d and self.noise.skip_today:
+        self.audit.append((i, "noise", d, "skip day"))
+    elif d < 0 and self.noise.fed_today and self.noise.check_end < FED_CUTOFF:
+        self.audit.append((i, "noise", d, "not qualified: FOMC-morning short"))
+    if self.cfg.williams and self.wb.raw == 2:
+        self.audit.append((i, "williams", 0, "not qualified: both levels"))
+    if self.sweep is not None:
+        for _, pd_ in self.sweep.penetrations:
+            self.audit.append((i, "sweep", pd_, "raw: penetration"))
+
+
+def _audit_blocked(self, i: int, day: str, c: float) -> None:
+    """Qualified noise / Williams setups on a bar where no entry could be taken."""
+    d = _noise_signal(self, c)
+    if d and not self.noise.skip_today and not (d < 0 and self.noise.fed_today and self.noise.check_end < FED_CUTOFF):
+        self.audit.append((i, "noise", d, self._blocked_why()))
+    if self.cfg.williams and self.wb.raw in (1, -1):
+        self.audit.append((i, "williams", self.wb.raw, self._blocked_why()))
+
+
+Model._audit_raw = _audit_raw
+Model._audit_blocked = _audit_blocked
 
 
 def run(bars: pd.DataFrame, cfg: DConfig) -> Model:
