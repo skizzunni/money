@@ -481,3 +481,27 @@ the FOMC leg is new evidence):
 
 **What would raise the ratio further** is a stream that makes money in the choppy years when B and the breakout both
 stall: a mean-reversion or volatility-selling edge. None of the ones tested so far has one.
+
+## 6. Forward test (fixed now, before any forward result)
+
+**Setup:**
+- **Two simulation accounts** on the same NinjaTrader connection:
+  - **SimB**: frozen B, PRESET_B-PRACTICE-v1.1;
+  - **SimBWF**: B with the breakout at $200 plus MnqFomcDrift at 2 MNQ, PRESET_BWF.
+- **Evaluation target off on both** (Evaluation: close everything at this profit = 0).
+
+**Each week:**
+- Export the executions and the 1-minute MNQ bars.
+- Record each account's net, gross profit, and maximum intraday drawdown from the account's start (open P/L at each
+  minute's worst price, `research/portfolio_dd.py`'s rule).
+
+**The comparison:**
+- Net ÷ maximum drawdown of each account, after 6 months and after 12 months.
+
+**Reading it:**
+- 12 months hold about 8 FOMC announcements and 150-200 breakout trades. The bootstrap (section 4e) gives BWF 65%
+  and B 52% for net > DD within a year. One year therefore separates them only weakly.
+- **What would count against BWF:**
+  - after 12 months, BWF's ratio below B's by more than the bootstrap's 1-year spread;
+  - or BWF's maximum drawdown above $20,000, past its 2011-2026 worst of $16,239.
+- **Never stop for a bad week.** The record's deep drawdowns lasted 3 to 17 months.
