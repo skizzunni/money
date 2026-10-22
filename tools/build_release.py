@@ -47,7 +47,7 @@ PACKAGES = {
     },
     "MnqCandidateD_candidate": {
         "code": {STRAT + "MnqCandidateD.cs": "ninjatrader/Strategies/MnqCandidateD.cs", ADDON: ENGINE},
-        "docs": ["INSTALL.md", "PRESET_D-CANDIDATE.md", "PRESET_F-CANDIDATE.md"],
+        "docs": ["INSTALL.md", "PRESET_D-CANDIDATE.md", "PRESET_F-CANDIDATE.md", "PRESET_G-CANDIDATE.md"],
     },
     "MnqMomentumRunner_candidate": {
         "code": {STRAT + "MnqMomentumRunner.cs": "ninjatrader/Strategies/MnqMomentumRunner.cs", ADDON: ENGINE},
