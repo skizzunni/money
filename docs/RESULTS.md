@@ -3178,6 +3178,58 @@ The choices the video leaves open were swept (`verification/noise_v2/triangle.cs
   drawdown. Neither fits a $1,000 daily limit.
 - For comparison, the noise strategy (v2.7, the same daily cap) makes about $40k on the 2025-2026 stand-in alone.
 
+## Pattern strategies: eight popular setups, as taught and improved (October 23, 2026)
+
+`research/patterns.py` (`verification/noise_v2/patterns.csv`). Eight day-trade setups as usually taught:
+- triangles;
+- bull / bear flags;
+- the 30-minute opening-range breakout;
+- the VWAP reclaim;
+- double bottoms / tops;
+- the previous day's high / low sweep;
+- the 9/21 EMA cross with the 200 EMA;
+- the inside-bar breakout.
+
+Shared execution:
+- 5-minute regular-hours MNQ bars, next-bar fills;
+- a resting stop and target, flat at 16:00;
+- about $500 risked a trade, the noise strategy's costs.
+
+Improvements were chosen on NQ 2015-2019 only and confirmed on NQ 2020-2025, the index 2011-2026 and the 2025-2026
+stand-in:
+- only with the day's direction (long above the day's VWAP and open, short below);
+- a stop to breakeven at 1R;
+- mornings only;
+- targets at 1-3R.
+
+**As taught** (profit factor: NQ 15-19 / NQ 20-25 / index / stand-in):
+
+| Setup | Profit factors | Net a year on the stand-in |
+|---|---|---:|
+| triangle | 0.97 / 1.04 / 0.98 / 0.81 | -$3,651 |
+| flag | 1.05 / 0.85 / 0.98 / 0.93 | -$2,250 |
+| opening range | 0.97 / 1.08 / 0.99 / 1.00 | -$42 |
+| VWAP reclaim | 0.93 / 0.91 / 0.98 / 0.88 | -$11,301 |
+| double bottom/top | 0.95 / 0.92 / 0.92 / 0.91 | -$4,159 |
+| previous day sweep | 1.03 / 0.93 / 1.02 / 0.92 | -$2,756 |
+| EMA cross | 0.87 / 1.05 / 0.98 / 0.85 | -$5,874 |
+| inside bar | 0.90 / 0.94 / 0.94 / 0.84 | -$21,641 |
+
+**Improved.** Each setup's best variant on 2015-2019 mostly failed later. For example, the flag (mornings, pattern
+target) went from profit factor 1.25 on 2015-2019 to 0.79 on NQ 2020-2025.
+
+One family was positive on all four sets: the previous day's sweep, only with the day's direction.
+- Profit factor 1.02-1.34, average +0.01 to +0.13 R.
+- +$240 to +$3,300 a year at $500 risk.
+- One family in 280 variants could be luck.
+
+**Added to v2.7 (daily P/L summed):**
+- Net rose 1-6%.
+- Drawdown rose on three of the four sets (stand-in $9.6k to $11.0k).
+- The two together broke the $1,000 daily limit on some days (worst -$1,200 to -$1,425).
+
+Not adopted.
+
 ```
 python research/v24_proxy.py <data dir> MNQ_09-26.Last.txt MNQ_12-26.Last.txt          # the stand-in
 python research/v24_scan.py '[{"max_losers": 4}]' out.csv '{"max_loss_per_trade": 1500, "lock_at": 0.5, "max_losers": 3}' \
