@@ -1,0 +1,1 @@
+holdout-nq: 1363 eligible sessions 2020-01-02..2025-06-30; 1363 starts, 66 non-overlapping; data to 2025-06-30

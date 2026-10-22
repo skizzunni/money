@@ -1,0 +1,5 @@
+candidate,gate,measure,threshold,result,verdict
+G-D cap line,P1,campaigns per eligible session (2 ticks),>= 2.0,1.532258064516129,FAIL
+G-D cap line,P2,sessions with 2 or 3 campaigns (2 ticks),>= 50%,41.0,FAIL
+G-D cap line,C1,net at 3 ticks,> $0,1083.5000000000002,PASS
+G-D cap line,C2,"net / intraday DD at 2 ticks, against frozen B's",>= 4.91,1.0453524068740705,FAIL

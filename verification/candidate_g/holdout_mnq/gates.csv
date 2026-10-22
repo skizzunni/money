@@ -1,0 +1,21 @@
+candidate,slippage,gate,measure,threshold,result,verdict
+B,2,G1,evaluation pass rate,>= 60%,33.333333333333336,FAIL
+B,2,G2,expiry,<= 15%,33.333333333333336,FAIL
+B,2,G3,worst window drawdown,"<= $1,500",2074.2000000000003,FAIL
+B,2,G4,win rate (completed positions),>= 50%,58.76288659793814,PASS
+B,2,G5,profit factor,>= 1.35,2.5395557655954635,PASS
+G-D cap line,2,G1,evaluation pass rate,>= 60%,0.0,FAIL
+G-D cap line,2,G2,expiry,<= 15%,100.0,FAIL
+G-D cap line,2,G3,worst window drawdown,"<= $1,500",1395.4500000000007,PASS
+G-D cap line,2,G4,win rate (completed positions),>= 50%,45.26315789473684,FAIL
+G-D cap line,2,G5,profit factor,>= 1.35,1.2639190744055226,FAIL
+B,3,G1,evaluation pass rate,>= 60%,33.333333333333336,FAIL
+B,3,G2,expiry,<= 15%,33.333333333333336,FAIL
+B,3,G3,worst window drawdown,"<= $1,500",2106.2000000000003,FAIL
+B,3,G4,win rate (completed positions),>= 50%,57.7319587628866,PASS
+B,3,G5,profit factor,>= 1.35,2.325340275874669,PASS
+G-D cap line,3,G1,evaluation pass rate,>= 60%,0.0,FAIL
+G-D cap line,3,G2,expiry,<= 15%,100.0,FAIL
+G-D cap line,3,G3,worst window drawdown,"<= $1,500",1424.4500000000007,PASS
+G-D cap line,3,G4,win rate (completed positions),>= 50%,29.473684210526315,FAIL
+G-D cap line,3,G5,profit factor,>= 1.35,1.1699981172335885,FAIL

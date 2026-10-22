@@ -1,0 +1,1 @@
+holdout-mnq: 62 eligible sessions 2026-07-20..2026-10-16; 62 starts, 3 non-overlapping; data to 2026-10-16

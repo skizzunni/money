@@ -296,3 +296,97 @@ emulator checks only the stop on a fill bar. The Pine script is the same either 
 | `pine/mnq_daily_g.pine` | `c5456086cccc26e3ec87b39b370fdcc761abfef7dcb8a551ea28c83c220a405e` |
 
 **The holdout:** `research/eval_g.py holdout-nq`, then `holdout-mnq`, once each. Results go in section 7.4.
+
+### 7.4 Holdout: the frozen G-D cap line, run once (simulator; native NinjaTrader not yet run)
+
+**Source:** `verification/candidate_g/holdout_nq/` and `verification/candidate_g/holdout_mnq/`. Both runs used
+identical sessions, costs and evaluation starts for G and frozen B.
+
+**NQ, 2020-01-02 to 2025-06-30** (1,363 eligible sessions, 65 fully observed non-overlapping windows; the deciding
+data):
+
+| | B 2t | **G 2t** | B 3t | **G 3t** |
+|---|---:|---:|---:|---:|
+| Positions | 2,693 | 2,338 | 2,685 | 2,340 |
+| **Net $** | 42,585 | **16,726** | 35,802 | **12,421** |
+| **Intraday DD $** | 13,731 | **4,936** | 14,121 | **5,829** |
+| **Net ÷ DD** | 3.10 | **3.39** | 2.54 | **2.13** |
+| Average net trade $ | 15.81 | 7.15 | 13.33 | 5.31 |
+| Profit factor | 1.15 | 1.12 | 1.13 | 1.09 |
+| Win rate % | 49.5 | 51.0 | 49.1 | 27.2 |
+| **Campaigns per eligible session** | 1.98 | **1.72** | 1.97 | 1.72 |
+| Sessions with 0 / 1 / 2 / 3 campaigns % | 41 / 14 / 9 / 11 (+25 above 3) | **18 / 29 / 15 / 37** | | 18 / 29 / 15 / 37 |
+| Evaluations, non-overlapping: pass / breach / expired | 17 / 47 / 1 | 1 / 5 / 59 | 17 / 47 / 1 | 1 / 6 / 58 |
+| Evaluations, overlapping (path-dependent) | 380 / 887 / 70 (7) | 30 / 128 / 1,179 (7) | 371 / 895 / 76 (2) | 25 / 143 / 1,173 (3) |
+| By sleeve | | noise 1,504 / +16,748; Williams 834 / -22 | | noise +13,997; Williams -1,577 |
+| Overruns (beyond planned risk) | n/a | 444, worst $36 | n/a | 756, worst $38 |
+
+**Yearly net, 2 ticks:**
+
+| Year | B | G |
+|---|---:|---:|
+| 2020 | 2,897 | -3,372 |
+| 2021 | 18,018 | 3,836 |
+| 2022 | 17,606 | 2,240 |
+| 2023 | -719 | 214 |
+| 2024 | 8,673 | 13,537 |
+| 2025 (to June) | -3,890 | 271 |
+
+Negative months: B 25 and G 28, of 66 (`ledger.csv.gz` has every position).
+
+**MNQ, 7/20 to 10/16/2026** (62 eligible sessions; the execution check, not deciding):
+
+| | B 2t | G 2t | B 3t | G 3t |
+|---|---:|---:|---:|---:|
+| Positions | 97 | 95 | 97 | 95 |
+| Net $ | 13,031 | 1,652 | 11,607 | 1,084 |
+| Intraday DD $ | 2,653 | 1,580 | 2,693 | 1,621 |
+| Net ÷ DD | 4.91 | 1.05 | 4.31 | 0.67 |
+| Average net trade $ | 134.34 | 17.38 | 119.66 | 11.41 |
+| Campaigns per session | 1.56 | 1.53 | | |
+| Sessions with 0 / 1 / 2 / 3 % | 56 / 5 / 5 / 10 (+24) | 19 / 40 / 8 / 32 | | |
+| By sleeve | | noise 53 / +3,159; Williams 42 / -1,507 | | |
+
+**Monthly net, MNQ, 2 ticks:**
+
+| Month | B | G |
+|---|---:|---:|
+| 2026-07 (from 7/20) | -374 | -903 |
+| 2026-08 | 3,280 | 512 |
+| 2026-09 | 5,516 | 1,013 |
+| 2026-10 (to 10/16) | 4,608 | 1,030 |
+
+**The gates (NQ holdout, 2 ticks):**
+
+| Gate | Result | Verdict |
+|---|---|---|
+| G1 evaluation pass rate ≥ 60% | 1.5% | FAIL |
+| G2 expiry ≤ 15% | 90.8% | FAIL |
+| G3 worst window drawdown ≤ $1,500 | $2,070 | FAIL |
+| G4 win rate ≥ 50% | 51.0% (27.2% at 3 ticks) | PASS at 2 ticks, FAIL at 3 |
+| G5 profit factor ≥ 1.35 | 1.12 | FAIL |
+| P1 campaigns per eligible session ≥ 2.0 | 1.72 | FAIL |
+| P2 sessions with 2 or 3 campaigns ≥ 50% | 53% | PASS |
+| C1 net at 3 ticks > $0 | $12,421 | PASS |
+| C2 net ÷ intraday DD ≥ frozen B's (3.10) | 3.39 | PASS |
+
+**On MNQ** (not deciding): G3 passes ($1,395); G1, G2, G4, G5, P1, P2 and C2 fail; C1 passes.
+
+**What the holdout shows:**
+
+1. **The fit fixed participation out of sample.**
+   - From 0.12 campaigns a session (F) to 1.72 on NQ and 1.53 on MNQ.
+   - 82% of NQ sessions and 81% of MNQ sessions traded.
+   - It never exceeds three, and every entry is a qualified setup.
+2. **It is profitable out of sample at both costs.**
+   - On the NQ holdout its net ÷ intraday drawdown (3.39) beats frozen B's (3.10).
+   - It does that with about a third of B's drawdown ($4,936 against $13,731), at $125 a campaign.
+3. **The noise sleeve carries it.**
+   - Williams breakouts were flat on the NQ holdout (-$22 at 2 ticks) and lost on MNQ (-$1,507).
+   - That is recorded and not tuned away: it is the holdout.
+4. **Evaluation passes are out of reach at $125 a campaign.**
+   - G nets about $3,000 a year on NQ.
+   - A $3,000 target in 30 days would need about 0.7R net a campaign. Hence G1 and G2.
+5. **2.0 campaigns a session is not reached.**
+   - 18% of sessions have no qualified setup in either sleeve.
+6. **G is not accepted under the pre-registered gates.** Every failure is listed above.
