@@ -86,6 +86,15 @@ class NoiseConfig:
     # the take-profit also works on the fill bar, from the expected fill, as a bracket sent with the entry does
     # (the NinjaTrader strategy); off: from the bar after the fill, as the Pine script places it
     target_on_fill_bar: bool = False
+    # research only (v2.1 study, docs/RESULTS.md), all off by default: fewer losers in a row without a daily stop.
+    # streak_k / streak_skip: after streak_k losing trades in a row (across days; a winner resets the count), skip the
+    # next streak_skip entry signals. side_cooldown: after a losing trade, skip the next this many signals on that side
+    # today. side_margin: after a losing trade today, a new entry on that side needs the close past the line by this
+    # many more noise units (until a winner on that side or the next session).
+    streak_k: int = 0
+    streak_skip: int = 1
+    side_cooldown: int = 0
+    side_margin: float = 0.0
     # research only (round 116), not in the Pine script or NinjaTrader: the paper's VWAP trailing stop. "checks": the
     # stop is also never looser than the day's VWAP as of the last check (long: max(stop, VWAP)); "bars": as of the
     # last bar's close. Volume-weighted typical price from 09:30; time-weighted where the data has no volume.
@@ -174,6 +183,9 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
     entry_px, entry_bar = 0.0, 0
     est_px = math.nan  # expected fill of the pending entry
     losers_today = 0  # losing trades closed today
+    consec = skip_left = 0  # the v2.1 study's streak rule: losers in a row, signals still to skip
+    side_cd = {1: 0, -1: 0}  # signals still to skip on a side today (side_cooldown)
+    side_lost = {1: False, -1: False}  # a loser on that side today (side_margin)
     locked = False  # the trade has reached the lock trigger (a broker's auto-breakeven)
     held, held_why = math.nan, ""  # tighten_only: the tightest stop so far in this trade, and what set it
     rest, part_pnl = 1.0, 0.0  # partial_at: the share still open, and what the closed part made
@@ -216,13 +228,34 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
         pos, entry_px, entry_bar, r_trade, br_trade = d, o[i] + d * slip, i, r_next, br_next
 
     def close_pos(i: int, price: float, reason: str) -> None:
-        nonlocal pos, held, locked, losers_today, rest, part_pnl, best
+        nonlocal pos, held, locked, losers_today, rest, part_pnl, best, consec, skip_left
         pnl = rest * (pos * (price - entry_px) * cfg.qty * cfg.point_value - 2 * cfg.commission_per_side * cfg.qty)
         trades.append(NoiseTrade(pos, cfg.qty, entry_bar, idx[entry_bar], entry_px, i, idx[i], price, reason, pnl,
                                  rest))
         if pnl + part_pnl < 0 and reason != "Session ended":  # a trade closed in parts is one trade
             losers_today += 1
+            consec += 1
+            if cfg.streak_k and consec >= cfg.streak_k:
+                skip_left = cfg.streak_skip
+            side_cd[pos] = cfg.side_cooldown
+            side_lost[pos] = True
+        elif pnl + part_pnl >= 0:
+            consec = 0
+            side_lost[pos] = False
         pos, held, locked, rest, part_pnl, best = 0, math.nan, False, 1.0, 0.0, math.nan
+
+    def study_ok(d: int, past_margin: bool) -> bool:
+        """The v2.1 study's rules (all off by default): may a signal on side d be taken?"""
+        nonlocal skip_left
+        if cfg.side_margin and side_lost[d] and not past_margin:
+            return False
+        if side_cd[d] > 0:
+            side_cd[d] -= 1
+            return False
+        if skip_left > 0:
+            skip_left -= 1
+            return False
+        return True
 
     def close_part(i: int, price: float) -> None:
         nonlocal rest, part_pnl
@@ -332,6 +365,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             prev_close = last_rth_close
             day_open = o[i]
             losers_today = 0
+            side_cd[1] = side_cd[-1] = 0
+            side_lost[1] = side_lost[-1] = False
             upper = lower = sigma = math.nan
             today = [math.nan] * N_CHECKS
             skip_today = t.strftime("%Y-%m-%d") in cfg.skip_dates  # substring test, like Pine's str.contains
@@ -373,11 +408,13 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                     pending = ("entry", 1) if c[i] > upper else ("close", 0)
                     events.append((i, "REVERSE" if c[i] > upper else "EXIT"))
                 elif pos == 0 and c[i] > upper and fresh_ok:
-                    pending = ("entry", 1)
-                    events.append((i, "BUY"))
+                    if study_ok(1, c[i] > upper * (1 + cfg.side_margin * sigma)):
+                        pending = ("entry", 1)
+                        events.append((i, "BUY"))
                 elif pos == 0 and c[i] < lower and short_ok and fresh_ok:
-                    pending = ("entry", -1)
-                    events.append((i, "SELL"))
+                    if study_ok(-1, c[i] < lower * (1 - cfg.side_margin * sigma)):
+                        pending = ("entry", -1)
+                        events.append((i, "SELL"))
                 if pending is not None and pending[0] == "entry":
                     d = pending[1]
                     est_px = c[i] + d * slip  # the expected fill, for the max loss on the fill bar
