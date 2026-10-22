@@ -3025,6 +3025,24 @@ On the user's 8/24-10/16 window (5-minute) v2.5 makes +$16,607: profit factor 2.
 - **A grace period**: only the max loss until the first check after the fill (`grace`; `v25_grace5.csv`,
   `v25_grace30.csv`). The 30-minute stand-in made $55-69k with a $19.7-24.8k drawdown, and the index's net was
   0.89-0.91x. The line stop's early exits save more than they cost.
+- **The max loss in noise units** (`cap_sigma` 0.4-1.0 x the check's noise; `v25_capsig5.csv`, `v25_capsig30.csv`).
+  It lowers the stand-in's 5-minute net to $88-93k, and the index's net per drawdown falls to 0.32-0.89x.
+
+**Every setting re-tested under v2.5** (`v25_dials25_5.csv`, `v25_dials25_30.csv`):
+- lookback 10/12/16/20;
+- take-profit 2.5/3.0;
+- stop buffer 0.15/0.35;
+- big-day rule off / 1.25 / 1.75;
+- 2 or 4 losers a day;
+- the 15:30 entries;
+- the after-loss rule off;
+- the stop that only tightens off;
+- lock offset 5.
+
+None is better on the stand-in and both histories at both bar lengths:
+- The after-loss rule off improves the histories and the user's window on 5-minute bars (NQ net 1.09x, index 1.02x;
+  window 70% winners), but on the 30-minute stand-in it makes $57.8k with a $26.2k drawdown against $71.1k and $17.5k.
+- A take-profit of 3.0 helps the 30-minute histories and hurts the 5-minute index (0.95x net).
 
 ```
 python research/v24_proxy.py <data dir> MNQ_09-26.Last.txt MNQ_12-26.Last.txt          # the stand-in

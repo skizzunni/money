@@ -155,6 +155,9 @@ class NoiseConfig:
     lock1_at: float = 0.0
     lock1_plus: float = 0.0
     confirm: bool = False  # research (v2.5 study): an entry needs the last check today past that side's line too
+    # research (v2.5 study): the max loss in noise units, cap_sigma x the check's noise x the price (contracts as usual;
+    # the dollar max loss then follows it, and the lock trigger with it); 0 = the dollar max loss
+    cap_sigma: float = 0.0
     grace: bool = False  # research (v2.5 study): until the first check after the fill, the max loss stop only
     late_tp: float = 0.0
     late_tp_from: int = 0
@@ -616,6 +619,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                     mm = (cfg.after_loss2_ml_mult or 1.0) if tier2 else cfg.after_loss_ml_mult
                     q_next = max(1, round(cfg.qty / qd)) if after_loss else cfg.qty
                     ml_next = cfg.max_loss_per_trade * (mm if after_loss else 1.0)
+                    if cfg.cap_sigma > 0:
+                        ml_next = cfg.cap_sigma * sigma * c[i] * q_next * cfg.point_value * (mm if after_loss else 1.0)
                     if cfg.trend_qty_div and against_trend(d):
                         q_next = max(1, round(q_next / cfg.trend_qty_div))
                         ml_next *= cfg.trend_ml_mult
