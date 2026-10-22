@@ -2729,6 +2729,45 @@ the index 2011-2026:
 | Daily loser limit 3 / 5 | 25,649 / 26,425 | 0.98 / 0.73 and 0.90 / 0.82 | lower |
 | Second tier 8 MNQ / $625 from the second loser in a row | 25,055 | 1.02 / 1.00 | level; less on the window |
 
+## v2.2 on the user's chart, and the next rounds (October 22, 2026)
+
+**The user's chart for v2.2** (MNQ1! 5-minute, 7/27-10/21, trading from 8/24):
+
+| Net | Drawdown | Winners | Profit factor |
+|---:|---:|---:|---:|
+| +$22,641 | $3,845 | 33 / 58 (56.9%) | 2.54 |
+
+v2.1 showed +$21,257 and $3,845. The drawdown is the six-loser run of 10/19-10/21, which is past the end of the bars
+here.
+
+**Re-tested under v2.2, none better on both histories** (`research/v23_scan.py`; `verification/noise_v2/v23_dials.csv`,
+`v23_risk.csv`):
+- **The noise lookback (10, 20)** gives a smaller net per drawdown on the window and on one of the histories.
+- **The line-stop buffer (0, 0.5, 1.0):**
+  - 0.5 and 1.0 are level with 0.24: net per drawdown 0.99-1.00 on NQ and 0.96-0.97 on the index, $544 less on the
+    window.
+  - 0 is worse.
+- **The entry band (0.9 / 1.1 / 1.25 x the noise area):**
+  - 1.1 is the best on the window: +$27,416, 67% winners.
+  - It cuts NQ's net per drawdown to 0.65 of v2.2's, and loses money on NQ 2023-2025.
+- **A smaller take-profit for afternoon entries:** level or lower.
+- **Max loss $475 / $500 / $525 x take-profit 1.9 / 2.0 / 2.1 x after-loss max loss $650 / $700 / $750 (27 rows):**
+  - A plateau. The best rows trade the window against the histories: take-profit 2.1 makes $28,100-28,600 on the
+    window but 0.73-0.93 of NQ's net per drawdown.
+  - Nothing is better on all three.
+- **The Williams breakout in the bot's gaps** (rounds 98-137): more net, but about 35% winners. Its standalone record
+  is weak in the newest year (round 137). Not added, since the user's request is more winners and fewer losers.
+
+**Bar length, the same rules on the window:**
+
+| | Trades | Winners | Net | Drawdown | Losses |
+|---|---:|---:|---:|---:|---:|
+| 5-minute bars | 53 | 33 (62%) | +$26,425 | $2,613 | -$10,909 |
+| **1-minute bars** | **60** | **41 (68%)** | **+$26,542** | **$2,613** | **-$10,377** |
+
+The lock acts within a minute instead of a bar late, so more trades close as small winners. A broker's auto-breakeven
+set to the same trigger (18.75 points at 10 MNQ and $500, offset +2.5) gets the 1-minute behaviour live.
+
 ## What this does and doesn't say
 
 - **It says** that the original sweep/breakout rules have no edge after realistic costs on 2023–2026 Nasdaq-100 data, and would very likely not pass a $25K evaluation. Of three published strategies, only noise-area momentum held up over 16 years, and even it fails most $25K evaluations.

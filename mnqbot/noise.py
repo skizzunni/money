@@ -102,6 +102,12 @@ class NoiseConfig:
     after_loss2_ml_mult: float = 0.0
     after_loss_same_side: bool = False
     after_loss_tp: float = 0.0  # its take-profit, noise units (0: take_profit)
+    # research only (v2.3 study), off by default. entry_k: a new entry needs the close past the noise area widened by
+    # this factor (the stops keep the area itself). late_tp / late_tp_from: entries from checks closing at or after
+    # late_tp_from (minute of day) take late_tp noise units as their take-profit
+    entry_k: float = 1.0
+    late_tp: float = 0.0
+    late_tp_from: int = 0
     # research only (v2.2 study), off by default: a runner after the take-profit. tp_keep: the share of the contracts
     # kept open when the take-profit fills (rounded to whole contracts); the rest keeps every stop rule, plus
     # runner_lock (the stop at the entry plus this share of the take-profit's distance) and tp2 (a second take-profit,
@@ -447,6 +453,10 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                 bands.append((i, upper, lower))
                 short_ok = not (fed_today and end < FED_CUTOFF)
                 fresh_ok = cfg.max_losers <= 0 or losers_today < cfg.max_losers  # the daily limit: new entries
+                up_e, lo_e = upper, lower  # the entry lines (entry_k: a wider area for entries only)
+                if cfg.entry_k != 1.0:
+                    up_e = max(day_open, prev_close) * (1 + cfg.entry_k * sigma)
+                    lo_e = min(day_open, prev_close) * (1 - cfg.entry_k * sigma)
                 if skip_today:
                     pass
                 elif use_stop and pos:
@@ -458,11 +468,11 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                 elif pos < 0 and c[i] > lower:
                     pending = ("entry", 1) if c[i] > upper else ("close", 0)
                     events.append((i, "REVERSE" if c[i] > upper else "EXIT"))
-                elif pos == 0 and c[i] > upper and fresh_ok:
+                elif pos == 0 and c[i] > up_e and fresh_ok:
                     if study_ok(1, c[i] > upper * (1 + cfg.side_margin * sigma)):
                         pending = ("entry", 1)
                         events.append((i, "BUY"))
-                elif pos == 0 and c[i] < lower and short_ok and fresh_ok:
+                elif pos == 0 and c[i] < lo_e and short_ok and fresh_ok:
                     if study_ok(-1, c[i] < lower * (1 - cfg.side_margin * sigma)):
                         pending = ("entry", -1)
                         events.append((i, "SELL"))
@@ -476,6 +486,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                     lock_next = cfg.after_loss_lock if (after_loss and cfg.after_loss_lock > 0) else cfg.lock_at
                     ml_next = cfg.max_loss_per_trade * (mm if after_loss else 1.0)
                     tp_next = cfg.after_loss_tp if (after_loss and cfg.after_loss_tp > 0) else cfg.take_profit
+                    if cfg.late_tp > 0 and end >= cfg.late_tp_from:
+                        tp_next = cfg.late_tp
                     est_px = c[i] + d * slip  # the expected fill, for the max loss on the fill bar
                     stop = tp = math.nan
                     if use_stop:  # the bracket: the closer of the line stop and the max loss, and the take-profit

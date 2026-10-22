@@ -39,8 +39,6 @@ VARIANTS += ([T1, {**T1, "after_loss_same_side": True}]
                 for q, m in ((10 / 7, 1.0), (2.0, 1.0), (10 / 9, 1.0), (1.0, 1.0), (10 / 9, 1.8), (10 / 8, 1.25))])
 VARIANTS += [{**T1, "tp_keep": k, "runner_lock": rl, "tp2": t2} for k in (0.3, 0.5) for rl in (0.0, 0.5)
              for t2 in (0.0, 4.0)]
-if len(sys.argv) > 6:  # only the variants whose number (0-based) is given
-    VARIANTS = [VARIANTS[int(k)] for k in sys.argv[6].split(",")]
 
 
 def back_to_back(pnl: np.ndarray) -> float:
@@ -68,8 +66,9 @@ def job(kw: dict) -> dict:
 
 def main() -> None:
     paths, out = sys.argv[1:5], Path(sys.argv[5])
+    variants = VARIANTS if len(sys.argv) <= 6 else [VARIANTS[int(k)] for k in sys.argv[6].split(",")]  # by number
     with ProcessPoolExecutor(4, initializer=V.init, initargs=(paths,)) as ex:
-        rows = list(ex.map(job, VARIANTS))
+        rows = list(ex.map(job, variants))
     pd.DataFrame(rows).to_csv(out, index=False)
     pd.set_option("display.width", 300)
     print(pd.DataFrame(rows).to_string(index=False))
