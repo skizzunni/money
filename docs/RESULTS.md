@@ -2507,6 +2507,60 @@ The same trades, winners and drawdown each time.
 - Over the first minutes after an entry, price is close to a coin flip. The lock trigger is the dial between more
   winners and more profit from the runners.
 
+## v1.9: a $450 max loss at 10 MNQ (October 22, 2026)
+
+**The request:** the user's TradingView chart of v1.8 showed +$15,838 (7/27-10/21/2026, 10 MNQ). They asked for
+$20,000 with fewer losses.
+
+**The search** (`research/v18_scan.py`):
+- 168 combinations of take-profit, loser limit, lock trigger and lock offset, on the user's MNQ bars and on NQ futures
+  2015-2025 and the index 2011-2026 (5-minute bars, scaled).
+- **No combination beat v1.8's net ÷ drawdown on both histories.** The settings that raised the window most removed the
+  loser limit, and added 28-32% to the historical drawdowns.
+
+**The max loss, the setting not in that grid:**
+- At 10 MNQ, $350 is a 17.5-point stop, which ordinary 5-minute noise hits.
+
+| 10 MNQ, script costs | Window net | Window DD | Window win % | NQ net / DD | Index net / DD |
+|---|---:|---:|---:|---:|---:|
+| $350 (17.5 pts, v1.8) | 23,483 | 4,181 | 42.6 | 242,616 / 25,169 | 478,204 / 39,239 |
+| $375 | 19,899 | 4,481 | 40.7 | 242,551 / 24,228 | 485,259 / 39,455 |
+| $400 | 27,409 | 3,799 | 47.3 | 235,263 / 27,757 | 464,219 / 42,426 |
+| $425 | 31,123 | 3,904 | 51.5 | 260,035 / 27,424 | 490,854 / 36,146 |
+| $437.50 | 30,601 | 4,016 | 51.5 | 273,173 / 24,030 | 509,656 / 36,722 |
+| **$450 (22.5 pts, v1.9)** | **29,506** | **4,161** | **50.0** | **277,715 / 24,149** | **485,245 / 39,271** |
+| $462.50 | 30,398 | 3,761 | 52.0 | 294,942 / 22,657 | 514,502 / 35,781 |
+| $475 | 31,085 | 3,861 | 54.0 | 279,615 / 25,174 | 501,269 / 35,820 |
+| $500 | 33,697 | 3,958 | 56.0 | 291,791 / 27,946 | 499,096 / 38,925 |
+| $550 | 32,039 | 5,583 | 54.5 | 288,827 / 31,170 | 529,686 / 38,343 |
+
+The window is the user's MNQ bars, trades from 7/27 to 10/16/2026 (the end of the data).
+
+**At $0.95 / 2 ticks, $450 against $350:**
+
+| | $450 | $350 |
+|---|---:|---:|
+| Window net | 28,317 | 19,418 |
+| Window DD | 4,289 | 4,778 |
+| NQ net | 186,130 | 143,620 |
+| NQ DD | 32,421 | 34,582 |
+| Index net | 345,962 | 354,778 |
+| Index DD | 45,291 | 45,282 |
+
+**$425-$475 is a plateau**; $400 and below are worse. v1.9 takes $450, the middle of the plateau and not its best
+point.
+
+**On the window** (the Pine script itself, in tests/pine_interpreter.py):
+- 102 trades, 51 winners (50%), +$29,506, drawdown $4,161.
+- v1.8: 108, 46 (43%), +$23,483, drawdown $4,181.
+- Losing trades fall from 62 to 51. Each can lose up to $450 plus costs, so their total is a little larger ($22,122
+  against $20,899).
+- Four losers in a day, the daily limit, is now about $1,850, close to a $2,000 trailing drawdown.
+
+**The caveats:**
+- The setting was chosen after looking at the user's window. The histories are what support it.
+- On the index at the higher costs it is level, not better.
+
 ## What this does and doesn't say
 
 - **It says** that the original sweep/breakout rules have no edge after realistic costs on 2023–2026 Nasdaq-100 data, and would very likely not pass a $25K evaluation. Of three published strategies, only noise-area momentum held up over 16 years, and even it fails most $25K evaluations.

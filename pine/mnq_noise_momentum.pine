@@ -15,6 +15,12 @@
 // Noise area for each half-hour mark = the day's open (and previous close) plus/minus the
 // average distance price has moved from the 09:30 open by that time over the last 14 sessions.
 //
+// v1.9, 2026-10-22: more profit, fewer losers and a smaller drawdown. The max loss is $450 (a 22.5-point stop at 10
+// MNQ) instead of $350 (17.5): the tight stop was hit by ordinary 5-minute noise. On the user's MNQ bars 7/27-10/16/2026
+// (5-minute chart): +$29,506 against +$23,483, drawdown $4,161 against $4,181, 50% winners against 43%. On NQ futures
+// 2015-2025: +14% net, -4% drawdown; on the Nasdaq-100 index 2011-2026: +1% net, 0% drawdown. Every max loss from $425
+// to $475 did about as well; $450 is the middle of that range, not its best point (docs/RESULTS.md, v1.9;
+// research/v18_scan.py). A single loser is now up to $450 + costs: four in a day (the daily limit) is about $1,850.
 // v1.8, 2026-10-22: the stop only ever tightens (setting "Stop only ever tightens", on), as the NinjaTrader strategy
 // since round one hundred and thirty-nine (more net in all four test periods, slightly smaller drawdowns). On the user's
 // MNQ bars 6/29-10/16/2026 (5-minute chart, 10 MNQ, $350): +$24,296 against v1.7's +$24,078, the same trades and
@@ -45,7 +51,7 @@
 // max loss after the fill bar are checked once per bar, so a 30-minute chart sees them later than a trader would.
 // The rules are the same as the Python reference in mnqbot/noise.py.
 // ------------------------------------------------------------------
-strategy("MNQ Noise-Area Momentum v1.8", shorttitle = "Noise-Mom", overlay = true,
+strategy("MNQ Noise-Area Momentum v1.9", shorttitle = "Noise-Mom", overlay = true,
      initial_capital = 50000, currency = currency.USD,
      default_qty_type = strategy.fixed, default_qty_value = 1, pyramiding = 0,
      commission_type = strategy.commission.cash_per_contract, commission_value = 0.62,
@@ -70,7 +76,7 @@ evalQty  = input.int(10, "Contracts in an evaluation", minval = 1, maxval = 60, 
 fundQty  = input.int(10, "Contracts on a funded account", minval = 1, maxval = 60, group = grpT,
      tooltip = "Every figure in docs/RESULTS.md is per contract. What matters is the max loss per contract (the dashboard shows it): $350 over 10 contracts is $35 a contract, a 17.5-point stop; over 3 it is $117, 58 points. See docs/RESULTS.md, rounds thirteen, twenty-seven, thirty-two and thirty-seven.")
 qty = account == "Evaluation" ? evalQty : fundQty
-maxLoss  = input.float(350, "Max loss per trade, $ (all contracts, 0 = off)", minval = 0, step = 10, group = grpT,
+maxLoss  = input.float(450, "Max loss per trade, $ (all contracts, 0 = off)", minval = 0, step = 10, group = grpT,
      tooltip = "A second stop this many dollars from the entry fill, for the whole position, live from the fill like a bracket order; whichever of it and the line stop is closer is used. Spread over many contracts it gets tight: $350 over 10 contracts is a $35 stop each, which normal 5-minute moves hit, and on 2023-2026 it made about $6 a day per contract against about $20 at $117 each. On 16 years, caps of $100-$200 per contract raised profit per day in every period and cut the worst losing stretch. Fees, slippage and a gap through the stop can add to the loss.")
 skipDates = input.string("2026-01-01,2026-01-19,2026-02-16,2026-04-03,2026-05-25,2026-06-19,2026-07-03,2026-09-07,2026-11-26,2026-11-27,2026-12-24,2026-12-25,2027-01-01,2027-01-18,2027-02-15,2027-03-26,2027-05-31,2027-06-18,2027-07-05,2027-09-06,2027-11-25,2027-11-26,2027-12-24",
      "Don't trade on these dates", group = grpT,
@@ -428,7 +434,7 @@ if showDash and (barstate.islastconfirmedhistory or barstate.isrealtime)
     closed = strategy.closedtrades
     todayPnlDash = strategy.netprofit - dayStartNet
     wins = strategy.wintrades
-    table.cell(dash, 0, 0, "MNQ Noise Momentum v1.8: " + account + ", " + str.tostring(qty) + " MNQ", text_color = color.white, text_size = size.small)
+    table.cell(dash, 0, 0, "MNQ Noise Momentum v1.9: " + account + ", " + str.tostring(qty) + " MNQ", text_color = color.white, text_size = size.small)
     table.cell(dash, 1, 0, status, text_color = statusColor, text_size = size.small)
     table.cell(dash, 0, 1, "Sessions of history", text_color = color.silver, text_size = size.small)
     table.cell(dash, 1, 1, str.tostring(math.min(filled, lookback)) + " / " + str.tostring(lookback), text_color = color.white, text_size = size.small)
