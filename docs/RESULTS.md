@@ -2598,6 +2598,39 @@ $73,672.
 **The daily loser limit:** four losers in a day is about $2,070. On an evaluation with a $2,000 trailing drawdown, set
 the daily loser limit to 3.
 
+## The v2.1 study: no daily stop, fewer losers in a row (October 22, 2026; not adopted)
+
+**The request:** v2.0 showed +$19,749 on the user's chart (drawdown $3,280, 57% winners). The user asked for more, to
+keep trading after losses, and for fewer losing trades back to back.
+
+**What was tested** (`research/v21_streak_scan.py`; `verification/noise_v2/streak_scan.csv`):
+- the research-only rules added to `mnqbot/noise.py`, all off by default;
+- the daily loser limit removed;
+- a skip of the next one or two signals after two or three losers in a row;
+- a cooldown on the side that lost;
+- a stronger breakout required on the side that lost.
+
+| v2.0 settings, 10 MNQ | Window net | Window DD | Window losers / trades | Window longest streak | NQ net / DD | NQ longest streak | Index net / DD |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| **v2.0 (loser limit 4)** | **22,762** | **2,934** | **24 / 62** | **4** | **315,996 / 27,294** | 17 | **533,461 / 39,085** |
+| No loser limit | 22,230 | 2,934 | 25 / 63 | 5 | 311,467 / 37,878 | 13 | 533,662 / 47,775 |
+| No limit, skip 1 after 2 in a row | 24,116 | 2,908 | 23 / 54 | 5 | 233,094 / 41,025 | 13 | 493,593 / 39,162 |
+| No limit, skip 2 after 2 in a row | 14,353 | 2,962 | 22 / 52 | 4 | 270,467 / 27,225 | 10 | 436,134 / 33,046 |
+| No limit, skip 1 after 3 in a row | 18,548 | 3,087 | 26 / 59 | 4 | 276,146 / 54,503 | 12 | 503,596 / 46,966 |
+| No limit, side cooldown 1 | 17,549 | 3,441 | 29 / 61 | 5 | 204,755 / 45,902 | 16 | 388,086 / 39,775 |
+| No limit, side margin 0.25 | 22,784 | 2,075 | 22 / 55 | 4 | 300,638 / 44,304 | 14 | 519,580 / 42,487 |
+| Limit 4, skip 1 after 3 in a row | 18,583 | 3,087 | 25 / 59 | 4 | 330,195 / 33,105 | 14 | 549,908 / 42,016 |
+
+**What it found:**
+- **Removing the daily loser limit** changes little on the window ($532 less, one more loser in a row). Over the
+  histories it adds 39% to the NQ drawdown and 22% to the index drawdown. The limit is what caps the bad days.
+- **No streak rule shortened the losing streaks without costing money or drawdown on the histories.** The best on the
+  window, the side margin, has a drawdown 62% larger on NQ.
+- **Why:** losers come in runs because the first minutes after an entry are close to a coin flip (round forty-three).
+  A skipped signal is as likely to be the winner as the next loser.
+
+**Not adopted:** v2.0 stays.
+
 ## What this does and doesn't say
 
 - **It says** that the original sweep/breakout rules have no edge after realistic costs on 2023–2026 Nasdaq-100 data, and would very likely not pass a $25K evaluation. Of three published strategies, only noise-area momentum held up over 16 years, and even it fails most $25K evaluations.
