@@ -3149,6 +3149,35 @@ budget, not a stop rule (`daily_loss_limit` in `mnqbot/noise.py`; setting "Max l
 - The worst day on NQ futures 2015-2025 was -$1,081: a stop is a resting order and can fill past its price in a fast
   market. The older index data's -$2,300 to -$2,600 days are gaps in that data.
 
+## The ascending triangle from the user's video: tested as shown, not adopted (October 22, 2026)
+
+The user sent a short video (TikTok @traders_notes_team, ETHUSDT 5-minute) and asked whether it can be a winning
+strategy without changing it. `research/triangle.py` turns it into rules, long only, as the video draws it:
+- a flat resistance through two or more equal swing highs, with two or more rising swing lows under it;
+- buy the first close above the resistance (filled at the next bar's open);
+- target the triangle's height above the resistance;
+- stop a tick under the last swing low;
+- optionally, volume falling while it forms.
+
+On MNQ it is day trading: 09:30-16:00, no entry after 15:30, flat at 16:00, the noise strategy's costs. Each trade
+risks about $500 (1-10 MNQ).
+
+The choices the video leaves open were swept (`verification/noise_v2/triangle.csv`, 24 combinations): pivot strength
+2/3 bars, "equal" highs within 0.03/0.06/0.10%, the longest pattern 3 or 6 hours, the volume rule on/off.
+
+| | Trades a year | Winners | Profit factor | Average R | Net a year ($500 risk) |
+|---|---:|---:|---:|---:|---:|
+| NQ futures 2015-2025 | 30-116 | 46-50% | 0.92-1.09 | -0.04 to +0.04 | -$900 to +$1,050 |
+| Index 2011-2026 | 35-116 | 47-49% | 0.93-1.01 | -0.02 to +0.01 | -$700 to +$240 |
+| Stand-in 2025-2026 | 33-111 | 39-47% | 0.61-0.83 | -0.19 to -0.06 | -$5,800 to -$2,300 |
+| User's MNQ 8/24-10/16 | 3-15 trades in all | | | | too few to judge |
+
+- About breakeven on 11-15 years and a loser in 2025-2026, at every setting. The volume rule changes little.
+- About 25-30% of trades reach the target and 37-50% hit the stop. The rest end at 16:00.
+- At a fixed 10 MNQ: NQ +$34k over 11 years with a $26.9k drawdown and a -$7.0k day. The index: +$11k with a $39.7k
+  drawdown. Neither fits a $1,000 daily limit.
+- For comparison, the noise strategy (v2.7, the same daily cap) makes about $40k on the 2025-2026 stand-in alone.
+
 ```
 python research/v24_proxy.py <data dir> MNQ_09-26.Last.txt MNQ_12-26.Last.txt          # the stand-in
 python research/v24_scan.py '[{"max_losers": 4}]' out.csv '{"max_loss_per_trade": 1500, "lock_at": 0.5, "max_losers": 3}' \
