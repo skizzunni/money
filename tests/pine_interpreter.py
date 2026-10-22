@@ -436,6 +436,9 @@ class PineRuntime:
         def floor(x):
             return NA if is_na(x) else math.floor(x)
 
+        def ceil(x):
+            return NA if is_na(x) else math.ceil(x)
+
         def tostring(x, fmt=None):
             if fmt == "mintick":
                 return f"{x:.2f}"
@@ -512,7 +515,7 @@ class PineRuntime:
             "dayofmonth": part("day"),
             "input": Namespace("input", int=self._input, float=self._input, bool=self._input,
                                string=self._input, session=self._input),
-            "math": Namespace("math", max=nmax, min=nmin, floor=floor, abs=abs),
+            "math": Namespace("math", max=nmax, min=nmin, floor=floor, ceil=ceil, abs=abs),
             "str": Namespace("str", tostring=tostring, upper=str.upper, lower=str.lower, startswith=str.startswith,
                              contains=lambda source, sub: sub in source, format_time=format_time,
                              split=lambda source, sep: source.split(sep), trim=str.strip),
@@ -580,6 +583,7 @@ class StrategyEmulator:
         self.market_entries: dict[str, dict] = {}  # strategy.entry without limit: next bar's open
         self.market_close: dict | None = None  # strategy.close: next bar's open
         self.exits: dict[str, dict] = {}
+        self.partial_exits: dict[str, dict] = {}  # strategy.exit with qty: part of the position (stop and/or target)
         self.pos: dict | None = None
         self.closed: list[dict] = []
         self.orders: list[dict] = []
@@ -610,6 +614,15 @@ class StrategyEmulator:
     @property
     def closedtrades(self):
         return _ClosedTrades(self.closed, self.rt.series["time"])
+
+    @property
+    def max_drawdown(self):  # closed-trade equity, peak to trough (TradingView also counts open P/L)
+        eq = peak = dd = 0.0
+        for t in self.closed:
+            eq += t["pnl"]
+            peak = max(peak, eq)
+            dd = max(dd, peak - eq)
+        return dd
 
     @property
     def wintrades(self):
@@ -644,17 +657,21 @@ class StrategyEmulator:
         self.market_close = {"id": id, "bar": self.rt.i, "comment": comment, "alert": alert_message}
 
     def exit(self, id, from_entry, stop=None, limit=None, comment=None, comment_loss=None, comment_profit=None,
-             alert_message=None, alert_loss=None, alert_profit=None, **kw):
-        self.exits[from_entry] = {"stop": None if is_na(stop) else stop, "limit": None if is_na(limit) else limit,
-                                  "loss": comment_loss or comment, "profit": comment_profit or comment,
-                                  "alert": alert_loss or alert_message, "alert_profit": alert_profit or alert_message}
+             alert_message=None, alert_loss=None, alert_profit=None, qty=None, **kw):
+        target = self.exits if qty is None else self.partial_exits
+        target[from_entry] = {"qty": None if qty is None else int(qty), "stop": None if is_na(stop) else stop,
+                              "limit": None if is_na(limit) else limit,
+                              "loss": comment_loss or comment, "profit": comment_profit or comment,
+                              "alert": alert_loss or alert_message, "alert_profit": alert_profit or alert_message}
 
     def cancel(self, id):
         self.entries.pop(id, None)
 
     def close_all(self, comment=None, immediately=False, alert_message=None, **kw):
-        if not immediately:
-            raise PineError("close_all without immediately=true is not emulated")
+        if not immediately:  # a market order: the next bar's open
+            if self.pos is not None:
+                self.market_close = {"id": self.pos["id"], "bar": self.rt.i, "comment": comment, "alert": alert_message}
+            return
         if self.pos is not None:
             c = self.rt.series["close"][self.rt.i]
             tick = self.rt.mintick
@@ -667,13 +684,18 @@ class StrategyEmulator:
             self.rt.alerts.append((i, msg))
 
     # ---- bar processing (before the script runs on the bar)
-    def _close(self, price, reason):
+    def _close(self, price, reason, qty=None):
+        """Close the position, or `qty` contracts of it (a partial exit)."""
         p = self.pos
-        gross = p["dir"] * (price - p["price"]) * p["qty"] * self.rt.pointvalue
-        fee = 2 * self.fee * p["qty"]
-        self.closed.append({"entry_bar": p["bar"], "exit_bar": self.rt.i, "dir": p["dir"], "qty": p["qty"],
+        q = p["qty"] if qty is None else min(qty, p["qty"])
+        gross = p["dir"] * (price - p["price"]) * q * self.rt.pointvalue
+        fee = 2 * self.fee * q
+        self.closed.append({"entry_bar": p["bar"], "exit_bar": self.rt.i, "dir": p["dir"], "qty": q,
                             "entry": p["price"], "exit": price, "pnl": gross - fee, "reason": reason})
-        self.pos = None
+        p["qty"] -= q
+        if p["qty"] <= 0:
+            self.partial_exits.pop(p["id"], None)
+            self.pos = None
 
     def process_bar(self, i):
         s, tick = self.rt.series, self.rt.mintick
@@ -707,9 +729,14 @@ class StrategyEmulator:
         if self.pos is None:
             return
         ex = self.exits.get(self.pos["id"])
-        if ex is None:
+        part = self.partial_exits.get(self.pos["id"])
+        if ex is None and part is None:
             return
+        if ex is None:  # only a partial exit: its stop protects the whole position here
+            ex = part
         d, stop, limit = self.pos["dir"], ex["stop"], ex["limit"]
+        if part is not None and part["stop"] is not None:
+            stop = part["stop"] if stop is None else (max(stop, part["stop"]) if d > 0 else min(stop, part["stop"]))
 
         def stop_fill(px):
             self._close(px + slip if d < 0 else px - slip, ex["loss"])
@@ -727,6 +754,11 @@ class StrategyEmulator:
             stop_fill(o)
         elif stop is not None and ((d < 0 and h >= stop) or (d > 0 and l <= stop)):
             stop_fill(stop)
+        elif part is not None and part["limit"] is not None and (
+                (d < 0 and l <= part["limit"] - thru) or (d > 0 and h >= part["limit"] + thru)):
+            pid = self.pos["id"]
+            self._close(part["limit"], part["profit"], part["qty"])
+            self.partial_exits.pop(pid, None)
         elif limit is not None and ((d < 0 and l <= limit - thru) or (d > 0 and h >= limit + thru)):
             self._close(limit, ex["profit"])
             if ex.get("alert_profit"):

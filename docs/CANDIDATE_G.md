@@ -231,3 +231,68 @@ development data. The holdout stays untouched.
 
 **The family** (`G_AMEND2`): G-D cap line q15, G-F1 cap line q15. The selection rule, data and holdout are as
 before.
+
+### 7.3 Development, amendment 2 (the same sessions)
+
+**Source:** `verification/candidate_g/dev_a2/`.
+
+| 2 ticks | G-D cap line q15 | G-F1 cap line q15 | (G-D cap line, 30 minutes) |
+|---|---:|---:|---:|
+| Positions | 2,082 | 2,098 | 1,982 |
+| Net $ | 10,831 | 10,785 | 14,974 |
+| Intraday DD $ | 8,254 | 8,269 | 5,792 |
+| Net ÷ DD | 1.31 | 1.30 | 2.59 |
+| Net at 3 ticks $ | 7,844 | 7,793 | 11,985 |
+| Campaigns per eligible session | 1.72 | 1.74 | 1.64 |
+| Sessions with 0 / 1 / 2 / 3 campaigns % | 19 / 28 / 15 / 38 | 18 / 28 / 16 / 38 | 19 / 31 / 16 / 34 |
+
+**Verdict:**
+- The 15-minute grid adds 0.08 campaigns a session. It costs 28% of the net and adds 43% to the drawdown.
+- P1 fails. **Rejected.**
+- The 19% of sessions with no qualified setup is unchanged. No exit or check timing in these sleeves reaches it.
+
+### Amendment 3 (pre-registered before the holdout): freeze the best development variant and confirm it once
+
+**Why freeze despite P1:**
+- No variant of these sleeves reaches P1 (2.0 campaigns a session) on development. The ceiling is set by the 19% of
+  sessions with no setup.
+- More development rounds on the same data would only fit it more closely.
+- The holdout is used once, for an honest out-of-sample reading.
+- **P1 stays a gate and is reported as it comes out**, as are G1-G5, P2, C1 and C2. Freezing is not acceptance.
+
+**The frozen variant: G-D cap line.**
+- Its sleeves are noise momentum and the Williams breakout.
+- It has the fitted stop (cap), and noise campaigns follow the noise line.
+- Everything else is the shared specification.
+- G-F1 cap line had a marginally higher net ÷ DD on development (2.63 against 2.59). Its sweep sleeve made 27
+  campaigns in five years (+$96), within noise.
+- G-D cap line is chosen for parsimony and because it is the variant ported to TradingView
+  (`pine/mnq_daily_g.pine`). The NinjaScript runs both.
+
+**What it is in each implementation:**
+- **NinjaScript:** `MnqCandidateD`, with these settings: noise On, Williams On, E1 Off, E2 Off, StopFit Cap, and
+  RunnerTrail Line.
+- **Python:** `DConfig(stop_fit="cap", runner_trail="line")`.
+- **Pine:** `pine/mnq_daily_g.pine` at its defaults.
+
+**Parity:**
+
+| Comparison | Data | Result |
+|---|---|---|
+| NinjaScript against Python | the user's MNQ bars, $125 and the second budget | identical, trade for trade (`tests/test_candidate_d.py`, configuration "G-D cap line") |
+| Pine against Python | raw NQ 2015-2019, development only (`research/pine_g_parity.py`) | 1,653 of 1,655 campaigns identical to the cent |
+
+The two Pine differences are both a half target touched on the fill bar. The model fills it there; the test
+emulator checks only the stop on a fill bar. The Pine script is the same either way.
+
+**Frozen (sha256):**
+
+| File | sha256 |
+|---|---|
+| `mnqbot/candidate_d.py` | `4998010483b5231f416d17416add1aad0e990dd6094840ef26158a33a7c8ed5d` |
+| `ninjatrader/Strategies/MnqCandidateD.cs` | `b61bb6738828800e371f6ad5198eee47f035f7bfed0d7c2c7cb32a650e50a93c` |
+| `research/eval_d.py` | `e7dbe6620b949b7bd2adf50376f13294d16dbbded41fdb5dd8a39848e9d8060b` |
+| `research/eval_g.py` | `3edac3fb5c6e69a2ac5b7eaf2188db4a4a0f2eac418b18835a151a57f35e58e1` |
+| `pine/mnq_daily_g.pine` | `c5456086cccc26e3ec87b39b370fdcc761abfef7dcb8a551ea28c83c220a405e` |
+
+**The holdout:** `research/eval_g.py holdout-nq`, then `holdout-mnq`, once each. Results go in section 7.4.

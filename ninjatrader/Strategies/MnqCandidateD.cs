@@ -35,6 +35,9 @@ namespace NinjaTrader.NinjaScript.Strategies
     // candidate G (docs/CANDIDATE_G.md): a stop wider than the budget allows is refused (Skip: D, E, F), moved in to the
     // widest affordable distance (Cap), or every stop is that distance (Budget)
     public enum StopFitMode { Skip, Cap, Budget }
+    // G amendment 1: a noise campaign's stop also follows frozen B's line stop (tightened only); after the half its runner
+    // trails by R (TrailR x R behind the best price: D-G), Line (the line only) or Line2R (the tighter of the line and 2R)
+    public enum RunnerTrailMode { R, Line, Line2R }
 
     // Sleeve E's causal sequence (docs/CANDIDATE_D.md section 3), fed every 1-minute bar.
     public sealed class SweepEngine
@@ -319,6 +322,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 UseE2 = false;
                 SweepStop = SweepStopReference.SweepExtreme;
                 StopFit = StopFitMode.Skip;
+                RunnerTrail = RunnerTrailMode.R;
                 RiskBudget = 125;
                 SizingCommission = 0.95;
                 AllowanceMarketTicks = 4;
@@ -370,7 +374,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 Print("D settings: " + Instrument.FullName + ", " + BarsPeriod.Value + " " + BarsPeriod.BarsPeriodType +
                       ", account " + (Account == null ? "none" : Account.Name) + ", PlaceOrders " + PlaceOrders +
                       ", sleeves " + (UseNoise ? "noise " : "") + (UseWilliams ? "Williams " : "") + (UseE1 ? "E1 " : "") +
-                      (UseE2 ? "E2 " : "") + ", sweep stop " + SweepStop + ", stop fit " + StopFit + ", budget " + RiskBudget + ", commission " + SizingCommission + ", allowance " +
+                      (UseE2 ? "E2 " : "") + ", sweep stop " + SweepStop + ", stop fit " + StopFit + ", runner trail " + RunnerTrail + ", budget " + RiskBudget + ", commission " + SizingCommission + ", allowance " +
                       AllowanceMarketTicks + "/" + AllowanceLimitTicks + " ticks, breakeven +" + BreakevenOffset + ", half at " +
                       PartialR + "R, trail " + TrailR + "R, campaigns " + MaxCampaigns + ", target " + EvalTarget + ", trail $" + EvalTrail);
                 if (BarsPeriod.BarsPeriodType != BarsPeriodType.Minute || BarsPeriod.Value != 1)
@@ -492,9 +496,15 @@ namespace NinjaTrader.NinjaScript.Strategies
                 double b = avg + d * BreakevenOffset;
                 nw = d > 0 ? Math.Max(nw, b) : Math.Min(nw, b);
             }
-            if (halfFilled && !double.IsNaN(best))
+            bool lineMode = RunnerTrail != RunnerTrailMode.R && campSleeve == "noise";
+            if (lineMode && !double.IsNaN(engine.Upper))
             {
-                double tr = Toward(d, best - d * TrailR * r);
+                double ln = Toward(d, d > 0 ? engine.Upper * (1 - StopBuffer * engine.Sigma) : engine.Lower * (1 + StopBuffer * engine.Sigma));
+                nw = d > 0 ? Math.Max(nw, ln) : Math.Min(nw, ln);
+            }
+            if (halfFilled && !double.IsNaN(best) && !(lineMode && RunnerTrail == RunnerTrailMode.Line))
+            {
+                double tr = Toward(d, best - d * (lineMode ? 2.0 : TrailR) * r);
                 nw = d > 0 ? Math.Max(nw, tr) : Math.Min(nw, tr);
             }
             if (nw != curStop)
@@ -767,6 +777,10 @@ namespace NinjaTrader.NinjaScript.Strategies
         [NinjaScriptProperty]
         [Display(Name = "Stop wider than the budget: Skip (D, E, F), Cap to the budget (G), Budget always", Order = 6, GroupName = "1. Sleeves")]
         public StopFitMode StopFit { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Noise campaigns: runner trail R (D-F), Line (G), Line2R", Order = 7, GroupName = "1. Sleeves")]
+        public RunnerTrailMode RunnerTrail { get; set; }
 
         [NinjaScriptProperty]
         [Range(1, 10000)]

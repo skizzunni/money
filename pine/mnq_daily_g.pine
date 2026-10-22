@@ -1,0 +1,346 @@
+//@version=6
+// MNQ Daily G: the daily MNQ strategy, candidate G (docs/CANDIDATE_G.md)
+// ------------------------------------------------------------------
+// A port of the Python model (mnqbot/candidate_d.py) and MnqCandidateD.cs, variant "G-D cap line": the noise-momentum
+// and Williams-breakout sleeves under the shared position manager.
+//
+// Entries (at a bar's close, filled at the next bar's open; flat only; at most 3 campaigns a session):
+//   * Noise momentum: at each check (bar closes 10:00, 10:30, ... 15:30 New York), BUY if the close is above the noise
+//     area, SELL if below. Fed days: no shorts before 14:00.
+//   * Williams breakout: the first bar from 09:30 to 15:00 to touch today's open +/- 0.5 x yesterday's range; one
+//     chance a day, none if a bar touches both. Its stop is 0.25 x yesterday's range.
+//   * The noise check comes first when both fire on one bar.
+// Risk ($125 a campaign, two contracts, all-in):
+//   * Planned risk = 2 x (R x $2 + 2 x commission + the slippage allowance: 4 ticks a contract).
+//   * A structural stop wider than that allows (R > 29.25 points) is moved in to 29.25 points ("Cap"). With "Skip"
+//     such a setup is refused, as candidates D, E and F did.
+// Management (at each bar's close; a new stop works from the next bar):
+//   * At +1R the stop goes to the fill + 1.5 points (the round trip plus 2 ticks: a fee-aware breakeven).
+//   * One contract takes profit at +2R; the other is an uncapped runner.
+//   * Noise campaigns: the stop also follows the noise line (the line -/+ 0.24 noise units, frozen B's line stop),
+//     tightened only; the runner trails that line. Williams campaigns: after the half, the runner trails 1R behind the
+//     best price.
+//   * A new stop already beyond the close exits at the next open ("Stop passed").
+//   * Flat at 15:55 (the order is sent at the 15:54 bar's close), or when the session ends early.
+// No daily P&L cap, no loser cutoff.
+//
+// Status: a DEVELOPMENT candidate. On NQ 2015-2019 (development data; simulator, not native NinjaTrader), $0.95 a side,
+// 2 ticks: 1,982 campaigns, net $14,974, intraday drawdown $5,792, 1.64 campaigns a session, sessions with 0/1/2/3
+// campaigns 19/31/16/34%. Its holdout (NQ 2020-2025, MNQ 2026) has not been run yet. This port follows the model's
+// rules; TradingView's fills inside a bar (stop and target on one bar, gaps) are its own, so expect small differences.
+//
+// Chart: MNQ1! (or the front-month contract), 1 minute (the model's bars), RTH or ETH. 5 minutes also runs, with
+// stops and targets seen per 5-minute bar. Needs 14 complete sessions on the chart before the first noise trade.
+// ------------------------------------------------------------------
+strategy("MNQ Daily G (development candidate)", shorttitle = "MNQ-G", overlay = true,
+     initial_capital = 50000, currency = currency.USD,
+     default_qty_type = strategy.fixed, default_qty_value = 1, pyramiding = 0,
+     commission_type = strategy.commission.cash_per_contract, commission_value = 0.95,
+     slippage = 2, margin_long = 0, margin_short = 0, max_bars_back = 500, max_labels_count = 500,
+     backtest_fill_limits_assumption = 1, process_orders_on_close = false)
+
+const string TZ = "America/New_York"
+const int FIRST_CHECK = 600
+const int LAST_CHECK = 930
+const int RTH_OPEN = 570
+const int RTH_CLOSE = 960
+const int FED_CUTOFF = 840
+const int FLAT_END = 955     // the bar ending 15:55 sends the flat order (filled at its next open)
+const int W_LAST = 900       // Williams: bars starting at or before 15:00
+
+// ── Inputs
+grpR = "Risk and management (the shared specification)"
+budget    = input.float(125, "Planned risk a campaign, $ (2 contracts, all-in)", minval = 10, step = 5, group = grpR)
+commSide  = input.float(0.95, "Commission a side a contract, $ (sizing and breakeven)", minval = 0, step = 0.05, group = grpR)
+allowTk   = input.int(4, "Slippage allowance, ticks a contract (market entry)", minval = 0, maxval = 40, group = grpR)
+beOffset  = input.float(1.5, "Breakeven: stop to the fill + this many points", minval = 0, step = 0.25, group = grpR)
+partialR  = input.float(2.0, "Half off at this many R", minval = 0.5, step = 0.25, group = grpR)
+maxCamps  = input.int(3, "Campaigns a session, at most", minval = 1, maxval = 10, group = grpR)
+stopFit   = input.string("Cap", "Stop wider than the budget", options = ["Cap", "Skip"], group = grpR,
+     tooltip = "Cap (candidate G): the stop moves in to the widest affordable distance. Skip (candidates D, E, F): the setup is refused; 88-94% of setups were refused that way.")
+trailMode = input.string("Noise line", "Noise campaigns: stop follows", options = ["Noise line", "1R trail only"], group = grpR,
+     tooltip = "Noise line (G amendment 1): the stop also follows frozen B's line stop and the runner trails it. 1R trail only (G family 1): the runner trails 1R behind the best price.")
+grpS = "Sleeves"
+useNoise  = input.bool(true, "Noise momentum", group = grpS)
+useWill   = input.bool(true, "Williams breakout", group = grpS)
+checkStep = input.int(30, "Noise check every, minutes", options = [30, 15], group = grpS,
+     tooltip = "30: frozen B's grid (12 checks). 15: G amendment 2's grid (23 checks), under development.")
+lookback  = input.int(14, "Sessions in the noise average", minval = 2, maxval = 60, group = grpS)
+stopBuf   = input.float(0.24, "Line stop, noise units past the line", minval = 0, maxval = 2, step = 0.01, group = grpS)
+wK        = input.float(0.5, "Williams: levels at open +/- this x yesterday's range", minval = 0.05, step = 0.05, group = grpS)
+wStop     = input.float(0.25, "Williams: structural stop, x yesterday's range", minval = 0.05, step = 0.05, group = grpS)
+skipDates = input.string("2023-01-02,2023-01-16,2023-02-20,2023-04-07,2023-05-29,2023-06-19,2023-07-03,2023-07-04,2023-09-04,2023-11-23,2023-11-24,2023-12-25,2024-01-01,2024-01-15,2024-02-19,2024-03-29,2024-05-27,2024-06-19,2024-07-03,2024-07-04,2024-09-02,2024-11-28,2024-11-29,2024-12-24,2024-12-25,2025-01-01,2025-01-20,2025-02-17,2025-04-18,2025-05-26,2025-06-19,2025-07-03,2025-07-04,2025-09-01,2025-11-27,2025-11-28,2025-12-24,2025-12-25,2026-01-01,2026-01-19,2026-02-16,2026-04-03,2026-05-25,2026-06-19,2026-07-03,2026-09-07,2026-11-26,2026-11-27,2026-12-24,2026-12-25,2027-01-01,2027-01-18,2027-02-15,2027-03-26,2027-05-31,2027-06-18,2027-07-05,2027-09-06,2027-11-25,2027-11-26,2027-12-24",
+     "Don't trade on these dates (holidays, half days)", group = grpS)
+fedDates  = input.string("2023-02-01,2023-03-22,2023-05-03,2023-06-14,2023-07-26,2023-09-20,2023-11-01,2023-12-13,2024-01-31,2024-03-20,2024-05-01,2024-06-12,2024-07-31,2024-09-18,2024-11-07,2024-12-18,2025-01-29,2025-03-19,2025-05-07,2025-06-18,2025-07-30,2025-09-17,2025-10-29,2025-12-10,2026-01-28,2026-03-18,2026-04-29,2026-06-17,2026-07-29,2026-09-16,2026-10-28,2026-12-09,2027-01-27,2027-03-17,2027-04-28,2027-06-09,2027-07-28,2027-09-15,2027-10-27,2027-12-08",
+     "Fed announcement days (no noise shorts before 14:00)", group = grpS)
+grpV = "Display"
+showBands  = input.bool(true, "Show noise area", group = grpV)
+showLabels = input.bool(true, "Show entry / exit labels", group = grpV)
+showDash   = input.bool(true, "Show dashboard", group = grpV)
+
+// ── Clock and grid
+barMin  = int(timeframe.in_seconds() / 60)
+validTf = barMin >= 1 and 15 % barMin == 0
+tMin    = hour(time, TZ) * 60 + minute(time, TZ)
+endMin  = tMin + barMin
+inRth   = tMin >= RTH_OPEN and endMin <= RTH_CLOSE
+nChecks = int((LAST_CHECK - FIRST_CHECK) / checkStep) + 1
+isCheck = validTf and inRth and endMin >= FIRST_CHECK and endMin <= LAST_CHECK and (endMin - FIRST_CHECK) % checkStep == 0
+tick    = syminfo.mintick
+pv      = syminfo.pointvalue
+
+floorTick(float x) => math.floor(x / tick + 1e-7) * tick
+ceilTick(float x) => math.ceil(x / tick - 1e-7) * tick
+away(int d, float p) => d > 0 ? floorTick(p) : ceilTick(p)     // a stop rounded away from the entry
+toward(int d, float p) => d > 0 ? ceilTick(p) : floorTick(p)   // a moving stop rounded toward the price
+px(float x) => str.tostring(x, format.mintick)
+usd(float x) => (x < 0 ? "-$" : "$") + str.tostring(math.abs(x), "#,##0.00")
+mark(string txt, bool below, color c) =>
+    if showLabels
+        label.new(bar_index, below ? low : high, txt, yloc = below ? yloc.belowbar : yloc.abovebar,
+             style = below ? label.style_label_up : label.style_label_down, color = c, textcolor = color.white, size = size.small)
+say(string msg) =>
+    alert(msg, alert.freq_once_per_bar_close)
+
+maxR = floorTick((budget / 2 - 2 * commSide - allowTk * tick * pv) / pv)   // 29.25 points at the defaults
+plannedFor(float r) => 2 * (r * pv + 2 * commSide + allowTk * tick * pv)
+
+// ── State: noise lines
+var float dayOpen = na
+var float prevClose = na
+var float lastRthClose = na
+var float ub = na
+var float lb = na
+var float sig = na
+var moves = array.new_float(lookback * 23, na)   // room for the 15-minute grid
+var today = array.new_float(23, na)
+var int filled = 0
+var int slot = 0
+var bool skipToday = false
+var bool fedToday = false
+// Williams
+var float wHi = na
+var float wLo = na
+var float wPrev = na
+var float wUp = na
+var float wDown = na
+var bool wDone = true
+// the campaign
+var int dayCount = 0
+var int campDir = 0
+var string campSleeve = ""
+var float campR = na
+var float campStop = na
+var float campBest = na
+var bool campBe = false
+var bool halfDone = false
+var bool exitSent = false
+var int campBase = 0   // strategy.closedtrades when the campaign was sent
+var string lastEvent = "-"
+
+flatNow = strategy.position_size == 0
+// a stop or a target filled the whole position during this bar: the campaign is over
+if flatNow and campDir != 0 and strategy.closedtrades > campBase and strategy.opentrades == 0
+    lastEvent := "closed (" + (strategy.closedtrades > 0 ? strategy.closedtrades.exit_comment(strategy.closedtrades - 1) : "") + ")"
+    campDir := 0
+    campSleeve := ""
+    exitSent := false
+
+// ── The 09:30 bar: a new session
+if tMin == RTH_OPEN
+    prevClose := lastRthClose
+    dayOpen := open
+    ub := na
+    lb := na
+    sig := na
+    dayCount := 0
+    dstr = str.format_time(time, "yyyy-MM-dd", TZ)
+    skipToday := str.contains(skipDates, dstr)
+    fedToday := str.contains(fedDates, dstr)
+    for k = 0 to 22
+        array.set(today, k, na)
+    // Williams: yesterday's RTH range, today's levels
+    if not na(wHi)
+        wPrev := wHi - wLo
+    wHi := na
+    wLo := na
+    wDone := na(wPrev) or wPrev <= 0
+    wUp := wDone ? na : open + wK * wPrev
+    wDown := wDone ? na : open - wK * wPrev
+if inRth
+    lastRthClose := close
+    wHi := na(wHi) ? high : math.max(wHi, high)
+    wLo := na(wLo) ? low : math.min(wLo, low)
+
+// a session that ended early (half day, data gap): get flat
+if strategy.position_size != 0 and not inRth and not exitSent
+    strategy.close_all(comment = "Session ended")
+    exitSent := true
+
+// ── Noise check: this check's lines
+checkNow = false
+if isCheck and not na(dayOpen)
+    k = int((endMin - FIRST_CHECK) / checkStep)
+    array.set(today, k, math.abs(close / dayOpen - 1))
+    if filled >= lookback and not na(prevClose)
+        float s = 0.0
+        for d = 0 to lookback - 1
+            s += array.get(moves, d * 23 + k)
+        sig := s / lookback
+        ub := math.max(dayOpen, prevClose) * (1 + sig)
+        lb := math.min(dayOpen, prevClose) * (1 - sig)
+        checkNow := true
+
+// entries allowed at this close: flat, budget of campaigns left, a trading day, before the flat bar
+allowed = flatNow and campDir == 0 and dayCount < maxCamps and not skipToday and endMin < FLAT_END and inRth
+
+// ── Williams: the day's one chance
+wSignal = 0
+float wStopPts = na
+if not wDone and inRth
+    if tMin > W_LAST
+        wDone := true
+    else
+        hu = high >= wUp
+        hd = low <= wDown
+        if hu or hd
+            wDone := true
+            if not (hu and hd) and allowed
+                wSignal := hu ? 1 : -1
+                wStopPts := wStop * wPrev
+
+// ── Manage the open campaign (at this bar's close; a new stop works from the next bar)
+if strategy.position_size != 0 and campDir != 0 and not exitSent
+    d = campDir
+    avg = strategy.position_avg_price
+    if math.abs(strategy.position_size) == 1 and not halfDone
+        halfDone := true
+        lastEvent := "half off at +" + str.tostring(partialR) + "R"
+    if endMin >= FLAT_END
+        strategy.close_all(comment = "Flat 15:55")
+        exitSent := true
+        mark("FLAT", d < 0, color.gray)
+        say("FLAT: close the MNQ position at market (15:55).")
+    else
+        ext = d > 0 ? high : low
+        campBest := na(campBest) ? ext : d > 0 ? math.max(campBest, ext) : math.min(campBest, ext)
+        if not campBe and d * (ext - avg) >= campR
+            campBe := true
+        float nw = campStop
+        if campBe
+            be = avg + d * beOffset
+            nw := d > 0 ? math.max(nw, be) : math.min(nw, be)
+        lineMode = trailMode == "Noise line" and campSleeve == "noise"
+        if lineMode and not na(ub)
+            ln = toward(d, d > 0 ? ub * (1 - stopBuf * sig) : lb * (1 + stopBuf * sig))
+            nw := d > 0 ? math.max(nw, ln) : math.min(nw, ln)
+        if halfDone and not lineMode
+            tr = toward(d, campBest - d * campR)
+            nw := d > 0 ? math.max(nw, tr) : math.min(nw, tr)
+        if nw != campStop
+            if d * (close - nw) <= 0
+                strategy.close_all(comment = "Stop passed")
+                exitSent := true
+                say("EXIT: the new stop " + px(nw) + " is past the price. Close the MNQ position at market.")
+            else
+                campStop := nw
+                say("MOVE STOP to " + px(nw) + (campBe ? " (breakeven reached)" : ""))
+
+// ── New entries: the noise check first, then Williams
+// the initial stop: the structural stop rounded away from the entry; with "Cap", moved in to maxR when wider
+fitStop(int d, float structural) =>
+    float st = away(d, structural)
+    if stopFit == "Cap" and d * (close - st) > maxR
+        st := toward(d, close - d * maxR)
+    st
+
+bool entered = false
+if allowed and useNoise and checkNow and not skipToday
+    int dn = close > ub ? 1 : close < lb and not (fedToday and endMin < FED_CUTOFF) ? -1 : 0
+    if dn != 0
+        stop = fitStop(dn, dn > 0 ? ub * (1 - stopBuf * sig) : lb * (1 + stopBuf * sig))
+        r = dn * (close - stop)
+        planned = plannedFor(r)
+        if r > 0 and planned <= budget + 1e-9
+            entered := true
+            campDir := dn
+            campSleeve := "noise"
+            campStop := stop
+            campR := r
+            mark((dn > 0 ? "BUY 2" : "SELL 2") + " noise\nR " + px(r) + "  $" + str.tostring(planned, "#.##"), dn > 0, dn > 0 ? color.green : color.red)
+            say((dn > 0 ? "BUY" : "SELL") + " 2 MNQ at market (noise). Stop " + px(stop) + ", half off at " + px(close + dn * partialR * r) + ", planned risk " + usd(planned) + ".")
+if allowed and not entered and useWill and wSignal != 0
+    stop = fitStop(wSignal, close - wSignal * wStopPts)
+    r = wSignal * (close - stop)
+    planned = plannedFor(r)
+    if r > 0 and planned <= budget + 1e-9
+        entered := true
+        campDir := wSignal
+        campSleeve := "williams"
+        campStop := stop
+        campR := r
+        mark((wSignal > 0 ? "BUY 2" : "SELL 2") + " Williams\nR " + px(r) + "  $" + str.tostring(planned, "#.##"), wSignal > 0, wSignal > 0 ? color.green : color.red)
+        say((wSignal > 0 ? "BUY" : "SELL") + " 2 MNQ at market (Williams). Stop " + px(stop) + ", half off at " + px(close + wSignal * partialR * r) + ", planned risk " + usd(planned) + ".")
+if entered
+    dayCount += 1
+    campBest := na
+    campBe := false
+    halfDone := false
+    exitSent := false
+    campBase := strategy.closedtrades
+    lastEvent := campSleeve + (campDir > 0 ? " long" : " short") + " #" + str.tostring(dayCount)
+    strategy.entry("G", campDir > 0 ? strategy.long : strategy.short, 2, comment = "G " + campSleeve)
+
+// ── The bracket: one stop for both contracts; one contract's target 2R from the fill (from the expected fill on the
+// signal bar). Two exits from the one 2-contract entry: the half (qty 1, stop and target) and the runner (the rest,
+// stop only).
+if campDir != 0 and not exitSent
+    basePx = strategy.position_size != 0 ? strategy.position_avg_price : close
+    tgt = basePx + campDir * partialR * campR
+    if not halfDone
+        strategy.exit("Half x", "G", qty = 1, stop = campStop, limit = tgt, comment_loss = "Stop", comment_profit = "Half +" + str.tostring(partialR) + "R")
+    strategy.exit("Run x", "G", stop = campStop, comment_loss = "Stop")
+
+// ── 16:00: store today's moves if the session was complete
+if inRth and endMin == RTH_CLOSE
+    if not na(dayOpen)
+        complete = true
+        for k = 0 to nChecks - 1
+            if na(array.get(today, k))
+                complete := false
+        if complete
+            for k = 0 to nChecks - 1
+                array.set(moves, slot * 23 + k, array.get(today, k))
+            slot := (slot + 1) % lookback
+            filled += 1
+    dayOpen := na
+
+// ── Drawing
+plot(showBands and inRth ? ub : na, "Upper noise line", color.teal, 2, plot.style_linebr)
+plot(showBands and inRth ? lb : na, "Lower noise line", color.maroon, 2, plot.style_linebr)
+plot(campDir != 0 ? campStop : na, "Stop", color.orange, 1, plot.style_linebr)
+plot(useWill and inRth and not na(wUp) ? wUp : na, "Williams up", color.new(color.blue, 50), 1, plot.style_linebr)
+plot(useWill and inRth and not na(wDown) ? wDown : na, "Williams down", color.new(color.purple, 50), 1, plot.style_linebr)
+
+var table dash = table.new(position.top_right, 2, 9, bgcolor = color.new(color.black, 15), border_width = 1, border_color = color.new(color.gray, 60))
+if showDash and (barstate.islastconfirmedhistory or barstate.isrealtime)
+    pos = strategy.position_size
+    status = not validTf ? "Use a 1, 3, 5 or 15 min chart" : filled < lookback ? "Building history " + str.tostring(filled) + "/" + str.tostring(lookback) : pos > 0 ? "LONG " + str.tostring(pos) : pos < 0 ? "SHORT " + str.tostring(-pos) : skipToday ? "No trades today (date list)" : "Flat"
+    table.cell(dash, 0, 0, "MNQ Daily G (development)", text_color = color.white, text_size = size.small)
+    table.cell(dash, 1, 0, status, text_color = pos > 0 ? color.lime : pos < 0 ? color.red : color.white, text_size = size.small)
+    table.cell(dash, 0, 1, "Campaigns today", text_color = color.silver, text_size = size.small)
+    table.cell(dash, 1, 1, str.tostring(dayCount) + " / " + str.tostring(maxCamps), text_color = color.white, text_size = size.small)
+    table.cell(dash, 0, 2, "Max R at " + usd(budget), text_color = color.silver, text_size = size.small)
+    table.cell(dash, 1, 2, px(maxR) + " points (" + stopFit + ")", text_color = color.white, text_size = size.small)
+    table.cell(dash, 0, 3, "Stop / R", text_color = color.silver, text_size = size.small)
+    table.cell(dash, 1, 3, campDir == 0 ? "-" : px(campStop) + " / " + px(campR) + (campBe ? ", breakeven on" : "") + (halfDone ? ", runner" : ""), text_color = color.white, text_size = size.small)
+    table.cell(dash, 0, 4, "Noise lines", text_color = color.silver, text_size = size.small)
+    table.cell(dash, 1, 4, na(ub) or not inRth ? "from 10:00" : px(ub) + " / " + px(lb), text_color = color.white, text_size = size.small)
+    table.cell(dash, 0, 5, "Last event", text_color = color.silver, text_size = size.small)
+    table.cell(dash, 1, 5, lastEvent, text_color = color.white, text_size = size.small)
+    table.cell(dash, 0, 6, "Backtest net (contract rows)", text_color = color.silver, text_size = size.small)
+    table.cell(dash, 1, 6, usd(strategy.netprofit), text_color = strategy.netprofit >= 0 ? color.lime : color.red, text_size = size.small)
+    table.cell(dash, 0, 7, "Max drawdown", text_color = color.silver, text_size = size.small)
+    table.cell(dash, 1, 7, usd(strategy.max_drawdown), text_color = color.white, text_size = size.small)
+    table.cell(dash, 0, 8, "Note", text_color = color.silver, text_size = size.small)
+    table.cell(dash, 1, 8, "a campaign is 1 or 2 rows in the trade list (half, runner)", text_color = color.gray, text_size = size.small)
