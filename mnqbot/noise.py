@@ -91,6 +91,12 @@ class NoiseConfig:
     # next streak_skip entry signals. side_cooldown: after a losing trade, skip the next this many signals on that side
     # today. side_margin: after a losing trade today, a new entry on that side needs the close past the line by this
     # many more noise units (until a winner on that side or the next session).
+    # the trade after a losing trade (research only, off by default): after_loss_qty_div divides the contracts (the same
+    # max loss, so a wider stop); after_loss_lock sets its lock trigger (in its own max losses); after_loss_hourly takes
+    # it only at a check on the hour
+    after_loss_qty_div: float = 1.0
+    after_loss_lock: float = 0.0
+    after_loss_hourly: bool = False
     streak_k: int = 0
     streak_skip: int = 1
     side_cooldown: int = 0
@@ -223,14 +229,18 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
     orders: list[tuple[int, int, float, float, float]] = []
     headsups: list[tuple[int, int]] = []
 
+    q_next = q_trade = cfg.qty  # contracts of the pending entry and of the open trade (after_loss_qty_div)
+    lock_next = lock_trade = cfg.lock_at  # their lock triggers, in max losses (after_loss_lock)
+
     def open_pos(i: int, d: int) -> None:
-        nonlocal pos, entry_px, entry_bar, r_trade, br_trade
+        nonlocal pos, entry_px, entry_bar, r_trade, br_trade, q_trade, lock_trade
         pos, entry_px, entry_bar, r_trade, br_trade = d, o[i] + d * slip, i, r_next, br_next
+        q_trade, lock_trade = q_next, lock_next
 
     def close_pos(i: int, price: float, reason: str) -> None:
         nonlocal pos, held, locked, losers_today, rest, part_pnl, best, consec, skip_left
-        pnl = rest * (pos * (price - entry_px) * cfg.qty * cfg.point_value - 2 * cfg.commission_per_side * cfg.qty)
-        trades.append(NoiseTrade(pos, cfg.qty, entry_bar, idx[entry_bar], entry_px, i, idx[i], price, reason, pnl,
+        pnl = rest * (pos * (price - entry_px) * q_trade * cfg.point_value - 2 * cfg.commission_per_side * q_trade)
+        trades.append(NoiseTrade(pos, q_trade, entry_bar, idx[entry_bar], entry_px, i, idx[i], price, reason, pnl,
                                  rest))
         if pnl + part_pnl < 0 and reason != "Session ended":  # a trade closed in parts is one trade
             losers_today += 1
@@ -247,6 +257,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
     def study_ok(d: int, past_margin: bool) -> bool:
         """The v2.1 study's rules (all off by default): may a signal on side d be taken?"""
         nonlocal skip_left
+        if cfg.after_loss_hourly and consec > 0 and end % 60:
+            return False
         if cfg.side_margin and side_lost[d] and not past_margin:
             return False
         if side_cd[d] > 0:
@@ -260,8 +272,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
     def close_part(i: int, price: float) -> None:
         nonlocal rest, part_pnl
         f = cfg.partial_frac
-        part_pnl = f * (pos * (price - entry_px) * cfg.qty * cfg.point_value - 2 * cfg.commission_per_side * cfg.qty)
-        trades.append(NoiseTrade(pos, cfg.qty, entry_bar, idx[entry_bar], entry_px, i, idx[i], price, "Partial",
+        part_pnl = f * (pos * (price - entry_px) * q_trade * cfg.point_value - 2 * cfg.commission_per_side * q_trade)
+        trades.append(NoiseTrade(pos, q_trade, entry_bar, idx[entry_bar], entry_px, i, idx[i], price, "Partial",
                                  part_pnl, f))
         rest = 1.0 - f
 
@@ -293,7 +305,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                 # from the fill price; on the fill bar itself from the expected fill (signal close + slippage), as a
                 # bracket order placed with the entry would be
                 base = entry_px if entry_bar != i else est_px
-                cap = base - pos * cfg.max_loss_per_trade / cfg.qty / cfg.point_value
+                cap = base - pos * cfg.max_loss_per_trade / q_trade / cfg.point_value
                 if (pos > 0 and cap > line) or (pos < 0 and cap < line):
                     line, reason = cap, "Max loss"
             if cfg.vwap_stop and not math.isnan(vwap_used):  # the paper's trailing stop
@@ -350,9 +362,9 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             bp = h[i] if pos > 0 else l[i]
             best = bp if math.isnan(best) else (max(best, bp) if pos > 0 else min(best, bp))
 
-        if use_stop and pos and not locked and cfg.lock_at > 0 and cfg.max_loss_per_trade > 0:
+        if use_stop and pos and not locked and lock_trade > 0 and cfg.max_loss_per_trade > 0:
             # the lock arms when the bar reaches the trigger (high for a long, low for a short), from the next bar
-            trigger = cfg.lock_at * cfg.max_loss_per_trade / cfg.qty / cfg.point_value
+            trigger = lock_trade * cfg.max_loss_per_trade / q_trade / cfg.point_value
             locked = pos * ((h[i] if pos > 0 else l[i]) - entry_px) >= trigger
 
         if pos and (not in_rth or t_min == RTH_OPEN):  # a session ended early (half day, data gap)
@@ -417,13 +429,16 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                         events.append((i, "SELL"))
                 if pending is not None and pending[0] == "entry":
                     d = pending[1]
+                    after_loss = consec > 0
+                    q_next = max(1, round(cfg.qty / cfg.after_loss_qty_div)) if after_loss else cfg.qty
+                    lock_next = cfg.after_loss_lock if (after_loss and cfg.after_loss_lock > 0) else cfg.lock_at
                     est_px = c[i] + d * slip  # the expected fill, for the max loss on the fill bar
                     stop = tp = math.nan
                     if use_stop:  # the bracket: the closer of the line stop and the max loss, and the take-profit
                         stop = upper * (1 - cfg.stop_buffer * sigma) if d > 0 else lower * (1 + cfg.stop_buffer * sigma)
                         at_line = stop
                         if cfg.max_loss_per_trade > 0:
-                            cap = est_px - d * cfg.max_loss_per_trade / cfg.qty / cfg.point_value
+                            cap = est_px - d * cfg.max_loss_per_trade / q_next / cfg.point_value
                             stop = max(stop, cap) if d > 0 else min(stop, cap)
                         if cfg.take_profit > 0:
                             tp = est_px * (1 + d * cfg.take_profit * sigma)
