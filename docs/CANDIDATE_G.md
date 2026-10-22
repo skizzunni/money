@@ -390,3 +390,28 @@ Negative months: B 25 and G 28, of 66 (`ledger.csv.gz` has every position).
 5. **2.0 campaigns a session is not reached.**
    - 18% of sessions have no qualified setup in either sleeve.
 6. **G is not accepted under the pre-registered gates.** Every failure is listed above.
+
+### 7.5 The daily opportunity audit of the frozen G-D cap line (2 ticks)
+
+**Source:** `research/daily_audit.py`; `verification/daily_audit/g_{nq,mnq}/`.
+
+| | NQ 2015-2025 (2,571 sessions) | MNQ 7/20-10/16/2026 (62) |
+|---|---:|---:|
+| Raw setups: noise / Williams | 8,917 / 1,833 | 211 / 46 |
+| Qualified setups | 10,712 | 249 |
+| Refused: unaffordable | **0** (F: 88-94%) | **0** |
+| Refused: blocked by a position | 3,109 | 99 |
+| Refused: blocked by a pending order | 0 | 0 |
+| Refused: daily entry budget exhausted (3 campaigns) | 3,263 | 54 |
+| Refused: same-bar priority | 20 | 1 |
+| Not qualified: FOMC-morning short | 38 | 8 |
+| **Campaigns** | **4,320** | **95** |
+| **Campaigns per eligible session** | **1.68** | **1.53** |
+| **Sessions with 0 / 1 / 2 / 3 campaigns %** | **18.8 / 30.0 / 15.6 / 35.6** | **19.4 / 40.3 / 8.1 / 32.3** |
+| Sessions with no valid setup % | 18.8 | 19.4 |
+| Missing-data / holiday or half-day / warm-up sessions | 6 / 85 / 32 | 2 / 1 / 15 |
+
+**What it shows:**
+- Every session with a qualified setup now trades. The zero-campaign share equals the no-setup share exactly.
+- The remaining refusals are the open position and the three-campaign budget. Both are rules of the specification.
+- The participation shortfall against 2.0 is the 19% of sessions on which neither sleeve has a setup.
