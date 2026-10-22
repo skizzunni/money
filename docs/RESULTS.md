@@ -3044,6 +3044,19 @@ None is better on the stand-in and both histories at both bar lengths:
   window 70% winners), but on the 30-minute stand-in it makes $57.8k with a $26.2k drawdown against $71.1k and $17.5k.
 - A take-profit of 3.0 helps the 30-minute histories and hurts the 5-minute index (0.95x net).
 
+**Walk-forward** (`research/v25_walk_forward.py`). Each year, the settings with the best net per drawdown over the
+earlier years trade that year. The grid: max loss $500 / $1,000 / $1,500, lock 0.5 / 0.75, calm rule off / on.
+
+| | Walk-forward | v2.3's risk ($500, lock 0.75) | v2.5 fixed |
+|---|---:|---:|---:|
+| NQ 2018-2025: net | 446,368 | 275,568 | 497,659 |
+| NQ 2018-2025: drawdown | 25,507 | 26,135 | 29,836 |
+| Index 2014-2026: net | 621,639 | 560,795 | 742,249 |
+| Index 2014-2026: drawdown | 32,423 | 29,602 | 33,928 |
+
+- Picked in real time, the wider stop ($1,000-1,500) wins from the first years. The calm rule is picked in most years.
+- v2.5's fixed figures include hindsight. A live expectation sits between the walk-forward column and v2.5's.
+
 ```
 python research/v24_proxy.py <data dir> MNQ_09-26.Last.txt MNQ_12-26.Last.txt          # the stand-in
 python research/v24_scan.py '[{"max_losers": 4}]' out.csv '{"max_loss_per_trade": 1500, "lock_at": 0.5, "max_losers": 3}' \
