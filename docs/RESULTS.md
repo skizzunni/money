@@ -2715,6 +2715,20 @@ behind it, not a large one.
 
 **The Pine script on the window:** 53 trades, 33 winners, +$26,425, drawdown $2,613, the same as the model.
 
+## On top of v2.2: none adopted (October 22, 2026)
+
+**The tests** (`verification/noise_v2/lockplus.csv`, `v23_scan.csv`), against v2.2 on the window, NQ 2015-2025 and
+the index 2011-2026:
+
+| Change | Window net | Net per drawdown vs v2.2: NQ / index | Verdict |
+|---|---:|---|---|
+| None (v2.2: lock trigger 0.75, offset 2.5 points) | 26,425 | 1.00 / 1.00 | |
+| Lock trigger 0.65 or 0.85, offset 2.5 | 27,173 / 26,425 | 0.90 / 0.94 and 0.97 / 0.96 | lower on the histories |
+| Lock offset 5 or 8 points (each trigger) | 17,994-23,649 | 0.62-0.88 / 0.61-0.81 | lower |
+| Take-profit 1.5 / 1.75 / 2.5 on the after-loss trade | 22,044 / 22,990 / 20,777 | 0.78-0.99 / 0.75-0.90 | lower |
+| Daily loser limit 3 / 5 | 25,649 / 26,425 | 0.98 / 0.73 and 0.90 / 0.82 | lower |
+| Second tier 8 MNQ / $625 from the second loser in a row | 25,055 | 1.02 / 1.00 | level; less on the window |
+
 ## What this does and doesn't say
 
 - **It says** that the original sweep/breakout rules have no edge after realistic costs on 2023–2026 Nasdaq-100 data, and would very likely not pass a $25K evaluation. Of three published strategies, only noise-area momentum held up over 16 years, and even it fails most $25K evaluations.

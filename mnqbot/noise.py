@@ -101,6 +101,7 @@ class NoiseConfig:
     after_loss2_qty_div: float = 0.0
     after_loss2_ml_mult: float = 0.0
     after_loss_same_side: bool = False
+    after_loss_tp: float = 0.0  # its take-profit, noise units (0: take_profit)
     # research only (v2.2 study), off by default: a runner after the take-profit. tp_keep: the share of the contracts
     # kept open when the take-profit fills (rounded to whole contracts); the rest keeps every stop rule, plus
     # runner_lock (the stop at the entry plus this share of the take-profit's distance) and tp2 (a second take-profit,
@@ -250,11 +251,12 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
     q_next = q_trade = cfg.qty  # contracts of the pending entry and of the open trade (after_loss_qty_div)
     lock_next = lock_trade = cfg.lock_at  # their lock triggers, in max losses (after_loss_lock)
     ml_next = ml_trade = cfg.max_loss_per_trade  # their max losses, $ (after_loss_ml_mult)
+    tp_next = tp_trade = cfg.take_profit  # their take-profits, noise units (after_loss_tp)
 
     def open_pos(i: int, d: int) -> None:
-        nonlocal pos, entry_px, entry_bar, r_trade, br_trade, q_trade, lock_trade, ml_trade
+        nonlocal pos, entry_px, entry_bar, r_trade, br_trade, q_trade, lock_trade, ml_trade, tp_trade
         pos, entry_px, entry_bar, r_trade, br_trade = d, o[i] + d * slip, i, r_next, br_next
-        q_trade, lock_trade, ml_trade = q_next, lock_next, ml_next
+        q_trade, lock_trade, ml_trade, tp_trade = q_next, lock_next, ml_next, tp_next
 
     def close_pos(i: int, price: float, reason: str) -> None:
         nonlocal pos, held, locked, losers_today, rest, part_pnl, best, consec, skip_left, loss_side, tp_dist
@@ -382,8 +384,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                     if (pos > 0 and h[i] >= t2 + cfg.tick) or (pos < 0 and l[i] <= t2 - cfg.tick):
                         close_pos(i, t2, "Target 2")
                         events.append((i, "TARGET"))
-            elif cfg.take_profit > 0 and (entry_bar != i or cfg.target_on_fill_bar):  # the take-profit limit
-                tp = (entry_px if entry_bar != i else est_px) * (1 + pos * cfg.take_profit * sigma)
+            elif tp_trade > 0 and (entry_bar != i or cfg.target_on_fill_bar):  # the take-profit limit
+                tp = (entry_px if entry_bar != i else est_px) * (1 + pos * tp_trade * sigma)
                 if cfg.nt_execution:
                     tp = entry_px + pos * br_trade[1] if entry_bar == i else on_grid(pos, tp)
                 if (pos > 0 and h[i] >= tp + cfg.tick) or (pos < 0 and l[i] <= tp - cfg.tick):
@@ -473,6 +475,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                     q_next = max(1, round(cfg.qty / qd)) if after_loss else cfg.qty
                     lock_next = cfg.after_loss_lock if (after_loss and cfg.after_loss_lock > 0) else cfg.lock_at
                     ml_next = cfg.max_loss_per_trade * (mm if after_loss else 1.0)
+                    tp_next = cfg.after_loss_tp if (after_loss and cfg.after_loss_tp > 0) else cfg.take_profit
                     est_px = c[i] + d * slip  # the expected fill, for the max loss on the fill bar
                     stop = tp = math.nan
                     if use_stop:  # the bracket: the closer of the line stop and the max loss, and the take-profit
@@ -481,8 +484,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                         if cfg.max_loss_per_trade > 0:
                             cap = est_px - d * ml_next / q_next / cfg.point_value
                             stop = max(stop, cap) if d > 0 else min(stop, cap)
-                        if cfg.take_profit > 0:
-                            tp = est_px * (1 + d * cfg.take_profit * sigma)
+                        if tp_next > 0:
+                            tp = est_px * (1 + d * tp_next * sigma)
                     r_next = abs(est_px - stop) if use_stop else math.nan
                     if use_stop:
                         why = "Max loss" if stop != at_line else "Back inside"
