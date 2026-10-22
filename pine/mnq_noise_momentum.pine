@@ -15,6 +15,14 @@
 // Noise area for each half-hour mark = the day's open (and previous close) plus/minus the
 // average distance price has moved from the 09:30 open by that time over the last 14 sessions.
 //
+// v2.7, 2026-10-22: at most $1,000 lost a day (setting "Max loss a day"), without a stop-trading rule. Each new trade
+// may risk only what is left of the day's $1,000 (today's closed P/L counted, so a winner adds room): it takes fewer
+// contracts with the same stop distance, and only when not even 1 MNQ fits do new entries wait for tomorrow. The
+// losing-trade count limit is off (0): the money limit decides. Worst day, 5-minute stand-in 1/2025-10/2026: -$997
+// (v2.6: -$2,8xx); the user's MNQ bars 8/24-10/16: -$921. The cap costs profit, because the strategy's good days often
+// start with a loser or two: stand-in 30-minute +$28.4k, drawdown $9.7k (v2.6 +$83.6k, $16.4k); 5-minute +$40.1k,
+// $10.6k (v2.6 +$95.6k, $11.6k). A stop is a resting order: a gap or fast market through it can lose more than
+// planned (NQ 2015-2025's worst day with the cap: -$1,081) (docs/RESULTS.md, v2.7).
 // v2.6, 2026-10-22: the middle risk. Max loss $750 (37.5 points at 10 MNQ), the trade after a loser 9 MNQ and $1,500,
 // the lock at 1.0 max losses (37.5 points), 4 losers a day; the calm-stretch rule stays. The user's 30-minute chart
 // 1/2025-10/2026 showed v2.5 ($1,500) below v2.3 ($500); the long histories, now without half days and data holes
@@ -103,7 +111,7 @@
 // max loss after the fill bar are checked once per bar, so a 30-minute chart sees them later than a trader would.
 // The rules are the same as the Python reference in mnqbot/noise.py.
 // ------------------------------------------------------------------
-strategy("MNQ Noise-Area Momentum v2.6", shorttitle = "Noise-Mom", overlay = true,
+strategy("MNQ Noise-Area Momentum v2.7", shorttitle = "Noise-Mom", overlay = true,
      initial_capital = 50000, currency = currency.USD,
      default_qty_type = strategy.fixed, default_qty_value = 1, pyramiding = 0,
      commission_type = strategy.commission.cash_per_contract, commission_value = 0.62,
@@ -142,6 +150,8 @@ calmK = input.float(0.7, "Calm stretch: no trades if the recent average range < 
      tooltip = "v2.5: no new entries (nor heads-ups) on a day when the average 09:30-16:00 range of the last sessions (the first number below) is under this share of the average over the longer stretch (the second). When ranges have shrunk well below normal, breakouts of the noise area mostly fail: at v2.4's settings trades after such stretches made the least of any fifth of days on NQ futures 2015-2025, the Nasdaq-100 index 2011-2026 and the 2025-2026 stand-in. With the rule, the profit factor rose on all three, on both 5- and 30-minute bars, at every pair of lengths tried (5-20 against 40-100 sessions), with net level on the histories (docs/RESULTS.md, v2.5).")
 calmShort = input.int(10, "Calm stretch: recent sessions", minval = 2, maxval = 50, group = grpT)
 calmLong = input.int(40, "Calm stretch: longer stretch, sessions", minval = 5, maxval = 100, group = grpT)
+dailyLimit = input.float(1000, "Max loss a day, $ (0 = off)", minval = 0, step = 50, group = grpT,
+     tooltip = "v2.7: no trade may risk more than what is left of this loss today (today's closed P/L counted, wins add room back). A trade that would risk more takes fewer contracts with the same stop distance; when not even 1 contract fits, no new entries until tomorrow. Trading never stops just because of a loss: the next trade is smaller instead. The stop is a resting order, so a gap or fast market through it can still lose a little more (docs/RESULTS.md, v2.7).")
 afterMaxLoss = input.float(1500, "After a losing trade: max loss per trade, $ (0 = the same)", minval = 0, step = 10, group = grpT)
 skipDates = input.string("2025-01-01,2025-01-09,2025-01-20,2025-02-17,2025-04-18,2025-05-26,2025-06-19,2025-07-03,2025-07-04,2025-09-01,2025-11-27,2025-11-28,2025-12-24,2025-12-25,2026-01-01,2026-01-19,2026-02-16,2026-04-03,2026-05-25,2026-06-19,2026-07-03,2026-09-07,2026-11-26,2026-11-27,2026-12-24,2026-12-25,2027-01-01,2027-01-18,2027-02-15,2027-03-26,2027-05-31,2027-06-18,2027-07-05,2027-09-06,2027-11-25,2027-11-26,2027-12-24",
      "Don't trade on these dates", group = grpT,
@@ -164,7 +174,7 @@ lockPlus = input.float(2.5, "Lock: stop to the entry plus, points", minval = 0, 
      tooltip = "2.5 points is $5 a contract, more than the round-trip fees and a tick of slippage, so a locked trade closes as a small winner.")
 tightenOnly = input.bool(true, "Stop only ever tightens", group = grpT,
      tooltip = "In a trade the stop never moves back toward the price: when the noise line steps back (it does in about 3 of 10 half-hour steps), the stop stays where it was. Adopted in the NinjaTrader strategy in round one hundred and thirty-nine: more net in all four test periods with a slightly smaller drawdown. Webhook orders always use it.")
-maxLosers = input.int(4, "Max losing trades a day (0 = no limit)", minval = 0, maxval = 20, group = grpT,
+maxLosers = input.int(0, "Max losing trades a day (0 = no limit)", minval = 0, maxval = 20, group = grpT,
      tooltip = "After this many losing trades in a day, no new entries until tomorrow (an open trade runs on as usual). Tested before running at 10 MNQ and $350 with the lock, on 1-minute data: on 2011-2018, 2019-2022, 2023-2026 and NQ futures 2015-2025 it made more per day, with a higher t-stat and a smaller worst losing stretch (31% smaller on NQ futures). 1 or 2 losers cut the profit by a third or more: the winner often comes after a few stop-outs. See docs/RESULTS.md, round thirty-eight.")
 grpV = "Display"
 showBands = input.bool(true, "Show noise area", group = grpV)
@@ -259,8 +269,16 @@ if strategy.closedtrades > lossSeen
             lossRun := 0
     lossSeen := strategy.closedtrades
 afterLoss = lossRun > 0
-qNext = afterLoss and afterQty > 0 ? afterQty : qty
-mlNext = afterLoss and afterMaxLoss > 0 ? afterMaxLoss : maxLoss
+qBase = afterLoss and afterQty > 0 ? afterQty : qty
+mlBase = afterLoss and afterMaxLoss > 0 ? afterMaxLoss : maxLoss
+// v2.7: today's loss budget. Each contract can lose its max loss plus costs (fees both ways, a tick of slippage each way)
+dayPnlNow = strategy.netprofit - dayStartNet
+budgetOn = dailyLimit > 0 and mlBase > 0
+perC = budgetOn ? mlBase / qBase + 2 * 0.62 + 2 * syminfo.mintick * syminfo.pointvalue : 0.0
+fitQ = budgetOn ? math.floor((dailyLimit + dayPnlNow) / perC + 1e-9) : qBase
+budgetOk = fitQ >= 1
+qNext = budgetOk and fitQ < qBase ? fitQ : qBase
+mlNext = qNext < qBase ? mlBase / qBase * qNext : mlBase
 var int tQty = 0
 var float tMaxLoss = 0.0
 
@@ -415,7 +433,7 @@ if isCheck and not na(dayOpen)
                     lastSignal := "EXIT short " + hhmmText(endMin) + " @ " + px(close)
                     say("EXIT SHORT at market now. Price " + px(close) + " closed back above the lower line (" + px(lb) +
                          "). Stay flat until the next signal.")
-            else if pos == 0 and close > ub and freshOk and endMin <= lastEntryEnd and blockDir != 1 and not calmDay
+            else if pos == 0 and close > ub and freshOk and endMin <= lastEntryEnd and blockDir != 1 and not calmDay and budgetOk
                 strategy.entry("Long", strategy.long, qNext, comment = "Above noise",
                      alert_message = useHook ? jsonEntry("buy", estL, useStop ? bracketL : na, tpL, qNext) : "")
                 longPlaced := true
@@ -423,7 +441,7 @@ if isCheck and not na(dayOpen)
                 lastSignal := "BUY " + hhmmText(endMin) + " @ " + px(close)
                 say("BUY " + str.tostring(qNext) + " MNQ at market now. Price " + px(close) + " is above the noise area (upper " +
                      px(ub) + "). " + holdLong + " Next check " + nextCheck + ".")
-            else if pos == 0 and close < lb and shortOk and freshOk and endMin <= lastEntryEnd and blockDir != -1 and not calmDay
+            else if pos == 0 and close < lb and shortOk and freshOk and endMin <= lastEntryEnd and blockDir != -1 and not calmDay and budgetOk
                 strategy.entry("Short", strategy.short, qNext, comment = "Below noise",
                      alert_message = useHook ? jsonEntry("sell", estS, useStop ? bracketS : na, tpS, qNext) : "")
                 shortPlaced := true
@@ -439,7 +457,7 @@ var string headsUp = ""
 preEnd = endMin + 5
 if isCheck
     headsUp := ""
-if validTf and 5 % barMin == 0 and inRth and preEnd >= FIRST_CHECK and preEnd <= math.min(LAST_CHECK, lastEntryEnd) and (preEnd - FIRST_CHECK) % 30 == 0 and not na(dayOpen) and filled >= lookback and not na(prevClose) and strategy.position_size == 0 and not skipToday and not calmDay and (maxLosers <= 0 or losersSince(dayStartClosed) < maxLosers)
+if validTf and 5 % barMin == 0 and inRth and preEnd >= FIRST_CHECK and preEnd <= math.min(LAST_CHECK, lastEntryEnd) and (preEnd - FIRST_CHECK) % 30 == 0 and not na(dayOpen) and filled >= lookback and not na(prevClose) and strategy.position_size == 0 and not skipToday and not calmDay and budgetOk and (maxLosers <= 0 or losersSince(dayStartClosed) < maxLosers)
     kh = int((preEnd - FIRST_CHECK) / 30)
     float sh = 0.0
     for d = 0 to lookback - 1
@@ -559,7 +577,7 @@ if showDash and (barstate.islastconfirmedhistory or barstate.isrealtime)
     closed = strategy.closedtrades
     todayPnlDash = strategy.netprofit - dayStartNet
     wins = strategy.wintrades
-    table.cell(dash, 0, 0, "MNQ Noise Momentum v2.6: " + account + ", " + str.tostring(qty) + " MNQ", text_color = color.white, text_size = size.small)
+    table.cell(dash, 0, 0, "MNQ Noise Momentum v2.7: " + account + ", " + str.tostring(qty) + " MNQ", text_color = color.white, text_size = size.small)
     table.cell(dash, 1, 0, status, text_color = statusColor, text_size = size.small)
     table.cell(dash, 0, 1, "Sessions of history", text_color = color.silver, text_size = size.small)
     table.cell(dash, 1, 1, str.tostring(math.min(filled, lookback)) + " / " + str.tostring(lookback), text_color = color.white, text_size = size.small)
@@ -594,8 +612,9 @@ if showDash and (barstate.islastconfirmedhistory or barstate.isrealtime)
     table.cell(dash, 0, 11, "Trades today", text_color = color.silver, text_size = size.small)
     losersNow = losersSince(dayStartClosed)
     doneToday = maxLosers > 0 and losersNow >= maxLosers
-    table.cell(dash, 1, 11, str.tostring(closed - dayStartClosed) + (maxLosers > 0 ? " (" + str.tostring(losersNow) + " lost" + (doneToday ? ": done for today)" : ", limit " + str.tostring(maxLosers) + ")") : ""),
-         text_color = doneToday ? color.orange : color.white, text_size = size.small)
+    roomText = budgetOn ? (budgetOk ? "; loss room " + usd(dailyLimit + dayPnlNow) + (qNext < qBase ? ", next trade " + str.tostring(qNext) + " MNQ" : "") : "; daily loss limit reached") : ""
+    table.cell(dash, 1, 11, str.tostring(closed - dayStartClosed) + (maxLosers > 0 ? " (" + str.tostring(losersNow) + " lost" + (doneToday ? ": done for today)" : ", limit " + str.tostring(maxLosers) + ")") : "") + roomText,
+         text_color = doneToday or (budgetOn and not budgetOk) ? color.orange : color.white, text_size = size.small)
     capLate = maxLoss > 0 and useStop and barMin > 5
     table.cell(dash, 0, 12, "Chart", text_color = color.silver, text_size = size.small)
     extHours = sawOvernight   // 24-hour bars: the 14 sessions of history use up most of the chart

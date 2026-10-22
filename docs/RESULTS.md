@@ -3117,6 +3117,38 @@ those trades, so their history drawdowns for wide stops were overstated.
 - v2.6 is better than v2.3 in both halves of both histories at both bar lengths, with no losing year.
 - On the user's 8/24-10/16 window (5-minute) it makes +$20.6k (v2.3 +$25.3k, v2.5 +$16.6k).
 
+## v2.7: at most $1,000 lost a day, without a stop-trading rule (October 22, 2026)
+
+The user can lose at most $1,000 a day and doesn't want trading switched off after losses. So the daily limit is a
+budget, not a stop rule (`daily_loss_limit` in `mnqbot/noise.py`; setting "Max loss a day" in the Pine script):
+- Each new trade may risk only what is left of the day's $1,000. Today's closed P/L counts, so a winner adds room.
+- A contract's risk is its max-loss stop distance plus costs: fees both ways and a tick of slippage each way.
+- A trade that doesn't fit takes fewer contracts, with the same stop distance.
+- Only when not even 1 MNQ fits do new entries (and heads-ups) wait for tomorrow.
+- The count of losing trades no longer stops anything (`max_losers` 0): the money decides.
+- Pine parity test: `test_pine_daily_loss_budget` (sizes cut, no day below the limit).
+
+**Under the cap** (`verification/noise_v2/v27_dl_5.csv`, `v27_dl_30.csv`: max loss $350/$500/$750, after a loser
+1.0/1.4/2.0x, lock 0.75/1.0, loser limit 0/4):
+- The cap binds hard, and the strategy's good days often start with a loser or two.
+- v2.6's risk settings were among the best at both bar lengths. $750 with 1.0x after a loser was a little better on
+  5-minute bars and worse on 30-minute.
+- Smaller base sizes (5-8 or 12 MNQ, the same 37.5-point stop; `v27_dlq_*.csv`) moved profit and drawdown down or up
+  together.
+
+| Stand-in 1/2025-10/2026 | Net | Drawdown | Winners | Profit factor | Worst day | Days under -$900 |
+|---|---:|---:|---:|---:|---:|---:|
+| 5-min v2.6 | 95,600 | 11,603 | 50.3% | 1.54 | -4,413 | 44 |
+| 5-min **v2.7** | 40,093 | 10,635 | 49.1% | 1.38 | **-997** | 16 |
+| 5-min v2.7, 2 ticks | 38,171 | 10,734 | 49.2% | 1.36 | -996 | 16 |
+| 30-min v2.6 | 83,593 | 16,359 | 44.3% | 1.47 | -5,094 | 46 |
+| 30-min **v2.7** | 28,411 | **9,747** | 42.4% | 1.28 | **-997** | 14 |
+
+- The cap cut about 190 trades' size on the stand-in.
+- The user's 8/24-10/16 window (5-minute): +$12,022, worst day -$921.
+- The worst day on NQ futures 2015-2025 was -$1,081: a stop is a resting order and can fill past its price in a fast
+  market. The older index data's -$2,300 to -$2,600 days are gaps in that data.
+
 ```
 python research/v24_proxy.py <data dir> MNQ_09-26.Last.txt MNQ_12-26.Last.txt          # the stand-in
 python research/v24_scan.py '[{"max_losers": 4}]' out.csv '{"max_loss_per_trade": 1500, "lock_at": 0.5, "max_losers": 3}' \

@@ -165,6 +165,10 @@ class NoiseConfig:
     # trigger, offset trigger - lock_plus, through TradingView's bar path: the extreme nearer the open first). After
     # that bar the stop stays at the trailing level it reached (at least the entry + lock_plus)
     lock_intrabar: bool = False
+    # no new trade may risk more than what is left of this much loss today (the day's realized P/L counted): the
+    # contracts are cut to fit, the stop distance kept; with not one contract left, no entry. 0 = off; the Pine
+    # script's default since v2.7 is $1,000
+    daily_loss_limit: float = 0.0
     grace: bool = False  # research (v2.5 study): until the first check after the fill, the max loss stop only
     late_tp: float = 0.0
     late_tp_from: int = 0
@@ -286,6 +290,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
     lock_px = math.nan  # lock_intrabar: the stop the in-bar lock reached
     prev_side = 0  # confirm: the last check today closed above its upper line (1), below its lower (-1), or inside
     target_today = False  # after_target_done: a take-profit filled today
+    day_pnl = 0.0  # daily_loss_limit: today's realized P/L
     eq_curve: list[float] = [0.0]  # eq_n: the closed P&L after each position
     side_cd = {1: 0, -1: 0}  # signals still to skip on a side today (side_cooldown)
     side_lost = {1: False, -1: False}  # a loser on that side today (side_margin)
@@ -345,7 +350,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
 
     def close_pos(i: int, price: float, reason: str) -> None:
         nonlocal pos, held, locked, losers_today, rest, part_pnl, best, consec, skip_left, loss_side, tp_dist
-        nonlocal add_px, add_due, target_today, locked1, fav, lock_px
+        nonlocal add_px, add_due, target_today, locked1, fav, lock_px, day_pnl
         pnl = rest * (pos * (price - entry_px) * q_trade * cfg.point_value - 2 * cfg.commission_per_side * q_trade)
         trades.append(NoiseTrade(pos, q_trade, entry_bar, idx[entry_bar], entry_px, i, idx[i], price, reason, pnl,
                                  rest))
@@ -358,6 +363,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
         add_px, add_due = math.nan, False
         if cfg.eq_n:
             eq_curve.append(eq_curve[-1] + pnl + part_pnl)
+        day_pnl += pnl
         if reason == "Target":
             target_today = True
         if pnl + part_pnl < 0 and reason != "Session ended":  # a trade closed in parts is one trade
@@ -409,6 +415,16 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             skip_left -= 1
             return False
         return True
+
+    def budget_fits() -> bool:
+        """daily_loss_limit: does one contract of the next trade (its after-loss size and max loss) fit today?"""
+        if cfg.daily_loss_limit <= 0 or cfg.max_loss_per_trade <= 0:
+            return True
+        after = consec > 0
+        q = max(1, round(cfg.qty / cfg.after_loss_qty_div)) if after else cfg.qty
+        ml = cfg.max_loss_per_trade * (cfg.after_loss_ml_mult if after else 1.0)
+        per_c = ml / q + 2 * cfg.commission_per_side + 2 * slip * cfg.point_value
+        return math.floor((cfg.daily_loss_limit + day_pnl) / per_c + 1e-9) >= 1
 
     def against_trend(d: int) -> bool:
         return bool(cfg.trend_n) and d == -trend and cfg.trend_side in (0, d)
@@ -560,6 +576,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
         if t_min == RTH_OPEN:
             block_dir = 0
             target_today = False
+            day_pnl = 0.0
             prev_side = 0
             if cfg.calm_k and len(day_ranges) >= cfg.calm_long:
                 cs, cl = cfg.calm_short, cfg.calm_long
@@ -659,6 +676,16 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                             ml_next *= cfg.eq_ml
                     if cfg.big_day_against_qty_div != 1.0 and block_dir == -d:
                         q_next = max(1, round(q_next / cfg.big_day_against_qty_div))
+                    if cfg.daily_loss_limit > 0 and cfg.max_loss_per_trade > 0:  # today's loss budget
+                        per_c = ml_next / q_next + 2 * cfg.commission_per_side + 2 * slip * cfg.point_value
+                        fit = math.floor((cfg.daily_loss_limit + day_pnl) / per_c + 1e-9)
+                        if fit < 1:  # not one contract fits: no entry
+                            pending = None
+                            events.pop()
+                        elif fit < q_next:  # fewer contracts, the same stop distance
+                            ml_next = ml_next / q_next * fit
+                            q_next = fit
+                if pending is not None and pending[0] == "entry":
                     lock_next = cfg.after_loss_lock if (after_loss and cfg.after_loss_lock > 0) else cfg.lock_at
                     tp_next = cfg.after_loss_tp if (after_loss and cfg.after_loss_tp > 0) else cfg.take_profit
                     if cfg.late_tp > 0 and end >= cfg.late_tp_from:
@@ -686,7 +713,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
         if (in_rth and 5 % minutes == 0 and not math.isnan(day_open) and FIRST_CHECK <= nxt <= LAST_CHECK
                 and (nxt - FIRST_CHECK) % STEP == 0 and filled >= lb_n and not math.isnan(prev_close) and pos == 0
                 and not skip_today and (cfg.max_losers <= 0 or losers_today < cfg.max_losers)
-                and not (cfg.last_entry_end and nxt > cfg.last_entry_end) and not (calm and not cfg.calm_div)):
+                and not (cfg.last_entry_end and nxt > cfg.last_entry_end) and not (calm and not cfg.calm_div)
+                and budget_fits()):
             k = (nxt - FIRST_CHECK) // STEP
             s = 0.0
             for d in range(lb_n):  # same summation order as the check

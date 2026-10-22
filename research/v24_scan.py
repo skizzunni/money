@@ -37,7 +37,8 @@ V23 = {"qty": 10, "max_loss_per_trade": 500.0, "tighten_only": True, "take_profi
 V24 = {**V23, "max_loss_per_trade": 1500.0, "lock_at": 0.5, "max_losers": 3}  # the Pine script's defaults in v2.4
 V25 = {**V24, "calm_k": 0.7, "calm_short": 10, "calm_long": 40}  # v2.5
 V26 = {**V23, "calm_k": 0.7, "calm_short": 10, "calm_long": 40, "max_loss_per_trade": 750.0, "after_loss_ml_mult": 2.0,
-       "lock_at": 1.0}  # the Pine script's defaults since v2.6
+       "lock_at": 1.0}  # v2.6
+V27 = {**V26, "daily_loss_limit": 1000.0, "max_losers": 0}  # the Pine script's defaults since v2.7
 D: dict = {}
 BASE: dict = {}
 
@@ -109,7 +110,8 @@ def job(kw: dict) -> dict:
         out.update({f"{name} net": round(p.sum()), f"{name} dd": round((np.maximum.accumulate(e) - e).max()),
                     f"{name} win": round(100 * (tf.pnl > 0).mean(), 1),
                     f"{name} pf": round(lg[lg > 0].sum() / -lg[lg < 0].sum(), 3), f"{name} n": len(lg),
-                    f"{name} streak": streak(p)})
+                    f"{name} streak": streak(p),
+                    f"{name} wday": round(tf.groupby(tf.exit_time.dt.date).pnl.sum().min()) if len(tf) else 0})
         if name in ("nq", "index"):
             out[f"{name} yrs"] = json.dumps(tf.groupby(tf.entry_time.dt.year).pnl.sum().round().astype(int).tolist())
     return out

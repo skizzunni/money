@@ -32,9 +32,11 @@ BIG_K = "After a big day: no trades its way if its range > this x the average (0
 BIG_N = "After a big day: sessions in the average range"  # 10 (v2.3)
 CALM = "Calm stretch: no trades if the recent average range < this x the longer one (0 = off)"  # 0.7 (v2.5); ref off
 CALM_S, CALM_L = "Calm stretch: recent sessions", "Calm stretch: longer stretch, sessions"  # 10, 40 (v2.5)
-V21 = {"max_loss_per_trade": 750.0, "lock_at": 1.0, "max_losers": 4, "take_profit": 2.0, "tighten_only": True,
+DAILY = "Max loss a day, $ (0 = off)"  # the script's default is $1,000 (v2.7); the reference's off
+V21 = {"max_loss_per_trade": 750.0, "lock_at": 1.0, "max_losers": 0, "take_profit": 2.0, "tighten_only": True,
        "after_loss_qty_div": 10 / 9, "after_loss_ml_mult": 2.0, "last_entry_end": 900,
-       "big_day_k": 1.5, "big_day_n": 10, "calm_k": 0.7, "calm_short": 10, "calm_long": 40}  # the script's defaults
+       "big_day_k": 1.5, "big_day_n": 10, "calm_k": 0.7, "calm_short": 10, "calm_long": 40,
+       "daily_loss_limit": 1000.0}  # the script's defaults
 P0 = 20_000.0
 BARS_PER_DAY = 78  # 09:30 .. 15:55 on 5-minute bars
 CHECK_10_00, CHECK_10_30, CLOSE_16_00 = 5, 11, 77  # bar numbers within a session
@@ -452,7 +454,7 @@ def assert_trade_log(log, res, exit_mode, rows=10):
 
 def assert_parity(bars, minutes=5, lookback=14, skip_dates=None, exit_mode="stop", stop_buffer=None, qty=1,
                   max_loss=None, fed_dates=None, fed_no_shorts=None, take_profit=None, hook=None, lock_at=None,
-                  max_losers=None, after_loss=None, last_entry=None, big_day=None, calm=None):
+                  max_losers=None, after_loss=None, last_entry=None, big_day=None, calm=None, daily=None):
     cfg = NoiseConfig(lookback=lookback, exit_mode=exit_mode, qty=qty)
     inputs = {"Sessions in the noise average": lookback}
     if lock_at is not None:
@@ -460,7 +462,7 @@ def assert_parity(bars, minutes=5, lookback=14, skip_dates=None, exit_mode="stop
     inputs[LOCK] = cfg.lock_at  # explicit: the script's default (0.85) is not the reference's (1.0)
     if max_losers is not None:
         cfg.max_losers = max_losers
-    inputs["Max losing trades a day (0 = no limit)"] = cfg.max_losers  # explicit: the script's default is 4 (v2.6)
+    inputs["Max losing trades a day (0 = no limit)"] = cfg.max_losers  # explicit: the script's default is 0 (v2.7)
     if hook is not None:  # webhook orders on, for this contract
         inputs["Webhook orders"], inputs["Contract for the webhook (blank = the chart's)"] = "TradersPost", hook
         cfg.tighten_only = True
@@ -477,6 +479,9 @@ def assert_parity(bars, minutes=5, lookback=14, skip_dates=None, exit_mode="stop
     if calm is not None:
         cfg.calm_k, cfg.calm_short, cfg.calm_long = calm
     inputs[CALM], inputs[CALM_S], inputs[CALM_L] = cfg.calm_k, cfg.calm_short, cfg.calm_long
+    if daily is not None:
+        cfg.daily_loss_limit = daily
+    inputs[DAILY] = cfg.daily_loss_limit
     inputs["Exit"] = "Resting stop at the line" if exit_mode == "stop" else "Half-hour check"
     inputs[FUNDED] = True  # the script's default is the evaluation's 3 contracts
     inputs["Contracts on a funded account"] = qty  # the script's default is 10; the reference's is 1
@@ -734,7 +739,8 @@ def test_pine_evaluation_tracker(target):
     days = sorted({d.date() for d in bars.index.tz_convert(NY)})
     start = days[40]
     inputs = {FUNDED: True, "Contracts on a funded account": 10, LOCK: 1.0, TIGHTEN: False, TP: 1.5, AFTER_QTY: 0,
-              AFTER_ML: 0.0, LAST_ENTRY: "15:30", BIG_K: 0.0, CALM: 0.0, "Max losing trades a day (0 = no limit)": 4,
+              AFTER_ML: 0.0, LAST_ENTRY: "15:30", BIG_K: 0.0, CALM: 0.0, DAILY: 0.0,
+              "Max losing trades a day (0 = no limit)": 4,
               "Max loss per trade, $ (all contracts, 0 = off)": 350.0,
               "Evaluation start date, YYYYMMDD (0 = off)": int(start.strftime("%Y%m%d")), "Profit target, $": target}
     pytest.importorskip("pynescript", reason="pip install pynescript to check the .pine files")
@@ -769,7 +775,7 @@ def test_pine_dashboard_shows_the_next_checks_lines():
     rt = PineRuntime(load_pine(NOISE_PINE), cut, {FUNDED: True, "Contracts on a funded account": 1, LOCK: 1.0,
                                                     TIGHTEN: False, MAX_LOSS: 350.0, TP: 1.5,
                                                     AFTER_QTY: 0, AFTER_ML: 0.0, LAST_ENTRY: "15:30",
-                                                    BIG_K: 0.0, CALM: 0.0},
+                                                    BIG_K: 0.0, CALM: 0.0, DAILY: 0.0},
                      timeframe_seconds=300)
     rt.run(lambda j, g: None)
     dash = [t.grid() for t in rt.tables if t.columns == 2 and t.grid() and t.grid()[0][0].startswith("MNQ Noise")][0]
@@ -1057,3 +1063,15 @@ def test_pine_calm_stretch():
     res = assert_parity(bars, qty=10, max_loss=500.0, calm=(0.95, 5, 20))
     free = run(bars, NoiseConfig(qty=10, max_loss_per_trade=500.0))
     assert len(res.trades) < len(free.trades)
+
+
+@pytest.mark.slow
+def test_pine_daily_loss_budget():
+    """v2.7: no trade risks more than what is left of the day's loss limit; it takes fewer contracts (the same stop
+    distance) or, with not one left, no entry. The script and the reference agree trade for trade, the budget cuts
+    some trades' size, and no day loses more than the limit (no gaps in these bars beyond a tick)."""
+    bars = synth_bars(sessions=90, seed=7)
+    res = assert_parity(bars, qty=10, max_loss=500.0, max_losers=0, daily=800.0)
+    assert any(t.qty < 10 for t in res.trades), "the budget cut a trade's size"
+    tf = res.trades_frame()
+    assert tf.groupby(tf.exit_time.dt.date).pnl.sum().min() >= -800.0 - 1e-6
