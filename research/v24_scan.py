@@ -34,7 +34,8 @@ NY = "America/New_York"
 V23 = {"qty": 10, "max_loss_per_trade": 500.0, "tighten_only": True, "take_profit": 2.0, "lock_at": 0.75,
        "max_losers": 4, "after_loss_qty_div": 10 / 9, "after_loss_ml_mult": 1.4, "last_entry_end": 900,
        "big_day_k": 1.5, "big_day_n": 10}
-V24 = {**V23, "max_loss_per_trade": 1500.0, "lock_at": 0.5, "max_losers": 3}  # the Pine script's defaults since v2.4
+V24 = {**V23, "max_loss_per_trade": 1500.0, "lock_at": 0.5, "max_losers": 3}  # the Pine script's defaults in v2.4
+V25 = {**V24, "calm_k": 0.7, "calm_short": 10, "calm_long": 40}  # and since v2.5
 D: dict = {}
 BASE: dict = {}
 MIN = [5]  # the bar length: SCAN_MINUTES=30 runs every set on 30-minute bars

@@ -2970,6 +2970,62 @@ missed this.
   - **Equity-curve sizing** (`v24_eq5.csv`, `v24_eq30.csv`): fewer contracts while the closed P&L is under its average
     of the last 5-40 trades. Net fell 30-50% on the histories, and drawdown wasn't better on both.
 
+## v2.5: no trades after a calm stretch (October 22, 2026)
+
+**The rule.** When the last 10 sessions' average 09:30-16:00 range (as a share of the open) is under 0.7 x the last 40
+sessions', there are no new entries or heads-ups that day (`calm_k`, `calm_short`, `calm_long` in `mnqbot/noise.py`).
+
+**The evidence.**
+- A per-trade look at v2.4's trades (the noise level, distance past the line, run from the open, range so far, gap,
+  yesterday's return, 5/20-day trend, trades earlier today, the 10/60-day range ratio, check time) found one pattern
+  that held on all three sets: the lowest fifth of the range ratio.
+  - 5-minute bars: index +$41 a trade, NQ +$96, the stand-in -$94 (the other fifths +$127 to +$375).
+  - 30-minute bars: -$31, +$96, -$136.
+- Robustness (`verification/noise_v2/v24_calm5.csv`, `v24_calm30.csv`, `v24_calm2_5.csv`, `v24_calm2_30.csv`): at
+  every pair of lengths (5, 10 or 20 against 40, 60 or 100 sessions) and both thresholds (0.7, 0.8), the profit factor
+  rose on the stand-in, NQ and the index, on 5- and 30-minute bars. The one exception was NQ at 20/100 (1.371 against
+  1.375).
+- Net per drawdown on the histories was mostly 0.85-1.06x. 10 against 40 at 0.7 kept both histories' net level or
+  better (5-minute: NQ 1.01x, index 1.03x; 30-minute: 1.01x, 1.06x).
+- Taking half the contracts instead of none (`calm_div` 2) was in between.
+
+**Also in v2.5:**
+- The 2025 holidays, half days and Fed days are now in the default lists, for TradingView backtests from January 2025.
+- On half days (e.g. 11/29/2024, 11/26/2021) a position can otherwise be held past the early close into the next
+  session. On the scaled histories that produced -$4k to -$24k trades, worse for the scaling but real as a risk.
+- Some other overnight holds on the histories come from missing 16:00 bars in the data, which TradingView's bars
+  don't have.
+
+| Stand-in 1/2025-10/2026 (with the 2025 dates) | Net | Drawdown | Trades | Winners | Profit factor |
+|---|---:|---:|---:|---:|---:|
+| 5-min v2.3 | 63,033 | 24,889 | 644 | 52.5% | 1.38 |
+| 5-min v2.4 | 109,026 | 14,811 | 473 | 59.8% | 1.58 |
+| 5-min **v2.5** | **112,731** | **14,811** | 439 | **60.1%** | **1.64** |
+| 30-min v2.3 | 72,047 | 18,693 | 533 | 43.2% | 1.42 |
+| 30-min v2.4 | 67,212 | 18,354 | 413 | 49.9% | 1.34 |
+| 30-min **v2.5** | **71,111** | **17,524** | 383 | **50.4%** | **1.39** |
+
+| Histories, 5-minute | Net | Drawdown | Winners | Profit factor |
+|---|---:|---:|---:|---:|
+| NQ 2015-2025 v2.4 | 597,743 | 27,333 | 59.7% | 1.375 |
+| NQ 2015-2025 **v2.5** | 600,937 | 29,836 | 59.9% | **1.407** |
+| Index 2011-2026 v2.4 | 904,778 | 33,928 | 58.8% | 1.414 |
+| Index 2011-2026 **v2.5** | **932,901** | 33,928 | 59.3% | **1.459** |
+
+On the user's 8/24-10/16 window (5-minute) v2.5 makes +$16,607: profit factor 2.10, 60% winners, 35 trades.
+
+**Not adopted on the way:**
+- **A two-stage lock** (`v24_lock1_5.csv`, `v24_lock1_30.csv`): at +11-25 points the stop to the entry -10/-25/-40
+  points, then the lock. Net per drawdown 0.72-1.14, not better on both histories.
+- **The last half hour in the direction of the first** (Gao et al.): -$127k to +$78k on the histories, profit factor
+  0.93-1.05. The effect is gone in these data.
+- **No entries from the 14:00 or 13:00 checks** (weak on all three sets). The 30-minute stand-in made less.
+- **Two checks in a row past the line before entering** (`confirm`; `v25_confirm5.csv`, `v25_confirm30.csv`). The
+  30-minute stand-in made $45-55k against $71k, and NQ's net was 0.67-0.77x. Waiting gives up the move.
+- **A grace period**: only the max loss until the first check after the fill (`grace`; `v25_grace5.csv`,
+  `v25_grace30.csv`). The 30-minute stand-in made $55-69k with a $19.7-24.8k drawdown, and the index's net was
+  0.89-0.91x. The line stop's early exits save more than they cost.
+
 ```
 python research/v24_proxy.py <data dir> MNQ_09-26.Last.txt MNQ_12-26.Last.txt          # the stand-in
 python research/v24_scan.py '[{"max_losers": 4}]' out.csv '{"max_loss_per_trade": 1500, "lock_at": 0.5, "max_losers": 3}' \

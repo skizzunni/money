@@ -30,9 +30,11 @@ AFTER_ML = "After a losing trade: max loss per trade, $ (0 = the same)"  # 2100 
 LAST_ENTRY = "Last check for new entries"  # the script's default is 15:00 (v2.2); the reference's every check
 BIG_K = "After a big day: no trades its way if its range > this x the average (0 = off)"  # 1.5 (v2.3); reference off
 BIG_N = "After a big day: sessions in the average range"  # 10 (v2.3)
+CALM = "Calm stretch: no trades if the recent average range < this x the longer one (0 = off)"  # 0.7 (v2.5); ref off
+CALM_S, CALM_L = "Calm stretch: recent sessions", "Calm stretch: longer stretch, sessions"  # 10, 40 (v2.5)
 V21 = {"max_loss_per_trade": 1500.0, "lock_at": 0.5, "max_losers": 3, "take_profit": 2.0, "tighten_only": True,
        "after_loss_qty_div": 10 / 9, "after_loss_ml_mult": 1.4, "last_entry_end": 900,
-       "big_day_k": 1.5, "big_day_n": 10}  # the script's defaults, 10 MNQ
+       "big_day_k": 1.5, "big_day_n": 10, "calm_k": 0.7, "calm_short": 10, "calm_long": 40}  # the script's defaults
 P0 = 20_000.0
 BARS_PER_DAY = 78  # 09:30 .. 15:55 on 5-minute bars
 CHECK_10_00, CHECK_10_30, CLOSE_16_00 = 5, 11, 77  # bar numbers within a session
@@ -303,7 +305,7 @@ def test_fed_day_keeps_longs_and_turns_a_morning_reversal_into_an_exit():
 def test_default_fed_dates_are_wednesdays_or_thursdays_and_eight_a_year():
     from mnqbot.noise import FED_DATES
     days = pd.to_datetime(FED_DATES.split(","))
-    assert set(days.year) == {2026, 2027} and all((days.year == y).sum() == 8 for y in (2026, 2027))
+    assert set(days.year) == {2025, 2026, 2027} and all((days.year == y).sum() == 8 for y in (2025, 2026, 2027))
     assert set(days.dayofweek) <= {2, 3}
 
 
@@ -325,8 +327,9 @@ def test_default_date_list_is_valid_and_covers_the_holidays():
     from mnqbot.noise import SKIP_DATES
 
     dates = pd.to_datetime(SKIP_DATES.split(","), format="%Y-%m-%d")
-    assert dates.is_monotonic_increasing and len(set(dates)) == len(dates) == 23
-    assert {"2026-11-26", "2026-11-27", "2026-12-24", "2027-07-05", "2027-11-26"} <= set(SKIP_DATES.split(","))
+    assert dates.is_monotonic_increasing and len(set(dates)) == len(dates) == 37
+    assert {"2025-07-03", "2025-11-28", "2025-12-24", "2026-11-26", "2026-11-27", "2026-12-24", "2027-07-05",
+            "2027-11-26"} <= set(SKIP_DATES.split(","))
 
 
 def test_no_trades_until_the_lookback_is_full():
@@ -449,7 +452,7 @@ def assert_trade_log(log, res, exit_mode, rows=10):
 
 def assert_parity(bars, minutes=5, lookback=14, skip_dates=None, exit_mode="stop", stop_buffer=None, qty=1,
                   max_loss=None, fed_dates=None, fed_no_shorts=None, take_profit=None, hook=None, lock_at=None,
-                  max_losers=None, after_loss=None, last_entry=None, big_day=None):
+                  max_losers=None, after_loss=None, last_entry=None, big_day=None, calm=None):
     cfg = NoiseConfig(lookback=lookback, exit_mode=exit_mode, qty=qty)
     inputs = {"Sessions in the noise average": lookback}
     if lock_at is not None:
@@ -471,6 +474,9 @@ def assert_parity(bars, minutes=5, lookback=14, skip_dates=None, exit_mode="stop
     if big_day is not None:
         cfg.big_day_k, cfg.big_day_n = big_day
     inputs[BIG_K], inputs[BIG_N] = cfg.big_day_k, cfg.big_day_n
+    if calm is not None:
+        cfg.calm_k, cfg.calm_short, cfg.calm_long = calm
+    inputs[CALM], inputs[CALM_S], inputs[CALM_L] = cfg.calm_k, cfg.calm_short, cfg.calm_long
     inputs["Exit"] = "Resting stop at the line" if exit_mode == "stop" else "Half-hour check"
     inputs[FUNDED] = True  # the script's default is the evaluation's 3 contracts
     inputs["Contracts on a funded account"] = qty  # the script's default is 10; the reference's is 1
@@ -728,7 +734,7 @@ def test_pine_evaluation_tracker(target):
     days = sorted({d.date() for d in bars.index.tz_convert(NY)})
     start = days[40]
     inputs = {FUNDED: True, "Contracts on a funded account": 10, LOCK: 1.0, TIGHTEN: False, TP: 1.5, AFTER_QTY: 0,
-              AFTER_ML: 0.0, LAST_ENTRY: "15:30", BIG_K: 0.0, "Max losing trades a day (0 = no limit)": 4,
+              AFTER_ML: 0.0, LAST_ENTRY: "15:30", BIG_K: 0.0, CALM: 0.0, "Max losing trades a day (0 = no limit)": 4,
               "Max loss per trade, $ (all contracts, 0 = off)": 350.0,
               "Evaluation start date, YYYYMMDD (0 = off)": int(start.strftime("%Y%m%d")), "Profit target, $": target}
     pytest.importorskip("pynescript", reason="pip install pynescript to check the .pine files")
@@ -763,7 +769,7 @@ def test_pine_dashboard_shows_the_next_checks_lines():
     rt = PineRuntime(load_pine(NOISE_PINE), cut, {FUNDED: True, "Contracts on a funded account": 1, LOCK: 1.0,
                                                     TIGHTEN: False, MAX_LOSS: 350.0, TP: 1.5,
                                                     AFTER_QTY: 0, AFTER_ML: 0.0, LAST_ENTRY: "15:30",
-                                                    BIG_K: 0.0},
+                                                    BIG_K: 0.0, CALM: 0.0},
                      timeframe_seconds=300)
     rt.run(lambda j, g: None)
     dash = [t.grid() for t in rt.tables if t.columns == 2 and t.grid() and t.grid()[0][0].startswith("MNQ Noise")][0]
@@ -1038,5 +1044,16 @@ def test_pine_after_a_big_day():
     some entries."""
     bars = synth_bars(sessions=90, seed=5)
     res = assert_parity(bars, qty=10, max_loss=500.0, big_day=(1.2, 10))
+    free = run(bars, NoiseConfig(qty=10, max_loss_per_trade=500.0))
+    assert len(res.trades) < len(free.trades)
+
+
+@pytest.mark.slow
+def test_pine_calm_stretch():
+    """v2.5: after a stretch whose recent sessions' average range is under the factor x the longer stretch's, no
+    entries (nor heads-ups) that day; the script and the reference agree trade for trade, and on these bars the rule
+    blocks some entries."""
+    bars = synth_bars(sessions=110, seed=5)
+    res = assert_parity(bars, qty=10, max_loss=500.0, calm=(0.95, 5, 20))
     free = run(bars, NoiseConfig(qty=10, max_loss_per_trade=500.0))
     assert len(res.trades) < len(free.trades)

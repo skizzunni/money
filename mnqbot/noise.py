@@ -51,6 +51,8 @@ RTH_OPEN, RTH_CLOSE = 570, 960  # 09:30, 16:00
 # US market holidays and half days, when MNQ trades a short session (closed or halted by about 13:00 ET).
 # The 16-year test only traded full sessions, so the bot sits these out. Same list as the Pine input.
 SKIP_DATES = (
+    "2025-01-01,2025-01-09,2025-01-20,2025-02-17,2025-04-18,2025-05-26,2025-06-19,2025-07-03,2025-07-04,2025-09-01,"
+    "2025-11-27,2025-11-28,2025-12-24,2025-12-25,"
     "2026-01-01,2026-01-19,2026-02-16,2026-04-03,2026-05-25,2026-06-19,2026-07-03,2026-09-07,"
     "2026-11-26,2026-11-27,2026-12-24,2026-12-25,2027-01-01,2027-01-18,2027-02-15,2027-03-26,"
     "2027-05-31,2027-06-18,2027-07-05,2027-09-06,2027-11-25,2027-11-26,2027-12-24"
@@ -58,6 +60,7 @@ SKIP_DATES = (
 # Scheduled FOMC announcement days (statement at 14:00 New York time), from federalreserve.gov. Same list as
 # the Pine input; research/fomc_dates.csv has 2011-2026.
 FED_DATES = (
+    "2025-01-29,2025-03-19,2025-05-07,2025-06-18,2025-07-30,2025-09-17,2025-10-29,2025-12-10,"
     "2026-01-28,2026-03-18,2026-04-29,2026-06-17,2026-07-29,2026-09-16,2026-10-28,2026-12-09,"
     "2027-01-27,2027-03-17,2027-04-28,2027-06-09,2027-07-28,2027-09-15,2027-10-27,2027-12-08"
 )
@@ -140,6 +143,19 @@ class NoiseConfig:
     eq_n: int = 0
     eq_div: float = 2.0
     eq_ml: float = 1.0
+    # a calm stretch: the last calm_short sessions' average range under calm_k x the last calm_long's. Then no new
+    # entries or heads-ups today; research: with calm_div > 0, cfg.qty / calm_div contracts instead (the same max loss).
+    # 0 = off; the Pine script's default since v2.5 is 0.7, 10 against 40 sessions
+    calm_k: float = 0.0
+    calm_div: float = 0.0
+    calm_short: int = 10  # the sessions in the two averages
+    calm_long: int = 60
+    # research (v2.4 study): a first lock step. Once the trade has been lock1_at max losses in profit, the stop moves to
+    # the entry plus lock1_plus points (negative: below the entry for a long), from the next bar; the lock proper later
+    lock1_at: float = 0.0
+    lock1_plus: float = 0.0
+    confirm: bool = False  # research (v2.5 study): an entry needs the last check today past that side's line too
+    grace: bool = False  # research (v2.5 study): until the first check after the fill, the max loss stop only
     late_tp: float = 0.0
     late_tp_from: int = 0
     # research only (v2.2 study), off by default: a runner after the take-profit. tp_keep: the share of the contracts
@@ -254,6 +270,9 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
     block_dir = 0  # big_day_k: no entries on this side today
     day_closes: list[float] = []  # completed sessions' closes (trend_n)
     trend = 0  # trend_n: the trend's direction today
+    calm = False  # calm_k: today follows a calm stretch
+    in_grace = False  # grace: no check since the fill yet
+    prev_side = 0  # confirm: the last check today closed above its upper line (1), below its lower (-1), or inside
     target_today = False  # after_target_done: a take-profit filled today
     eq_curve: list[float] = [0.0]  # eq_n: the closed P&L after each position
     side_cd = {1: 0, -1: 0}  # signals still to skip on a side today (side_cooldown)
@@ -262,6 +281,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
     side_skip = {1: 0, -1: 0}  # signals still to skip on each side (side_run_k)
     add_px, add_bar, add_due = math.nan, 0, False  # add_at_lock: the added contracts' fill, its bar, an add to send
     locked = False  # the trade has reached the lock trigger (a broker's auto-breakeven)
+    locked1 = False  # lock1_at: the first step reached
     held, held_why = math.nan, ""  # tighten_only: the tightest stop so far in this trade, and what set it
     rest, part_pnl = 1.0, 0.0  # partial_at: the share still open, and what the closed part made
     tp_dist = math.nan  # tp_keep: the first take-profit's distance from the entry once it filled (the runner is on)
@@ -306,12 +326,14 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
 
     def open_pos(i: int, d: int) -> None:
         nonlocal pos, entry_px, entry_bar, r_trade, br_trade, q_trade, lock_trade, ml_trade, tp_trade
+        nonlocal in_grace
+        in_grace = True
         pos, entry_px, entry_bar, r_trade, br_trade = d, o[i] + d * slip, i, r_next, br_next
         q_trade, lock_trade, ml_trade, tp_trade = q_next, lock_next, ml_next, tp_next
 
     def close_pos(i: int, price: float, reason: str) -> None:
         nonlocal pos, held, locked, losers_today, rest, part_pnl, best, consec, skip_left, loss_side, tp_dist
-        nonlocal add_px, add_due, target_today
+        nonlocal add_px, add_due, target_today, locked1
         pnl = rest * (pos * (price - entry_px) * q_trade * cfg.point_value - 2 * cfg.commission_per_side * q_trade)
         trades.append(NoiseTrade(pos, q_trade, entry_bar, idx[entry_bar], entry_px, i, idx[i], price, reason, pnl,
                                  rest))
@@ -342,6 +364,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             side_lost[pos] = False
             side_run[pos] = 0
         pos, held, locked, rest, part_pnl, best, tp_dist = 0, math.nan, False, 1.0, 0.0, math.nan, math.nan
+        locked1 = False
 
     def study_ok(d: int, past_margin: bool) -> bool:
         """The v2.1 study's rules (all off by default): may a signal on side d be taken?"""
@@ -360,6 +383,10 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             side_skip[d] -= 1
             return False
         if against_trend(d) and not cfg.trend_qty_div:
+            return False
+        if calm and not cfg.calm_div:
+            return False
+        if cfg.confirm and prev_side != d:
             return False
         if cfg.side_margin and side_lost[d] and not past_margin:
             return False
@@ -408,6 +435,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
         if use_stop and pos and not math.isnan(upper):
             line = upper * (1 - cfg.stop_buffer * sigma) if pos > 0 else lower * (1 + cfg.stop_buffer * sigma)
             reason = "Back inside"
+            if cfg.grace and in_grace:  # research: no line stop yet, the max loss only
+                line = -math.inf if pos > 0 else math.inf
             if cfg.max_loss_per_trade > 0:
                 # from the fill price; on the fill bar itself from the expected fill (signal close + slippage), as a
                 # bracket order placed with the entry would be
@@ -418,6 +447,10 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             if cfg.vwap_stop and not math.isnan(vwap_used):  # the paper's trailing stop
                 if (pos > 0 and vwap_used > line) or (pos < 0 and vwap_used < line):
                     line, reason = vwap_used, "VWAP"
+            if locked1 and not locked:  # research: the first lock step
+                lk1 = entry_px + pos * cfg.lock1_plus
+                if (pos > 0 and lk1 > line) or (pos < 0 and lk1 < line):
+                    line, reason = lk1, "Lock 1"
             if locked:  # a small win locked in: the stop at the entry plus lock_plus
                 lk = entry_px + pos * cfg.lock_plus
                 if (pos > 0 and lk > line) or (pos < 0 and lk < line):
@@ -489,6 +522,9 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             trigger = lock_trade * ml_trade / q_trade / cfg.point_value
             locked = pos * ((h[i] if pos > 0 else l[i]) - entry_px) >= trigger
             add_due = locked and cfg.add_at_lock > 0
+            if cfg.lock1_at > 0 and not locked1:
+                t1 = cfg.lock1_at * ml_trade / q_trade / cfg.point_value
+                locked1 = pos * ((h[i] if pos > 0 else l[i]) - entry_px) >= t1
 
         if pos and (not in_rth or t_min == RTH_OPEN):  # a session ended early (half day, data gap)
             close_pos(i, c[i] - pos * slip, "Session ended")
@@ -497,6 +533,10 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
         if t_min == RTH_OPEN:
             block_dir = 0
             target_today = False
+            prev_side = 0
+            if cfg.calm_k and len(day_ranges) >= cfg.calm_long:
+                cs, cl = cfg.calm_short, cfg.calm_long
+                calm = sum(day_ranges[-cs:]) / cs < cfg.calm_k * (sum(day_ranges[-cl:]) / cl)  # as the Pine script
             if cfg.trend_n and len(day_closes) >= cfg.trend_n:
                 ma = sum(day_closes[-cfg.trend_n:]) / cfg.trend_n
                 trend = 1 if day_closes[-1] > ma else -1 if day_closes[-1] < ma else 0
@@ -566,6 +606,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                     if study_ok(-1, c[i] < lower * (1 - cfg.side_margin * sigma)):
                         pending = ("entry", -1)
                         events.append((i, "SELL"))
+                prev_side = 1 if c[i] > upper else -1 if c[i] < lower else 0  # confirm: for the next check
+                in_grace = False
                 if pending is not None and pending[0] == "entry":
                     d = pending[1]
                     after_loss = consec > 0 and (not cfg.after_loss_same_side or d == loss_side)
@@ -580,6 +622,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                     elif cfg.trend_n and d == trend:
                         q_next = max(1, round(q_next * cfg.trend_with_mult))
                         ml_next *= cfg.trend_with_mult * cfg.trend_with_ml
+                    if calm and cfg.calm_div:
+                        q_next = max(1, round(q_next / cfg.calm_div))
                     if cfg.eq_n and len(eq_curve) > cfg.eq_n:
                         if eq_curve[-1] < sum(eq_curve[-cfg.eq_n:]) / cfg.eq_n:
                             q_next = max(1, round(q_next / cfg.eq_div))
@@ -613,7 +657,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
         if (in_rth and 5 % minutes == 0 and not math.isnan(day_open) and FIRST_CHECK <= nxt <= LAST_CHECK
                 and (nxt - FIRST_CHECK) % STEP == 0 and filled >= lb_n and not math.isnan(prev_close) and pos == 0
                 and not skip_today and (cfg.max_losers <= 0 or losers_today < cfg.max_losers)
-                and not (cfg.last_entry_end and nxt > cfg.last_entry_end)):
+                and not (cfg.last_entry_end and nxt > cfg.last_entry_end) and not (calm and not cfg.calm_div)):
             k = (nxt - FIRST_CHECK) // STEP
             s = 0.0
             for d in range(lb_n):  # same summation order as the check

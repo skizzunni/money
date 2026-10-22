@@ -15,6 +15,15 @@
 // Noise area for each half-hour mark = the day's open (and previous close) plus/minus the
 // average distance price has moved from the 09:30 open by that time over the last 14 sessions.
 //
+// v2.5, 2026-10-22: no trades after a calm stretch (settings "Calm stretch"): when the last 10 sessions' average
+// 09:30-16:00 range is under 0.7 x the last 40's, no new entries that day. After such stretches breakouts of the noise
+// area mostly failed. At every pair of lengths tried (5-20 against 40-100 sessions, 0.7 and 0.8) the profit factor rose
+// on NQ futures 2015-2025, the Nasdaq-100 index 2011-2026 and the 2025-2026 stand-in, on 5- and 30-minute bars; 10
+// against 40 at 0.7 is the one that kept the histories' net level (NQ 1.01x, the index 1.03x). Stand-in 1/2025-10/2026,
+// 5-minute: +$112,731 against v2.4's +$109,026, drawdown $14,811 both, 60.1% winners, profit factor 1.64 against 1.58;
+// 30-minute: +$71,111 against +$67,212, drawdown $17,524 against $18,354, profit factor 1.39 against 1.34. Also: the
+// 2025 holidays, half days and Fed days in the date lists, for backtests from January 2025 (a position must not be
+// held over a half day's early close) (docs/RESULTS.md, v2.5).
 // v2.4, 2026-10-22: room for the trade. Max loss $1,500 (a 75-point stop at 10 MNQ; the line stop, 0.24 noise units
 // past the noise line, is usually closer and takes over), the lock at 0.5 max losses (37.5 points, then the stop to the
 // entry + 2.5), the trade after a loser 9 MNQ and $2,100, and no new entries after 3 losers in a day. The $500 stop (25
@@ -85,7 +94,7 @@
 // max loss after the fill bar are checked once per bar, so a 30-minute chart sees them later than a trader would.
 // The rules are the same as the Python reference in mnqbot/noise.py.
 // ------------------------------------------------------------------
-strategy("MNQ Noise-Area Momentum v2.4", shorttitle = "Noise-Mom", overlay = true,
+strategy("MNQ Noise-Area Momentum v2.5", shorttitle = "Noise-Mom", overlay = true,
      initial_capital = 50000, currency = currency.USD,
      default_qty_type = strategy.fixed, default_qty_value = 1, pyramiding = 0,
      commission_type = strategy.commission.cash_per_contract, commission_value = 0.62,
@@ -120,15 +129,19 @@ lastEntryEnd = lastEntry == "15:00" ? 900 : 930
 bigDayK = input.float(1.5, "After a big day: no trades its way if its range > this x the average (0 = off)", minval = 0, step = 0.05, group = grpT,
      tooltip = "v2.3: after a session whose 09:30-16:00 range was over this many times the average range of the last sessions below (that session included), no new entries the next day in that session's direction (its close against its open); the other direction trades as usual. After an outsized day the next session tends to retrace: at v2.2's settings the next day's trades in the big day's direction lost on average on NQ futures 2015-2025 (365 trades, -$112 each) and the Nasdaq-100 index 2011-2026 (536, -$67), while those against it made +$148 and +$190. With the rule, NQ futures +14% net and +39% net per drawdown, better in both halves and 8 of 11 years; the index +10% and +15%, 12 of 16 years (docs/RESULTS.md, v2.3).")
 bigDayN = input.int(10, "After a big day: sessions in the average range", minval = 2, maxval = 60, group = grpT)
+calmK = input.float(0.7, "Calm stretch: no trades if the recent average range < this x the longer one (0 = off)", minval = 0, maxval = 2, step = 0.05, group = grpT,
+     tooltip = "v2.5: no new entries (nor heads-ups) on a day when the average 09:30-16:00 range of the last sessions (the first number below) is under this share of the average over the longer stretch (the second). When ranges have shrunk well below normal, breakouts of the noise area mostly fail: at v2.4's settings trades after such stretches made the least of any fifth of days on NQ futures 2015-2025, the Nasdaq-100 index 2011-2026 and the 2025-2026 stand-in. With the rule, the profit factor rose on all three, on both 5- and 30-minute bars, at every pair of lengths tried (5-20 against 40-100 sessions), with net level on the histories (docs/RESULTS.md, v2.5).")
+calmShort = input.int(10, "Calm stretch: recent sessions", minval = 2, maxval = 50, group = grpT)
+calmLong = input.int(40, "Calm stretch: longer stretch, sessions", minval = 5, maxval = 100, group = grpT)
 afterMaxLoss = input.float(2100, "After a losing trade: max loss per trade, $ (0 = the same)", minval = 0, step = 10, group = grpT)
-skipDates = input.string("2026-01-01,2026-01-19,2026-02-16,2026-04-03,2026-05-25,2026-06-19,2026-07-03,2026-09-07,2026-11-26,2026-11-27,2026-12-24,2026-12-25,2027-01-01,2027-01-18,2027-02-15,2027-03-26,2027-05-31,2027-06-18,2027-07-05,2027-09-06,2027-11-25,2027-11-26,2027-12-24",
+skipDates = input.string("2025-01-01,2025-01-09,2025-01-20,2025-02-17,2025-04-18,2025-05-26,2025-06-19,2025-07-03,2025-07-04,2025-09-01,2025-11-27,2025-11-28,2025-12-24,2025-12-25,2026-01-01,2026-01-19,2026-02-16,2026-04-03,2026-05-25,2026-06-19,2026-07-03,2026-09-07,2026-11-26,2026-11-27,2026-12-24,2026-12-25,2027-01-01,2027-01-18,2027-02-15,2027-03-26,2027-05-31,2027-06-18,2027-07-05,2027-09-06,2027-11-25,2027-11-26,2027-12-24",
      "Don't trade on these dates", group = grpT,
-     tooltip = "YYYY-MM-DD, comma separated. Pre-filled with the 2026-2027 US market holidays and half days, when MNQ trades a short session. Add news days if you like.")
+     tooltip = "YYYY-MM-DD, comma separated. Pre-filled with the 2025-2027 US market holidays and half days (2025 for backtests from January 2025), when MNQ trades a short session. Add news days if you like.")
 fedNoShorts = input.bool(true, "Fed days: no shorts before 14:00", group = grpT,
      tooltip = "On scheduled Fed announcement days, skip short signals from the checks before the 14:00 statement (10:00-13:30); longs and everything after 14:00 as usual. Stocks tend to drift up into the announcement (Lucca & Moench, 2015). Tested before running on 2011-2018, then 2019-2022 and 2023-2026: a little more per day in every period and the same worst losing stretch. It changes only 1-3 trades a year. See docs/RESULTS.md, round twenty-four.")
-fedDates = input.string("2026-01-28,2026-03-18,2026-04-29,2026-06-17,2026-07-29,2026-09-16,2026-10-28,2026-12-09,2027-01-27,2027-03-17,2027-04-28,2027-06-09,2027-07-28,2027-09-15,2027-10-27,2027-12-08",
+fedDates = input.string("2025-01-29,2025-03-19,2025-05-07,2025-06-18,2025-07-30,2025-09-17,2025-10-29,2025-12-10,2026-01-28,2026-03-18,2026-04-29,2026-06-17,2026-07-29,2026-09-16,2026-10-28,2026-12-09,2027-01-27,2027-03-17,2027-04-28,2027-06-09,2027-07-28,2027-09-15,2027-10-27,2027-12-08",
      "Fed announcement days", group = grpT,
-     tooltip = "YYYY-MM-DD, comma separated: the scheduled FOMC statement days from federalreserve.gov, 2026-2027. In 2028, add that year's dates.")
+     tooltip = "YYYY-MM-DD, comma separated: the scheduled FOMC statement days from federalreserve.gov, 2025-2027. In 2028, add that year's dates.")
 exitMode = input.string("Resting stop at the line", "Exit", options = ["Resting stop at the line", "Half-hour check"], group = grpT,
      tooltip = "Resting stop: once in a trade, a stop order sits at the noise line and moves with it at every half hour. Tested on 16 years: smaller worst days and better evaluation odds. Half-hour check: the paper's rule, exit only when a half-hour check closes back inside the lines.")
 useStop = exitMode == "Resting stop at the line"
@@ -280,6 +293,7 @@ var dayDirs = array.new_int(0)
 var float dayHi = na
 var float dayLo = na
 var int blockDir = 0
+var bool calmDay = false  // v2.5: today follows a calm stretch, no new entries
 
 // ── New day at the 09:30 bar
 if tMin == RTH_OPEN
@@ -291,6 +305,15 @@ if tMin == RTH_OPEN
             sR += array.get(dayRanges, j)
         if array.get(dayRanges, nR - 1) > bigDayK * (sR / bigDayN)
             blockDir := array.get(dayDirs, nR - 1)
+    calmDay := false
+    if calmK > 0 and nR >= calmLong
+        float sS = 0.0
+        float sL = 0.0
+        for j = nR - calmLong to nR - 1
+            sL += array.get(dayRanges, j)
+            if j >= nR - calmShort
+                sS += array.get(dayRanges, j)
+        calmDay := sS / calmShort < calmK * (sL / calmLong)
     dayHi := na
     dayLo := na
     prevClose := lastRthClose
@@ -383,7 +406,7 @@ if isCheck and not na(dayOpen)
                     lastSignal := "EXIT short " + hhmmText(endMin) + " @ " + px(close)
                     say("EXIT SHORT at market now. Price " + px(close) + " closed back above the lower line (" + px(lb) +
                          "). Stay flat until the next signal.")
-            else if pos == 0 and close > ub and freshOk and endMin <= lastEntryEnd and blockDir != 1
+            else if pos == 0 and close > ub and freshOk and endMin <= lastEntryEnd and blockDir != 1 and not calmDay
                 strategy.entry("Long", strategy.long, qNext, comment = "Above noise",
                      alert_message = useHook ? jsonEntry("buy", estL, useStop ? bracketL : na, tpL, qNext) : "")
                 longPlaced := true
@@ -391,7 +414,7 @@ if isCheck and not na(dayOpen)
                 lastSignal := "BUY " + hhmmText(endMin) + " @ " + px(close)
                 say("BUY " + str.tostring(qNext) + " MNQ at market now. Price " + px(close) + " is above the noise area (upper " +
                      px(ub) + "). " + holdLong + " Next check " + nextCheck + ".")
-            else if pos == 0 and close < lb and shortOk and freshOk and endMin <= lastEntryEnd and blockDir != -1
+            else if pos == 0 and close < lb and shortOk and freshOk and endMin <= lastEntryEnd and blockDir != -1 and not calmDay
                 strategy.entry("Short", strategy.short, qNext, comment = "Below noise",
                      alert_message = useHook ? jsonEntry("sell", estS, useStop ? bracketS : na, tpS, qNext) : "")
                 shortPlaced := true
@@ -407,7 +430,7 @@ var string headsUp = ""
 preEnd = endMin + 5
 if isCheck
     headsUp := ""
-if validTf and 5 % barMin == 0 and inRth and preEnd >= FIRST_CHECK and preEnd <= math.min(LAST_CHECK, lastEntryEnd) and (preEnd - FIRST_CHECK) % 30 == 0 and not na(dayOpen) and filled >= lookback and not na(prevClose) and strategy.position_size == 0 and not skipToday and (maxLosers <= 0 or losersSince(dayStartClosed) < maxLosers)
+if validTf and 5 % barMin == 0 and inRth and preEnd >= FIRST_CHECK and preEnd <= math.min(LAST_CHECK, lastEntryEnd) and (preEnd - FIRST_CHECK) % 30 == 0 and not na(dayOpen) and filled >= lookback and not na(prevClose) and strategy.position_size == 0 and not skipToday and not calmDay and (maxLosers <= 0 or losersSince(dayStartClosed) < maxLosers)
     kh = int((preEnd - FIRST_CHECK) / 30)
     float sh = 0.0
     for d = 0 to lookback - 1
@@ -527,7 +550,7 @@ if showDash and (barstate.islastconfirmedhistory or barstate.isrealtime)
     closed = strategy.closedtrades
     todayPnlDash = strategy.netprofit - dayStartNet
     wins = strategy.wintrades
-    table.cell(dash, 0, 0, "MNQ Noise Momentum v2.4: " + account + ", " + str.tostring(qty) + " MNQ", text_color = color.white, text_size = size.small)
+    table.cell(dash, 0, 0, "MNQ Noise Momentum v2.5: " + account + ", " + str.tostring(qty) + " MNQ", text_color = color.white, text_size = size.small)
     table.cell(dash, 1, 0, status, text_color = statusColor, text_size = size.small)
     table.cell(dash, 0, 1, "Sessions of history", text_color = color.silver, text_size = size.small)
     table.cell(dash, 1, 1, str.tostring(math.min(filled, lookback)) + " / " + str.tostring(lookback), text_color = color.white, text_size = size.small)
