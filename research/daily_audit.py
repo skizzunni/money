@@ -3,8 +3,8 @@
     python research/daily_audit.py mnq <MNQ_09-26.Last.txt> <MNQ_12-26.Last.txt> <out folder> [book ...]
     python research/daily_audit.py nq <nq1m_scaled.pkl> <nq1m raw folder> <out folder> [book ...]
 
-Books: research/eval_d.py's F_CANDIDATES names (default D+F1 and D+F2), the Python model of MnqCandidateD.cs at 2 ticks
-with the evaluation's skip, FOMC and NFP dates.
+Books: research/eval_d.py's F_CANDIDATES or research/eval_g.py's G_FAMILY names (default D+F1 and D+F2), the
+Python model of MnqCandidateD.cs at 2 ticks with the evaluation's skip, FOMC and NFP dates.
 
 Each row: the session's data coverage (09:30-16:00 minutes of 390, electronic-session minutes), its status
 (eligible, holiday or half day, missing data, warm-up), the sleeves' warm-up, raw setups by sleeve (noise checks
@@ -25,6 +25,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import controlled as K  # noqa: E402
 import eval_d as ED  # noqa: E402
+import eval_g as G  # noqa: E402
 
 from mnqbot.candidate_d import RTH_OPEN, DConfig, Model  # noqa: E402
 
@@ -162,7 +163,8 @@ def main() -> None:
     skip = holiday | missing  # the evaluation's skip set, unchanged
     summary = []
     for book in books:
-        cfg = DConfig(slippage_ticks=2, skip_dates=skip, fed_dates=ED.FOMC, nfp_dates=ED.NFP, **ED.F_CANDIDATES[book])
+        kw = ED.F_CANDIDATES[book] if book in ED.F_CANDIDATES else G.G_FAMILY[book]
+        cfg = DConfig(slippage_ticks=2, skip_dates=skip, fed_dates=ED.FOMC, nfp_dates=ED.NFP, **kw)
         m, warm = run_with_snapshots(bars, cfg)
         t = daily_table(bars, m, warm, holiday, missing, ED.FOMC, ED.NFP, FIRST[kind])
         t.to_csv(out / f"daily_audit_{book}.csv", index=False)
