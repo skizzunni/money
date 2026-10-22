@@ -74,7 +74,7 @@ def main() -> None:
     else:
         if not FROZEN.exists():
             raise SystemExit("no frozen variant: the holdout is run only after the freeze step")
-        name = FROZEN.read_text().split()[0]
+        name = FROZEN.read_text().strip()
         candidates = {name: ALL[name]}
         bars = ED.nq_bars(a1, a2, first=first, last=last) if period == "holdout-nq" else ED.mnq_series(a1, a2)
     ED.evaluate(period, bars, dll, pd.Timestamp(first), candidates, (), out)

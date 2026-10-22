@@ -292,7 +292,7 @@ emulator checks only the stop on a fill bar. The Pine script is the same either 
 | `mnqbot/candidate_d.py` | `4998010483b5231f416d17416add1aad0e990dd6094840ef26158a33a7c8ed5d` |
 | `ninjatrader/Strategies/MnqCandidateD.cs` | `b61bb6738828800e371f6ad5198eee47f035f7bfed0d7c2c7cb32a650e50a93c` |
 | `research/eval_d.py` | `e7dbe6620b949b7bd2adf50376f13294d16dbbded41fdb5dd8a39848e9d8060b` |
-| `research/eval_g.py` | `3edac3fb5c6e69a2ac5b7eaf2188db4a4a0f2eac418b18835a151a57f35e58e1` |
+| `research/eval_g.py` | `ee71e0204c57d04e4c4d672200f2c559f2a661feada519a824b9c36753ba3f94` (one fix after freezing, before any holdout computation: the frozen name was read as its first word, "G-D", and the run stopped at once; the earlier hash was `3edac3fb…`) |
 | `pine/mnq_daily_g.pine` | `c5456086cccc26e3ec87b39b370fdcc761abfef7dcb8a551ea28c83c220a405e` |
 
 **The holdout:** `research/eval_g.py holdout-nq`, then `holdout-mnq`, once each. Results go in section 7.4.
