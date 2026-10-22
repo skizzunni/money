@@ -97,6 +97,10 @@ class DConfig:
     # candidate G (docs/CANDIDATE_G.md): a setup whose stop does not fit the budget. "skip" (D, E, F: refused as
     # unaffordable); "cap" (the stop moved in to the widest distance the budget allows); "budget" (always that distance)
     stop_fit: str = "skip"
+    # G amendment 1: a noise campaign's stop also follows frozen B's line stop (tightened only); after the half its
+    # runner trails by "r" (trail_r x R behind the best price: D-G), "line" (the line only) or "line_2r" (the tighter of
+    # the line and 2R behind the best price). Williams and sweep campaigns always trail by "r".
+    runner_trail: str = "r"
 
 
 @dataclass
@@ -557,8 +561,15 @@ class Model:
         if self.be:
             be = avg + d * cfg.be_offset
             new = max(new, be) if d > 0 else min(new, be)
-        if self.half_filled and not math.isnan(self.best):
-            tr = toward(d, self.best - d * cfg.trail_r * r)
+        line_mode = cfg.runner_trail != "r" and cp.sleeve == "noise"
+        if line_mode and not math.isnan(self.noise.upper):
+            nz = self.noise
+            ln = toward(d, nz.upper * (1 - cfg.stop_buffer * nz.sigma) if d > 0
+                        else nz.lower * (1 + cfg.stop_buffer * nz.sigma))
+            new = max(new, ln) if d > 0 else min(new, ln)
+        if self.half_filled and not math.isnan(self.best) and not (line_mode and cfg.runner_trail == "line"):
+            k = 2.0 if line_mode else cfg.trail_r
+            tr = toward(d, self.best - d * k * r)
             new = max(new, tr) if d > 0 else min(new, tr)
         if new != self.stop:
             if d * (c - new) <= 0:

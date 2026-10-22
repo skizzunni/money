@@ -133,4 +133,54 @@ All at $0.95 a side, 2 ticks base and 3 ticks stress.
 
 ## 7. Results
 
-(None yet.)
+### 7.1 Development, family 1 (NQ, 1,208 eligible sessions 2015-03-02 to 2019-12-31; 58 non-overlapping windows)
+
+**Source:** `verification/candidate_g/dev1/`.
+
+| 2 ticks | B | G-D cap | G-D budget | G-F1 cap | G-F1 budget | G-F2 cap | G-F2 budget |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Positions | 2,245 | 2,093 | 2,092 | 2,110 | 2,121 | 2,119 | 2,132 |
+| Net $ | 48,990 | 6,047 | 4,903 | 6,527 | 4,436 | 5,322 | 3,468 |
+| Intraday DD $ | 9,037 | 6,724 | 6,722 | 6,832 | 6,965 | 6,919 | 7,262 |
+| Net ÷ DD | 5.42 | 0.90 | 0.73 | 0.96 | 0.64 | 0.77 | 0.48 |
+| Average net trade $ | 21.82 | 2.89 | 2.34 | 3.09 | 2.09 | 2.51 | 1.63 |
+| Profit factor | 1.22 | 1.05 | 1.04 | 1.05 | 1.04 | 1.04 | 1.03 |
+| Net at 3 ticks $ | 37,508 | 2,860 | 2,203 | 3,334 | 1,096 | 2,119 | 117 |
+| **Campaigns per eligible session (P1)** | 1.86 | **1.73** | 1.73 | **1.75** | 1.76 | 1.75 | 1.76 |
+| Sessions with 0 / 1 / 2 / 3 campaigns % | 42 / 14 / 10 / 12 (+22 above 3) | 19 / 29 / 11 / 41 | 19 / 29 / 11 / 41 | 19 / 29 / 11 / 41 | 19 / 28 / 12 / 41 | 19 / 28 / 12 / 41 | 18 / 28 / 13 / 41 |
+| Evaluations: pass / breach / expired (of 58) | 17 / 34 / 7 | 0 / 4 / 54 | 0 / 4 / 54 | 0 / 5 / 53 | 1 / 5 / 52 | 0 / 5 / 53 | 1 / 5 / 52 |
+
+**What the fit did:**
+- Participation went from 0.12 to 1.73-1.76 campaigns per session. 81% of sessions are active, and 52-54% have 2 or 3
+  campaigns.
+- Every variant is profitable at 2 and 3 ticks.
+
+**The selection rule:**
+- P1 (at least 2.0 a session) fails for all six; C1 passes for all six.
+- **None qualifies, so nothing is frozen and the holdout is untouched.**
+
+**The diagnosis (development data only):**
+- Frozen B risks $200 on 4 contracts, about 25 points a contract. That is the same distance as G's 29.25, so a tight
+  stop is not what separates them.
+- Per contract and trade, B nets about $5.45 and G-D cap $1.45.
+- B lets a trade ride its noise line, tightened at every check, to a 1.5-noise-unit target. G's runner trails 1R
+  (29 points) behind the best price and is shaken out by ordinary noise.
+
+### Amendment 1 (pre-registered before it was run): the runner trails the noise line
+
+**The change, for noise-momentum campaigns only:**
+- The stop also tightens to frozen B's line stop: the current check's line ∓ 0.24 noise units, B's `LineStop`,
+  updated at each check and never loosened.
+- After the half is off, the runner trails by that line instead of 1R ("line"), or by the tighter of the line and
+  2R behind the best price ("line+2R").
+- Williams and sweep campaigns keep the 1R trail. The noise line is not a level for them.
+
+**Unchanged:**
+- the fitted initial stop (cap);
+- the fee-aware breakeven at +1R; half off at +2R; an uncapped runner;
+- the $125 budget, two contracts, three campaigns, 15:55.
+
+**The family** (`research/eval_g.py` `G_AMEND1`): G-D cap line, G-D cap line+2R, G-F1 cap line, G-F1 cap line+2R.
+
+**The rule and the data:** the same selection rule (P1 and C1, then the highest net ÷ DD at 2 ticks), on the same
+development data. The holdout stays untouched.

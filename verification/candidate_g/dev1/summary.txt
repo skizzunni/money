@@ -1,0 +1,1 @@
+dev: 1208 eligible sessions 2015-03-02..2019-12-31; 1208 starts, 58 non-overlapping; data to 2019-12-31

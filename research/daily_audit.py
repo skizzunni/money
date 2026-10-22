@@ -163,7 +163,7 @@ def main() -> None:
     skip = holiday | missing  # the evaluation's skip set, unchanged
     summary = []
     for book in books:
-        kw = ED.F_CANDIDATES[book] if book in ED.F_CANDIDATES else G.G_FAMILY[book]
+        kw = ED.F_CANDIDATES[book] if book in ED.F_CANDIDATES else G.ALL[book]
         cfg = DConfig(slippage_ticks=2, skip_dates=skip, fed_dates=ED.FOMC, nfp_dates=ED.NFP, **kw)
         m, warm = run_with_snapshots(bars, cfg)
         t = daily_table(bars, m, warm, holiday, missing, ED.FOMC, ED.NFP, FIRST[kind])

@@ -1,0 +1,25 @@
+candidate,gate,measure,threshold,result,verdict
+G-D cap,P1,campaigns per eligible session (2 ticks),>= 2.0,1.7326158940397351,FAIL
+G-D cap,P2,sessions with 2 or 3 campaigns (2 ticks),>= 50%,52.0,PASS
+G-D cap,C1,net at 3 ticks,> $0,2859.499999999998,PASS
+G-D cap,C2,"net / intraday DD at 2 ticks, against frozen B's",>= 5.42,0.8992705723144718,FAIL
+G-D budget,P1,campaigns per eligible session (2 ticks),>= 2.0,1.7317880794701987,FAIL
+G-D budget,P2,sessions with 2 or 3 campaigns (2 ticks),>= 50%,52.0,PASS
+G-D budget,C1,net at 3 ticks,> $0,2202.7999999999997,PASS
+G-D budget,C2,"net / intraday DD at 2 ticks, against frozen B's",>= 5.42,0.7293323118803474,FAIL
+G-F1 cap,P1,campaigns per eligible session (2 ticks),>= 2.0,1.7466887417218544,FAIL
+G-F1 cap,P2,sessions with 2 or 3 campaigns (2 ticks),>= 50%,52.0,PASS
+G-F1 cap,C1,net at 3 ticks,> $0,3333.899999999998,PASS
+G-F1 cap,C2,"net / intraday DD at 2 ticks, against frozen B's",>= 5.42,0.955322185224495,FAIL
+G-F1 budget,P1,campaigns per eligible session (2 ticks),>= 2.0,1.755794701986755,FAIL
+G-F1 budget,P2,sessions with 2 or 3 campaigns (2 ticks),>= 50%,53.0,PASS
+G-F1 budget,C1,net at 3 ticks,> $0,1096.099999999997,PASS
+G-F1 budget,C2,"net / intraday DD at 2 ticks, against frozen B's",>= 5.42,0.6369229223049424,FAIL
+G-F2 cap,P1,campaigns per eligible session (2 ticks),>= 2.0,1.7541390728476822,FAIL
+G-F2 cap,P2,sessions with 2 or 3 campaigns (2 ticks),>= 50%,53.0,PASS
+G-F2 cap,C1,net at 3 ticks,> $0,2119.199999999998,PASS
+G-F2 cap,C2,"net / intraday DD at 2 ticks, against frozen B's",>= 5.42,0.7691518344281433,FAIL
+G-F2 budget,P1,campaigns per eligible session (2 ticks),>= 2.0,1.7649006622516556,FAIL
+G-F2 budget,P2,sessions with 2 or 3 campaigns (2 ticks),>= 50%,54.0,PASS
+G-F2 budget,C1,net at 3 ticks,> $0,116.79999999999497,PASS
+G-F2 budget,C2,"net / intraday DD at 2 ticks, against frozen B's",>= 5.42,0.4775307587973489,FAIL
