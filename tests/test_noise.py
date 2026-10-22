@@ -21,16 +21,16 @@ from mnqbot.noise import NoiseConfig, run
 ROOT = Path(__file__).resolve().parents[1]
 NOISE_PINE = ROOT / "pine" / "mnq_noise_momentum.pine"
 FUNDED = "FUNDED ACCOUNT (tick for the funded contracts; untick for the evaluation's)"  # the script's account switch
-LOCK = "Lock a small win: trigger, in max losses (0 = off)"  # the script's default is 0.85 (v1.7); the reference's 1.0
+LOCK = "Lock a small win: trigger, in max losses (0 = off)"  # the script's default is 0.5 (v2.4); the reference's 1.0
 TIGHTEN = "Stop only ever tightens"  # the script's default is on (v1.8); the reference's off
-MAX_LOSS = "Max loss per trade, $ (all contracts, 0 = off)"  # the script's default is $500 (v2.0); the reference's $350
+MAX_LOSS = "Max loss per trade, $ (all contracts, 0 = off)"  # script default $1,500 (v2.4); the reference's $350
 TP = "Take profit, noise units from the entry (0 = off)"  # the script's default is 2.0 (v2.0); the reference's 1.5
 AFTER_QTY = "After a losing trade: contracts (0 = the same)"  # the script's default is 9 (v2.1); the reference's off
-AFTER_ML = "After a losing trade: max loss per trade, $ (0 = the same)"  # 700 (v2.1); the reference's off
+AFTER_ML = "After a losing trade: max loss per trade, $ (0 = the same)"  # 2100 (v2.4; 700 v2.1); the reference's off
 LAST_ENTRY = "Last check for new entries"  # the script's default is 15:00 (v2.2); the reference's every check
 BIG_K = "After a big day: no trades its way if its range > this x the average (0 = off)"  # 1.5 (v2.3); reference off
 BIG_N = "After a big day: sessions in the average range"  # 10 (v2.3)
-V21 = {"max_loss_per_trade": 500.0, "lock_at": 0.75, "take_profit": 2.0, "tighten_only": True,
+V21 = {"max_loss_per_trade": 1500.0, "lock_at": 0.5, "max_losers": 3, "take_profit": 2.0, "tighten_only": True,
        "after_loss_qty_div": 10 / 9, "after_loss_ml_mult": 1.4, "last_entry_end": 900,
        "big_day_k": 1.5, "big_day_n": 10}  # the script's defaults, 10 MNQ
 P0 = 20_000.0
@@ -456,7 +456,8 @@ def assert_parity(bars, minutes=5, lookback=14, skip_dates=None, exit_mode="stop
         cfg.lock_at = lock_at
     inputs[LOCK] = cfg.lock_at  # explicit: the script's default (0.85) is not the reference's (1.0)
     if max_losers is not None:
-        cfg.max_losers = inputs["Max losing trades a day (0 = no limit)"] = max_losers
+        cfg.max_losers = max_losers
+    inputs["Max losing trades a day (0 = no limit)"] = cfg.max_losers  # explicit: the script's default is 3 (v2.4)
     if hook is not None:  # webhook orders on, for this contract
         inputs["Webhook orders"], inputs["Contract for the webhook (blank = the chart's)"] = "TradersPost", hook
         cfg.tighten_only = True
@@ -727,7 +728,7 @@ def test_pine_evaluation_tracker(target):
     days = sorted({d.date() for d in bars.index.tz_convert(NY)})
     start = days[40]
     inputs = {FUNDED: True, "Contracts on a funded account": 10, LOCK: 1.0, TIGHTEN: False, TP: 1.5, AFTER_QTY: 0,
-              AFTER_ML: 0.0, LAST_ENTRY: "15:30", BIG_K: 0.0,
+              AFTER_ML: 0.0, LAST_ENTRY: "15:30", BIG_K: 0.0, "Max losing trades a day (0 = no limit)": 4,
               "Max loss per trade, $ (all contracts, 0 = off)": 350.0,
               "Evaluation start date, YYYYMMDD (0 = off)": int(start.strftime("%Y%m%d")), "Profit target, $": target}
     pytest.importorskip("pynescript", reason="pip install pynescript to check the .pine files")
@@ -776,7 +777,7 @@ def test_pine_dashboard_shows_the_next_checks_lines():
 def test_pine_account_switch(funded, eval_qty, qty):
     """The evaluation (the default) trades 10 MNQ as v1.5 did, or its own setting; the funded switch 10; the same max
     loss, so the stop and the lock scale. The script's defaults: at 10 MNQ the after-loss size and max loss (9 MNQ,
-    $700) included; at 3 MNQ off."""
+    $2,100) included; at 3 MNQ off."""
     bars = synth_bars(sessions=60, seed=11)
     inputs = {} if funded is None else {FUNDED: funded}
     cfg = NoiseConfig(qty=qty, **V21)

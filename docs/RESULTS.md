@@ -2845,6 +2845,137 @@ setting is "After a big day" (0 turns it off).
   No bucket loses on both histories, so there is nothing to filter. Two days after a big day the effect is gone (NQ
   -$59 against, the index +$17).
 
+**Also not adopted, on top of v2.3** (`research/v23_scan.py` set "next", `v23_next.csv`):
+- a second after-loss tier;
+- fewer contracts against the big day, or no trades at all the day after it;
+- skipping a side after 2, 3 or 4 losers in a row on that side across days.
+
+None was better on both histories.
+
+## v2.4: room for the trade (October 22, 2026)
+
+The user's TradingView view of v2.3 over January 2, 2025 - October 21, 2026 (MNQ1!, 30-minute chart, 50K): +$55,485,
+drawdown $19,185, 41.9% winners, profit factor 1.29. The user trades on 5-minute charts.
+
+**A stand-in for that view.** TradingView's 5-minute history doesn't reach back that far, and these files hold no MNQ
+bars before mid-2026. `research/v24_proxy.py` splices three sources at raw prices, each later piece scaled to meet the
+earlier one at the splice:
+- NQ futures to 7/23/2025;
+- the Nasdaq-100 index (HistData) to 6/30/2026;
+- the user's MNQ bars after.
+
+It is not TradingView's bars. The three sources disagree month by month: April 2025 is +$3.9k on NQ and +$16.3k on the
+index at 30 minutes. So it shows direction, not the chart's dollar figures.
+
+The script and `mnqbot/noise.py` agree trade for trade on 30-minute bars as well (the interpreter, 100 trades,
+January-May 2025).
+
+| v2.3 | Net | Drawdown | Trades | Winners | Profit factor |
+|---|---:|---:|---:|---:|---:|
+| stand-in, 5-minute | 60,345 | 27,577 | 651 | 52.5% | 1.36 |
+| stand-in, 30-minute | 69,861 | 18,693 | 539 | 43.2% | 1.40 |
+
+**Where v2.3 lost (5-minute stand-in).**
+- 253 max-loss stops: -$150k.
+- 281 lock exits: +$4k (scratches).
+- 55 trades held to 16:00 and 24 take-profits: +$216k.
+
+The $500 max loss (25 points at 10 MNQ) sat inside ordinary 5-minute noise. v2.0's grid only covered $475-525, so it
+missed this.
+
+**Wider stops** (`research/v24_scan.py`; `verification/noise_v2/v24_grid1.csv`, `v24_grid2.csv`, `v24_grid3.csv`,
+`v24_refB.csv`):
+- Every max loss from $1,000 to $1,500, at every lock trigger tried, beat $500 on the stand-in, NQ futures 2015-2025 and
+  the index 2011-2026.
+- Above $1,500 the index got worse (rare large losses): net per drawdown 0.6-0.9 of v2.3's at $2,500-3,000.
+- One at a time around the pick (none better on both histories):
+  - take-profit 1.5-3.0 or off;
+  - lock offset 5 or 10 points;
+  - after-loss size or max loss;
+  - the max loss $1,250 or $1,750;
+  - the big-day rule off or at 1.25 / 1.75;
+  - the 15:30 entries back;
+  - stop buffer 0.5;
+  - lookback 10 or 20.
+- The one small gain was 3 losers a day instead of 4: net per drawdown 1.07 on both histories, and a smaller worst day.
+
+**v2.4:** max loss $1,500, lock at 0.5 max losses (37.5 points), after a loser 9 MNQ and $2,100, 3 losers a day.
+
+| | v2.3 | v2.4 | v2.4, 2 ticks a side |
+|---|---:|---:|---:|
+| Stand-in 5-min 2025-10/2026: net | 60,345 | **106,385** | 101,033 |
+| drawdown | 27,577 | **14,811** | 15,054 |
+| winners | 52.5% | **59.5%** | 59.5% |
+| profit factor | 1.36 | **1.55** | 1.52 |
+| NQ 2015-2025: net | 375,170 | **597,743** | 553,614 |
+| drawdown | 26,135 | 27,333 | 31,834 |
+| winners / profit factor | 49.7% / 1.29 | **59.7% / 1.38** | 59.6% / 1.35 |
+| Index 2011-2026: net | 669,794 | **904,778** | 849,406 |
+| drawdown | 29,602 | 33,928 | 34,414 |
+| winners / profit factor | 50.3% / 1.38 | **58.8% / 1.41** | 58.6% / 1.38 |
+| User's window 8/24-10/16 (5-min): net | **25,295** | 17,730 | 17,468 |
+| drawdown | **2,613** | 4,129 | 4,189 |
+| Stand-in 30-min: net | **69,861** | 64,571 | 61,120 |
+| drawdown | **18,693** | 20,995 | 22,580 |
+
+**Year by year.** v2.4 is better in 10 of 11 NQ years and 12 of 16 index years.
+
+**Costs of the change.**
+- NQ's worst trade (-$23.6k) is not real. The scaled history's day-to-day rescaling made a 1,300-point gap after the
+  11/29/2024 half day, and a position held through it.
+- A v2.4 loser costs up to about $1,500, or $2,100 after a loser. The worst day on the stand-in is -$4,585, against
+  -$2,822. That is too much for a $2,000 trailing-drawdown evaluation.
+- On the user's 8/24-10/16 window it makes less. v2.3's settings were chosen on that window.
+- On 30-minute bars it makes less too. The lock moves only at a bar's close there. v2.4 is chosen for the 5-minute
+  chart the user trades.
+
+**Not adopted along the way:**
+- **Contracts added when the lock arms** (3, 5, 10; `v24_add.csv`). The lock's scratch trades turn into losers: the
+  stand-in fell to $48-49k, and the index's net per drawdown to 0.44-0.62.
+- **A trend filter**: the last close against the average of the last 5-50 closes (`v24_trend.csv`, `v24_trend2.csv`,
+  `v24_trend3.csv`).
+  - Against $500 stops, a wider stop on counter-trend trades helped a lot. That was the stop, not the trend: a wider
+    stop on every trade did as well.
+  - On top of v2.4 (`v24_filtB.csv`), blocking counter-trend trades raised the stand-in's profit factor to 1.6-1.8 but
+    cut NQ's net by 16-51%.
+- **Other filters on top of v2.4** (`v24_filtB.csv`). None better on both histories:
+  - no 14:00 or 13:00 entries;
+  - no 10:00 entries (the stand-in's weakest check, but the histories' best);
+  - no entries after a take-profit fills;
+  - a stricter entry band (1.1, 1.2);
+  - stop buffer 0 or 0.1;
+  - a side cooldown, a side run or a streak skip.
+- **Volatility regime**: no quintile of the 10-day against 100-day range ratio, or of the 10-day range itself, loses on
+  all three sets. So nothing to size by.
+
+**Toward the user's 30-minute targets** (net $100k+, drawdown under $10k, 70%+ winners, profit factor 2+ on the
+30-minute chart; `SCAN_MINUTES=30 research/v24_scan.py`):
+- **The 30-minute chart.**
+  - v2.4 there: $64,571, drawdown $20,995, 49.6% winners, profit factor 1.32.
+  - Why it lags the 5-minute chart: on a 30-minute bar the lock arms only at the bar's close.
+  - 112 of 417 trades stop out inside the bar they entered, for -$129k. The line stop sits about 20-25 points from the
+    fill (0.24 noise units past the line).
+- **Within the strategy's own settings** (`v24_g30_1.csv`, 81 combinations): max loss $1,000-2,000, lock trigger
+  15-37.5 points, take-profit 1.0-2.0, trend filter none / 5 / 10. The 30-minute stand-in topped out at profit factor
+  1.63 and 60% winners. The best profit factors all used the 5-day trend filter, which halves net on the histories.
+- **Not adopted:**
+  - **A trailing stop once the lock arms** (`v24_trail5.csv`). TradingView's broker would run it inside the bar on a
+    30-minute chart. Every offset (22.5-100 points) cut the stand-in's profit factor to 1.20-1.39 and both histories'
+    net per drawdown to 0.52-0.97.
+  - **Scaling out** part of the position at 0.1-0.5 R (`v24_part5.csv`). Winners as TradingView counts them rose to
+    75-78% and the stand-in's drawdown fell to $8.8-11.4k. But net fell to $48-83k, profit factor to 1.37-1.47, and
+    both histories' net per drawdown to 0.29-0.93.
+  - **A wider line stop** (0.5-3 noise units on 30-minute bars; `v24_sb30.csv`). The stand-in made less with a larger
+    drawdown: the tight line stop keeps losers small.
+  - **Equity-curve sizing** (`v24_eq5.csv`, `v24_eq30.csv`): fewer contracts while the closed P&L is under its average
+    of the last 5-40 trades. Net fell 30-50% on the histories, and drawdown wasn't better on both.
+
+```
+python research/v24_proxy.py <data dir> MNQ_09-26.Last.txt MNQ_12-26.Last.txt          # the stand-in
+python research/v24_scan.py '[{"max_losers": 4}]' out.csv '{"max_loss_per_trade": 1500, "lock_at": 0.5, "max_losers": 3}' \
+    <data dir> MNQ_09-26.Last.txt MNQ_12-26.Last.txt                                    # v2.4 against a variant
+```
+
 ## What this does and doesn't say
 
 - **It says** that the original sweep/breakout rules have no edge after realistic costs on 2023–2026 Nasdaq-100 data, and would very likely not pass a $25K evaluation. Of three published strategies, only noise-area momentum held up over 16 years, and even it fails most $25K evaluations.

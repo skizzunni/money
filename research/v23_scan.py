@@ -46,7 +46,14 @@ def sets() -> dict[str, list[dict]]:
         {"after_loss_qty_div": 1.0, "after_loss_ml_mult": 1.0}, {"last_entry_end": 0}, {"tighten_only": False},
         {"max_loss_per_trade": 350.0, "take_profit": 1.5, "lock_at": 0.85, "after_loss_qty_div": 1.0,
          "after_loss_ml_mult": 1.0}, {"max_losers": 0})]
-    return {"dials": dials, "risk": risk, "bigday": bigday, "against": against, "ablate": ablate}
+    # after v2.3: a second after-loss tier, smaller trades against the big day or none at all that day, and a side's
+    # run of losers across days
+    nxt = [{"big_day_k": 1.5, "big_day_n": 10, **k} for k in (
+        [{"after_loss2_qty_div": q, "after_loss2_ml_mult": m} for q, m in ((10 / 7, 1.0), (10 / 8, 1.4), (10 / 9, 1.0),
+                                                                         (10 / 9, 1.6))]
+        + [{"big_day_against_qty_div": q} for q in (10 / 8, 10 / 6, 2.0)] + [{"big_day_both": True}]
+        + [{"side_run_k": k, "side_run_skip": n} for k in (2, 3, 4) for n in (1, 2, 4)])]
+    return {"dials": dials, "risk": risk, "bigday": bigday, "against": against, "ablate": ablate, "next": nxt}
 
 
 def job(kw: dict) -> dict:
@@ -75,7 +82,8 @@ def job(kw: dict) -> dict:
 
 def main() -> None:
     paths, out, which = sys.argv[1:5], Path(sys.argv[5]), sys.argv[6]
-    base = [{"big_day_k": 1.5, "big_day_n": 10}] if which in ("against", "ablate") else [{}]  # v2.3 from "against"
+    v23 = which in ("against", "ablate", "next")  # the sets from "against" on start from v2.3
+    base = [{"big_day_k": 1.5, "big_day_n": 10}] if v23 else [{}]
     variants = base + sets()[which]
     with ProcessPoolExecutor(4, initializer=V.init, initargs=(paths,)) as ex:
         rows = list(ex.map(job, variants))

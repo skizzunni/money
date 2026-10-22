@@ -112,6 +112,34 @@ class NoiseConfig:
     big_day_k: float = 0.0
     big_day_n: int = 20
     big_day_against_tp: float = -1.0  # research: the take-profit of a trade against the big session (-1: as others)
+    # research (after v2.3): a trade against the big session takes cfg.qty / big_day_against_qty_div contracts (the
+    # same max loss, a wider stop); big_day_both: no entries at all the day after a big session
+    big_day_against_qty_div: float = 1.0
+    big_day_both: bool = False
+    # research (after v2.3): after side_run_k losing trades in a row on one side (across days; a winner on that side
+    # resets it), skip the next side_run_skip signals on that side
+    side_run_k: int = 0
+    side_run_skip: int = 1
+    # research (v2.4 study): once the lock arms, add add_at_lock contracts at the next bar's open; they share the
+    # position's exits (stop, lock, take-profit, 16:00) and close with it
+    add_at_lock: int = 0
+    # research (v2.4 study): the trend, the last session's close against the average of the last trend_n sessions'
+    # closes. A trade against it (on side trend_side only; 0: both) is skipped, or with trend_qty_div > 0 takes
+    # cfg.qty / trend_qty_div contracts (the same max loss)
+    trend_n: int = 0
+    trend_side: int = 0
+    trend_qty_div: float = 0.0
+    trend_ml_mult: float = 1.0  # the against-trend trade's max loss x this
+    trend_with_mult: float = 1.0  # a trade with the trend: contracts and max loss x this (the same stop in points)
+    trend_with_ml: float = 1.0  # a trade with the trend: its max loss x this (the same contracts)
+    # research (v2.4 study): no new entries at these checks (minutes of the day the check's bar closes, e.g. "840")
+    skip_checks: str = ""
+    after_target_done: bool = False  # research: no new entries today after a take-profit fills
+    # research (v2.4 study): the equity curve. While the closed-trade P&L is below its average over the last eq_n
+    # trades (positions), a new entry takes cfg.qty / eq_div contracts and the max loss x eq_ml
+    eq_n: int = 0
+    eq_div: float = 2.0
+    eq_ml: float = 1.0
     late_tp: float = 0.0
     late_tp_from: int = 0
     # research only (v2.2 study), off by default: a runner after the take-profit. tp_keep: the share of the contracts
@@ -224,8 +252,15 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
     day_ranges: list[float] = []  # completed sessions' range / open, oldest first
     day_dirs: list[int] = []  # and their direction (close against open)
     block_dir = 0  # big_day_k: no entries on this side today
+    day_closes: list[float] = []  # completed sessions' closes (trend_n)
+    trend = 0  # trend_n: the trend's direction today
+    target_today = False  # after_target_done: a take-profit filled today
+    eq_curve: list[float] = [0.0]  # eq_n: the closed P&L after each position
     side_cd = {1: 0, -1: 0}  # signals still to skip on a side today (side_cooldown)
     side_lost = {1: False, -1: False}  # a loser on that side today (side_margin)
+    side_run = {1: 0, -1: 0}  # losers in a row on each side, across days (side_run_k)
+    side_skip = {1: 0, -1: 0}  # signals still to skip on each side (side_run_k)
+    add_px, add_bar, add_due = math.nan, 0, False  # add_at_lock: the added contracts' fill, its bar, an add to send
     locked = False  # the trade has reached the lock trigger (a broker's auto-breakeven)
     held, held_why = math.nan, ""  # tighten_only: the tightest stop so far in this trade, and what set it
     rest, part_pnl = 1.0, 0.0  # partial_at: the share still open, and what the closed part made
@@ -276,9 +311,21 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
 
     def close_pos(i: int, price: float, reason: str) -> None:
         nonlocal pos, held, locked, losers_today, rest, part_pnl, best, consec, skip_left, loss_side, tp_dist
+        nonlocal add_px, add_due, target_today
         pnl = rest * (pos * (price - entry_px) * q_trade * cfg.point_value - 2 * cfg.commission_per_side * q_trade)
         trades.append(NoiseTrade(pos, q_trade, entry_bar, idx[entry_bar], entry_px, i, idx[i], price, reason, pnl,
                                  rest))
+        if not math.isnan(add_px):  # the added contracts close with the position (one trade for the loser count)
+            n = cfg.add_at_lock
+            ap = pos * (price - add_px) * n * cfg.point_value - 2 * cfg.commission_per_side * n
+            trades.append(NoiseTrade(pos, cfg.add_at_lock, add_bar, idx[add_bar], add_px, i, idx[i], price, "Added",
+                                     ap, 1.0))
+            pnl += ap
+        add_px, add_due = math.nan, False
+        if cfg.eq_n:
+            eq_curve.append(eq_curve[-1] + pnl + part_pnl)
+        if reason == "Target":
+            target_today = True
         if pnl + part_pnl < 0 and reason != "Session ended":  # a trade closed in parts is one trade
             losers_today += 1
             consec += 1
@@ -287,9 +334,13 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                 skip_left = cfg.streak_skip
             side_cd[pos] = cfg.side_cooldown
             side_lost[pos] = True
+            side_run[pos] += 1
+            if cfg.side_run_k and side_run[pos] >= cfg.side_run_k:
+                side_skip[pos], side_run[pos] = cfg.side_run_skip, 0
         elif pnl + part_pnl >= 0:
             consec = 0
             side_lost[pos] = False
+            side_run[pos] = 0
         pos, held, locked, rest, part_pnl, best, tp_dist = 0, math.nan, False, 1.0, 0.0, math.nan, math.nan
 
     def study_ok(d: int, past_margin: bool) -> bool:
@@ -299,7 +350,16 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             return False
         if cfg.last_entry_end and end > cfg.last_entry_end:
             return False
-        if block_dir and d == block_dir:
+        if cfg.skip_checks and str(end) in cfg.skip_checks.split(","):
+            return False
+        if cfg.after_target_done and target_today:
+            return False
+        if block_dir and (d == block_dir or cfg.big_day_both):
+            return False
+        if side_skip[d] > 0:
+            side_skip[d] -= 1
+            return False
+        if against_trend(d) and not cfg.trend_qty_div:
             return False
         if cfg.side_margin and side_lost[d] and not past_margin:
             return False
@@ -310,6 +370,9 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             skip_left -= 1
             return False
         return True
+
+    def against_trend(d: int) -> bool:
+        return bool(cfg.trend_n) and d == -trend and cfg.trend_side in (0, d)
 
     def close_part(i: int, price: float, f: float | None = None) -> None:
         nonlocal rest, part_pnl
@@ -338,6 +401,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                     close_pos(i, o[i] - pos * slip, "reversed")
                 if pos == 0:
                     open_pos(i, d)
+        if add_due and pos:  # add_at_lock: a market order from the last bar
+            add_px, add_bar, add_due = o[i] + pos * slip, i, False
 
         # the resting stop at the line (checked before the script-side logic, like the broker)
         if use_stop and pos and not math.isnan(upper):
@@ -423,6 +488,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             # the lock arms when the bar reaches the trigger (high for a long, low for a short), from the next bar
             trigger = lock_trade * ml_trade / q_trade / cfg.point_value
             locked = pos * ((h[i] if pos > 0 else l[i]) - entry_px) >= trigger
+            add_due = locked and cfg.add_at_lock > 0
 
         if pos and (not in_rth or t_min == RTH_OPEN):  # a session ended early (half day, data gap)
             close_pos(i, c[i] - pos * slip, "Session ended")
@@ -430,6 +496,10 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
 
         if t_min == RTH_OPEN:
             block_dir = 0
+            target_today = False
+            if cfg.trend_n and len(day_closes) >= cfg.trend_n:
+                ma = sum(day_closes[-cfg.trend_n:]) / cfg.trend_n
+                trend = 1 if day_closes[-1] > ma else -1 if day_closes[-1] < ma else 0
             if cfg.big_day_k > 0 and len(day_ranges) >= cfg.big_day_n:
                 avg = sum(day_ranges[-cfg.big_day_n:]) / cfg.big_day_n
                 if day_ranges[-1] > cfg.big_day_k * avg:
@@ -503,8 +573,20 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                     qd = (cfg.after_loss2_qty_div or 1.0) if tier2 else cfg.after_loss_qty_div
                     mm = (cfg.after_loss2_ml_mult or 1.0) if tier2 else cfg.after_loss_ml_mult
                     q_next = max(1, round(cfg.qty / qd)) if after_loss else cfg.qty
-                    lock_next = cfg.after_loss_lock if (after_loss and cfg.after_loss_lock > 0) else cfg.lock_at
                     ml_next = cfg.max_loss_per_trade * (mm if after_loss else 1.0)
+                    if cfg.trend_qty_div and against_trend(d):
+                        q_next = max(1, round(q_next / cfg.trend_qty_div))
+                        ml_next *= cfg.trend_ml_mult
+                    elif cfg.trend_n and d == trend:
+                        q_next = max(1, round(q_next * cfg.trend_with_mult))
+                        ml_next *= cfg.trend_with_mult * cfg.trend_with_ml
+                    if cfg.eq_n and len(eq_curve) > cfg.eq_n:
+                        if eq_curve[-1] < sum(eq_curve[-cfg.eq_n:]) / cfg.eq_n:
+                            q_next = max(1, round(q_next / cfg.eq_div))
+                            ml_next *= cfg.eq_ml
+                    if cfg.big_day_against_qty_div != 1.0 and block_dir == -d:
+                        q_next = max(1, round(q_next / cfg.big_day_against_qty_div))
+                    lock_next = cfg.after_loss_lock if (after_loss and cfg.after_loss_lock > 0) else cfg.lock_at
                     tp_next = cfg.after_loss_tp if (after_loss and cfg.after_loss_tp > 0) else cfg.take_profit
                     if cfg.late_tp > 0 and end >= cfg.late_tp_from:
                         tp_next = cfg.late_tp
@@ -554,6 +636,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             if not math.isnan(day_open) and not math.isnan(day_hi):  # big_day_k's session record
                 day_ranges.append((day_hi - day_lo) / day_open)
                 day_dirs.append(1 if c[i] > day_open else -1 if c[i] < day_open else 0)
+                day_closes.append(c[i])
             if not math.isnan(day_open) and not any(math.isnan(x) for x in today):
                 ring[slot * N_CHECKS : (slot + 1) * N_CHECKS] = today
                 slot = (slot + 1) % lb_n
