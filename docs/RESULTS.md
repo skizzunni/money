@@ -2486,6 +2486,27 @@ historical $50K evaluations (round thirteen).
 **The chart:** the 1-minute chart, or a broker's auto-breakeven, shows the lock's real win rate. The 5-minute chart moves
 it a bar late.
 
+## v1.8: the stop only ever tightens, on TradingView too (October 22, 2026)
+
+**The rule:** round one hundred and thirty-nine adopted it for the NinjaTrader strategy. In a trade, the stop never
+moves back toward the price. The Pine script had it only in webhook mode; v1.8 adds the setting **"Stop only ever
+tightens"**, on by default.
+
+**On the user's MNQ bars** (5-minute chart, 10 MNQ, $350):
+- At the script's costs: +$24,296 against +$24,078.
+- At $0.95 / 2 ticks: +$20,704 against +$20,501.
+- On the 1-minute chart: +$23,858 against +$23,625.
+
+The same trades, winners and drawdown each time.
+
+**The user's request this time:** "more profits and less losses."
+
+**What the earlier rounds found about filtering the quick stop-outs, which are most of the losses:**
+- The S&P confirmation, spike filters, better entry prices, waiting, time exits, a second chance, more room and a
+  VWAP stop each cost more profit than they saved, or failed the recent years (rounds 36-58, 95, 116, 138).
+- Over the first minutes after an entry, price is close to a coin flip. The lock trigger is the dial between more
+  winners and more profit from the runners.
+
 ## What this does and doesn't say
 
 - **It says** that the original sweep/breakout rules have no edge after realistic costs on 2023–2026 Nasdaq-100 data, and would very likely not pass a $25K evaluation. Of three published strategies, only noise-area momentum held up over 16 years, and even it fails most $25K evaluations.

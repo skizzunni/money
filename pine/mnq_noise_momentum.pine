@@ -15,6 +15,10 @@
 // Noise area for each half-hour mark = the day's open (and previous close) plus/minus the
 // average distance price has moved from the 09:30 open by that time over the last 14 sessions.
 //
+// v1.8, 2026-10-22: the stop only ever tightens (setting "Stop only ever tightens", on), as the NinjaTrader strategy
+// since round one hundred and thirty-nine (more net in all four test periods, slightly smaller drawdowns). On the user's
+// MNQ bars 6/29-10/16/2026 (5-minute chart, 10 MNQ, $350): +$24,296 against v1.7's +$24,078, the same trades and
+// drawdown.
 // v1.7, 2026-10-22: more winning trades, the v1.5 size. The lock arms at 0.85 max losses (14.9 points at 10 MNQ and
 // $350) instead of 1.0 (17.5): on NQ futures 2015-2025 (1-minute bars) 51.1% winners against 48.8% for $132 against
 // $129 a day at 10 MNQ; on the user's MNQ bars 6/29-10/16/2026 (5-minute chart) 49 winners in 112 trades (43.8%) against
@@ -41,7 +45,7 @@
 // max loss after the fill bar are checked once per bar, so a 30-minute chart sees them later than a trader would.
 // The rules are the same as the Python reference in mnqbot/noise.py.
 // ------------------------------------------------------------------
-strategy("MNQ Noise-Area Momentum v1.7", shorttitle = "Noise-Mom", overlay = true,
+strategy("MNQ Noise-Area Momentum v1.8", shorttitle = "Noise-Mom", overlay = true,
      initial_capital = 50000, currency = currency.USD,
      default_qty_type = strategy.fixed, default_qty_value = 1, pyramiding = 0,
      commission_type = strategy.commission.cash_per_contract, commission_value = 0.62,
@@ -87,6 +91,8 @@ lockAt = input.float(0.85, "Lock a small win: trigger, in max losses (0 = off)",
      tooltip = "Once a trade has been this far in profit (1 = as far as the max loss: 17.5 points with $350 on 10 MNQ), the stop moves to the entry plus the points below, so the trade can't turn into a loser. Like Tradovate's Auto Breakeven: set the trigger and the offset in your bracket (70 and +10 ticks at the defaults). Tested at $35 a contract on 1-minute data, 2011-2026 index and 2015-2025 NQ futures: winners from about 14% to 48%, the same money, a higher t-stat (docs/RESULTS.md, round thirty-seven). On a 5-minute chart the lock moves one bar after the trigger is touched, so the chart's backtest shows fewer winners than the broker gets: over 16 years at 10 MNQ and $350, about 40% on this chart against about 49% with Tradovate's Auto Breakeven (docs/RESULTS.md).")
 lockPlus = input.float(2.5, "Lock: stop to the entry plus, points", minval = 0, maxval = 50, step = 0.25, group = grpT,
      tooltip = "2.5 points is $5 a contract, more than the round-trip fees and a tick of slippage, so a locked trade closes as a small winner.")
+tightenOnly = input.bool(true, "Stop only ever tightens", group = grpT,
+     tooltip = "In a trade the stop never moves back toward the price: when the noise line steps back (it does in about 3 of 10 half-hour steps), the stop stays where it was. Adopted in the NinjaTrader strategy in round one hundred and thirty-nine: more net in all four test periods with a slightly smaller drawdown. Webhook orders always use it.")
 maxLosers = input.int(4, "Max losing trades a day (0 = no limit)", minval = 0, maxval = 20, group = grpT,
      tooltip = "After this many losing trades in a day, no new entries until tomorrow (an open trade runs on as usual). Tested before running at 10 MNQ and $350 with the lock, on 1-minute data: on 2011-2018, 2019-2022, 2023-2026 and NQ futures 2015-2025 it made more per day, with a higher t-stat and a smaller worst losing stretch (31% smaller on NQ futures). 1 or 2 losers cut the profit by a third or more: the winner often comes after a few stop-outs. See docs/RESULTS.md, round thirty-eight.")
 grpV = "Display"
@@ -358,13 +364,13 @@ if not na(lockL) and lockL > longStop
 if not na(lockS) and lockS < shortStop
     shortStop := lockS
     shortWhy := "Lock"
-// Webhook mode: the broker holds the stop placed with the entry and the strategy can't move it, so here the stop only
-// ever tightens (an exit message closes the trade when the chart's tighter stop fills). Same money in the tests.
+// The stop only ever tightens (v1.8, on by default; always in webhook mode, where the broker holds the stop placed with
+// the entry and an exit message closes the trade when the chart's tighter stop fills).
 var float heldL = na
 var float heldS = na
 var string heldWhyL = ""
 var string heldWhyS = ""
-if useHook and useStop
+if (useHook or tightenOnly) and useStop
     if strategy.position_size > 0 and not na(heldL) and heldL > longStop
         longStop := heldL
         longWhy := heldWhyL
@@ -422,7 +428,7 @@ if showDash and (barstate.islastconfirmedhistory or barstate.isrealtime)
     closed = strategy.closedtrades
     todayPnlDash = strategy.netprofit - dayStartNet
     wins = strategy.wintrades
-    table.cell(dash, 0, 0, "MNQ Noise Momentum v1.7: " + account + ", " + str.tostring(qty) + " MNQ", text_color = color.white, text_size = size.small)
+    table.cell(dash, 0, 0, "MNQ Noise Momentum v1.8: " + account + ", " + str.tostring(qty) + " MNQ", text_color = color.white, text_size = size.small)
     table.cell(dash, 1, 0, status, text_color = statusColor, text_size = size.small)
     table.cell(dash, 0, 1, "Sessions of history", text_color = color.silver, text_size = size.small)
     table.cell(dash, 1, 1, str.tostring(math.min(filled, lookback)) + " / " + str.tostring(lookback), text_color = color.white, text_size = size.small)
