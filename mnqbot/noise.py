@@ -111,6 +111,7 @@ class NoiseConfig:
     # close against its open). 0 = off; the Pine script's default since v2.3 is 1.5 x the last 10 sessions
     big_day_k: float = 0.0
     big_day_n: int = 20
+    big_day_against_tp: float = -1.0  # research: the take-profit of a trade against the big session (-1: as others)
     late_tp: float = 0.0
     late_tp_from: int = 0
     # research only (v2.2 study), off by default: a runner after the take-profit. tp_keep: the share of the contracts
@@ -507,6 +508,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                     tp_next = cfg.after_loss_tp if (after_loss and cfg.after_loss_tp > 0) else cfg.take_profit
                     if cfg.late_tp > 0 and end >= cfg.late_tp_from:
                         tp_next = cfg.late_tp
+                    if cfg.big_day_against_tp >= 0 and block_dir == -d:
+                        tp_next = cfg.big_day_against_tp
                     est_px = c[i] + d * slip  # the expected fill, for the max loss on the fill bar
                     stop = tp = math.nan
                     if use_stop:  # the bracket: the closer of the line stop and the max loss, and the take-profit

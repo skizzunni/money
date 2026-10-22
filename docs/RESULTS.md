@@ -2818,6 +2818,33 @@ before the chart trades and lost $1,065.)
 **The Pine script on the window:** 49 trades, 30 winners, +$25,295, drawdown $2,613, the same as the model. The
 setting is "After a big day" (0 turns it off).
 
+## After v2.3: checks and studies (October 22, 2026)
+
+**Every component of v2.3 still earns its place with the others present** (`research/v23_scan.py` set "ablate",
+`verification/noise_v2/v23_ablate.csv`). One at a time back to its earlier value:
+
+| v2.3 without | Window net | NQ net per DD vs v2.3 | Index net per DD vs v2.3 |
+|---|---:|---:|---:|
+| (v2.3) | 25,295 | 1.00 | 1.00 |
+| the after-loss size and max loss | 21,909 | 0.93 | 0.75 |
+| the 15:00 last entry | 23,923 | 0.84 | 0.90 |
+| the stop that only tightens | 25,072 | 0.97 | 0.99 |
+| v2.0's risk ($500, take-profit 2.0, lock 0.75), back to v1.8's | 20,112 | 0.62 | 0.65 |
+| the daily loser limit (0 = none) | 25,295 | 0.94 | 0.73 |
+
+**Not adopted:**
+- **A larger take-profit for trades against the big day** (none / 2.5 / 3.0; `v23_against.csv`): none +1-3%, 2.5
+  -2%, 3.0 +4% on the histories, all less on the window. Not monotone, so not trusted.
+- **Day-level descriptions, at v2.3's settings, on NQ and the index:**
+  - the overnight gap's size and direction;
+  - yesterday's direction alone;
+  - yesterday's range in buckets below 1.5 x;
+  - two days after a big day;
+  - how far price had already run from the open at entry, in fifths.
+
+  No bucket loses on both histories, so there is nothing to filter. Two days after a big day the effect is gone (NQ
+  -$59 against, the index +$17).
+
 ## What this does and doesn't say
 
 - **It says** that the original sweep/breakout rules have no edge after realistic costs on 2023–2026 Nasdaq-100 data, and would very likely not pass a $25K evaluation. Of three published strategies, only noise-area momentum held up over 16 years, and even it fails most $25K evaluations.

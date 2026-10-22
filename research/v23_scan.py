@@ -40,7 +40,13 @@ def sets() -> dict[str, list[dict]]:
             for ml, tp, aml in itertools.product((475.0, 500.0, 525.0), (1.9, 2.0, 2.1), (650.0, 700.0, 750.0))
             if (ml, tp, aml) != (500.0, 2.0, 700.0)]
     bigday = [{"big_day_k": k, "big_day_n": n} for k in (1.25, 1.5, 1.75, 2.0) for n in (10, 20)]
-    return {"dials": dials, "risk": risk, "bigday": bigday}
+    against = [{"big_day_k": 1.5, "big_day_n": 10, "big_day_against_tp": t} for t in (0.0, 2.5, 3.0)]
+    # v2.3 with one component at a time back to its earlier value (the sets after "against" start from v2.3)
+    ablate = [{"big_day_k": 1.5, "big_day_n": 10, **k} for k in (
+        {"after_loss_qty_div": 1.0, "after_loss_ml_mult": 1.0}, {"last_entry_end": 0}, {"tighten_only": False},
+        {"max_loss_per_trade": 350.0, "take_profit": 1.5, "lock_at": 0.85, "after_loss_qty_div": 1.0,
+         "after_loss_ml_mult": 1.0}, {"max_losers": 0})]
+    return {"dials": dials, "risk": risk, "bigday": bigday, "against": against, "ablate": ablate}
 
 
 def job(kw: dict) -> dict:
@@ -69,7 +75,8 @@ def job(kw: dict) -> dict:
 
 def main() -> None:
     paths, out, which = sys.argv[1:5], Path(sys.argv[5]), sys.argv[6]
-    variants = [{}] + sets()[which]
+    base = [{"big_day_k": 1.5, "big_day_n": 10}] if which in ("against", "ablate") else [{}]  # v2.3 from "against"
+    variants = base + sets()[which]
     with ProcessPoolExecutor(4, initializer=V.init, initargs=(paths,)) as ex:
         rows = list(ex.map(job, variants))
     d = pd.DataFrame(rows)
