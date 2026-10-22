@@ -184,3 +184,50 @@ All at $0.95 a side, 2 ticks base and 3 ticks stress.
 
 **The rule and the data:** the same selection rule (P1 and C1, then the highest net ÷ DD at 2 ticks), on the same
 development data. The holdout stays untouched.
+
+### 7.2 Development, amendment 1 (the same 1,208 sessions)
+
+**Source:** `verification/candidate_g/dev_a1/`.
+
+| 2 ticks | B | G-D cap line | G-D cap line+2R | G-F1 cap line | G-F1 cap line+2R |
+|---|---:|---:|---:|---:|---:|
+| Positions | 2,245 | 1,982 | 2,069 | 2,000 | 2,088 |
+| Net $ | 48,990 | 14,974 | 11,532 | 15,527 | 12,021 |
+| Intraday DD $ | 9,037 | 5,792 | 6,373 | 5,906 | 6,488 |
+| Net ÷ DD | 5.42 | 2.59 | 1.81 | 2.63 | 1.85 |
+| Average net trade $ | 21.82 | 7.56 | 5.57 | 7.76 | 5.76 |
+| Profit factor | 1.22 | 1.13 | 1.10 | 1.13 | 1.10 |
+| Net at 3 ticks $ | 37,508 | 11,985 | 8,308 | 12,531 | 8,787 |
+| **Campaigns per eligible session (P1)** | 1.86 | **1.64** | 1.71 | **1.66** | 1.73 |
+| Sessions with 0 / 1 / 2 / 3 campaigns % | 42 / 14 / 10 / 12 (+22) | 19 / 31 / 16 / 34 | 19 / 29 / 12 / 39 | 19 / 31 / 17 / 34 | 19 / 29 / 13 / 39 |
+| Evaluations: pass / breach / expired (of 58) | 17 / 34 / 7 | 1 / 4 / 53 | 0 / 4 / 54 | 1 / 4 / 53 | 0 / 5 / 53 |
+
+**What the line trail did:**
+- Net is 2.4 times family 1's, the drawdown is lower, and net ÷ DD is 2.6 (0.96 before).
+- The noise sleeve went from +$0.70 to +$7.85 a trade.
+
+**The selection rule:** P1 still fails (1.64-1.73), so nothing is frozen.
+
+**Participation (development):**
+- 19% of sessions have no qualified setup in any sleeve.
+- One-campaign sessions are mostly a single Williams breakout.
+
+**The evaluation outcomes:**
+- At $125 a campaign, the best variant nets about $3,100 a year. A $3,000 target in 30 days would need about 0.7R net
+  per campaign.
+- G1 (60% passes) and G2 (expiry ≤ 15%) cannot be met under the $125 rule by any variant of this kind.
+- They stay in the gate table and are reported as they come out.
+
+### Amendment 2 (pre-registered before it was run): a 15-minute check grid for the noise sleeve
+
+**The change:**
+- The noise sleeve checks every 15 minutes from 10:00 to 15:30 (23 checks), not every 30 (12).
+- Each check's noise is the average over the last 14 sessions of |close ÷ open - 1| at that minute: the same
+  definition at the finer grid.
+- The line trail of amendment 1 follows the 15-minute lines.
+- Frozen B's engine (`MnqNoiseEngine.cs`) is not touched. The grid is the candidate's own.
+
+**The aim:** more qualified chances to re-enter after a stop or a scratch on active days, without forcing a trade.
+
+**The family** (`G_AMEND2`): G-D cap line q15, G-F1 cap line q15. The selection rule, data and holdout are as
+before.

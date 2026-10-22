@@ -1,11 +1,11 @@
 """Candidate G (docs/CANDIDATE_G.md): the daily candidate with its stop fitted to the $125 budget, by the protocol
 pre-registered there.
 
-    python research/eval_g.py dev <nq1m_scaled.pkl> <nq1m raw folder> <B sim.dll> <out folder> [family: 1 | a1]
+    python research/eval_g.py dev <nq1m_scaled.pkl> <nq1m raw folder> <B sim.dll> <out folder> [family: 1 | a1 | a2]
     python research/eval_g.py holdout-nq <nq1m_scaled.pkl> <nq1m raw folder> <B sim.dll> <out folder>
     python research/eval_g.py holdout-mnq <MNQ_09-26.Last.txt> <MNQ_12-26.Last.txt> <B sim.dll> <out folder>
 
-dev: a development family (1: the six variants of section 3; a1: amendment 1, section 7) on NQ 2015-03 to 2019-12
+dev: a development family (1: the six variants of section 3; a1, a2: amendments, section 7) on NQ 2015-03 to 2019-12
 against frozen B on the same sessions, and the selection rule's verdict. holdout-*: only the variant frozen in
 verification/candidate_g/frozen.txt (written by the freeze step, after the development results and before any holdout
 run), against frozen B, with every gate.
@@ -29,7 +29,9 @@ G_FAMILY = {f"G-{book} {fit}": {**kw, "stop_fit": fit}
             for book, kw in (("D", {}), ("F1", F1), ("F2", F2)) for fit in ("cap", "budget")}
 G_AMEND1 = {f"G-{book} cap {name}": {**kw, "stop_fit": "cap", "runner_trail": trail}
             for book, kw in (("D", {}), ("F1", F1)) for name, trail in (("line", "line"), ("line+2R", "line_2r"))}
-FAMILIES = {"1": G_FAMILY, "a1": G_AMEND1}
+G_AMEND2 = {f"G-{book} cap line q15": {**kw, "stop_fit": "cap", "runner_trail": "line", "check_step": 15}
+            for book, kw in (("D", {}), ("F1", F1))}
+FAMILIES = {"1": G_FAMILY, "a1": G_AMEND1, "a2": G_AMEND2}
 ALL = {k: v for f in FAMILIES.values() for k, v in f.items()}
 PERIODS = {"dev": ("2015-03-01", "2019-12-31"), "holdout-nq": ("2020-01-01", "2025-06-30"),
            "holdout-mnq": ("2026-07-20", None)}

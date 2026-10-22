@@ -101,6 +101,8 @@ class DConfig:
     # runner trails by "r" (trail_r x R behind the best price: D-G), "line" (the line only) or "line_2r" (the tighter of
     # the line and 2R behind the best price). Williams and sweep campaigns always trail by "r".
     runner_trail: str = "r"
+    # G amendment 2: the noise sleeve's check grid, minutes (30: frozen B's 12 checks 10:00-15:30; 15: 23 checks)
+    check_step: int = 30
 
 
 @dataclass
@@ -138,8 +140,10 @@ class NoiseLines:
     def __init__(self, cfg: DConfig):
         self.lb = cfg.lookback
         self.skip, self.fed = cfg.skip_dates, cfg.fed_dates
-        self.ring = [math.nan] * (self.lb * NCHECKS)
-        self.today = [math.nan] * NCHECKS
+        self.step = cfg.check_step
+        self.n = (LAST_CHECK - FIRST_CHECK) // self.step + 1
+        self.ring = [math.nan] * (self.lb * self.n)
+        self.today = [math.nan] * self.n
         self.filled = self.slot = 0
         self.day_open = self.prev_close = self.last_raw = math.nan
         self.upper = self.lower = self.sigma = math.nan
@@ -154,26 +158,26 @@ class NoiseLines:
             self.prev_close = self.last_raw * scale
             self.day_open = o
             self.upper = self.lower = self.sigma = math.nan
-            self.today = [math.nan] * NCHECKS
+            self.today = [math.nan] * self.n
             self.skip_today = day in self.skip
             self.fed_today = day in self.fed
         if in_rth:
             self.last_raw = c / scale
         if (in_rth and not math.isnan(self.day_open) and FIRST_CHECK <= end <= LAST_CHECK
-                and (end - FIRST_CHECK) % STEP == 0):
-            k = (end - FIRST_CHECK) // STEP
+                and (end - FIRST_CHECK) % self.step == 0):
+            k = (end - FIRST_CHECK) // self.step
             self.today[k] = abs(c / self.day_open - 1)
             if self.filled >= self.lb and not math.isnan(self.prev_close):
                 s = 0.0
                 for d in range(self.lb):
-                    s += self.ring[d * NCHECKS + k]
+                    s += self.ring[d * self.n + k]
                 self.sigma = s / self.lb
                 self.upper = max(self.day_open, self.prev_close) * (1 + self.sigma)
                 self.lower = min(self.day_open, self.prev_close) * (1 - self.sigma)
                 self.check_end = end
         if in_rth and end == RTH_CLOSE:
             if not math.isnan(self.day_open) and not any(math.isnan(x) for x in self.today):
-                self.ring[self.slot * NCHECKS:(self.slot + 1) * NCHECKS] = self.today
+                self.ring[self.slot * self.n:(self.slot + 1) * self.n] = self.today
                 self.slot = (self.slot + 1) % self.lb
                 self.filled += 1
             self.day_open = math.nan
