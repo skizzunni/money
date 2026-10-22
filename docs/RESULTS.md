@@ -2671,6 +2671,50 @@ loser gets a wider stop and is not skipped. Skipping was the v2.1 study's approa
 **On the window:** the Pine script itself gives the same as the model: 57 trades (22 of them at 9 MNQ), +$25,052,
 drawdown $2,580.
 
+## v2.2: no new entries from the 15:30 check (October 22, 2026)
+
+**The user's chart for v2.1:** +$21,257, drawdown $3,845, 56% winners. Most of the drawdown is 10/19-10/21: four
+after-loss trades in a row, each stopped for about $700.
+
+**Tested on top of v2.1, not adopted** (`verification/noise_v2/after_loss4.csv`, `runner.csv`):
+- **A second tier after two or more losers in a row** (7 MNQ / $500, 5 / $500, 9 / $500, back to 10 / $500, 9 / $900,
+  8 / $625):
+  - The best, 8 / $625, keeps the stop distance and risks less on the third and later trades of a run.
+  - Net and drawdown came out about equal to v2.1: index net per drawdown 1.31 against 1.29 of v2.0's, NQ 0.88
+    against 0.87, the window $23,840 against $25,052.
+- **The wider stop only on the losing trade's side:** the back-to-back share rose again (39% on the window).
+- **A runner after the take-profit:**
+  - Keeping 30% or 50% of the contracts past the target, with or without locking half its distance and a second
+    target at 4 noise units.
+  - Less on every dataset: the window $17,270-$18,600 against $25,052; NQ and the index 6-20% less.
+  - The full take-profit is the better exit for this strategy.
+
+**Adopted: no new entries from the 15:30 check.**
+
+By entry time at v2.1's settings, the 15:30 entries lost on average on every dataset:
+
+| | 15:30 entries | Average | Total |
+|---|---:|---:|---:|
+| NQ 2015-2025 | 258 | -$58 | -$14,869 |
+| Index 2011-2026 | 370 | -$53 | -$19,481 |
+| Window | 4 | -$293 | -$1,173 |
+
+They have 25 minutes to reach a two-noise-unit target before 15:55. Round thirty-four found the opposite at the old
+settings (a 17.5-point stop and a 1.5 target), where the 15:30 entries paid.
+
+| | Window net / DD | NQ net / DD | Index net / DD |
+|---|---|---|---|
+| v2.1 | 25,052 / 2,580 | 317,536 / 31,550 | 587,013 / 33,394 |
+| **v2.2: last entry 15:00** | **26,425 / 2,613** | **329,768 / 31,888** | **606,437 / 30,697** |
+| Last entry 14:30 | 26,360 / 2,613 | 300,549 / 30,015 | 537,357 / 32,702 |
+
+**Year by year it is mixed:** better in 6 of 11 NQ years and 9 of 16 index years. It is a small edge with a reason
+behind it, not a large one.
+
+**The heads-up:** v2.2 also stops the five-minutes-ahead alert for a check that can no longer open a trade.
+
+**The Pine script on the window:** 53 trades, 33 winners, +$26,425, drawdown $2,613, the same as the model.
+
 ## What this does and doesn't say
 
 - **It says** that the original sweep/breakout rules have no edge after realistic costs on 2023–2026 Nasdaq-100 data, and would very likely not pass a $25K evaluation. Of three published strategies, only noise-area momentum held up over 16 years, and even it fails most $25K evaluations.

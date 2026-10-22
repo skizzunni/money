@@ -96,6 +96,21 @@ class NoiseConfig:
     # it only at a check on the hour
     after_loss_qty_div: float = 1.0
     after_loss_ml_mult: float = 1.0  # its max loss x this (the same contracts, a wider stop)
+    # a second tier for two or more losers in a row (0: the same as after one loser), and the rule on the losing
+    # trade's side only (another side: the normal size)
+    after_loss2_qty_div: float = 0.0
+    after_loss2_ml_mult: float = 0.0
+    after_loss_same_side: bool = False
+    # research only (v2.2 study), off by default: a runner after the take-profit. tp_keep: the share of the contracts
+    # kept open when the take-profit fills (rounded to whole contracts); the rest keeps every stop rule, plus
+    # runner_lock (the stop at the entry plus this share of the take-profit's distance) and tp2 (a second take-profit,
+    # noise units from the entry; 0 = none)
+    tp_keep: float = 0.0
+    # no new entries from checks closing after this minute of the day (900: 15:00, the Pine script's default since v2.2;
+    # 0 = every check)
+    last_entry_end: int = 0
+    runner_lock: float = 0.0
+    tp2: float = 0.0
     after_loss_lock: float = 0.0
     after_loss_hourly: bool = False
     streak_k: int = 0
@@ -191,11 +206,13 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
     est_px = math.nan  # expected fill of the pending entry
     losers_today = 0  # losing trades closed today
     consec = skip_left = 0  # the v2.1 study's streak rule: losers in a row, signals still to skip
+    loss_side = 0  # the side of the last losing trade
     side_cd = {1: 0, -1: 0}  # signals still to skip on a side today (side_cooldown)
     side_lost = {1: False, -1: False}  # a loser on that side today (side_margin)
     locked = False  # the trade has reached the lock trigger (a broker's auto-breakeven)
     held, held_why = math.nan, ""  # tighten_only: the tightest stop so far in this trade, and what set it
     rest, part_pnl = 1.0, 0.0  # partial_at: the share still open, and what the closed part made
+    tp_dist = math.nan  # tp_keep: the first take-profit's distance from the entry once it filled (the runner is on)
     best = math.nan  # trail_points: the best high (long) / low (short) since the entry, to the last bar's close
     r_pts = cfg.max_loss_per_trade / cfg.qty / cfg.point_value if cfg.max_loss_per_trade > 0 else math.nan
     if cfg.partial_r not in ("cap", "initial"):
@@ -240,13 +257,14 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
         q_trade, lock_trade, ml_trade = q_next, lock_next, ml_next
 
     def close_pos(i: int, price: float, reason: str) -> None:
-        nonlocal pos, held, locked, losers_today, rest, part_pnl, best, consec, skip_left
+        nonlocal pos, held, locked, losers_today, rest, part_pnl, best, consec, skip_left, loss_side, tp_dist
         pnl = rest * (pos * (price - entry_px) * q_trade * cfg.point_value - 2 * cfg.commission_per_side * q_trade)
         trades.append(NoiseTrade(pos, q_trade, entry_bar, idx[entry_bar], entry_px, i, idx[i], price, reason, pnl,
                                  rest))
         if pnl + part_pnl < 0 and reason != "Session ended":  # a trade closed in parts is one trade
             losers_today += 1
             consec += 1
+            loss_side = pos
             if cfg.streak_k and consec >= cfg.streak_k:
                 skip_left = cfg.streak_skip
             side_cd[pos] = cfg.side_cooldown
@@ -254,12 +272,14 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
         elif pnl + part_pnl >= 0:
             consec = 0
             side_lost[pos] = False
-        pos, held, locked, rest, part_pnl, best = 0, math.nan, False, 1.0, 0.0, math.nan
+        pos, held, locked, rest, part_pnl, best, tp_dist = 0, math.nan, False, 1.0, 0.0, math.nan, math.nan
 
     def study_ok(d: int, past_margin: bool) -> bool:
         """The v2.1 study's rules (all off by default): may a signal on side d be taken?"""
         nonlocal skip_left
         if cfg.after_loss_hourly and consec > 0 and end % 60:
+            return False
+        if cfg.last_entry_end and end > cfg.last_entry_end:
             return False
         if cfg.side_margin and side_lost[d] and not past_margin:
             return False
@@ -271,9 +291,9 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             return False
         return True
 
-    def close_part(i: int, price: float) -> None:
+    def close_part(i: int, price: float, f: float | None = None) -> None:
         nonlocal rest, part_pnl
-        f = cfg.partial_frac
+        f = cfg.partial_frac if f is None else f
         part_pnl = f * (pos * (price - entry_px) * q_trade * cfg.point_value - 2 * cfg.commission_per_side * q_trade)
         trades.append(NoiseTrade(pos, q_trade, entry_bar, idx[entry_bar], entry_px, i, idx[i], price, "Partial",
                                  part_pnl, f))
@@ -317,6 +337,10 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                 lk = entry_px + pos * cfg.lock_plus
                 if (pos > 0 and lk > line) or (pos < 0 and lk < line):
                     line, reason = lk, "Lock"
+                if not math.isnan(tp_dist) and cfg.runner_lock > 0:  # research: the runner keeps part of the target
+                    rl = entry_px + pos * cfg.runner_lock * tp_dist
+                    if (pos > 0 and rl > line) or (pos < 0 and rl < line):
+                        line, reason = rl, "Runner lock"
                 if cfg.trail_points > 0 and not math.isnan(best):  # research: trailing behind the best price
                     tr = best - pos * cfg.trail_points
                     if (pos > 0 and tr > line) or (pos < 0 and tr < line):
@@ -352,12 +376,23 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                     close_part(i, pt)
             if not pos or hit:
                 pass
+            elif not math.isnan(tp_dist):  # research: the runner after the take-profit, and its second target
+                if cfg.tp2 > 0:
+                    t2 = entry_px * (1 + pos * cfg.tp2 * sigma)
+                    if (pos > 0 and h[i] >= t2 + cfg.tick) or (pos < 0 and l[i] <= t2 - cfg.tick):
+                        close_pos(i, t2, "Target 2")
+                        events.append((i, "TARGET"))
             elif cfg.take_profit > 0 and (entry_bar != i or cfg.target_on_fill_bar):  # the take-profit limit
                 tp = (entry_px if entry_bar != i else est_px) * (1 + pos * cfg.take_profit * sigma)
                 if cfg.nt_execution:
                     tp = entry_px + pos * br_trade[1] if entry_bar == i else on_grid(pos, tp)
                 if (pos > 0 and h[i] >= tp + cfg.tick) or (pos < 0 and l[i] <= tp - cfg.tick):
-                    close_pos(i, tp, "Target")
+                    keep = round(q_trade * cfg.tp_keep) if cfg.tp_keep > 0 and rest == 1.0 else 0
+                    if 0 < keep < q_trade:
+                        close_part(i, tp, 1.0 - keep / q_trade)
+                        tp_dist = abs(tp - entry_px)
+                    else:
+                        close_pos(i, tp, "Target")
                     events.append((i, "TARGET"))
 
         if pos and cfg.trail_points > 0:  # the best price so far, as of this bar's close (used from the next bar)
@@ -431,10 +466,13 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                         events.append((i, "SELL"))
                 if pending is not None and pending[0] == "entry":
                     d = pending[1]
-                    after_loss = consec > 0
-                    q_next = max(1, round(cfg.qty / cfg.after_loss_qty_div)) if after_loss else cfg.qty
+                    after_loss = consec > 0 and (not cfg.after_loss_same_side or d == loss_side)
+                    tier2 = after_loss and consec >= 2 and (cfg.after_loss2_qty_div or cfg.after_loss2_ml_mult)
+                    qd = (cfg.after_loss2_qty_div or 1.0) if tier2 else cfg.after_loss_qty_div
+                    mm = (cfg.after_loss2_ml_mult or 1.0) if tier2 else cfg.after_loss_ml_mult
+                    q_next = max(1, round(cfg.qty / qd)) if after_loss else cfg.qty
                     lock_next = cfg.after_loss_lock if (after_loss and cfg.after_loss_lock > 0) else cfg.lock_at
-                    ml_next = cfg.max_loss_per_trade * (cfg.after_loss_ml_mult if after_loss else 1.0)
+                    ml_next = cfg.max_loss_per_trade * (mm if after_loss else 1.0)
                     est_px = c[i] + d * slip  # the expected fill, for the max loss on the fill bar
                     stop = tp = math.nan
                     if use_stop:  # the bracket: the closer of the line stop and the max loss, and the take-profit
@@ -455,7 +493,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
         nxt = end + 5
         if (in_rth and 5 % minutes == 0 and not math.isnan(day_open) and FIRST_CHECK <= nxt <= LAST_CHECK
                 and (nxt - FIRST_CHECK) % STEP == 0 and filled >= lb_n and not math.isnan(prev_close) and pos == 0
-                and not skip_today and (cfg.max_losers <= 0 or losers_today < cfg.max_losers)):
+                and not skip_today and (cfg.max_losers <= 0 or losers_today < cfg.max_losers)
+                and not (cfg.last_entry_end and nxt > cfg.last_entry_end)):
             k = (nxt - FIRST_CHECK) // STEP
             s = 0.0
             for d in range(lb_n):  # same summation order as the check

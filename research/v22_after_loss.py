@@ -33,6 +33,12 @@ VARIANTS = ([{}, {"max_losers": 0}]
                {"after_loss_ml_mult": 1.25, "after_loss_qty_div": 1.25}]
             + [{"after_loss_ml_mult": m, "after_loss_qty_div": q} for m in (1.1, 1.25, 1.4) for q in (1.1, 1.25, 1.5)
                if (m, q) != (1.25, 1.25)])
+T1 = {"after_loss_qty_div": 10 / 9, "after_loss_ml_mult": 1.4}  # v2.1
+VARIANTS += ([T1, {**T1, "after_loss_same_side": True}]
+             + [{**T1, "after_loss2_qty_div": q, "after_loss2_ml_mult": m}
+                for q, m in ((10 / 7, 1.0), (2.0, 1.0), (10 / 9, 1.0), (1.0, 1.0), (10 / 9, 1.8), (10 / 8, 1.25))])
+VARIANTS += [{**T1, "tp_keep": k, "runner_lock": rl, "tp2": t2} for k in (0.3, 0.5) for rl in (0.0, 0.5)
+             for t2 in (0.0, 4.0)]
 if len(sys.argv) > 6:  # only the variants whose number (0-based) is given
     VARIANTS = [VARIANTS[int(k)] for k in sys.argv[6].split(",")]
 
