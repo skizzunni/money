@@ -24,10 +24,11 @@
 //   * Flat at 15:55 (the order is sent at the 15:54 bar's close), or when the session ends early.
 // No daily P&L cap, no loser cutoff.
 //
-// Status: a DEVELOPMENT candidate. On NQ 2015-2019 (development data; simulator, not native NinjaTrader), $0.95 a side,
-// 2 ticks: 1,982 campaigns, net $14,974, intraday drawdown $5,792, 1.64 campaigns a session, sessions with 0/1/2/3
-// campaigns 19/31/16/34%. Its holdout (NQ 2020-2025, MNQ 2026) has not been run yet. This port follows the model's
-// rules; TradingView's fills inside a bar (stop and target on one bar, gaps) are its own, so expect small differences.
+// Status: frozen candidate G (simulator results, not native NinjaTrader; $0.95 a side, 2 ticks). Holdout, run once, on
+// NQ 2020-2025: 2,338 campaigns, net $16,726, intraday drawdown $4,936 (frozen B: $42,585 / $13,731), $12,421 at
+// 3 ticks, 1.72 campaigns a session, sessions with 0/1/2/3 campaigns 18/29/15/37%. MNQ 7/20-10/16/2026: net $1,652,
+// drawdown $1,580. Not accepted under its pre-registered gates (docs/CANDIDATE_G.md 7.4). This port matches the
+// Python model on 1,653 of 1,655 development campaigns; TradingView's own fills inside a bar may differ slightly.
 //
 // Chart: MNQ1! (or the front-month contract), 1 minute (the model's bars), RTH or ETH. 5 minutes also runs, with
 // stops and targets seen per 5-minute bar. Needs 14 complete sessions on the chart before the first noise trade.
