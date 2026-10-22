@@ -20,7 +20,8 @@ from mnqbot.noise import NoiseConfig, run
 
 ROOT = Path(__file__).resolve().parents[1]
 NOISE_PINE = ROOT / "pine" / "mnq_noise_momentum.pine"
-FUNDED = "FUNDED ACCOUNT (tick for 10 MNQ; untick for the 3 MNQ evaluation)"  # the script's account switch
+FUNDED = "FUNDED ACCOUNT (tick for the funded contracts; untick for the evaluation's)"  # the script's account switch
+LOCK = "Lock a small win: trigger, in max losses (0 = off)"  # the script's default is 0.85 (v1.7); the reference's 1.0
 P0 = 20_000.0
 BARS_PER_DAY = 78  # 09:30 .. 15:55 on 5-minute bars
 CHECK_10_00, CHECK_10_30, CLOSE_16_00 = 5, 11, 77  # bar numbers within a session
@@ -441,7 +442,8 @@ def assert_parity(bars, minutes=5, lookback=14, skip_dates=None, exit_mode="stop
     cfg = NoiseConfig(lookback=lookback, exit_mode=exit_mode, qty=qty)
     inputs = {"Sessions in the noise average": lookback}
     if lock_at is not None:
-        cfg.lock_at = inputs["Lock a small win: trigger, in max losses (0 = off)"] = lock_at
+        cfg.lock_at = lock_at
+    inputs[LOCK] = cfg.lock_at  # explicit: the script's default (0.85) is not the reference's (1.0)
     if max_losers is not None:
         cfg.max_losers = inputs["Max losing trades a day (0 = no limit)"] = max_losers
     if hook is not None:  # webhook orders on, for this contract
@@ -701,7 +703,7 @@ def test_pine_evaluation_tracker(target):
     bars = synth_bars(sessions=120, seed=3)
     days = sorted({d.date() for d in bars.index.tz_convert(NY)})
     start = days[40]
-    inputs = {FUNDED: True, "Contracts on a funded account": 10,
+    inputs = {FUNDED: True, "Contracts on a funded account": 10, LOCK: 1.0,
               "Max loss per trade, $ (all contracts, 0 = off)": 350.0,
               "Evaluation start date, YYYYMMDD (0 = off)": int(start.strftime("%Y%m%d")), "Profit target, $": target}
     pytest.importorskip("pynescript", reason="pip install pynescript to check the .pine files")
@@ -733,7 +735,7 @@ def test_pine_dashboard_shows_the_next_checks_lines():
     res = run(full, NoiseConfig())
     i, upper, lower = res.bands[-5]  # a check late in the data; cut the bars ten minutes before it
     cut = full.iloc[: i - 1]
-    rt = PineRuntime(load_pine(NOISE_PINE), cut, {FUNDED: True, "Contracts on a funded account": 1},
+    rt = PineRuntime(load_pine(NOISE_PINE), cut, {FUNDED: True, "Contracts on a funded account": 1, LOCK: 1.0},
                      timeframe_seconds=300)
     rt.run(lambda j, g: None)
     dash = [t.grid() for t in rt.tables if t.columns == 2 and t.grid() and t.grid()[0][0].startswith("MNQ Noise")][0]
@@ -743,14 +745,16 @@ def test_pine_dashboard_shows_the_next_checks_lines():
 
 
 @pytest.mark.slow
-@pytest.mark.parametrize("funded, qty", [(None, 3), (False, 3), (True, 10)])
-def test_pine_account_switch(funded, qty):
-    """The evaluation (the default) trades 3 MNQ, the funded switch 10, with the same $350 max loss: the stop and the
-    lock scale."""
+@pytest.mark.parametrize("funded, eval_qty, qty", [(None, None, 10), (False, 3, 3), (True, 3, 10)])
+def test_pine_account_switch(funded, eval_qty, qty):
+    """The evaluation (the default) trades 10 MNQ as v1.5 did, or its own setting; the funded switch 10; the same $350
+    max loss, so the stop and the lock scale. The script's defaults, lock 0.85 included."""
     bars = synth_bars(sessions=60, seed=11)
     inputs = {} if funded is None else {FUNDED: funded}
+    if eval_qty is not None:
+        inputs["Contracts in an evaluation"] = eval_qty
     trades, events, _, _, _, heads = run_pine(bars, inputs, 5)
-    res = run(bars, NoiseConfig(qty=qty, max_loss_per_trade=350.0))
+    res = run(bars, NoiseConfig(qty=qty, max_loss_per_trade=350.0, lock_at=0.85))
     assert trades == trades_of(res) and events == res.events and heads == res.headsups
     assert len(trades) >= 10
 

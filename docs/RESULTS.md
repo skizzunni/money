@@ -2454,6 +2454,38 @@ check: [`research/nt_run_check.py`](../research/nt_run_check.py).
 - Six weeks of a strongly trending stretch: well above the 16-year average (35-37% of evaluations passed). It shows the
   strategy runs in NinjaTrader as tested; it is not a forecast.
 
+## Round one hundred and forty: v1.7, the v1.5 size with more winners (October 22, 2026)
+
+**What the user asked:** the v1.5 results (10 MNQ, $350 max loss) with more winning trades, after the daily
+candidate G (docs/CANDIDATE_G.md) made about $170 on the same TradingView chart.
+
+**What was changed:** the lock trigger, from 1.0 to 0.85 max losses, so 14.9 points at 10 MNQ instead of 17.5. Nothing
+else changed. The evidence is the earlier rounds:
+- "The lock dial, finely": NQ futures 2015-2025 on 1-minute bars, 51.1% winners against 48.8%, $132 against $129 a
+  day ×10, and a worst stretch of $16,377 against $18,347.
+
+**On the user's MNQ bars** (traded contracts, 6/29-10/16/2026, `research/v15_lock_mnq.py`; the user's v1.5 source in
+the interpreter at 10 MNQ and $350):
+
+| | 5-min, script costs ($0.62 / 1 tick) | 5-min, $0.95 / 2 ticks | 1-min, script costs | 1-min, $0.95 / 2 ticks |
+|---|---|---|---|---|
+| Lock 1.0 (v1.5) | 45 / 111 winners (40.5%), +$21,487 | 40.9%, +$21,731 | 50.8%, +$20,624 | 48.7%, +$19,438 |
+| **Lock 0.85 (v1.7)** | **49 / 112 (43.8%), +$24,078** | **43.4%, +$20,501** | **52.0%, +$23,625** | **52.4%, +$19,746** |
+| Lock 0.75 | 43.4%, +$23,710 | 42.1%, +$20,087 | 50.4%, +$20,918 | 50.0%, +$17,312 |
+
+The closed-trade drawdown is the same, $4,181 (5-minute, script costs).
+
+**The trade-off is the one rounds 52-58 found:**
+- An earlier lock saves stopped-out losers and cuts some runners short.
+- At $0.95 and 2 ticks on the 5-minute chart, 0.85 made about 6% less than 1.0 on these weeks.
+- Over 2023-2025 on NQ futures it roughly tied.
+
+**The evaluation size:** v1.7's evaluation size is 10 MNQ, as v1.5 traded, at the user's choice. 3 MNQ passed more
+historical $50K evaluations (round thirteen).
+
+**The chart:** the 1-minute chart, or a broker's auto-breakeven, shows the lock's real win rate. The 5-minute chart moves
+it a bar late.
+
 ## What this does and doesn't say
 
 - **It says** that the original sweep/breakout rules have no edge after realistic costs on 2023–2026 Nasdaq-100 data, and would very likely not pass a $25K evaluation. Of three published strategies, only noise-area momentum held up over 16 years, and even it fails most $25K evaluations.
