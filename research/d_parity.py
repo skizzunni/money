@@ -27,7 +27,10 @@ CONFIGS = {"D": {}, "D+E1": {"e1": True}, "D+E2": {"e1": True, "e2": True},
            "E only (code coverage)": {"noise": False, "williams": False, "e1": True, "e2": True},
            # candidate F (docs/CANDIDATE_F.md): E's chain with the stop at the FVG's far edge
            "D+F1": {"e1": True, "e_stop": "fvg"}, "D+F2": {"e1": True, "e2": True, "e_stop": "fvg"},
-           "F only (code coverage)": {"noise": False, "williams": False, "e1": True, "e2": True, "e_stop": "fvg"}}
+           "F only (code coverage)": {"noise": False, "williams": False, "e1": True, "e2": True, "e_stop": "fvg"},
+           # candidate G (docs/CANDIDATE_G.md): a stop wider than the budget moved in to it, or always the budget's
+           "G cap (D+F2)": {"e1": True, "e2": True, "e_stop": "fvg", "stop_fit": "cap"},
+           "G budget (D+F2)": {"e1": True, "e2": True, "e_stop": "fvg", "stop_fit": "budget"}}
 COLS = ["sleeve", "d", "kind", "signal_bar", "entry_bar", "exit_bar", "runner_fill", "runner_exit", "runner_why",
         "half_fill", "half_exit", "half_why", "stop0", "r", "planned", "pnl"]
 
@@ -36,6 +39,7 @@ def nt_positions(dll, csv, cfg_kw, budget, slip=2, extra=()):
     props = {"UseNoise": cfg_kw.get("noise", True), "UseWilliams": cfg_kw.get("williams", True),
              "UseE1": bool(cfg_kw.get("e1")), "UseE2": bool(cfg_kw.get("e2")), "RiskBudget": budget,
              "SweepStop": "FvgFarEdge" if cfg_kw.get("e_stop") == "fvg" else "SweepExtreme",
+             "StopFit": cfg_kw.get("stop_fit", "skip").capitalize(),
              "SimSlippageTicks": slip, "SimCommissionPerSide": 0.95, "SimExitExecutions": True, "EvalTarget": 0,
              "EvalTrail": 0, "NfpDates": NFP, **dict(extra)}
     r = subprocess.run([K.DOTNET, str(dll), str(csv), "1", "Strategy=D", *[f"{k}={v}" for k, v in props.items()]],

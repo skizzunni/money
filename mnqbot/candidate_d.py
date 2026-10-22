@@ -94,6 +94,9 @@ class DConfig:
     # selected FVG's far boundary - 2 ticks)
     e_stop: str = "extreme"
     fvg_stop_ticks: int = 2
+    # candidate G (docs/CANDIDATE_G.md): a setup whose stop does not fit the budget. "skip" (D, E, F: refused as
+    # unaffordable); "cap" (the stop moved in to the widest distance the budget allows); "budget" (always that distance)
+    stop_fit: str = "skip"
 
 
 @dataclass
@@ -406,6 +409,22 @@ class Sweep:
         return [self.pools[n] for n, pd_ in self.pools_on if pd_ == -d and n in self.pools]
 
 
+def max_r(cfg: DConfig, allowance_ticks: int) -> float:
+    """The widest R (points, on the grid) whose two-contract planned all-in risk fits the budget."""
+    return floor_tick((cfg.budget / cfg.qty - 2 * cfg.commission - allowance_ticks * TICK * PV) / PV)
+
+
+def fit_stop(d: int, entry: float, stop: float, cfg: DConfig, allowance_ticks: int) -> float:
+    """Candidate G's stop: unchanged under "skip"; moved toward the entry to max_r under "cap" when wider (rounded
+    toward the entry, so R never exceeds max_r), and always under "budget"."""
+    if cfg.stop_fit == "skip":
+        return stop
+    rmax = max_r(cfg, allowance_ticks)
+    if cfg.stop_fit == "budget" or d * (entry - stop) > rmax:
+        return toward(d, entry - d * rmax)
+    return stop
+
+
 def sweep_prices(dec: dict, scale: float, cfg: DConfig, mode: str | None = None) -> tuple[float, float, float, float]:
     """A sweep decision's limit, initial stop, R (points) and planned all-in risk ($, both contracts), in the decision
     bar's prices. mode: "extreme" (E) or "fvg" (F); default the configuration's. Both round the stop away from the
@@ -416,6 +435,7 @@ def sweep_prices(dec: dict, scale: float, cfg: DConfig, mode: str | None = None)
         stop = away(d, dec["far_raw"] * scale - d * cfg.fvg_stop_ticks * TICK)
     else:
         stop = away(d, (dec["extreme_raw"] - d * cfg.atr_mult * dec["atr_raw"]) * scale)
+    stop = fit_stop(d, lim, stop, cfg, cfg.allowance_limit)
     r = d * (lim - stop)
     planned = cfg.qty * (r * PV + 2 * cfg.commission + cfg.allowance_limit * TICK * PV)
     return lim, stop, r, planned
@@ -583,7 +603,7 @@ class Model:
             d = self.wb.signal
             cands.append(("williams", d, c - d * self.wb.stop_pts))
         for n, (name, d, structural) in enumerate(cands):
-            stop = away(d, structural)
+            stop = fit_stop(d, c, away(d, structural), cfg, cfg.allowance_market)
             r = d * (c - stop)
             planned = cfg.qty * (r * PV + 2 * cfg.commission + cfg.allowance_market * TICK * PV)
             if r <= 0 or planned > cfg.budget + 1e-9:

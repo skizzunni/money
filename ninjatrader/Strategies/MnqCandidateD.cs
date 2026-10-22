@@ -32,6 +32,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 {
     // The sweep setups' initial stop (docs/CANDIDATE_F.md): E's sweep extreme - 0.1 ATR, or F's FVG far edge - 2 ticks.
     public enum SweepStopReference { SweepExtreme, FvgFarEdge }
+    // candidate G (docs/CANDIDATE_G.md): a stop wider than the budget allows is refused (Skip: D, E, F), moved in to the
+    // widest affordable distance (Cap), or every stop is that distance (Budget)
+    public enum StopFitMode { Skip, Cap, Budget }
 
     // Sleeve E's causal sequence (docs/CANDIDATE_D.md section 3), fed every 1-minute bar.
     public sealed class SweepEngine
@@ -315,6 +318,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 UseE1 = false;
                 UseE2 = false;
                 SweepStop = SweepStopReference.SweepExtreme;
+                StopFit = StopFitMode.Skip;
                 RiskBudget = 125;
                 SizingCommission = 0.95;
                 AllowanceMarketTicks = 4;
@@ -366,7 +370,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 Print("D settings: " + Instrument.FullName + ", " + BarsPeriod.Value + " " + BarsPeriod.BarsPeriodType +
                       ", account " + (Account == null ? "none" : Account.Name) + ", PlaceOrders " + PlaceOrders +
                       ", sleeves " + (UseNoise ? "noise " : "") + (UseWilliams ? "Williams " : "") + (UseE1 ? "E1 " : "") +
-                      (UseE2 ? "E2 " : "") + ", sweep stop " + SweepStop + ", budget " + RiskBudget + ", commission " + SizingCommission + ", allowance " +
+                      (UseE2 ? "E2 " : "") + ", sweep stop " + SweepStop + ", stop fit " + StopFit + ", budget " + RiskBudget + ", commission " + SizingCommission + ", allowance " +
                       AllowanceMarketTicks + "/" + AllowanceLimitTicks + " ticks, breakeven +" + BreakevenOffset + ", half at " +
                       PartialR + "R, trail " + TrailR + "R, campaigns " + MaxCampaigns + ", target " + EvalTarget + ", trail $" + EvalTrail);
                 if (BarsPeriod.BarsPeriodType != BarsPeriodType.Minute || BarsPeriod.Value != 1)
@@ -397,6 +401,17 @@ namespace NinjaTrader.NinjaScript.Strategies
         double CeilTick(double x) { return Math.Ceiling(x / TickSize - 1e-7) * TickSize; }
         double Away(int d, double price) { return d > 0 ? FloorTick(price) : CeilTick(price); }
         double Toward(int d, double price) { return d > 0 ? CeilTick(price) : FloorTick(price); }
+
+        // the widest R (points, on the grid) whose two-contract planned all-in risk fits the budget
+        double MaxR(int allowanceTicks) { return FloorTick((RiskBudget / 2 - 2 * SizingCommission - allowanceTicks * TickSize * pv) / pv); }
+
+        double FitStop(int d, double entry, double stop, int allowanceTicks)
+        {
+            if (StopFit == StopFitMode.Skip) return stop;
+            double rmax = MaxR(allowanceTicks);
+            if (StopFit == StopFitMode.Budget || d * (entry - stop) > rmax) return Toward(d, entry - d * rmax);
+            return stop;
+        }
         string RunnerName { get { return campDir > 0 ? "Long" : "Short"; } }
         string HalfName { get { return campDir > 0 ? "Long half" : "Short half"; } }
         bool Exposed { get { return Position.MarketPosition != MarketPosition.Flat; } }
@@ -543,6 +558,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 double lim = d > 0 ? FloorTick(dec.Limit) : CeilTick(dec.Limit);
                 double stop = SweepStop == SweepStopReference.FvgFarEdge ? Away(d, dec.Far - d * 2 * TickSize)
                                                                           : Away(d, dec.Extreme - d * 0.1 * dec.Atr);
+                stop = FitStop(d, lim, stop, AllowanceLimitTicks);
                 double r = d * (lim - stop);
                 double planned = 2 * (r * pv + 2 * SizingCommission + AllowanceLimitTicks * TickSize * pv);
                 if (r <= 0 || planned > RiskBudget + 1e-9) { Refusal("sweep", d, "unaffordable"); continue; }
@@ -560,7 +576,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         bool TryMarket(string sleeve, int d, double c, double structural, string day)
         {
-            double stop = Away(d, structural);
+            double stop = FitStop(d, c, Away(d, structural), AllowanceMarketTicks);
             double r = d * (c - stop);
             double planned = 2 * (r * pv + 2 * SizingCommission + AllowanceMarketTicks * TickSize * pv);
             if (r <= 0 || planned > RiskBudget + 1e-9)
@@ -747,6 +763,10 @@ namespace NinjaTrader.NinjaScript.Strategies
         [NinjaScriptProperty]
         [Display(Name = "Sweep initial stop: sweep extreme (E) or FVG far edge + 2 ticks (F)", Order = 5, GroupName = "1. Sleeves")]
         public SweepStopReference SweepStop { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Stop wider than the budget: Skip (D, E, F), Cap to the budget (G), Budget always", Order = 6, GroupName = "1. Sleeves")]
+        public StopFitMode StopFit { get; set; }
 
         [NinjaScriptProperty]
         [Range(1, 10000)]

@@ -377,13 +377,19 @@ def main():
     argv = [a for a in sys.argv if a != "--f"]
     kind, out = argv[1], Path(argv[-1])
     candidates, stages = (F_CANDIDATES, F_STAGES) if use_f else (CANDIDATES, STAGES)
-    out.mkdir(parents=True, exist_ok=True)
     if kind == "nq":
         bars = nq_bars(argv[2], argv[3])
         dll, first = argv[4], pd.Timestamp("2015-03-01")
     else:
         bars = mnq_series(argv[2], argv[3])
         dll, first = argv[4], pd.Timestamp("2026-07-20")
+    evaluate(kind, bars, dll, first, candidates, stages, out)
+
+
+def evaluate(kind, bars, dll, first, candidates, stages, out):
+    """Every candidate (and frozen B) from the session `first` to the end of `bars`, at 2 and 3 ticks: comparison,
+    gates, windows, ledger and increments in `out`."""
+    out.mkdir(parents=True, exist_ok=True)
     skip = skip_set(bars)
     pkl = out / "bars.pkl"
     bars.to_pickle(pkl)
