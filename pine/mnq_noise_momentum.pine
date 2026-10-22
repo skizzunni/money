@@ -15,6 +15,12 @@
 // Noise area for each half-hour mark = the day's open (and previous close) plus/minus the
 // average distance price has moved from the 09:30 open by that time over the last 14 sessions.
 //
+// v2.1, 2026-10-22: fewer losers back to back. The trade after a losing trade uses 9 MNQ and a $700 max loss (a
+// 38.9-point stop) instead of 10 and $500 (25 points); a winner resets it. On the user's chart window (MNQ1! 5-minute,
+// trades from 8/24/2026 to the data's end on 10/16): +$25,052 against v2.0's +$22,762, drawdown $2,580 against $2,934,
+// losers followed by another loser 36% against 42%, longest losing streak 3 against 4. NQ futures 2015-2025: back-to-back
+// losers 51% against 57%, net level, drawdown +16%; Nasdaq-100 index 2011-2026: 50% against 55%, net +10%, drawdown -15%
+// (docs/RESULTS.md, v2.1; research/v22_after_loss.py). That trade risks up to $700.
 // v2.0, 2026-10-22: fewer and smaller losses, more winners. Max loss $500 (a 25-point stop at 10 MNQ), take-profit 2.0
 // noise units, lock at 0.75 max losses (18.75 points). On the user's TradingView window (MNQ1! 5-minute, trades from
 // 8/24/2026; the bars match the user's chart to the dollar through 10/16): +$22,762 against v1.8's +$17,973, drawdown
@@ -58,7 +64,7 @@
 // max loss after the fill bar are checked once per bar, so a 30-minute chart sees them later than a trader would.
 // The rules are the same as the Python reference in mnqbot/noise.py.
 // ------------------------------------------------------------------
-strategy("MNQ Noise-Area Momentum v2.0", shorttitle = "Noise-Mom", overlay = true,
+strategy("MNQ Noise-Area Momentum v2.1", shorttitle = "Noise-Mom", overlay = true,
      initial_capital = 50000, currency = currency.USD,
      default_qty_type = strategy.fixed, default_qty_value = 1, pyramiding = 0,
      commission_type = strategy.commission.cash_per_contract, commission_value = 0.62,
@@ -85,6 +91,9 @@ fundQty  = input.int(10, "Contracts on a funded account", minval = 1, maxval = 6
 qty = account == "Evaluation" ? evalQty : fundQty
 maxLoss  = input.float(500, "Max loss per trade, $ (all contracts, 0 = off)", minval = 0, step = 10, group = grpT,
      tooltip = "A second stop this many dollars from the entry fill, for the whole position, live from the fill like a bracket order; whichever of it and the line stop is closer is used. Spread over many contracts it gets tight: $350 over 10 contracts is a $35 stop each, which normal 5-minute moves hit, and on 2023-2026 it made about $6 a day per contract against about $20 at $117 each. On 16 years, caps of $100-$200 per contract raised profit per day in every period and cut the worst losing stretch. Fees, slippage and a gap through the stop can add to the loss.")
+afterQty = input.int(9, "After a losing trade: contracts (0 = the same)", minval = 0, maxval = 60, group = grpT,
+     tooltip = "The trade after a losing trade uses this many contracts and the max loss below, so its stop sits further away (9 MNQ and $700: 38.9 points, against 25 for 10 MNQ and $500). A winner, or the next trade, goes back to the normal size. Ordinary noise stopped many re-entries after a loss; the wider stop turned some of them into winners: back-to-back losers 36% against 42% of losers on the user's MNQ window, 51% against 57% on NQ futures 2015-2025 (docs/RESULTS.md, v2.1). It risks up to $700 on that trade.")
+afterMaxLoss = input.float(700, "After a losing trade: max loss per trade, $ (0 = the same)", minval = 0, step = 10, group = grpT)
 skipDates = input.string("2026-01-01,2026-01-19,2026-02-16,2026-04-03,2026-05-25,2026-06-19,2026-07-03,2026-09-07,2026-11-26,2026-11-27,2026-12-24,2026-12-25,2027-01-01,2027-01-18,2027-02-15,2027-03-26,2027-05-31,2027-06-18,2027-07-05,2027-09-06,2027-11-25,2027-11-26,2027-12-24",
      "Don't trade on these dates", group = grpT,
      tooltip = "YYYY-MM-DD, comma separated. Pre-filled with the 2026-2027 US market holidays and half days, when MNQ trades a short session. Add news days if you like.")
@@ -146,8 +155,8 @@ say(string msg) =>
     alert(msg, alert.freq_once_per_bar_close)
 // ── Webhook messages (TradersPost JSON), sent with order fills when "Webhook orders" is on
 hookSym = hookTicker != "" ? hookTicker : na(syminfo.current_contract) ? syminfo.ticker : syminfo.current_contract
-jsonEntry(string action, float est, float stop, float tp) =>
-    '{"ticker": "' + hookSym + '", "action": "' + action + '", "orderType": "market", "quantity": ' + str.tostring(qty) + ', "price": ' + px(est) +
+jsonEntry(string action, float est, float stop, float tp, int q) =>
+    '{"ticker": "' + hookSym + '", "action": "' + action + '", "orderType": "market", "quantity": ' + str.tostring(q) + ', "price": ' + px(est) +
          (na(stop) ? '' : ', "stopLoss": {"type": "stop", "stopPrice": ' + px(stop) + '}') +
          (na(tp) ? '' : ', "takeProfit": {"limitPrice": ' + px(tp) + '}') + '}'
 jsonExit = '{"ticker": "' + hookSym + '", "action": "exit", "cancel": true}'
@@ -186,6 +195,25 @@ var string lastSignal = "-"
 var int prevClosed = 0   // closed trades at the end of the previous bar
 var float dayStartNet = 0.0   // strategy.netprofit at 09:30, for today's P/L
 var int dayStartClosed = 0    // strategy.closedtrades at 09:30, for today's trade count
+
+// ── Losing trades in a row (v2.1): a winner resets the count; a trade closed because the session ended doesn't count.
+// The next entry after a loser uses the after-loss contracts and max loss (a wider stop); tQty / tMaxLoss are the open
+// (or just placed) trade's.
+var int lossRun = 0
+var int lossSeen = 0
+if strategy.closedtrades > lossSeen
+    for j = lossSeen to strategy.closedtrades - 1
+        pj = strategy.closedtrades.profit(j)
+        if pj < 0 and strategy.closedtrades.exit_comment(j) != "Session ended"
+            lossRun += 1
+        else if pj >= 0
+            lossRun := 0
+    lossSeen := strategy.closedtrades
+afterLoss = lossRun > 0
+qNext = afterLoss and afterQty > 0 ? afterQty : qty
+mlNext = afterLoss and afterMaxLoss > 0 ? afterMaxLoss : maxLoss
+var int tQty = 0
+var float tMaxLoss = 0.0
 
 // ── The resting stop filled during this bar (the broker did it; show it). A trade can open and
 // close inside one bar, so look at the closed-trade count, not the position.
@@ -255,18 +283,18 @@ if isCheck and not na(dayOpen)
         shortStopNow = lb * (1 + stopBuf * sig)
         // The bracket to place with the entry, from the expected fill (this close plus a tick): the stop is the closer of
         // the line stop and the max loss, the target tpUnits noise units away. Same numbers the backtest uses.
-        capPtsNow = maxLoss > 0 ? maxLoss / qty / syminfo.pointvalue : na
+        capPtsNow = mlNext > 0 ? mlNext / qNext / syminfo.pointvalue : na
         estL = close + syminfo.mintick
         estS = close - syminfo.mintick
         bracketL = na(capPtsNow) ? longStopNow : math.max(longStopNow, estL - capPtsNow)
         bracketS = na(capPtsNow) ? shortStopNow : math.min(shortStopNow, estS + capPtsNow)
-        whyL = bracketL > longStopNow ? "your " + usd(maxLoss) + " max loss" : "just below the upper line"
-        whyS = bracketS < shortStopNow ? "your " + usd(maxLoss) + " max loss" : "just above the lower line"
+        whyL = bracketL > longStopNow ? "your " + usd(mlNext) + " max loss" : "just below the upper line"
+        whyS = bracketS < shortStopNow ? "your " + usd(mlNext) + " max loss" : "just above the lower line"
         tpTextL = tpUnits > 0 ? ", take-profit limit " + px(estL * (1 + tpUnits * sig)) : ""
         tpTextS = tpUnits > 0 ? ", take-profit limit " + px(estS * (1 - tpUnits * sig)) : ""
         tpL = useStop and tpUnits > 0 ? estL * (1 + tpUnits * sig) : na
         tpS = useStop and tpUnits > 0 ? estS * (1 - tpUnits * sig) : na
-        lockPtsNow = useStop and lockAt > 0 and maxLoss > 0 ? lockAt * maxLoss / qty / syminfo.pointvalue : na
+        lockPtsNow = useStop and lockAt > 0 and mlNext > 0 ? lockAt * mlNext / qNext / syminfo.pointvalue : na
         lockTextL = na(lockPtsNow) ? "" : " Auto-breakeven: at " + px(estL + lockPtsNow) + " move the stop to " + px(estL + lockPlus) + "."
         lockTextS = na(lockPtsNow) ? "" : " Auto-breakeven: at " + px(estS - lockPtsNow) + " move the stop to " + px(estS - lockPlus) + "."
         moveText = " If your fill is different, keep the same distances. At each half hour move the stop with the line (the dashboard shows it); the max loss never moves."
@@ -284,10 +312,10 @@ if isCheck and not na(dayOpen)
         if not skipToday
             if not inPosStop and pos > 0 and close < ub
                 if close < lb and shortOk
-                    strategy.entry("Short", strategy.short, qty, comment = "Reverse short", alert_message = useHook ? jsonEntry("sell", estS, na, na) : "")
-                    mark("REVERSE\nSELL " + str.tostring(2 * qty), false, color.red)
+                    strategy.entry("Short", strategy.short, qNext, comment = "Reverse short", alert_message = useHook ? jsonEntry("sell", estS, na, na, qNext) : "")
+                    mark("REVERSE\nSELL " + str.tostring(2 * qNext), false, color.red)
                     lastSignal := "REVERSE to short " + hhmmText(endMin) + " @ " + px(close)
-                    say("REVERSE: exit the long and SELL " + str.tostring(qty) + " MNQ at market now. Price " + px(close) +
+                    say("REVERSE: exit the long and SELL " + str.tostring(qNext) + " MNQ at market now. Price " + px(close) +
                          " is below the noise area (lower " + px(lb) + "). Next check " + nextCheck + ".")
                 else
                     strategy.close("Long", comment = "Back inside", alert_message = hookExit)
@@ -297,10 +325,10 @@ if isCheck and not na(dayOpen)
                          "). Stay flat until the next signal.")
             else if not inPosStop and pos < 0 and close > lb
                 if close > ub
-                    strategy.entry("Long", strategy.long, qty, comment = "Reverse long", alert_message = useHook ? jsonEntry("buy", estL, na, na) : "")
-                    mark("REVERSE\nBUY " + str.tostring(2 * qty), true, color.green)
+                    strategy.entry("Long", strategy.long, qNext, comment = "Reverse long", alert_message = useHook ? jsonEntry("buy", estL, na, na, qNext) : "")
+                    mark("REVERSE\nBUY " + str.tostring(2 * qNext), true, color.green)
                     lastSignal := "REVERSE to long " + hhmmText(endMin) + " @ " + px(close)
-                    say("REVERSE: exit the short and BUY " + str.tostring(qty) + " MNQ at market now. Price " + px(close) +
+                    say("REVERSE: exit the short and BUY " + str.tostring(qNext) + " MNQ at market now. Price " + px(close) +
                          " is above the noise area (upper " + px(ub) + "). Next check " + nextCheck + ".")
                 else
                     strategy.close("Short", comment = "Back inside", alert_message = hookExit)
@@ -309,20 +337,20 @@ if isCheck and not na(dayOpen)
                     say("EXIT SHORT at market now. Price " + px(close) + " closed back above the lower line (" + px(lb) +
                          "). Stay flat until the next signal.")
             else if pos == 0 and close > ub and freshOk
-                strategy.entry("Long", strategy.long, qty, comment = "Above noise",
-                     alert_message = useHook ? jsonEntry("buy", estL, useStop ? bracketL : na, tpL) : "")
+                strategy.entry("Long", strategy.long, qNext, comment = "Above noise",
+                     alert_message = useHook ? jsonEntry("buy", estL, useStop ? bracketL : na, tpL, qNext) : "")
                 longPlaced := true
-                mark("BUY " + str.tostring(qty) + " MNQ", true, color.green)
+                mark("BUY " + str.tostring(qNext) + " MNQ", true, color.green)
                 lastSignal := "BUY " + hhmmText(endMin) + " @ " + px(close)
-                say("BUY " + str.tostring(qty) + " MNQ at market now. Price " + px(close) + " is above the noise area (upper " +
+                say("BUY " + str.tostring(qNext) + " MNQ at market now. Price " + px(close) + " is above the noise area (upper " +
                      px(ub) + "). " + holdLong + " Next check " + nextCheck + ".")
             else if pos == 0 and close < lb and shortOk and freshOk
-                strategy.entry("Short", strategy.short, qty, comment = "Below noise",
-                     alert_message = useHook ? jsonEntry("sell", estS, useStop ? bracketS : na, tpS) : "")
+                strategy.entry("Short", strategy.short, qNext, comment = "Below noise",
+                     alert_message = useHook ? jsonEntry("sell", estS, useStop ? bracketS : na, tpS, qNext) : "")
                 shortPlaced := true
-                mark("SELL " + str.tostring(qty) + " MNQ", false, color.red)
+                mark("SELL " + str.tostring(qNext) + " MNQ", false, color.red)
                 lastSignal := "SELL " + hhmmText(endMin) + " @ " + px(close)
-                say("SELL " + str.tostring(qty) + " MNQ at market now. Price " + px(close) + " is below the noise area (lower " +
+                say("SELL " + str.tostring(qNext) + " MNQ at market now. Price " + px(close) + " is below the noise area (lower " +
                      px(lb) + "). " + holdShort + " Next check " + nextCheck + ".")
 
 // ── Heads-up: five minutes before a check, flat, and price already past that check's line. On 2011-2018 a signal
@@ -340,8 +368,8 @@ if validTf and 5 % barMin == 0 and inRth and preEnd >= FIRST_CHECK and preEnd <=
     sgh = sh / lookback
     upH = math.max(dayOpen, prevClose) * (1 + sgh)
     loH = math.min(dayOpen, prevClose) * (1 - sgh)
-    lockH = useStop and lockAt > 0 and maxLoss > 0 ? ", auto-breakeven at +" + px(lockAt * maxLoss / qty / syminfo.pointvalue) + " to +" + px(lockPlus) : ""
-    readyH = " Get the order ready: " + str.tostring(qty) + " MNQ, stop " + (maxLoss > 0 ? px(maxLoss / qty / syminfo.pointvalue) + " points from your fill (your " + usd(maxLoss) + ")" : "at the line") + (useStop and tpUnits > 0 ? ", take-profit about " + px(tpUnits * sgh * close) + " points" : "") + lockH + "."
+    lockH = useStop and lockAt > 0 and mlNext > 0 ? ", auto-breakeven at +" + px(lockAt * mlNext / qNext / syminfo.pointvalue) + " to +" + px(lockPlus) : ""
+    readyH = " Get the order ready: " + str.tostring(qNext) + " MNQ, stop " + (mlNext > 0 ? px(mlNext / qNext / syminfo.pointvalue) + " points from your fill (your " + usd(mlNext) + ")" : "at the line") + (useStop and tpUnits > 0 ? ", take-profit about " + px(tpUnits * sgh * close) + " points" : "") + lockH + "."
     if close > upH
         headsUp := hhmmText(preEnd) + " BUY likely"
         say("HEADS-UP: " + hhmmText(preEnd) + " BUY likely. Price " + px(close) + " is already above the " + hhmmText(preEnd) + " upper line (" + px(upH) + ")." + readyH)
@@ -352,7 +380,10 @@ if validTf and 5 % barMin == 0 and inRth and preEnd >= FIRST_CHECK and preEnd <=
 // ── The resting stop: just past the current line, or the max-loss cap from the fill if that is closer.
 // Re-placed every bar so it moves with the line. The cap is live from the fill bar, like a bracket order: placed
 // with the entry, it is measured from the expected fill (the signal close plus a tick), then from the real fill.
-capPts = maxLoss > 0 ? maxLoss / qty / syminfo.pointvalue : na
+if longPlaced or shortPlaced  // the placed entry's size and max loss, for its bracket and lock
+    tQty := qNext
+    tMaxLoss := mlNext
+capPts = tMaxLoss > 0 and tQty > 0 ? tMaxLoss / tQty / syminfo.pointvalue : na
 lineStopL = ub * (1 - stopBuf * sig)
 lineStopS = lb * (1 + stopBuf * sig)
 capL = na(capPts) ? na : strategy.position_size > 0 ? strategy.position_avg_price - capPts : longPlaced ? close + syminfo.mintick - capPts : na
@@ -364,7 +395,7 @@ shortWhy = not na(capS) and capS < lineStopS ? "Max loss" : "Back inside"
 // The lock: once a bar has reached lockAt max losses in profit, the stop moves to the entry plus lockPlus, from the next
 // bar (a broker's auto-breakeven does it the moment price touches the trigger).
 var bool locked = false
-lockPts = useStop and lockAt > 0 and maxLoss > 0 ? lockAt * maxLoss / qty / syminfo.pointvalue : na
+lockPts = useStop and lockAt > 0 and tMaxLoss > 0 and tQty > 0 ? lockAt * tMaxLoss / tQty / syminfo.pointvalue : na
 if strategy.position_size == 0
     locked := false
 else if not na(lockPts) and not locked
@@ -441,7 +472,7 @@ if showDash and (barstate.islastconfirmedhistory or barstate.isrealtime)
     closed = strategy.closedtrades
     todayPnlDash = strategy.netprofit - dayStartNet
     wins = strategy.wintrades
-    table.cell(dash, 0, 0, "MNQ Noise Momentum v2.0: " + account + ", " + str.tostring(qty) + " MNQ", text_color = color.white, text_size = size.small)
+    table.cell(dash, 0, 0, "MNQ Noise Momentum v2.1: " + account + ", " + str.tostring(qty) + " MNQ", text_color = color.white, text_size = size.small)
     table.cell(dash, 1, 0, status, text_color = statusColor, text_size = size.small)
     table.cell(dash, 0, 1, "Sessions of history", text_color = color.silver, text_size = size.small)
     table.cell(dash, 1, 1, str.tostring(math.min(filled, lookback)) + " / " + str.tostring(lookback), text_color = color.white, text_size = size.small)

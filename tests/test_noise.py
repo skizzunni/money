@@ -25,6 +25,10 @@ LOCK = "Lock a small win: trigger, in max losses (0 = off)"  # the script's defa
 TIGHTEN = "Stop only ever tightens"  # the script's default is on (v1.8); the reference's off
 MAX_LOSS = "Max loss per trade, $ (all contracts, 0 = off)"  # the script's default is $500 (v2.0); the reference's $350
 TP = "Take profit, noise units from the entry (0 = off)"  # the script's default is 2.0 (v2.0); the reference's 1.5
+AFTER_QTY = "After a losing trade: contracts (0 = the same)"  # the script's default is 9 (v2.1); the reference's off
+AFTER_ML = "After a losing trade: max loss per trade, $ (0 = the same)"  # 700 (v2.1); the reference's off
+V21 = {"max_loss_per_trade": 500.0, "lock_at": 0.75, "take_profit": 2.0, "tighten_only": True,
+       "after_loss_qty_div": 10 / 9, "after_loss_ml_mult": 1.4}  # the script's defaults at 10 MNQ
 P0 = 20_000.0
 BARS_PER_DAY = 78  # 09:30 .. 15:55 on 5-minute bars
 CHECK_10_00, CHECK_10_30, CLOSE_16_00 = 5, 11, 77  # bar numbers within a session
@@ -441,7 +445,7 @@ def assert_trade_log(log, res, exit_mode, rows=10):
 
 def assert_parity(bars, minutes=5, lookback=14, skip_dates=None, exit_mode="stop", stop_buffer=None, qty=1,
                   max_loss=None, fed_dates=None, fed_no_shorts=None, take_profit=None, hook=None, lock_at=None,
-                  max_losers=None):
+                  max_losers=None, after_loss=None):
     cfg = NoiseConfig(lookback=lookback, exit_mode=exit_mode, qty=qty)
     inputs = {"Sessions in the noise average": lookback}
     if lock_at is not None:
@@ -453,6 +457,9 @@ def assert_parity(bars, minutes=5, lookback=14, skip_dates=None, exit_mode="stop
         inputs["Webhook orders"], inputs["Contract for the webhook (blank = the chart's)"] = "TradersPost", hook
         cfg.tighten_only = True
     inputs[TIGHTEN] = cfg.tighten_only  # explicit: the script's default (on) is not the reference's (off)
+    if after_loss is not None:  # (contracts, max loss) after a losing trade, as the script takes them
+        cfg.after_loss_qty_div, cfg.after_loss_ml_mult = qty / after_loss[0], after_loss[1] / (max_loss or 350.0)
+    inputs[AFTER_QTY], inputs[AFTER_ML] = after_loss if after_loss is not None else (0, 0.0)
     inputs["Exit"] = "Resting stop at the line" if exit_mode == "stop" else "Half-hour check"
     inputs[FUNDED] = True  # the script's default is the evaluation's 3 contracts
     inputs["Contracts on a funded account"] = qty  # the script's default is 10; the reference's is 1
@@ -709,7 +716,8 @@ def test_pine_evaluation_tracker(target):
     bars = synth_bars(sessions=120, seed=3)
     days = sorted({d.date() for d in bars.index.tz_convert(NY)})
     start = days[40]
-    inputs = {FUNDED: True, "Contracts on a funded account": 10, LOCK: 1.0, TIGHTEN: False, TP: 1.5,
+    inputs = {FUNDED: True, "Contracts on a funded account": 10, LOCK: 1.0, TIGHTEN: False, TP: 1.5, AFTER_QTY: 0,
+              AFTER_ML: 0.0,
               "Max loss per trade, $ (all contracts, 0 = off)": 350.0,
               "Evaluation start date, YYYYMMDD (0 = off)": int(start.strftime("%Y%m%d")), "Profit target, $": target}
     pytest.importorskip("pynescript", reason="pip install pynescript to check the .pine files")
@@ -742,7 +750,8 @@ def test_pine_dashboard_shows_the_next_checks_lines():
     i, upper, lower = res.bands[-5]  # a check late in the data; cut the bars ten minutes before it
     cut = full.iloc[: i - 1]
     rt = PineRuntime(load_pine(NOISE_PINE), cut, {FUNDED: True, "Contracts on a funded account": 1, LOCK: 1.0,
-                                                    TIGHTEN: False, MAX_LOSS: 350.0, TP: 1.5},
+                                                    TIGHTEN: False, MAX_LOSS: 350.0, TP: 1.5,
+                                                    AFTER_QTY: 0, AFTER_ML: 0.0},
                      timeframe_seconds=300)
     rt.run(lambda j, g: None)
     dash = [t.grid() for t in rt.tables if t.columns == 2 and t.grid() and t.grid()[0][0].startswith("MNQ Noise")][0]
@@ -754,14 +763,19 @@ def test_pine_dashboard_shows_the_next_checks_lines():
 @pytest.mark.slow
 @pytest.mark.parametrize("funded, eval_qty, qty", [(None, None, 10), (False, 3, 3), (True, 3, 10)])
 def test_pine_account_switch(funded, eval_qty, qty):
-    """The evaluation (the default) trades 10 MNQ as v1.5 did, or its own setting; the funded switch 10; the same $350
-    max loss, so the stop and the lock scale. The script's defaults, lock 0.85 included."""
+    """The evaluation (the default) trades 10 MNQ as v1.5 did, or its own setting; the funded switch 10; the same max
+    loss, so the stop and the lock scale. The script's defaults: at 10 MNQ the after-loss size and max loss (9 MNQ,
+    $700) included; at 3 MNQ off."""
     bars = synth_bars(sessions=60, seed=11)
     inputs = {} if funded is None else {FUNDED: funded}
+    cfg = NoiseConfig(qty=qty, **V21)
     if eval_qty is not None:
         inputs["Contracts in an evaluation"] = eval_qty
+    if qty == 3:
+        inputs[AFTER_QTY], inputs[AFTER_ML] = 0, 0.0
+        cfg.after_loss_qty_div = cfg.after_loss_ml_mult = 1.0
     trades, events, _, _, _, heads = run_pine(bars, inputs, 5)
-    res = run(bars, NoiseConfig(qty=qty, max_loss_per_trade=500.0, lock_at=0.75, take_profit=2.0, tighten_only=True))
+    res = run(bars, cfg)
     assert trades == trades_of(res) and events == res.events and heads == res.headsups
     assert len(trades) >= 10
 
@@ -976,3 +990,19 @@ def test_partial_exit_rule():
     for t in res.trades:
         if t.reason != "Partial" and t.entry_bar not in {p.entry_bar for p in parts}:
             assert t.frac == 1.0
+
+
+@pytest.mark.slow
+def test_pine_after_loss_size_and_stop():
+    """v2.1: the trade after a losing trade uses the after-loss contracts and max loss (a wider stop); a winner resets
+    it. The script and the reference agree trade for trade, and the size follows the previous trade's result."""
+    bars = synth_bars(sessions=60, seed=11)
+    res = assert_parity(bars, qty=10, max_loss=500.0, take_profit=2.0, lock_at=0.75, after_loss=(9, 700.0))
+    run_ = 0  # losers in a row before each trade, by the rule
+    for x in res.trades:
+        assert x.qty == (9 if run_ else 10)
+        if x.pnl < 0 and x.reason != "Session ended":
+            run_ += 1
+        elif x.pnl >= 0:
+            run_ = 0
+    assert {x.qty for x in res.trades} == {9, 10}

@@ -2631,6 +2631,46 @@ keep trading after losses, and for fewer losing trades back to back.
 
 **Not adopted:** v2.0 stays.
 
+## v2.1: a wider stop on the trade after a losing trade (October 22, 2026)
+
+**The request:** turn consecutive losses into wins, with fewer losers back to back.
+
+**The idea:** losers come in runs on choppy days, when ordinary noise reaches a 25-point stop. So the trade after a
+loser gets a wider stop and is not skipped. Skipping was the v2.1 study's approach, and it failed.
+
+**What was tested** (`research/v22_after_loss.py`, the research-only `after_loss_*` options of `mnqbot/noise.py`):
+- an earlier lock on that trade;
+- hourly checks only after a loss;
+- fewer contracts, the same max loss;
+- a larger max loss with the same contracts;
+- combinations of these.
+
+**The "back-to-back" measure:** the share of losers followed by another loser. All rows in
+`verification/noise_v2/after_loss*.csv`.
+
+| v2.0 otherwise, 10 MNQ | Window net | Window DD | Back-to-back % | Longest streak | NQ net / DD | NQ back-to-back % | Index net / DD | Index back-to-back % |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| v2.0 | 22,762 | 2,934 | 41.7 | 4 | 315,996 / 27,294 | 56.7 | 533,461 / 39,085 | 55.4 |
+| Earlier lock (0.4) after a loss | 19,430 | 3,451 | 46.4 | 4 | 283,875 / 33,972 | 56.0 | 550,548 / 36,286 | 54.1 |
+| Hourly checks only after a loss | 23,776 | 3,061 | 43.5 | 5 | 168,060 / 36,822 | 57.1 | 418,054 / 38,930 | 55.2 |
+| 5 MNQ, $500 after a loss | 19,726 | 2,142 | 30.0 | 3 | 252,544 / 30,740 | 46.8 | 432,892 / 30,214 | 47.5 |
+| 10 MNQ, $750 after a loss | 25,729 | 3,314 | 39.1 | 3 | 323,486 / 33,444 | 50.6 | 605,499 / 37,100 | 49.9 |
+| 8 MNQ, $625 after a loss | 23,752 | 2,446 | 36.4 | 3 | 300,272 / 29,574 | 50.4 | 553,479 / 33,111 | 49.5 |
+| **9 MNQ, $700 after a loss (v2.1)** | **25,052** | **2,580** | **36.4** | **3** | **317,536 / 31,550** | **50.5** | **587,013 / 33,394** | **49.5** |
+
+**What the scan shows:**
+- **A wider stop after a loss cuts the back-to-back losers on every dataset**, in all nine variants of the
+  neighbourhood scan, and the window's longest streak falls to 3 in every one.
+- An earlier lock or hourly-only checks don't.
+
+**What v2.1 costs:**
+- NQ's worst drawdown grows 16% ($31,550 against $27,294) at the same net.
+- That trade risks up to $700.
+- NQ 2023-2025 nets $13,549 against $11,767. The index 2023-2026 nets $105,731 against $79,283.
+
+**On the window:** the Pine script itself gives the same as the model: 57 trades (22 of them at 9 MNQ), +$25,052,
+drawdown $2,580.
+
 ## What this does and doesn't say
 
 - **It says** that the original sweep/breakout rules have no edge after realistic costs on 2023–2026 Nasdaq-100 data, and would very likely not pass a $25K evaluation. Of three published strategies, only noise-area momentum held up over 16 years, and even it fails most $25K evaluations.

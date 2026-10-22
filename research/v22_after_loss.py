@@ -27,7 +27,14 @@ VARIANTS = ([{}, {"max_losers": 0}]
             + [{"after_loss_qty_div": k} for k in (1.5, 2.0)]
             + [{"after_loss_hourly": True}]
             + [{"after_loss_lock": 0.4, "after_loss_qty_div": 2.0}, {"after_loss_lock": 0.5, "after_loss_hourly": True},
-               {"after_loss_lock": 0.4, "max_losers": 0}, {"after_loss_qty_div": 2.0, "max_losers": 0}])
+               {"after_loss_lock": 0.4, "max_losers": 0}, {"after_loss_qty_div": 2.0, "max_losers": 0}]
+            + [{"after_loss_ml_mult": m} for m in (1.25, 1.5, 2.0)]
+            + [{"after_loss_ml_mult": 1.5, "after_loss_qty_div": 1.25}, {"after_loss_ml_mult": 1.5, "max_losers": 0},
+               {"after_loss_ml_mult": 1.25, "after_loss_qty_div": 1.25}]
+            + [{"after_loss_ml_mult": m, "after_loss_qty_div": q} for m in (1.1, 1.25, 1.4) for q in (1.1, 1.25, 1.5)
+               if (m, q) != (1.25, 1.25)])
+if len(sys.argv) > 6:  # only the variants whose number (0-based) is given
+    VARIANTS = [VARIANTS[int(k)] for k in sys.argv[6].split(",")]
 
 
 def back_to_back(pnl: np.ndarray) -> float:
