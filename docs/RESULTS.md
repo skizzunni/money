@@ -2561,6 +2561,43 @@ point.
 - The setting was chosen after looking at the user's window. The histories are what support it.
 - On the index at the higher costs it is level, not better.
 
+## v2.0: a $500 max loss, take-profit 2.0, lock 0.75 (October 22, 2026)
+
+**Why v1.9 missed on the user's chart:**
+- v1.9 showed +$15,813 on the user's chart against v1.8's +$15,838, with a larger drawdown.
+- **The bars are the same:** the trades of 10/16 match the user's trade log to the tick.
+- **The chart starts trading on 8/24, not 7/27.** TradingView loads too little 5-minute history for the 14 warm-up
+  sessions before then.
+- From 8/24 to 10/16 the model gives v1.8 $17,973 and v1.9 $18,562. The chart, less its 10/19-10/21 trades (from the
+  user's log), gives $17,975 and $18,550.
+- The earlier window (from 7/27) had included a July that the chart never trades.
+
+**The search on the chart's window** (8/24-10/16 from the bars, plus 10/19-10/21 estimated as six full stops and one
+locked win, as the user's log shows them):
+- 72 combinations of max loss ($350-$500), take-profit (1.25-2.0), loser limit (3, 4) and lock (0.75-1.0).
+- Then 60 around the best: $475-$600, take-profit 1.75-2.5, lock 0.65-0.85.
+- Every row with NQ futures 2015-2025 and the index 2011-2026 (5-minute, scaled) beside it, in
+  `verification/noise_v2/`.
+
+| 10 MNQ, script costs | Window net | Est. with 10/19-21 | Window DD | Losers / trades | Losses $ | NQ net, net/DD vs v1.8 | Index net, net/DD vs v1.8 |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| v1.8 ($350, TP 1.5, lock 0.85) | 17,973 | 15,801 | 3,100 | 42 / 77 | -14,026 | 1.00, 1.00 | 1.00, 1.00 |
+| **v2.0 ($500, TP 2.0, lock 0.75)** | **22,762** | **19,690** | **2,934** | **24 / 62** | **-11,392** | **1.30, 1.20** | **1.12, 1.12** |
+| $500, TP 2.25, lock 0.75 | 25,071 | 21,999 | 2,934 | 23 / 59 | -10,865 | 1.30, 1.20 | 1.02, 0.89 |
+| $525, TP 2.0, lock 0.85 | 24,264 | 21,042 | 4,234 | 25 / 62 | -13,005 | 1.50, 1.22 | 1.17, 1.23 |
+
+**Why v2.0 and not the others:**
+- v2.0 is the only setting that improves net and net per drawdown on both histories.
+- On the window it also lowers the drawdown, the number of losers and the total lost.
+- The window rides on a few take-profits: from take-profit 2.25 to 2.5 its net falls by about $10,000. So the settings
+  that show more than $20,000 there were not taken, since they are worse on the index or on NQ 2023-2025.
+
+**Its weak spot:** NQ 2023-2025 nets $11,767, against v1.8's $22,747. The index 2023-2026 nets $79,283, against
+$73,672.
+
+**The daily loser limit:** four losers in a day is about $2,070. On an evaluation with a $2,000 trailing drawdown, set
+the daily loser limit to 3.
+
 ## What this does and doesn't say
 
 - **It says** that the original sweep/breakout rules have no edge after realistic costs on 2023–2026 Nasdaq-100 data, and would very likely not pass a $25K evaluation. Of three published strategies, only noise-area momentum held up over 16 years, and even it fails most $25K evaluations.
