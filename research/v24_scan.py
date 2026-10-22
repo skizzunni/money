@@ -35,9 +35,43 @@ V23 = {"qty": 10, "max_loss_per_trade": 500.0, "tighten_only": True, "take_profi
        "max_losers": 4, "after_loss_qty_div": 10 / 9, "after_loss_ml_mult": 1.4, "last_entry_end": 900,
        "big_day_k": 1.5, "big_day_n": 10}
 V24 = {**V23, "max_loss_per_trade": 1500.0, "lock_at": 0.5, "max_losers": 3}  # the Pine script's defaults in v2.4
-V25 = {**V24, "calm_k": 0.7, "calm_short": 10, "calm_long": 40}  # and since v2.5
+V25 = {**V24, "calm_k": 0.7, "calm_short": 10, "calm_long": 40}  # v2.5
+V26 = {**V23, "calm_k": 0.7, "calm_short": 10, "calm_long": 40, "max_loss_per_trade": 750.0, "after_loss_ml_mult": 2.0,
+       "lock_at": 1.0}  # the Pine script's defaults since v2.6
 D: dict = {}
 BASE: dict = {}
+
+
+def us_closures(first: int = 2010, last: int = 2027) -> str:
+    """US market holidays and half days (CME equity futures trade a short session or none), first..last: the
+    histories skip them as the Pine script's date list does for 2025-2027. Without it a position opened on a half day
+    is held to the next session's open, and on the scaled histories that gap is the day-to-day rescaling."""
+    from pandas.tseries.holiday import (
+        GoodFriday,
+        Holiday,
+        USLaborDay,
+        USMartinLutherKingJr,
+        USMemorialDay,
+        USPresidentsDay,
+        USThanksgivingDay,
+        nearest_workday,
+    )
+    rules = [Holiday("NY", month=1, day=1, observance=nearest_workday), USMartinLutherKingJr, USPresidentsDay,
+             GoodFriday, USMemorialDay, Holiday("J19", month=6, day=19, start_date="2022-01-01",
+                                                  observance=nearest_workday),
+             Holiday("J4", month=7, day=4, observance=nearest_workday), USLaborDay, USThanksgivingDay,
+             Holiday("X", month=12, day=25, observance=nearest_workday)]
+    lo, hi = pd.Timestamp(f"{first}-01-01"), pd.Timestamp(f"{last}-12-31")
+    days = {d for r in rules for d in r.dates(lo, hi)}
+    for y in range(first, last + 1):
+        for d in (pd.Timestamp(f"{y}-07-03"), pd.Timestamp(f"{y}-12-24")):
+            if d.dayofweek < 5:
+                days.add(d)
+        days |= {d + pd.Timedelta(days=1) for d in USThanksgivingDay.dates(f"{y}-01-01", f"{y}-12-31")}
+    return ",".join(sorted(d.strftime("%Y-%m-%d") for d in days))
+
+
+CLOSURES = us_closures()
 MIN = [5]  # the bar length: SCAN_MINUTES=30 runs every set on 30-minute bars
 
 
@@ -51,16 +85,21 @@ def init(base: dict, data: str, sep: str, dec: str) -> None:
         return b if m == 5 else resample(b, f"{m}min")
     D["win"] = (bars(V.DATA["mnq"][0]), "2026-08-24", True)
     D["proxy"] = (pd.read_pickle(f"{data}/proxy_{m}m.pkl"), "2025-01-02", True)
-    D["nq"] = (bars(V.DATA["nq"][0]), None, False)
-    D["index"] = (bars(V.DATA["index"][0]), None, False)
+    for name in ("nq", "index"):  # the histories skip closures and sessions with missing data (no 09:30 or 15:55 bar,
+        b = V.DATA[name][0]        # or under 70 five-minute bars): a trade there would be held to the next session
+        t = b.index.tz_convert(NY)
+        g = pd.DataFrame({"d": t.strftime("%Y-%m-%d"), "m": t.hour * 60 + t.minute}).groupby("d").m.agg(
+            ["count", "min", "max"])
+        holes = g[(g["max"] < 955) | (g["min"] > 570) | (g["count"] < 70)].index
+        D[name] = (bars(b), None, CLOSURES + "," + ",".join(holes))
 
 
 def job(kw: dict) -> dict:
     out = {"rule": json.dumps(kw) if kw else "base"}
-    for name, (bars, first, keep_dates) in D.items():
+    for name, (bars, first, skip) in D.items():
         cfg = NoiseConfig(**{**V23, **BASE, **kw})
-        if not keep_dates:
-            cfg.skip_dates, cfg.fed_dates = "", ""
+        if isinstance(skip, str):  # the histories: their own closures, no Fed list
+            cfg.skip_dates, cfg.fed_dates = skip, ""
         tf = run(bars, cfg, minutes=MIN[0]).trades_frame()
         if first:
             tf = tf[tf.entry_time >= pd.Timestamp(first, tz=NY)]

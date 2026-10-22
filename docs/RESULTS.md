@@ -3057,6 +3057,66 @@ earlier years trade that year. The grid: max loss $500 / $1,000 / $1,500, lock 0
 - Picked in real time, the wider stop ($1,000-1,500) wins from the first years. The calm rule is picked in most years.
 - v2.5's fixed figures include hindsight. A live expectation sits between the walk-forward column and v2.5's.
 
+## v2.6: the middle risk (October 22, 2026)
+
+**The user's chart.** MNQ1! on a 30-minute chart, 1/2/2025-10/22/2026:
+
+| | Net | Drawdown | Winners | Trades | Profit factor |
+|---|---:|---:|---:|---:|---:|
+| v2.3 | +$55,485 | $19,185 | 41.9% | 566 | 1.29 |
+| v2.5 | +$44,307 | $22,681 | 48.7% | 398 | 1.21 |
+
+**Where the stand-in and the chart part.**
+- Over 7/2026-10/16/2026 the stand-in is the user's own MNQ bars. There my 30-minute run of v2.5 makes about what
+  the chart shows (+$33k).
+- The gap is in 1/2025-6/2026, where the stand-in is NQ futures and the cash index:
+  - The cash index is smoother than futures.
+  - Over a few months small differences in the bars change which trades happen.
+  - On the NQ months (1-7/2025) the chart has v2.3 ahead and my data has v2.5 ahead.
+- One 21-month window can't rank versions this close. The long histories have to.
+
+**Why the 30-minute chart trails 5-minute trading** (`lock_at_checks`, `v26_lac5.csv`, `v26_lac30.csv`).
+- On 5-minute bars with the lock armed only at half-hour checks, the stand-in makes $75.6k. The 30-minute chart makes
+  $71.1k and 5-minute trading $112.7k.
+- Trade by trade, 5-minute trading takes 84 trades the 30-minute chart doesn't (+$25k): re-entries after earlier
+  exits.
+- Lock timing turns 8 trades the 30-minute chart holds to 16:00 into early locks on 5-minute bars (-$30k).
+- **A lock run inside the 30-minute bar** (a trailing stop activating at the trigger, through TradingView's bar path;
+  `lock_intrabar`, `v26_lib30.csv`, `v26_lib5.csv`) adds only +$3k there. Not adopted.
+
+**The histories cleaned** (`research/v24_scan.py`). The histories now skip:
+- US holidays and half days, 2010-2027;
+- sessions with missing data (no 09:30 or 15:55 bar, or under 70 five-minute bars).
+
+A trade on those days was carried to the next session. On the scaled histories that gap is the day-to-day rescaling,
+e.g. -$23.6k on NQ after 11/29/2024 and -$17.4k on the index after 3/9/2020. Earlier v2.4/v2.5 comparisons included
+those trades, so their history drawdowns for wide stops were overstated.
+
+**Re-ranked on clean histories, both bar lengths** (`v26_clean*.csv`, `v26_v23c_*.csv`, `v26_mid_*.csv`).
+- v2.3 plus the calm rule is better than v2.3 everywhere, but only a little.
+- On top of it, a max loss of $600-1,000 with $1,000-1,500 on the trade after a loser beat it on both histories at both
+  bar lengths (NQ net 1.3-1.7x).
+- $750 / $1,500 / lock 1.0 / 4 losers a day did best on the 30-minute stand-in.
+
+| | v2.3 | v2.3 + calm | **v2.6** | v2.5 |
+|---|---:|---:|---:|---:|
+| 30-min stand-in: net | 72.0k | 74.4k | **83.6k** | 71.1k |
+| 30-min stand-in: drawdown | 18.7k | 18.7k | **16.4k** | 17.5k |
+| 30-min NQ 2015-2025: net | 387k | 407k | **624k** | 607k |
+| 30-min NQ 2015-2025: drawdown | 35.2k | 35.2k | 43.3k | 46.7k |
+| 30-min index 2011-2026: net | 645k | 684k | **823k** | 801k |
+| 30-min index 2011-2026: drawdown | 30.3k | 27.5k | 31.4k | 30.1k |
+| 5-min stand-in: net | 63.0k | 67.0k | **95.6k** | 112.7k |
+| 5-min stand-in: drawdown | 24.9k | 25.1k | **11.6k** | 14.8k |
+| 5-min NQ: net | 375k | 384k | **621k** | 627k |
+| 5-min NQ: drawdown | 26.1k | 27.1k | 31.5k | 32.0k |
+| 5-min index: net | 701k | 719k | **918k** | 921k |
+| 5-min index: drawdown | 28.7k | 24.4k | 30.2k | 33.9k |
+| MNQ 7-10/2026, 30-min | 31.7k | 31.3k | 32.2k | 32.8k |
+
+- v2.6 is better than v2.3 in both halves of both histories at both bar lengths, with no losing year.
+- On the user's 8/24-10/16 window (5-minute) it makes +$20.6k (v2.3 +$25.3k, v2.5 +$16.6k).
+
 ```
 python research/v24_proxy.py <data dir> MNQ_09-26.Last.txt MNQ_12-26.Last.txt          # the stand-in
 python research/v24_scan.py '[{"max_losers": 4}]' out.csv '{"max_loss_per_trade": 1500, "lock_at": 0.5, "max_losers": 3}' \

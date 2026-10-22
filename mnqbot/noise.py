@@ -158,6 +158,13 @@ class NoiseConfig:
     # research (v2.5 study): the max loss in noise units, cap_sigma x the check's noise x the price (contracts as usual;
     # the dollar max loss then follows it, and the lock trigger with it); 0 = the dollar max loss
     cap_sigma: float = 0.0
+    # research (v2.5 study): the lock arms only at a half-hour check, if the trade has reached the trigger since the
+    # fill (on a 30-minute chart every bar is a check, so 5- and 30-minute charts then behave alike)
+    lock_at_checks: bool = False
+    # research (v2.5 study): the lock as the broker would run it inside the bar (a trailing stop that activates at the
+    # trigger, offset trigger - lock_plus, through TradingView's bar path: the extreme nearer the open first). After
+    # that bar the stop stays at the trailing level it reached (at least the entry + lock_plus)
+    lock_intrabar: bool = False
     grace: bool = False  # research (v2.5 study): until the first check after the fill, the max loss stop only
     late_tp: float = 0.0
     late_tp_from: int = 0
@@ -275,6 +282,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
     trend = 0  # trend_n: the trend's direction today
     calm = False  # calm_k: today follows a calm stretch
     in_grace = False  # grace: no check since the fill yet
+    fav = math.nan  # the best high (long) / low (short) since the fill, for the lock
+    lock_px = math.nan  # lock_intrabar: the stop the in-bar lock reached
     prev_side = 0  # confirm: the last check today closed above its upper line (1), below its lower (-1), or inside
     target_today = False  # after_target_done: a take-profit filled today
     eq_curve: list[float] = [0.0]  # eq_n: the closed P&L after each position
@@ -336,7 +345,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
 
     def close_pos(i: int, price: float, reason: str) -> None:
         nonlocal pos, held, locked, losers_today, rest, part_pnl, best, consec, skip_left, loss_side, tp_dist
-        nonlocal add_px, add_due, target_today, locked1
+        nonlocal add_px, add_due, target_today, locked1, fav, lock_px
         pnl = rest * (pos * (price - entry_px) * q_trade * cfg.point_value - 2 * cfg.commission_per_side * q_trade)
         trades.append(NoiseTrade(pos, q_trade, entry_bar, idx[entry_bar], entry_px, i, idx[i], price, reason, pnl,
                                  rest))
@@ -367,7 +376,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             side_lost[pos] = False
             side_run[pos] = 0
         pos, held, locked, rest, part_pnl, best, tp_dist = 0, math.nan, False, 1.0, 0.0, math.nan, math.nan
-        locked1 = False
+        locked1, fav, lock_px = False, math.nan, math.nan
 
     def study_ok(d: int, past_margin: bool) -> bool:
         """The v2.1 study's rules (all off by default): may a signal on side d be taken?"""
@@ -455,7 +464,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                 if (pos > 0 and lk1 > line) or (pos < 0 and lk1 < line):
                     line, reason = lk1, "Lock 1"
             if locked:  # a small win locked in: the stop at the entry plus lock_plus
-                lk = entry_px + pos * cfg.lock_plus
+                lk = entry_px + pos * cfg.lock_plus if math.isnan(lock_px) else lock_px
                 if (pos > 0 and lk > line) or (pos < 0 and lk < line):
                     line, reason = lk, "Lock"
                 if not math.isnan(tp_dist) and cfg.runner_lock > 0:  # research: the runner keeps part of the target
@@ -485,6 +494,18 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             else:
                 hit = l[i] <= line if pos > 0 else h[i] >= line
                 price = line - pos * slip
+            if (cfg.lock_intrabar and not locked and not hit and entry_bar != i and lock_trade > 0
+                    and cfg.max_loss_per_trade > 0):
+                trig = lock_trade * ml_trade / q_trade / cfg.point_value
+                ext, adv = (h[i], l[i]) if pos > 0 else (l[i], h[i])
+                tp_px = entry_px * (1 + pos * tp_trade * sigma) if tp_trade > 0 else math.nan
+                if pos * (ext - entry_px) >= trig and not (pos * (ext - tp_px) >= cfg.tick):  # no target this bar
+                    tr = ext - pos * (trig - cfg.lock_plus)
+                    fav_first = (abs(h[i] - o[i]) <= abs(l[i] - o[i])) == (pos > 0)
+                    after = adv if fav_first else c[i]  # where the path goes after the extreme
+                    if pos * (after - tr) <= 0:
+                        hit, price, reason = True, tr - pos * slip, "Lock"
+                    lock_px = tr
             if hit:
                 close_pos(i, price, reason)
                 events.append((i, "EXIT"))
@@ -523,7 +544,10 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
         if use_stop and pos and not locked and lock_trade > 0 and cfg.max_loss_per_trade > 0:
             # the lock arms when the bar reaches the trigger (high for a long, low for a short), from the next bar
             trigger = lock_trade * ml_trade / q_trade / cfg.point_value
-            locked = pos * ((h[i] if pos > 0 else l[i]) - entry_px) >= trigger
+            fav = (h[i] if pos > 0 else l[i]) if math.isnan(fav) else (max(fav, h[i]) if pos > 0 else min(fav, l[i]))
+            at_check = FIRST_CHECK <= end <= LAST_CHECK and (end - FIRST_CHECK) % STEP == 0
+            if not cfg.lock_at_checks or at_check:
+                locked = pos * (fav - entry_px) >= trigger
             add_due = locked and cfg.add_at_lock > 0
             if cfg.lock1_at > 0 and not locked1:
                 t1 = cfg.lock1_at * ml_trade / q_trade / cfg.point_value
