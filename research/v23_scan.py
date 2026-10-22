@@ -5,8 +5,9 @@ window (trades from 8/24/2026) and NQ 2015-2025 / index 2011-2026 (docs/RESULTS.
         <out.csv> <set>
 
 Sets: "dials" (lookback, stop buffer, entry band, late take-profit), "risk" (max loss, take-profit and after-loss max
-loss together). Net, intraday-free closed-trade drawdown, win rate, longest losing streak and back-to-back rate; for
-the histories, net per drawdown against v2.2's and the years in which a variant beat it.
+loss together), "bigday" (no entries in a big session's direction the next day). Net, closed-trade drawdown, win
+rate, longest losing streak and back-to-back rate; for the histories, net per drawdown against v2.2's, the years in
+which a variant beat it, and each history's early and late halves.
 """
 from __future__ import annotations
 
@@ -38,7 +39,8 @@ def sets() -> dict[str, list[dict]]:
     risk = [{"max_loss_per_trade": ml, "take_profit": tp, "after_loss_ml_mult": aml / ml}
             for ml, tp, aml in itertools.product((475.0, 500.0, 525.0), (1.9, 2.0, 2.1), (650.0, 700.0, 750.0))
             if (ml, tp, aml) != (500.0, 2.0, 700.0)]
-    return {"dials": dials, "risk": risk}
+    bigday = [{"big_day_k": k, "big_day_n": n} for k in (1.25, 1.5, 1.75, 2.0) for n in (10, 20)]
+    return {"dials": dials, "risk": risk, "bigday": bigday}
 
 
 def job(kw: dict) -> dict:
@@ -58,6 +60,9 @@ def job(kw: dict) -> dict:
         if name != "mnq":
             years = tf.groupby(tf.entry_time.dt.year).pnl.sum()
             out[f"{name} 23+"] = round(tf[tf.entry_time.dt.year >= 2023].pnl.sum())
+            split = 2020 if name == "nq" else 2019  # the two halves of each history
+            out[f"{name} early"] = round(tf[tf.entry_time.dt.year < split].pnl.sum())
+            out[f"{name} late"] = round(tf[tf.entry_time.dt.year >= split].pnl.sum())
             out[f"{name} years"] = json.dumps(years.round().astype(int).tolist())
     return out
 
@@ -77,8 +82,9 @@ def main() -> None:
     d.to_csv(out, index=False)
     pd.set_option("display.width", 340)
     pd.set_option("display.max_colwidth", 90)
-    print(d[["rule", "mnq net", "mnq dd", "mnq win", "mnq streak", "nq net/b", "nq r/b", "nq yrs+", "nq 23+",
-             "index net/b", "index r/b", "index yrs+", "index 23+"]].to_string(index=False))
+    print(d[["rule", "mnq net", "mnq dd", "mnq win", "mnq streak", "nq net/b", "nq r/b", "nq yrs+", "nq early",
+             "nq late", "nq 23+", "index net/b", "index r/b", "index yrs+", "index early", "index late",
+             "index 23+"]].to_string(index=False))
 
 
 if __name__ == "__main__":

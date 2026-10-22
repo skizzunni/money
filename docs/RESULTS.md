@@ -2768,6 +2768,56 @@ here.
 The lock acts within a minute instead of a bar late, so more trades close as small winners. A broker's auto-breakeven
 set to the same trigger (18.75 points at 10 MNQ and $500, offset +2.5) gets the 1-minute behaviour live.
 
+## v2.3: after a big day, no trades in its direction the next day (October 22, 2026)
+
+**The finding** (descriptive at first, at v2.2's settings): the trades the day after a big-range session, by whether
+they go the way that session went. A big session has a range over 1.5 x the 20-session average.
+
+| | With the big day's direction | Against it | Other days |
+|---|---|---|---|
+| NQ 2015-2025 | 365 trades, -$112 each (-$40,803) | 474, +$148 each | about +$75 each |
+| Index 2011-2026 | 536, -$67 each (-$35,715) | 615, +$190 each | about +$90 each |
+| User's window | 7, +$9 each | 11, +$999 each | |
+
+After an outsized session the next one tends to retrace, so breakouts that continue it fail.
+
+**The rule as tested** (`research/v23_scan.py` set "bigday", `mnqbot/noise.py` `big_day_k` / `big_day_n`):
+- At 09:30, if the last session's 09:30-16:00 range (as a share of its open) beat big_day_k x the average of the last
+  big_day_n sessions (it included), no entries or heads-ups today in its direction (close against open).
+- The other direction trades as usual.
+- The whole strategy is re-run, not trades removed from a list.
+
+| Rule | Window net | NQ net / DD | NQ net per DD vs v2.2 | NQ 2015-19 / 2020-25 | NQ years better | Index net / DD | Index net per DD vs v2.2 | Index 2011-18 / 2019-26 | Index years better |
+|---|---:|---|---:|---|---:|---|---:|---|---:|
+| v2.2 | 26,425 | 329,768 / 31,888 | 1.00 | 169,589 / 160,179 | | 606,437 / 30,697 | 1.00 | 294,342 / 312,095 | |
+| 1.25 x / 10 | 25,811 | 324,159 / 27,066 | 1.16 | 150,112 / 174,047 | 7 / 11 | 578,170 / 28,714 | 1.02 | 311,311 / 266,859 | 8 / 16 |
+| 1.25 x / 20 | 25,811 | 330,852 / 23,231 | 1.38 | 170,640 / 160,212 | 7 | 588,651 / 28,739 | 1.04 | 323,122 / 265,529 | 6 |
+| **1.5 x / 10 (v2.3)** | **25,295** | **375,170 / 26,135** | **1.39** | **183,401 / 191,769** | **8** | **669,794 / 29,602** | **1.15** | **350,774 / 319,020** | **12** |
+| 1.5 x / 20 | 25,295 | 358,874 / 27,346 | 1.27 | 178,899 / 179,975 | 7 | 639,619 / 29,602 | 1.09 | 336,297 / 303,322 | 11 |
+| 1.75 x / 10 | 25,295 | 377,127 / 30,131 | 1.21 | 184,438 / 192,690 | 10 | 642,307 / 30,354 | 1.07 | 313,951 / 328,356 | 13 |
+| 1.75 x / 20 | 25,295 | 349,913 / 30,787 | 1.10 | 160,607 / 189,305 | 8 | 655,604 / 29,602 | 1.12 | 327,917 / 327,687 | 13 |
+| 2.0 x / 10 | 26,425 | 336,083 / 31,888 | 1.02 | 167,050 / 169,032 | 7 | 623,082 / 30,697 | 1.03 | 298,827 / 324,255 | 10 |
+| 2.0 x / 20 | 25,295 | 359,611 / 31,762 | 1.09 | 172,162 / 187,449 | 10 | 636,979 / 30,697 | 1.05 | 317,698 / 319,280 | 14 |
+
+**From 1.5 x to 2.0 x every row improves both halves of both histories.** At 1.25 x the late index half falls. 1.5 x
+/ 10 is taken, the best on both histories, with its neighbours also better than v2.2.
+
+**v2.3 against v2.2, across the histories:**
+
+| | Net | Drawdown | Winners | Trades |
+|---|---|---|---|---|
+| NQ | +14% | -18% | 49.7% against 49.0% | 4,497 against 4,818 |
+| Index | +10% | -4% | 50.3% against 49.7% | 6,407 against 6,862 |
+
+NQ 2023-2025 nets $37,217 against $20,493.
+
+**On the user's window** it skips one day, 9/22: four longs after the big up day of 9/21, which there made +$1,130.
+So the window shows +$25,295 against +$26,425, with the same drawdown. (The other blocked day in the bars, 7/28, is
+before the chart trades and lost $1,065.)
+
+**The Pine script on the window:** 49 trades, 30 winners, +$25,295, drawdown $2,613, the same as the model. The
+setting is "After a big day" (0 turns it off).
+
 ## What this does and doesn't say
 
 - **It says** that the original sweep/breakout rules have no edge after realistic costs on 2023–2026 Nasdaq-100 data, and would very likely not pass a $25K evaluation. Of three published strategies, only noise-area momentum held up over 16 years, and even it fails most $25K evaluations.

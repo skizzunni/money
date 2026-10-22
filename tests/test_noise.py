@@ -28,8 +28,11 @@ TP = "Take profit, noise units from the entry (0 = off)"  # the script's default
 AFTER_QTY = "After a losing trade: contracts (0 = the same)"  # the script's default is 9 (v2.1); the reference's off
 AFTER_ML = "After a losing trade: max loss per trade, $ (0 = the same)"  # 700 (v2.1); the reference's off
 LAST_ENTRY = "Last check for new entries"  # the script's default is 15:00 (v2.2); the reference's every check
+BIG_K = "After a big day: no trades its way if its range > this x the average (0 = off)"  # 1.5 (v2.3); reference off
+BIG_N = "After a big day: sessions in the average range"  # 10 (v2.3)
 V21 = {"max_loss_per_trade": 500.0, "lock_at": 0.75, "take_profit": 2.0, "tighten_only": True,
-       "after_loss_qty_div": 10 / 9, "after_loss_ml_mult": 1.4, "last_entry_end": 900}  # the script's defaults, 10 MNQ
+       "after_loss_qty_div": 10 / 9, "after_loss_ml_mult": 1.4, "last_entry_end": 900,
+       "big_day_k": 1.5, "big_day_n": 10}  # the script's defaults, 10 MNQ
 P0 = 20_000.0
 BARS_PER_DAY = 78  # 09:30 .. 15:55 on 5-minute bars
 CHECK_10_00, CHECK_10_30, CLOSE_16_00 = 5, 11, 77  # bar numbers within a session
@@ -446,7 +449,7 @@ def assert_trade_log(log, res, exit_mode, rows=10):
 
 def assert_parity(bars, minutes=5, lookback=14, skip_dates=None, exit_mode="stop", stop_buffer=None, qty=1,
                   max_loss=None, fed_dates=None, fed_no_shorts=None, take_profit=None, hook=None, lock_at=None,
-                  max_losers=None, after_loss=None, last_entry=None):
+                  max_losers=None, after_loss=None, last_entry=None, big_day=None):
     cfg = NoiseConfig(lookback=lookback, exit_mode=exit_mode, qty=qty)
     inputs = {"Sessions in the noise average": lookback}
     if lock_at is not None:
@@ -464,6 +467,9 @@ def assert_parity(bars, minutes=5, lookback=14, skip_dates=None, exit_mode="stop
     if last_entry is not None:
         cfg.last_entry_end = last_entry
     inputs[LAST_ENTRY] = "15:00" if cfg.last_entry_end == 900 else "15:30"
+    if big_day is not None:
+        cfg.big_day_k, cfg.big_day_n = big_day
+    inputs[BIG_K], inputs[BIG_N] = cfg.big_day_k, cfg.big_day_n
     inputs["Exit"] = "Resting stop at the line" if exit_mode == "stop" else "Half-hour check"
     inputs[FUNDED] = True  # the script's default is the evaluation's 3 contracts
     inputs["Contracts on a funded account"] = qty  # the script's default is 10; the reference's is 1
@@ -721,7 +727,7 @@ def test_pine_evaluation_tracker(target):
     days = sorted({d.date() for d in bars.index.tz_convert(NY)})
     start = days[40]
     inputs = {FUNDED: True, "Contracts on a funded account": 10, LOCK: 1.0, TIGHTEN: False, TP: 1.5, AFTER_QTY: 0,
-              AFTER_ML: 0.0, LAST_ENTRY: "15:30",
+              AFTER_ML: 0.0, LAST_ENTRY: "15:30", BIG_K: 0.0,
               "Max loss per trade, $ (all contracts, 0 = off)": 350.0,
               "Evaluation start date, YYYYMMDD (0 = off)": int(start.strftime("%Y%m%d")), "Profit target, $": target}
     pytest.importorskip("pynescript", reason="pip install pynescript to check the .pine files")
@@ -755,7 +761,8 @@ def test_pine_dashboard_shows_the_next_checks_lines():
     cut = full.iloc[: i - 1]
     rt = PineRuntime(load_pine(NOISE_PINE), cut, {FUNDED: True, "Contracts on a funded account": 1, LOCK: 1.0,
                                                     TIGHTEN: False, MAX_LOSS: 350.0, TP: 1.5,
-                                                    AFTER_QTY: 0, AFTER_ML: 0.0, LAST_ENTRY: "15:30"},
+                                                    AFTER_QTY: 0, AFTER_ML: 0.0, LAST_ENTRY: "15:30",
+                                                    BIG_K: 0.0},
                      timeframe_seconds=300)
     rt.run(lambda j, g: None)
     dash = [t.grid() for t in rt.tables if t.columns == 2 and t.grid() and t.grid()[0][0].startswith("MNQ Noise")][0]
@@ -1021,3 +1028,14 @@ def test_pine_no_entries_from_the_last_check():
     assert not any(t.entry_time.tz_convert(NY).strftime("%H:%M") == "15:30" for t in res.trades)
     every = run(bars, NoiseConfig(qty=10, max_loss_per_trade=500.0))
     assert any(t.entry_time.tz_convert(NY).strftime("%H:%M") == "15:30" for t in every.trades)
+
+
+@pytest.mark.slow
+def test_pine_after_a_big_day():
+    """v2.3: after a session whose range beat the average by the factor, no entries (nor heads-ups) the next day in
+    that session's direction; the script and the reference agree trade for trade, and on these bars the rule blocks
+    some entries."""
+    bars = synth_bars(sessions=90, seed=5)
+    res = assert_parity(bars, qty=10, max_loss=500.0, big_day=(1.2, 10))
+    free = run(bars, NoiseConfig(qty=10, max_loss_per_trade=500.0))
+    assert len(res.trades) < len(free.trades)

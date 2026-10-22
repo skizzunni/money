@@ -106,6 +106,11 @@ class NoiseConfig:
     # this factor (the stops keep the area itself). late_tp / late_tp_from: entries from checks closing at or after
     # late_tp_from (minute of day) take late_tp noise units as their take-profit
     entry_k: float = 1.0
+    # after a big session (its 09:30-16:00 range over big_day_k x the average of the last big_day_n sessions' ranges,
+    # as a share of the open; that session included), no entries or heads-ups today in that session's direction (its
+    # close against its open). 0 = off; the Pine script's default since v2.3 is 1.5 x the last 10 sessions
+    big_day_k: float = 0.0
+    big_day_n: int = 20
     late_tp: float = 0.0
     late_tp_from: int = 0
     # research only (v2.2 study), off by default: a runner after the take-profit. tp_keep: the share of the contracts
@@ -214,6 +219,10 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
     losers_today = 0  # losing trades closed today
     consec = skip_left = 0  # the v2.1 study's streak rule: losers in a row, signals still to skip
     loss_side = 0  # the side of the last losing trade
+    day_hi = day_lo = math.nan  # today's 09:30-16:00 high and low (big_day_k)
+    day_ranges: list[float] = []  # completed sessions' range / open, oldest first
+    day_dirs: list[int] = []  # and their direction (close against open)
+    block_dir = 0  # big_day_k: no entries on this side today
     side_cd = {1: 0, -1: 0}  # signals still to skip on a side today (side_cooldown)
     side_lost = {1: False, -1: False}  # a loser on that side today (side_margin)
     locked = False  # the trade has reached the lock trigger (a broker's auto-breakeven)
@@ -288,6 +297,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
         if cfg.after_loss_hourly and consec > 0 and end % 60:
             return False
         if cfg.last_entry_end and end > cfg.last_entry_end:
+            return False
+        if block_dir and d == block_dir:
             return False
         if cfg.side_margin and side_lost[d] and not past_margin:
             return False
@@ -417,6 +428,12 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             events.append((i, "EXIT"))
 
         if t_min == RTH_OPEN:
+            block_dir = 0
+            if cfg.big_day_k > 0 and len(day_ranges) >= cfg.big_day_n:
+                avg = sum(day_ranges[-cfg.big_day_n:]) / cfg.big_day_n
+                if day_ranges[-1] > cfg.big_day_k * avg:
+                    block_dir = day_dirs[-1]
+            day_hi = day_lo = math.nan
             pv_sum = v_sum = 0.0
             vwap_now = vwap_used = math.nan
             prev_close = last_rth_close
@@ -430,6 +447,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             fed_today = cfg.fed_no_shorts and t.strftime("%Y-%m-%d") in cfg.fed_dates
         if in_rth:
             last_rth_close = c[i]
+            day_hi = h[i] if math.isnan(day_hi) else max(day_hi, h[i])
+            day_lo = l[i] if math.isnan(day_lo) else min(day_lo, l[i])
             if cfg.vwap_stop:
                 w = vol[i] if vol[i] > 0 else 1.0
                 pv_sum += w * (h[i] + l[i] + c[i]) / 3
@@ -516,9 +535,11 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                 s += ring[d * N_CHECKS + k]
             sg = s / lb_n
             if c[i] > max(day_open, prev_close) * (1 + sg):
-                headsups.append((i, 1))
+                if block_dir != 1:
+                    headsups.append((i, 1))
             elif c[i] < min(day_open, prev_close) * (1 - sg) and not (fed_today and nxt < FED_CUTOFF):
-                headsups.append((i, -1))
+                if block_dir != -1:
+                    headsups.append((i, -1))
 
         if in_rth and end == RTH_CLOSE:
             if pos and cfg.nt_execution:
@@ -527,6 +548,9 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             elif pos:
                 close_pos(i, c[i] - pos * slip, "16:00 close")
                 events.append((i, "FLAT"))
+            if not math.isnan(day_open) and not math.isnan(day_hi):  # big_day_k's session record
+                day_ranges.append((day_hi - day_lo) / day_open)
+                day_dirs.append(1 if c[i] > day_open else -1 if c[i] < day_open else 0)
             if not math.isnan(day_open) and not any(math.isnan(x) for x in today):
                 ring[slot * N_CHECKS : (slot + 1) * N_CHECKS] = today
                 slot = (slot + 1) % lb_n
