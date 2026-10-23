@@ -44,11 +44,25 @@ import v18_scan as V  # noqa: E402
 
 NY = "America/New_York"
 TICK, PV, FEE, RISK = 0.25, 2.0, 0.62, 500.0
-SETUPS = ("triangle", "flag", "orb", "vwap", "double", "sweep", "ema", "inside")
+SETUPS = ("triangle", "flag", "orb", "vwap", "double", "sweep", "ema", "inside", "fvg", "trendpb")
 D: dict = {}
+ETH = [False]  # PATTERNS_ETH=1: around the clock (sessions 18:00-17:00 New York) on raw NQ futures and the user's MNQ
 
 
 def init(data: str, sep: str, dec: str) -> None:
+    import os
+    if os.environ.get("PATTERNS_ETH") == "1":
+        from mnqbot.data import resample
+        ETH[0] = True
+        nq = pd.concat([pd.read_parquet(f) for f in sorted(Path(data).glob("nq1m/NQ_1min_*.parquet"))])
+        nq = nq.set_index(pd.to_datetime(nq.timestamp).dt.tz_localize("UTC").dt.tz_convert(NY))
+        nq = resample(nq.drop(columns="timestamp").astype(float), "5min")
+        cut = pd.Timestamp("2020-01-01", tz=NY)
+        D["NQ 15-19 ETH (dev)"] = (nq[nq.index < cut], None)
+        D["NQ 20-25 ETH"] = (nq[nq.index >= cut], None)
+        mq = pd.read_pickle(f"{data}/mnq_eth.pkl")
+        D["MNQ 7-10/2026 ETH"] = (resample(mq.assign(volume=mq.get("volume", 0.0)), "5min"), "2026-07-01")
+        return
     V.init([sep, dec, f"{data}/nq5m_scaled.pkl", f"{data}/bars5_scaled.pkl"])
     nq = V.DATA["nq"][0]
     cut = pd.Timestamp("2020-01-01", tz=NY)
@@ -204,6 +218,40 @@ def signals(day: Day, setup: str):
                     out.append((i, 1, l[m] - TICK, None, "R"))
                 elif c[i] < l[m]:
                     out.append((i, -1, h[m] + TICK, None, "R"))
+    elif setup == "fvg":  # displacement fill: a strong bar leaves a gap; enter when a later bar retests it and holds
+        for g in range(2, n - 2):
+            a = day.atr[g]
+            if not a > 0:
+                continue
+            for d in (1, -1):
+                body = d * (c[g - 1] - day.o[g - 1])
+                if body < 1.5 * a:
+                    continue
+                top, bot = (l[g], h[g - 2]) if d > 0 else (h[g], l[g - 2])  # the gap: (near edge, far edge)
+                if d * (top - bot) <= 0:
+                    continue
+                stop = (l[g - 2] if d > 0 else h[g - 2]) - d * TICK
+                for j in range(g + 1, min(n - 1, g + 13)):
+                    if d * (c[j] - bot) < 0:  # closed through the gap: no setup
+                        break
+                    touched = (l[j] <= top) if d > 0 else (h[j] >= top)
+                    if touched and d * (c[j] - top) > 0:  # the retest bar closes back out of the gap
+                        out.append((j, d, stop, None, "R"))
+                        break
+    elif setup == "trendpb":  # trend follow: a regression slope, a pullback, and the bar that resumes it
+        x = np.arange(24) - 11.5
+        for i in range(25, n - 1):
+            a = day.atr[i]
+            if not a > 0:
+                continue
+            slope = float(np.dot(x, c[i - 24:i] - c[i - 24:i].mean()) / np.dot(x, x))  # points a bar
+            for d in (1, -1):
+                if d * slope * 24 < 3 * a:  # the last two hours moved 3+ ATR on the fitted line
+                    continue
+                pulled = (l[i - 1] < l[i - 2]) if d > 0 else (h[i - 1] > h[i - 2])
+                if pulled and d * (c[i] - (h[i - 1] if d > 0 else l[i - 1])) > 0:
+                    lo = l[i - 6:i + 1].min() if d > 0 else h[i - 6:i + 1].max()
+                    out.append((i, d, lo - d * TICK, None, "R"))
     return sorted(out, key=lambda s: s[0])
 
 
@@ -212,6 +260,9 @@ def prepare(bars: pd.DataFrame, setup: str) -> list:
     t = bars.index.tz_convert(NY)
     mins = (t.hour * 60 + t.minute).to_numpy()
     day_id = t.normalize()
+    if ETH[0]:  # a session runs 18:00-17:00; shift the clock so the 15:30 / 16:00 rules fall at 16:25 / 16:55
+        day_id = (t + pd.Timedelta(hours=6)).normalize()
+        mins = (mins - 1080) % 1440 - 420
     o, h, l, c = (bars[x].to_numpy(float) for x in ("open", "high", "low", "close"))
     v = bars["volume"].to_numpy(float) if "volume" in bars else np.zeros(len(bars))
     e9, e21, e200 = ema(c, 9), ema(c, 21), ema(c, 200)

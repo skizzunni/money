@@ -3180,7 +3180,7 @@ The choices the video leaves open were swept (`verification/noise_v2/triangle.cs
 
 ## Pattern strategies: eight popular setups, as taught and improved (October 23, 2026)
 
-`research/patterns.py` (`verification/noise_v2/patterns.csv`). Eight day-trade setups as usually taught:
+`research/patterns.py` (`verification/noise_v2/patterns_rth.csv`). Eight day-trade setups as usually taught:
 - triangles;
 - bull / bear flags;
 - the 30-minute opening-range breakout;
@@ -3229,6 +3229,56 @@ One family was positive on all four sets: the previous day's sweep, only with th
 - The two together broke the $1,000 daily limit on some days (worst -$1,200 to -$1,425).
 
 Not adopted.
+
+## The ONYX models, tested on history (October 23, 2026)
+
+The user's screenshots of "ONYX 5.0" show three MNQ models trading around the clock: Displacement Fill, Sweep Reversal
+and Trend Follow. They have grades A-C, a profit keeper and a daily cutoff.
+
+Each has only 3-47 trades from 10/15-10/23/2026, and the same model swings from one week to the next:
+- Trend Follow: +486 points, profit factor 2.09 over 22 trades; then +91 points with a 669-point drawdown over 47.
+- Sweep Reversal: profit factor 2.61 over 21 trades in its v2; -71 points over 3 in its v3.
+
+**Added to `research/patterns.py`:**
+- `fvg` (displacement fill): a bar with a body of 1.5+ ATR leaves a three-bar gap. Enter when a bar within an hour
+  retests the gap and closes back out of it. The stop goes past the gap's first bar.
+- `trendpb` (trend follow): the last two hours' regression line has moved 3+ ATR. A bar makes a pullback low (high)
+  and the next closes past its high (low). The stop goes past the last 7 bars' extreme.
+- `PATTERNS_ETH=1`: every setup around the clock, sessions 18:00-17:00. Data: raw NQ futures 2015-2025 and the user's
+  MNQ 7-10/2026.
+
+**Regular hours** (`verification/noise_v2/patterns_rth.csv`):
+- **Trend pullback, mornings, 3R target.** It was the best of all variants on NQ 2015-2019 (profit factor 1.42,
+  +0.25 R) and held on data not used to choose it:
+  - NQ 2020-2025: 1.22, +0.13 R;
+  - the index 2011-2026: 1.17, +0.10 R;
+  - the 2025-2026 stand-in: 1.11, +0.05 R.
+
+  This is the first new setup to survive that test.
+- **Displacement fill:** about breakeven, profit factor 0.95-1.17 as taught. Its best variant on 2015-2019 lost on the
+  index and the stand-in.
+- **The previous-day sweep with the day's direction** stays slightly positive everywhere.
+
+**Around the clock** (`verification/noise_v2/patterns_eth.csv`):
+- No variant of any setup was positive on all three sets.
+- As taught, every setup lost on NQ 2015-2019 (profit factor 0.67-1.03).
+- Overnight moves are small against costs.
+
+**The trend pullback added to v2.7** (daily P/L summed; the pullback risking $250 a trade, mornings, 3R):
+
+| | Pullback alone | Pullback years positive | v2.7 | Together | Drawdown, v2.7 / together |
+|---|---:|---:|---:|---:|---:|
+| NQ 2015-2019 | +8.4k | 5/5 | 165.5k | 173.8k | 16.0k / 15.9k |
+| NQ 2020-2025 | +8.4k | 5/6 | 157.9k | 166.3k | 20.4k / 19.2k |
+| Index 2011-2026 | +15.8k | 10/16 | 539.9k | 555.7k | 16.3k / 16.1k |
+| Stand-in 2025-2026 | +0.6k | | 40.1k | 40.7k | 9.6k / 9.9k |
+
+- It adds 1.5-5% net at about the same drawdown.
+- It trades on many of the same days as the bot (correlation 0.2-0.4). Run on its own, it would take days past the
+  $1,000 limit (worst -$1,133 to -$1,231) unless it shared the bot's budget.
+- One TradingView strategy holds one net position, so sharing it would need a second position engine in the script.
+
+Not adopted into v2.7; a candidate for a separate forward test.
 
 ```
 python research/v24_proxy.py <data dir> MNQ_09-26.Last.txt MNQ_12-26.Last.txt          # the stand-in
