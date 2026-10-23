@@ -32,6 +32,7 @@ from __future__ import annotations
 
 import itertools
 import math
+import os
 import sys
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
@@ -45,12 +46,22 @@ import v18_scan as V  # noqa: E402
 NY = "America/New_York"
 TICK, PV, FEE, RISK = 0.25, 2.0, 0.62, 500.0
 SETUPS = ("triangle", "flag", "orb", "vwap", "double", "sweep", "ema", "inside", "fvg", "trendpb")
+# the candlestick chart the user sent: each pattern with the side it is drawn with ("img"; it marks the hammer Sell and
+# the hanging man Buy) and with the textbook side ("std"), anywhere or only at a key level (yesterday's high, low and
+# close, today's open). The stop goes past the pattern, at least 0.3 ATR from its close (a hammer sold would otherwise
+# have its stop a tick away)
+CANDLES = ("dragonfly", "morning_star", "hammer", "engulfing", "three_white", "hanging_man", "three_black",
+           "gravestone")
+IMG_SIDE = {"dragonfly": 1, "morning_star": 1, "hammer": -1, "engulfing": 1, "three_white": 1, "hanging_man": 1,
+            "three_black": -1, "gravestone": -1}
+STD_SIDE = {**IMG_SIDE, "hammer": 1, "hanging_man": -1}
+CANDLE_SETUPS = tuple(f"candle:{n}:{conv}:{lvl}" for n in CANDLES for conv in ("img", "std")
+                      for lvl in ("any", "level") if conv == "img" or STD_SIDE[n] != IMG_SIDE[n])
 D: dict = {}
 ETH = [False]  # PATTERNS_ETH=1: around the clock (sessions 18:00-17:00 New York) on raw NQ futures and the user's MNQ
 
 
 def init(data: str, sep: str, dec: str) -> None:
-    import os
     if os.environ.get("PATTERNS_ETH") == "1":
         from mnqbot.data import resample
         ETH[0] = True
@@ -90,15 +101,56 @@ def ema(x: np.ndarray, n: int) -> np.ndarray:
 class Day:
     """One session's arrays plus what the setups need from before it."""
 
-    def __init__(self, o, h, l, c, v, mins, pdh, pdl, e9, e21, e200, atr):
+    def __init__(self, o, h, l, c, v, mins, pdh, pdl, e9, e21, e200, atr, pdc=math.nan):
         self.o, self.h, self.l, self.c, self.mins = o, h, l, c, mins
         self.n = len(c)
         w = np.where(v > 0, v, 1.0)
         tp = (h + l + c) / 3
         self.vwap = np.cumsum(w * tp) / np.cumsum(w)
         self.pdh, self.pdl, self.e9, self.e21, self.e200, self.atr = pdh, pdl, e9, e21, e200, atr
+        self.pdc = pdc
         self.k = 3
         self.ph, self.pl = pivots(h, self.k, True), pivots(l, self.k, False)
+
+
+def candle_at(day: Day, i: int, name: str) -> bool:
+    """Is the named pattern complete at bar i (its last bar)? Textbook shapes on 5-minute bars; bars smaller than half
+    an ATR don't count; the reversal shapes need the move they reverse (the close 5 bars before on the other side)."""
+    o, h, l, c, a = day.o, day.h, day.l, day.c, day.atr[i]
+    if i < 6 or not a > 0:
+        return False
+    body = abs(c[i] - o[i])
+    rng = h[i] - l[i]
+    uw, lw = h[i] - max(o[i], c[i]), min(o[i], c[i]) - l[i]
+    down, up = c[i - 1] < c[i - 6], c[i - 1] > c[i - 6]
+    big = rng >= 0.5 * a
+    if name in ("hammer", "hanging_man"):
+        shape = big and body > 0 and lw >= 2 * body and uw <= 0.3 * body + 1e-9
+        return shape and (down if name == "hammer" else up)
+    if name == "dragonfly":
+        return big and body <= 0.1 * rng and lw >= 0.7 * rng and down
+    if name == "gravestone":
+        return big and body <= 0.1 * rng and uw >= 0.7 * rng and up
+    if name == "engulfing":
+        return (c[i - 1] < o[i - 1] and c[i] > o[i] and o[i] <= c[i - 1] and c[i] >= o[i - 1]
+                and body > abs(c[i - 1] - o[i - 1]) and down)
+    if name == "morning_star":
+        b2 = o[i - 2] - c[i - 2]
+        return (b2 >= 0.6 * a and abs(c[i - 1] - o[i - 1]) <= 0.3 * b2 and c[i] > o[i]
+                and c[i] > (o[i - 2] + c[i - 2]) / 2 and down)
+    if name in ("three_white", "three_black"):
+        d = 1 if name == "three_white" else -1
+        for j in (i - 2, i - 1, i):
+            if d * (c[j] - o[j]) < 0.3 * a:
+                return False
+        return (d * (c[i] - c[i - 1]) > 0 and d * (c[i - 1] - c[i - 2]) > 0
+                and min(o[i - 1], c[i - 2]) <= o[i - 1] <= max(o[i - 2], c[i - 2])
+                and min(o[i - 1], c[i - 1]) <= o[i] <= max(o[i - 1], c[i - 1]))
+    raise ValueError(name)
+
+
+CANDLE_BARS = {"dragonfly": 1, "hammer": 1, "hanging_man": 1, "gravestone": 1, "engulfing": 2, "morning_star": 3,
+               "three_white": 3, "three_black": 3}
 
 
 def signals(day: Day, setup: str):
@@ -252,6 +304,22 @@ def signals(day: Day, setup: str):
                 if pulled and d * (c[i] - (h[i - 1] if d > 0 else l[i - 1])) > 0:
                     lo = l[i - 6:i + 1].min() if d > 0 else h[i - 6:i + 1].max()
                     out.append((i, d, lo - d * TICK, None, "R"))
+    elif setup.startswith("candle:"):
+        _, name, conv, lvl = setup.split(":")
+        d = (IMG_SIDE if conv == "img" else STD_SIDE)[name]
+        levels = [x for x in (day.pdh, day.pdl, day.pdc, day.o[0]) if not math.isnan(x)]
+        for i in range(6, n - 1):
+            if not candle_at(day, i, name):
+                continue
+            span = slice(i - CANDLE_BARS[name] + 1, i + 1)
+            lo, hi = l[span].min(), h[span].max()
+            if lvl == "level":  # the pattern's extreme touched a key level (within 0.3 ATR)
+                ext = lo if STD_SIDE[name] > 0 else hi
+                if not any(abs(ext - x) <= 0.3 * day.atr[i] for x in levels):
+                    continue
+            stop = (lo if d > 0 else hi) - d * TICK
+            stop = min(stop, c[i] - 0.3 * day.atr[i]) if d > 0 else max(stop, c[i] + 0.3 * day.atr[i])
+            out.append((i, d, stop, None, "R"))
     return sorted(out, key=lambda s: s[0])
 
 
@@ -270,13 +338,13 @@ def prepare(bars: pd.DataFrame, setup: str) -> list:
     atr = pd.Series(tr).rolling(14).mean().to_numpy()
     starts = np.flatnonzero(np.r_[True, day_id[1:] != day_id[:-1]])
     ends = np.r_[starts[1:], len(bars)]
-    days, pdh, pdl = [], math.nan, math.nan
+    days, pdh, pdl, pdc = [], math.nan, math.nan, math.nan
     for a, b in zip(starts, ends, strict=True):
         if b - a >= 30:
             dy = Day(o[a:b], h[a:b], l[a:b], c[a:b], v[a:b], mins[a:b], pdh, pdl, e9[a:b], e21[a:b], e200[a:b],
-                     atr[a:b])
+                     atr[a:b], pdc)
             days.append((dy, t[a:b], day_id[a], signals(dy, setup)))
-        pdh, pdl = h[a:b].max(), l[a:b].min()
+        pdh, pdl, pdc = h[a:b].max(), l[a:b].min(), c[b - 1]
     return days
 
 
@@ -357,7 +425,8 @@ def job(setup: str) -> list[dict]:
 def main() -> None:
     data, sep, dec, out = sys.argv[1:5]
     with ProcessPoolExecutor(4, initializer=init, initargs=(data, sep, dec)) as ex:
-        rows = [r for rs in ex.map(job, SETUPS) for r in rs]
+        which = CANDLE_SETUPS if os.environ.get("PATTERNS_SET") == "candles" else SETUPS
+        rows = [r for rs in ex.map(job, which) for r in rs]
     pd.DataFrame(rows).to_csv(out, index=False)
     print(f"{len(rows)} variants -> {out}")
 

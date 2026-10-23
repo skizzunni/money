@@ -3280,6 +3280,58 @@ Each has only 3-47 trades from 10/15-10/23/2026, and the same model swings from 
 
 Not adopted into v2.7; a candidate for a separate forward test.
 
+## Candlestick patterns, and a key-level trading video (October 23, 2026)
+
+**The material.**
+- A candlestick chart: dragonfly doji, morning star, hammer, bullish engulfing, three white soldiers, hanging man, three
+  black crows, gravestone doji. It marks the hammer "Sell" and the hanging man "Buy", the reverse of the textbook.
+- A trading video (@market.makerz): 8 NQ on a 15-second chart, shorting the 09:30 drop, then buying a reversal at a
+  level drawn before the open and trailing the stop for +$46,840. One morning, hand-picked.
+- Its testable part is a reversal at a key level. That is the previous-day sweep above, and the candles at levels below.
+
+**Each pattern as a strategy** (`research/patterns.py`, `PATTERNS_SET=candles`; `verification/noise_v2/candles_rth.csv`,
+640 variants):
+- Textbook shapes on 5-minute bars, taken on both the chart's side and the textbook side, anywhere or only at a key level
+  (yesterday's high, low and close; today's open).
+- Stop past the pattern, at least 0.3 ATR away. Without that floor a hammer sold has its stop a tick away and costs
+  dominate.
+- The same execution as the other setups, improvements chosen on NQ 2015-2019 only.
+
+Results:
+- **The reversal shapes don't work:** hammer, hanging man, dragonfly and gravestone, on either side.
+  - As drawn, the hammer sold: profit factor 0.73-0.90 everywhere.
+  - The hanging man bought: 0.93-1.20.
+  - Their textbook sides are no better.
+- **The momentum shapes hold up, mornings only:**
+  - Three white soldiers (mornings, 2R, chosen on 2015-2019): profit factor 1.25 / 1.31 / 1.23 / 1.06 on NQ 15-19 / NQ
+    20-25 / index / stand-in, and positive on all four at most targets.
+  - Morning star (mornings, with the day, 3R): 1.71 / 1.18 / 1.26 / 1.25.
+  - Three black crows: slightly positive.
+
+**Patterns as a filter on v2.7's entries** (`research/candles_vs_bot.py`, "filter"). A pattern on the check's bar, with
+or against the trade, doesn't sort the trades:
+- trades with a reversal pattern against them made $11 to $591 a trade, against $88 to $137 for the rest;
+- trades with a confirming pattern made $16 to $221, against $101 to $141.
+
+No filter.
+
+**The four setups that held, together, added to v2.7** (trend pullback, three white soldiers, morning star, previous-day
+sweep, $250 risk each, daily P/L summed; `candles_vs_bot.py`, "ensemble"):
+
+| | v2.7 | Four setups | Together | Drawdown, v2.7 / together | Worst day together |
+|---|---:|---:|---:|---:|---:|
+| NQ 2015-2019 | 165.5k | 21.4k | 186.8k | 16.0k / 13.2k | -1,325 |
+| NQ 2020-2025 | 157.9k | 17.9k | 175.7k | 20.4k / 18.6k | -1,293 |
+| Index 2011-2026 | 539.9k | 31.8k | 571.7k | 16.3k / 16.2k | -1,370 |
+| Stand-in 2025-2026 | 40.1k | 3.1k | 43.1k | 9.6k / 11.0k | -1,133 |
+
+- The histories gain 6-13% with no larger drawdown.
+- On 2025-2026 the gain is $3k and the drawdown grows.
+- Together they break the $1,000 daily limit unless they share its budget. One TradingView strategy holds one net
+  position, so that needs a second position engine in the script.
+
+Not adopted.
+
 ```
 python research/v24_proxy.py <data dir> MNQ_09-26.Last.txt MNQ_12-26.Last.txt          # the stand-in
 python research/v24_scan.py '[{"max_losers": 4}]' out.csv '{"max_loss_per_trade": 1500, "lock_at": 0.5, "max_losers": 3}' \
