@@ -409,7 +409,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                                      ap, 1.0))
             pnl += ap
         add_px, add_due = math.nan, False
-        if cfg.eq_n:
+        if cfg.eq_n or cfg.trail_dd > 0:
             eq_curve.append(eq_curve[-1] + pnl + part_pnl)
         day_pnl += pnl
         if reason == "Target":
