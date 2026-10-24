@@ -43,7 +43,7 @@ OWN_STOP = "Size by the trade's own stop"  # on (v3.0)
 TREND = "No shorts while the last close is above its average of this many sessions (0 = off)"  # 50 (v3.1)
 SQUEEZE = ("Never stuck: when no contract fits, 1 with its stop cut to the room left, if at least this many points "
            "(0 = off)")  # 20 (v3.1)
-V21 = {"max_loss_per_trade": 187.5, "lock_at": 0.25, "max_losers": 0, "take_profit": 2.0, "tighten_only": True,
+V21 = {"max_loss_per_trade": 187.5, "lock_at": 0.35, "max_losers": 0, "take_profit": 2.0, "tighten_only": True,
        "after_loss_qty_div": 1.0, "after_loss_ml_mult": 4 / 3, "last_entry_end": 900,
        "big_day_k": 1.5, "big_day_n": 10, "calm_k": 0.7, "calm_short": 10, "calm_long": 40,
        "daily_loss_limit": 1000.0, "range_pos_min": 0.65, "trail_dd": 2000.0, "trail_cap": 0.0,

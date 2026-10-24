@@ -15,6 +15,10 @@
 // Noise area for each half-hour mark = the day's open (and previous close) plus/minus the
 // average distance price has moved from the 09:30 open by that time over the last 14 sessions.
 //
+// v3.2, 2026-10-24: the lock arms at 0.35 max losses (32.8 points at $187.50 a contract) instead of 0.25 (23.4).
+// Retuned on v3.1's trades: on 5-minute bars better on every set (NQ futures 2015-2025 1.22x net, 1.42x net per
+// drawdown; the Nasdaq-100 index 2011-2026 1.19x, 1.23x, 13 of 16 years better; the 2025-2026 stand-in's profit factor
+// 1.65 to 1.91); on 30-minute bars about even (docs/RESULTS.md, v3.2).
 // v3.1, 2026-10-24: from the user's TradingView run of v3.0 (1/2025-10/2026, 30 minutes): its shorts lost $2,179 and
 // its longs made $2,117 in 2025, and near the trailing floor not one contract fitted, so it stopped trading for most of
 // 2026. Now no shorts while yesterday's close is above its 50-session average (setting "No shorts while..."), and
@@ -143,7 +147,7 @@
 // max loss after the fill bar are checked once per bar, so a 30-minute chart sees them later than a trader would.
 // The rules are the same as the Python reference in mnqbot/noise.py.
 // ------------------------------------------------------------------
-strategy("MNQ Noise-Area Momentum v3.1", shorttitle = "Noise-Mom", overlay = true,
+strategy("MNQ Noise-Area Momentum v3.2", shorttitle = "Noise-Mom", overlay = true,
      initial_capital = 50000, currency = currency.USD,
      default_qty_type = strategy.fixed, default_qty_value = 1, pyramiding = 0,
      commission_type = strategy.commission.cash_per_contract, commission_value = 0.62,
@@ -217,7 +221,7 @@ stopBuf = input.float(0.24, "Stop distance past the line, in noise units", minva
      tooltip = "0 puts the stop exactly on the line. 0.24 is how far price typically overshoots the line before resuming, measured on 2011-2018; it cut whipsaw stop-outs and raised profit per day on every later period. See docs/RESULTS.md.")
 tpUnits = input.float(2.0, "Take profit, noise units from the entry (0 = off)", minval = 0, maxval = 10, step = 0.1, group = grpT,
      tooltip = "A limit order this many noise units past your fill (1.5 x the current noise x the fill price), working from the bar after the fill; with the resting stop only. Chosen walk-forward, each year from the years before only: over 2015-2026 it raised profit per day from $24.66 to $25.77 per contract, the t-stat from 4.71 to 5.39, cut the worst losing stretch from $5,178 to $4,185, and raised the $50K pass rate at 2 MNQ in 2023-2026 from 42% to 68%. See docs/RESULTS.md, round twenty-six.")
-lockAt = input.float(0.25, "Lock a small win: trigger, in max losses (0 = off)", minval = 0, maxval = 10, step = 0.05, group = grpT,
+lockAt = input.float(0.35, "Lock a small win: trigger, in max losses (0 = off)", minval = 0, maxval = 10, step = 0.05, group = grpT,
      tooltip = "Once a trade has been this far in profit (1 = as far as the max loss: 17.5 points with $350 on 10 MNQ), the stop moves to the entry plus the points below, so the trade can't turn into a loser. Like Tradovate's Auto Breakeven: set the trigger and the offset in your bracket (70 and +10 ticks at the defaults). Tested at $35 a contract on 1-minute data, 2011-2026 index and 2015-2025 NQ futures: winners from about 14% to 48%, the same money, a higher t-stat (docs/RESULTS.md, round thirty-seven). On a 5-minute chart the lock moves one bar after the trigger is touched, so the chart's backtest shows fewer winners than the broker gets: over 16 years at 10 MNQ and $350, about 40% on this chart against about 49% with Tradovate's Auto Breakeven (docs/RESULTS.md).")
 lockPlus = input.float(2.5, "Lock: stop to the entry plus, points", minval = 0, maxval = 50, step = 0.25, group = grpT,
      tooltip = "2.5 points is $5 a contract, more than the round-trip fees and a tick of slippage, so a locked trade closes as a small winner.")
@@ -689,7 +693,7 @@ if showDash and (barstate.islastconfirmedhistory or barstate.isrealtime)
     closed = strategy.closedtrades
     todayPnlDash = strategy.netprofit - dayStartNet
     wins = strategy.wintrades
-    table.cell(dash, 0, 0, "MNQ Noise Momentum v3.1: " + account + ", " + str.tostring(qty) + " MNQ", text_color = color.white, text_size = size.small)
+    table.cell(dash, 0, 0, "MNQ Noise Momentum v3.2: " + account + ", " + str.tostring(qty) + " MNQ", text_color = color.white, text_size = size.small)
     table.cell(dash, 1, 0, status, text_color = statusColor, text_size = size.small)
     table.cell(dash, 0, 1, "Sessions of history", text_color = color.silver, text_size = size.small)
     table.cell(dash, 1, 1, str.tostring(math.min(filled, lookback)) + " / " + str.tostring(lookback), text_color = color.white, text_size = size.small)
