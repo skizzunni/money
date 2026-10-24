@@ -3784,6 +3784,24 @@ of $3,000 that stops at the starting balance, and $2,000 a day. On v3.4's rules 
 (55.8%), profit factor 1.63. That is 0.74x the stand-in's $35.3k, with the same trades as v3.4 (283) at larger sizes.
 The drawdown came after the account was well over $3,000 up, with the floor already at the starting balance.
 
+**The lock as the broker runs it, on v3.6** (`lock_intrabar`, `v37_broker_lock_*.csv`). A trailing stop arms the moment
+price touches the trigger, inside the bar, instead of the Pine lock's next-bar move.
+- **30-minute, lock 0.2:**
+
+  | | v3.6 | Broker lock |
+  |---|---|---|
+  | Stand-in net | $35.3k | $36.7k |
+  | Stand-in profit factor | 2.10 | 2.11 |
+  | Winners | 56.4% | 60.7% |
+  | NQ | 1.00x | 1.10x |
+  | Index | 1.00x | 1.05x |
+
+- **Its neighbours.** At 0.25 and with the plain lock at 0.15 the NQ history went under the floor's room and stopped
+  trading. At 0.15 the stand-in made $24.9k.
+- **5-minute bars.** Winners reached 70-75% (lock 0.15-0.25), but the profit factor fell to 1.47-1.75 and the
+  histories made 0.84-0.92x.
+- Not adopted: a small gain on one setting, with its neighbours failing.
+
 **On v3.3, not adopted** (`v34_followup_*.csv`):
 - **Half-size shorts.** Less net on the stand-in ($19.9k and $14.5k against $23.0k and $19.1k).
 - **Trend lengths of 30, 75 and 100 sessions.** Each did worse on the stand-in at one bar length or both.
