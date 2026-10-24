@@ -178,6 +178,15 @@ class NoiseConfig:
     # research (after v2.8): an entry needs the check's close in the top range_pos_min of the day's range so far (its
     # bottom for a short): (close - low) / (high - low) from 09:30; 0 = off
     range_pos_min: float = 0.0
+    # research (after v2.9): a prop firm's end-of-day trailing drawdown. The floor is the highest end-of-day closed
+    # equity minus trail_dd (from trail_from, YYYY-MM-DD; "" = the start); with trail_cap >= 0 it stops rising at the
+    # starting equity plus trail_cap (most firms: 0, the starting balance). A new trade may risk only what is left above
+    # the floor less trail_buffer, as with daily_loss_limit (fewer contracts, the same stop distance; none when not
+    # one fits). 0 = off
+    trail_dd: float = 0.0
+    trail_cap: float = -1.0
+    trail_buffer: float = 0.0
+    trail_from: str = ""
     day_up_mult: float = 1.0
     day_up_from: float = 0.0
     # research (v2.8 study): besides the half-hour checks, a stop order rests at the current noise lines from 10:00 and
@@ -327,6 +336,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
     prev_side = 0  # confirm: the last check today closed above its upper line (1), below its lower (-1), or inside
     target_today = False  # after_target_done: a take-profit filled today
     day_pnl = 0.0  # daily_loss_limit: today's realized P/L
+    trail_base = trail_peak = math.nan  # trail_dd: the closed equity at its start, the highest end-of-day equity
     touched = {1: -1, -1: -1}  # touch_entry: the half hour (check count) of each side's last touch entry
     n_checks_seen = 0  # touch_entry: checks so far
     eq_curve: list[float] = [0.0]  # eq_n: the closed P&L after each position
@@ -466,15 +476,27 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             return True
         return st == d if cfg.confirm_mode == "with" else st != -d
 
+    def money_room() -> float:
+        """What a new trade may risk: the rest of today's loss limit and the room above the trailing floor."""
+        room = math.inf
+        if cfg.daily_loss_limit > 0:
+            room = cfg.budget_frac * (cfg.daily_loss_limit + day_pnl)
+        if cfg.trail_dd > 0 and not math.isnan(trail_peak):
+            floor = trail_peak - cfg.trail_dd
+            if cfg.trail_cap >= 0:
+                floor = min(floor, trail_base + cfg.trail_cap)
+            room = min(room, eq_curve[-1] - floor - cfg.trail_buffer)
+        return room
+
     def budget_fits() -> bool:
         """daily_loss_limit: does one contract of the next trade (its after-loss size and max loss) fit today?"""
-        if cfg.daily_loss_limit <= 0 or cfg.max_loss_per_trade <= 0:
+        if (cfg.daily_loss_limit <= 0 and cfg.trail_dd <= 0) or cfg.max_loss_per_trade <= 0:
             return True
         after = consec > 0
         q = max(1, round(cfg.qty / cfg.after_loss_qty_div)) if after else cfg.qty
         ml = cfg.max_loss_per_trade * (cfg.after_loss_ml_mult if after else 1.0)
         per_c = ml / q + 2 * cfg.commission_per_side + 2 * slip * cfg.point_value
-        return math.floor(cfg.budget_frac * (cfg.daily_loss_limit + day_pnl) / per_c + 1e-9) >= 1
+        return math.floor(money_room() / per_c + 1e-9) >= 1
 
     def against_trend(d: int) -> bool:
         return bool(cfg.trend_n) and d == -trend and cfg.trend_side in (0, d)
@@ -677,6 +699,10 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             block_dir = 0
             target_today = False
             day_pnl = 0.0
+            if cfg.trail_dd > 0 and t.strftime("%Y-%m-%d") >= cfg.trail_from:  # yesterday's end-of-day equity
+                if math.isnan(trail_base):
+                    trail_base = trail_peak = eq_curve[-1]
+                trail_peak = max(trail_peak, eq_curve[-1])
             prev_side = 0
             if cfg.calm_k and len(day_ranges) >= cfg.calm_long:
                 cs, cl = cfg.calm_short, cfg.calm_long
@@ -785,9 +811,9 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                     if cfg.day_up_mult != 1.0 and day_pnl > cfg.day_up_from:
                         q_up = max(1, round(q_next * cfg.day_up_mult))
                         ml_next, q_next = ml_next / q_next * q_up, q_up
-                    if cfg.daily_loss_limit > 0 and cfg.max_loss_per_trade > 0:  # today's loss budget
+                    if (cfg.daily_loss_limit > 0 or cfg.trail_dd > 0) and cfg.max_loss_per_trade > 0:  # loss budget
                         per_c = ml_next / q_next + 2 * cfg.commission_per_side + 2 * slip * cfg.point_value
-                        fit = math.floor(cfg.budget_frac * (cfg.daily_loss_limit + day_pnl) / per_c + 1e-9)
+                        fit = math.floor(money_room() / per_c + 1e-9)
                         if fit < 1:  # not one contract fits: no entry
                             pending = None
                             events.pop()

@@ -108,6 +108,8 @@ def job(kw: dict) -> dict:
         cfg = NoiseConfig(**{**V23, **BASE, **kw})
         if isinstance(skip, str):  # the histories: their own closures, no Fed list
             cfg.skip_dates, cfg.fed_dates = skip, ""
+        if cfg.trail_dd > 0 and first:  # the trailing drawdown starts with the counted trades
+            cfg.trail_from = first
         tf = run(bars, cfg, minutes=MIN[0]).trades_frame()
         if first:
             tf = tf[tf.entry_time >= pd.Timestamp(first, tz=NY)]
@@ -119,9 +121,32 @@ def job(kw: dict) -> dict:
                     f"{name} pf": round(lg[lg > 0].sum() / -lg[lg < 0].sum(), 3), f"{name} n": len(lg),
                     f"{name} streak": streak(p),
                     f"{name} wday": round(tf.groupby(tf.exit_time.dt.date).pnl.sum().min()) if len(tf) else 0})
+        out.update(trail_stats(name, tf))
         if name in ("nq", "index"):
             out[f"{name} yrs"] = json.dumps(tf.groupby(tf.entry_time.dt.year).pnl.sum().round().astype(int).tolist())
     return out
+
+
+TRAIL = float(os.environ.get("TRAIL_DD", "2000"))
+
+
+def trail_stats(name: str, tf: pd.DataFrame) -> dict:
+    """The end-of-day trailing drawdown (the largest fall of the end-of-day closed equity from its highest), and
+    whether a TRAIL_DD trailing floor was ever touched by the closed equity after a trade: "tb" with the floor trailing
+    for ever, "tb0" with it stopping at the starting balance (most prop firms)."""
+    if tf.empty:
+        return {f"{name} eoddd": 0, f"{name} tb": 0, f"{name} tb0": 0}
+    tf = tf.sort_values("exit_time")
+    day = tf.exit_time.dt.tz_convert(NY).dt.date
+    eod = tf.groupby(day).pnl.sum().cumsum()
+    peak = np.maximum.accumulate(np.r_[0.0, eod.to_numpy()])  # the start counts as a peak
+    eoddd = (peak[1:] - eod.to_numpy()).max()
+    prev_peak = pd.Series(peak[:-1], index=eod.index)  # the highest end-of-day equity before each day
+    eq = tf.pnl.cumsum().to_numpy()
+    floor = prev_peak.reindex(day).to_numpy() - TRAIL
+    tb = int((eq < floor).sum())
+    tb0 = int((eq < np.minimum(floor, 0.0)).sum())
+    return {f"{name} eoddd": round(max(eoddd, 0.0)), f"{name} tb": tb, f"{name} tb0": tb0}
 
 
 def main() -> None:
