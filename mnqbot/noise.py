@@ -193,6 +193,9 @@ class NoiseConfig:
     trail_frac: float = 1.0
     budget_actual: bool = False
     size_up_to: int = 0
+    # with trail_dd: one more contract (the same stop distance) for each profit_step of closed profit above the
+    # trailing drawdown's starting equity, up to size_up_to (0 = no limit); 0 = off
+    profit_step: float = 0.0
     day_up_mult: float = 1.0
     day_up_from: float = 0.0
     # research (v2.8 study): besides the half-hour checks, a stop order rests at the current noise lines from 10:00 and
@@ -795,6 +798,11 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                     ml_next = cfg.max_loss_per_trade * (mm if after_loss else 1.0)
                     if cfg.cap_sigma > 0:
                         ml_next = cfg.cap_sigma * sigma * c[i] * q_next * cfg.point_value * (mm if after_loss else 1.0)
+                    if cfg.profit_step > 0 and not math.isnan(trail_base):  # a contract more per step of profit
+                        q_up = q_next + int(max(0.0, eq_curve[-1] - trail_base) // cfg.profit_step)
+                        if cfg.size_up_to > 0:
+                            q_up = min(q_up, cfg.size_up_to)
+                        ml_next, q_next = ml_next / q_next * q_up, q_up
                     if cfg.trend_qty_div and against_trend(d):
                         q_next = max(1, round(q_next / cfg.trend_qty_div))
                         ml_next *= cfg.trend_ml_mult
@@ -831,7 +839,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                         elif fit < q_next:  # fewer contracts, the same stop distance
                             ml_next = ml_next / q_next * fit
                             q_next = fit
-                        elif cfg.size_up_to > q_next and fit > q_next:  # more, the same stop distance
+                        elif cfg.size_up_to > q_next and fit > q_next and not cfg.profit_step:  # more contracts
                             q_up = min(fit, cfg.size_up_to)
                             ml_next, q_next = ml_next / q_next * q_up, q_up
                 if pending is not None and pending[0] == "entry":
