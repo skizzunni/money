@@ -15,6 +15,10 @@
 // Noise area for each half-hour mark = the day's open (and previous close) plus/minus the
 // average distance price has moved from the 09:30 open by that time over the last 14 sessions.
 //
+// v3.3, 2026-10-24: a contract more per $1,500 of profit (was $2,500), still up to 8. With v3.1's trend rule the
+// equity is smoother: steps of $1,500 never touched the floor nor stopped trading on any set; $1,000 got stuck on the
+// histories; starting at 2-3 contracts hit the floor in early 2025. The user's chart ran v3.2 at +$13,815 (profit
+// factor 1.61); on the stand-in this step adds about 37-39% (docs/RESULTS.md, v3.3).
 // v3.2, 2026-10-24: the lock arms at 0.35 max losses (32.8 points at $187.50 a contract) instead of 0.25 (23.4).
 // Retuned on v3.1's trades: on 5-minute bars better on every set (NQ futures 2015-2025 1.22x net, 1.42x net per
 // drawdown; the Nasdaq-100 index 2011-2026 1.19x, 1.23x, 13 of 16 years better; the 2025-2026 stand-in's profit factor
@@ -147,7 +151,7 @@
 // max loss after the fill bar are checked once per bar, so a 30-minute chart sees them later than a trader would.
 // The rules are the same as the Python reference in mnqbot/noise.py.
 // ------------------------------------------------------------------
-strategy("MNQ Noise-Area Momentum v3.2", shorttitle = "Noise-Mom", overlay = true,
+strategy("MNQ Noise-Area Momentum v3.3", shorttitle = "Noise-Mom", overlay = true,
      initial_capital = 50000, currency = currency.USD,
      default_qty_type = strategy.fixed, default_qty_value = 1, pyramiding = 0,
      commission_type = strategy.commission.cash_per_contract, commission_value = 0.62,
@@ -194,8 +198,8 @@ trailStop = input.bool(true, "Trailing drawdown stops at the starting balance", 
      tooltip = "As at most prop firms: once the floor reaches your starting balance it stays there. Unticked, it keeps trailing your highest end-of-day balance for ever.")
 trailFrom = input.int(20250102, "Trailing drawdown and contract steps from date, YYYYMMDD (0 = the first bar)", minval = 0, group = grpT,
      tooltip = "The day the account started: 20250102 (the default) for the backtest from January 2, 2025; for a live account, the day it began. Before it the script trades the starting contracts with no trailing drawdown, so the steps and the floor count only from this day.")
-profitStep = input.float(2500, "Add a contract per $ of profit (0 = off)", minval = 0, step = 100, group = grpT,
-     tooltip = "v3.0: one more contract for each this much closed profit since the start date (the same stop distance and max loss per contract), up to the most contracts below. A $2,000 trailing drawdown fits about 1 MNQ until there is a cushion: at 1 MNQ the 2025-2026 stand-in's worst end-of-day drawdown was $1,841. Steps of $750-1,500 grew too fast and lost the cushion in a losing stretch; $2,500-5,000 never touched the floor on any test set (docs/RESULTS.md, v3.0).")
+profitStep = input.float(1500, "Add a contract per $ of profit (0 = off)", minval = 0, step = 100, group = grpT,
+     tooltip = "v3.0: one more contract for each this much closed profit since the start date (the same stop distance and max loss per contract), up to the most contracts below. A $2,000 trailing drawdown fits about 1 MNQ until there is a cushion: at 1 MNQ the 2025-2026 stand-in's worst end-of-day drawdown was $1,841. v3.3: $1,500. With v3.1's trend rule, steps of $1,500-2,500 never touched the floor on any test set; $1,000 got stuck on the histories (docs/RESULTS.md, v3.0-v3.3).")
 sizeUpTo = input.int(8, "Most contracts (0 = no limit)", minval = 0, maxval = 60, group = grpT)
 budgetStop = input.bool(true, "Size by the trade's own stop", group = grpT,
      tooltip = "v3.0: a contract's risk for the loss limits is its stop at entry, the line stop or the max loss, whichever is closer (plus fees and a tick each way). Unticked: always the full max loss.")
@@ -693,7 +697,7 @@ if showDash and (barstate.islastconfirmedhistory or barstate.isrealtime)
     closed = strategy.closedtrades
     todayPnlDash = strategy.netprofit - dayStartNet
     wins = strategy.wintrades
-    table.cell(dash, 0, 0, "MNQ Noise Momentum v3.2: " + account + ", " + str.tostring(qty) + " MNQ", text_color = color.white, text_size = size.small)
+    table.cell(dash, 0, 0, "MNQ Noise Momentum v3.3: " + account + ", " + str.tostring(qty) + " MNQ", text_color = color.white, text_size = size.small)
     table.cell(dash, 1, 0, status, text_color = statusColor, text_size = size.small)
     table.cell(dash, 0, 1, "Sessions of history", text_color = color.silver, text_size = size.small)
     table.cell(dash, 1, 1, str.tostring(math.min(filled, lookback)) + " / " + str.tostring(lookback), text_color = color.white, text_size = size.small)
