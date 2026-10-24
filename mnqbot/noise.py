@@ -187,6 +187,12 @@ class NoiseConfig:
     trail_cap: float = -1.0
     trail_buffer: float = 0.0
     trail_from: str = ""
+    # with the money budget: trail_frac of the room above the trailing floor per trade; budget_actual: a contract's
+    # risk is its initial stop distance (the line stop or the max loss, whichever is closer) instead of the max loss;
+    # size_up_to > 0: take more contracts than qty when the budget fits them, up to this many (the same stop distance)
+    trail_frac: float = 1.0
+    budget_actual: bool = False
+    size_up_to: int = 0
     day_up_mult: float = 1.0
     day_up_from: float = 0.0
     # research (v2.8 study): besides the half-hour checks, a stop order rests at the current noise lines from 10:00 and
@@ -485,7 +491,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             floor = trail_peak - cfg.trail_dd
             if cfg.trail_cap >= 0:
                 floor = min(floor, trail_base + cfg.trail_cap)
-            room = min(room, eq_curve[-1] - floor - cfg.trail_buffer)
+            room = min(room, cfg.trail_frac * (eq_curve[-1] - floor - cfg.trail_buffer))
         return room
 
     def budget_fits() -> bool:
@@ -813,6 +819,11 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                         ml_next, q_next = ml_next / q_next * q_up, q_up
                     if (cfg.daily_loss_limit > 0 or cfg.trail_dd > 0) and cfg.max_loss_per_trade > 0:  # loss budget
                         per_c = ml_next / q_next + 2 * cfg.commission_per_side + 2 * slip * cfg.point_value
+                        if cfg.budget_actual and use_stop:  # the initial stop: the line's or the max loss
+                            sb = cfg.stop_buffer * sigma
+                            ln_stop = upper * (1 - sb) if d > 0 else lower * (1 + sb)
+                            pts = min(abs(c[i] + d * slip - ln_stop), ml_next / q_next / cfg.point_value)
+                            per_c = pts * cfg.point_value + 2 * cfg.commission_per_side + 2 * slip * cfg.point_value
                         fit = math.floor(money_room() / per_c + 1e-9)
                         if fit < 1:  # not one contract fits: no entry
                             pending = None
@@ -820,6 +831,9 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                         elif fit < q_next:  # fewer contracts, the same stop distance
                             ml_next = ml_next / q_next * fit
                             q_next = fit
+                        elif cfg.size_up_to > q_next and fit > q_next:  # more, the same stop distance
+                            q_up = min(fit, cfg.size_up_to)
+                            ml_next, q_next = ml_next / q_next * q_up, q_up
                 if pending is not None and pending[0] == "entry":
                     lock_next = cfg.after_loss_lock if (after_loss and cfg.after_loss_lock > 0) else cfg.lock_at
                     tp_next = cfg.after_loss_tp if (after_loss and cfg.after_loss_tp > 0) else cfg.take_profit
