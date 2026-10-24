@@ -173,6 +173,8 @@ class NoiseConfig:
     # all of it), so a loser leaves room for the next; and once today's closed P/L is above day_up_from, day_up_mult
     # times the contracts (the same stop distance), still within the budget
     budget_frac: float = 1.0
+    # research (after v2.8): shorts take short_mult x the contracts (the same stop distance); 0 = no short entries
+    short_mult: float = 1.0
     day_up_mult: float = 1.0
     day_up_from: float = 0.0
     # research (v2.8 study): besides the half-hour checks, a stop order rests at the current noise lines from 10:00 and
@@ -716,7 +718,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                 upper = max(day_open, prev_close) * (1 + sigma)
                 lower = min(day_open, prev_close) * (1 - sigma)
                 bands.append((i, upper, lower))
-                short_ok = not (fed_today and end < FED_CUTOFF)
+                short_ok = not (fed_today and end < FED_CUTOFF) and cfg.short_mult > 0
                 fresh_ok = cfg.max_losers <= 0 or losers_today < cfg.max_losers  # the daily limit: new entries
                 up_e, lo_e = upper, lower  # the entry lines (entry_k: a wider area for entries only)
                 if cfg.entry_k != 1.0:
@@ -770,6 +772,9 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                             ml_next *= cfg.eq_ml
                     if cfg.big_day_against_qty_div != 1.0 and block_dir == -d:
                         q_next = max(1, round(q_next / cfg.big_day_against_qty_div))
+                    if d < 0 and cfg.short_mult != 1.0:
+                        q_s = max(1, round(q_next * cfg.short_mult))
+                        ml_next, q_next = ml_next / q_next * q_s, q_s
                     if cfg.day_up_mult != 1.0 and day_pnl > cfg.day_up_from:
                         q_up = max(1, round(q_next * cfg.day_up_mult))
                         ml_next, q_next = ml_next / q_next * q_up, q_up
