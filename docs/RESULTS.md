@@ -3504,6 +3504,25 @@ skipping roll weeks.
 - Profit factor 1.11-1.15, 54-56% winners.
 - About $13-14k per MNQ over 11 years, with a $5.4-7.7k drawdown and a losing 2022. Not added.
 
+**Fading the lines on calm days** (`research/v29_fade.py`, `v29_fade_30.csv`). The days v2.9 doesn't trade (after a
+calm stretch) never compete for the daily budget, so they get the opposite trade: short a check's close above the
+upper line, buy one below the lower. Stops of 0.5-1.5 and targets of 0.5-1.5 noise units, $500 risk, 30-minute bars.
+- **The stand-in:** profit factor 1.75-5.7 and 49-78% winners, but only 29-45 trades.
+- **NQ 2015-2025:** a profit factor under 1 at every setting (0.68-0.99).
+- **The index:** 0.80-1.21.
+- **On every day,** not only calm ones: it loses everywhere (0.66-0.87).
+- Not added: the stand-in's few trades are luck that the histories don't share.
+
+**The learned filter, checked further** (`v29_meta30_*.csv`).
+- **Depth-3 trees, skipping 10-20%.** On the histories the same story every time: NQ +14-18% net, net per drawdown
+  1.10-1.25x; the index +7%, 1.24-1.26x. The stand-in made $24.6-27.9k against $27.1k, with a larger drawdown.
+- **Depth-2 trees:** smaller gains, and none on the index.
+- A filter that helps the histories and not the recent stand-in, and can't run in Pine, isn't adopted.
+
+**A finer check grid with the range rule** (`v29_grid_5.csv`, 5-minute bars only).
+- Every 15 minutes: +9-17% net, but net per drawdown 0.71-0.99x on the histories.
+- Every 10 minutes: worse.
+
 ## What this does and doesn't say
 
 - **It says** that the original sweep/breakout rules have no edge after realistic costs on 2023–2026 Nasdaq-100 data, and would very likely not pass a $25K evaluation. Of three published strategies, only noise-area momentum held up over 16 years, and even it fails most $25K evaluations.
