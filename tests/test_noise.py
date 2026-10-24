@@ -33,8 +33,8 @@ BIG_N = "After a big day: sessions in the average range"  # 10 (v2.3)
 CALM = "Calm stretch: no trades if the recent average range < this x the longer one (0 = off)"  # 0.7 (v2.5); ref off
 CALM_S, CALM_L = "Calm stretch: recent sessions", "Calm stretch: longer stretch, sessions"  # 10, 40 (v2.5)
 DAILY = "Max loss a day, $ (0 = off)"  # the script's default is $1,000 (v2.7); the reference's off
-V21 = {"max_loss_per_trade": 750.0, "lock_at": 1.0, "max_losers": 0, "take_profit": 2.0, "tighten_only": True,
-       "after_loss_qty_div": 10 / 9, "after_loss_ml_mult": 2.0, "last_entry_end": 900,
+V21 = {"max_loss_per_trade": 750.0, "lock_at": 0.25, "max_losers": 0, "take_profit": 2.0, "tighten_only": True,
+       "after_loss_qty_div": 1.0, "after_loss_ml_mult": 4 / 3, "last_entry_end": 900,
        "big_day_k": 1.5, "big_day_n": 10, "calm_k": 0.7, "calm_short": 10, "calm_long": 40,
        "daily_loss_limit": 1000.0}  # the script's defaults
 P0 = 20_000.0
@@ -785,11 +785,11 @@ def test_pine_dashboard_shows_the_next_checks_lines():
 
 
 @pytest.mark.slow
-@pytest.mark.parametrize("funded, eval_qty, qty", [(None, None, 10), (False, 3, 3), (True, 3, 10)])
+@pytest.mark.parametrize("funded, eval_qty, qty", [(None, None, 4), (False, 3, 3), (True, 3, 4)])
 def test_pine_account_switch(funded, eval_qty, qty):
-    """The evaluation (the default) trades 10 MNQ as v1.5 did, or its own setting; the funded switch 10; the same max
-    loss, so the stop and the lock scale. The script's defaults: at 10 MNQ the after-loss size and max loss (9 MNQ,
-    $1,500) included; at 3 MNQ off."""
+    """The evaluation (the default) trades 4 MNQ (v2.8), or its own setting; the funded switch 4; the same max loss,
+    so the stop and the lock scale. The script's defaults: at 4 MNQ the after-loss max loss ($1,000, the same contracts)
+    included; at 3 MNQ off."""
     bars = synth_bars(sessions=60, seed=11)
     inputs = {} if funded is None else {FUNDED: funded}
     cfg = NoiseConfig(qty=qty, **V21)

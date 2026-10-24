@@ -15,6 +15,16 @@
 // Noise area for each half-hour mark = the day's open (and previous close) plus/minus the
 // average distance price has moved from the 09:30 open by that time over the last 14 sessions.
 //
+// v2.8, 2026-10-24: fewer contracts, a wider stop, an early lock: 4 MNQ, max loss $750 (93.75 points; the line stop
+// is usually closer), the lock at 0.25 max losses (23.4 points, then the stop to the entry + 2.5), the trade after a
+// loser the same 4 MNQ with $1,000. Under the $1,000 daily limit 10 MNQ with a 37.5-point stop was stopped by ordinary
+// noise and used up the day's room in one or two losers; 4 MNQ gives the trade room and the lock turns more of them
+// into small winners. Stand-in 1/2025-10/2026, 30-minute: +$27.1k (v2.7 +$28.4k), drawdown $6.5k ($9.7k), 54.4% winners
+// (42.4%), profit factor 1.42 (1.28), worst day -$918; 5-minute: +$28.7k (+$40.1k), drawdown $5.7k ($10.6k), 67.0%
+// (49.1%), 1.45 (1.38). Net per drawdown on NQ futures 2015-2025 1.21-1.26x v2.7's, on the index 2011-2026 0.88-0.98x;
+// net 0.53-0.61x on both. On the user's MNQ bars 8/24-10/16 (5-minute) +$2.7k against +$12.0k. After a full loser the
+// $1,000 after-loss trade no longer fits the day's room, so entries wait for the next day. To go back to v2.7: 10
+// contracts, after a loser 9 and $1,500, lock 1.0 (docs/RESULTS.md, v2.8).
 // v2.7, 2026-10-22: at most $1,000 lost a day (setting "Max loss a day"), without a stop-trading rule. Each new trade
 // may risk only what is left of the day's $1,000 (today's closed P/L counted, so a winner adds room): it takes fewer
 // contracts with the same stop distance, and only when not even 1 MNQ fits do new entries wait for tomorrow. The
@@ -130,16 +140,16 @@ const int FED_CUTOFF = 840   // 14:00, the Fed statement
 grpT = "Trading"
 lookback = input.int(14, "Sessions in the noise average", minval = 2, maxval = 60, group = grpT)
 funded   = input.bool(false, "FUNDED ACCOUNT (tick for the funded contracts; untick for the evaluation's)", group = grpT,
-     tooltip = "Unticked: the evaluation's contracts below (10, as v1.5). Ticked: the funded account's (10). Same rules and the same max loss per trade; the stop and the lock scale with the contracts. At 10 MNQ and $350 (a $35 stop a contract) about 25-30% of historical $50K evaluations passed; at 3 MNQ ($117 a contract) about 45-55%, because the stop has room and four losers no longer eat the $2,000 drawdown. Once funded, tick it.")
+     tooltip = "Unticked: the evaluation's contracts below (4 since v2.8). Ticked: the funded account's (4). Same rules and the same max loss per trade; the stop and the lock scale with the contracts. At 10 MNQ and $350 (a $35 stop a contract) about 25-30% of historical $50K evaluations passed; at 3 MNQ ($117 a contract) about 45-55%, because the stop has room and four losers no longer eat the $2,000 drawdown. Once funded, tick it.")
 account  = funded ? "Funded" : "Evaluation"
-evalQty  = input.int(10, "Contracts in an evaluation", minval = 1, maxval = 60, group = grpT)
-fundQty  = input.int(10, "Contracts on a funded account", minval = 1, maxval = 60, group = grpT,
+evalQty  = input.int(4, "Contracts in an evaluation", minval = 1, maxval = 60, group = grpT)
+fundQty  = input.int(4, "Contracts on a funded account", minval = 1, maxval = 60, group = grpT,
      tooltip = "Every figure in docs/RESULTS.md is per contract. What matters is the max loss per contract (the dashboard shows it): $350 over 10 contracts is $35 a contract, a 17.5-point stop; over 3 it is $117, 58 points. See docs/RESULTS.md, rounds thirteen, twenty-seven, thirty-two and thirty-seven.")
 qty = account == "Evaluation" ? evalQty : fundQty
 maxLoss  = input.float(750, "Max loss per trade, $ (all contracts, 0 = off)", minval = 0, step = 10, group = grpT,
      tooltip = "A second stop this many dollars from the entry fill, for the whole position, live from the fill like a bracket order; whichever of it and the line stop is closer is used. Spread over many contracts it gets tight: $350 over 10 contracts is a $35 stop each, which normal 5-minute moves hit, and on 2023-2026 it made about $6 a day per contract against about $20 at $117 each. On 16 years, caps of $100-$200 per contract raised profit per day in every period and cut the worst losing stretch. Fees, slippage and a gap through the stop can add to the loss.")
-afterQty = input.int(9, "After a losing trade: contracts (0 = the same)", minval = 0, maxval = 60, group = grpT,
-     tooltip = "The trade after a losing trade uses this many contracts and the max loss below, so its stop sits further away (v2.6, 9 MNQ and $1,500: 83.3 points, against 37.5 for 10 MNQ and $750). A winner, or the next trade, goes back to the normal size. Ordinary noise stopped many re-entries after a loss; the wider stop turned some of them into winners: back-to-back losers 36% against 42% of losers on the user's MNQ window, 51% against 57% on NQ futures 2015-2025 (docs/RESULTS.md, v2.1). It risks up to $1,500 on that trade.")
+afterQty = input.int(0, "After a losing trade: contracts (0 = the same)", minval = 0, maxval = 60, group = grpT,
+     tooltip = "The trade after a losing trade uses this many contracts and the max loss below, so its stop sits further away (v2.8: the same 4 MNQ and $1,000, 125 points, against 93.75 for 4 MNQ and $750; v2.6 was 9 MNQ and $1,500 against 10 and $750). A winner, or the next trade, goes back to the normal size. Ordinary noise stopped many re-entries after a loss; the wider stop turned some of them into winners: back-to-back losers 36% against 42% of losers on the user's MNQ window, 51% against 57% on NQ futures 2015-2025 (docs/RESULTS.md, v2.1). It risks up to $1,000 on that trade, and never more than what is left of the day's loss limit.")
 lastEntry = input.string("15:00", "Last check for new entries", options = ["15:00", "15:30"], group = grpT,
      tooltip = "v2.2: no new entries from the 15:30 check. With 25 minutes left before the 15:55 exit such a trade can't reach its take-profit but can lose its full stop: at v2.1's settings the 15:30 entries lost on average on NQ futures 2015-2025 (258 trades, -$58 each), the index 2011-2026 (370, -$53) and the user's MNQ window; without them +4% net on NQ, +3% on the index, +5% on the window (docs/RESULTS.md, v2.2).")
 lastEntryEnd = lastEntry == "15:00" ? 900 : 930
@@ -152,7 +162,7 @@ calmShort = input.int(10, "Calm stretch: recent sessions", minval = 2, maxval = 
 calmLong = input.int(40, "Calm stretch: longer stretch, sessions", minval = 5, maxval = 100, group = grpT)
 dailyLimit = input.float(1000, "Max loss a day, $ (0 = off)", minval = 0, step = 50, group = grpT,
      tooltip = "v2.7: no trade may risk more than what is left of this loss today (today's closed P/L counted, wins add room back). A trade that would risk more takes fewer contracts with the same stop distance; when not even 1 contract fits, no new entries until tomorrow. Trading never stops just because of a loss: the next trade is smaller instead. The stop is a resting order, so a gap or fast market through it can still lose a little more (docs/RESULTS.md, v2.7).")
-afterMaxLoss = input.float(1500, "After a losing trade: max loss per trade, $ (0 = the same)", minval = 0, step = 10, group = grpT)
+afterMaxLoss = input.float(1000, "After a losing trade: max loss per trade, $ (0 = the same)", minval = 0, step = 10, group = grpT)
 skipDates = input.string("2025-01-01,2025-01-09,2025-01-20,2025-02-17,2025-04-18,2025-05-26,2025-06-19,2025-07-03,2025-07-04,2025-09-01,2025-11-27,2025-11-28,2025-12-24,2025-12-25,2026-01-01,2026-01-19,2026-02-16,2026-04-03,2026-05-25,2026-06-19,2026-07-03,2026-09-07,2026-11-26,2026-11-27,2026-12-24,2026-12-25,2027-01-01,2027-01-18,2027-02-15,2027-03-26,2027-05-31,2027-06-18,2027-07-05,2027-09-06,2027-11-25,2027-11-26,2027-12-24",
      "Don't trade on these dates", group = grpT,
      tooltip = "YYYY-MM-DD, comma separated. Pre-filled with the 2025-2027 US market holidays and half days (2025 for backtests from January 2025), when MNQ trades a short session. Add news days if you like.")
@@ -168,7 +178,7 @@ stopBuf = input.float(0.24, "Stop distance past the line, in noise units", minva
      tooltip = "0 puts the stop exactly on the line. 0.24 is how far price typically overshoots the line before resuming, measured on 2011-2018; it cut whipsaw stop-outs and raised profit per day on every later period. See docs/RESULTS.md.")
 tpUnits = input.float(2.0, "Take profit, noise units from the entry (0 = off)", minval = 0, maxval = 10, step = 0.1, group = grpT,
      tooltip = "A limit order this many noise units past your fill (1.5 x the current noise x the fill price), working from the bar after the fill; with the resting stop only. Chosen walk-forward, each year from the years before only: over 2015-2026 it raised profit per day from $24.66 to $25.77 per contract, the t-stat from 4.71 to 5.39, cut the worst losing stretch from $5,178 to $4,185, and raised the $50K pass rate at 2 MNQ in 2023-2026 from 42% to 68%. See docs/RESULTS.md, round twenty-six.")
-lockAt = input.float(1.0, "Lock a small win: trigger, in max losses (0 = off)", minval = 0, maxval = 10, step = 0.05, group = grpT,
+lockAt = input.float(0.25, "Lock a small win: trigger, in max losses (0 = off)", minval = 0, maxval = 10, step = 0.05, group = grpT,
      tooltip = "Once a trade has been this far in profit (1 = as far as the max loss: 17.5 points with $350 on 10 MNQ), the stop moves to the entry plus the points below, so the trade can't turn into a loser. Like Tradovate's Auto Breakeven: set the trigger and the offset in your bracket (70 and +10 ticks at the defaults). Tested at $35 a contract on 1-minute data, 2011-2026 index and 2015-2025 NQ futures: winners from about 14% to 48%, the same money, a higher t-stat (docs/RESULTS.md, round thirty-seven). On a 5-minute chart the lock moves one bar after the trigger is touched, so the chart's backtest shows fewer winners than the broker gets: over 16 years at 10 MNQ and $350, about 40% on this chart against about 49% with Tradovate's Auto Breakeven (docs/RESULTS.md).")
 lockPlus = input.float(2.5, "Lock: stop to the entry plus, points", minval = 0, maxval = 50, step = 0.25, group = grpT,
      tooltip = "2.5 points is $5 a contract, more than the round-trip fees and a tick of slippage, so a locked trade closes as a small winner.")
