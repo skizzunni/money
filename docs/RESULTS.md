@@ -3481,6 +3481,29 @@ the check's close.
   - Skipping 35% or 50% was worse: not a smooth effect.
 - Such a model can't run inside a Pine script.
 
+**Is the range rule chosen in hindsight?** It was found on all the years at once. Split in two, the trades it skips
+earn less than the rest in every part:
+
+| Period | Skipped trades | Profit factor of the rest |
+|---|---|---:|
+| NQ 2015-2019 | profit factor 1.11 | 1.44 |
+| NQ 2020-2025 | 1.24 | 1.45 |
+| Index 2011-2017 | 0.99 | 1.32 |
+| Index 2018-2026 | 1.25 | 1.53 |
+| Stand-in | 0.60 | 1.55 |
+
+**A second rule, chosen properly.** Every one-description skip rule was tried on the early years only (NQ 2015-2019,
+the index 2011-2017). A rule had to qualify on both, with the skipped trades at a profit factor under 0.95.
+- Of the 3 that qualified, none held on the later years: the trades they skipped made money there (profit factor
+  1.16-2.28).
+- By check time the early and late years disagree. 14:00 was weak early (0.69, 0.92) and mixed later (1.76, 1.01,
+  0.29).
+
+**The overnight drift as a second strategy.** NQ futures 2015-2025: buy at the 16:00 close and sell at 04:00-09:30,
+skipping roll weeks.
+- Profit factor 1.11-1.15, 54-56% winners.
+- About $13-14k per MNQ over 11 years, with a $5.4-7.7k drawdown and a losing 2022. Not added.
+
 ## What this does and doesn't say
 
 - **It says** that the original sweep/breakout rules have no edge after realistic costs on 2023–2026 Nasdaq-100 data, and would very likely not pass a $25K evaluation. Of three published strategies, only noise-area momentum held up over 16 years, and even it fails most $25K evaluations.
