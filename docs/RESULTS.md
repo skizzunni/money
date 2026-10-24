@@ -3714,6 +3714,45 @@ On v3.2 (`v33_sizing_*.csv`): starting at 1-3 contracts, steps of $1,500, $2,000
 factor 1.43. That is the same net as v3.2's +$13,815 with a lower profit factor (1.61), so the stand-in's gain from
 the faster step didn't show on the user's bars. v3.4 goes back to the $2,500 step.
 
+## v3.5: four settings retuned together (October 24, 2026)
+
+**The search.** 40 random combinations of v3.4's settings (`v35_random_*.csv`):
+
+| Setting | Values tried |
+|---|---|
+| Lock | 0.3, 0.35, 0.45 |
+| Stop buffer | 0.2, 0.24, 0.3 |
+| Take-profit | 1.75, 2.0, 2.5 |
+| Range rule | 0.6, 0.65, 0.7 |
+| Calm rule | 0.6, 0.7, 0.8 |
+| Trend for shorts | 40, 50, 60 sessions |
+| After-loss max loss | 1.0, 1.33, 1.67x |
+
+- Every combination ran on all four sets at 5- and 30-minute bars.
+- A combination counted only if:
+  - no set went under the floor or got stuck;
+  - both histories made at least 0.9x v3.4's net at both bar lengths.
+- Ranked by the stand-in's net at both bar lengths.
+
+**The pick:** lock 0.45, stop buffer 0.24, take-profit 2.0, range 0.7, calm 0.7, trend 40, after-loss max loss 1.0x
+(no wider stop after a loser).
+
+| | v3.4 | v3.5 |
+|---|---|---|
+| Stand-in 30-min | $16.8k, PF 1.95 | $23.1k, PF 2.06, 55.3% winners, end-of-day drawdown $2.5k |
+| Stand-in 5-min | $13.8k, PF 1.91 | $15.1k, PF 1.77, 64.6% winners |
+| NQ 30-min | 1.00x | 1.19x net, net per drawdown 1.11x |
+| Index 30-min | 1.00x | 1.18x, 1.21x |
+| NQ 5-min | 1.00x | 1.02x, 0.94x |
+| Index 5-min | 1.00x | 1.02x, 1.05x |
+
+**Its neighbours** (`v35_neighbours_*.csv`): one step either way on the lock (0.4, 0.5), range (0.675, 0.725), trend
+(35, 45) and after-loss max loss (1.17x).
+- The 30-minute stand-in made $16.4-24.9k, with a profit factor of 1.77-2.08 (all but range 0.725 at least $19.8k
+  and 1.88).
+- No set went under the floor.
+- With 2 ticks of slippage: $20.1k, PF 1.95 (30-minute); $11.7k, PF 1.73 (5-minute).
+
 **On v3.3, not adopted** (`v34_followup_*.csv`):
 - **Half-size shorts.** Less net on the stand-in ($19.9k and $14.5k against $23.0k and $19.1k).
 - **Trend lengths of 30, 75 and 100 sessions.** Each did worse on the stand-in at one bar length or both.
