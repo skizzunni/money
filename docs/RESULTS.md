@@ -3710,6 +3710,10 @@ On v3.2 (`v33_sizing_*.csv`): starting at 1-3 contracts, steps of $1,500, $2,000
 - With the trend rule, $1,500 is safe on every set. In v3.0 (no trend rule) steps under $2,500 got stuck. A $1,000
   step still gets stuck on the histories.
 
+**The user's TradingView run of v3.3**: +$13,778, max drawdown $4,212, 157 winners in 282 trades (55.7%), profit
+factor 1.43. That is the same net as v3.2's +$13,815 with a lower profit factor (1.61), so the stand-in's gain from
+the faster step didn't show on the user's bars. v3.4 goes back to the $2,500 step.
+
 **On v3.3, not adopted** (`v34_followup_*.csv`):
 - **Half-size shorts.** Less net on the stand-in ($19.9k and $14.5k against $23.0k and $19.1k).
 - **Trend lengths of 30, 75 and 100 sessions.** Each did worse on the stand-in at one bar length or both.
