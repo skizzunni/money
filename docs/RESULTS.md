@@ -3710,6 +3710,13 @@ On v3.2 (`v33_sizing_*.csv`): starting at 1-3 contracts, steps of $1,500, $2,000
 - With the trend rule, $1,500 is safe on every set. In v3.0 (no trend rule) steps under $2,500 got stuck. A $1,000
   step still gets stuck on the histories.
 
+**On v3.3, not adopted** (`v34_followup_*.csv`):
+- **Half-size shorts.** Less net on the stand-in ($19.9k and $14.5k against $23.0k and $19.1k).
+- **Trend lengths of 30, 75 and 100 sessions.** Each did worse on the stand-in at one bar length or both.
+- **The after-loss max loss at $187.50** (no wider stop after a loser). Mixed: NQ better, the stand-in and the
+  5-minute index worse.
+- **A range rule of 0.5 or 0.75.** NQ went under the floor's room on 30-minute bars and stopped trading.
+
 ## What this does and doesn't say
 
 - **It says** that the original sweep/breakout rules have no edge after realistic costs on 2023–2026 Nasdaq-100 data, and would very likely not pass a $25K evaluation. Of three published strategies, only noise-area momentum held up over 16 years, and even it fails most $25K evaluations.
