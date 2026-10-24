@@ -15,6 +15,12 @@
 // Noise area for each half-hour mark = the day's open (and previous close) plus/minus the
 // average distance price has moved from the 09:30 open by that time over the last 14 sessions.
 //
+// v3.1, 2026-10-24: from the user's TradingView run of v3.0 (1/2025-10/2026, 30 minutes): its shorts lost $2,179 and
+// its longs made $2,117 in 2025, and near the trailing floor not one contract fitted, so it stopped trading for most of
+// 2026. Now no shorts while yesterday's close is above its 50-session average (setting "No shorts while..."), and
+// when not one contract fits, 1 MNQ with its max loss cut to the room left (setting "Never stuck"). On the 2025
+// stand-in (NQ futures to July): v3.0 52.1% winners, profit factor 1.12; with the trend rule 59.0%, 1.47, the shorts
+// +$976 instead of -$1,041 (docs/RESULTS.md, v3.1).
 // v3.0, 2026-10-24: a $2,000 end-of-day trailing drawdown (settings "Trailing drawdown"), as at a prop firm: the floor
 // is the highest end-of-day balance minus $2,000 and stops at the starting balance. The account starts at 1 MNQ and adds
 // a contract for each $2,500 of profit since the start date (up to 8); no trade risks more than the room above the
@@ -137,7 +143,7 @@
 // max loss after the fill bar are checked once per bar, so a 30-minute chart sees them later than a trader would.
 // The rules are the same as the Python reference in mnqbot/noise.py.
 // ------------------------------------------------------------------
-strategy("MNQ Noise-Area Momentum v3.0", shorttitle = "Noise-Mom", overlay = true,
+strategy("MNQ Noise-Area Momentum v3.1", shorttitle = "Noise-Mom", overlay = true,
      initial_capital = 50000, currency = currency.USD,
      default_qty_type = strategy.fixed, default_qty_value = 1, pyramiding = 0,
      commission_type = strategy.commission.cash_per_contract, commission_value = 0.62,
@@ -189,6 +195,10 @@ profitStep = input.float(2500, "Add a contract per $ of profit (0 = off)", minva
 sizeUpTo = input.int(8, "Most contracts (0 = no limit)", minval = 0, maxval = 60, group = grpT)
 budgetStop = input.bool(true, "Size by the trade's own stop", group = grpT,
      tooltip = "v3.0: a contract's risk for the loss limits is its stop at entry, the line stop or the max loss, whichever is closer (plus fees and a tick each way). Unticked: always the full max loss.")
+trendN = input.int(50, "No shorts while the last close is above its average of this many sessions (0 = off)", minval = 0, maxval = 250, group = grpT,
+     tooltip = "v3.1: in an uptrend (yesterday's 16:00 close above the average of the last 50 sessions' closes) no new shorts; longs as usual. On the user's TradingView chart 1/2025-12/2025 v3.0's shorts lost $2,179 while its longs made $2,117; shorts against the 50-session trend lost on NQ futures 2015-2025 and the Nasdaq-100 index 2011-2026 too (docs/RESULTS.md, v3.1).")
+squeezeMin = input.float(20, "Never stuck: when no contract fits, 1 with its stop cut to the room left, if at least this many points (0 = off)", minval = 0, step = 5, group = grpT,
+     tooltip = "v3.1: near the trailing floor (or the day's limit) not even 1 contract may fit; v3.0 then stopped trading, on the user's chart for most of 2026. Now it takes 1 MNQ with its max loss cut to the room left (less costs), as long as that leaves a stop of at least this many points.")
 rangePos = input.float(0.65, "Entries near the day's extreme: the close in the top this share of the day's range (0 = off)", minval = 0, maxval = 1, step = 0.05, group = grpT,
      tooltip = "v2.9: a long needs the check's close in the top part of the day's 09:30-to-now range: (close - day low) / (day high - day low) at least this (a short: the bottom part, (day high - close) / (day high - day low)). A breakout of the noise area after the day had already run further and come back down to the line made about nothing: profit factor 1.0-1.1 on NQ futures 2015-2025, the Nasdaq-100 index 2011-2026 and the 2025-2026 stand-in, against 1.5 for the rest. Skipping them frees the day's loss room for the others (docs/RESULTS.md, v2.9).")
 afterMaxLoss = input.float(250, "After a losing trade: max loss per trade, $ (0 = the same)", minval = 0, step = 10, group = grpT)
@@ -390,6 +400,8 @@ var float dayHi = na
 var float dayLo = na
 var int blockDir = 0
 var bool calmDay = false  // v2.5: today follows a calm stretch, no new entries
+var dayCloses = array.new_float(0)  // v3.1: completed sessions' 16:00 closes
+var int trendDir = 0  // v3.1: yesterday's close against the trendN-session average: 1 above, -1 below
 
 // ── New day at the 09:30 bar
 if tMin == RTH_OPEN
@@ -401,6 +413,13 @@ if tMin == RTH_OPEN
             sR += array.get(dayRanges, j)
         if array.get(dayRanges, nR - 1) > bigDayK * (sR / bigDayN)
             blockDir := array.get(dayDirs, nR - 1)
+    nC = array.size(dayCloses)
+    if trendN > 0 and nC >= trendN
+        float sC = 0.0
+        for j = nC - trendN to nC - 1
+            sC += array.get(dayCloses, j)
+        lastC = array.get(dayCloses, nC - 1)
+        trendDir := lastC > sC / trendN ? 1 : lastC < sC / trendN ? -1 : 0
     calmDay := false
     if calmK > 0 and nR >= calmLong
         float sS = 0.0
@@ -439,6 +458,7 @@ rangeOk(int d) =>
 longPlaced = false
 shortPlaced = false
 var int qPlaced = 0   // the contracts of the entry placed at this check
+var float mlPlaced = 0.0   // and its max loss
 if isCheck and not na(dayOpen)
     k = int((endMin - FIRST_CHECK) / 30)
     array.set(today, k, math.abs(close / dayOpen - 1))
@@ -455,22 +475,30 @@ if isCheck and not na(dayOpen)
         shortStopNow = lb * (1 + stopBuf * sig)
         // The bracket to place with the entry, from the expected fill (this close plus a tick): the stop is the closer of
         // the line stop and the max loss, the target tpUnits noise units away. Same numbers the backtest uses.
-        capPtsNow = mlNext > 0 ? mlNext / qNext / syminfo.pointvalue : na
         estL = close + syminfo.mintick
         estS = close - syminfo.mintick
-        qL = qFor(estL - longStopNow)   // v3.0: the contracts the loss limits leave for a long / a short now
-        qS = qFor(shortStopNow - estS)
-        bracketL = na(capPtsNow) ? longStopNow : math.max(longStopNow, estL - capPtsNow)
-        bracketS = na(capPtsNow) ? shortStopNow : math.min(shortStopNow, estS + capPtsNow)
-        whyL = bracketL > longStopNow ? "your " + usd(mlNext) + " max loss" : "just below the upper line"
-        whyS = bracketS < shortStopNow ? "your " + usd(mlNext) + " max loss" : "just above the lower line"
+        qL0 = qFor(estL - longStopNow)   // v3.0: the contracts the loss limits leave for a long / a short now
+        qS0 = qFor(shortStopNow - estS)
+        // v3.1: when not one fits, 1 contract with its max loss cut to the room left (squeezeMin points at least)
+        sqzOk = squeezeMin > 0 and budgetOn and not na(moneyRoom) and moneyRoom - costC >= squeezeMin * syminfo.pointvalue
+        qL = qL0 < 1 and sqzOk ? 1 : qL0
+        qS = qS0 < 1 and sqzOk ? 1 : qS0
+        mlL = qL0 < 1 and sqzOk ? moneyRoom - costC : mlBase / qBase * qL
+        mlS = qS0 < 1 and sqzOk ? moneyRoom - costC : mlBase / qBase * qS
+        capPtsL = mlBase > 0 and qL > 0 ? mlL / qL / syminfo.pointvalue : na
+        capPtsS = mlBase > 0 and qS > 0 ? mlS / qS / syminfo.pointvalue : na
+        bracketL = na(capPtsL) ? longStopNow : math.max(longStopNow, estL - capPtsL)
+        bracketS = na(capPtsS) ? shortStopNow : math.min(shortStopNow, estS + capPtsS)
+        whyL = bracketL > longStopNow ? "your " + usd(mlL) + " max loss" : "just below the upper line"
+        whyS = bracketS < shortStopNow ? "your " + usd(mlS) + " max loss" : "just above the lower line"
         tpTextL = tpUnits > 0 ? ", take-profit limit " + px(estL * (1 + tpUnits * sig)) : ""
         tpTextS = tpUnits > 0 ? ", take-profit limit " + px(estS * (1 - tpUnits * sig)) : ""
         tpL = useStop and tpUnits > 0 ? estL * (1 + tpUnits * sig) : na
         tpS = useStop and tpUnits > 0 ? estS * (1 - tpUnits * sig) : na
-        lockPtsNow = useStop and lockAt > 0 and mlNext > 0 ? lockAt * mlNext / qNext / syminfo.pointvalue : na
-        lockTextL = na(lockPtsNow) ? "" : " Auto-breakeven: at " + px(estL + lockPtsNow) + " move the stop to " + px(estL + lockPlus) + "."
-        lockTextS = na(lockPtsNow) ? "" : " Auto-breakeven: at " + px(estS - lockPtsNow) + " move the stop to " + px(estS - lockPlus) + "."
+        lockPtsL = useStop and lockAt > 0 and not na(capPtsL) ? lockAt * capPtsL : na
+        lockPtsS = useStop and lockAt > 0 and not na(capPtsS) ? lockAt * capPtsS : na
+        lockTextL = na(lockPtsL) ? "" : " Auto-breakeven: at " + px(estL + lockPtsL) + " move the stop to " + px(estL + lockPlus) + "."
+        lockTextS = na(lockPtsS) ? "" : " Auto-breakeven: at " + px(estS - lockPtsS) + " move the stop to " + px(estS - lockPlus) + "."
         moveText = " If your fill is different, keep the same distances. At each half hour move the stop with the line (the dashboard shows it); the max loss never moves."
         // When the max loss is the closer stop (always at 10 MNQ and $350), the line decided under 1 trade in 100 over
         // 16 years and a bracket left alone made the same money (docs/RESULTS.md): one bracket, no stop moves.
@@ -515,15 +543,17 @@ if isCheck and not na(dayOpen)
                      alert_message = useHook ? jsonEntry("buy", estL, useStop ? bracketL : na, tpL, qL) : "")
                 longPlaced := true
                 qPlaced := qL
+                mlPlaced := mlL
                 mark("BUY " + str.tostring(qL) + " MNQ", true, color.green)
                 lastSignal := "BUY " + hhmmText(endMin) + " @ " + px(close)
                 say("BUY " + str.tostring(qL) + " MNQ at market now. Price " + px(close) + " is above the noise area (upper " +
                      px(ub) + "). " + holdLong + " Next check " + nextCheck + ".")
-            else if pos == 0 and close < lb and shortOk and freshOk and endMin <= lastEntryEnd and blockDir != -1 and not calmDay and qS >= 1 and rangeOk(-1)
+            else if pos == 0 and close < lb and shortOk and freshOk and endMin <= lastEntryEnd and blockDir != -1 and not calmDay and qS >= 1 and rangeOk(-1) and not (trendN > 0 and trendDir == 1)
                 strategy.entry("Short", strategy.short, qS, comment = "Below noise",
                      alert_message = useHook ? jsonEntry("sell", estS, useStop ? bracketS : na, tpS, qS) : "")
                 shortPlaced := true
                 qPlaced := qS
+                mlPlaced := mlS
                 mark("SELL " + str.tostring(qS) + " MNQ", false, color.red)
                 lastSignal := "SELL " + hhmmText(endMin) + " @ " + px(close)
                 say("SELL " + str.tostring(qS) + " MNQ at market now. Price " + px(close) + " is below the noise area (lower " +
@@ -560,7 +590,7 @@ if validTf and 5 % barMin == 0 and inRth and preEnd >= FIRST_CHECK and preEnd <=
 // with the entry, it is measured from the expected fill (the signal close plus a tick), then from the real fill.
 if longPlaced or shortPlaced  // the placed entry's size and max loss, for its bracket and lock
     tQty := qPlaced
-    tMaxLoss := mlBase / qBase * qPlaced
+    tMaxLoss := mlPlaced
 capPts = tMaxLoss > 0 and tQty > 0 ? tMaxLoss / tQty / syminfo.pointvalue : na
 lineStopL = ub * (1 - stopBuf * sig)
 lineStopS = lb * (1 + stopBuf * sig)
@@ -628,6 +658,9 @@ if inRth and endMin == RTH_CLOSE
     if not na(dayOpen) and not na(dayHi)  // the session's record for the big-day rule
         array.push(dayRanges, (dayHi - dayLo) / dayOpen)
         array.push(dayDirs, close > dayOpen ? 1 : close < dayOpen ? -1 : 0)
+        array.push(dayCloses, close)
+        if array.size(dayCloses) > 300
+            array.shift(dayCloses)
         if array.size(dayRanges) > 100
             array.shift(dayRanges)
             array.shift(dayDirs)
@@ -656,7 +689,7 @@ if showDash and (barstate.islastconfirmedhistory or barstate.isrealtime)
     closed = strategy.closedtrades
     todayPnlDash = strategy.netprofit - dayStartNet
     wins = strategy.wintrades
-    table.cell(dash, 0, 0, "MNQ Noise Momentum v3.0: " + account + ", " + str.tostring(qty) + " MNQ", text_color = color.white, text_size = size.small)
+    table.cell(dash, 0, 0, "MNQ Noise Momentum v3.1: " + account + ", " + str.tostring(qty) + " MNQ", text_color = color.white, text_size = size.small)
     table.cell(dash, 1, 0, status, text_color = statusColor, text_size = size.small)
     table.cell(dash, 0, 1, "Sessions of history", text_color = color.silver, text_size = size.small)
     table.cell(dash, 1, 1, str.tostring(math.min(filled, lookback)) + " / " + str.tostring(lookback), text_color = color.white, text_size = size.small)

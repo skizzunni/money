@@ -40,12 +40,15 @@ TRAIL_FROM = "Trailing drawdown and contract steps from date, YYYYMMDD (0 = the 
 STEP = "Add a contract per $ of profit (0 = off)"  # $2,500 (v3.0)
 UP_TO = "Most contracts (0 = no limit)"  # 8 (v3.0)
 OWN_STOP = "Size by the trade's own stop"  # on (v3.0)
+TREND = "No shorts while the last close is above its average of this many sessions (0 = off)"  # 50 (v3.1)
+SQUEEZE = ("Never stuck: when no contract fits, 1 with its stop cut to the room left, if at least this many points "
+           "(0 = off)")  # 20 (v3.1)
 V21 = {"max_loss_per_trade": 187.5, "lock_at": 0.25, "max_losers": 0, "take_profit": 2.0, "tighten_only": True,
        "after_loss_qty_div": 1.0, "after_loss_ml_mult": 4 / 3, "last_entry_end": 900,
        "big_day_k": 1.5, "big_day_n": 10, "calm_k": 0.7, "calm_short": 10, "calm_long": 40,
        "daily_loss_limit": 1000.0, "range_pos_min": 0.65, "trail_dd": 2000.0, "trail_cap": 0.0,
        "profit_step": 2500.0, "size_up_to": 8, "budget_actual": True,
-       "trail_from": "2025-01-02"}  # the script's defaults
+       "trail_from": "2025-01-02", "trend_n": 50, "trend_side": -1, "squeeze_min": 20.0}  # the script's defaults
 P0 = 20_000.0
 BARS_PER_DAY = 78  # 09:30 .. 15:55 on 5-minute bars
 CHECK_10_00, CHECK_10_30, CLOSE_16_00 = 5, 11, 77  # bar numbers within a session
@@ -463,8 +466,10 @@ def assert_trade_log(log, res, exit_mode, rows=10):
 
 def trail_inputs(cfg: NoiseConfig) -> dict:
     """The v3.0 sizing inputs for a reference config (all explicit: the script's defaults are on)."""
+    assert not cfg.trend_n or cfg.trend_side == -1, "the script skips shorts only"
     return {TRAIL: cfg.trail_dd, TRAIL_STOP: cfg.trail_cap >= 0, STEP: cfg.profit_step, UP_TO: cfg.size_up_to,
-            TRAIL_FROM: int(cfg.trail_from.replace("-", "")) if cfg.trail_from else 0, OWN_STOP: cfg.budget_actual}
+            TRAIL_FROM: int(cfg.trail_from.replace("-", "")) if cfg.trail_from else 0, OWN_STOP: cfg.budget_actual,
+            TREND: cfg.trend_n, SQUEEZE: cfg.squeeze_min}
 
 
 def assert_parity(bars, minutes=5, lookback=14, skip_dates=None, exit_mode="stop", stop_buffer=None, qty=1,
@@ -1128,3 +1133,18 @@ def test_pine_trailing_drawdown_sizing(cap):
                          trail={**trail, "trail_from": "2026-05-01"})  # from a start date inside the data
     first = [t for t in late.trades if t.entry_time < pd.Timestamp("2026-05-01", tz=NY)]
     assert first and {t.qty for t in first} == {1}, "before the start date: the starting contracts"
+
+
+@pytest.mark.slow
+def test_pine_trend_and_squeeze():
+    """v3.1: no shorts while yesterday's close is above its trend_n-session average; and when not one contract fits
+    the loss limits, 1 contract with its max loss cut to the room left. The script and the reference agree trade for
+    trade; the trend rule skips shorts, and the squeeze changes the trades the plain budget allows."""
+    bars = synth_bars(sessions=120, seed=3)
+    tight = {"trail_dd": 400.0, "trail_cap": -1.0, "budget_actual": True}
+    plain = assert_parity(bars, qty=1, max_loss=187.5, max_losers=0, daily=60.0, trail=tight)
+    sq = assert_parity(bars, qty=1, max_loss=187.5, max_losers=0, daily=60.0, trail={**tight, "squeeze_min": 5.0})
+    assert [(t.entry_bar, t.pnl) for t in sq.trades] != [(t.entry_bar, t.pnl) for t in plain.trades], "it binds"
+    tr = assert_parity(bars, qty=1, max_loss=187.5, trail={"trend_n": 5, "trend_side": -1})
+    free = run(bars, NoiseConfig(qty=1, max_loss_per_trade=187.5))
+    assert sum(t.direction < 0 for t in tr.trades) < sum(t.direction < 0 for t in free.trades)
