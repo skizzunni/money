@@ -3416,6 +3416,71 @@ python research/v24_scan.py '[{"max_losers": 4}]' out.csv '{"max_loss_per_trade"
     <data dir> MNQ_09-26.Last.txt MNQ_12-26.Last.txt                                    # v2.4 against a variant
 ```
 
+## v2.9: entries only near the day's extreme (October 24, 2026)
+
+**Where v2.8's trades make their money** (no daily limit, 30-minute bars; `research/v29_meta.py` writes the rows):
+- **Longs** earn a profit factor of 1.59-1.86 on every set; **shorts** 1.22-1.29.
+- The **13:30 check** is the best on NQ (2.46) and the index (2.11).
+- **Range position**: where the check's close sits in the day's 09:30-to-now range, `(close - low) / (high - low)` for
+  a long, `(high - close) / (high - low)` for a short. It was the one description that sorted the trades the same way
+  on all three long sets.
+
+| Range position | NQ 2015-2025 | Index 2011-2026 | Stand-in 2025-2026 |
+|---|---|---|---|
+| under 0.7 | 395 trades, PF 1.01, +$726 | 553, PF 1.01, +$858 | 60, PF 0.87, -$1,539 |
+| 0.7 and over | 2,418, PF 1.49 | 3,366, PF 1.48 | 393, PF 1.55 |
+
+Such a breakout comes after the day had already run further and fallen back to the line.
+
+**The rule** (`range_pos_min`; setting "Entries near the day's extreme"): a new entry needs the range position of at
+least 0.65.
+- On top of v2.8, 0.5-0.8 all gave the histories about the same or more (`v29_range_*.csv`).
+- 0.65 was the best balance. 0.85 cut too much.
+
+| Stand-in 1/2025-10/2026 | Net | Drawdown | Winners | Profit factor | Worst day |
+|---|---:|---:|---:|---:|---:|
+| 30-min v2.8 | 27,079 | 6,464 | 54.4% | 1.42 | -918 |
+| 30-min **v2.9** | **29,375** | **5,864** | 54.6% | **1.48** | -918 |
+| 5-min v2.8 | 28,707 | 5,711 | 67.0% | 1.45 | -966 |
+| 5-min **v2.9** | 26,628 | 5,613 | 67.2% | 1.46 | -966 |
+
+| Histories against v2.8 | NQ net | NQ net per drawdown | NQ PF | Index net | Index net per drawdown | Index PF | Index years better |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| 30-minute | 1.03x | 0.98x | 1.40 to 1.43 | 1.03x | 1.21x | 1.39 to 1.42 | 12 of 16 |
+| 5-minute | 1.06x | 1.05x | 1.41 to 1.46 | 1.00x | 1.13x | 1.48 to 1.51 | 10 of 16 |
+
+The user's MNQ window 8/24-10/16 (5-minute): +$1.8k against +$2.7k.
+
+Pine parity test: `test_pine_range_position`.
+
+**Tried with it, not adopted** (`v29_side_*.csv`, `v29_combo_*.csv`):
+- **No shorts** (`short_mult` 0).
+  - The stand-in's profit factor rose to 1.79-1.90 and winners to 61-69%, with a drawdown of $3.1-3.8k.
+  - Net fell 30-45%, and net per drawdown on the histories fell to 0.5-0.9x.
+  - With 5 MNQ for the longs, net fell 30-35% and net per drawdown 0.5-0.9x.
+- **Half-size shorts.** Net 0.85-0.9x on the histories.
+- **No shorts when the 20-100-day trend is up.** The profit factor rose (the index 1.55-1.67), but the stand-in made
+  $15.8-20.3k.
+- **The take-profit**, after the exit retune below.
+
+**Exits retuned on v2.8** (`v29_exits_*.csv`):
+- Take-profit 0.75-1.5 noise units, and a trailing stop of 30 or 50 points, were worse everywhere.
+- No take-profit (or 3.0) helped the 30-minute histories (NQ profit factor 1.52) but made the stand-in $22k against
+  $27k, and the 5-minute sets less.
+- A larger lock offset (5-20 points) changed little.
+
+**A learned filter** (`research/v29_meta.py`): a model scores every signal from 17 descriptions of what was known at
+the check's close.
+- **How it was tested.** Each year was scored by a model fit only on earlier years, inside the strategy's own run
+  with the daily budget.
+- **Results on 30-minute bars.** Logistic regression and a boosted classifier cut net or added nothing.
+- **A boosted regressor skipping the lowest 20%.**
+  - NQ: +18% net, profit factor 1.52, net per drawdown 1.25x.
+  - The index: +7% net, net per drawdown 1.26x.
+  - The stand-in: $27.9k, profit factor 1.47.
+  - Skipping 35% or 50% was worse: not a smooth effect.
+- Such a model can't run inside a Pine script.
+
 ## What this does and doesn't say
 
 - **It says** that the original sweep/breakout rules have no edge after realistic costs on 2023–2026 Nasdaq-100 data, and would very likely not pass a $25K evaluation. Of three published strategies, only noise-area momentum held up over 16 years, and even it fails most $25K evaluations.
