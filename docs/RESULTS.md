@@ -3523,6 +3523,13 @@ upper line, buy one below the lower. Stops of 0.5-1.5 and targets of 0.5-1.5 noi
 - Every 15 minutes: +9-17% net, but net per drawdown 0.71-0.99x on the histories.
 - Every 10 minutes: worse.
 
+**Adding contracts once the lock arms** (`add_at_lock` 2-8; `v29_add_*.csv`). They are bought about 23 points up and
+share the locked stop at the entry + 2.5.
+- On the histories, net rose (NQ 1.2-2.0x), but net per drawdown fell to 0.2-0.8x.
+- The stand-in made far less: $11.7-21.9k against $29.4k on 30-minute bars, and $9k or a loss at 2+ adds on 5-minute.
+- Most adds were stopped near the lock.
+- Their risk sits outside the daily budget, so worst days reached -$1,100 to -$4,000.
+
 ## What this does and doesn't say
 
 - **It says** that the original sweep/breakout rules have no edge after realistic costs on 2023–2026 Nasdaq-100 data, and would very likely not pass a $25K evaluation. Of three published strategies, only noise-area momentum held up over 16 years, and even it fails most $25K evaluations.
