@@ -123,7 +123,8 @@ def job(kw: dict) -> dict:
                     f"{name} wday": round(tf.groupby(tf.exit_time.dt.date).pnl.sum().min()) if len(tf) else 0})
         out.update(trail_stats(name, tf))
         if name in ("nq", "index"):
-            out[f"{name} yrs"] = json.dumps(tf.groupby(tf.entry_time.dt.year).pnl.sum().round().astype(int).tolist())
+            yr = tf.groupby(tf.entry_time.dt.year).pnl.sum().round().astype(int)
+            out[f"{name} yrs"] = json.dumps({str(k): int(v) for k, v in yr.items()})
     return out
 
 
@@ -158,8 +159,8 @@ def main() -> None:
     for k in ("nq", "index"):
         d[f"{k} r/b"] = ((d[f"{k} net"] / d[f"{k} dd"]) / (b[f"{k} net"] / b[f"{k} dd"])).round(2)
         d[f"{k} net/b"] = (d[f"{k} net"] / b[f"{k} net"]).round(2)
-        by = np.array(json.loads(b[f"{k} yrs"]))
-        d[f"{k} yrs+"] = [int((np.array(json.loads(x)) > by).sum()) for x in d[f"{k} yrs"]]
+        by = json.loads(b[f"{k} yrs"])
+        d[f"{k} yrs+"] = [sum(json.loads(x).get(y, 0) > v for y, v in by.items()) for x in d[f"{k} yrs"]]
     d.to_csv(out, index=False)
     pd.set_option("display.width", 320)
     pd.set_option("display.max_colwidth", 80)
