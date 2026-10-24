@@ -3834,6 +3834,11 @@ Raw prices: NQ futures 2015-2025 (roll weeks skipped), the Nasdaq-100 index 2011
   - NQ: 1.00-1.09 in 2015-2019 and 1.19-1.34 later.
   - The index: 0.76-0.84 in 2011-2017 and 1.23-1.47 later.
   - About 45 trades a year. Not consistent.
+- **v3.6 with a turn-of-the-month tilt** (`tom_no_shorts`, `tom_mult`; `v40_tom_*.csv`).
+  - No shorts on those days: the stand-in about the same ($37.6k against $35.3k on 30-minute bars, the same on
+    5-minute), the histories 0.91-0.96x net.
+  - 1.5-2x the contracts on those days: the stand-in less, and the NQ history went under the floor's room and stopped
+    trading. Not adopted.
 
 ## What this does and doesn't say
 
