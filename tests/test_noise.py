@@ -47,7 +47,7 @@ V21 = {"max_loss_per_trade": 187.5, "lock_at": 0.35, "max_losers": 0, "take_prof
        "after_loss_qty_div": 1.0, "after_loss_ml_mult": 4 / 3, "last_entry_end": 900,
        "big_day_k": 1.5, "big_day_n": 10, "calm_k": 0.7, "calm_short": 10, "calm_long": 40,
        "daily_loss_limit": 1000.0, "range_pos_min": 0.65, "trail_dd": 2000.0, "trail_cap": 0.0,
-       "profit_step": 1500.0, "size_up_to": 8, "budget_actual": True,
+       "profit_step": 2500.0, "size_up_to": 8, "budget_actual": True,
        "trail_from": "2025-01-02", "trend_n": 50, "trend_side": -1, "squeeze_min": 20.0}  # the script's defaults
 P0 = 20_000.0
 BARS_PER_DAY = 78  # 09:30 .. 15:55 on 5-minute bars
