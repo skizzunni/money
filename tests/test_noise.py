@@ -34,10 +34,18 @@ CALM = "Calm stretch: no trades if the recent average range < this x the longer 
 CALM_S, CALM_L = "Calm stretch: recent sessions", "Calm stretch: longer stretch, sessions"  # 10, 40 (v2.5)
 DAILY = "Max loss a day, $ (0 = off)"  # the script's default is $1,000 (v2.7); the reference's off
 RANGE = "Entries near the day's extreme: the close in the top this share of the day's range (0 = off)"  # 0.65 (v2.9)
-V21 = {"max_loss_per_trade": 750.0, "lock_at": 0.25, "max_losers": 0, "take_profit": 2.0, "tighten_only": True,
+TRAIL = "Trailing drawdown (end of day), $ (0 = off)"  # $2,000 (v3.0); the reference's off
+TRAIL_STOP = "Trailing drawdown stops at the starting balance"  # on (v3.0)
+TRAIL_FROM = "Trailing drawdown and contract steps from date, YYYYMMDD (0 = the first bar)"
+STEP = "Add a contract per $ of profit (0 = off)"  # $2,500 (v3.0)
+UP_TO = "Most contracts (0 = no limit)"  # 8 (v3.0)
+OWN_STOP = "Size by the trade's own stop"  # on (v3.0)
+V21 = {"max_loss_per_trade": 187.5, "lock_at": 0.25, "max_losers": 0, "take_profit": 2.0, "tighten_only": True,
        "after_loss_qty_div": 1.0, "after_loss_ml_mult": 4 / 3, "last_entry_end": 900,
        "big_day_k": 1.5, "big_day_n": 10, "calm_k": 0.7, "calm_short": 10, "calm_long": 40,
-       "daily_loss_limit": 1000.0, "range_pos_min": 0.65}  # the script's defaults
+       "daily_loss_limit": 1000.0, "range_pos_min": 0.65, "trail_dd": 2000.0, "trail_cap": 0.0,
+       "profit_step": 2500.0, "size_up_to": 8, "budget_actual": True,
+       "trail_from": "2025-01-02"}  # the script's defaults
 P0 = 20_000.0
 BARS_PER_DAY = 78  # 09:30 .. 15:55 on 5-minute bars
 CHECK_10_00, CHECK_10_30, CLOSE_16_00 = 5, 11, 77  # bar numbers within a session
@@ -453,10 +461,16 @@ def assert_trade_log(log, res, exit_mode, rows=10):
         assert g[5] == pytest.approx(e[5], abs=0.006), (g, e)
 
 
+def trail_inputs(cfg: NoiseConfig) -> dict:
+    """The v3.0 sizing inputs for a reference config (all explicit: the script's defaults are on)."""
+    return {TRAIL: cfg.trail_dd, TRAIL_STOP: cfg.trail_cap >= 0, STEP: cfg.profit_step, UP_TO: cfg.size_up_to,
+            TRAIL_FROM: int(cfg.trail_from.replace("-", "")) if cfg.trail_from else 0, OWN_STOP: cfg.budget_actual}
+
+
 def assert_parity(bars, minutes=5, lookback=14, skip_dates=None, exit_mode="stop", stop_buffer=None, qty=1,
                   max_loss=None, fed_dates=None, fed_no_shorts=None, take_profit=None, hook=None, lock_at=None,
                   max_losers=None, after_loss=None, last_entry=None, big_day=None, calm=None, daily=None,
-                  range_pos=None):
+                  range_pos=None, trail=None):
     cfg = NoiseConfig(lookback=lookback, exit_mode=exit_mode, qty=qty)
     inputs = {"Sessions in the noise average": lookback}
     if lock_at is not None:
@@ -487,6 +501,10 @@ def assert_parity(bars, minutes=5, lookback=14, skip_dates=None, exit_mode="stop
     if range_pos is not None:
         cfg.range_pos_min = range_pos
     inputs[RANGE] = cfg.range_pos_min
+    if trail is not None:  # NoiseConfig overrides for the v3.0 sizing
+        for k, v in trail.items():
+            setattr(cfg, k, v)
+    inputs.update(trail_inputs(cfg))
     inputs["Exit"] = "Resting stop at the line" if exit_mode == "stop" else "Half-hour check"
     inputs[FUNDED] = True  # the script's default is the evaluation's 3 contracts
     inputs["Contracts on a funded account"] = qty  # the script's default is 10; the reference's is 1
@@ -744,7 +762,7 @@ def test_pine_evaluation_tracker(target):
     days = sorted({d.date() for d in bars.index.tz_convert(NY)})
     start = days[40]
     inputs = {FUNDED: True, "Contracts on a funded account": 10, LOCK: 1.0, TIGHTEN: False, TP: 1.5, AFTER_QTY: 0,
-              AFTER_ML: 0.0, LAST_ENTRY: "15:30", BIG_K: 0.0, CALM: 0.0, DAILY: 0.0, RANGE: 0.0,
+              AFTER_ML: 0.0, LAST_ENTRY: "15:30", BIG_K: 0.0, CALM: 0.0, DAILY: 0.0, RANGE: 0.0, TRAIL: 0.0,
               "Max losing trades a day (0 = no limit)": 4,
               "Max loss per trade, $ (all contracts, 0 = off)": 350.0,
               "Evaluation start date, YYYYMMDD (0 = off)": int(start.strftime("%Y%m%d")), "Profit target, $": target}
@@ -780,7 +798,7 @@ def test_pine_dashboard_shows_the_next_checks_lines():
     rt = PineRuntime(load_pine(NOISE_PINE), cut, {FUNDED: True, "Contracts on a funded account": 1, LOCK: 1.0,
                                                     TIGHTEN: False, MAX_LOSS: 350.0, TP: 1.5,
                                                     AFTER_QTY: 0, AFTER_ML: 0.0, LAST_ENTRY: "15:30",
-                                                    BIG_K: 0.0, CALM: 0.0, DAILY: 0.0},
+                                                    BIG_K: 0.0, CALM: 0.0, DAILY: 0.0, TRAIL: 0.0},
                      timeframe_seconds=300)
     rt.run(lambda j, g: None)
     dash = [t.grid() for t in rt.tables if t.columns == 2 and t.grid() and t.grid()[0][0].startswith("MNQ Noise")][0]
@@ -790,11 +808,11 @@ def test_pine_dashboard_shows_the_next_checks_lines():
 
 
 @pytest.mark.slow
-@pytest.mark.parametrize("funded, eval_qty, qty", [(None, None, 4), (False, 3, 3), (True, 3, 4)])
+@pytest.mark.parametrize("funded, eval_qty, qty", [(None, None, 1), (False, 3, 3), (True, 3, 1)])
 def test_pine_account_switch(funded, eval_qty, qty):
-    """The evaluation (the default) trades 4 MNQ (v2.8), or its own setting; the funded switch 4; the same max loss,
-    so the stop and the lock scale. The script's defaults: at 4 MNQ the after-loss max loss ($1,000, the same contracts)
-    included; at 3 MNQ off."""
+    """The evaluation (the default) starts at 1 MNQ (v3.0), or its own setting; the funded switch 1; the same max loss,
+    so the stop and the lock scale. The script's defaults: at 1 MNQ the after-loss max loss ($250, the same contracts)
+    and the v3.0 sizing included; at 3 MNQ the after-loss size off."""
     bars = synth_bars(sessions=60, seed=11)
     inputs = {} if funded is None else {FUNDED: funded}
     cfg = NoiseConfig(qty=qty, **V21)
@@ -1091,3 +1109,22 @@ def test_pine_range_position():
     free = run(bars, NoiseConfig(qty=10, max_loss_per_trade=500.0))
     assert len(res.trades) < len(free.trades), "the rule skipped entries"
     assert_parity(bars, qty=10, max_loss=500.0, range_pos=0.65, daily=800.0, max_losers=0)
+
+
+@pytest.mark.slow
+@pytest.mark.parametrize("cap", [0.0, -1.0])
+def test_pine_trailing_drawdown_sizing(cap):
+    """v3.0: a contract more per step of profit since the start, no trade risking more than the room above an
+    end-of-day trailing floor (stopping at the starting balance, or not) or the rest of the day's limit, a contract's
+    risk from its own stop. Tight limits so that every part binds; the script and the reference agree trade for
+    trade."""
+    bars = synth_bars(sessions=120, seed=3)
+    trail = {"trail_dd": 600.0, "trail_cap": cap, "profit_step": 250.0, "size_up_to": 4, "budget_actual": True}
+    res = assert_parity(bars, qty=1, max_loss=187.5, max_losers=0, daily=500.0, trail=trail)
+    assert {t.qty for t in res.trades} > {1}, "the profit steps added contracts"
+    fixed = run(bars, NoiseConfig(qty=1, max_loss_per_trade=187.5, max_losers=0, daily_loss_limit=500.0))
+    assert [t.qty for t in res.trades] != [t.qty for t in fixed.trades]
+    late = assert_parity(bars, qty=1, max_loss=187.5, max_losers=0, daily=500.0,
+                         trail={**trail, "trail_from": "2026-05-01"})  # from a start date inside the data
+    first = [t for t in late.trades if t.entry_time < pd.Timestamp("2026-05-01", tz=NY)]
+    assert first and {t.qty for t in first} == {1}, "before the start date: the starting contracts"

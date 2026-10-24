@@ -15,6 +15,15 @@
 // Noise area for each half-hour mark = the day's open (and previous close) plus/minus the
 // average distance price has moved from the 09:30 open by that time over the last 14 sessions.
 //
+// v3.0, 2026-10-24: a $2,000 end-of-day trailing drawdown (settings "Trailing drawdown"), as at a prop firm: the floor
+// is the highest end-of-day balance minus $2,000 and stops at the starting balance. The account starts at 1 MNQ and adds
+// a contract for each $2,500 of profit since the start date (up to 8); no trade risks more than the room above the
+// floor or what is left of the day's $1,000, a contract's risk counted from its own stop. At 4 MNQ from the start
+// (v2.9) the 2025-2026 stand-in went below that floor 29 times; with v3.0 never, nor on NQ futures 2015-2025 or the
+// Nasdaq-100 index 2011-2026. Stand-in 1/2025-10/2026, 30-minute: +$24.6k (v2.9 +$29.4k), profit factor 1.87 (1.48),
+// 53.9% winners, worst day -$929, the largest end-of-day fall from a high $2.7k (after the floor had stopped at the
+// start); 5-minute: +$18.6k (+$26.6k), 1.57 (1.46), 67.1%. NQ futures +$244k against v2.9's +$196k (docs/RESULTS.md,
+// v3.0).
 // v2.9, 2026-10-24: entries only near the day's extreme (setting "Entries near the day's extreme"): a long needs the
 // check's close in the top 35% of the day's range so far, a short in the bottom 35%. A breakout after the day had run
 // further and come back to the line made about nothing (profit factor 1.0-1.1 on NQ futures 2015-2025, the index
@@ -147,13 +156,13 @@ const int FED_CUTOFF = 840   // 14:00, the Fed statement
 grpT = "Trading"
 lookback = input.int(14, "Sessions in the noise average", minval = 2, maxval = 60, group = grpT)
 funded   = input.bool(false, "FUNDED ACCOUNT (tick for the funded contracts; untick for the evaluation's)", group = grpT,
-     tooltip = "Unticked: the evaluation's contracts below (4 since v2.8). Ticked: the funded account's (4). Same rules and the same max loss per trade; the stop and the lock scale with the contracts. At 10 MNQ and $350 (a $35 stop a contract) about 25-30% of historical $50K evaluations passed; at 3 MNQ ($117 a contract) about 45-55%, because the stop has room and four losers no longer eat the $2,000 drawdown. Once funded, tick it.")
+     tooltip = "Unticked: the evaluation's contracts below (1 to start since v3.0; more as profit builds, see \"Add a contract per $ of profit\"). Ticked: the funded account's (1). Same rules and the same max loss per trade; the stop and the lock scale with the contracts. At 10 MNQ and $350 (a $35 stop a contract) about 25-30% of historical $50K evaluations passed; at 3 MNQ ($117 a contract) about 45-55%, because the stop has room and four losers no longer eat the $2,000 drawdown. Once funded, tick it.")
 account  = funded ? "Funded" : "Evaluation"
-evalQty  = input.int(4, "Contracts in an evaluation", minval = 1, maxval = 60, group = grpT)
-fundQty  = input.int(4, "Contracts on a funded account", minval = 1, maxval = 60, group = grpT,
+evalQty  = input.int(1, "Contracts in an evaluation", minval = 1, maxval = 60, group = grpT)
+fundQty  = input.int(1, "Contracts on a funded account", minval = 1, maxval = 60, group = grpT,
      tooltip = "Every figure in docs/RESULTS.md is per contract. What matters is the max loss per contract (the dashboard shows it): $350 over 10 contracts is $35 a contract, a 17.5-point stop; over 3 it is $117, 58 points. See docs/RESULTS.md, rounds thirteen, twenty-seven, thirty-two and thirty-seven.")
 qty = account == "Evaluation" ? evalQty : fundQty
-maxLoss  = input.float(750, "Max loss per trade, $ (all contracts, 0 = off)", minval = 0, step = 10, group = grpT,
+maxLoss  = input.float(187.5, "Max loss per trade, $ (all contracts, 0 = off)", minval = 0, step = 10, group = grpT,
      tooltip = "A second stop this many dollars from the entry fill, for the whole position, live from the fill like a bracket order; whichever of it and the line stop is closer is used. Spread over many contracts it gets tight: $350 over 10 contracts is a $35 stop each, which normal 5-minute moves hit, and on 2023-2026 it made about $6 a day per contract against about $20 at $117 each. On 16 years, caps of $100-$200 per contract raised profit per day in every period and cut the worst losing stretch. Fees, slippage and a gap through the stop can add to the loss.")
 afterQty = input.int(0, "After a losing trade: contracts (0 = the same)", minval = 0, maxval = 60, group = grpT,
      tooltip = "The trade after a losing trade uses this many contracts and the max loss below, so its stop sits further away (v2.8: the same 4 MNQ and $1,000, 125 points, against 93.75 for 4 MNQ and $750; v2.6 was 9 MNQ and $1,500 against 10 and $750). A winner, or the next trade, goes back to the normal size. Ordinary noise stopped many re-entries after a loss; the wider stop turned some of them into winners: back-to-back losers 36% against 42% of losers on the user's MNQ window, 51% against 57% on NQ futures 2015-2025 (docs/RESULTS.md, v2.1). It risks up to $1,000 on that trade, and never more than what is left of the day's loss limit.")
@@ -169,9 +178,20 @@ calmShort = input.int(10, "Calm stretch: recent sessions", minval = 2, maxval = 
 calmLong = input.int(40, "Calm stretch: longer stretch, sessions", minval = 5, maxval = 100, group = grpT)
 dailyLimit = input.float(1000, "Max loss a day, $ (0 = off)", minval = 0, step = 50, group = grpT,
      tooltip = "v2.7: no trade may risk more than what is left of this loss today (today's closed P/L counted, wins add room back). A trade that would risk more takes fewer contracts with the same stop distance; when not even 1 contract fits, no new entries until tomorrow. Trading never stops just because of a loss: the next trade is smaller instead. The stop is a resting order, so a gap or fast market through it can still lose a little more (docs/RESULTS.md, v2.7).")
+trailDD = input.float(2000, "Trailing drawdown (end of day), $ (0 = off)", minval = 0, step = 100, group = grpT,
+     tooltip = "v3.0: a prop firm's end-of-day trailing drawdown. The floor is your highest end-of-day balance minus this; no trade may risk more than what is left above it (fewer contracts, the same stop; none when not even 1 fits). With the $1,000 a day limit, a trade gets the smaller of the two rooms (docs/RESULTS.md, v3.0).")
+trailStop = input.bool(true, "Trailing drawdown stops at the starting balance", group = grpT,
+     tooltip = "As at most prop firms: once the floor reaches your starting balance it stays there. Unticked, it keeps trailing your highest end-of-day balance for ever.")
+trailFrom = input.int(20250102, "Trailing drawdown and contract steps from date, YYYYMMDD (0 = the first bar)", minval = 0, group = grpT,
+     tooltip = "The day the account started: 20250102 (the default) for the backtest from January 2, 2025; for a live account, the day it began. Before it the script trades the starting contracts with no trailing drawdown, so the steps and the floor count only from this day.")
+profitStep = input.float(2500, "Add a contract per $ of profit (0 = off)", minval = 0, step = 100, group = grpT,
+     tooltip = "v3.0: one more contract for each this much closed profit since the start date (the same stop distance and max loss per contract), up to the most contracts below. A $2,000 trailing drawdown fits about 1 MNQ until there is a cushion: at 1 MNQ the 2025-2026 stand-in's worst end-of-day drawdown was $1,841. Steps of $750-1,500 grew too fast and lost the cushion in a losing stretch; $2,500-5,000 never touched the floor on any test set (docs/RESULTS.md, v3.0).")
+sizeUpTo = input.int(8, "Most contracts (0 = no limit)", minval = 0, maxval = 60, group = grpT)
+budgetStop = input.bool(true, "Size by the trade's own stop", group = grpT,
+     tooltip = "v3.0: a contract's risk for the loss limits is its stop at entry, the line stop or the max loss, whichever is closer (plus fees and a tick each way). Unticked: always the full max loss.")
 rangePos = input.float(0.65, "Entries near the day's extreme: the close in the top this share of the day's range (0 = off)", minval = 0, maxval = 1, step = 0.05, group = grpT,
      tooltip = "v2.9: a long needs the check's close in the top part of the day's 09:30-to-now range: (close - day low) / (day high - day low) at least this (a short: the bottom part, (day high - close) / (day high - day low)). A breakout of the noise area after the day had already run further and come back down to the line made about nothing: profit factor 1.0-1.1 on NQ futures 2015-2025, the Nasdaq-100 index 2011-2026 and the 2025-2026 stand-in, against 1.5 for the rest. Skipping them frees the day's loss room for the others (docs/RESULTS.md, v2.9).")
-afterMaxLoss = input.float(1000, "After a losing trade: max loss per trade, $ (0 = the same)", minval = 0, step = 10, group = grpT)
+afterMaxLoss = input.float(250, "After a losing trade: max loss per trade, $ (0 = the same)", minval = 0, step = 10, group = grpT)
 skipDates = input.string("2025-01-01,2025-01-09,2025-01-20,2025-02-17,2025-04-18,2025-05-26,2025-06-19,2025-07-03,2025-07-04,2025-09-01,2025-11-27,2025-11-28,2025-12-24,2025-12-25,2026-01-01,2026-01-19,2026-02-16,2026-04-03,2026-05-25,2026-06-19,2026-07-03,2026-09-07,2026-11-26,2026-11-27,2026-12-24,2026-12-25,2027-01-01,2027-01-18,2027-02-15,2027-03-26,2027-05-31,2027-06-18,2027-07-05,2027-09-06,2027-11-25,2027-11-26,2027-12-24",
      "Don't trade on these dates", group = grpT,
      tooltip = "YYYY-MM-DD, comma separated. Pre-filled with the 2025-2027 US market holidays and half days (2025 for backtests from January 2025), when MNQ trades a short session. Add news days if you like.")
@@ -288,16 +308,46 @@ if strategy.closedtrades > lossSeen
             lossRun := 0
     lossSeen := strategy.closedtrades
 afterLoss = lossRun > 0
-qBase = afterLoss and afterQty > 0 ? afterQty : qty
-mlBase = afterLoss and afterMaxLoss > 0 ? afterMaxLoss : maxLoss
-// v2.7: today's loss budget. Each contract can lose its max loss plus costs (fees both ways, a tick of slippage each way)
+qBase0 = afterLoss and afterQty > 0 ? afterQty : qty
+mlBase0 = afterLoss and afterMaxLoss > 0 ? afterMaxLoss : maxLoss
+// v3.0: the end-of-day trailing drawdown. At each session's first bar (yesterday's end-of-day balance), from trailFrom
+var float trailBase = na
+var float trailPeak = na
+if trailDD > 0 and tMin == RTH_OPEN and (trailFrom <= 0 or year(time, TZ) * 10000 + month(time, TZ) * 100 + dayofmonth(time, TZ) >= trailFrom)
+    if na(trailBase)
+        trailBase := strategy.netprofit
+        trailPeak := strategy.netprofit
+    trailPeak := math.max(trailPeak, strategy.netprofit)
+// v3.0: a contract more for each profitStep of closed profit since then, up to sizeUpTo (the same max loss per contract)
+qBase = qBase0
+mlBase = mlBase0
+if profitStep > 0 and not na(trailBase)
+    qUp = qBase0 + int(math.floor(math.max(0.0, strategy.netprofit - trailBase) / profitStep))
+    qUp := sizeUpTo > 0 ? math.min(qUp, sizeUpTo) : qUp
+    mlBase := mlBase0 / qBase0 * qUp
+    qBase := qUp
+// v2.7: today's loss budget, and since v3.0 the room above the trailing floor: a new trade gets the smaller. Each
+// contract can lose its max loss plus costs (fees both ways, a tick of slippage each way)
 dayPnlNow = strategy.netprofit - dayStartNet
-budgetOn = dailyLimit > 0 and mlBase > 0
-perC = budgetOn ? mlBase / qBase + 2 * 0.62 + 2 * syminfo.mintick * syminfo.pointvalue : 0.0
-fitQ = budgetOn ? math.floor((dailyLimit + dayPnlNow) / perC + 1e-9) : qBase
+trailFloor = na(trailPeak) ? na : trailStop ? math.min(trailPeak - trailDD, trailBase) : trailPeak - trailDD
+roomDay = dailyLimit > 0 ? dailyLimit + dayPnlNow : na
+roomTrail = trailDD > 0 and not na(trailFloor) ? strategy.netprofit - trailFloor : na
+moneyRoom = na(roomDay) ? roomTrail : na(roomTrail) ? roomDay : math.min(roomDay, roomTrail)
+budgetOn = (dailyLimit > 0 or trailDD > 0) and mlBase > 0
+costC = 2 * 0.62 + 2 * syminfo.mintick * syminfo.pointvalue
+perC = budgetOn ? mlBase / qBase + costC : 0.0
+fitQ = budgetOn and not na(moneyRoom) ? math.floor(moneyRoom / perC + 1e-9) : qBase
 budgetOk = fitQ >= 1
 qNext = budgetOk and fitQ < qBase ? fitQ : qBase
 mlNext = qNext < qBase ? mlBase / qBase * qNext : mlBase
+// The contracts for an entry whose stop at the fill is stopPts away (budgetStop: its own stop, else the max loss)
+qFor(float stopPts) =>
+    int q = budgetOk ? qNext : 0
+    if budgetOn and not na(moneyRoom) and budgetStop and useStop
+        pc = math.min(stopPts, mlBase / qBase / syminfo.pointvalue) * syminfo.pointvalue + costC
+        f = math.floor(moneyRoom / pc + 1e-9)
+        q := f < qBase ? f : qBase
+    q
 var int tQty = 0
 var float tMaxLoss = 0.0
 
@@ -388,6 +438,7 @@ rangeOk(int d) =>
 // ── Half-hour checks
 longPlaced = false
 shortPlaced = false
+var int qPlaced = 0   // the contracts of the entry placed at this check
 if isCheck and not na(dayOpen)
     k = int((endMin - FIRST_CHECK) / 30)
     array.set(today, k, math.abs(close / dayOpen - 1))
@@ -407,6 +458,8 @@ if isCheck and not na(dayOpen)
         capPtsNow = mlNext > 0 ? mlNext / qNext / syminfo.pointvalue : na
         estL = close + syminfo.mintick
         estS = close - syminfo.mintick
+        qL = qFor(estL - longStopNow)   // v3.0: the contracts the loss limits leave for a long / a short now
+        qS = qFor(shortStopNow - estS)
         bracketL = na(capPtsNow) ? longStopNow : math.max(longStopNow, estL - capPtsNow)
         bracketS = na(capPtsNow) ? shortStopNow : math.min(shortStopNow, estS + capPtsNow)
         whyL = bracketL > longStopNow ? "your " + usd(mlNext) + " max loss" : "just below the upper line"
@@ -457,21 +510,23 @@ if isCheck and not na(dayOpen)
                     lastSignal := "EXIT short " + hhmmText(endMin) + " @ " + px(close)
                     say("EXIT SHORT at market now. Price " + px(close) + " closed back above the lower line (" + px(lb) +
                          "). Stay flat until the next signal.")
-            else if pos == 0 and close > ub and freshOk and endMin <= lastEntryEnd and blockDir != 1 and not calmDay and budgetOk and rangeOk(1)
-                strategy.entry("Long", strategy.long, qNext, comment = "Above noise",
-                     alert_message = useHook ? jsonEntry("buy", estL, useStop ? bracketL : na, tpL, qNext) : "")
+            else if pos == 0 and close > ub and freshOk and endMin <= lastEntryEnd and blockDir != 1 and not calmDay and qL >= 1 and rangeOk(1)
+                strategy.entry("Long", strategy.long, qL, comment = "Above noise",
+                     alert_message = useHook ? jsonEntry("buy", estL, useStop ? bracketL : na, tpL, qL) : "")
                 longPlaced := true
-                mark("BUY " + str.tostring(qNext) + " MNQ", true, color.green)
+                qPlaced := qL
+                mark("BUY " + str.tostring(qL) + " MNQ", true, color.green)
                 lastSignal := "BUY " + hhmmText(endMin) + " @ " + px(close)
-                say("BUY " + str.tostring(qNext) + " MNQ at market now. Price " + px(close) + " is above the noise area (upper " +
+                say("BUY " + str.tostring(qL) + " MNQ at market now. Price " + px(close) + " is above the noise area (upper " +
                      px(ub) + "). " + holdLong + " Next check " + nextCheck + ".")
-            else if pos == 0 and close < lb and shortOk and freshOk and endMin <= lastEntryEnd and blockDir != -1 and not calmDay and budgetOk and rangeOk(-1)
-                strategy.entry("Short", strategy.short, qNext, comment = "Below noise",
-                     alert_message = useHook ? jsonEntry("sell", estS, useStop ? bracketS : na, tpS, qNext) : "")
+            else if pos == 0 and close < lb and shortOk and freshOk and endMin <= lastEntryEnd and blockDir != -1 and not calmDay and qS >= 1 and rangeOk(-1)
+                strategy.entry("Short", strategy.short, qS, comment = "Below noise",
+                     alert_message = useHook ? jsonEntry("sell", estS, useStop ? bracketS : na, tpS, qS) : "")
                 shortPlaced := true
-                mark("SELL " + str.tostring(qNext) + " MNQ", false, color.red)
+                qPlaced := qS
+                mark("SELL " + str.tostring(qS) + " MNQ", false, color.red)
                 lastSignal := "SELL " + hhmmText(endMin) + " @ " + px(close)
-                say("SELL " + str.tostring(qNext) + " MNQ at market now. Price " + px(close) + " is below the noise area (lower " +
+                say("SELL " + str.tostring(qS) + " MNQ at market now. Price " + px(close) + " is below the noise area (lower " +
                      px(lb) + "). " + holdShort + " Next check " + nextCheck + ".")
 
 // ── Heads-up: five minutes before a check, flat, and price already past that check's line. On 2011-2018 a signal
@@ -504,8 +559,8 @@ if validTf and 5 % barMin == 0 and inRth and preEnd >= FIRST_CHECK and preEnd <=
 // Re-placed every bar so it moves with the line. The cap is live from the fill bar, like a bracket order: placed
 // with the entry, it is measured from the expected fill (the signal close plus a tick), then from the real fill.
 if longPlaced or shortPlaced  // the placed entry's size and max loss, for its bracket and lock
-    tQty := qNext
-    tMaxLoss := mlNext
+    tQty := qPlaced
+    tMaxLoss := mlBase / qBase * qPlaced
 capPts = tMaxLoss > 0 and tQty > 0 ? tMaxLoss / tQty / syminfo.pointvalue : na
 lineStopL = ub * (1 - stopBuf * sig)
 lineStopS = lb * (1 + stopBuf * sig)
@@ -636,7 +691,7 @@ if showDash and (barstate.islastconfirmedhistory or barstate.isrealtime)
     table.cell(dash, 0, 11, "Trades today", text_color = color.silver, text_size = size.small)
     losersNow = losersSince(dayStartClosed)
     doneToday = maxLosers > 0 and losersNow >= maxLosers
-    roomText = budgetOn ? (budgetOk ? "; loss room " + usd(dailyLimit + dayPnlNow) + (qNext < qBase ? ", next trade " + str.tostring(qNext) + " MNQ" : "") : "; daily loss limit reached") : ""
+    roomText = budgetOn ? (budgetOk ? "; loss room " + usd(moneyRoom) + (qNext < qBase ? ", next trade " + str.tostring(qNext) + " MNQ" : ", up to " + str.tostring(qBase) + " MNQ") : "; loss limit reached") : ""
     table.cell(dash, 1, 11, str.tostring(closed - dayStartClosed) + (maxLosers > 0 ? " (" + str.tostring(losersNow) + " lost" + (doneToday ? ": done for today)" : ", limit " + str.tostring(maxLosers) + ")") : "") + roomText,
          text_color = doneToday or (budgetOn and not budgetOk) ? color.orange : color.white, text_size = size.small)
     capLate = maxLoss > 0 and useStop and barMin > 5
