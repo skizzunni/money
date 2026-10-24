@@ -3606,6 +3606,49 @@ Worst days with 8 contracts: -$1,031 to -$1,090, from stops filled past their pr
 loss in the middle of a trade isn't checked. But no trade may risk more than the room above the floor, so only a stop
 filled past its price could reach it.
 
+## v3.1: from the user's TradingView run of v3.0 (October 24, 2026)
+
+**The user's run.** MNQ1!, 30 minutes, 1/2, 2025 to 10/23, 2026, $50K:
+
+| | Result |
+|---|---|
+| Net | -$62 |
+| Max drawdown | $1,994 |
+| Trades | 197 |
+| Winners | 48.7% |
+| Profit factor | 0.99 |
+| Longs ("Above noise") | +$2,117 |
+| Shorts ("Below noise") | -$2,179 |
+
+- **It went under at the start.** The equity fell to about -$1,400 by April 2025, rose to about +$1,800 by June, and
+  slid back to about $0 by December.
+- **Then it froze.** The floor had stopped at -$200 (the June high less $2,000, under the start). Near it, not one
+  contract fitted, so it traded no more in 2026.
+
+**The stand-in agrees on 2025.** Its first seven months are NQ futures, then the index.
+- v3.0 on the 2025 stand-in: 217 trades, +$1,277, 52.1% winners, profit factor 1.12.
+- Its longs made +$2,317 and its shorts lost -$1,041.
+- The weakness is the shorts. It isn't the data.
+
+**No shorts against the 50-session trend** (`trend_n` 50, `trend_side` -1). No new shorts while yesterday's close is
+above the average of the last 50 sessions' closes.
+- On the 2025 stand-in: 139 trades, +$3,294, 59.0% winners, profit factor 1.47. The shorts that remain made +$976.
+- Over 2015-2026 the profit factor rose on every set (`v31_b_*.csv`, `v31_a_*.csv`):
+  - NQ: 1.39 to 1.50 (30-minute) and 1.41 to 1.48 (5-minute).
+  - The index: 1.34 to 1.48 and 1.41 to 1.54.
+  - The stand-in: 1.87 to 1.93 and 1.57 to 1.65, with 59.8% and 70.0% winners.
+- Net on the histories: 0.94-1.06x.
+- Trend lengths of 20 and 100 sessions were close. No shorts at all (`short_mult` 0) went under the NQ floor's room
+  early and stopped trading.
+
+**Never stuck** (`squeeze_min`). When not one contract fits the loss limits, take 1 contract with its max loss cut to
+the room left (less costs), if that still leaves a stop of 20 points or more.
+- It never binds on the stand-in.
+- On the histories it adds trades at about the same profit factor.
+- It would have kept v3.0 trading through 2026 on the user's chart.
+
+Pine parity test: `test_pine_trend_and_squeeze`.
+
 ## What this does and doesn't say
 
 - **It says** that the original sweep/breakout rules have no edge after realistic costs on 2023–2026 Nasdaq-100 data, and would very likely not pass a $25K evaluation. Of three published strategies, only noise-area momentum held up over 16 years, and even it fails most $25K evaluations.
