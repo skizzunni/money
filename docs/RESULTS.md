@@ -3753,6 +3753,33 @@ the faster step didn't show on the user's bars. v3.4 goes back to the $2,500 ste
 - No set went under the floor.
 - With 2 ticks of slippage: $20.1k, PF 1.95 (30-minute); $11.7k, PF 1.73 (5-minute).
 
+## v3.6: a 100K account (October 24, 2026)
+
+**The user's TradingView run of v3.5:** +$9,467, max drawdown $4,171, 54.5% winners, profit factor 1.47. v3.4 had
+made +$13,815 there with 1.61.
+- The settings searches (v3.3, v3.5) improved the stand-in but not the user's chart: they were fitting the stand-in.
+- v3.6 goes back to v3.4's rules.
+
+**The 100K limits.** The user moves to 100K accounts, assumed with the usual limits: an end-of-day trailing drawdown
+of $3,000 that stops at the starting balance, and $2,000 a day. On v3.4's rules (`v36_acct100_*.csv`):
+
+| Stand-in 1/2025-10/2026 | Net | Profit factor | Winners | End-of-day drawdown | Under the floor |
+|---|---:|---:|---:|---:|---:|
+| 30-min, 50K (v3.4) | 16,800 | 1.95 | 56.4% | 2,021 | never |
+| 30-min, 100K, steps $2,500, up to 8-20 | 18,775 | 2.06 | 56.4% | 2,021 | never |
+| 30-min, 100K, **steps $1,500, up to 15** | **35,255** | **2.10** | 56.4% | 4,296 | **never** |
+| 30-min, 100K, steps $1,500, up to 20 | 36,977 | 2.13 | 56.4% | 4,296 | never |
+| 30-min, 100K, from 2 MNQ, steps $2,500 | 42,324 | 1.94 | 56.4% | 5,676 | 12 times |
+| 5-min, 100K, steps $1,500, up to 15 | 23,909 | 1.88 | 66.1% | 1,835 | never |
+
+- **Starting size.** From 2 or 3 contracts, early 2025 went under the floor. From 3, the stand-in stopped trading
+  after 22 trades.
+- **The histories** never went under the floor from 1 contract.
+- **Worst days.** With up to 15 contracts, the histories' worst days were -$2,087 to -$2,097: past $2,000 by stop
+  fills in fast markets.
+- **What a bigger account can't change.** The winners and the profit factor are the strategy's. On the user's chart
+  v3.4 made about 0.8x the stand-in, so the chart should show roughly $25-30k.
+
 **On v3.3, not adopted** (`v34_followup_*.csv`):
 - **Half-size shorts.** Less net on the stand-in ($19.9k and $14.5k against $23.0k and $19.1k).
 - **Trend lengths of 30, 75 and 100 sessions.** Each did worse on the stand-in at one bar length or both.
