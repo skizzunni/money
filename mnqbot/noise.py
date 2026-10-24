@@ -196,6 +196,9 @@ class NoiseConfig:
     # with trail_dd: one more contract (the same stop distance) for each profit_step of closed profit above the
     # trailing drawdown's starting equity, up to size_up_to (0 = no limit); 0 = off
     profit_step: float = 0.0
+    # with the money budget: when not even 1 contract fits, still take 1 with its max loss cut to the room left (less
+    # costs), if that leaves at least squeeze_min points of stop; 0 = off (no entry)
+    squeeze_min: float = 0.0
     day_up_mult: float = 1.0
     day_up_from: float = 0.0
     # research (v2.8 study): besides the half-hour checks, a stop order rests at the current noise lines from 10:00 and
@@ -835,6 +838,10 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                             per_c = pts * cfg.point_value + 2 * cfg.commission_per_side + 2 * slip * cfg.point_value
                         room = money_room()
                         fit = math.floor(room / per_c + 1e-9) if math.isfinite(room) else q_next
+                        costs = 2 * cfg.commission_per_side + 2 * slip * cfg.point_value
+                        if fit < 1 and cfg.squeeze_min > 0 and math.isfinite(room) \
+                                and room - costs >= cfg.squeeze_min * cfg.point_value:
+                            fit, q_next, ml_next = 1, 1, room - costs  # 1 contract, the stop cut to the room
                         if fit < 1:  # not one contract fits: no entry
                             pending = None
                             events.pop()
