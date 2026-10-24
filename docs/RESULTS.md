@@ -3809,6 +3809,23 @@ price touches the trigger, inside the bar, instead of the Pine lock's next-bar m
   5-minute index worse.
 - **A range rule of 0.5 or 0.75.** NQ went under the floor's room on 30-minute bars and stopped trading.
 
+## New strategy families after v3.6, none with an edge (October 25, 2026)
+
+Raw prices: NQ futures 2015-2025 (roll weeks skipped), the Nasdaq-100 index 2011-2026, and the 2025-2026 stand-in.
+1 MNQ, fees and a tick of slippage. Profit factors are given for the early and late halves of each history.
+
+- **The opening-gap fade** (`research/v38_gap.py`, `v38_gap.csv`).
+  - Trade a 09:30 gap of 0.1-0.3% to 0.5-1.2% back toward the previous close. Stops of 0.5-2x the gap, out at 10:30,
+    12:00 or 16:00, both sides or buys only.
+  - Of 216 settings, none had a profit factor over 1.2 in both early halves.
+  - The best on every half: 1.07-1.16. The median: 0.83-0.90.
+- **A pullback in an intraday trend** (`research/v38_intraday.py`, `v38_intraday.csv`).
+  - A 2-bar RSI under 5-20 with the close above its 100- or 300-bar EMA (shorts mirrored). Out at RSI 50 or 70, a
+    1.5-6x range stop, or 15:55.
+  - Winners 52-67%, but the profit factor stayed under 1 on every half (best 0.60-0.98).
+- **The last half hour following the first** (Gao et al. 2018). The return to 10:00 picks the side for 15:30-16:00.
+  - Profit factor 0.70-0.91 everywhere.
+
 ## What this does and doesn't say
 
 - **It says** that the original sweep/breakout rules have no edge after realistic costs on 2023–2026 Nasdaq-100 data, and would very likely not pass a $25K evaluation. Of three published strategies, only noise-area momentum held up over 16 years, and even it fails most $25K evaluations.
