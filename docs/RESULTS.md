@@ -3664,6 +3664,25 @@ Pine parity test: `test_pine_trend_and_squeeze`.
   - The stand-in made $2.4-7.1k against $16.3k.
   - NQ and the index made 0.53-0.76x net, and the index stopped trading at 60 days.
 
+## v3.2: the lock at 0.35 max losses (October 24, 2026)
+
+The exits were retuned on v3.1's trades (`v32_exits_*.csv`): the lock at 0.15-0.5, take-profit 1.5 and 3.0, the stop
+buffer 0.15 and 0.35, the lock offset 5 points.
+
+**The lock at 0.35** (32.8 points at $187.50 a contract) against 0.25:
+
+| | Stand-in profit factor | Stand-in winners | NQ net, net per drawdown | Index net, net per drawdown |
+|---|---|---|---|---|
+| 5-minute | 1.65 to 1.91 | 70.0% to 66.1% | 1.22x, 1.42x (7 of 11 years better) | 1.19x, 1.23x (13 of 16 years) |
+| 30-minute | 1.93 to 1.95 | 59.8% to 56.4% | 0.94x, 0.93x | 1.02x, 1.03x |
+
+- The user trades on 5-minute bars, so it was adopted.
+- 0.5 was close on 5-minute bars and worse on NQ.
+
+**The other changes:**
+- Take-profit 1.5 and a 5-point lock offset sent one history to the trailing floor, where it stopped trading.
+- Take-profit 3.0 and both stop buffers cut net on most sets.
+
 ## What this does and doesn't say
 
 - **It says** that the original sweep/breakout rules have no edge after realistic costs on 2023–2026 Nasdaq-100 data, and would very likely not pass a $25K evaluation. Of three published strategies, only noise-area momentum held up over 16 years, and even it fails most $25K evaluations.
