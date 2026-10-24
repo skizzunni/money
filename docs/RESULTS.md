@@ -3688,6 +3688,28 @@ $4,176, 158 winners in 283 trades (55.8%), profit factor 1.61. v3.0 on the same 
 dipped about $500 in early 2025, then rose as the contracts grew; most of the gain came in 2026. The 30-minute
 stand-in had v3.2 at about +$16.8k, close to the chart.
 
+## v3.3: a contract more per $1,500 of profit (October 24, 2026)
+
+On v3.2 (`v33_sizing_*.csv`): starting at 1-3 contracts, steps of $1,500, $2,000 and $2,500, up to 8 or 15.
+- **Starting at 2 or 3 contracts** hit the floor in early 2025 on the stand-in, and it stopped trading after 20-44
+  trades. The squeeze can't help when the room is under 20 points.
+- **Starting at 1, a step of $1,500 up to 8:**
+
+  | Stand-in | v3.2 (step $2,500) | v3.3 (step $1,500) |
+  |---|---|---|
+  | 30-min net | $16.8k | $23.0k |
+  | 30-min profit factor | 1.95 | 1.83 |
+  | 30-min end-of-day drawdown | $2.0k | $3.1k |
+  | 5-min net | $13.8k | $19.1k |
+  | 5-min profit factor | 1.91 | 1.82 |
+  | 5-min end-of-day drawdown | $1.4k | $1.8k |
+
+  - The capped floor was never touched on any set, and nothing got stuck.
+  - The histories made 1.01-1.04x net.
+- **Up to 15** made a little more, but the histories' worst days reached -$1,228. Kept at 8.
+- With the trend rule, $1,500 is safe on every set. In v3.0 (no trend rule) steps under $2,500 got stuck. A $1,000
+  step still gets stuck on the histories.
+
 ## What this does and doesn't say
 
 - **It says** that the original sweep/breakout rules have no edge after realistic costs on 2023–2026 Nasdaq-100 data, and would very likely not pass a $25K evaluation. Of three published strategies, only noise-area momentum held up over 16 years, and even it fails most $25K evaluations.
