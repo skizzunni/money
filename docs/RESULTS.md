@@ -3780,6 +3780,10 @@ of $3,000 that stops at the starting balance, and $2,000 a day. On v3.4's rules 
 - **What a bigger account can't change.** The winners and the profit factor are the strategy's. On the user's chart
   v3.4 made about 0.8x the stand-in, so the chart should show roughly $25-30k.
 
+**The user's TradingView run of v3.6** (100K settings): +$26,106, max drawdown $8,444, 158 winners in 283 trades
+(55.8%), profit factor 1.63. That is 0.74x the stand-in's $35.3k, with the same trades as v3.4 (283) at larger sizes.
+The drawdown came after the account was well over $3,000 up, with the floor already at the starting balance.
+
 **On v3.3, not adopted** (`v34_followup_*.csv`):
 - **Half-size shorts.** Less net on the stand-in ($19.9k and $14.5k against $23.0k and $19.1k).
 - **Trend lengths of 30, 75 and 100 sessions.** Each did worse on the stand-in at one bar length or both.
