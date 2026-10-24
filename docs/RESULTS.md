@@ -3825,6 +3825,15 @@ Raw prices: NQ futures 2015-2025 (roll weeks skipped), the Nasdaq-100 index 2011
   - Winners 52-67%, but the profit factor stayed under 1 on every half (best 0.60-0.98).
 - **The last half hour following the first** (Gao et al. 2018). The return to 10:00 picks the side for 15:30-16:00.
   - Profit factor 0.70-0.91 everywhere.
+- **The overnight-range breakout** (`research/v39_overnight.py`, `v39_overnight.csv`; NQ only, the index has no
+  overnight session).
+  - A 5-minute close past the 18:00-09:30 high (or low) before 12:00, the stop at the range's middle or 0.25-1x the
+    range, targets of 1-3x the risk.
+  - The best: profit factor 1.08-1.09 in 2015-2019 and 1.09-1.19 in 2020-2025, with 31-47% winners.
+- **The turn of the month** (long 09:30-16:00 on the last trading day and the first three).
+  - NQ: 1.00-1.09 in 2015-2019 and 1.19-1.34 later.
+  - The index: 0.76-0.84 in 2011-2017 and 1.23-1.47 later.
+  - About 45 trades a year. Not consistent.
 
 ## What this does and doesn't say
 
