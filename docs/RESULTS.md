@@ -3649,6 +3649,21 @@ the room left (less costs), if that still leaves a stop of 20 points or more.
 
 Pine parity test: `test_pine_trend_and_squeeze`.
 
+**After v3.1, not adopted.**
+- **Faster contract steps** (`v32_steps_*.csv`).
+  - A $1,000 step got stuck on both histories, which ended at about $0.
+  - $1,500 and $2,000 made more on the stand-in: $22.8k and $20.2k against $16.3k (30-minute), and $16.7k and $14.3k
+    against $12.8k (5-minute).
+  - Those steps left a larger end-of-day drawdown ($2.5-4.1k after the floor had stopped) and gave the histories about
+    the same net.
+  - $1,500 is one step from getting stuck, and the gain depends on the order the stand-in's trades came in. v3.1
+    keeps $2,500.
+  - More than 8 contracts lowered the histories' profit factor, and their worst days passed -$1,200.
+- **An equity-curve filter** (`research/v32_eqfilter.py`, `v32_eqfilter_30.csv`). A shadow run takes every signal at
+  1 contract. The real one trades a day only if the shadow's end-of-day equity is at or above its 10-60-day average.
+  - The stand-in made $2.4-7.1k against $16.3k.
+  - NQ and the index made 0.53-0.76x net, and the index stopped trading at 60 days.
+
 ## What this does and doesn't say
 
 - **It says** that the original sweep/breakout rules have no edge after realistic costs on 2023–2026 Nasdaq-100 data, and would very likely not pass a $25K evaluation. Of three published strategies, only noise-area momentum held up over 16 years, and even it fails most $25K evaluations.
