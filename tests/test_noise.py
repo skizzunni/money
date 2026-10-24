@@ -33,10 +33,11 @@ BIG_N = "After a big day: sessions in the average range"  # 10 (v2.3)
 CALM = "Calm stretch: no trades if the recent average range < this x the longer one (0 = off)"  # 0.7 (v2.5); ref off
 CALM_S, CALM_L = "Calm stretch: recent sessions", "Calm stretch: longer stretch, sessions"  # 10, 40 (v2.5)
 DAILY = "Max loss a day, $ (0 = off)"  # the script's default is $1,000 (v2.7); the reference's off
+RANGE = "Entries near the day's extreme: the close in the top this share of the day's range (0 = off)"  # 0.65 (v2.9)
 V21 = {"max_loss_per_trade": 750.0, "lock_at": 0.25, "max_losers": 0, "take_profit": 2.0, "tighten_only": True,
        "after_loss_qty_div": 1.0, "after_loss_ml_mult": 4 / 3, "last_entry_end": 900,
        "big_day_k": 1.5, "big_day_n": 10, "calm_k": 0.7, "calm_short": 10, "calm_long": 40,
-       "daily_loss_limit": 1000.0}  # the script's defaults
+       "daily_loss_limit": 1000.0, "range_pos_min": 0.65}  # the script's defaults
 P0 = 20_000.0
 BARS_PER_DAY = 78  # 09:30 .. 15:55 on 5-minute bars
 CHECK_10_00, CHECK_10_30, CLOSE_16_00 = 5, 11, 77  # bar numbers within a session
@@ -454,7 +455,8 @@ def assert_trade_log(log, res, exit_mode, rows=10):
 
 def assert_parity(bars, minutes=5, lookback=14, skip_dates=None, exit_mode="stop", stop_buffer=None, qty=1,
                   max_loss=None, fed_dates=None, fed_no_shorts=None, take_profit=None, hook=None, lock_at=None,
-                  max_losers=None, after_loss=None, last_entry=None, big_day=None, calm=None, daily=None):
+                  max_losers=None, after_loss=None, last_entry=None, big_day=None, calm=None, daily=None,
+                  range_pos=None):
     cfg = NoiseConfig(lookback=lookback, exit_mode=exit_mode, qty=qty)
     inputs = {"Sessions in the noise average": lookback}
     if lock_at is not None:
@@ -482,6 +484,9 @@ def assert_parity(bars, minutes=5, lookback=14, skip_dates=None, exit_mode="stop
     if daily is not None:
         cfg.daily_loss_limit = daily
     inputs[DAILY] = cfg.daily_loss_limit
+    if range_pos is not None:
+        cfg.range_pos_min = range_pos
+    inputs[RANGE] = cfg.range_pos_min
     inputs["Exit"] = "Resting stop at the line" if exit_mode == "stop" else "Half-hour check"
     inputs[FUNDED] = True  # the script's default is the evaluation's 3 contracts
     inputs["Contracts on a funded account"] = qty  # the script's default is 10; the reference's is 1
@@ -739,7 +744,7 @@ def test_pine_evaluation_tracker(target):
     days = sorted({d.date() for d in bars.index.tz_convert(NY)})
     start = days[40]
     inputs = {FUNDED: True, "Contracts on a funded account": 10, LOCK: 1.0, TIGHTEN: False, TP: 1.5, AFTER_QTY: 0,
-              AFTER_ML: 0.0, LAST_ENTRY: "15:30", BIG_K: 0.0, CALM: 0.0, DAILY: 0.0,
+              AFTER_ML: 0.0, LAST_ENTRY: "15:30", BIG_K: 0.0, CALM: 0.0, DAILY: 0.0, RANGE: 0.0,
               "Max losing trades a day (0 = no limit)": 4,
               "Max loss per trade, $ (all contracts, 0 = off)": 350.0,
               "Evaluation start date, YYYYMMDD (0 = off)": int(start.strftime("%Y%m%d")), "Profit target, $": target}
@@ -1075,3 +1080,14 @@ def test_pine_daily_loss_budget():
     assert any(t.qty < 10 for t in res.trades), "the budget cut a trade's size"
     tf = res.trades_frame()
     assert tf.groupby(tf.exit_time.dt.date).pnl.sum().min() >= -800.0 - 1e-6
+
+
+@pytest.mark.slow
+def test_pine_range_position():
+    """v2.9: a new entry needs the check's close in the top range_pos of the day's range so far (the bottom for a
+    short). The script and the reference agree trade for trade, and the rule skips some entries."""
+    bars = synth_bars(sessions=90, seed=7)
+    res = assert_parity(bars, qty=10, max_loss=500.0, range_pos=0.8)
+    free = run(bars, NoiseConfig(qty=10, max_loss_per_trade=500.0))
+    assert len(res.trades) < len(free.trades), "the rule skipped entries"
+    assert_parity(bars, qty=10, max_loss=500.0, range_pos=0.65, daily=800.0, max_losers=0)

@@ -15,6 +15,13 @@
 // Noise area for each half-hour mark = the day's open (and previous close) plus/minus the
 // average distance price has moved from the 09:30 open by that time over the last 14 sessions.
 //
+// v2.9, 2026-10-24: entries only near the day's extreme (setting "Entries near the day's extreme"): a long needs the
+// check's close in the top 35% of the day's range so far, a short in the bottom 35%. A breakout after the day had run
+// further and come back to the line made about nothing (profit factor 1.0-1.1 on NQ futures 2015-2025, the index
+// 2011-2026 and the 2025-2026 stand-in, against 1.5 for the rest). Stand-in 1/2025-10/2026, 30-minute: +$29.4k against
+// v2.8's +$27.1k, drawdown $5.9k against $6.5k, profit factor 1.48 against 1.42; 5-minute: +$26.6k against +$28.7k,
+// drawdown $5.6k against $5.7k, 1.46 against 1.45. Histories: net 1.00-1.06x, net per drawdown 0.98-1.21x, the index
+// better in 12 of 16 years on 30-minute bars (docs/RESULTS.md, v2.9).
 // v2.8, 2026-10-24: fewer contracts, a wider stop, an early lock: 4 MNQ, max loss $750 (93.75 points; the line stop
 // is usually closer), the lock at 0.25 max losses (23.4 points, then the stop to the entry + 2.5), the trade after a
 // loser the same 4 MNQ with $1,000. Under the $1,000 daily limit 10 MNQ with a 37.5-point stop was stopped by ordinary
@@ -162,6 +169,8 @@ calmShort = input.int(10, "Calm stretch: recent sessions", minval = 2, maxval = 
 calmLong = input.int(40, "Calm stretch: longer stretch, sessions", minval = 5, maxval = 100, group = grpT)
 dailyLimit = input.float(1000, "Max loss a day, $ (0 = off)", minval = 0, step = 50, group = grpT,
      tooltip = "v2.7: no trade may risk more than what is left of this loss today (today's closed P/L counted, wins add room back). A trade that would risk more takes fewer contracts with the same stop distance; when not even 1 contract fits, no new entries until tomorrow. Trading never stops just because of a loss: the next trade is smaller instead. The stop is a resting order, so a gap or fast market through it can still lose a little more (docs/RESULTS.md, v2.7).")
+rangePos = input.float(0.65, "Entries near the day's extreme: the close in the top this share of the day's range (0 = off)", minval = 0, maxval = 1, step = 0.05, group = grpT,
+     tooltip = "v2.9: a long needs the check's close in the top part of the day's 09:30-to-now range: (close - day low) / (day high - day low) at least this (a short: the bottom part, (day high - close) / (day high - day low)). A breakout of the noise area after the day had already run further and come back down to the line made about nothing: profit factor 1.0-1.1 on NQ futures 2015-2025, the Nasdaq-100 index 2011-2026 and the 2025-2026 stand-in, against 1.5 for the rest. Skipping them frees the day's loss room for the others (docs/RESULTS.md, v2.9).")
 afterMaxLoss = input.float(1000, "After a losing trade: max loss per trade, $ (0 = the same)", minval = 0, step = 10, group = grpT)
 skipDates = input.string("2025-01-01,2025-01-09,2025-01-20,2025-02-17,2025-04-18,2025-05-26,2025-06-19,2025-07-03,2025-07-04,2025-09-01,2025-11-27,2025-11-28,2025-12-24,2025-12-25,2026-01-01,2026-01-19,2026-02-16,2026-04-03,2026-05-25,2026-06-19,2026-07-03,2026-09-07,2026-11-26,2026-11-27,2026-12-24,2026-12-25,2027-01-01,2027-01-18,2027-02-15,2027-03-26,2027-05-31,2027-06-18,2027-07-05,2027-09-06,2027-11-25,2027-11-26,2027-12-24",
      "Don't trade on these dates", group = grpT,
@@ -371,6 +380,11 @@ var bool sawOvernight = false
 if tMin < RTH_OPEN or tMin >= RTH_CLOSE + 15
     sawOvernight := true
 
+// v2.9: is the close near the day's extreme on side d (rangePos)?
+rangeOk(int d) =>
+    rng = dayHi - dayLo
+    rangePos <= 0 or na(rng) or rng <= 0 or (d > 0 ? (close - dayLo) / rng : (dayHi - close) / rng) >= rangePos
+
 // ── Half-hour checks
 longPlaced = false
 shortPlaced = false
@@ -443,7 +457,7 @@ if isCheck and not na(dayOpen)
                     lastSignal := "EXIT short " + hhmmText(endMin) + " @ " + px(close)
                     say("EXIT SHORT at market now. Price " + px(close) + " closed back above the lower line (" + px(lb) +
                          "). Stay flat until the next signal.")
-            else if pos == 0 and close > ub and freshOk and endMin <= lastEntryEnd and blockDir != 1 and not calmDay and budgetOk
+            else if pos == 0 and close > ub and freshOk and endMin <= lastEntryEnd and blockDir != 1 and not calmDay and budgetOk and rangeOk(1)
                 strategy.entry("Long", strategy.long, qNext, comment = "Above noise",
                      alert_message = useHook ? jsonEntry("buy", estL, useStop ? bracketL : na, tpL, qNext) : "")
                 longPlaced := true
@@ -451,7 +465,7 @@ if isCheck and not na(dayOpen)
                 lastSignal := "BUY " + hhmmText(endMin) + " @ " + px(close)
                 say("BUY " + str.tostring(qNext) + " MNQ at market now. Price " + px(close) + " is above the noise area (upper " +
                      px(ub) + "). " + holdLong + " Next check " + nextCheck + ".")
-            else if pos == 0 and close < lb and shortOk and freshOk and endMin <= lastEntryEnd and blockDir != -1 and not calmDay and budgetOk
+            else if pos == 0 and close < lb and shortOk and freshOk and endMin <= lastEntryEnd and blockDir != -1 and not calmDay and budgetOk and rangeOk(-1)
                 strategy.entry("Short", strategy.short, qNext, comment = "Below noise",
                      alert_message = useHook ? jsonEntry("sell", estS, useStop ? bracketS : na, tpS, qNext) : "")
                 shortPlaced := true
