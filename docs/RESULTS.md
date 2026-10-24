@@ -3451,6 +3451,16 @@ least 0.65.
 
 The user's MNQ window 8/24-10/16 (5-minute): +$1.8k against +$2.7k.
 
+**With more slippage** (`v29_slip_*.csv`; stand-in, 30-minute / 5-minute):
+
+| Slippage per fill | v2.9 | v2.8 |
+|---|---|---|
+| 1 tick | $29.4k, PF 1.48 / $26.6k, PF 1.46 | $27.1k, 1.42 / $28.7k, 1.45 |
+| 2 ticks | $24.4k, 1.40 / $20.5k, 1.35 | $21.2k, 1.32 / $22.1k, 1.34 |
+| 3 ticks | $23.3k, 1.38 / $19.3k, 1.33 | |
+
+On NQ 2015-2025 2 ticks cost v2.9 6-8% of net.
+
 Pine parity test: `test_pine_range_position`.
 
 **Tried with it, not adopted** (`v29_side_*.csv`, `v29_combo_*.csv`):
