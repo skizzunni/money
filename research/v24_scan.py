@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import json
 import os
+import pickle
 import sys
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
@@ -73,6 +74,7 @@ def us_closures(first: int = 2010, last: int = 2027) -> str:
 
 
 CLOSURES = us_closures()
+CONFIRM: dict = {}  # SPX_STATE=<pickle>: "confirm_map": "spx" in a variant loads it
 MIN = [5]  # the bar length: SCAN_MINUTES=30 runs every set on 30-minute bars
 
 
@@ -97,6 +99,11 @@ def init(base: dict, data: str, sep: str, dec: str) -> None:
 
 def job(kw: dict) -> dict:
     out = {"rule": json.dumps(kw) if kw else "base"}
+    if kw.get("confirm_map") == "spx" or BASE.get("confirm_map") == "spx":  # research/spx_noise_state.py's output
+        if "spx" not in CONFIRM:
+            with open(os.environ["SPX_STATE"], "rb") as f:
+                CONFIRM["spx"] = pickle.load(f)
+        kw = {**kw, "confirm_map": CONFIRM["spx"]}
     for name, (bars, first, skip) in D.items():
         cfg = NoiseConfig(**{**V23, **BASE, **kw})
         if isinstance(skip, str):  # the histories: their own closures, no Fed list

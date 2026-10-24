@@ -3332,6 +3332,77 @@ sweep, $250 risk each, daily P/L summed; `candles_vs_bot.py`, "ensemble"):
 
 Not adopted.
 
+## After v2.7: six new ideas, none adopted (October 23, 2026)
+
+All on top of v2.7, the $1,000 daily budget included (`research/v24_scan.py`; `verification/noise_v2/v28_*.csv`).
+
+- **Entering on the touch of the line** (`touch_entry`). A stop order rests at the noise lines from 10:00, once a side
+  per half hour, instead of waiting for a check's close past them.
+  - It loses everywhere, at every stop buffer, lock, max loss and target tried.
+  - Profit factor 0.57-0.88 on the stand-in, NQ and the index.
+  - Crossings between checks are mostly false. The half-hour close is the filter.
+- **A 15-minute check grid** (`check_step`, `first_check`), each mark with its own 14-session noise average.
+  - The stand-in made more: $50k, or $71k from 09:45, against $40k.
+  - The index made 0.85-0.97x net with a much larger drawdown (net per drawdown 0.51-0.64).
+  - Hourly checks and a 10:30 start were worse.
+- **S&P 500 confirmation** (`confirm_map` from `research/spx_noise_state.py`): the S&P's own noise state at the same
+  check.
+  - Only taking entries it confirms raised the profit factor (5-minute NQ 1.40 to 1.50, index 1.49 to 1.55) but cut
+    net 12-20%, and the index's drawdown grew (net per drawdown 0.49).
+  - "Not against it" changed nothing: the S&P is almost never past its other line.
+  - Half size when unconfirmed was in between.
+- **The same strategy on the S&P 500 (MES) beside MNQ** (`research/v28_mes.py`; same rules, the same stop as a share of
+  price).
+  - MES alone made far less: $134k on 2011-2026 with a $31k drawdown, and -$24k on the 2025-2026 stand-in.
+  - The two markets' daily P/L correlate 0.40-0.49.
+  - Split $500 + $500 of the daily budget: about 40% less net with a larger drawdown.
+
+- **Scale-outs with the rest at breakeven** (`partial_at`, `partial_frac`, `partial_be`; `v28_tvpath_30.csv`).
+  - Winners 66-67%, but the profit factor fell to 0.47-0.88.
+  - On 30-minute bars the breakeven stop is hit inside the same bar far too often.
+- **Pullback limit entries** (`limit_entry_frac`: a limit part of the way back to the line after a signal;
+  `v28_lim_*.csv`): 0.1-0.7x net. The trades that don't pull back are the best ones.
+- **TradingView's bar path** (`tv_path`: the high first when it is nearer the open) changes almost nothing; the scans
+  below use it.
+
+## v2.8: fewer contracts, a wider stop, an early lock (October 24, 2026)
+
+Under the $1,000 daily limit v2.7's 10 MNQ with a 37.5-point stop was stopped by ordinary noise: one or two losers used
+up the day. v2.8 trades 4 MNQ with the same $750 max loss (93.75 points, so the line stop takes over on most trades)
+and locks the stop to the entry + 2.5 once a trade is 0.25 max losses (23.4 points) in profit. The trade after a loser
+keeps the 4 MNQ, with $1,000 (`v28_c_*.csv`, `v28_d_*.csv`, `v28_wide_*.csv`; all with the $1,000 budget and `tv_path`).
+
+| Stand-in 1/2025-10/2026 | Net | Drawdown | Winners | Profit factor | Worst day |
+|---|---:|---:|---:|---:|---:|
+| 30-min v2.7 | 28,411 | 9,747 | 42.4% | 1.28 | -997 |
+| 30-min **v2.8** | 27,079 | **6,464** | **54.4%** | **1.42** | -918 |
+| 5-min v2.7 | 40,093 | 10,635 | 49.1% | 1.38 | -997 |
+| 5-min **v2.8** | 28,707 | **5,711** | **67.0%** | **1.45** | -966 |
+
+- **Histories.** Net per drawdown against v2.7: NQ futures 2015-2025 1.26x (30-minute) and 1.21x (5-minute); the index
+  2011-2026 0.98x and 0.88x. Net 0.53-0.61x on both: it makes less, with a smaller drawdown.
+- **The user's MNQ bars 8/24-10/16.** 5-minute +$2.7k against +$12.0k; 30-minute +$8.9k against +$10.6k.
+- **Fragile around the after-loss size.** The 30-minute stand-in made $14.6-22.1k with $800-950 after a loser
+  (drawdown $7.1-11.9k) and $27.1k with $1,000. The 5-minute stand-in and the histories barely moved.
+- **What else was tried.** Lock 0.2-0.4 were close (0.25 the best on the 30-minute stand-in). 3 MNQ / $600 and 5 MNQ /
+  $900 were worse. So were 4-8 MNQ with $600-900 and locks 0.22-1.0 (`v28_wide_*.csv`).
+- **After a full loser** (about -$760), $240 is left: the $1,000 after-loss trade doesn't fit, so entries wait for the
+  next day. A smaller after-loss max loss that leaves room for 1 more MNQ (the $800-950 rows above) did worse.
+
+**What the $1,000 limit costs** (v2.7's settings; `v28_cap_*.csv`):
+
+| Daily limit | 30-min net | 30-min drawdown | 5-min net | 5-min drawdown | Worst day (30-min) |
+|---|---:|---:|---:|---:|---:|
+| $1,000 | 28,411 | 9,747 | 40,093 | 10,635 | -997 |
+| $1,500 | 33,504 | 12,574 | 52,508 | 13,239 | -1,494 |
+| $2,000 | 38,948 | 16,347 | 53,120 | 14,108 | -2,029 |
+| $3,000 | 49,757 | 22,055 | 65,264 | 11,537 | -2,982 |
+| none | 96,497 | 16,359 | 90,325 | 11,603 | -4,413 |
+
+$100k over 1/2025-10/2026 needs days that can lose $4,000-7,000. None of the 200+ variants tried under the $1,000
+limit made more than about $41k on the 5-minute stand-in or $30k on the 30-minute. None reached 70% winners together
+with a profit factor of 2.
+
 ```
 python research/v24_proxy.py <data dir> MNQ_09-26.Last.txt MNQ_12-26.Last.txt          # the stand-in
 python research/v24_scan.py '[{"max_losers": 4}]' out.csv '{"max_loss_per_trade": 1500, "lock_at": 0.5, "max_losers": 3}' \
