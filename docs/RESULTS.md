@@ -3540,6 +3540,72 @@ share the locked stop at the entry + 2.5.
 - Most adds were stopped near the lock.
 - Their risk sits outside the daily budget, so worst days reached -$1,100 to -$4,000.
 
+## v3.0: a $2,000 end-of-day trailing drawdown (October 24, 2026)
+
+**The user's limit.** An end-of-day trailing drawdown of $2,000, as at a prop firm: the floor is the highest
+end-of-day balance minus $2,000. Two versions were checked (`trail_dd`, `trail_cap` in `mnqbot/noise.py`):
+- **Capped:** the floor stops rising at the starting balance, as at most firms.
+- **Strict:** it trails for ever.
+
+The scan (`research/v24_scan.py`) gives each set's largest end-of-day fall from a high ("eoddd"). It also counts the
+trades whose close left the closed equity under each floor ("tb" strict, "tb0" capped). The stand-in and the user's
+window start fresh at their first counted day.
+
+**v2.9 fails it.** At 4 MNQ from the start, the 2025-2026 stand-in went under the capped floor 29 times on 30-minute
+bars (26 on 5-minute) and under the strict one 125 times. Its end-of-day drawdown was $5.9k.
+
+**Sizing to the room above the floor is not enough on its own** (`v30_trail*_*.csv`).
+- Each trade may risk only the room left above the floor, besides the day's $1,000. A contract's risk is the max loss
+  (`trail_dd`) or the trade's own initial stop (`budget_actual`), plus fees and a tick each way. There were also
+  versions risking 25-50% of the room (`trail_frac`).
+- Every version got stuck. A losing stretch in early 2025 came before there was any cushion, the room fell under one
+  contract's risk, and trading stopped for good: 17-185 trades on the stand-in.
+- With the strict floor, the histories stopped too, after a few dozen trades.
+- At a fixed 1 MNQ, the stand-in's worst end-of-day drawdown was $1,841 on 30-minute bars ($1,692 on 5-minute), with
+  no breach. It made $9.2k and $8.9k.
+
+**What works: start at 1 MNQ and add a contract per step of profit** (`profit_step`, `size_up_to`), with the room rule
+as a safety net, under the capped floor.
+- With steps of $750-1,500, the stand-in grew to several contracts and a losing stretch gave the cushion back. It
+  ended stuck at the starting balance, about $0 up.
+- With steps of $2,500-5,000, nothing got stuck and no set ever touched the floor (`v30_trail4_*.csv`).
+
+| Stand-in 1/2025-10/2026 | Net | Profit factor | Winners | Worst day | End-of-day drawdown | Under the floor |
+|---|---:|---:|---:|---:|---:|---:|
+| 30-min v2.9 (4 MNQ) | 29,375 | 1.48 | 54.6% | -918 | 5,864 | 29 times |
+| 30-min, 1 MNQ | 9,178 | 1.50 | 53.8% | -441 | 1,841 | never |
+| 30-min **v3.0** (step $2,500, up to 8) | **24,568** | **1.87** | 53.9% | -929 | 2,698 | **never** |
+| 30-min, step $3,000 | 21,238 | 1.86 | 53.8% | -890 | 2,049 | never |
+| 5-min v2.9 | 26,628 | 1.46 | 67.2% | -966 | 5,036 | 26 times |
+| 5-min, 1 MNQ | 8,942 | 1.54 | 67.2% | -469 | 1,692 | never |
+| 5-min **v3.0** | **18,587** | **1.57** | 67.1% | -944 | 3,742 | **never** |
+
+**The end-of-day drawdown passes $2,000 under v3.0.** On 30-minute bars it reached $2,698, and $3,742 on 5-minute.
+That fall came only after the account was more than $2,000 up, so the capped floor was already at the starting
+balance. Under the strict floor, no size above 1 MNQ stays within $2,000 of the high over the 2025-2026 stand-in.
+
+**The histories.** v3.0 never went under the capped floor on either history.
+
+| History | v3.0 30-min | v2.9 30-min | v3.0 5-min | v2.9 5-min |
+|---|---:|---:|---:|---:|
+| NQ futures 2015-2025 | +$244k | +$196k | +$256k | +$197k |
+| Index 2011-2026 | +$318k | +$257k | +$349k | +$287k |
+
+Worst days with 8 contracts: -$1,031 to -$1,090, from stops filled past their price.
+
+**The user's MNQ window 8/24-10/16** at 1 MNQ: +$2.3k (30-minute), +$1.5k (5-minute).
+
+**In the Pine script:**
+- Settings "Trailing drawdown (end of day)" ($2,000), "Trailing drawdown stops at the starting balance" (on),
+  "Trailing drawdown and contract steps from date" (20250102 for the backtest; the account's start date for live
+  trading), "Add a contract per $ of profit" ($2,500), "Most contracts" (8) and "Size by the trade's own stop" (on).
+- It starts at 1 MNQ with a $187.50 max loss (93.75 points) and $250 after a loser.
+- Pine parity test: `test_pine_trailing_drawdown_sizing`, with the floor capped and not.
+
+**How the floor is checked.** The scan checks the floor against the closed equity after each trade. A position's open
+loss in the middle of a trade isn't checked. But no trade may risk more than the room above the floor, so only a stop
+filled past its price could reach it.
+
 ## What this does and doesn't say
 
 - **It says** that the original sweep/breakout rules have no edge after realistic costs on 2023–2026 Nasdaq-100 data, and would very likely not pass a $25K evaluation. Of three published strategies, only noise-area momentum held up over 16 years, and even it fails most $25K evaluations.

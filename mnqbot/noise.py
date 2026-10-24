@@ -505,7 +505,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
         q = max(1, round(cfg.qty / cfg.after_loss_qty_div)) if after else cfg.qty
         ml = cfg.max_loss_per_trade * (cfg.after_loss_ml_mult if after else 1.0)
         per_c = ml / q + 2 * cfg.commission_per_side + 2 * slip * cfg.point_value
-        return math.floor(money_room() / per_c + 1e-9) >= 1
+        room = money_room()
+        return not math.isfinite(room) or math.floor(room / per_c + 1e-9) >= 1
 
     def against_trend(d: int) -> bool:
         return bool(cfg.trend_n) and d == -trend and cfg.trend_side in (0, d)
@@ -832,7 +833,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                             ln_stop = upper * (1 - sb) if d > 0 else lower * (1 + sb)
                             pts = min(abs(c[i] + d * slip - ln_stop), ml_next / q_next / cfg.point_value)
                             per_c = pts * cfg.point_value + 2 * cfg.commission_per_side + 2 * slip * cfg.point_value
-                        fit = math.floor(money_room() / per_c + 1e-9)
+                        room = money_room()
+                        fit = math.floor(room / per_c + 1e-9) if math.isfinite(room) else q_next
                         if fit < 1:  # not one contract fits: no entry
                             pending = None
                             events.pop()
