@@ -3683,6 +3683,11 @@ buffer 0.15 and 0.35, the lock offset 5 points.
 - Take-profit 1.5 and a 5-point lock offset sent one history to the trailing floor, where it stopped trading.
 - Take-profit 3.0 and both stop buffers cut net on most sets.
 
+**The user's TradingView run of v3.2** (MNQ1!, 30 minutes, 1/2, 2025 to 10/23, 2026, $50K): +$13,815, max drawdown
+$4,176, 158 winners in 283 trades (55.8%), profit factor 1.61. v3.0 on the same chart had made -$62. The equity
+dipped about $500 in early 2025, then rose as the contracts grew; most of the gain came in 2026. The 30-minute
+stand-in had v3.2 at about +$16.8k, close to the chart.
+
 ## What this does and doesn't say
 
 - **It says** that the original sweep/breakout rules have no edge after realistic costs on 2023–2026 Nasdaq-100 data, and would very likely not pass a $25K evaluation. Of three published strategies, only noise-area momentum held up over 16 years, and even it fails most $25K evaluations.
