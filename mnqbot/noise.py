@@ -175,6 +175,9 @@ class NoiseConfig:
     budget_frac: float = 1.0
     # research (after v2.8): shorts take short_mult x the contracts (the same stop distance); 0 = no short entries
     short_mult: float = 1.0
+    # research (after v2.8): an entry needs the check's close in the top range_pos_min of the day's range so far (its
+    # bottom for a short): (close - low) / (high - low) from 09:30; 0 = off
+    range_pos_min: float = 0.0
     day_up_mult: float = 1.0
     day_up_from: float = 0.0
     # research (v2.8 study): besides the half-hour checks, a stop order rests at the current noise lines from 10:00 and
@@ -441,6 +444,10 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             return False
         if cfg.confirm and prev_side != d:
             return False
+        if cfg.range_pos_min > 0 and day_hi > day_lo:
+            rp = (c[i] - day_lo) / (day_hi - day_lo) if d > 0 else (day_hi - c[i]) / (day_hi - day_lo)
+            if rp < cfg.range_pos_min:
+                return False
         if cfg.confirm_map is not None and not cfg.confirm_div and not confirmed(d):
             return False
         if cfg.side_margin and side_lost[d] and not past_margin:
