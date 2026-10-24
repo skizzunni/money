@@ -3399,6 +3399,13 @@ keeps the 4 MNQ, with $1,000 (`v28_c_*.csv`, `v28_d_*.csv`, `v28_wide_*.csv`; al
 | $3,000 | 49,757 | 22,055 | 65,264 | 11,537 | -2,982 |
 | none | 96,497 | 16,359 | 90,325 | 11,603 | -4,413 |
 
+**Two sizing rules on top of v2.8, not adopted** (`v29_budget_*.csv`):
+- Each trade risks only part of what is left of the day (`budget_frac` 0.5-0.8), so a loser leaves room for more.
+  - Smaller worst days (-$581 at 0.5).
+  - Net 0.46-0.96x; profit factor no better; net per drawdown 0.71-0.94x on NQ.
+- More contracts once the day is green (`day_up_mult` 1.5-2.5): +2-17% net on the histories, but net per drawdown on
+  NQ 0.57-0.89x.
+
 $100k over 1/2025-10/2026 needs days that can lose $4,000-7,000. None of the 200+ variants tried under the $1,000
 limit made more than about $41k on the 5-minute stand-in or $30k on the 30-minute. None reached 70% winners together
 with a profit factor of 2.
