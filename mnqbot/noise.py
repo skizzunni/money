@@ -199,6 +199,10 @@ class NoiseConfig:
     # with the money budget: when not even 1 contract fits, still take 1 with its max loss cut to the room left (less
     # costs), if that leaves at least squeeze_min points of stop; 0 = off (no entry)
     squeeze_min: float = 0.0
+    # research (after v3.6): the turn of the month (a month's last trading day on the chart and the next month's first
+    # three): no new shorts (tom_no_shorts) and tom_mult x the contracts (the same stop distance)
+    tom_no_shorts: bool = False
+    tom_mult: float = 1.0
     day_up_mult: float = 1.0
     day_up_from: float = 0.0
     # research (v2.8 study): besides the half-hour checks, a stop order rests at the current noise lines from 10:00 and
@@ -349,6 +353,15 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
     target_today = False  # after_target_done: a take-profit filled today
     day_pnl = 0.0  # daily_loss_limit: today's realized P/L
     trail_base = trail_peak = math.nan  # trail_dd: the closed equity at its start, the highest end-of-day equity
+    tom_days: set = set()
+    if cfg.tom_no_shorts or cfg.tom_mult != 1.0:  # the turn of the month, from the chart's trading days
+        tdays = sorted(set(idx.strftime("%Y-%m-%d")))
+        for j, dd in enumerate(tdays):
+            if j + 1 < len(tdays) and tdays[j + 1][:7] != dd[:7]:
+                tom_days.add(dd)
+            if j == 0 or tdays[j - 1][:7] != dd[:7]:
+                tom_days.update(tdays[j:j + 3])
+    tom_today = False
     touched = {1: -1, -1: -1}  # touch_entry: the half hour (check count) of each side's last touch entry
     n_checks_seen = 0  # touch_entry: checks so far
     eq_curve: list[float] = [0.0]  # eq_n: the closed P&L after each position
@@ -739,6 +752,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             today = [math.nan] * N_CHECKS
             skip_today = t.strftime("%Y-%m-%d") in cfg.skip_dates  # substring test, like Pine's str.contains
             fed_today = cfg.fed_no_shorts and t.strftime("%Y-%m-%d") in cfg.fed_dates
+            tom_today = t.strftime("%Y-%m-%d") in tom_days
         if in_rth:
             last_rth_close = c[i]
             day_hi = h[i] if math.isnan(day_hi) else max(day_hi, h[i])
@@ -764,7 +778,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                 upper = max(day_open, prev_close) * (1 + sigma)
                 lower = min(day_open, prev_close) * (1 - sigma)
                 bands.append((i, upper, lower))
-                short_ok = not (fed_today and end < FED_CUTOFF) and cfg.short_mult > 0
+                short_ok = (not (fed_today and end < FED_CUTOFF) and cfg.short_mult > 0
+                            and not (tom_today and cfg.tom_no_shorts))
                 fresh_ok = cfg.max_losers <= 0 or losers_today < cfg.max_losers  # the daily limit: new entries
                 up_e, lo_e = upper, lower  # the entry lines (entry_k: a wider area for entries only)
                 if cfg.entry_k != 1.0:
@@ -802,6 +817,9 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                     ml_next = cfg.max_loss_per_trade * (mm if after_loss else 1.0)
                     if cfg.cap_sigma > 0:
                         ml_next = cfg.cap_sigma * sigma * c[i] * q_next * cfg.point_value * (mm if after_loss else 1.0)
+                    if tom_today and cfg.tom_mult != 1.0:
+                        q_t = max(1, round(q_next * cfg.tom_mult))
+                        ml_next, q_next = ml_next / q_next * q_t, q_t
                     if cfg.profit_step > 0 and not math.isnan(trail_base):  # a contract more per step of profit
                         q_up = q_next + int(max(0.0, eq_curve[-1] - trail_base) // cfg.profit_step)
                         if cfg.size_up_to > 0:
