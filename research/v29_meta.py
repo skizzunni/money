@@ -10,7 +10,8 @@ while flat); the cut-off for "low" is a quantile of the training rows' own score
 
     python research/v29_meta.py <out.csv> '<base: JSON overrides>' '<label base: JSON overrides>' <data dir> \
         <MNQ_09-26.Last.txt> <MNQ_12-26.Last.txt>
-SCAN_MINUTES=30 (environment): 30-minute bars.
+SCAN_MINUTES=30 (environment): 30-minute bars. META_KINDS (logit,gbc,gbr), META_Q (the skipped shares) and META_HP
+(the regressor's depth,iterations,leaf size) pick the runs.
 """
 from __future__ import annotations
 
@@ -114,8 +115,9 @@ def models(kind: str):
     if kind == "gbc":
         return HistGradientBoostingClassifier(max_depth=3, learning_rate=0.05, max_iter=150, min_samples_leaf=60,
                                               l2_regularization=1.0)
-    return HistGradientBoostingRegressor(max_depth=3, learning_rate=0.05, max_iter=150, min_samples_leaf=60,
-                                         l2_regularization=1.0, loss="absolute_error")
+    depth, iters, leaf = (int(x) for x in os.environ.get("META_HP", "3,150,60").split(","))
+    return HistGradientBoostingRegressor(max_depth=depth, learning_rate=0.05, max_iter=iters, min_samples_leaf=leaf,
+                                         l2_regularization=1.0, loss="absolute_error", random_state=0)
 
 
 def fit_score(train: pd.DataFrame, test: pd.DataFrame, kind: str) -> tuple[np.ndarray, np.ndarray]:
@@ -156,7 +158,7 @@ def main() -> None:
     results = [{"rule": "base", **{k: v for name, (bars, first, skip) in S.D.items()
                                    for k, v in metrics(name, run(bars, config(base, skip), minutes=m)
                                                        .trades_frame(), first).items()}}]
-    for kind in ("logit", "gbc", "gbr"):
+    for kind in os.environ.get("META_KINDS", "logit,gbc,gbr").split(","):
         scores = {}  # per set: (test score, cut-offs per quantile) for every row
         for name in ("nq", "index"):
             f = rows[name]
@@ -173,7 +175,7 @@ def main() -> None:
         for name in ("proxy", "win"):
             s_tr, s_te = fit_score(pool, rows[name], kind)
             scores[name] = (pd.Series(s_te, index=rows[name].index), {y: s_tr for y in rows[name].year.unique()})
-        for q in (0.2, 0.35, 0.5):
+        for q in (float(x) for x in os.environ.get("META_Q", "0.2,0.35,0.5").split(",")):
             r = {"rule": f"{kind} skip {int(q * 100)}%"}
             for name, (bars, first, skip) in S.D.items():
                 f = rows[name]
