@@ -114,3 +114,56 @@ separately, on both bar lengths. T1 is accepted only if all four pass.
 
 The criteria are pass/fail checks on the measured numbers. Nothing in the rules was set to meet them. If T1 fails
 any of them, the report says so and T1 is not adopted.
+
+## Results (measured, 2026-10-28, after the pre-registration above was committed)
+
+`research/t1_eval.py`, output in `verification/noise_v2/t1_eval_5.csv` and `t1_eval_30.csv`. Every trade is counted
+after commission and slippage.
+
+**The acceptance window: the Jan 2 2025 – Oct 2026 stand-in (461 sessions)**
+
+| | 5-min reference | 5-min T1 | 30-min reference | 30-min T1 |
+|---|---|---|---|---|
+| Sessions with an entry | 133 (28.9%) | 133 (28.9%) | 133 (28.9%) | 133 (28.9%) |
+| Trades / per active day | 274 / 2.06 | 404 / 3.04 | 241 / 1.81 | 287 / 2.16 |
+| Bars in a position | 12.6% | 10.8% | 14.6% | 14.3% |
+| Fills | 548 | 808 | 482 | 574 |
+| Commission / slippage paid | $1,029 / $810 | $2,166 / $1,730 | $1,043 / $809 | $960 / $749 |
+| **Net profit** | $23,909 | $27,713 | $35,255 | $24,926 |
+| **Net expectancy per trade** (per contract) | $87.26 ($28.81) | $68.60 ($15.86) | $146.29 ($41.92) | $86.85 ($32.20) |
+| **Net win rate** | 66.1% | 75.0% | 56.4% | 59.2% |
+| **Profit factor** | 1.877 | 1.745 | 2.100 | 1.898 |
+| Closed-trade drawdown | $1,859 | $5,212 | $4,936 | $3,889 |
+| **Marked-equity drawdown** | $4,686 | $6,957 | $6,110 | $4,101 |
+| End-of-day drawdown / floor touched | $1,835 / no | $5,061 / no | $4,296 / no | $3,889 / no |
+| Worst day | −$1,832 | −$1,572 | −$1,750 | −$1,040 |
+
+**Acceptance checks**
+
+| | Net ≥ $75,000 | Net win ≥ 80% | PF ≥ 2.0 | Marked DD < $4,000 | Accepted |
+|---|---|---|---|---|---|
+| 5-min reference | fail | fail | fail | fail | no |
+| 5-min T1 | fail | fail | fail | fail | no |
+| 30-min reference | fail | fail | pass | fail | no |
+| 30-min T1 | fail | fail | fail | fail | no |
+
+**The other data (not acceptance tests)**
+
+| Data, bars | Reference net / win / PF / marked DD | T1 net / win / PF / marked DD |
+|---|---|---|
+| User's MNQ from Aug 24 2026, 5-min | $1,288 / 61.9% / 2.390 / $423 | $1,242 / 68.0% / 2.505 / $396 |
+| User's MNQ from Aug 24 2026, 30-min | $1,528 / 61.1% / 4.189 / $361 | $1,585 / 68.2% / 3.603 / $361 |
+| NQ 2015-2025, 5-min | $536,754 / 64.7% / 1.569 / $29,986 | $495,230 / 68.4% / 1.563 / $29,996 |
+| NQ 2015-2025, 30-min | $472,591 / 51.4% / 1.504 / $30,741 | $499,069 / 53.3% / 1.522 / $37,543 |
+| Index 2011-2026, 5-min | $796,672 / 64.7% / 1.600 / $29,198 | $703,394 / 70.1% / 1.556 / $23,540 |
+| Index 2011-2026, 30-min | $653,848 / 51.3% / 1.475 / $49,036 | $682,244 / 53.2% / 1.508 / $51,838 |
+
+(The histories grow to 15 contracts over many years, so their dollar figures are not comparable with the 2025-2026
+window. The user's MNQ window has 40 sessions, too few to judge anything.)
+
+**Verdict: T1 is not accepted.** It fails all four criteria on both bar lengths. The earlier lock raises the win rate
+(+9 points on 5-minute bars) by turning would-be losers into small scratches and cutting winners short. Profit factor
+and expectancy per trade fall, and costs roughly double on 5-minute bars because it trades more often. The reference
+also fails the criteria; it passes only the profit factor on 30-minute bars, and the stand-in flatters it (the user's
+TradingView run of the same rules: +$26,106, PF 1.63, $8,444 drawdown). v3.6 stays the delivered script, and T1 is
+not put into Pine.

@@ -1,0 +1,9 @@
+bars,data,system,sessions,active days,active %,trades,trades/active day,in position %,fills,contracts traded,commission $,slippage $,net $,expectancy $/trade,expectancy $/contract,net win %,profit factor,closed dd $,marked dd $,eod dd $,floor touches,worst day $,pass net,pass win,pass pf,pass marked dd,accepted
+30-min,win,reference v3.6,40,9,22.5,18,2.0,10.8,36,19,24,17,1528,84.89,80.42,61.1,4.189,220,361,129,0,-100,,,,,
+30-min,win,candidate T1,40,9,22.5,22,2.44,11.0,44,23,29,21,1585,72.03,68.9,68.2,3.603,220,361,159,0,-159,,,,,
+30-min,proxy,reference v3.6,461,133,28.9,241,1.81,14.6,482,841,1043,809,35255,146.29,41.92,56.4,2.1,4936,6110,4296,0,-1750,False,False,True,False,False
+30-min,proxy,candidate T1,461,133,28.9,287,2.16,14.3,574,774,960,749,24926,86.85,32.2,59.2,1.898,3889,4101,3889,0,-1040,False,False,False,False,False
+30-min,nq,reference v3.6,2703,990,36.6,1905,1.92,16.7,3810,16758,20780,16192,472591,248.08,28.2,51.4,1.504,29791,30741,29791,0,-2087,,,,,
+30-min,nq,candidate T1,2703,990,36.6,2058,2.08,16.5,4116,19316,23952,18714,499069,242.5,25.84,53.3,1.522,35873,37543,35873,0,-2087,,,,,
+30-min,index,reference v3.6,4051,1422,35.1,2647,1.86,16.3,5294,26628,33019,25743,653848,247.01,24.55,51.3,1.475,47862,49036,41883,0,-2097,,,,,
+30-min,index,candidate T1,4051,1422,35.1,2920,2.05,16.1,5840,29197,36204,28348,682244,233.65,23.37,53.2,1.508,51286,51838,46985,0,-2067,,,,,
