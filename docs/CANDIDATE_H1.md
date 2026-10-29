@@ -141,3 +141,46 @@ All 72 settings are in `verification/noise_v2/h1_dev.csv`. Five settings met the
 - It is tested once on the holdout only because its win rate is near the 80% target. The result is reported whatever
   it shows.
 - Two settings now go to the holdout, not one. Any pass will be weighed with that in mind.
+
+## Holdout results (2026-10-29; one run each, frozen settings, 1 MNQ)
+
+`verification/noise_v2/h1_holdout.csv`, `h1b_holdout.csv`. Costs: about $3.1-3.5 a trade. "Sessions held" counts the
+closes a trade was held through: 0 for a trade that exited the day it entered.
+
+**H1** (L 30, 09:30, k 1.0, swing, no target)
+
+| Holdout set | Trades (per yr) | Gross / net $ per trade | t | Net win % | Breakeven win % | PF | Net $ | Marked DD |
+|---|---|---|---|---|---|---|---|---|
+| NQ 2020 – Jul 2025 | 151 (34.0) | $180.09 / $176.61 | 1.79 | 55.0 | 45.2 | 1.480 | $26,668 | $15,162 |
+| Index 2019 – Sep 2026 | 223 (34.2) | $164.16 / $160.68 | 2.29 | 55.2 | 45.9 | 1.450 | $35,832 | $6,831 |
+| **Stand-in Jan 2025 – Oct 2026** | 64 (39.5) | −$7.57 / **−$11.05** | −0.12 | 45.3 | 46.1 | **0.967** | **−$707** | $6,472 |
+
+Pooled t 2.75. There are no trades within ±$5 except 1.
+
+**H1b** (L 10, 09:30, k 2.0, swing, 0.5 ATR target)
+
+| Holdout set | Trades (per yr) | Net $ per trade | t | Net win % | Breakeven win % | PF | Net $ | Marked DD |
+|---|---|---|---|---|---|---|---|---|
+| NQ 2020 – Jul 2025 | 49 (11.0) | $73.97 | 0.66 | 77.6 | 72.9 | 1.282 | $3,624 | $5,048 |
+| Index 2019 – Sep 2026 | 73 (11.2) | $10.43 | 0.11 | 72.6 | 71.9 | 1.034 | $761 | $7,182 |
+| **Stand-in Jan 2025 – Oct 2026** | 24 (14.8) | **−$26.16** | −0.20 | 66.7 | 69.0 | **0.900** | **−$628** | $3,089 |
+
+Pooled t 0.40.
+
+### Gate: failed, for both
+
+The gate needs a positive mean net per trade on every holdout set and a pooled t of at least 2.0.
+- **H1:** the pooled t passes (2.75), but the stand-in, the window the user trades, loses money: −$11.05 a trade, PF
+  0.967. Gate failed.
+- **H1b:** the stand-in also loses (−$26.16 a trade, PF 0.900), and the pooled t is 0.40. Its high development win
+  rate fell to 66.7-77.6%, below its own breakeven on the stand-in. Gate failed.
+
+**Acceptance on the stand-in, as measured at 1 MNQ:** both fail all four targets:
+- net −$707 and −$628, against $75,000;
+- net win 45.3% and 66.7%, against 80%;
+- PF 0.967 and 0.900, against 2.0;
+- marked DD $6,472 and $3,089: H1b is under $4,000 only because it barely trades.
+
+**Decision:** H1 and H1b are rejected. As pre-registered, no frequency or size work is done on them. The histories
+show a pullback effect in 2019-2025, but not in the 2025-2026 window the targets are judged on. Testing variants until
+one fits that window would be tuning to it.
