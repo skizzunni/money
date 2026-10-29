@@ -116,3 +116,28 @@ Otherwise H1 is rejected, and no larger size or added frequency is tested on it.
 
 The four targets above, on the stand-in. At 1 MNQ they are reported as measured. They are not used to pick settings.
 Success is claimed only if all four pass.
+
+## Development results (2026-10-29, before any holdout run)
+
+All 72 settings are in `verification/noise_v2/h1_dev.csv`. Five settings met the frequency and positive-mean rule.
+
+**Frequency:** no setting reached many trades.
+- The most frequent made about 33 trades a year (L 30).
+- At L 10, settings made 10-17 a year.
+
+**Selected by the frozen rule: H1** = L 30, 09:30 entry, k 1.0, swing exit, no target. Pooled development t-statistic
+1.59.
+
+| Development set | Trades/yr | Net $/trade | t | Net win % | Breakeven win % | PF | Marked DD |
+|---|---|---|---|---|---|---|---|
+| NQ 2015-2019 | 33.3 | $41.68 | 0.62 | 50.8 | 47.6 | 1.133 | $12,617 |
+| Index 2011-2018 | 31.2 | $75.87 | 1.53 | 52.7 | 47.0 | 1.257 | $7,413 |
+
+**A second frozen setting, H1b, added now, before the holdout.**
+- H1b = L 10, 09:30 entry, k 2.0, swing exit, 0.5 ATR target.
+- It had the highest pooled development t (3.37) and the highest net win rate: 86.3% on NQ and 89.7% on the index.
+  Its breakeven win rates were 79.8% and 77.6%.
+- **It fails the pre-registered frequency rule:** 12.8-12.9 trades a year. So it is not the selected candidate.
+- It is tested once on the holdout only because its win rate is near the 80% target. The result is reported whatever
+  it shows.
+- Two settings now go to the holdout, not one. Any pass will be weighed with that in mind.
