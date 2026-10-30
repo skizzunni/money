@@ -33,3 +33,27 @@ edge would make a multi-account plan steadier.
 
 **One run. No settings are changed afterwards.** If a market qualifies, the next step is real 5-minute data for it
 (v3.6's own rules), not more tuning on these hourly bars.
+
+## Results (2026-10-30; one run; `verification/noise_v2/x1_markets.csv`)
+
+| Market | Trades | Net $ | Net $/trade | t | Win % | PF | Closed DD | Correlation with NQ |
+|---|---|---|---|---|---|---|---|---|
+| NQ (reference) | 309 | −$2,454 | −$7.94 | −0.51 | 42.1 | 0.920 | $6,212 | 1.00 |
+| ES | 322 | −$808 | −$2.51 | −0.36 | 40.7 | 0.944 | $2,063 | 0.76 |
+| YM | 334 | −$2,144 | −$6.42 | −1.53 | 35.0 | 0.794 | $2,553 | 0.45 |
+| RTY | 315 | −$878 | −$2.79 | −0.77 | 41.3 | 0.890 | $1,288 | 0.37 |
+
+**No market qualifies.**
+
+**The test is inconclusive for the Dow and the Russell.** The reference itself failed: the simplified hourly rules lose
+money on NQ over the same months in which v3.6 (half-hour checks from the 09:30 open, its stops and its filters) made
+money on NQ.
+- So the hourly simplification removed the edge.
+- It cannot say whether v3.6 itself works on MYM or M2K. That needs regular-hours 1- or 5-minute bars for those
+  markets.
+- Yahoo serves those for the last 60 days only.
+
+What it does show:
+- Daily P&L on the Dow and the Russell is much less tied to the Nasdaq (correlation 0.45 and 0.37) than the S&P's is
+  (0.76).
+- So if v3.6's edge held on them, they would be real diversifiers.
