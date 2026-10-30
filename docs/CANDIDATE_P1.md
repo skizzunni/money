@@ -90,3 +90,35 @@ That makes 18 settings, all reported.
 
 At the base size they are reported as measured. A larger size would be a separate, later step, taken only if the gate
 passes, and it would be reported with its drawdown.
+
+## Development results (2011-2018; `verification/noise_v2/p1_dev.csv`): P1 rejected
+
+- **All 18 settings lost money.**
+  - Net per trade was −$23.64 to −$62.21, with t from −4.2 to −6.7.
+  - Even gross, before costs, every setting lost (−$5.83 to −$44.41 a trade). Costs were about $17.80 a trade for 2
+    MNQ plus about 3.6 MES.
+- No setting qualifies, so P1 is rejected at the development stage, and its holdout is not run.
+- **What it shows:** inside a session, the hedged gap between the Nasdaq-100 and the S&P 500 tended to keep going,
+  not to come back. Fading it lost before costs.
+
+## Candidate P2 (registered 2026-10-30, after P1's development run and before any run of P2)
+
+**Disclosure:** P2 is the opposite of P1, and the idea comes from P1's development losses. So 2011-2018 is not an
+independent test for P2. P2's evidence is only its holdouts, 2019-2024 and the user's window, which no candidate has
+been run on.
+
+**Rules:** as P1, except:
+- **Entry:** follow the gap. At a bar close from 10:00 to 15:00 with |z| ≥ Z, z > 0: long MNQ / short MES; z < 0:
+  the reverse.
+- **Exit:** at the next bar's open after z falls back to Zback or nearer zero (|z| shrinking toward zero is the
+  stop); else at the 15:55 bar's close. There is no target.
+- At most 1 trade a day.
+- The development grid (2011-2018): Z in {1.5, 2.0, 2.5}; Zback in {0.0, 1.0, none}. That is 9 settings.
+- Selection, gate and acceptance are the same as P1:
+  - at least 25 trades a year and a positive mean on development, and the highest t;
+  - holdout 2019-2024: mean above $0 and t ≥ 2.0;
+  - then the user's targets on Jan 2025 – Sep 2026.
+
+**Note, stated before the run:** a follow-the-trend trade with no target usually wins less than half the time, so the
+80% net win target is unlikely by its structure. It is tested because it may have a real edge, and the results are
+reported whatever they show.
