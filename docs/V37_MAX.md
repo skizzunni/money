@@ -65,8 +65,8 @@ with no floor touches. Under the user's limits:
 | Drawdown under $4,000 | yes | $3,228 (yes) |
 
 **Settings for the user's limits:** set the v3.6 script's inputs to:
-- "Daily loss limit, $" 1000;
-- "End-of-day trailing drawdown, $" 2000.
+- "Max loss a day, $" 1000;
+- "Trailing drawdown (end of day), $" 2000.
 
 Leave everything else at its defaults. The stand-in flattered v3.6 before: on the user's chart the same rules made
 less than here. Expect the chart to show less too.
