@@ -57,3 +57,33 @@ The user's targets on the stand-in: net at least $75,000, net win at least 80%, 
 $4,000.
 - They are checked at 1 MNQ as measured.
 - Size is not raised unless the net expectancy is positive on every data set.
+
+## Results (2026-10-30; one run, 1 MNQ; `verification/noise_v2/w1_video.csv`)
+
+| | Stand-in Jan 2025 – Oct 2026 | NQ 2015 – Jul 2025 | Index 2011 – Sep 2026 |
+|---|---|---|---|
+| Trades (per yr) | 332 (205) | 1,740 (207) | 3,012 (213) |
+| Stopped out | 57.8% | 57.5% | 58.4% |
+| Net win % / breakeven win % | 28.3 / 33.2 | 30.1 / 28.5 | 30.4 / 29.7 |
+| Gross / net $ a trade (cost $2.24) | −$18.25 / **−$20.49** | $10.91 / $8.67 | $5.89 / $3.65 |
+| t | −1.42 | 0.97 | 0.58 |
+| Profit factor | **0.794** | 1.077 | 1.034 |
+| Net $ | **−$6,802** | +$15,081 | +$10,993 |
+| Closed / marked DD | $9,459 / **$9,523** | $8,686 / $9,397 | $11,511 / $12,243 |
+| Largest winner | $1,610 | $2,582 | $3,495 |
+| Longest losing run | 11 | 19 | 19 |
+
+**Acceptance on the stand-in: fails all four.**
+- Net −$6,802, against $75,000.
+- Net win 28.3%, against 80%.
+- PF 0.794, against 2.0.
+- Marked DD $9,523, against $4,000.
+
+**What the video shows, and what the rules show:**
+- The recording shows the rare day that pays. Hold-to-close winners do reach many times the risk.
+- But about 58% of the trades are stopped, and about 70% lose after costs.
+- Over 10-16 years the result is roughly zero after costs, and over the user's window it loses.
+- At the recording's size of 15 NQ (150 MNQ), the stand-in's −$6,802 would be about −$1.0 million. Its $9,523 marked
+  drawdown would be about $1.4 million.
+
+**Decision:** W1 is rejected. No size is added.

@@ -1,0 +1,4 @@
+set,from,to,sessions,trades,trades/yr,gross $/trade,cost $/trade,net $/trade,t,net win %,breakeven win %,within $5,pf,net $,closed dd $,marked dd $,worst trade $,avg sessions held,stopped %,largest winner $,longest losing run,shorts,longs,pass net,pass win,pass pf,pass marked dd
+proxy,2025-01-02,2026-10-16,408,332,205.1,-18.25,2.24,-20.49,-1.42,28.3,33.2,2,0.794,-6802,9459,9523,-558,0.0,57.8,1610,11,195,137,False,False,False,False
+nq,2015-01-01,2025-07-24,2118,1740,207.0,10.91,2.24,8.67,0.97,30.1,28.5,14,1.077,15081,8686,9397,-1355,0.0,57.5,2582,19,996,744,,,,
+index,2011-01-01,2026-09-30,3560,3012,213.2,5.89,2.24,3.65,0.58,30.4,29.7,31,1.034,10993,11511,12243,-1422,0.0,58.4,3495,19,1693,1319,,,,
