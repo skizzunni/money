@@ -304,6 +304,33 @@ def signals(day: Day, setup: str):
                 if pulled and d * (c[i] - (h[i - 1] if d > 0 else l[i - 1])) > 0:
                     lo = l[i - 6:i + 1].min() if d > 0 else h[i - 6:i + 1].max()
                     out.append((i, d, lo - d * TICK, None, "R"))
+    elif setup == "sweep3":  # ONYX Sweep Reversal v3 (docs/CANDIDATE_O3.md): structural levels in, round numbers out
+        used = set()
+        for i in range(1, n - 1):
+            for d in (1, -1):  # the trade's side: a long sweeps a low
+                ext = l if d > 0 else h
+                cands = []
+                pd_lvl = day.pdl if d > 0 else day.pdh
+                if not math.isnan(pd_lvl) and (i == 0 or d * (ext[:i] - pd_lvl).min() >= 0 if d > 0 else
+                                               (ext[:i] - pd_lvl).max() <= 0):
+                    cands.append(("pd", pd_lvl))
+                for p in (day.pl if d > 0 else day.ph):
+                    if i - 144 <= p <= i - k:
+                        seg = ext[p + 1:i]
+                        if (seg.min() >= ext[p]) if d > 0 else (seg.max() <= ext[p]):
+                            cands.append((p, ext[p]))
+                hit = [(key, lvl) for key, lvl in cands if key not in used
+                       and ((l[i] < lvl < c[i]) if d > 0 else (h[i] > lvl > c[i]))]
+                if not hit:
+                    continue
+                stop = (l[i] if d > 0 else h[i]) - d * TICK
+                r = d * (c[i] - stop)
+                tgt = (math.ceil((c[i] + r) / 100) if d > 0 else math.floor((c[i] - r) / 100)) * 100.0
+                for key, _ in hit:
+                    used.add(key)
+                if r > 0 and d * (tgt - c[i]) <= 5 * r:
+                    out.append((i, d, stop, tgt, "pattern"))
+                break
     elif setup.startswith("candle:"):
         _, name, conv, lvl = setup.split(":")
         d = (IMG_SIDE if conv == "img" else STD_SIDE)[name]
@@ -408,7 +435,7 @@ def stats(f: pd.DataFrame, first: str | None) -> dict:
 
 def job(setup: str) -> list[dict]:
     prepared = {name: (prepare(bars, setup), first) for name, (bars, first) in D.items()}
-    pat_opts = (True, False) if setup in ("triangle", "flag", "double") else (False,)
+    pat_opts = (True, False) if setup in ("triangle", "flag", "double", "sweep3") else (False,)
     rows = []
     for trend, be, morning, r, pat in itertools.product((False, True), (False, True), (False, True),
                                                         (1.0, 1.5, 2.0, 3.0), pat_opts):

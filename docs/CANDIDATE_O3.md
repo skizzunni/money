@@ -63,3 +63,31 @@ Written and committed on 2026-10-30, before `sweep3` was run.
 **The test (one run):** the as-taught variant, with no trend filter, no breakeven and all hours.
 - **It passes** if PF ≥ 1.2 and the net is positive on all three sets.
 - The other execution variants that `patterns.py` prints are descriptive only.
+
+## Results (2026-10-30; one run; `verification/noise_v2/o3_sweep3.csv`)
+
+**As taught** (no filters, round-number target; 1-10 MNQ at about $500 risk):
+
+| | NQ 2015-2019 (development) | NQ 2020-2025 | MNQ Jul-Oct 2026 |
+|---|---|---|---|
+| Trades a year | 463 | 1,277 | 1,922 |
+| Winners | 28.7% | 27.9% | 24.5% |
+| PF | **0.76** | **0.86** | **0.72** |
+| Average R | −0.31 | −0.16 | −0.24 |
+| Net a year | −$11,375 | −$37,605 | −$142,808 (annualized from about 3.5 months) |
+
+**Fails.** It lost on all three sets.
+
+**Every one of the 40 execution variants** (day's-direction filter, breakeven at 1R, mornings, 1-3R targets) also
+lost on development. The best development PF was 0.78. So no improvement can be chosen honestly on development, and
+none is adopted.
+
+**Why the screenshots look better than history:**
+- About two weeks of trades.
+- Points before costs, at model prices.
+- Versions changed in between: v2 then v3, with an optimizer and grades.
+- A run of 23 trades with 65% winners happens by chance about once in a few dozen tries, even for a breakeven rule.
+
+**The other two ONYX models were tested on Oct 23** (docs/RESULTS.md):
+- Displacement Fill: about breakeven.
+- Trend Follow: slightly positive only in regular-hours mornings with a 3R target, PF 1.11-1.22 on held-out data.
