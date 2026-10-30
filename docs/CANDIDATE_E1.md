@@ -61,3 +61,28 @@ The user's targets on the stand-in: net at least $75,000, net win at least 80%, 
 under $4,000. Also reported against the pasted claims: 75.3% wins, PF 2.78 and $187,240.
 
 One run. No settings are tuned afterwards.
+
+## Results (2026-10-30; one run; `verification/noise_v2/e1_ema_pullback.csv`)
+
+| | Stand-in Jan 2025 – Oct 2026 | NQ 2015 – Jul 2025 | Index 2011 – Sep 2026 |
+|---|---|---|---|
+| Trades (per yr); days with a trade | 251 (155); 60.8% | 1,119 (133); 51.9% | 1,955 (138); 53.8% |
+| Average contracts at $625 risk | 3.3 | 3.8 | 4.2 |
+| Exits: target / stop / breakeven / close | 5.2 / 30.7 / 9.2 / 55.0% | 5.9 / 34.1 / 12.5 / 47.5% | 6.2 / 33.0 / 11.9 / 49.0% |
+| Net win % / breakeven win % | **38.6** / 38.1 | 39.1 / 38.3 | 38.1 / 37.6 |
+| Gross / costs / net $ a trade | $12.06 / $7.21 / **$4.86** | $16.01 / $8.32 / $7.68 | $13.79 / $9.28 / $4.51 |
+| t | 0.14 | 0.47 | 0.36 |
+| Profit factor | **1.025** | 1.038 | 1.023 |
+| Net $ | **+$1,219** | +$8,596 | +$8,826 |
+| Closed / marked DD | $5,855 / **$6,048** | $12,564 / $12,928 | $13,962 / $15,144 |
+
+**Against the pasted claims:**
+- 75.3% wins: measured 38.6%.
+- PF 2.78: measured 1.025.
+- $187,240: measured +$1,219.
+- "Zero loss": 31% of trades were stopped for a full loss.
+- The 2.8R target was reached on only about 5-6% of trades. Most trades ran out of time at 15:55.
+
+**Acceptance on the stand-in: fails all four** (net, net win, PF, marked DD).
+
+**Decision:** E1 is rejected. It is about breakeven after costs on every data set.
