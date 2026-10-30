@@ -3840,6 +3840,25 @@ Raw prices: NQ futures 2015-2025 (roll weeks skipped), the Nasdaq-100 index 2011
   - 1.5-2x the contracts on those days: the stand-in less, and the NQ history went under the floor's room and stopped
     trading. Not adopted.
 
+## Pre-registered candidates after v3.6, all rejected (October 28-30, 2026)
+
+Each was written down and committed before its first run. Each counts every trade and cost, and measures
+marked-equity drawdown separately. The user's targets on the Jan 2025 – Oct 2026 window are net at least $75,000,
+net win at least 80%, PF at least 2.0 and marked DD under $4,000.
+
+| Candidate | Idea | User's window: net / net win / PF / marked DD | Why rejected | Doc |
+|---|---|---|---|---|
+| T1 | v3.6 with a broker-style early breakeven | $27,713 / 75.0% / 1.75 / $6,957 (5-min) | fails all four | `CANDIDATE_T1.md` |
+| H1 | buy a 2-day RSI pullback in a 200-day uptrend | −$707 / 45.3% / 0.97 / $6,472 | loses in the window | `CANDIDATE_H1.md` |
+| H1b | the same, deeper pullback, with a 0.5 ATR target | −$628 / 66.7% / 0.90 / $3,089 | loses; about 15 trades a year | `CANDIDATE_H1.md` |
+| W1 | the user's video: fade a spike past yesterday's high or low, hold to the close | −$6,802 / 28.3% / 0.79 / $9,523 | loses; about 0 over 10-16 years | `CANDIDATE_W1.md` |
+| E1 | the pasted "Perfect Strategy": 9 EMA pullback, 2.8R target | +$1,219 / 38.6% / 1.03 / $6,048 | breakeven after costs | `CANDIDATE_E1.md` |
+| P1 | hedged Nasdaq/S&P spread, fade the gap | not run (failed development, t −4 to −7) | the gap trends inside the day | `CANDIDATE_P1.md` |
+| P2 | hedged Nasdaq/S&P spread, follow the gap | −$2,865 / 46.2% / 0.87 / $4,910 | 2019-2024 holdout t 0.09 | `CANDIDATE_P1.md` |
+
+Ideas checked and found already tested before: VIX and fear regimes (rounds 18-19), news and release days (rounds 46,
+73, 74), previous-day sweeps (round one, the pattern study), overnight ranges (round 120 and v3.9).
+
 ## What this does and doesn't say
 
 - **It says** that the original sweep/breakout rules have no edge after realistic costs on 2023–2026 Nasdaq-100 data, and would very likely not pass a $25K evaluation. Of three published strategies, only noise-area momentum held up over 16 years, and even it fails most $25K evaluations.
