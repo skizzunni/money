@@ -6,6 +6,7 @@ close from 10:00 to 15:00 with |z| >= Z, the gap is faded at the next open. The 
 comes back to Zexit or reaches Z + Zstop, else at 15:55.
 
     python research/p1_spread.py <data dir> dev <out.csv>
+    python research/p1_spread.py <data dir> dev2 <out.csv>        # P2, following the gap
     python research/p1_spread.py <data dir> holdout <out.csv> '<frozen setting as JSON>'
 """
 from __future__ import annotations
@@ -26,6 +27,7 @@ FEE = 0.62
 PV_N, PV_S, TICK = 2.0, 5.0, 0.25
 QN = 2
 GRID = {"Z": (1.5, 2.0, 2.5), "Zstop": (1.0, 2.0, 99.0), "Zexit": (0.0, 0.5)}
+GRID_P2 = {"mode": ("follow",), "Z": (1.5, 2.0, 2.5), "Zback": (0.0, 1.0, -99.0)}  # P2: follow the gap; -99 = no exit
 WINDOWS = {"dev": [("2011-2018", "2011-01-01", "2018-12-31")],
            "holdout": [("2019-2024", "2019-01-01", "2024-12-31"), ("user window", "2025-01-02", "2026-09-30")]}
 
@@ -70,6 +72,8 @@ def simulate(sess: list[dict], start: str, end: str, p: dict) -> tuple[pd.DataFr
     first = int(np.searchsorted(days, start))
     last = int(np.searchsorted(days, end, side="right"))
     rows, marks = [], []
+    follow = p.get("mode") == "follow"
+    max_trades = 1 if follow else 2
     for i in range(first, last):
         s = sess[i]
         if not s["ok"]:
@@ -81,14 +85,17 @@ def simulate(sess: list[dict], start: str, end: str, p: dict) -> tuple[pd.DataFr
                 dn, ss, qs = pos["dn"], -pos["dn"], pos["qs"]
                 sign = pos["sign"]
                 last_bar = j == len(mi) - 1
-                trig = z[j] * sign <= p["Zexit"] or z[j] * sign >= p["Z"] + p["Zstop"]
+                if follow:
+                    trig = z[j] * sign <= p["Zback"]
+                else:
+                    trig = z[j] * sign <= p["Zexit"] or z[j] * sign >= p["Z"] + p["Zstop"]
                 if trig or last_bar:
                     if last_bar:
                         n_px, s_px, reason = s["nc"][j], s["sc"][j], "close"
                         jx = j
                     else:
                         n_px, s_px = s["no"][j + 1], s["so"][j + 1]
-                        reason = "mean" if z[j] * sign <= p["Zexit"] else "stop"
+                        reason = "stop" if follow else ("mean" if z[j] * sign <= p["Zexit"] else "stop")
                         jx = j + 1
                     n_exit, s_exit = n_px - dn * TICK, s_px - ss * TICK
                     gross_px = QN * PV_N * dn * (n_exit - pos["n_in"]) + qs * PV_S * ss * (s_exit - pos["s_in"])
@@ -108,9 +115,9 @@ def simulate(sess: list[dict], start: str, end: str, p: dict) -> tuple[pd.DataFr
                          - (QN + qs) * FEE)
                     marks.append((i, j, w, c))
                     continue
-            if pos is None and n_trades < 2 and 595 <= mi[j] <= 895 and j + 1 < len(mi) and abs(z[j]) >= p["Z"]:
+            if pos is None and n_trades < max_trades and 595 <= mi[j] <= 895 and j + 1 < len(mi) and abs(z[j]) >= p["Z"]:
                 sign = 1 if z[j] > 0 else -1
-                dn = -sign
+                dn = sign if follow else -sign
                 qs = max(1, int(round(QN * s["beta"] * PV_N * s["nc"][j] / (PV_S * s["sc"][j]))))
                 pos = {"dn": dn, "sign": sign, "qs": qs, "n_in": s["no"][j + 1] + dn * TICK,
                        "s_in": s["so"][j + 1] - dn * TICK}
@@ -142,10 +149,11 @@ def main() -> None:
     sess = load(data)
     print("sessions", len(sess), sess[0]["day"], sess[-1]["day"], flush=True)
     rows = []
-    if stage == "dev":
+    if stage in ("dev", "dev2"):
+        grid = GRID if stage == "dev" else GRID_P2
         best = None
-        for combo in itertools.product(*GRID.values()):
-            p = dict(zip(GRID, combo, strict=True))
+        for combo in itertools.product(*grid.values()):
+            p = dict(zip(grid, combo, strict=True))
             r = run(sess, "dev", p)[0]
             r["qualifies"] = r.get("trades/yr", 0) >= 25 and r.get("net $/trade", -1) > 0
             if r["qualifies"] and (best is None or r["t"] > best[0]):
