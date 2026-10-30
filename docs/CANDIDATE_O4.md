@@ -34,3 +34,24 @@ That makes 486 settings. Everything else is as in `patterns.py`:
 - a higher PF than the base on at least 2 of the 3.
 
 If it fails, the base stays as it is.
+
+## Results (2026-10-30; `verification/noise_v2/o4_dev.csv`, `o4_holdout.csv`)
+
+**Development:** 183 of 486 settings had at least 50 trades a year.
+- **Selected:** L 12, K 3, S 12, last entry 13:30, 3R, no direction filter.
+- On NQ 2015-2019 that is 67 trades a year, 54.6% winners and PF 1.38. The base had 41 a year and PF 1.42; it misses
+  the 50-a-year floor.
+
+**Holdout** (one run):
+
+| | Base PF / net a year / DD | Selected PF / net a year / DD |
+|---|---|---|
+| NQ 2020-2025 | 1.22 / $2,759 / $8,233 | **1.25** / $1,684 / $5,369 |
+| Index 2011-2026 | 1.17 / $1,946 / $12,938 | **1.27** / $2,352 / $5,552 |
+| Stand-in 2025-2026 | 1.11 / $1,514 / $6,804 | **0.97** / −$311 / $5,448 |
+
+**Fails.** The selected setting needed PF ≥ 1.2 on all three; it lost on the stand-in (PF 0.97).
+- It beat the base on 2 of 3 sets, with smaller drawdowns.
+- But in the 2025-2026 window it lost money.
+
+**The base stays.** Neither version comes near the user's targets: about $1.5-2.8k a year at about $500 risk a trade.
