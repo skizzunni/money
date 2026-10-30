@@ -95,3 +95,23 @@ Nothing was chosen from these runs.
 - **Several accounts:** copies of the same trades scale every number together, including the flat windows.
   - At the median, about 3-4 accounts make $75,000 over 21 months.
   - In a weak window, every account is weak at once.
+
+### How many accounts for $75,000 (`verification/noise_v2/v37_accounts.csv`)
+
+The accounts copy the same trades, so N accounts are N times one account in every respect. The chance of reaching
+$75,000 combined in 21 months, from the replays above, on 30-minute bars (5-minute in brackets):
+
+| Accounts | NQ: chance of $75k | Index: chance of $75k | Median combined drawdown (NQ / index) |
+|---|---|---|---|
+| 1 | 0% (0%) | 0% (0%) | $10,329 / $6,694 |
+| 2 | 38% (12%) | 30% (22%) | $20,658 / $13,388 |
+| 3 | 50% (35%) | 44% (52%) | $30,987 / $20,082 |
+| 4 | 56% (56%) | 52% (65%) | $41,316 / $26,776 |
+| 5 | 56% (71%) | 54% (67%) | $51,645 / $33,470 |
+| 8 | 59% (74%) | 65% (85%) | $82,632 / $53,552 |
+
+- **More accounts stop helping beyond about 4-5.** The windows that make nothing are the same for every copy:
+  - 21% of NQ windows and 6% of index windows end at or below $0 (30-minute bars);
+  - that is 12% and 7% on 5-minute bars.
+- Every account still has to stay inside its own $2,000 / $1,000 limits. In the replays they did.
+- Evaluation fees and payout rules are not included.
