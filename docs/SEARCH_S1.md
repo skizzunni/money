@@ -75,3 +75,38 @@ reported with that number of rules attached.
 - In the search, it is computed per trade: closed equity plus the trade's worst excursion before it closed, against
   the closed-equity peak. That understates it slightly, because it leaves out open-trade highs.
 - A finalist that passes is recomputed bar by bar before any claim.
+
+## Results (2026-10-30; one run; `verification/noise_v2/s1_dev.csv`, `s1_test.csv`)
+
+**Development** (index 2011-2022, NQ 2015-2022; all 1,260 rules had at least 20 trades a year on both sets)
+- **No rule passed.** None had net win ≥ 80% and PF ≥ 2.0 on both sets.
+- **The frontier**, taking each rule's worse development set:
+
+| Requirement | Rules meeting it | Best achieved alongside |
+|---|---|---|
+| Net win ≥ 60% / 70% / 80% / 90% | 443 / 313 / 208 / 53 | the best PF is 1.277 at every level |
+| PF ≥ 1.2 | 77 | the best net win is 93.1% |
+| PF ≥ 1.5 | **0** | — |
+| PF ≥ 2.0 | **0** | — |
+
+The highest PF of any rule was 1.487.
+- **High win rates are easy:** a target of 0.05 × the daily range wins 90%+ of trades.
+- But the few losers are large, so PF stays near 1.
+
+**The finalists' test** (one run). Net per trade at 1 MNQ:
+
+| Finalist (target 0.05 R for all) | 2023-24 index | 2023 – mid-2025 NQ | User's window | Net win, user's window |
+|---|---|---|---|---|
+| MOM 1.0, with-trend, no stop | −$4.73 | +$5.59 | **−$2.43** (PF 0.93) | 92.8% |
+| MOM 1.0, with-trend, stop 0.5 | −$0.26 | +$10.37 | **−$0.96** (PF 0.97) | 91.0% |
+| MOM 1.0, with-trend, stop 1.0 | −$3.12 | +$5.07 | **−$4.72** (PF 0.87) | 92.8% |
+| MOM 1.5, counter-trend, stop 0.5 | +$11.33 | +$0.64 | **−$0.56** (PF 0.98) | 90.6% |
+| PREV-R, counter-trend, stop 1.0 | −$2.28 | −$6.41 | +$4.95 (PF 1.19) | 91.0% |
+
+None is positive on every test set, so the size stage is not reached.
+- The user's window: −$783 to +$1,045 at 1 MNQ. PF 0.87-1.19. Marked DD $1,072-$3,200.
+- The 90%+ net win rates hold on new data, but the money does not: each is about breakeven after costs.
+
+**Decision:** S1 found no rule that meets the targets.
+- 80% net winners with PF ≥ 2.0 did not occur together anywhere in 1,260 rules, even on the data used to pick them.
+- Raising the size multiplies the drawdown as fast as the profit, so it cannot turn a breakeven rule into $75,000.
