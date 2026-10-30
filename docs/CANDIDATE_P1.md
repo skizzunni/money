@@ -122,3 +122,28 @@ been run on.
 **Note, stated before the run:** a follow-the-trend trade with no target usually wins less than half the time, so the
 80% net win target is unlikely by its structure. It is tested because it may have a real edge, and the results are
 reported whatever they show.
+
+## P2 results
+
+**Development** (2011-2018; `verification/noise_v2/p2_dev.csv`)
+- All 9 settings were positive after costs: $5.13 to $27.21 a trade, t 0.6-2.0, PF 1.06-1.23.
+- Selected by the frozen rule: Z 2.5, Zback 0. That is +$26.59 a trade, t 1.99, 50.9% net winners and PF 1.223.
+
+**Holdout** (one run; `verification/noise_v2/p2_holdout.csv`)
+
+| | 2019-2024 | User window Jan 2025 – Sep 2026 |
+|---|---|---|
+| Trades (per yr); days with a trade | 495 (96.7); 38.4% | 145 (91.8); 36.4% |
+| Gross / costs / net $ a trade | $20.65 / $19.03 / **$1.62** | $0.25 / $20.01 / **−$19.76** |
+| t | 0.09 | −0.68 |
+| Net win % / breakeven win % | 48.7 / 48.4 | 46.2 / 49.8 |
+| PF | 1.011 | **0.866** |
+| Net $ | +$800 | **−$2,865** |
+| Closed / marked DD | $6,429 / $7,505 | $4,569 / $4,910 |
+
+**Gate failed:** the 2019-2024 mean was +$1.62 a trade, with t 0.09, against the required t ≥ 2.0.
+- The development edge shrank by more than half gross and was eaten by costs. In the user's window it lost money.
+
+**Acceptance on the user's window:** fails all four targets.
+
+**Decision:** P2 is rejected. P1 and P2 are closed; no further variants of the spread are tried.

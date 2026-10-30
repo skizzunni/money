@@ -1,0 +1,3 @@
+mode,Z,Zback,window,sessions,trades,trades/yr,gross $/trade,cost $/trade,net $/trade,t,net win %,breakeven win %,within $5,pf,net $,closed dd $,marked dd $,worst trade $,avg sessions held,days with a trade %,avg MES,mean %,stop %,close %,pass net,pass win,pass pf,pass marked dd
+follow,2.5,0.0,2019-2024,1290,495,96.7,20.65,19.03,1.62,0.09,48.7,48.4,5,1.011,800,6429,7505,-1014,0.0,38.4,3.89,0.0,18.6,81.4,,,,
+follow,2.5,0.0,user window,398,145,91.8,0.25,20.01,-19.76,-0.68,46.2,49.8,2,0.866,-2865,4569,4910,-1063,0.0,36.4,4.15,0.0,15.2,84.8,False,False,False,False
