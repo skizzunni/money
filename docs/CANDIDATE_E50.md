@@ -82,3 +82,27 @@ The trades do not depend on the account, so one run per data set is sliced by st
   A stop set at about $260 keeps the realized loss under $300.
 - **$50,000 is not reachable under a $300 per-trade cap.** Profit scales with contracts, and 3 MNQ (the most that fits
   a $300 stop of reasonable width) made about $17k in the window, while failing nearly half the evaluations.
+
+## E50b: limiting losing streaks (registered 2026-10-31, before its run)
+
+**The user's request:** no consecutive losing trades.
+- No rule can guarantee that, since any trade can lose.
+- What a rule can do is stop trading for the day after a loss: `max_losers` 1. Then two losses never fall on the same
+  day.
+
+**Variants:**
+- 1 MNQ, a $260 cap for the whole position;
+- take-profit off or 2.0;
+- `max_losers` 0 (no limit) or 1 (stop for the day after a loss).
+
+That makes 4 variants. Everything else is as in E50.
+
+**Reported:**
+- the longest run of losing trades;
+- how often a loss is followed by another loss (as a share of losses);
+- the 50K evaluation pass and fail rates;
+- net, winners and PF.
+
+**Selection:** the highest average evaluation pass rate on NQ and the index, on 5-minute bars, as before.
+- The user's window is reported once, on 30-minute bars.
+- The selected variant becomes the Pine script's defaults (v3.8).
