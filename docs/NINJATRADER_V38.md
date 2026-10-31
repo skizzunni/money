@@ -424,3 +424,18 @@ Everything else is the baseline: growth mode with G6's time stop.
 
 On 30-minute bars it is mixed in the same way (`verification/noise_v2/g8_last_entry_growth.csv`). The floor was
 never touched in any run.
+
+## G9: a longer time stop (registered 2026-10-31, before its run)
+
+**The idea:** G6 tried only 30 and 60 minutes. A longer limit cuts fewer slow starters and still closes the losers
+that drift.
+
+**Variants:** time stop 90 and 120 minutes, against the baseline's 60. Everything else is the baseline.
+
+**Adopt only if all hold, in both the chart's and NinjaTrader's execution:**
+- on 5-minute bars it has a higher net than the 60-minute time stop on NQ, the index and the window;
+- it never touches the trailing floor;
+- no more days at −$1,000 or worse.
+
+This is a second look at a setting already chosen, so a variant must beat 60 on all six 5-minute runs. If both do,
+take the one with the higher NinjaTrader window net.
