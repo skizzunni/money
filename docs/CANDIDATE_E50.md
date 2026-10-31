@@ -48,3 +48,37 @@ The trades do not depend on the account, so one run per data set is sliced by st
   - the largest single loss (to check the $300 cap);
   - the closed and end-of-day drawdown;
   - the evaluation pass rate.
+
+## Results (2026-10-31; `verification/noise_v2/e50_5.csv`, `e50_30.csv`)
+
+**Evaluation pass rate on the histories** (5-minute bars; the selection data):
+
+| Contracts | Take-profit | NQ pass / fail | Index pass / fail | Average pass |
+|---|---|---|---|---|
+| 1 | 2.0 | 91.1% / 6.8% | 96.3% / 1.7% | **93.7% (selected)** |
+| 1 | none (uncapped) | 87.6% / 10.4% | 93.3% / 4.6% | 90.5% |
+| 2 | 2.0 | 69.3% / 28.7% | 70.2% / 28.5% | 69.8% |
+| 2 | none | 56.9% / 41.0% | 68.6% / 30.0% | 62.8% |
+| 3 | 2.0 | 58.0% / 39.7% | 61.7% / 37.4% | 59.9% |
+| 3 | none | 47.9% / 49.9% | 56.6% / 42.4% | 52.3% |
+
+**The user's window, Jan 2025 – Oct 2026 stand-in, 30-minute bars** (reported once):
+
+| Contracts, take-profit | Net | Winners | PF | Largest loss | Largest win | EOD DD | Pass / fail | Median days to pass |
+|---|---|---|---|---|---|---|---|---|
+| 1, 2.0 (selected) | $8,357 | 55.4% | 1.79 | −$310 | $1,123 | $1,513 | 81.7% / 0% | 180 |
+| 1, none | $8,852 | 55.6% | 1.87 | −$302 | $3,493 | $1,597 | 77.4% / 0% | 159 |
+| 2, 2.0 | $13,451 | 57.3% | 1.61 | −$320 | $2,246 | $3,242 | 61.3% / 34.4% | 85 |
+| 3, 2.0 | $17,397 | 53.7% | 1.54 | −$331 | $2,943 | $4,162 | 51.6% / 44.1% | 45 |
+
+**Findings**
+- **One contract never failed an evaluation** in the user's window, and it failed in 2-10% of starts in the histories.
+  But it is slow: a median of 6-8 months to make the $3,000.
+- **More contracts pass sooner but fail far more often**: about 1 start in 3 with 2 MNQ, and in 2-3 with 3 MNQ.
+- **Uncapped profit vs the 2-unit take-profit:** about the same.
+  - Uncapped keeps the big days (the largest win is $3,493 against $1,123), but passes slightly fewer evaluations
+    on the histories.
+- **The $300 cap is the stop, not a guarantee.** Slippage and gaps through the stop made the largest losses $302-439.
+  A stop set at about $260 keeps the realized loss under $300.
+- **$50,000 is not reachable under a $300 per-trade cap.** Profit scales with contracts, and 3 MNQ (the most that fits
+  a $300 stop of reasonable width) made about $17k in the window, while failing nearly half the evaluations.
