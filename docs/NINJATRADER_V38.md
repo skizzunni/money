@@ -157,3 +157,19 @@ stop, the lock or 16:00.
 It lost on all three. On 30-minute bars it was higher only on NQ ($238,996 against $207,740) and lower on the index
 and in the window. The floor was never touched either way. The take-profit lets a trade's full size be re-used the same
 day, which is worth more than the occasional bigger winner.
+
+## G3: a per-trade risk cap in growth mode (registered 2026-10-31, before its run)
+
+**The user wants the big wins without the big losses** (from v3.6's TradingView log at 15 MNQ: wins of
+$2,296-3,116, losses of $1,117-1,818).
+
+**The variant:** growth mode with a new research option, `trade_risk_cap`: no trade may risk more than this many
+dollars. It is a third limit on the money budget, beside today's room and the trailing floor's, so it means fewer
+contracts at the same stop distance.
+- Caps tested: $400 and $600, against none (today's $900 at most).
+- Reported on 5- and 30-minute bars, for NQ, the index and the window: net, PF, largest win, largest loss, worst day,
+  closed drawdown and floor touches.
+
+**Adopt a cap only if**, on 5-minute bars:
+- its net is at least 90% of no cap's on all three sets; and
+- its largest loss and closed drawdown are lower on all three.

@@ -204,6 +204,9 @@ class NoiseConfig:
     # risk_per_trade (so the cap per contract is risk_per_trade / contracts). 0 = off
     risk_per_trade: float = 0.0
     risk_max_qty: int = 1
+    # research (G3, docs/NINJATRADER_V38.md): with the money budget, no trade may risk more than this many dollars
+    # (fewer contracts, the same stop distance); 0 = off
+    trade_risk_cap: float = 0.0
     # research (after v3.6): the turn of the month (a month's last trading day on the chart and the next month's first
     # three): no new shorts (tom_no_shorts) and tom_mult x the contracts (the same stop distance)
     tom_no_shorts: bool = False
@@ -516,6 +519,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             if cfg.trail_cap >= 0:
                 floor = min(floor, trail_base + cfg.trail_cap)
             room = min(room, cfg.trail_frac * (eq_curve[-1] - floor - cfg.trail_buffer))
+        if cfg.trade_risk_cap > 0:
+            room = min(room, cfg.trade_risk_cap)
         return room
 
     def budget_fits() -> bool:
