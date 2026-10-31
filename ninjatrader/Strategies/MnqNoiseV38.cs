@@ -497,6 +497,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         int minutes;
         bool badChart;
         int nTrades;
+        string firstBar = "";
         double net, peak, maxDd, worstDay, dayNet;
         DateTime lastDay = DateTime.MinValue;
 
@@ -531,6 +532,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 SkipDates = SkipDefault;
                 FedDates = FedDefault;
                 PlaceOrders = true;
+                Mode = "Funded growth";
                 AfterLossMaxLoss = 0;
                 TrailDD = 0;
                 TrailFrom = "";
@@ -543,6 +545,16 @@ namespace NinjaTrader.NinjaScript.Strategies
                 newYork = NewYork();
                 minutes = BarsPeriod.Value;
                 badChart = BarsPeriod.BarsPeriodType != BarsPeriodType.Minute || minutes <= 0 || 30 % minutes != 0;
+                if (Mode == "Funded growth")  // the tested growth settings (docs/NINJATRADER_V38.md), whatever is set below
+                {
+                    Contracts = 1; MaxLoss = 187.5; AfterLossMaxLoss = 250; DailyLoss = 900; TrailDD = 2000;
+                    ProfitStep = 1500; MaxContracts = 15; SizeByOwnStop = true;
+                }
+                else if (Mode == "Evaluation")  // v3.8: 1 MNQ, $260 a trade, $900 a day
+                {
+                    Contracts = 1; MaxLoss = 260; AfterLossMaxLoss = 0; DailyLoss = 900; TrailDD = 0;
+                    ProfitStep = 0; SizeByOwnStop = false;
+                }
                 V38Settings st = new V38Settings();
                 st.Qty = Contracts; st.MaxLoss = MaxLoss; st.DailyLoss = DailyLoss; st.TakeProfit = TakeProfit;
                 st.LockAt = LockAt; st.LockPlus = LockPlus; st.StopBuffer = StopBuffer; st.SqueezeMin = SqueezeMin;
@@ -555,12 +567,12 @@ namespace NinjaTrader.NinjaScript.Strategies
                 st.PointValue = Instrument.MasterInstrument.PointValue;
                 if (!badChart)
                     engine = new V38Engine(st, minutes);
-                Print("MnqNoiseV38: " + Instrument.FullName + ", " + minutes + " " + BarsPeriod.BarsPeriodType + ", " + Contracts +
+                Print("MnqNoiseV38 (" + Mode + "): " + Instrument.FullName + ", " + minutes + " " + BarsPeriod.BarsPeriodType + ", " + Contracts +
                       " MNQ, max loss $" + MaxLoss + " a trade, $" + DailyLoss + " a day, take-profit " + TakeProfit +
                       (badChart ? "  -- use a minute chart whose length divides 30 (5 or 30)" : ""));
             }
             else if (State == State.Terminated && engine != null)
-                Print("MnqNoiseV38 done: " + nTrades + " trades, net $" + net.ToString("0.00", CultureInfo.InvariantCulture) +
+                Print("MnqNoiseV38 done: data from " + firstBar + ", " + nTrades + " trades, net $" + net.ToString("0.00", CultureInfo.InvariantCulture) +
                       ", closed drawdown $" + maxDd.ToString("0.00", CultureInfo.InvariantCulture) +
                       ", worst day $" + worstDay.ToString("0.00", CultureInfo.InvariantCulture));
         }
@@ -578,6 +590,8 @@ namespace NinjaTrader.NinjaScript.Strategies
             TimeZoneInfo platform = NinjaTrader.Core.Globals.GeneralOptions.TimeZoneInfo ?? TimeZoneInfo.Local;
             DateTime endNy = TimeZoneInfo.ConvertTime(DateTime.SpecifyKind(Time[0], DateTimeKind.Unspecified), platform, newYork);
             DateTime start = endNy.AddMinutes(-minutes);
+            if (firstBar.Length == 0)
+                firstBar = start.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
             int before = engine.Trades.Count;
             engine.OnBar(start, Open[0], High[0], Low[0], Close[0]);
             for (int k = before; k < engine.Trades.Count; k++)
@@ -645,8 +659,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         void Dashboard(DateTime endNy)
         {
-            string txt = "MNQ Noise Momentum v3.8, " + Contracts + " MNQ\n" +
+            string txt = "MNQ Noise Momentum v3.8, " + Mode + (engine.TradeQty > 0 && engine.Position != 0 ? ", " + engine.TradeQty + " MNQ" : "") + "\n" +
+                         "Data from " + firstBar + " (results need data from 50 sessions before)\n" +
                          "Sessions of history: " + engine.SessionsLoaded + " / 14\n" +
+                         (double.IsNaN(engine.TrailFloorRoom) ? "" : "Room above the trailing floor: $" + engine.TrailFloorRoom.ToString("0", CultureInfo.InvariantCulture) + "\n") +
                          (double.IsNaN(engine.Upper) ? "Lines: after the 10:00 check\n" :
                           "Upper / lower: " + engine.Upper.ToString("0.00", CultureInfo.InvariantCulture) + " / " +
                           engine.Lower.ToString("0.00", CultureInfo.InvariantCulture) + "\n") +
@@ -659,6 +675,10 @@ namespace NinjaTrader.NinjaScript.Strategies
         }
 
         #region Properties
+        [NinjaScriptProperty]
+        [Display(Name = "Mode: Funded growth, Evaluation, or Custom (the settings below)", Order = 0, GroupName = "1. Size and risk")]
+        public string Mode { get; set; }
+
         [NinjaScriptProperty]
         [Range(1, 20)]
         [Display(Name = "Contracts", Order = 1, GroupName = "1. Size and risk")]

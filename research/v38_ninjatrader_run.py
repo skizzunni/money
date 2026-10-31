@@ -4,7 +4,7 @@ import numpy as np, pandas as pd
 import e50_eval as E
 import t1_eval as T, v24_scan as VS
 GROW = len(sys.argv) > 1 and sys.argv[1] == "grow"
-NTARGS = ["MaxLoss=187.5", "AfterLossMaxLoss=250", "DailyLoss=900", "TrailDD=2000", "TrailFrom=2025-01-02", "ProfitStep=1500", "MaxContracts=15", "SizeByOwnStop=true"] if GROW else []
+NTARGS = ["Mode=Funded growth", "TrailFrom=2025-01-02"] if GROW else ["Mode=Evaluation"]
 from mnqbot.noise import NoiseConfig, run
 S = "/tmp/claude-0/-home-user-money/b0ea31b5-d9fc-525a-a114-db6430eff3ed/scratchpad"
 SIM = "ninjatrader/tests/Sim/bin/Release/net8.0/Sim"

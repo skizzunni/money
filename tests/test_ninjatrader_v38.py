@@ -28,8 +28,7 @@ GROW = NoiseConfig(**{**V21, "qty": 1, "lookback": 14, "max_loss_per_trade": 187
                       "trail_dd": 2000.0, "trail_from": "", "profit_step": 1500.0, "size_up_to": 15,
                       "budget_actual": True, "tv_path": False}, nt_execution=True, round_prices=True,
                    target_on_fill_bar=True)
-GROW_ARGS = ["MaxLoss=187.5", "AfterLossMaxLoss=250", "TrailDD=2000", "ProfitStep=1500", "MaxContracts=15",
-             "SizeByOwnStop=true"]
+GROW_ARGS = ["Mode=Funded growth"]  # the default; its settings are the tested ones above
 
 
 @pytest.fixture(scope="module")
@@ -50,7 +49,7 @@ def test_v38_ninjatrader_code_and_python_agree(sim, sample_1m, minutes, grow, tm
     with path.open("w") as f:
         for t, r in zip(bars.index, bars.itertuples(), strict=True):
             f.write(f"{t:%Y-%m-%d %H:%M},{r.open!r},{r.high!r},{r.low!r},{r.close!r}\n")
-    args = [DOTNET, str(sim), str(path), str(minutes), "Strategy=V38", *(GROW_ARGS if grow else [])]
+    args = [DOTNET, str(sim), str(path), str(minutes), "Strategy=V38", *(GROW_ARGS if grow else ["Mode=Evaluation"])]
     r = subprocess.run(args, capture_output=True, text=True, env=ENV)
     assert r.returncode == 0, r.stderr[-2000:]
     nt = [x.split(",")[1:] for x in r.stdout.splitlines() if x.startswith("T,")]

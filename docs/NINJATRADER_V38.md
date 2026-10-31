@@ -73,7 +73,11 @@ real MNQ data will differ somewhat. The stand-in has flattered this strategy bef
 **The user's rule, clarified:** a trade may risk more than $300, as long as the day never reaches the $1,000 loss
 limit and the account is never lost.
 
-**For a funded account**, switch on v3.6's growth sizing, in the strategy's properties:
+**Mode** (the first property): "Funded growth" (the default since 2026-10-31) applies the column below, "Evaluation" the
+other; "Custom" uses the properties as set. The dashboard and the Output window show the first date of the data loaded:
+results need about 50 sessions before the period judged.
+
+The growth settings, as "Funded growth" sets them:
 
 | Property | Evaluation (default) | Funded growth |
 |---|---|---|
