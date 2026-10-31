@@ -23,6 +23,13 @@ from mnqbot.noise import NoiseConfig, run
 
 CFG = NoiseConfig(**{**V21, "qty": 1, "lookback": 14, "trail_from": "", "tv_path": False}, nt_execution=True,
                   round_prices=True, target_on_fill_bar=True)
+# funded growth (docs/NINJATRADER_V38.md): v3.6's sizing at $900 a day and a $2,000 end-of-day trailing drawdown
+GROW = NoiseConfig(**{**V21, "qty": 1, "lookback": 14, "max_loss_per_trade": 187.5, "after_loss_ml_mult": 250 / 187.5,
+                      "trail_dd": 2000.0, "trail_from": "", "profit_step": 1500.0, "size_up_to": 15,
+                      "budget_actual": True, "tv_path": False}, nt_execution=True, round_prices=True,
+                   target_on_fill_bar=True)
+GROW_ARGS = ["MaxLoss=187.5", "AfterLossMaxLoss=250", "TrailDD=2000", "ProfitStep=1500", "MaxContracts=15",
+             "SizeByOwnStop=true"]
 
 
 @pytest.fixture(scope="module")
@@ -33,22 +40,26 @@ def sample_1m():
 
 
 @pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+@pytest.mark.parametrize("grow", [False, True])
 @pytest.mark.parametrize("minutes", [5, 30])
-def test_v38_ninjatrader_code_and_python_agree(sim, sample_1m, minutes, tmp_path):  # noqa: F811
+def test_v38_ninjatrader_code_and_python_agree(sim, sample_1m, minutes, grow, tmp_path):  # noqa: F811
     assert CFG.max_loss_per_trade == 260.0 and CFG.daily_loss_limit == 900.0 and CFG.take_profit == 2.0
+    cfg = GROW if grow else CFG
     bars = resample(sample_1m, f"{minutes}min")
     path = tmp_path / "bars.csv"
     with path.open("w") as f:
         for t, r in zip(bars.index, bars.itertuples(), strict=True):
             f.write(f"{t:%Y-%m-%d %H:%M},{r.open!r},{r.high!r},{r.low!r},{r.close!r}\n")
-    r = subprocess.run([DOTNET, str(sim), str(path), str(minutes), "Strategy=V38"], capture_output=True, text=True,
-                       env=ENV)
+    args = [DOTNET, str(sim), str(path), str(minutes), "Strategy=V38", *(GROW_ARGS if grow else [])]
+    r = subprocess.run(args, capture_output=True, text=True, env=ENV)
     assert r.returncode == 0, r.stderr[-2000:]
     nt = [x.split(",")[1:] for x in r.stdout.splitlines() if x.startswith("T,")]
-    py = run(bars, CFG, minutes=minutes).trades
+    py = run(bars, cfg, minutes=minutes).trades
     assert len(nt) == len(py) and len(py) >= 20
     for a, t in zip(nt, py, strict=True):
         assert (int(a[0]), int(a[1]), int(a[3])) == (t.direction, t.entry_bar, t.exit_bar), (a, t)
         assert float(a[2]) == t.entry and float(a[4]) == t.exit, (a, t)
         assert math.isclose(float(a[6]), t.pnl, abs_tol=1e-6), (a, t)
-        assert t.pnl > -300.0  # the $260 cap holds, with fees and a tick of slippage
+        assert grow or t.pnl > -300.0  # the $260 cap holds, with fees and a tick of slippage
+    if grow:
+        assert max(t.qty for t in py) >= 2  # the contract steps were reached

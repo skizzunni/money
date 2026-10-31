@@ -49,6 +49,13 @@ namespace NinjaTrader.NinjaScript.Strategies
         public double BigDayK = 1.5, CalmK = 0.7;
         public bool FedNoShorts = true, TightenOnly = true, RoundPrices = true;
         public string SkipDates = "", FedDates = "";
+        // funded growth (pine v3.6's sizing; off in the evaluation): the trade after a loser risks AfterLossMaxLoss;
+        // an end-of-day trailing drawdown from TrailFrom that stops at the starting balance; one more contract per
+        // ProfitStep of closed profit since then, up to MaxContracts; each trade sized by its own stop
+        public double AfterLossMaxLoss = 0.0, TrailDD = 0.0, ProfitStep = 0.0;
+        public int MaxContracts = 0;
+        public bool SizeByOwnStop = false;
+        public string TrailFrom = "";
     }
 
     public sealed class V38Trade
@@ -84,6 +91,9 @@ namespace NinjaTrader.NinjaScript.Strategies
         string brWhyNext = "", brWhyTrade = "";
         double held = double.NaN, fav = double.NaN;
         string heldWhy = "";
+        int consec;                       // losing trades in a row, across days
+        double equity;                    // the closed P/L so far
+        double trailBase = double.NaN, trailPeak = double.NaN;
 
         public readonly List<V38Trade> Trades = new List<V38Trade>();
         public int Bar = -1;
@@ -201,6 +211,9 @@ namespace NinjaTrader.NinjaScript.Strategies
             t.ExitBar = i; t.Exit = price; t.Reason = reason; t.Pnl = pnl;
             Trades.Add(t);
             DayPnl += pnl;
+            equity += pnl;
+            if (pnl < 0 && reason != "Session ended") consec++;
+            else if (pnl >= 0) consec = 0;
             Position = 0;
             Locked = false;
             held = double.NaN;
@@ -309,6 +322,11 @@ namespace NinjaTrader.NinjaScript.Strategies
             {
                 blockDir = 0;
                 DayPnl = 0;
+                if (s.TrailDD > 0 && string.CompareOrdinal(nyStart.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture), s.TrailFrom ?? "") >= 0)
+                {
+                    if (double.IsNaN(trailBase)) trailBase = trailPeak = equity;  // yesterday's end-of-day equity
+                    trailPeak = Math.Max(trailPeak, equity);
+                }
                 if (s.CalmK > 0 && dayRanges.Count >= s.CalmLong)
                     calm = Avg(dayRanges, s.CalmShort) < s.CalmK * Avg(dayRanges, s.CalmLong);
                 if (s.TrendN > 0 && dayCloses.Count >= s.TrendN)
@@ -387,17 +405,46 @@ namespace NinjaTrader.NinjaScript.Strategies
             lastBarClose = c;
         }
 
+        // What a new trade may risk: the rest of today's loss limit and the room above the trailing floor
+        double MoneyRoom()
+        {
+            double room = double.PositiveInfinity;
+            if (s.DailyLoss > 0)
+                room = s.DailyLoss + DayPnl;
+            if (s.TrailDD > 0 && !double.IsNaN(trailPeak))
+            {
+                double floor = Math.Min(trailPeak - s.TrailDD, trailBase);  // it stops at the starting balance
+                room = Math.Min(room, equity - floor);
+            }
+            return room;
+        }
+
+        public double TrailFloorRoom { get { return s.TrailDD > 0 && !double.IsNaN(trailPeak) ? equity - Math.Min(trailPeak - s.TrailDD, trailBase) : double.NaN; } }
+
         void Entry(int d, double c)
         {
             int q = s.Qty;
-            double ml = s.MaxLoss;
-            if (s.DailyLoss > 0 && ml > 0)  // the day's loss budget
+            bool afterLoss = consec > 0;
+            double ml = afterLoss && s.AfterLossMaxLoss > 0 ? s.AfterLossMaxLoss : s.MaxLoss;
+            if (s.ProfitStep > 0 && !double.IsNaN(trailBase))  // a contract more per step of profit
+            {
+                int qUp = q + (int)Math.Floor(Math.Max(0.0, equity - trailBase) / s.ProfitStep);
+                if (s.MaxContracts > 0) qUp = Math.Min(qUp, s.MaxContracts);
+                ml = ml / q * qUp;
+                q = qUp;
+            }
+            if ((s.DailyLoss > 0 || s.TrailDD > 0) && ml > 0)  // the loss budget
             {
                 double costs = 2 * s.CommissionPerSide + 2 * slip * s.PointValue;
                 double perC = ml / q + costs;
-                double room = s.DailyLoss + DayPnl;
-                int fit = (int)Math.Floor(room / perC + 1e-9);
-                if (fit < 1 && s.SqueezeMin > 0 && room - costs >= s.SqueezeMin * s.PointValue)
+                if (s.SizeByOwnStop)  // a contract's risk is its initial stop: the line's or the max loss
+                {
+                    double pts = Math.Min(Math.Abs(c + d * slip - LineStop(d)), ml / q / s.PointValue);
+                    perC = pts * s.PointValue + costs;
+                }
+                double room = MoneyRoom();
+                int fit = double.IsInfinity(room) ? q : (int)Math.Floor(room / perC + 1e-9);
+                if (fit < 1 && s.SqueezeMin > 0 && !double.IsInfinity(room) && room - costs >= s.SqueezeMin * s.PointValue)
                 {
                     fit = 1; q = 1; ml = room - costs;  // 1 contract, the stop cut to the room left
                 }
@@ -484,6 +531,12 @@ namespace NinjaTrader.NinjaScript.Strategies
                 SkipDates = SkipDefault;
                 FedDates = FedDefault;
                 PlaceOrders = true;
+                AfterLossMaxLoss = 0;
+                TrailDD = 0;
+                TrailFrom = "";
+                ProfitStep = 0;
+                MaxContracts = 15;
+                SizeByOwnStop = false;
             }
             else if (State == State.DataLoaded)
             {
@@ -496,6 +549,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 st.LastEntryEnd = LastEntry == "15:30" ? 930 : 900;
                 st.BigDayK = BigDayK; st.CalmK = CalmK; st.RangePosMin = RangePos; st.TrendN = TrendSessions;
                 st.FedNoShorts = FedNoShorts; st.SkipDates = SkipDates; st.FedDates = FedDates;
+                st.AfterLossMaxLoss = AfterLossMaxLoss; st.TrailDD = TrailDD; st.TrailFrom = TrailFrom ?? "";
+                st.ProfitStep = ProfitStep; st.MaxContracts = MaxContracts; st.SizeByOwnStop = SizeByOwnStop;
                 st.Tick = TickSize;
                 st.PointValue = Instrument.MasterInstrument.PointValue;
                 if (!badChart)
@@ -618,6 +673,34 @@ namespace NinjaTrader.NinjaScript.Strategies
         [Range(0, 10000)]
         [Display(Name = "Max loss a day, $ (0 = off)", Order = 3, GroupName = "1. Size and risk")]
         public double DailyLoss { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, 5000)]
+        [Display(Name = "After a losing trade: max loss per trade, $ (0 = the same)", Order = 5, GroupName = "1. Size and risk")]
+        public double AfterLossMaxLoss { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, 20000)]
+        [Display(Name = "Trailing drawdown (end of day, stops at the start), $ (0 = off)", Order = 6, GroupName = "1. Size and risk")]
+        public double TrailDD { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Trailing drawdown and contract steps from date, yyyy-MM-dd (blank = the first bar)", Order = 7, GroupName = "1. Size and risk")]
+        public string TrailFrom { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, 100000)]
+        [Display(Name = "Add a contract per $ of profit (0 = off)", Order = 8, GroupName = "1. Size and risk")]
+        public double ProfitStep { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, 60)]
+        [Display(Name = "Most contracts (with the contract steps; 0 = no limit)", Order = 9, GroupName = "1. Size and risk")]
+        public int MaxContracts { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Size by the trade's own stop", Order = 10, GroupName = "1. Size and risk")]
+        public bool SizeByOwnStop { get; set; }
 
         [NinjaScriptProperty]
         [Range(0, 200)]

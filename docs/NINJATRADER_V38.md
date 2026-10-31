@@ -67,3 +67,50 @@ real MNQ data will differ somewhat. The stand-in has flattered this strategy bef
 - **The model and the account can disagree** after a rejected order or a broker-side fill that differs. If the account
   is in a position the model has closed, the strategy closes it at market ("Model flat"); it never holds a position the
   model doesn't manage.
+
+## Funded growth mode (2026-10-31)
+
+**The user's rule, clarified:** a trade may risk more than $300, as long as the day never reaches the $1,000 loss
+limit and the account is never lost.
+
+**For a funded account**, switch on v3.6's growth sizing, in the strategy's properties:
+
+| Property | Evaluation (default) | Funded growth |
+|---|---|---|
+| Max loss per trade, $ | 260 | **187.5** (per contract; the position's grows with the contracts) |
+| After a losing trade: max loss per trade, $ | 0 (the same) | **250** |
+| Max loss a day, $ | 900 | **900** |
+| Trailing drawdown (end of day, stops at the start), $ | 0 | **2000** |
+| Trailing drawdown and contract steps from date | blank | **the funded account's first day** |
+| Add a contract per $ of profit | 0 | **1500** |
+| Most contracts | 15 | **15** |
+| Size by the trade's own stop | off | **on** |
+
+Each trade is sized to fit both today's room (the $900 less today's net loss) and the room above the trailing floor.
+- **A single trade can lose more than $300.** That happens only on a day already up, so the day's net stays above
+  −$900.
+- **On the trailing floor:** the same settings never touched it on any data set or bar length (docs/V37_MAX.md).
+
+**Verified:** the simulator against the Python reference, all 243 trades of the 30-minute stand-in window identical.
+On 5-minute bars 275 of 276; the other is the same March 9 data gap. `tests/test_ninjatrader_v38.py` covers both
+modes on the fixed MNQ sample.
+
+**Results on the stand-in, Jan 2 2025 – Oct 2026, NinjaTrader execution, 1 tick, $0.62 a side:**
+
+| | 30-minute bars | 5-minute bars |
+|---|---|---|
+| Net | **$26,672** | $18,275 |
+| Trades / winners | 243 / 56.8% | 276 / 66.3% |
+| Profit factor | 1.79 | 1.81 |
+| Closed drawdown | $3,916 | $1,841 |
+| Worst day | −$899 | −$899 |
+| Largest single loss | −$1,634 | −$852 |
+| Most contracts | 15 | 12 |
+| Trailing floor touched | never | never |
+
+**Over 10-16 years**, the worst day was −$899 to −$988 everywhere but one: −$1,023 on Dec 27, 2018 (30-minute NQ),
+where price gapped past the stop. An $800 internal limit cut that, but on NQ the account then stalled near the floor.
+
+**Expect from one account:**
+- The fresh 21-month account replays (docs/V37_MAX.md) put a typical result at $20-27k.
+- About 1 start in 4 reached $50k on NQ, and about 1 in 5 made almost nothing.
