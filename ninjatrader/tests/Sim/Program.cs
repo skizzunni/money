@@ -60,7 +60,7 @@ static class Program
         foreach (string x in s.OrderLog)
             Console.WriteLine("O," + x);
         string d;
-        if (Draw.Texts.TryGetValue(runner ? "runner_dash" : cand ? "c_dash" : "mnq_dash", out d))
+        if (Draw.Texts.TryGetValue(runner ? "runner_dash" : cand ? "c_dash" : v38 ? "v38_dash" : "mnq_dash", out d))
             Console.WriteLine("D," + d.Replace("\n", " | "));
         foreach (string x in s.Printed)
             Console.WriteLine("P," + x);

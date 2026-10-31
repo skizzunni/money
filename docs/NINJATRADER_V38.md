@@ -189,3 +189,42 @@ contracts at the same stop distance.
 
 It remains a choice for the user: the research option `trade_risk_cap` exists in the Python model. The NinjaTrader
 strategy does not have it yet.
+
+## Tracking (2026-10-31)
+
+**The journal.** Every closed trade of the account, from NinjaTrader's own fills, goes into a CSV in
+`Documents\NinjaTrader 8`. Each line has:
+- the entry and exit time (New York), the side and the contracts;
+- the trade number that day, the entry and exit price, how it ended, and the P/L;
+- the day's P/L, the total, today's room left, the room above the trailing floor, and the next trade's contracts.
+
+A DAY line closes each day with its trades and P/L.
+- `MnqNoiseV38_backtest.csv`: written anew at each run, backtest or live.
+- `MnqNoiseV38_live_<account>.csv`: live trades only, kept across restarts.
+- A trade closed at a 09:30 open (a 16:00 exit on a chart without a 16:00 bar) is counted in the day before.
+
+Tested (`tests/test_ninjatrader_v38.py`):
+- one line per trade of the account, with the same P/L to the cent;
+- every trade in exactly one day;
+- the days adding up to the total;
+- the dashboard drawn.
+
+On the stand-in window this was checked for 326 trades (5-minute) and 289 trades (30-minute).
+
+**The loss report.** `python research/journal_report.py <journal.csv>` prints:
+- the results;
+- every loss broken down by how it ended, side, entry hour and size;
+- the 10 largest losses, with the day's P/L at the time;
+- the streaks, the days and the months;
+- three checks: the trades add up to the total, the days add up to the trades, and no day reached the $1,000 limit.
+
+**Risk limits on the account's own numbers.** The $900 daily budget and the trailing floor use the worse of the
+model's P/L and the account's real fills. A live fill worse than the model's can only make the next trade smaller.
+With equal fills, as in the simulator, every trade is unchanged: all 243 and 231 30-minute window trades are identical
+again.
+
+**The dashboard** redraws at every bar close. It shows:
+- the progress to the goal ($50,000 by default);
+- the account's real P/L, total and today;
+- the next trade's contracts and today's room;
+- the mode, the first date of the data, the room above the trailing floor, the lines and the model's own totals.

@@ -29,6 +29,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
+using System.IO;
 using NinjaTrader.Cbi;
 using NinjaTrader.Data;
 using NinjaTrader.NinjaScript;
@@ -102,6 +103,27 @@ namespace NinjaTrader.NinjaScript.Strategies
         public double Upper = double.NaN, Lower = double.NaN, Sigma = double.NaN;
         public bool Locked, SkipToday, FedToday;
         public double DayPnl;
+        // the account's own numbers (the strategy's real fills), set by the wrapper before each bar; every risk limit
+        // uses the worse of these and the model's, so a live fill worse than the model's never adds risk (NaN: unset)
+        public double ExtDayPnl = double.NaN, ExtEquity = double.NaN;
+        double DayEff { get { return double.IsNaN(ExtDayPnl) ? DayPnl : Math.Min(DayPnl, ExtDayPnl); } }
+        double EqEff { get { return double.IsNaN(ExtEquity) ? equity : Math.Min(equity, ExtEquity); } }
+        public double Equity { get { return EqEff; } }
+        public double TrailBase { get { return trailBase; } }
+        public int NextQty
+        {
+            get
+            {
+                int q = s.Qty;
+                if (s.ProfitStep > 0 && !double.IsNaN(trailBase))
+                {
+                    q += (int)Math.Floor(Math.Max(0.0, EqEff - trailBase) / s.ProfitStep);
+                    if (s.MaxContracts > 0) q = Math.Min(q, s.MaxContracts);
+                }
+                return q;
+            }
+        }
+        public double DayRoom { get { return s.DailyLoss > 0 ? s.DailyLoss + DayEff : double.NaN; } }
         public int NewEntry;          // this bar's signal: +1 / -1 to send now (0: none)
         public int NewQty;
         public double NewStopPts, NewTpPts;
@@ -324,8 +346,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 DayPnl = 0;
                 if (s.TrailDD > 0 && string.CompareOrdinal(nyStart.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture), s.TrailFrom ?? "") >= 0)
                 {
-                    if (double.IsNaN(trailBase)) trailBase = trailPeak = equity;  // yesterday's end-of-day equity
-                    trailPeak = Math.Max(trailPeak, equity);
+                    if (double.IsNaN(trailBase)) trailBase = trailPeak = EqEff;  // yesterday's end-of-day equity
+                    trailPeak = Math.Max(trailPeak, EqEff);
                 }
                 if (s.CalmK > 0 && dayRanges.Count >= s.CalmLong)
                     calm = Avg(dayRanges, s.CalmShort) < s.CalmK * Avg(dayRanges, s.CalmLong);
@@ -410,16 +432,16 @@ namespace NinjaTrader.NinjaScript.Strategies
         {
             double room = double.PositiveInfinity;
             if (s.DailyLoss > 0)
-                room = s.DailyLoss + DayPnl;
+                room = s.DailyLoss + DayEff;
             if (s.TrailDD > 0 && !double.IsNaN(trailPeak))
             {
                 double floor = Math.Min(trailPeak - s.TrailDD, trailBase);  // it stops at the starting balance
-                room = Math.Min(room, equity - floor);
+                room = Math.Min(room, EqEff - floor);
             }
             return room;
         }
 
-        public double TrailFloorRoom { get { return s.TrailDD > 0 && !double.IsNaN(trailPeak) ? equity - Math.Min(trailPeak - s.TrailDD, trailBase) : double.NaN; } }
+        public double TrailFloorRoom { get { return s.TrailDD > 0 && !double.IsNaN(trailPeak) ? EqEff - Math.Min(trailPeak - s.TrailDD, trailBase) : double.NaN; } }
 
         void Entry(int d, double c)
         {
@@ -428,7 +450,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             double ml = afterLoss && s.AfterLossMaxLoss > 0 ? s.AfterLossMaxLoss : s.MaxLoss;
             if (s.ProfitStep > 0 && !double.IsNaN(trailBase))  // a contract more per step of profit
             {
-                int qUp = q + (int)Math.Floor(Math.Max(0.0, equity - trailBase) / s.ProfitStep);
+                int qUp = q + (int)Math.Floor(Math.Max(0.0, EqEff - trailBase) / s.ProfitStep);
                 if (s.MaxContracts > 0) qUp = Math.Min(qUp, s.MaxContracts);
                 ml = ml / q * qUp;
                 q = qUp;
@@ -498,6 +520,11 @@ namespace NinjaTrader.NinjaScript.Strategies
         bool badChart;
         int nTrades;
         string firstBar = "";
+        int journaled;                   // the account's closed trades already written to the journal
+        double realDayStart;
+        int realDayTrades;
+        string realDay = "";
+        string journalPath = "", liveJournalPath = "";
         double net, peak, maxDd, worstDay, dayNet;
         DateTime lastDay = DateTime.MinValue;
 
@@ -533,6 +560,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 FedDates = FedDefault;
                 PlaceOrders = true;
                 Mode = "Funded growth";
+                Goal = 50000;
                 AfterLossMaxLoss = 0;
                 TrailDD = 0;
                 TrailFrom = "";
@@ -567,14 +595,37 @@ namespace NinjaTrader.NinjaScript.Strategies
                 st.PointValue = Instrument.MasterInstrument.PointValue;
                 if (!badChart)
                     engine = new V38Engine(st, minutes);
+                // the journal: every closed trade from the account's own fills, and a line per day. A backtest's goes to
+                // MnqNoiseV38_backtest.csv (written anew each run); live trades are also added to
+                // MnqNoiseV38_live_<account>.csv, kept across restarts. Both in Documents\NinjaTrader 8.
+                try
+                {
+                    string dir = NinjaTrader.Core.Globals.UserDataDir;
+                    journalPath = Path.Combine(dir, "MnqNoiseV38_backtest.csv");
+                    liveJournalPath = Path.Combine(dir, "MnqNoiseV38_live_" + Safe(Account == null ? "none" : Account.Name) + ".csv");
+                    File.WriteAllText(journalPath, JournalHeader);
+                    if (!File.Exists(liveJournalPath))
+                        File.WriteAllText(liveJournalPath, JournalHeader);
+                }
+                catch (Exception e)
+                {
+                    journalPath = liveJournalPath = "";
+                    Print("MnqNoiseV38: the journal can't be written (" + e.Message + ")");
+                }
                 Print("MnqNoiseV38 (" + Mode + "): " + Instrument.FullName + ", " + minutes + " " + BarsPeriod.BarsPeriodType + ", " + Contracts +
                       " MNQ, max loss $" + MaxLoss + " a trade, $" + DailyLoss + " a day, take-profit " + TakeProfit +
                       (badChart ? "  -- use a minute chart whose length divides 30 (5 or 30)" : ""));
             }
             else if (State == State.Terminated && engine != null)
+            {
+                if (realDay.Length > 0)
+                    JournalDay(SystemPerformance.AllTrades.TradesPerformance.Currency.CumProfit);
+                realDay = "";
                 Print("MnqNoiseV38 done: data from " + firstBar + ", " + nTrades + " trades, net $" + net.ToString("0.00", CultureInfo.InvariantCulture) +
                       ", closed drawdown $" + maxDd.ToString("0.00", CultureInfo.InvariantCulture) +
-                      ", worst day $" + worstDay.ToString("0.00", CultureInfo.InvariantCulture));
+                      ", worst day $" + worstDay.ToString("0.00", CultureInfo.InvariantCulture) +
+                      (journalPath.Length > 0 ? ", journal " + journalPath : ""));
+            }
         }
 
         static TimeZoneInfo NewYork()
@@ -592,6 +643,22 @@ namespace NinjaTrader.NinjaScript.Strategies
             DateTime start = endNy.AddMinutes(-minutes);
             if (firstBar.Length == 0)
                 firstBar = start.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+            // the account's own numbers for the risk limits: its closed P/L, and today's from the 09:30 bar
+            double cum = SystemPerformance.AllTrades.TradesPerformance.Currency.CumProfit;
+            int tMin = start.Hour * 60 + start.Minute;
+            // trades closed since the last bar first: at 09:30 they are the day before's (a 16:00 exit filled at this
+            // open on a chart without a 16:00 bar), so they go into that day's line
+            WriteTrades(platform);
+            if (tMin == V38Engine.RthOpen)
+            {
+                if (realDay.Length > 0)
+                    JournalDay(cum);
+                realDay = start.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+                realDayStart = cum;
+                realDayTrades = 0;
+            }
+            engine.ExtEquity = cum;
+            engine.ExtDayPnl = cum - realDayStart;
             int before = engine.Trades.Count;
             engine.OnBar(start, Open[0], High[0], Low[0], Close[0]);
             for (int k = before; k < engine.Trades.Count; k++)
@@ -636,7 +703,62 @@ namespace NinjaTrader.NinjaScript.Strategies
             }
             else if (real != 0 && engine.Position == 0)
                 Flatten(real, "Model flat");  // the model closed (a fill elsewhere): don't hold an unmanaged position
+            WriteTrades(platform);
             Dashboard(endNy);
+        }
+
+        const string JournalHeader = "kind,entry time,exit time,side,contracts,trades today,entry,exit,exit kind,P/L,day P/L,total P/L,room today,room above floor,next contracts\n";
+
+        // a day's line: the same 15 columns as a trade's, with the date, the day's trades, its P/L and the total
+        void JournalDay(double cum)
+        {
+            Journal(string.Join(",", new[] { "DAY", realDay, "", "", "", realDayTrades.ToString(CultureInfo.InvariantCulture),
+                                             "", "", "", "", F(cum - realDayStart), F(cum), "", "", "" }), false);
+        }
+
+        static string F(double x) { return double.IsNaN(x) ? "" : x.ToString("0.00", CultureInfo.InvariantCulture); }
+
+        static string Safe(string name)
+        {
+            foreach (char ch in Path.GetInvalidFileNameChars())
+                name = name.Replace(ch, '_');
+            return name.Replace(' ', '_');
+        }
+
+        void Journal(string line, bool live)
+        {
+            if (journalPath.Length == 0)
+                return;
+            try
+            {
+                File.AppendAllText(journalPath, line + "\n");
+                if (live)
+                    File.AppendAllText(liveJournalPath, line + "\n");
+            }
+            catch (Exception e)
+            {
+                Print("MnqNoiseV38: journal write failed (" + e.Message + ")");
+                journalPath = "";
+            }
+        }
+
+        // every newly closed trade of the account, as NinjaTrader recorded it from the fills
+        void WriteTrades(TimeZoneInfo platform)
+        {
+            double cum = SystemPerformance.AllTrades.TradesPerformance.Currency.CumProfit;
+            while (journaled < SystemPerformance.AllTrades.Count)
+            {
+                Trade t = SystemPerformance.AllTrades[journaled++];
+                realDayTrades++;
+                DateTime en = TimeZoneInfo.ConvertTime(DateTime.SpecifyKind(t.Entry.Time, DateTimeKind.Unspecified), platform, newYork);
+                DateTime ex = TimeZoneInfo.ConvertTime(DateTime.SpecifyKind(t.Exit.Time, DateTimeKind.Unspecified), platform, newYork);
+                string side = t.Entry.Name == ShortName ? "SHORT" : "LONG";
+                Journal("TRADE," + en.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture) + "," +
+                        ex.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture) + "," + side + "," + t.Quantity + "," +
+                        realDayTrades + "," + F(t.Entry.Price) + "," + F(t.Exit.Price) + "," + t.Exit.Name + "," + F(t.ProfitCurrency) + "," +
+                        F(cum - realDayStart) + "," + F(cum) + "," + F(engine.DayRoom) + "," + F(engine.TrailFloorRoom) + "," +
+                        engine.NextQty, State == State.Realtime);
+            }
         }
 
         void Flatten(int real, string why)
@@ -659,16 +781,22 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         void Dashboard(DateTime endNy)
         {
-            string txt = "MNQ Noise Momentum v3.8, " + Mode + (engine.TradeQty > 0 && engine.Position != 0 ? ", " + engine.TradeQty + " MNQ" : "") + "\n" +
+            double cumReal = SystemPerformance.AllTrades.TradesPerformance.Currency.CumProfit;
+            double sinceStart = double.IsNaN(engine.TrailBase) ? cumReal : engine.Equity - engine.TrailBase;
+            string goal = Goal > 0 ? "Goal $" + Goal.ToString("0", CultureInfo.InvariantCulture) + ": $" +
+                          sinceStart.ToString("0", CultureInfo.InvariantCulture) + " so far (" +
+                          (100 * sinceStart / Goal).ToString("0.0", CultureInfo.InvariantCulture) + "%)\n" : "";
+            string txt = goal + "Account P/L (real fills): $" + cumReal.ToString("0.00", CultureInfo.InvariantCulture) +
+                         ", today $" + (cumReal - realDayStart).ToString("0.00", CultureInfo.InvariantCulture) + "\n" +
+                         "Next trade: " + engine.NextQty + " MNQ, room today $" + (double.IsNaN(engine.DayRoom) ? "-" : Math.Max(0, engine.DayRoom).ToString("0", CultureInfo.InvariantCulture)) + "\n" +
+                         "MNQ Noise Momentum v3.8, " + Mode + (engine.TradeQty > 0 && engine.Position != 0 ? ", " + engine.TradeQty + " MNQ" : "") + "\n" +
                          "Data from " + firstBar + " (results need data from 50 sessions before)\n" +
                          "Sessions of history: " + engine.SessionsLoaded + " / 14\n" +
                          (double.IsNaN(engine.TrailFloorRoom) ? "" : "Room above the trailing floor: $" + engine.TrailFloorRoom.ToString("0", CultureInfo.InvariantCulture) + "\n") +
                          (double.IsNaN(engine.Upper) ? "Lines: after the 10:00 check\n" :
                           "Upper / lower: " + engine.Upper.ToString("0.00", CultureInfo.InvariantCulture) + " / " +
                           engine.Lower.ToString("0.00", CultureInfo.InvariantCulture) + "\n") +
-                         "Today P/L (model): $" + engine.DayPnl.ToString("0.00", CultureInfo.InvariantCulture) +
-                         ", room left $" + Math.Max(0, DailyLoss + engine.DayPnl).ToString("0", CultureInfo.InvariantCulture) + "\n" +
-                         "Trades " + nTrades + ", net $" + net.ToString("0.00", CultureInfo.InvariantCulture) +
+                         "Model: trades " + nTrades + ", net $" + net.ToString("0.00", CultureInfo.InvariantCulture) +
                          ", drawdown $" + maxDd.ToString("0.00", CultureInfo.InvariantCulture) + "\n" +
                          (engine.Note.Length > 0 ? "Last check: " + engine.Note : "");
             Draw.TextFixed(this, "v38_dash", txt, TextPosition.TopRight);
@@ -786,6 +914,11 @@ namespace NinjaTrader.NinjaScript.Strategies
         [NinjaScriptProperty]
         [Display(Name = "Place orders", Order = 1, GroupName = "4. Orders")]
         public bool PlaceOrders { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, 10000000)]
+        [Display(Name = "Profit goal for the dashboard, $ (0 = hide)", Order = 2, GroupName = "4. Orders")]
+        public double Goal { get; set; }
         #endregion
     }
 }
