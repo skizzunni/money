@@ -411,3 +411,16 @@ Everything else is the baseline: growth mode with G6's time stop.
 - on 5-minute bars it has a higher net than the baseline on NQ, the index and the window;
 - it never touches the trailing floor;
 - no more days at −$1,000 or worse than the baseline on any set.
+
+**G8 result (run once, 2026-10-31): rejected.** On the long histories the 15:30 entries add a little (NQ and the
+index, 5-minute bars, +$2k to +$10k over ten years). On the window, the period the account trades now, they lose:
+−$5.2k on the chart's execution, −$6.3k on NinjaTrader's. Entries stay through 15:00.
+
+| Net, 5 min | through 15:00 (now) | through 15:30 |
+|---|---|---|
+| window, chart / NinjaTrader | $18,516 / $18,549 | $13,319 / $12,280 |
+| NQ, chart / NinjaTrader | $277,322 / $267,571 | $273,185 / $269,602 |
+| index, chart / NinjaTrader | $407,796 / $404,250 | $417,836 / $412,826 |
+
+On 30-minute bars it is mixed in the same way (`verification/noise_v2/g8_last_entry_growth.csv`). The floor was
+never touched in any run.
