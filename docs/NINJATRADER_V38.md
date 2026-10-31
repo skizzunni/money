@@ -381,3 +381,19 @@ it (`trend_side` 0 in mnqbot/noise.py).
 - on 5-minute bars it has a higher net than the baseline on NQ, the index and the window;
 - it never touches the trailing floor;
 - no more days at −$1,000 or worse than the baseline on any set.
+
+**G7 result (run once, 2026-10-31): rejected.** Blocking longs below the 50-session average cut the net by about
+half on every set, in both executions. The longs taken in a downtrend are part of the edge. Markets fall on most of
+those days but bounce hard, and the noise breakout catches the bounces. The shorts-only filter stays.
+
+| Net | baseline (no shorts in an uptrend) | both sides |
+|---|---|---|
+| 5 min, window (NinjaTrader) | $18,549 | $8,744 |
+| 5 min, NQ (NinjaTrader) | $267,571 | $145,586 |
+| 5 min, index (NinjaTrader) | $404,250 | $176,562 |
+| 30 min, window (NinjaTrader) | $28,620 | $14,911 |
+| 30 min, NQ (NinjaTrader) | $257,756 | $134,910 |
+| 30 min, index (NinjaTrader) | $310,560 | $135,936 |
+
+The chart's execution shows the same: on 30-minute bars the index even ran down to the floor and stopped
+(`verification/noise_v2/g7_trend_both_growth.csv`).
