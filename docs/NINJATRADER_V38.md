@@ -278,3 +278,20 @@ risks more than today's room or the room above the floor).
 - no more days at −$1,000 or worse than growth mode on any set.
 
 If more than one passes, take the one with the highest 5-minute window net.
+
+**G5 result (run once, 2026-10-31): rejected; faster steps lose the account.** With a $1,000 or $750 step the account
+grows faster at first, then a run of losses at the larger size takes it all the way back to the floor (which stops at
+the starting balance). There it can't size a trade, so it stops: net ≈ $0 after about 110 to 140 trades on NQ, at
+both bar lengths, and on the index on 30-minute bars. In a prop account that is a lost account. The $1,500 step is
+the fastest one that survives every history (`verification/noise_v2/g5_steps_growth.csv`).
+
+| Net | $1,500 to 15 (growth mode) | $1,000 to 15 | $750 to 15 | $1,000 to 20 |
+|---|---|---|---|---|
+| 5 min, window | $18,473 | $20,202 | $17,525 | $20,215 |
+| 5 min, NQ | $269,579 | **$0, back at the floor after 141 trades** | $286,839 | **$0, floor, 141 trades** |
+| 5 min, index | $406,336 | $409,212 | $409,843 | $396,966 |
+| 30 min, window | $23,082 | $27,397 | $29,066 | $27,966 |
+| 30 min, NQ | $207,740 | **$4, floor, 114 trades** | **−$3, floor, 112 trades** | **$4, floor, 114 trades** |
+| 30 min, index | $313,654 | **$7, floor, 63 trades** | **$1, floor, 60 trades** | **$7, floor, 63 trades** |
+
+Growth mode stays at $1,500 a contract, up to 15.
