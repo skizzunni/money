@@ -368,3 +368,16 @@ All results are in `verification/noise_v2/g6_time_stop_growth.csv`.
 | 5 min | $18,275 | **$18,542** | 291 | 61.5% | 1.82 | −$899 | every trade but the Mar 9, 2026 data gap (above) |
 
 The updated results are in `verification/noise_v2/v38_growth_ninjatrader_*.csv`.
+
+## G7: the trend filter on both sides (registered 2026-10-31, before its run)
+
+**The idea:** "trade with the bias" (the user's Winter Trades screenshots). Since v3.1 the bot takes no shorts while
+yesterday's close is above its 50-session average. G7 adds the mirror: no new longs while yesterday's close is below
+it (`trend_side` 0 in mnqbot/noise.py).
+
+**Baseline:** growth mode as it now runs, with G6's 60-minute time stop.
+
+**Adopt only if all hold, in both the chart's and NinjaTrader's execution:**
+- on 5-minute bars it has a higher net than the baseline on NQ, the index and the window;
+- it never touches the trailing floor;
+- no more days at −$1,000 or worse than the baseline on any set.
