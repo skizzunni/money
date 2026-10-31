@@ -24,10 +24,11 @@ from mnqbot.noise import NoiseConfig, run
 
 CFG = NoiseConfig(**{**V21, "qty": 1, "lookback": 14, "trail_from": "", "tv_path": False}, nt_execution=True,
                   round_prices=True, target_on_fill_bar=True)
-# funded growth (docs/NINJATRADER_V38.md): v3.6's sizing at $900 a day and a $2,000 end-of-day trailing drawdown
+# funded growth (docs/NINJATRADER_V38.md): v3.6's sizing at $900 a day and a $2,000 end-of-day trailing drawdown, and
+# G6's 60-minute time stop
 GROW = NoiseConfig(**{**V21, "qty": 1, "lookback": 14, "max_loss_per_trade": 187.5, "after_loss_ml_mult": 250 / 187.5,
                       "trail_dd": 2000.0, "trail_from": "", "profit_step": 1500.0, "size_up_to": 15,
-                      "budget_actual": True, "tv_path": False}, nt_execution=True, round_prices=True,
+                      "budget_actual": True, "time_stop": 60, "tv_path": False}, nt_execution=True, round_prices=True,
                    target_on_fill_bar=True)
 GROW_ARGS = ["Mode=Funded growth"]  # the default; its settings are the tested ones above
 
@@ -35,24 +36,26 @@ GROW_ARGS = ["Mode=Funded growth"]  # the default; its settings are the tested o
 @pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
 @pytest.mark.parametrize("minutes", [5, 30])
 def test_v38_time_stop_agrees(sim, sample_1m, minutes, tmp_path):  # noqa: F811
-    """G6's time stop (60 minutes, growth mode): the same trades in NinjaTrader's code and the Python model, and the
-    time stop really fires."""
+    """G6's time stop (60 minutes, on in growth mode): the same trades in NinjaTrader's code and the Python model, and
+    the time stop really fires; with it switched off, the trades change."""
     bars = resample(sample_1m, f"{minutes}min")
     path = tmp_path / "bars.csv"
     with path.open("w") as f:
         for t, r in zip(bars.index, bars.itertuples(), strict=True):
             f.write(f"{t:%Y-%m-%d %H:%M},{r.open!r},{r.high!r},{r.low!r},{r.close!r}\n")
-    args = [DOTNET, str(sim), str(path), str(minutes), "Strategy=V38", *GROW_ARGS, "TimeStop=60"]
+    args = [DOTNET, str(sim), str(path), str(minutes), "Strategy=V38", *GROW_ARGS]
     r = subprocess.run(args, capture_output=True, text=True, env=ENV)
     assert r.returncode == 0, r.stderr[-2000:]
     nt = [x.split(",")[1:] for x in r.stdout.splitlines() if x.startswith("T,")]
-    py = run(bars, dataclasses.replace(GROW, time_stop=60), minutes=minutes).trades
+    py = run(bars, GROW, minutes=minutes).trades
     assert len(nt) == len(py) >= 20
     for a, t in zip(nt, py, strict=True):
         assert (int(a[0]), int(a[1]), int(a[3])) == (t.direction, t.entry_bar, t.exit_bar), (a, t)
         assert float(a[2]) == t.entry and float(a[4]) == t.exit, (a, t)
         assert math.isclose(float(a[6]), t.pnl, abs_tol=1e-6), (a, t)
     assert sum(t.reason == "Time stop" for t in py) >= 1
+    off = run(bars, dataclasses.replace(GROW, time_stop=0), minutes=minutes).trades
+    assert [(t.entry_bar, t.exit_bar) for t in off] != [(t.entry_bar, t.exit_bar) for t in py]
 
 
 @pytest.fixture(scope="module")

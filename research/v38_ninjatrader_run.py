@@ -30,7 +30,8 @@ for m in (30, 5):
     nt = [l.split(",") for l in res.splitlines() if l.startswith("T,")]
     nt = pd.DataFrame([(int(x[1]), int(x[2]), float(x[3]), int(x[4]), float(x[5]), x[6], float(x[7])) for x in nt],
                       columns=["d", "eb", "entry", "xb", "exit", "why", "pnl"])
-    base = ({**VS.V23, **T.REFERENCE, "daily_loss_limit": 900.0, "trail_dd": 2000.0, "trail_from": "2025-01-02"} if GROW
+    base = ({**VS.V23, **T.REFERENCE, "daily_loss_limit": 900.0, "trail_dd": 2000.0, "trail_from": "2025-01-02",
+             "time_stop": 60} if GROW
             else {**E.config(1, 2.0, 260.0, 0), "daily_loss_limit": 900.0})
     cfg = NoiseConfig(**{**base, "tv_path": False, "nt_execution": True, "round_prices": True, "target_on_fill_bar": True})
     py = run(bars, cfg, minutes=m).trades_frame()

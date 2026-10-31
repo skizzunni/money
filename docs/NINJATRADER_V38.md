@@ -314,3 +314,48 @@ that close would be. Everything else is unchanged.
 - no more days at −$1,000 or worse than growth mode on any set.
 
 If both pass, take the one with the higher 5-minute window net.
+
+**G6 result (run once, 2026-10-31): the 60-minute time stop passes, and is now on in Funded growth mode.** On 5-minute
+bars it made more on all three sets, the floor was never touched, and no day reached −$1,000 any more often. The
+30-minute time stop failed (much less on the window). The gain is small, a few thousand dollars over ten years, and
+the winners drop by about 4 points: some slow starters are cut before they work. In return, losers that drift
+against you get cut instead of sitting there.
+
+| Net | growth mode | time stop 30 min | time stop 60 min |
+|---|---|---|---|
+| 5 min, window | $18,473 | $13,161 | **$18,516** |
+| 5 min, NQ | $269,579 | $256,086 | **$277,322** |
+| 5 min, index | $406,336 | $378,497 | **$407,796** |
+| 30 min, window | $23,082 | $22,966 | $25,834 |
+| 30 min, NQ | $207,740 | $220,557 | $210,145 |
+| 30 min, index | $313,654 | $314,582 | $301,828 |
+
+**Checked again with NinjaTrader's own execution.** That means market exits at the next open and a bracket from the
+fill. 16:00 bars were added where the history has none, so the 16:00 exit fills that day, as on an ETH chart:
+
+| Net, NinjaTrader's execution | growth mode | time stop 60 min |
+|---|---|---|
+| 5 min, window | $18,283 | $18,549 |
+| 5 min, NQ | $266,098 | $267,571 |
+| 5 min, index | $398,911 | $404,250 |
+| 30 min, window | $26,672 | $28,620 |
+| 30 min, NQ | $252,213 | $257,756 |
+| 30 min, index | $316,876 | $310,560 |
+
+On those runs:
+- the floor was never touched;
+- the worst day was −$900 or better on every set;
+- no day reached −$1,000.
+
+All results are in `verification/noise_v2/g6_time_stop_growth.csv`.
+
+**Implemented:**
+- `time_stop` in mnqbot/noise.py.
+- `TimeStop` in MnqNoiseV38.cs: 60 in Funded growth mode, 0 in Evaluation. NinjaTrader sends a market exit at the bar
+  close ("Time stop"), so it fills at the next open.
+- "Time stop" in the Pine script: 0 by default, because the evaluation hasn't been tested with it; set 60 for funded
+  growth.
+
+**Tests:**
+- NinjaTrader's code matches the Python model trade for trade, with the time stop on, on 5 and 30 minutes.
+- The Pine script matches the Python model trade for trade, alerts included.

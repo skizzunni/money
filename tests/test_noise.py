@@ -43,6 +43,7 @@ OWN_STOP = "Size by the trade's own stop"  # on (v3.0)
 TREND = "No shorts while the last close is above its average of this many sessions (0 = off)"  # 50 (v3.1)
 SQUEEZE = ("Never stuck: when no contract fits, 1 with its stop cut to the room left, if at least this many points "
            "(0 = off)")  # 20 (v3.1)
+TIME_STOP = "Time stop: close a losing trade not yet locked this many minutes after its fill (0 = off)"  # 0 (G6)
 V21 = {"max_loss_per_trade": 260.0, "lock_at": 0.35, "max_losers": 0, "take_profit": 2.0, "tighten_only": True,
        "after_loss_qty_div": 1.0, "after_loss_ml_mult": 1.0, "last_entry_end": 900,
        "big_day_k": 1.5, "big_day_n": 10, "calm_k": 0.7, "calm_short": 10, "calm_long": 40,
@@ -438,7 +439,8 @@ def run_pine(bars, inputs=None, minutes=5):
 
 LOG_HEADER = ["Opened (NY)", "Side", "Entry", "Closed (NY)", "Exit", "P/L", "Why"]
 WHY = {"Back inside": "stop at the line", "Max loss": "max loss stop", "16:00 close": "16:00 close",
-       "Session ended": "session ended", "reversed": "reversed", "Target": "take profit", "Lock": "locked win"}
+       "Session ended": "session ended", "reversed": "reversed", "Target": "take profit", "Lock": "locked win",
+       "Time stop": "time stop"}
 
 
 def money(text):
@@ -469,7 +471,7 @@ def trail_inputs(cfg: NoiseConfig) -> dict:
     assert not cfg.trend_n or cfg.trend_side == -1, "the script skips shorts only"
     return {TRAIL: cfg.trail_dd, TRAIL_STOP: cfg.trail_cap >= 0, STEP: cfg.profit_step, UP_TO: cfg.size_up_to,
             TRAIL_FROM: int(cfg.trail_from.replace("-", "")) if cfg.trail_from else 0, OWN_STOP: cfg.budget_actual,
-            TREND: cfg.trend_n, SQUEEZE: cfg.squeeze_min}
+            TREND: cfg.trend_n, SQUEEZE: cfg.squeeze_min, TIME_STOP: cfg.time_stop}
 
 
 def assert_parity(bars, minutes=5, lookback=14, skip_dates=None, exit_mode="stop", stop_buffer=None, qty=1,
@@ -1149,3 +1151,15 @@ def test_pine_trend_and_squeeze():
     tr = assert_parity(bars, qty=1, max_loss=187.5, trail={"trend_n": 5, "trend_side": -1})
     free = run(bars, NoiseConfig(qty=1, max_loss_per_trade=187.5))
     assert sum(t.direction < 0 for t in tr.trades) < sum(t.direction < 0 for t in free.trades)
+
+
+@pytest.mark.slow
+@pytest.mark.parametrize("minutes", [5, 30])
+def test_pine_time_stop(minutes):
+    """G6: a trade still losing time_stop minutes after its fill, and not locked, is closed at the next bar's open. The
+    script and the reference agree trade for trade, and the time stop fires."""
+    bars = synth_bars(sessions=90, seed=3)
+    if minutes != 5:
+        bars = resample(bars, f"{minutes}min")
+    res = assert_parity(bars, minutes=minutes, qty=1, max_loss=187.5, trail={"time_stop": 60})
+    assert sum(t.reason == "Time stop" for t in res.trades) >= 3

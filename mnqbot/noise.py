@@ -683,7 +683,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                 hit, price, reason, deferred = True, o[i] - pos * slip, "Time stop", None
             if hit:
                 close_pos(i, price, reason)
-                events.append((i, "EXIT"))
+                events.append((i - 1 if reason == "Time stop" else i, "EXIT"))  # the time stop's alert: at the close
             initial = cfg.partial_r == "initial"
             r_now = r_trade if initial else r_pts
             if (pos and rest == 1.0 and cfg.partial_at > 0 and not math.isnan(r_now)  # research: part at +partial_at R

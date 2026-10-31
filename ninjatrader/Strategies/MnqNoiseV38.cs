@@ -589,12 +589,12 @@ namespace NinjaTrader.NinjaScript.Strategies
                 if (Mode == "Funded growth")  // the tested growth settings (docs/NINJATRADER_V38.md), whatever is set below
                 {
                     Contracts = 1; MaxLoss = 187.5; AfterLossMaxLoss = 250; DailyLoss = 900; TrailDD = 2000;
-                    ProfitStep = 1500; MaxContracts = 15; SizeByOwnStop = true;
+                    ProfitStep = 1500; MaxContracts = 15; SizeByOwnStop = true; TimeStop = 60;
                 }
                 else if (Mode == "Evaluation")  // v3.8: 1 MNQ, $260 a trade, $900 a day
                 {
                     Contracts = 1; MaxLoss = 260; AfterLossMaxLoss = 0; DailyLoss = 900; TrailDD = 0;
-                    ProfitStep = 0; SizeByOwnStop = false;
+                    ProfitStep = 0; SizeByOwnStop = false; TimeStop = 0;
                 }
                 V38Settings st = new V38Settings();
                 st.Qty = Contracts; st.MaxLoss = MaxLoss; st.DailyLoss = DailyLoss; st.TakeProfit = TakeProfit;
