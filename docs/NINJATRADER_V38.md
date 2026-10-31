@@ -118,3 +118,18 @@ where price gapped past the stop. An $800 internal limit cut that, but on NQ the
 **Expect from one account:**
 - The fresh 21-month account replays (docs/V37_MAX.md) put a typical result at $20-27k.
 - About 1 start in 4 reached $50k on NQ, and about 1 in 5 made almost nothing.
+
+## How long one account takes to make $50,000 in funded growth mode (`research/growth_time_to_50k.py`)
+
+Each run is a fresh account in funded growth mode ($900 a day, $2,000 trailing):
+- it starts at 1 MNQ at a quarter start on NQ 2015-2025 and the Nasdaq-100 2011-2026;
+- it runs to the end of the data, at least 3 years.
+
+| | Starts | Reached $50k | Months to $50k: 25th / median / 75th | Within 21 months | Within 36 months |
+|---|---|---|---|---|---|
+| NQ, 5-min | 29 | 24 | 26.0 / 29.5 / 33.2 | 1 | 20 |
+| Index, 5-min | 50 | 42 | 26.1 / 30.0 / 34.2 | 1 | 35 |
+| NQ, 30-min | 29 | 22 | 17.0 / 22.0 / 25.5 | 10 | 22 |
+| Index, 30-min | 50 | 41 | 22.9 / 27.9 / 36.5 | 6 | 29 |
+
+**On one account, $50,000 typically takes about 2 to 2.5 years.** About 1 start in 5 never got there in the data.
