@@ -383,8 +383,8 @@ it (`trend_side` 0 in mnqbot/noise.py).
 - no more days at −$1,000 or worse than the baseline on any set.
 
 **G7 result (run once, 2026-10-31): rejected.** Blocking longs below the 50-session average cut the net by about
-half on every set, in both executions. The longs taken in a downtrend are part of the edge. Markets fall on most of
-those days but bounce hard, and the noise breakout catches the bounces. The shorts-only filter stays.
+half on every set, in both executions. The longs taken below the average make money on their own, so blocking them
+only removes profit. The shorts-only filter stays.
 
 | Net | baseline (no shorts in an uptrend) | both sides |
 |---|---|---|
