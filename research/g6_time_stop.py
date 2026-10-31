@@ -1,7 +1,8 @@
 """G6 (docs/NINJATRADER_V38.md): growth mode with a time stop, on the window, NQ and the index.
 
-    [SCAN_MINUTES=30] python research/g6_time_stop.py <data dir> <MNQ 09-26 file> <MNQ 12-26 file>
+    [SCAN_MINUTES=30] [NT_EXEC=1] python research/g6_time_stop.py <data dir> <MNQ 09-26 file> <MNQ 12-26 file>
 """
+import os
 import sys
 
 import numpy as np
@@ -18,6 +19,8 @@ for ts in (0, 30, 60):
             continue
         cfg = NoiseConfig(**{**S.V23, **T.REFERENCE, "daily_loss_limit": 900.0, "trail_dd": 2000.0,
                              "time_stop": ts})
+        if os.environ.get("NT_EXEC"):  # NinjaTrader's execution, as MnqNoiseV38.cs trades it
+            cfg.tv_path, cfg.nt_execution, cfg.round_prices, cfg.target_on_fill_bar = False, True, True, True
         if isinstance(skip, str):
             cfg.skip_dates, cfg.fed_dates = skip, ""
         if first:
