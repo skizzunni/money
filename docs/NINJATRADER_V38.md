@@ -397,3 +397,17 @@ only removes profit. The shorts-only filter stays.
 
 The chart's execution shows the same: on 30-minute bars the index even ran down to the floor and stopped
 (`verification/noise_v2/g7_trend_both_growth.csv`).
+
+## G8: entries at the 15:30 check too (registered 2026-10-31, before its run)
+
+**The idea:** growth mode takes no new entries after the 15:00 check (`last_entry_end` 900, from v2.3). The
+thirty-fourth round (docs/RESULTS.md) found the 15:30 entries paid about $23 a trade per contract on the old bot.
+That was never checked with growth mode's sizing, lock, take-profit and time stop.
+
+**The variant:** the last entry check is 15:30 (`last_entry_end` 930; "Last entry" 15:30 in MnqNoiseV38.cs).
+Everything else is the baseline: growth mode with G6's time stop.
+
+**Adopt only if all hold, in both the chart's and NinjaTrader's execution:**
+- on 5-minute bars it has a higher net than the baseline on NQ, the index and the window;
+- it never touches the trailing floor;
+- no more days at −$1,000 or worse than the baseline on any set.
