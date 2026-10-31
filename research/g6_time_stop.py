@@ -13,13 +13,31 @@ import v24_scan as S
 from mnqbot.noise import NoiseConfig, run
 
 S.init({}, *sys.argv[1:4])
+NT = bool(os.environ.get("NT_EXEC"))  # NinjaTrader's execution, as MnqNoiseV38.cs trades it
+
+
+def with_1600(bars: pd.DataFrame, m: int) -> pd.DataFrame:
+    """Where a session's data stops at 16:00 with no 16:00 bar, one at the last price (as research/
+    v38_ninjatrader_run.py): on an ETH chart MNQ trades to 17:00, so NinjaTrader's 16:00 exit fills there."""
+    t = bars.index.tz_convert("America/New_York")
+    mins = t.hour * 60 + t.minute
+    last = (mins + m == 960) & ~pd.Series(mins == 960).shift(-1, fill_value=False).to_numpy()
+    add = bars[last].copy()
+    add.index = add.index + pd.Timedelta(minutes=m)
+    for k in ("open", "high", "low"):
+        add[k] = add["close"]
+    return pd.concat([bars, add]).sort_index()
+
+
+if NT:
+    S.D = {k: (with_1600(b, S.MIN[0]), first, skip) for k, (b, first, skip) in S.D.items()}
 for ts in (0, 30, 60):
     for name, (bars, first, skip) in S.D.items():
         if name == "win":
             continue
         cfg = NoiseConfig(**{**S.V23, **T.REFERENCE, "daily_loss_limit": 900.0, "trail_dd": 2000.0,
                              "time_stop": ts})
-        if os.environ.get("NT_EXEC"):  # NinjaTrader's execution, as MnqNoiseV38.cs trades it
+        if NT:
             cfg.tv_path, cfg.nt_execution, cfg.round_prices, cfg.target_on_fill_bar = False, True, True, True
         if isinstance(skip, str):
             cfg.skip_dates, cfg.fed_dates = skip, ""

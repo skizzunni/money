@@ -8,6 +8,7 @@ price and P/L.
 """
 from __future__ import annotations
 
+import dataclasses
 import gzip
 import math
 import subprocess
@@ -29,6 +30,29 @@ GROW = NoiseConfig(**{**V21, "qty": 1, "lookback": 14, "max_loss_per_trade": 187
                       "budget_actual": True, "tv_path": False}, nt_execution=True, round_prices=True,
                    target_on_fill_bar=True)
 GROW_ARGS = ["Mode=Funded growth"]  # the default; its settings are the tested ones above
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+@pytest.mark.parametrize("minutes", [5, 30])
+def test_v38_time_stop_agrees(sim, sample_1m, minutes, tmp_path):  # noqa: F811
+    """G6's time stop (60 minutes, growth mode): the same trades in NinjaTrader's code and the Python model, and the
+    time stop really fires."""
+    bars = resample(sample_1m, f"{minutes}min")
+    path = tmp_path / "bars.csv"
+    with path.open("w") as f:
+        for t, r in zip(bars.index, bars.itertuples(), strict=True):
+            f.write(f"{t:%Y-%m-%d %H:%M},{r.open!r},{r.high!r},{r.low!r},{r.close!r}\n")
+    args = [DOTNET, str(sim), str(path), str(minutes), "Strategy=V38", *GROW_ARGS, "TimeStop=60"]
+    r = subprocess.run(args, capture_output=True, text=True, env=ENV)
+    assert r.returncode == 0, r.stderr[-2000:]
+    nt = [x.split(",")[1:] for x in r.stdout.splitlines() if x.startswith("T,")]
+    py = run(bars, dataclasses.replace(GROW, time_stop=60), minutes=minutes).trades
+    assert len(nt) == len(py) >= 20
+    for a, t in zip(nt, py, strict=True):
+        assert (int(a[0]), int(a[1]), int(a[3])) == (t.direction, t.entry_bar, t.exit_bar), (a, t)
+        assert float(a[2]) == t.entry and float(a[4]) == t.exit, (a, t)
+        assert math.isclose(float(a[6]), t.pnl, abs_tol=1e-6), (a, t)
+    assert sum(t.reason == "Time stop" for t in py) >= 1
 
 
 @pytest.fixture(scope="module")

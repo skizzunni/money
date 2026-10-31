@@ -57,6 +57,9 @@ namespace NinjaTrader.NinjaScript.Strategies
         public int MaxContracts = 0;
         public bool SizeByOwnStop = false;
         public string TrailFrom = "";
+        // a time stop (G6): a trade not yet locked that is losing at a bar close TimeStop minutes or more after its
+        // fill is closed at market, filled at the next bar's open (0 = off)
+        public int TimeStop = 0;
     }
 
     public sealed class V38Trade
@@ -128,6 +131,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         public int NewQty;
         public double NewStopPts, NewTpPts;
         public bool FlatNow;          // this bar is the 16:00 bar: close at market
+        public bool TimeStopNow;      // the time stop: close at market now
         public string Note = "";      // what this bar's check found, for the dashboard
 
         public V38Engine(V38Settings settings, int barMinutes)
@@ -265,6 +269,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             bool inRth = tMin >= RthOpen && end <= RthClose;
             NewEntry = 0;
             FlatNow = false;
+            TimeStopNow = false;
             Note = "";
 
             if (pendingKind != 0)  // market orders from the last bar fill at this bar's open
@@ -317,6 +322,11 @@ namespace NinjaTrader.NinjaScript.Strategies
                 {
                     hit = p > 0 ? l <= line : h >= line;
                     price = line - p * slip;
+                }
+                if (s.TimeStop > 0 && !Locked && EntryBar != i && (i - EntryBar) * minutes >= s.TimeStop
+                    && p * (lastBarClose - EntryPrice) < 0)
+                {
+                    hit = true; price = o - p * slip; reason = "Time stop";  // sent at the last close, filled now
                 }
                 if (hit)
                     Close(i, price, reason);
@@ -425,6 +435,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 dayOpen = double.NaN;
             }
             lastBarClose = c;
+            TimeStopNow = s.TimeStop > 0 && Position != 0 && !Locked && (i + 1 - EntryBar) * minutes >= s.TimeStop
+                          && Position * (c - EntryPrice) < 0 && !FlatNow;
         }
 
         // What a new trade may risk: the rest of today's loss limit and the room above the trailing floor
@@ -567,6 +579,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 ProfitStep = 0;
                 MaxContracts = 15;
                 SizeByOwnStop = false;
+                TimeStop = 0;
             }
             else if (State == State.DataLoaded)
             {
@@ -591,6 +604,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 st.FedNoShorts = FedNoShorts; st.SkipDates = SkipDates; st.FedDates = FedDates;
                 st.AfterLossMaxLoss = AfterLossMaxLoss; st.TrailDD = TrailDD; st.TrailFrom = TrailFrom ?? "";
                 st.ProfitStep = ProfitStep; st.MaxContracts = MaxContracts; st.SizeByOwnStop = SizeByOwnStop;
+                st.TimeStop = TimeStop;
                 st.Tick = TickSize;
                 st.PointValue = Instrument.MasterInstrument.PointValue;
                 if (!badChart)
@@ -668,6 +682,10 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (real != 0 && engine.FlatNow)
             {
                 Flatten(real, "Flat 16:00");
+            }
+            else if (real != 0 && engine.Position == real && engine.TimeStopNow)
+            {
+                Flatten(real, "Time stop");  // still losing this long after the fill: out at the next open
             }
             else if (real == 0 && engine.NewEntry != 0 && PlaceOrders)
             {
@@ -849,6 +867,11 @@ namespace NinjaTrader.NinjaScript.Strategies
         [NinjaScriptProperty]
         [Display(Name = "Size by the trade's own stop", Order = 10, GroupName = "1. Size and risk")]
         public bool SizeByOwnStop { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, 390)]
+        [Display(Name = "Time stop: close a losing trade not yet locked this many minutes after its fill (0 = off)", Order = 11, GroupName = "1. Size and risk")]
+        public int TimeStop { get; set; }
 
         [NinjaScriptProperty]
         [Range(0, 200)]
