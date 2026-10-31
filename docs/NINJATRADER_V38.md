@@ -228,3 +228,22 @@ again.
 - the account's real P/L, total and today;
 - the next trade's contracts and today's room;
 - the mode, the first date of the data, the room above the trailing floor, the lines and the model's own totals.
+
+## G4: partial profits in growth mode (registered 2026-10-31, before its run)
+
+**The idea, from the user's Winter Trades screenshots:** "partial at the end of the move", "trading is all about
+securing profits".
+
+**The variant:** growth mode, plus a limit that closes part of the position at +X R. R is the trade's initial risk,
+the bracket's stop distance (the model's `partial_at` with `partial_r` "initial", as the NinjaTrader strategy
+measures it). The rest keeps every rule.
+
+**Variants:**
+- X = 1.0, half off;
+- X = 1.5, half off;
+- X = 1.0, a third off.
+
+**Adopt a variant only if all hold:**
+- on 5-minute bars it has a higher net than growth mode on NQ, the index and the window;
+- it never touches the trailing floor;
+- no day reaches −$1,000 more often.
