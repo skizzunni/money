@@ -412,8 +412,8 @@ Everything else is the baseline: growth mode with G6's time stop.
 - it never touches the trailing floor;
 - no more days at −$1,000 or worse than the baseline on any set.
 
-**G8 result (run once, 2026-10-31): rejected.** On the long histories the 15:30 entries add a little (NQ and the
-index, 5-minute bars, +$2k to +$10k over ten years). On the window, the period the account trades now, they lose:
+**G8 result (run once, 2026-10-31): rejected.** On the long histories the 15:30 entries change little: on 5-minute bars,
+−$4k to +$2k on NQ and +$9k to +$10k on the index, over ten years. On the window, the period the account trades now, they lose:
 −$5.2k on the chart's execution, −$6.3k on NinjaTrader's. Entries stay through 15:00.
 
 | Net, 5 min | through 15:00 (now) | through 15:30 |
