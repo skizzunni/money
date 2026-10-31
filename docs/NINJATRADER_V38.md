@@ -359,3 +359,12 @@ All results are in `verification/noise_v2/g6_time_stop_growth.csv`.
 **Tests:**
 - NinjaTrader's code matches the Python model trade for trade, with the time stop on, on 5 and 30 minutes.
 - The Pine script matches the Python model trade for trade, alerts included.
+
+**MnqNoiseV38.cs in Funded growth mode on the simulator, with the time stop, Jan 2025 to Oct 2026:**
+
+| Bars | Before | Now | Trades | Winners | PF | Worst day | Matches the Python model |
+|---|---|---|---|---|---|---|---|
+| 30 min | $26,672 | **$28,620** | 252 | 53.6% | 1.88 | −$899 | every trade |
+| 5 min | $18,275 | **$18,542** | 291 | 61.5% | 1.82 | −$899 | every trade but the Mar 9, 2026 data gap (above) |
+
+The updated results are in `verification/noise_v2/v38_growth_ninjatrader_*.csv`.
