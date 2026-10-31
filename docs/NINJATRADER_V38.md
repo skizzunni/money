@@ -133,3 +133,15 @@ Each run is a fresh account in funded growth mode ($900 a day, $2,000 trailing):
 | Index, 30-min | 50 | 41 | 22.9 / 27.9 / 36.5 | 6 | 29 |
 
 **On one account, $50,000 typically takes about 2 to 2.5 years.** About 1 start in 5 never got there in the data.
+
+## G2: growth mode with no take-profit (registered 2026-10-31, before its run)
+
+**The variant:** funded growth mode exactly as above, except the take-profit is off. Winners exit only at the line
+stop, the lock or 16:00.
+
+**Adopt it only if all four hold:**
+- 5-minute bars (the user's chart): net higher on NQ 2015-2025, on the index 2011-2026 and in the Jan 2025 – Oct 2026
+  stand-in window;
+- the trailing floor is never touched on any of them;
+- no day reaches −$1,000 more often than with the take-profit;
+- the same on 30-minute bars, reported.
