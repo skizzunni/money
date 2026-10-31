@@ -145,3 +145,23 @@ That makes 4 variants. Everything else is as in E50.
 - the evaluation tracker at a $3,000 target and a $2,000 end-of-day trailing drawdown.
 
 The 155 Pine-against-Python parity tests pass.
+
+## E50R: size each trade to its own stop at a fixed $260 risk (registered 2026-10-31, before its run)
+
+**The user's request:** one account, the same rules ($300 a trade at most, under $1,000 a day, a small drawdown),
+more profit.
+
+**The lever:** v3.8 always trades 1 MNQ. Its $260 is a ceiling, and the line stop is often much closer.
+- New option `risk_per_trade` R: contracts = floor(R / (the initial stop's distance × $2 + $2.24 costs)), from 1 up
+  to `risk_max_qty`.
+- The whole position's max loss is R, so the cap per contract is R / contracts.
+- Everything else is v3.8, including the $900 daily budget with its squeeze. The lock trigger is 0.35 × the cap per
+  contract, so it scales with the size.
+
+**Variants:** R = $260; most contracts 3, 5 or 10. Each also with no take-profit. That makes 6 variants.
+
+**Selection** (NQ 2015-2025 and the index 2011-2026, 5-minute bars):
+- Among variants whose average evaluation fail rate is at most 10% (v3.8: 6.65%) and whose largest loss is under
+  $300, the highest average net per year.
+- If none qualifies, v3.8 stays.
+- The user's window is reported once, on 30-minute bars.

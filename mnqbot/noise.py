@@ -199,6 +199,11 @@ class NoiseConfig:
     # with the money budget: when not even 1 contract fits, still take 1 with its max loss cut to the room left (less
     # costs), if that leaves at least squeeze_min points of stop; 0 = off (no entry)
     squeeze_min: float = 0.0
+    # research (E50R, docs/CANDIDATE_E50.md): a fixed dollar risk a trade. Contracts = floor(risk_per_trade / (the
+    # initial stop's distance x point value + costs)), 1 to risk_max_qty; the whole position's max loss is
+    # risk_per_trade (so the cap per contract is risk_per_trade / contracts). 0 = off
+    risk_per_trade: float = 0.0
+    risk_max_qty: int = 1
     # research (after v3.6): the turn of the month (a month's last trading day on the chart and the next month's first
     # three): no new shorts (tom_no_shorts) and tom_mult x the contracts (the same stop distance)
     tom_no_shorts: bool = False
@@ -847,6 +852,14 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                     if cfg.day_up_mult != 1.0 and day_pnl > cfg.day_up_from:
                         q_up = max(1, round(q_next * cfg.day_up_mult))
                         ml_next, q_next = ml_next / q_next * q_up, q_up
+                    if cfg.risk_per_trade > 0 and use_stop:  # E50R: size to the trade's own stop at a fixed risk
+                        costs_c = 2 * cfg.commission_per_side + 2 * slip * cfg.point_value
+                        sb = cfg.stop_buffer * sigma
+                        ln_stop = upper * (1 - sb) if d > 0 else lower * (1 + sb)
+                        pts = min(abs(c[i] + d * slip - ln_stop), cfg.risk_per_trade / cfg.point_value)
+                        q_r = int(cfg.risk_per_trade // (pts * cfg.point_value + costs_c)) if pts > 0 else 1
+                        q_next = max(1, min(cfg.risk_max_qty, q_r))
+                        ml_next = cfg.risk_per_trade
                     if (cfg.daily_loss_limit > 0 or cfg.trail_dd > 0) and cfg.max_loss_per_trade > 0:  # loss budget
                         per_c = ml_next / q_next + 2 * cfg.commission_per_side + 2 * slip * cfg.point_value
                         if cfg.budget_actual and use_stop:  # the initial stop: the line's or the max loss
