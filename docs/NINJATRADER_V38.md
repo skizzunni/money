@@ -439,3 +439,16 @@ that drift.
 
 This is a second look at a setting already chosen, so a variant must beat 60 on all six 5-minute runs. If both do,
 take the one with the higher NinjaTrader window net.
+
+**G9 result (run once, 2026-10-31): rejected; the time stop stays at 60 minutes.** A longer limit raises the winners
+(about 61% to 63-65% on 5-minute bars) but makes less on NQ, by $6k to $15k over ten years. No variant beat 60 on all
+six 5-minute runs.
+
+| Net, 5 min (chart / NinjaTrader) | 60 min (now) | 90 min | 120 min |
+|---|---|---|---|
+| window | $18,516 / $18,549 | $18,113 / $16,325 | $18,463 / $18,578 |
+| NQ | $277,322 / $267,571 | $261,951 / $259,244 | $261,149 / $260,613 |
+| index | $407,796 / $404,250 | $397,711 / $392,367 | $412,677 / $403,429 |
+| winners (NinjaTrader window) | 61.5% | 63.6% | 65.4% |
+
+The floor was never touched in any run (`verification/noise_v2/g9_time_stop_long_growth.csv`).
