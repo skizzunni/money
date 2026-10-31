@@ -29,8 +29,10 @@ for step, top in ((1500.0, 15), (1000.0, 15), (750.0, 15), (1000.0, 20)):
         e = np.r_[0.0, np.cumsum(p)]
         dayp = tf.groupby(tf.exit_time.dt.date).pnl.sum()
         tr = S.trail_stats(name, tf)
-        print({"bars": S.MIN[0], "step": step, "max qty": top, "set": name, "trades": len(p), "net $": round(float(p.sum())),
-               "pf": round(float(p[p > 0].sum() / -p[p <= 0].sum()), 3), "win %": round(100 * float((p > 0).mean()), 1),
-               "largest loss $": round(float(p.min())), "closed dd $": round(float((np.maximum.accumulate(e) - e).max())),
+        print({"bars": S.MIN[0], "step": step, "max qty": top, "set": name, "trades": len(p),
+               "net $": round(float(p.sum())), "pf": round(float(p[p > 0].sum() / -p[p <= 0].sum()), 3),
+               "win %": round(100 * float((p > 0).mean()), 1),
+               "largest loss $": round(float(p.min())),
+               "closed dd $": round(float((np.maximum.accumulate(e) - e).max())),
                "worst day $": round(float(dayp.min())), "days <= -1000": int((dayp <= -1000).sum()),
                "floor touches": tr[f"{name} tb0"]}, flush=True)
