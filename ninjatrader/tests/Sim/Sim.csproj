@@ -20,5 +20,6 @@
     <Compile Include="../../Strategies/MnqMomentumC.cs" />
     <Compile Include="../../Strategies/MnqCandidateD.cs" />
     <Compile Include="../../Strategies/MnqFomcDrift.cs" />
+    <Compile Include="../../Strategies/MnqNoiseV38.cs" />
   </ItemGroup>
 </Project>
