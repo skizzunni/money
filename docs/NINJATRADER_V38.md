@@ -263,3 +263,18 @@ the big winners pay for the strategy, and a partial takes half of each of them o
 | 30 min, index | $313,654 | $174,080 | $215,419 | $223,337 |
 
 Growth mode stays as it is.
+
+## G5: faster contract steps in growth mode (registered 2026-10-31, before its run)
+
+**The idea:** growth mode adds a contract per $1,500 of profit, up to 15. The account grows faster if it adds them
+sooner, as long as the $900 daily budget and the $2,000 trailing floor still size every trade (they do: a trade never
+risks more than today's room or the room above the floor).
+
+**Variants:** profit step $1,000 up to 15; $750 up to 15; $1,000 up to 20. Everything else is growth mode.
+
+**Adopt a variant only if all hold:**
+- on 5-minute bars it has a higher net than growth mode on NQ, the index and the window;
+- it never touches the trailing floor;
+- no more days at −$1,000 or worse than growth mode on any set.
+
+If more than one passes, take the one with the highest 5-minute window net.
