@@ -173,3 +173,19 @@ contracts at the same stop distance.
 **Adopt a cap only if**, on 5-minute bars:
 - its net is at least 90% of no cap's on all three sets; and
 - its largest loss and closed drawdown are lower on all three.
+
+**G3 result: not adopted as the default.** On 5-minute bars:
+
+| | No cap | $600 cap | $400 cap |
+|---|---|---|---|
+| Window net / largest win / largest loss | $18,473 / $3,699 / −$853 | $13,844 / $2,774 / −$569 | $11,098 / $1,849 / −$399 |
+| NQ net / largest loss / closed DD | $269,579 / −$3,776 / $17,027 | $164,295 / −$716 / $10,191 | $113,163 / −$412 / $5,911 |
+| Index net / largest loss / closed DD | $406,336 / −$3,754 / $17,148 | $236,552 / −$701 / $9,139 | $161,914 / −$561 / $6,422 |
+
+- **A cap cuts the big losses**, by 70-90% on the histories, and roughly halves the drawdown.
+- **It cuts the big wins and the net just as hard.** The same contracts make both. A $600 cap keeps 58-75% of the net
+  and $400 keeps 40-60%, against the 90% the rule required.
+- **The winners are unchanged:** 64-66% at every cap. Profit factor falls slightly as the cap tightens.
+
+It remains a choice for the user: the research option `trade_risk_cap` exists in the Python model. The NinjaTrader
+strategy does not have it yet.
