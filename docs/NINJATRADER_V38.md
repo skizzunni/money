@@ -295,3 +295,22 @@ the fastest one that survives every history (`verification/noise_v2/g5_steps_gro
 | 30 min, index | $313,654 | **$7, floor, 63 trades** | **$1, floor, 60 trades** | **$7, floor, 63 trades** |
 
 Growth mode stays at $1,500 a contract, up to 15.
+
+## G6: a time stop in growth mode (registered 2026-10-31, before its run)
+
+**The idea:** breakouts that work tend to work fast. The nineteenth round (docs/RESULTS.md) found that a 30-minute
+time stop made the losses about 14% smaller at about the same profit, but that was on the old bot, at 1 contract,
+with no lock and no take-profit. In growth mode, smaller losses could compound into more contracts sooner.
+
+**The variant:** growth mode, plus a time stop (`time_stop` in mnqbot/noise.py). A trade that is not yet locked and
+is losing at a bar close T minutes or more after its fill is closed at the next bar's open, as a market order sent at
+that close would be. Everything else is unchanged.
+
+**Variants:** T = 30 minutes and T = 60 minutes.
+
+**Adopt a variant only if all hold:**
+- on 5-minute bars it has a higher net than growth mode on NQ, the index and the window;
+- it never touches the trailing floor;
+- no more days at −$1,000 or worse than growth mode on any set.
+
+If both pass, take the one with the higher 5-minute window net.

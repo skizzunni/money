@@ -265,6 +265,9 @@ class NoiseConfig:
     # partial_frac of the position (a tick through it; the stop first in a bar that reaches both); the rest keeps
     # every rule above.
     trail_points: float = 0.0
+    # research (G6, docs/NINJATRADER_V38.md): a time stop. A trade not yet locked that is losing at a bar close
+    # time_stop minutes or more after its fill is closed at the next bar's open (a market order sent at that close).
+    time_stop: int = 0
     partial_at: float = 0.0
     partial_frac: float = 0.5
     partial_next_bar: bool = False  # the part's limit works from the bar after the fill (as NinjaTrader can send it)
@@ -675,6 +678,9 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             if (cfg.tv_path and hit and entry_bar != i and not gapped
                     and ((h[i] - o[i] <= o[i] - l[i]) if pos > 0 else (o[i] - l[i] < h[i] - o[i]))):
                 deferred, hit = (price, reason), False  # the favourable extreme first: profit orders before the stop
+            if (cfg.time_stop and not locked and entry_bar != i  # at the open, before any stop in the bar
+                    and (i - entry_bar) * minutes >= cfg.time_stop and pos * (c[i - 1] - entry_px) < 0):
+                hit, price, reason, deferred = True, o[i] - pos * slip, "Time stop", None
             if hit:
                 close_pos(i, price, reason)
                 events.append((i, "EXIT"))
