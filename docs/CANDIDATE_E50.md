@@ -165,3 +165,22 @@ more profit.
   $300, the highest average net per year.
 - If none qualifies, v3.8 stays.
 - The user's window is reported once, on 30-minute bars.
+
+## E50R results (`verification/noise_v2/e50r_5.csv`, `e50r_30.csv`): rejected, v3.8 stays
+
+Sizing each trade to its own stop at $260 put on 1.4-1.8 contracts on average.
+
+| 5-minute bars | v3.8 | Up to 3 MNQ | Up to 5 | Up to 10 |
+|---|---|---|---|---|
+| Net a year, NQ / index | $5,490 / $5,365 | $6,764 / $5,970 | $6,789 / $6,000 | $6,778 / $5,962 |
+| Evaluations failed, NQ / index | **8.9% / 4.4%** | 18.9% / 19.1% | 20.3% / 20.0% | 20.0% / 20.1% |
+| Largest loss | −$274.74 | −$306.95 | −$306.95 | −$306.95 |
+| User's window: net (5 / 30-min) | $7,853 / $8,215 | $8,318 / $9,292 | $8,439 / $9,414 | $9,054 / $10,029 |
+
+These rows are with the 2.0 take-profit; the no-take-profit rows are alike.
+
+- **About 10-25% more profit a year, and about twice the failed evaluations.**
+  - More trades risk close to the full $260, so losing runs reach the $2,000 floor sooner.
+  - Gaps through stops pushed the largest loss past $300.
+- **No variant meets the frozen rule** (fail rate at most 10%, largest loss under $300), so E50R is rejected.
+- Even the best variant adds about $2,000 over the user's 21-month window, not the ~$40,000 more needed for $50,000.
