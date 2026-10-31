@@ -145,3 +145,15 @@ stop, the lock or 16:00.
 - the trailing floor is never touched on any of them;
 - no day reaches −$1,000 more often than with the take-profit;
 - the same on 30-minute bars, reported.
+
+**G2 result: rejected, the take-profit stays.** On 5-minute bars, without the take-profit:
+
+| | With take-profit | Without |
+|---|---|---|
+| NQ | $269,579 | $225,665 |
+| Index | $406,336 | $329,907 |
+| Stand-in window | $18,473 | $14,384 |
+
+It lost on all three. On 30-minute bars it was higher only on NQ ($238,996 against $207,740) and lower on the index
+and in the window. The floor was never touched either way. The take-profit lets a trade's full size be re-used the same
+day, which is worth more than the occasional bigger winner.
