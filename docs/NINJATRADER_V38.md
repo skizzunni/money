@@ -247,3 +247,19 @@ measures it). The rest keeps every rule.
 - on 5-minute bars it has a higher net than growth mode on NQ, the index and the window;
 - it never touches the trailing floor;
 - no day reaches −$1,000 more often.
+
+**G4 result (run once, 2026-10-31): rejected.** Every partial variant made less on every data set, at both bar lengths.
+The floor was never touched and the worst day did not change (−$1,023 on NQ, a gap, in every variant). Partials
+trimmed the largest losses a little (the 30-minute window's −$853 became −$755) but cut the net by 22% to 58%:
+the big winners pay for the strategy, and a partial takes half of each of them off at 1 R.
+
+| Net | growth mode | half at 1 R | half at 1.5 R | a third at 1 R |
+|---|---|---|---|---|
+| 5 min, window | $18,473 | $10,154 | $13,188 | $14,394 |
+| 5 min, NQ | $269,579 | $169,396 | $197,761 | $199,486 |
+| 5 min, index | $406,336 | $272,120 | $300,844 | $314,658 |
+| 30 min, window | $23,082 | $11,685 | $16,710 | $15,191 |
+| 30 min, NQ | $207,740 | $86,724 | $142,853 | $147,438 |
+| 30 min, index | $313,654 | $174,080 | $215,419 | $223,337 |
+
+Growth mode stays as it is.
