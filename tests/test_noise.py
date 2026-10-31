@@ -43,12 +43,12 @@ OWN_STOP = "Size by the trade's own stop"  # on (v3.0)
 TREND = "No shorts while the last close is above its average of this many sessions (0 = off)"  # 50 (v3.1)
 SQUEEZE = ("Never stuck: when no contract fits, 1 with its stop cut to the room left, if at least this many points "
            "(0 = off)")  # 20 (v3.1)
-V21 = {"max_loss_per_trade": 187.5, "lock_at": 0.35, "max_losers": 0, "take_profit": 2.0, "tighten_only": True,
-       "after_loss_qty_div": 1.0, "after_loss_ml_mult": 4 / 3, "last_entry_end": 900,
+V21 = {"max_loss_per_trade": 260.0, "lock_at": 0.35, "max_losers": 0, "take_profit": 2.0, "tighten_only": True,
+       "after_loss_qty_div": 1.0, "after_loss_ml_mult": 1.0, "last_entry_end": 900,
        "big_day_k": 1.5, "big_day_n": 10, "calm_k": 0.7, "calm_short": 10, "calm_long": 40,
-       "daily_loss_limit": 2000.0, "range_pos_min": 0.65, "trail_dd": 3000.0, "trail_cap": 0.0,
-       "profit_step": 1500.0, "size_up_to": 15, "budget_actual": True,
-       "trail_from": "2025-01-02", "trend_n": 50, "trend_side": -1, "squeeze_min": 20.0}  # the script's defaults
+       "daily_loss_limit": 900.0, "range_pos_min": 0.65, "trail_dd": 0.0, "trail_cap": 0.0,
+       "profit_step": 0.0, "size_up_to": 0, "budget_actual": False,
+       "trail_from": "2025-01-02", "trend_n": 50, "trend_side": -1, "squeeze_min": 20.0}  # the script's defaults (v3.8)
 P0 = 20_000.0
 BARS_PER_DAY = 78  # 09:30 .. 15:55 on 5-minute bars
 CHECK_10_00, CHECK_10_30, CLOSE_16_00 = 5, 11, 77  # bar numbers within a session
@@ -817,7 +817,7 @@ def test_pine_dashboard_shows_the_next_checks_lines():
 @pytest.mark.parametrize("funded, eval_qty, qty", [(None, None, 1), (False, 3, 3), (True, 3, 1)])
 def test_pine_account_switch(funded, eval_qty, qty):
     """The evaluation (the default) starts at 1 MNQ (v3.0), or its own setting; the funded switch 1; the same max loss,
-    so the stop and the lock scale. The script's defaults: at 1 MNQ the after-loss max loss ($250, the same contracts)
+    so the stop and the lock scale. The script's defaults: at 1 MNQ v3.8's $260 for every trade
     and the v3.0 sizing included; at 3 MNQ the after-loss size off."""
     bars = synth_bars(sessions=60, seed=11)
     inputs = {} if funded is None else {FUNDED: funded}

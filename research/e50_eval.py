@@ -2,7 +2,9 @@
 no take-profit and no limit on trades a day, replayed as 50K evaluations ($2,000 end-of-day trailing drawdown that
 stops at the start, $1,000 daily limit, $3,000 target).
 
-    SCAN_MINUTES=5 python research/e50_eval.py <data dir> <MNQ_09-26> <MNQ_12-26> <out.csv>
+    SCAN_MINUTES=5 python research/e50_eval.py <data dir> <MNQ_09-26> <MNQ_12-26> <out.csv> [b]
+
+"b" runs E50b: 1 MNQ at $260, take-profit off or 2.0, with or without a stop for the day after a loss.
 """
 from __future__ import annotations
 
@@ -23,9 +25,9 @@ NY = "America/New_York"
 TARGET, TRAIL = 3000.0, 2000.0
 
 
-def config(qty: int, tp: float) -> dict:
-    return {**S.V23, **T.REFERENCE, "qty": qty, "max_loss_per_trade": 300.0, "after_loss_ml_mult": 1.0,
-            "after_loss_qty_div": 1.0, "take_profit": tp, "max_losers": 0, "daily_loss_limit": 1000.0,
+def config(qty: int, tp: float, ml: float = 300.0, losers: int = 0) -> dict:
+    return {**S.V23, **T.REFERENCE, "qty": qty, "max_loss_per_trade": ml, "after_loss_ml_mult": 1.0,
+            "after_loss_qty_div": 1.0, "take_profit": tp, "max_losers": losers, "daily_loss_limit": 1000.0,
             "trail_dd": 0.0, "profit_step": 0.0, "size_up_to": 0, "budget_actual": False}
 
 
@@ -69,13 +71,26 @@ def evals(tf: pd.DataFrame, days: list[str]) -> dict:
             "median days to pass": int(np.median(dur)) if dur else None}
 
 
+def streaks(p: np.ndarray) -> dict:
+    loss = p <= 0
+    run = best = 0
+    for x in loss:
+        run = run + 1 if x else 0
+        best = max(best, run)
+    after = int((loss[1:] & loss[:-1]).sum())
+    return {"longest losing run": best, "loss after a loss % of losses": round(100 * after / max(1, int(loss.sum())), 1)}
+
+
 def main() -> None:
     S.init({}, *sys.argv[1:4])
     rows = []
-    for qty in (1, 2, 3):
-        for tp in (0.0, 2.0):
+    variants = [(q, tp, 300.0, 0) for q in (1, 2, 3) for tp in (0.0, 2.0)]
+    if len(sys.argv) > 5 and sys.argv[5] == "b":  # E50b: 1 MNQ at $260, stop for the day after a loss or not
+        variants = [(1, tp, 260.0, lo) for tp in (0.0, 2.0) for lo in (0, 1)]
+    for qty, tp, ml, losers in variants:
+        if True:
             for name, (bars, first, skip) in S.D.items():
-                cfg = NoiseConfig(**config(qty, tp))
+                cfg = NoiseConfig(**config(qty, tp, ml, losers))
                 if isinstance(skip, str):
                     cfg.skip_dates, cfg.fed_dates = skip, ""
                 tf = run(bars, cfg, minutes=S.MIN[0]).trades_frame()
@@ -88,7 +103,8 @@ def main() -> None:
                 if first:
                     days = [x for x in days if x >= first]
                 tr = S.trail_stats(name, tf)
-                r = {"bars": f"{S.MIN[0]}-min", "qty": qty, "take_profit": tp, "set": name, "trades": len(p),
+                r = {"bars": f"{S.MIN[0]}-min", "qty": qty, "take_profit": tp, "max loss": ml, "max losers": losers,
+                     "set": name, "trades": len(p), **streaks(p),
                      "trades/day": round(len(p) / max(1, tf.entry_time.dt.date.nunique()), 2),
                      "net $": round(float(p.sum())), "win %": round(100 * float((p > 0).mean()), 1),
                      "pf": round(float(p[p > 0].sum() / max(1e-9, -p[p <= 0].sum())), 3),

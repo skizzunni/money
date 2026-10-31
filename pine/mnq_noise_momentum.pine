@@ -15,6 +15,15 @@
 // Noise area for each half-hour mark = the day's open (and previous close) plus/minus the
 // average distance price has moved from the 09:30 open by that time over the last 14 sessions.
 //
+// v3.8, 2026-10-31: for a 50K evaluation (docs/CANDIDATE_E50.md). 1 MNQ, at most $260 lost per trade (the whole
+// position; the trade after a loser the same), so slippage keeps the realized loss under $300; take-profit 2 noise
+// units; no limit on trades a day; max loss a day $900, so the day stays under the firm's $1,000 (as losses build up,
+// each new trade's stop is cut to the room left instead of stopping); no extra contracts as profit builds; the
+// evaluation tracker's target $3,000 and end-of-day trailing drawdown $2,000. In replayed 50K evaluations from every
+// 5th session: 89% passed on NQ 2015-2025 and 94% on the index 2011-2026 (5-minute bars); in the Jan 2025 - Oct 2026
+// window none failed and 84% passed, typically in 6-8 months, on 30-minute bars ($8,215, PF 1.78). Stopping for the
+// day after a loss did not cut back-to-back losers (about 40% of losers either way) and passed fewer evaluations, so
+// it is off. No rule prevents losing trades or losing streaks.
 // v3.6, 2026-10-24: for a 100K account, with v3.4's rules (the best on the user's chart; v3.5's retuned settings
 // made less there: +$9,467 against +$13,815). Max loss a day $2,000, end-of-day trailing drawdown $3,000 (stopping at
 // the starting balance), a contract more per $1,500 of profit, up to 15; the evaluation tracker's target $6,000 and
@@ -164,7 +173,7 @@
 // max loss after the fill bar are checked once per bar, so a 30-minute chart sees them later than a trader would.
 // The rules are the same as the Python reference in mnqbot/noise.py.
 // ------------------------------------------------------------------
-strategy("MNQ Noise-Area Momentum v3.6", shorttitle = "Noise-Mom", overlay = true,
+strategy("MNQ Noise-Area Momentum v3.8", shorttitle = "Noise-Mom", overlay = true,
      initial_capital = 50000, currency = currency.USD,
      default_qty_type = strategy.fixed, default_qty_value = 1, pyramiding = 0,
      commission_type = strategy.commission.cash_per_contract, commission_value = 0.62,
@@ -189,7 +198,7 @@ evalQty  = input.int(1, "Contracts in an evaluation", minval = 1, maxval = 60, g
 fundQty  = input.int(1, "Contracts on a funded account", minval = 1, maxval = 60, group = grpT,
      tooltip = "Every figure in docs/RESULTS.md is per contract. What matters is the max loss per contract (the dashboard shows it): $350 over 10 contracts is $35 a contract, a 17.5-point stop; over 3 it is $117, 58 points. See docs/RESULTS.md, rounds thirteen, twenty-seven, thirty-two and thirty-seven.")
 qty = account == "Evaluation" ? evalQty : fundQty
-maxLoss  = input.float(187.5, "Max loss per trade, $ (all contracts, 0 = off)", minval = 0, step = 10, group = grpT,
+maxLoss  = input.float(260, "Max loss per trade, $ (all contracts, 0 = off)", minval = 0, step = 10, group = grpT,
      tooltip = "A second stop this many dollars from the entry fill, for the whole position, live from the fill like a bracket order; whichever of it and the line stop is closer is used. Spread over many contracts it gets tight: $350 over 10 contracts is a $35 stop each, which normal 5-minute moves hit, and on 2023-2026 it made about $6 a day per contract against about $20 at $117 each. On 16 years, caps of $100-$200 per contract raised profit per day in every period and cut the worst losing stretch. Fees, slippage and a gap through the stop can add to the loss.")
 afterQty = input.int(0, "After a losing trade: contracts (0 = the same)", minval = 0, maxval = 60, group = grpT,
      tooltip = "The trade after a losing trade uses this many contracts and the max loss below, so its stop sits further away (v2.8: the same 4 MNQ and $1,000, 125 points, against 93.75 for 4 MNQ and $750; v2.6 was 9 MNQ and $1,500 against 10 and $750). A winner, or the next trade, goes back to the normal size. Ordinary noise stopped many re-entries after a loss; the wider stop turned some of them into winners: back-to-back losers 36% against 42% of losers on the user's MNQ window, 51% against 57% on NQ futures 2015-2025 (docs/RESULTS.md, v2.1). It risks up to $1,000 on that trade, and never more than what is left of the day's loss limit.")
@@ -203,18 +212,18 @@ calmK = input.float(0.7, "Calm stretch: no trades if the recent average range < 
      tooltip = "v2.5: no new entries (nor heads-ups) on a day when the average 09:30-16:00 range of the last sessions (the first number below) is under this share of the average over the longer stretch (the second). When ranges have shrunk well below normal, breakouts of the noise area mostly fail: at v2.4's settings trades after such stretches made the least of any fifth of days on NQ futures 2015-2025, the Nasdaq-100 index 2011-2026 and the 2025-2026 stand-in. With the rule, the profit factor rose on all three, on both 5- and 30-minute bars, at every pair of lengths tried (5-20 against 40-100 sessions), with net level on the histories (docs/RESULTS.md, v2.5).")
 calmShort = input.int(10, "Calm stretch: recent sessions", minval = 2, maxval = 50, group = grpT)
 calmLong = input.int(40, "Calm stretch: longer stretch, sessions", minval = 5, maxval = 100, group = grpT)
-dailyLimit = input.float(2000, "Max loss a day, $ (0 = off)", minval = 0, step = 50, group = grpT,
+dailyLimit = input.float(900, "Max loss a day, $ (0 = off)", minval = 0, step = 50, group = grpT,
      tooltip = "v2.7: no trade may risk more than what is left of this loss today (today's closed P/L counted, wins add room back). A trade that would risk more takes fewer contracts with the same stop distance; when not even 1 contract fits, no new entries until tomorrow. Trading never stops just because of a loss: the next trade is smaller instead. The stop is a resting order, so a gap or fast market through it can still lose a little more (docs/RESULTS.md, v2.7).")
-trailDD = input.float(3000, "Trailing drawdown (end of day), $ (0 = off)", minval = 0, step = 100, group = grpT,
+trailDD = input.float(0, "Trailing drawdown (end of day), $ (0 = off)", minval = 0, step = 100, group = grpT,
      tooltip = "v3.0: a prop firm's end-of-day trailing drawdown. The floor is your highest end-of-day balance minus this; no trade may risk more than what is left above it (fewer contracts, the same stop; none when not even 1 fits). With the $1,000 a day limit, a trade gets the smaller of the two rooms (docs/RESULTS.md, v3.0).")
 trailStop = input.bool(true, "Trailing drawdown stops at the starting balance", group = grpT,
      tooltip = "As at most prop firms: once the floor reaches your starting balance it stays there. Unticked, it keeps trailing your highest end-of-day balance for ever.")
 trailFrom = input.int(20250102, "Trailing drawdown and contract steps from date, YYYYMMDD (0 = the first bar)", minval = 0, group = grpT,
      tooltip = "The day the account started: 20250102 (the default) for the backtest from January 2, 2025; for a live account, the day it began. Before it the script trades the starting contracts with no trailing drawdown, so the steps and the floor count only from this day.")
-profitStep = input.float(1500, "Add a contract per $ of profit (0 = off)", minval = 0, step = 100, group = grpT,
+profitStep = input.float(0, "Add a contract per $ of profit (0 = off)", minval = 0, step = 100, group = grpT,
      tooltip = "v3.0: one more contract for each this much closed profit since the start date (the same stop distance and max loss per contract), up to the most contracts below. A $2,000 trailing drawdown fits about 1 MNQ until there is a cushion: at 1 MNQ the 2025-2026 stand-in's worst end-of-day drawdown was $1,841. v3.4: $2,500 (v3.3's $1,500 made no more on the user's chart). With v3.1's trend rule, steps of $1,500-2,500 never touched the floor on any test set; $1,000 got stuck on the histories (docs/RESULTS.md, v3.0-v3.3).")
 sizeUpTo = input.int(15, "Most contracts (0 = no limit)", minval = 0, maxval = 60, group = grpT)
-budgetStop = input.bool(true, "Size by the trade's own stop", group = grpT,
+budgetStop = input.bool(false, "Size by the trade's own stop", group = grpT,
      tooltip = "v3.0: a contract's risk for the loss limits is its stop at entry, the line stop or the max loss, whichever is closer (plus fees and a tick each way). Unticked: always the full max loss.")
 trendN = input.int(50, "No shorts while the last close is above its average of this many sessions (0 = off)", minval = 0, maxval = 250, group = grpT,
      tooltip = "v3.1: in an uptrend (yesterday's 16:00 close above the average of the last 50 sessions' closes) no new shorts; longs as usual. On the user's TradingView chart 1/2025-12/2025 v3.0's shorts lost $2,179 while its longs made $2,117; shorts against the 50-session trend lost on NQ futures 2015-2025 and the Nasdaq-100 index 2011-2026 too (docs/RESULTS.md, v3.1).")
@@ -222,7 +231,7 @@ squeezeMin = input.float(20, "Never stuck: when no contract fits, 1 with its sto
      tooltip = "v3.1: near the trailing floor (or the day's limit) not even 1 contract may fit; v3.0 then stopped trading, on the user's chart for most of 2026. Now it takes 1 MNQ with its max loss cut to the room left (less costs), as long as that leaves a stop of at least this many points.")
 rangePos = input.float(0.65, "Entries near the day's extreme: the close in the top this share of the day's range (0 = off)", minval = 0, maxval = 1, step = 0.05, group = grpT,
      tooltip = "v2.9: a long needs the check's close in the top part of the day's 09:30-to-now range: (close - day low) / (day high - day low) at least this (a short: the bottom part, (day high - close) / (day high - day low)). A breakout of the noise area after the day had already run further and come back down to the line made about nothing: profit factor 1.0-1.1 on NQ futures 2015-2025, the Nasdaq-100 index 2011-2026 and the 2025-2026 stand-in, against 1.5 for the rest. Skipping them frees the day's loss room for the others (docs/RESULTS.md, v2.9).")
-afterMaxLoss = input.float(250, "After a losing trade: max loss per trade, $ (0 = the same)", minval = 0, step = 10, group = grpT)
+afterMaxLoss = input.float(0, "After a losing trade: max loss per trade, $ (0 = the same)", minval = 0, step = 10, group = grpT)
 skipDates = input.string("2025-01-01,2025-01-09,2025-01-20,2025-02-17,2025-04-18,2025-05-26,2025-06-19,2025-07-03,2025-07-04,2025-09-01,2025-11-27,2025-11-28,2025-12-24,2025-12-25,2026-01-01,2026-01-19,2026-02-16,2026-04-03,2026-05-25,2026-06-19,2026-07-03,2026-09-07,2026-11-26,2026-11-27,2026-12-24,2026-12-25,2027-01-01,2027-01-18,2027-02-15,2027-03-26,2027-05-31,2027-06-18,2027-07-05,2027-09-06,2027-11-25,2027-11-26,2027-12-24",
      "Don't trade on these dates", group = grpT,
      tooltip = "YYYY-MM-DD, comma separated. Pre-filled with the 2025-2027 US market holidays and half days (2025 for backtests from January 2025), when MNQ trades a short session. Add news days if you like.")
@@ -257,8 +266,8 @@ logRows   = input.int(10, "Trades in the log", minval = 1, maxval = 30, group = 
 grpE = "Evaluation tracker"
 evalStart = input.int(0, "Evaluation start date, YYYYMMDD (0 = off)", minval = 0, group = grpE,
      tooltip = "The day your evaluation began, e.g. 20261020. A table at the bottom left then follows it from the strategy's trades since that day, by the rules below (end-of-day balances): profit toward the target, the trailing drawdown floor and how many full losers fit above it, your best day against the consistency rule, and what it takes to pass. It reads the trades only; it changes nothing.")
-evalTarget = input.float(6000, "Profit target, $", minval = 0, step = 100, group = grpE)
-evalDD = input.float(3000, "End-of-day trailing drawdown, $", minval = 0, step = 100, group = grpE,
+evalTarget = input.float(3000, "Profit target, $", minval = 0, step = 100, group = grpE)
+evalDD = input.float(2000, "End-of-day trailing drawdown, $", minval = 0, step = 100, group = grpE,
      tooltip = "Trails the highest end-of-day balance and stops rising at the starting balance, as the backtests in docs/RESULTS.md assume.")
 evalCons = input.float(50, "Best day under this % of the profit (0 = no rule)", minval = 0, maxval = 100, group = grpE)
 evalDays = input.int(5, "Minimum trading days", minval = 0, group = grpE)
@@ -710,7 +719,7 @@ if showDash and (barstate.islastconfirmedhistory or barstate.isrealtime)
     closed = strategy.closedtrades
     todayPnlDash = strategy.netprofit - dayStartNet
     wins = strategy.wintrades
-    table.cell(dash, 0, 0, "MNQ Noise Momentum v3.6: " + account + ", " + str.tostring(qty) + " MNQ", text_color = color.white, text_size = size.small)
+    table.cell(dash, 0, 0, "MNQ Noise Momentum v3.8: " + account + ", " + str.tostring(qty) + " MNQ", text_color = color.white, text_size = size.small)
     table.cell(dash, 1, 0, status, text_color = statusColor, text_size = size.small)
     table.cell(dash, 0, 1, "Sessions of history", text_color = color.silver, text_size = size.small)
     table.cell(dash, 1, 1, str.tostring(math.min(filled, lookback)) + " / " + str.tostring(lookback), text_color = color.white, text_size = size.small)

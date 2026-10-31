@@ -106,3 +106,42 @@ That makes 4 variants. Everything else is as in E50.
 **Selection:** the highest average evaluation pass rate on NQ and the index, on 5-minute bars, as before.
 - The user's window is reported once, on 30-minute bars.
 - The selected variant becomes the Pine script's defaults (v3.8).
+
+## E50b results (`verification/noise_v2/e50b_5.csv`, `e50b_30.csv`)
+
+1 MNQ at a $260 cap.
+
+| Take-profit, stop after a loss | NQ pass / fail (5-min) | Index pass / fail | Loss after a loss (NQ) | Longest losing run (NQ) |
+|---|---|---|---|---|
+| 2.0, no (selected) | 89.1% / 8.9% | 93.5% / 4.4% | 39.3% of losses | 8 |
+| none, no | 88.9% / 9.1% | 93.0% / 4.9% | 40.1% | 8 |
+| 2.0, yes | 76.3% / 20.3% | 82.1% / 5.2% | 40.2% | 7 |
+| none, yes | 76.0% / 21.3% | 72.1% / 18.2% | 40.3% | 7 |
+
+**Stopping for the day after a loss did not cut back-to-back losers.** The next loss simply came the next day: about
+40% of losses were followed by another loss either way. It also passed fewer evaluations, so it is off.
+
+- The largest realized loss at the $260 cap was $262-291, under $300.
+- **The user's window, 30-minute bars, selected variant:**
+  - net $8,215, 55.9% winners, PF 1.78, worst day −$417;
+  - longest losing run 6;
+  - 84% of evaluations passed and none failed.
+
+## The daily limit at $900 instead of $1,000 (`e50c_daily900_*.csv`)
+
+**The user's request:** never touch the firm's $1,000 daily limit, without stopping trading.
+- At a $900 internal limit, each new trade's stop is cut to the room left (at least 20 points), so trading continues
+  on smaller risk.
+- **Worst day:** −$898 to −$902 on every set and bar length. There was no day at −$1,000 or worse; at $1,000 there was
+  one −$1,012 day on 30-minute NQ.
+- **The cost:** 30-minute NQ evaluations passed 74.7% instead of 82.1%. The index and the user's window were unchanged.
+
+## Pine v3.8
+
+`pine/mnq_noise_momentum.pine`'s defaults are now the selected variant:
+- 1 MNQ, max loss $260 (also after a loser), take-profit 2.0, no loser limit;
+- max loss a day $900;
+- no trailing-drawdown sizing and no extra contracts;
+- the evaluation tracker at a $3,000 target and a $2,000 end-of-day trailing drawdown.
+
+The 155 Pine-against-Python parity tests pass.
