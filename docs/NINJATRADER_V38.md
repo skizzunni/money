@@ -452,3 +452,20 @@ six 5-minute runs.
 | winners (NinjaTrader window) | 61.5% | 63.6% | 65.4% |
 
 The floor was never touched in any run (`verification/noise_v2/g9_time_stop_long_growth.csv`).
+
+## G10: more contracts once the day is green (registered 2026-11-01, before its run)
+
+**The idea:** press when the day is working. Once today's closed P/L is above $0, the next entries take
+`day_up_mult` times the contracts (the same stop distance), still no more than 15, and still sized down to today's
+$900 room and the room above the floor. Tested on v2.8 (docs/RESULTS.md), where it made 2-17% more on the histories
+at a deeper drawdown, but never in growth mode, where the room limits every trade.
+
+**Variants:** `day_up_mult` 1.5 and 2.0, `day_up_from` $0. Everything else is the baseline (growth mode with G6's
+60-minute time stop).
+
+**Adopt only if all hold, in both the chart's and NinjaTrader's execution:**
+- on 5-minute bars it has a higher net than the baseline on NQ, the index and the window;
+- it never touches the trailing floor;
+- no more days at −$1,000 or worse than the baseline on any set.
+
+If both pass, take the one with the higher NinjaTrader window net.

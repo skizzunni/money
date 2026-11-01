@@ -862,6 +862,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                         ml_next, q_next = ml_next / q_next * q_s, q_s
                     if cfg.day_up_mult != 1.0 and day_pnl > cfg.day_up_from:
                         q_up = max(1, round(q_next * cfg.day_up_mult))
+                        if cfg.size_up_to > 0:  # still no more than the most contracts
+                            q_up = min(q_up, max(q_next, cfg.size_up_to))
                         ml_next, q_next = ml_next / q_next * q_up, q_up
                     if cfg.risk_per_trade > 0 and use_stop:  # E50R: size to the trade's own stop at a fixed risk
                         costs_c = 2 * cfg.commission_per_side + 2 * slip * cfg.point_value
