@@ -469,3 +469,22 @@ at a deeper drawdown, but never in growth mode, where the room limits every trad
 - no more days at −$1,000 or worse than the baseline on any set.
 
 If both pass, take the one with the higher NinjaTrader window net.
+
+**G10 result (run once, 2026-11-01): rejected; it can lose the account early.** On 5-minute bars the window, which
+starts the account at $0, went wrong at both sizes. The bigger trades after a green start lost back the early profit
+before the floor had stopped at the starting balance. The account then sat at −$1,636, too close to the floor to size
+a trade, after 49 trades. On a real account that is the end of it. On the ten-year histories, where the account is
+already well above the floor when most of the pressing happens, it made more: +$15k to +$28k. On 30-minute bars,
+2.0x ran NQ (chart execution) to the floor and stopped.
+
+| Net, 5 min (chart / NinjaTrader) | baseline | 1.5x on a green day | 2x on a green day |
+|---|---|---|---|
+| window | $18,516 / $18,549 | **−$1,636 / −$1,636, stuck after 49 trades** | **−$1,636 / −$1,636, stuck** |
+| NQ | $277,322 / $267,571 | $285,451 / $282,810 | $289,035 / $286,735 |
+| index | $407,796 / $404,250 | $426,162 / $421,805 | $434,248 / $429,324 |
+
+(`verification/noise_v2/g10_day_up_growth.csv`)
+
+**What this says about bigger size in general.** G5 and G10 failed the same way. More size early, before the cushion
+is built, can run a new account down to a floor that hasn't stopped yet. Any later idea that adds size has to be
+safe from the first trade on.
