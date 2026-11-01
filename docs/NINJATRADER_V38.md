@@ -505,3 +505,20 @@ most 15 contracts, still sized down to today's $900 room and the room above the 
 - no more days at −$1,000 or worse than the baseline on any set.
 
 If both pass, take the one with the higher NinjaTrader window net.
+
+**G11 result (run once, 2026-11-01): rejected.** Waiting for the floor to stop fixed the window: +$1.5k at 1.5x on
+NinjaTrader's execution. It didn't save NQ on 5-minute bars. There the account reached $2,000 early, the floor
+stopped at the starting balance, and the bigger trades gave everything back, down to the start (net $0 to $4 after
+about 140 trades, both executions, both sizes). The room above a floor at the start is all of the account's profit,
+and two or three bad weeks at double size used it up. On 30-minute bars and on the index it made a little more.
+
+| Net, 5 min (chart / NinjaTrader) | baseline | 1.5x, floor stopped | 2x, floor stopped |
+|---|---|---|---|
+| window | $18,516 / $18,549 | $20,307 / $20,029 | $17,249 / $19,752 |
+| NQ | $277,322 / $267,571 | **$0 / $4, back at the start after 140 trades** | **$1 / $1, back at the start** |
+| index | $407,796 / $404,250 | $413,197 / $408,381 | $417,281 / $416,197 |
+
+(`verification/noise_v2/g11_day_up_locked_growth.csv`)
+
+**Sizing, so far:** G5, G10 and G11 all failed the same way. Growth mode's sizing is already about as large as one
+account's $2,000 floor survives through a bad stretch.
