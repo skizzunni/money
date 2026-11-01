@@ -488,3 +488,20 @@ already well above the floor when most of the pressing happens, it made more: +$
 **What this says about bigger size in general.** G5 and G10 failed the same way. More size early, before the cushion
 is built, can run a new account down to a floor that hasn't stopped yet. Any later idea that adds size has to be
 safe from the first trade on.
+
+## G11: more contracts on a green day, only once the floor has stopped (registered 2026-11-01, before its run)
+
+**The idea:** G10's gain on the histories came once the account had a cushion. Its failure came on a new account,
+before the floor had stopped at the starting balance. So press only after that: once the highest end-of-day equity
+is $2,000 above the start, the floor is fixed at the starting balance for good (`day_up_locked` in
+mnqbot/noise.py). Until then, growth mode as it is.
+
+**Variants:** `day_up_mult` 1.5 and 2.0 once the day's closed P/L is above $0 and the floor has stopped. Still at
+most 15 contracts, still sized down to today's $900 room and the room above the floor.
+
+**Adopt only if all hold, in both the chart's and NinjaTrader's execution:**
+- on 5-minute bars it has a higher net than the baseline on NQ, the index and the window;
+- it never touches the trailing floor;
+- no more days at −$1,000 or worse than the baseline on any set.
+
+If both pass, take the one with the higher NinjaTrader window net.

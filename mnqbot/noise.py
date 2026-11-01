@@ -213,6 +213,9 @@ class NoiseConfig:
     tom_mult: float = 1.0
     day_up_mult: float = 1.0
     day_up_from: float = 0.0
+    # research (G11, docs/NINJATRADER_V38.md): day_up_mult only once the trailing floor has stopped at the starting
+    # equity plus trail_cap (the highest end-of-day equity trail_dd above that), so a new account presses no size
+    day_up_locked: bool = False
     # research (v2.8 study): besides the half-hour checks, a stop order rests at the current noise lines from 10:00 and
     # fills when price reaches one (at the line, or the open if it gapped past), once a side per half hour; the same
     # filters, size and exits as a check's entry
@@ -860,7 +863,10 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                     if d < 0 and cfg.short_mult != 1.0:
                         q_s = max(1, round(q_next * cfg.short_mult))
                         ml_next, q_next = ml_next / q_next * q_s, q_s
-                    if cfg.day_up_mult != 1.0 and day_pnl > cfg.day_up_from:
+                    floor_locked = (not math.isnan(trail_peak) and cfg.trail_cap >= 0
+                                    and trail_peak - cfg.trail_dd >= trail_base + cfg.trail_cap)
+                    if (cfg.day_up_mult != 1.0 and day_pnl > cfg.day_up_from
+                            and (not cfg.day_up_locked or floor_locked)):
                         q_up = max(1, round(q_next * cfg.day_up_mult))
                         if cfg.size_up_to > 0:  # still no more than the most contracts
                             q_up = min(q_up, max(q_next, cfg.size_up_to))
