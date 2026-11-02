@@ -204,6 +204,9 @@ class NoiseConfig:
     # with trail_dd: one more contract (the same stop distance) for each profit_step of closed profit above the
     # trailing drawdown's starting equity, up to size_up_to (0 = no limit); 0 = off
     profit_step: float = 0.0
+    # research (G30): no profit steps until the trailing floor has stopped at the starting equity plus trail_cap (a
+    # new account trades its starting contracts until then)
+    steps_after_lock: bool = False
     # with the money budget: when not even 1 contract fits, still take 1 with its max loss cut to the room left (less
     # costs), if that leaves at least squeeze_min points of stop; 0 = off (no entry)
     squeeze_min: float = 0.0
@@ -863,7 +866,9 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                     if tom_today and cfg.tom_mult != 1.0:
                         q_t = max(1, round(q_next * cfg.tom_mult))
                         ml_next, q_next = ml_next / q_next * q_t, q_t
-                    if cfg.profit_step > 0 and not math.isnan(trail_base):  # a contract more per step of profit
+                    step_ok = not cfg.steps_after_lock or (not math.isnan(trail_peak) and cfg.trail_cap >= 0
+                                                           and trail_peak - cfg.trail_dd >= trail_base + cfg.trail_cap)
+                    if cfg.profit_step > 0 and not math.isnan(trail_base) and step_ok:  # a contract more per step
                         q_up = q_next + int(max(0.0, eq_curve[-1] - trail_base) // cfg.profit_step)
                         if cfg.size_up_to > 0:
                             q_up = min(q_up, cfg.size_up_to)

@@ -1156,3 +1156,20 @@ Every 30-minute run held at 3 ticks.
   test; it hasn't been tested yet.
 
 (`verification/noise_v2/g29_slippage_growth.csv`)
+
+## G30: a gentler start for a new account (registered 2026-11-02, before its run)
+
+**The idea, from G29's warning:** a new account is weakest before its trailing floor has stopped at the starting
+balance (the highest end-of-day equity $2,000 above the start). Growth mode adds a contract at +$1,500, so it is
+already at 2 contracts while the floor still trails. With bad fills (3 ticks) one NQ run lost its cushion there. G30
+keeps the starting 1 contract until the floor has stopped, then the usual steps apply (`steps_after_lock` in
+mnqbot/noise.py).
+
+**The variant:** `steps_after_lock` on, at 1, 2 and 3 ticks of slippage. Baseline: growth mode with G6's time stop,
+at the same slippage.
+
+**Adopt only if all hold:**
+- at 1 tick, a net of at least 95% of the baseline's on all three 5-minute sets, in both executions (safety may cost
+  a little, not much);
+- the floor is never touched at 1, 2 or 3 ticks on any 5-minute set, in both executions;
+- no more days at −$1,000 or worse.
