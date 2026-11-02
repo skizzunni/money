@@ -808,3 +808,19 @@ NinjaTrader's execution (−$3.8k from 15:00, −$2.2k from 15:30). The historie
 (`verification/noise_v2/g19_late_lock_growth.csv`) G13, G17 and G19 now agree: every rule that takes profit off the
 table early (by time in the trade, by the day's gains, or by the clock) costs more than it saves. The bot's money is
 in the runners.
+
+## G20: a farther take-profit for trades with the trend (registered 2026-11-02, before its run)
+
+**The idea:** G13, G17 and G19 showed the bot's money is in the runners. G2 (no take-profit at all) lost net. A
+middle way: let only the trades with the 50-session trend run further, a long while yesterday's close is above its
+50-session average or a short while it is below. Those are the ones most likely to keep going. Every other trade keeps
+the 2-noise-unit take-profit (`trend_with_tp` in mnqbot/noise.py).
+
+**Variants:** with-trend take-profit 3 and 4 noise units. Baseline: growth mode with G6's time stop (2 for all).
+
+**Adopt only if all hold, in both the chart's and NinjaTrader's execution:**
+- on 5-minute bars it has a higher net than the baseline on NQ, the index and the window;
+- it never touches the trailing floor;
+- no more days at −$1,000 or worse.
+
+If both pass, take the one with the higher NinjaTrader window net.

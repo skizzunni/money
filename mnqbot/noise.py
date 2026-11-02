@@ -135,6 +135,7 @@ class NoiseConfig:
     trend_ml_mult: float = 1.0  # the against-trend trade's max loss x this
     trend_with_mult: float = 1.0  # a trade with the trend: contracts and max loss x this (the same stop in points)
     trend_with_ml: float = 1.0  # a trade with the trend: its max loss x this (the same contracts)
+    trend_with_tp: float = 0.0  # research (G20): a trade with the trend takes this take-profit, noise units (0 = off)
     # research (v2.4 study): no new entries at these checks (minutes of the day the check's bar closes, e.g. "840")
     skip_checks: str = ""
     after_target_done: bool = False  # research: no new entries today after a take-profit fills
@@ -931,6 +932,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                         tp_next = cfg.late_tp
                     if cfg.big_day_against_tp >= 0 and block_dir == -d:
                         tp_next = cfg.big_day_against_tp
+                    if cfg.trend_with_tp > 0 and trend == d:
+                        tp_next = cfg.trend_with_tp
                     est_px = c[i] + d * slip  # the expected fill, for the max loss on the fill bar
                     stop = tp = math.nan
                     if use_stop:  # the bracket: the closer of the line stop and the max loss, and the take-profit
