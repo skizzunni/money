@@ -728,3 +728,22 @@ whatever the day has made). Baseline: growth mode with G6's time stop (`day_keep
 - no more days at −$1,000 or worse.
 
 If both pass, take the one with the higher NinjaTrader window net. The largest single loss is reported too.
+
+**G17 result (run once, 2026-11-02): rejected; it does what it says, at a price.** Keeping all of the day's profit
+caps every trade's loss near the $900 limit:
+- the largest single loss falls from −$3,776 to −$894 (NinjaTrader, NQ, 5-minute bars);
+- the closed drawdown falls from $16.6k to $13.2k.
+
+The re-risked profit is where much of the money comes from, though. The big winners often come after a green start,
+at full size. Net fell everywhere:
+
+| Net, 5 min (chart / NinjaTrader) | baseline (risk today's profit) | keep half | keep all |
+|---|---|---|---|
+| window | $18,516 / $18,549 | $18,267 / $18,316 | $16,850 / $16,895 |
+| NQ | $277,322 / $267,571 | $258,625 / $249,991 | $234,677 / $228,367 |
+| index | $407,796 / $404,250 | $360,723 / $355,830 | $311,967 / $309,457 |
+| largest loss (NinjaTrader NQ) | −$3,776 | −$3,776 | −$894 |
+| closed drawdown (NinjaTrader NQ) | $16,633 | $15,076 | $13,231 |
+
+(`verification/noise_v2/g17_day_keep_growth.csv`) The "no big single losses" version is available: −$1.7k on the
+window, −$39k on NQ over ten years.
