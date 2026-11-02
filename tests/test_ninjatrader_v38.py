@@ -118,3 +118,27 @@ def test_v38_journal_logs_every_trade_and_day(sim, sample_1m, minutes, tmp_path)
     assert (data / "MnqNoiseV38_live_Sim101.csv").exists()  # the live journal is there, empty in a backtest
     assert len(pd.read_csv(data / "MnqNoiseV38_live_Sim101.csv")) == 0
     assert "Goal $50000" in [x for x in r.stdout.splitlines() if x.startswith("D,")][0]  # the dashboard was drawn
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+@pytest.mark.parametrize("minutes", [5, 30])
+def test_v38_gentle_start_agrees(sim, sample_1m, minutes, tmp_path):  # noqa: F811
+    """G30's gentle start (off by default; on, no contract steps until the trailing floor has stopped): the same
+    trades in NinjaTrader's code and the Python model, and the switch changes the sizes."""
+    bars = resample(sample_1m, f"{minutes}min")
+    path = tmp_path / "bars.csv"
+    with path.open("w") as f:
+        for t, r in zip(bars.index, bars.itertuples(), strict=True):
+            f.write(f"{t:%Y-%m-%d %H:%M},{r.open!r},{r.high!r},{r.low!r},{r.close!r}\n")
+    args = [DOTNET, str(sim), str(path), str(minutes), "Strategy=V38", *GROW_ARGS, "StepsAfterLock=True"]
+    r = subprocess.run(args, capture_output=True, text=True, env=ENV)
+    assert r.returncode == 0, r.stderr[-2000:]
+    nt = [x.split(",")[1:] for x in r.stdout.splitlines() if x.startswith("T,")]
+    py = run(bars, dataclasses.replace(GROW, steps_after_lock=True), minutes=minutes).trades
+    assert len(nt) == len(py) >= 20
+    for a, t in zip(nt, py, strict=True):
+        assert (int(a[0]), int(a[1]), int(a[3])) == (t.direction, t.entry_bar, t.exit_bar), (a, t)
+        assert float(a[2]) == t.entry and float(a[4]) == t.exit, (a, t)
+        assert math.isclose(float(a[6]), t.pnl, abs_tol=1e-6), (a, t)
+    plain = run(bars, GROW, minutes=minutes).trades
+    assert [t.qty for t in py] != [t.qty for t in plain], "the gentle start changes the sizes"

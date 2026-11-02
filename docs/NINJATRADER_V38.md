@@ -1191,4 +1191,10 @@ at the same slippage.
 | **chart execution, NQ, 3 ticks** | **$2, stuck at the floor** | **$241,762** |
 
 (`verification/noise_v2/g30_gentle_start_growth.csv`) If live fills turn out worse than 2 ticks, this is the setting
-to turn on: `steps_after_lock`, still to be added to MnqNoiseV38.cs.
+to turn on.
+
+**Now in MnqNoiseV38.cs, off by default (2026-11-02).**
+- **Where:** "Gentle start: no contract steps until the trailing floor has stopped", in group 1, "Size and risk".
+- **Tested:** `test_v38_gentle_start_agrees` runs NinjaTrader's code against the Python model with it on, at 5 and 30
+  minutes: the same trades to the cent, with the sizes changed.
+- **When to switch it on:** if the journal shows fills 3 or more ticks worse than the model's on a new account.

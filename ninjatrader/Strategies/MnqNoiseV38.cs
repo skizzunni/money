@@ -60,6 +60,8 @@ namespace NinjaTrader.NinjaScript.Strategies
         // a time stop (G6): a trade not yet locked that is losing at a bar close TimeStop minutes or more after its
         // fill is closed at market, filled at the next bar's open (0 = off)
         public int TimeStop = 0;
+        // a gentle start (G30): no contract steps until the trailing floor has stopped at the starting balance
+        public bool StepsAfterLock = false;
     }
 
     public sealed class V38Trade
@@ -113,12 +115,14 @@ namespace NinjaTrader.NinjaScript.Strategies
         double EqEff { get { return double.IsNaN(ExtEquity) ? equity : Math.Min(equity, ExtEquity); } }
         public double Equity { get { return EqEff; } }
         public double TrailBase { get { return trailBase; } }
+        // the contract steps may apply: always, or with StepsAfterLock once the floor has stopped at the start
+        bool StepsOk { get { return !s.StepsAfterLock || (!double.IsNaN(trailPeak) && trailPeak - s.TrailDD >= trailBase); } }
         public int NextQty
         {
             get
             {
                 int q = s.Qty;
-                if (s.ProfitStep > 0 && !double.IsNaN(trailBase))
+                if (s.ProfitStep > 0 && !double.IsNaN(trailBase) && StepsOk)
                 {
                     q += (int)Math.Floor(Math.Max(0.0, EqEff - trailBase) / s.ProfitStep);
                     if (s.MaxContracts > 0) q = Math.Min(q, s.MaxContracts);
@@ -460,7 +464,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             int q = s.Qty;
             bool afterLoss = consec > 0;
             double ml = afterLoss && s.AfterLossMaxLoss > 0 ? s.AfterLossMaxLoss : s.MaxLoss;
-            if (s.ProfitStep > 0 && !double.IsNaN(trailBase))  // a contract more per step of profit
+            if (s.ProfitStep > 0 && !double.IsNaN(trailBase) && StepsOk)  // a contract more per step of profit
             {
                 int qUp = q + (int)Math.Floor(Math.Max(0.0, EqEff - trailBase) / s.ProfitStep);
                 if (s.MaxContracts > 0) qUp = Math.Min(qUp, s.MaxContracts);
@@ -580,6 +584,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 MaxContracts = 15;
                 SizeByOwnStop = false;
                 TimeStop = 0;
+                StepsAfterLock = false;
             }
             else if (State == State.DataLoaded)
             {
@@ -605,6 +610,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 st.AfterLossMaxLoss = AfterLossMaxLoss; st.TrailDD = TrailDD; st.TrailFrom = TrailFrom ?? "";
                 st.ProfitStep = ProfitStep; st.MaxContracts = MaxContracts; st.SizeByOwnStop = SizeByOwnStop;
                 st.TimeStop = TimeStop;
+                st.StepsAfterLock = StepsAfterLock;
                 st.Tick = TickSize;
                 st.PointValue = Instrument.MasterInstrument.PointValue;
                 if (!badChart)
@@ -872,6 +878,10 @@ namespace NinjaTrader.NinjaScript.Strategies
         [Range(0, 390)]
         [Display(Name = "Time stop: close a losing trade not yet locked this many minutes after its fill (0 = off)", Order = 11, GroupName = "1. Size and risk")]
         public int TimeStop { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Gentle start: no contract steps until the trailing floor has stopped (turn on if live fills are 3+ ticks worse)", Order = 12, GroupName = "1. Size and risk")]
+        public bool StepsAfterLock { get; set; }
 
         [NinjaScriptProperty]
         [Range(0, 200)]
