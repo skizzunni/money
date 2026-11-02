@@ -747,3 +747,20 @@ at full size. Net fell everywhere:
 
 (`verification/noise_v2/g17_day_keep_growth.csv`) The "no big single losses" version is available: −$1.7k on the
 window, −$39k on NQ over ten years.
+
+## G18: no entries in a stormy stretch (registered 2026-11-02, before its run)
+
+**The idea:** the mirror of the calm-stretch filter. The bot already sits out calm stretches (the last 10 sessions'
+average range under 0.7x the last 40's). It has never sat out storms. The biggest single losses (−$3,000 and more)
+come at full size in violent markets, where the noise line and the stop are far apart. G18 takes no new entries on a
+day whose last 10 sessions' average range is above `storm_k` times the last 100 sessions' (`storm_k` /
+`storm_long` in mnqbot/noise.py).
+
+**Variants:** `storm_k` 1.5 and 2.0, `storm_long` 100. Baseline: growth mode with G6's time stop.
+
+**Adopt only if all hold, in both the chart's and NinjaTrader's execution:**
+- on 5-minute bars it has a higher net than the baseline on NQ, the index and the window;
+- it never touches the trailing floor;
+- no more days at −$1,000 or worse.
+
+If both pass, take the one with the higher NinjaTrader window net.

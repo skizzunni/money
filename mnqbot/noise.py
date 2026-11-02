@@ -147,6 +147,10 @@ class NoiseConfig:
     # entries or heads-ups today; research: with calm_div > 0, cfg.qty / calm_div contracts instead (the same max loss).
     # 0 = off; the Pine script's default since v2.5 is 0.7, 10 against 40 sessions
     calm_k: float = 0.0
+    # research (G18, docs/NINJATRADER_V38.md): a stormy stretch, the mirror of calm. The last calm_short sessions'
+    # average range over storm_k x the last storm_long's: no new entries today either (0 = off)
+    storm_k: float = 0.0
+    storm_long: int = 100
     calm_div: float = 0.0
     calm_short: int = 10  # the sessions in the two averages
     calm_long: int = 60
@@ -762,6 +766,9 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             if cfg.calm_k and len(day_ranges) >= cfg.calm_long:
                 cs, cl = cfg.calm_short, cfg.calm_long
                 calm = sum(day_ranges[-cs:]) / cs < cfg.calm_k * (sum(day_ranges[-cl:]) / cl)  # as the Pine script
+            if cfg.storm_k and len(day_ranges) >= cfg.storm_long:
+                cs, sl = cfg.calm_short, cfg.storm_long
+                calm = calm or sum(day_ranges[-cs:]) / cs > cfg.storm_k * (sum(day_ranges[-sl:]) / sl)
             if cfg.trend_n and len(day_closes) >= cfg.trend_n:
                 ma = sum(day_closes[-cfg.trend_n:]) / cfg.trend_n
                 trend = 1 if day_closes[-1] > ma else -1 if day_closes[-1] < ma else 0
