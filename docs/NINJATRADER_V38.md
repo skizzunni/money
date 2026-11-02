@@ -587,3 +587,17 @@ T = 30. Baseline: growth mode with G6's 60-minute time stop.
 - no more days at −$1,000 or worse.
 
 If both pass, take the one with the higher NinjaTrader window net.
+
+**G13 result (run once, 2026-11-02): rejected.** The time lock turns slow trades into small winners: up to 70.7% winners
+at 30 minutes, against 61.5%. It cost money on the window at both times: −$2.0k at 60 minutes and −$3.5k at 30, on
+NinjaTrader's execution. Some of the trades it locks would have gone on to the take-profit. At 60 minutes NQ and the
+index were mixed (+$11k chart, −$0.3k NinjaTrader on NQ).
+
+| Net, 5 min (chart / NinjaTrader) | baseline | time lock 30 min | time lock 60 min |
+|---|---|---|---|
+| window | $18,516 / $18,549 | $15,167 / $15,026 | $16,570 / $16,560 |
+| NQ | $277,322 / $267,571 | $261,306 / $254,693 | $288,182 / $277,259 |
+| index | $407,796 / $404,250 | $376,913 / $371,418 | $413,322 / $408,398 |
+| winners (NinjaTrader window) | 61.5% | 70.7% | 65.7% |
+
+(`verification/noise_v2/g13_time_lock_growth.csv`) A higher win rate is available this way, but it costs profit.
