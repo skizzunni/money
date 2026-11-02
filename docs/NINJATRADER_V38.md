@@ -986,3 +986,20 @@ bars, so it fails the all-sets rule. A 100-session trend made much less on the w
 
 (`verification/noise_v2/g25_trend_n_growth.csv`) Like G16, a choice the user can make. Over the long run the evidence
 leans to 30, but it isn't better on the window, so the rule keeps 50.
+
+## G26: G16 and G25 together (registered 2026-11-02, before its run)
+
+**The idea:** the two near misses, G16 (no wider stop after a loser, `after_loss_ml_mult` 1) and G25 (a 30-session
+trend, `trend_n` 30), each made more on the ten-year histories and a little less on the window. Their gains may
+add up and cover the window.
+
+**A caution, stated before the run:** both parts were picked after their results were seen. This is a combination of
+near misses, which is where overfitting hides, so it gets no allowance. It is held to the same all-sets rule, in both
+executions, and a pass would still be reported with this caution.
+
+**The variant:** `after_loss_ml_mult` 1.0 and `trend_n` 30 together. Baseline: growth mode with G6's time stop.
+
+**Adopt only if all hold, in both the chart's and NinjaTrader's execution:**
+- on 5-minute bars it has a higher net than the baseline on NQ, the index and the window;
+- it never touches the trailing floor;
+- no more days at −$1,000 or worse.
