@@ -1070,3 +1070,22 @@ strictly (0.8) helps, or sitting out less of them (0.6) does.
 - no more days at −$1,000 or worse.
 
 This is a second look at a setting already chosen, so the bar is all six 5-minute runs.
+
+**G28 result (run once, 2026-11-02): rejected; 0.7 stays.** Both thresholds made less on the window: −$3.7k (0.6) and
+−$6.2k (0.8) on NinjaTrader's execution, 5-minute bars. They made a little less or about the same on the histories.
+
+| Net, 5 min (chart / NinjaTrader) | 0.7 (now) | 0.6 | 0.8 |
+|---|---|---|---|
+| window | $18,516 / $18,549 | $12,647 / $14,811 | $12,309 / $12,322 |
+| NQ | $277,322 / $267,571 | $272,492 / $270,352 | $254,168 / $251,469 |
+| index | $407,796 / $404,250 | $403,729 / $397,603 | $392,342 / $388,384 |
+
+(`verification/noise_v2/g28_calm_growth.csv`)
+
+**The re-check is complete (G9, G16 and G21-G28).** Every setting growth mode uses has been tested against
+its neighbours with the time stop in place. The results:
+- held: time stop 60, lock 0.35, stop distance 0.24, range position 0.65, lookback 14, big day 1.5, calm 0.7;
+- the after-loss stop and the trend length came out as near misses (G16, G25, together G26). They win on the
+  ten-year histories and lose a little on the window.
+
+The current settings are where the evidence points.
