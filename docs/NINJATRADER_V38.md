@@ -873,3 +873,18 @@ This is a second look at a setting already chosen, so the bar is all six 5-minut
 (`verification/noise_v2/g21_lock_at_growth.csv`) A setting that wins only on the recent window, by $5k, and loses
 $30-90k over ten years is the classic sign of fitting the recent past. That is what the all-sets rule is there to
 catch.
+
+## G22: the stop distance past the line, re-checked with the time stop (registered 2026-11-02, before its run)
+
+**The idea:** the line stop sits 0.24 noise units past the noise line (`stop_buffer`, chosen on 2011-2018 long before
+the time stop). With the time stop cutting slow losers at 60 minutes, a wider stop now costs less: fewer whipsaw
+stop-outs, and the trades that drift get cut by the clock. A tighter stop gets out of failed breakouts sooner.
+
+**Variants:** `stop_buffer` 0.15 and 0.35. Baseline: growth mode with G6's time stop (0.24).
+
+**Adopt only if all hold, in both the chart's and NinjaTrader's execution:**
+- on 5-minute bars it has a higher net than the baseline on NQ, the index and the window;
+- it never touches the trailing floor;
+- no more days at −$1,000 or worse.
+
+This is a second look at a setting already chosen, so the bar is all six 5-minute runs.
