@@ -1228,3 +1228,18 @@ baseline on all six 5-minute runs.
 
 (`verification/noise_v2/g31_squeeze_growth.csv`) With G31, every setting growth mode uses has been re-checked with
 the time stop in place.
+
+## G32: the most contracts (registered 2026-11-02, before its run)
+
+**The idea:** growth mode adds a contract per $1,500 of profit, up to 15 (`size_up_to` 15). G5 tried faster steps; the
+cap itself was never re-checked. A lower cap means smaller losses once the account is large; a higher cap means
+more profit on its best days. The $900 daily room and the floor still size every trade.
+
+**Variants:** `size_up_to` 10 and 20, with the $1,500 step. Baseline: growth mode with G6's time stop (15).
+
+**Adopt only if all hold, in both the chart's and NinjaTrader's execution:**
+- on 5-minute bars it has a higher net than the baseline on NQ, the index and the window;
+- it never touches the trailing floor;
+- no more days at −$1,000 or worse.
+
+This is a second look at a setting already chosen, so the bar is all six 5-minute runs.
