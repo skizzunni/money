@@ -957,3 +957,18 @@ to the floor and stopped. The 14-session noise area, the source paper's, is the 
 | index | $407,796 / $404,250 | $341,724 / $337,638 | $379,574 / $390,723 |
 
 (`verification/noise_v2/g24_lookback_growth.csv`)
+
+## G25: the trend filter's length (registered 2026-11-02, before its run)
+
+**The idea:** no shorts while yesterday's close is above its 50-session average (`trend_n` 50, from v3.1; 20 and 100
+were "close" then, before growth mode and the time stop). A shorter average turns faster after a top; a longer one
+blocks shorts through more of a bull market.
+
+**Variants:** `trend_n` 30 and 100. Baseline: growth mode with G6's time stop (50).
+
+**Adopt only if all hold, in both the chart's and NinjaTrader's execution:**
+- on 5-minute bars it has a higher net than the baseline on NQ, the index and the window;
+- it never touches the trailing floor;
+- no more days at −$1,000 or worse.
+
+This is a second look at a setting already chosen, so the bar is all six 5-minute runs.
