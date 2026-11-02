@@ -888,3 +888,17 @@ stop-outs, and the trades that drift get cut by the clock. A tighter stop gets o
 - no more days at −$1,000 or worse.
 
 This is a second look at a setting already chosen, so the bar is all six 5-minute runs.
+
+**G22 result (run once, 2026-11-02): rejected; 0.24 stays.** Both stop distances made less on the window: −$4.4k
+(0.15) and −$8.3k (0.35) on NinjaTrader's execution, 5-minute bars. The tighter stop also added days past −$1,000 on
+the chart's execution (the index: 2 against 0). The histories were mixed, within a few thousand dollars, except the
+wider stop on the index (−$40k).
+
+| Net, 5 min (chart / NinjaTrader) | 0.24 (now) | 0.15 | 0.35 |
+|---|---|---|---|
+| window | $18,516 / $18,549 | $16,222 / $14,170 | $10,340 / $10,259 |
+| NQ | $277,322 / $267,571 | $266,371 / $269,050 | $259,776 / $257,301 |
+| index | $407,796 / $404,250 | $421,711 / $406,230 | $366,538 / $364,414 |
+
+(`verification/noise_v2/g22_stop_buffer_growth.csv`) With G9 (time stop) and G21 (lock trigger), the three main
+exit settings have now each been re-checked with the time stop in place, and each current value held.
