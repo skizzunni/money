@@ -1119,3 +1119,17 @@ G26's ten-year lead is real, but on the index it comes from a handful of big yea
 (−$13.3k) and the current 2026 (−$1.1k). The rule needs it to win year in, year out on both histories, and it
 doesn't, so the current settings stay. Every year in both histories was profitable or close to flat under both
 settings: the worst was −$2,918 (index, 2019) (`verification/noise_v2/g26_by_year.csv`).
+
+## G29: stress test, worse fills (registered 2026-11-02, before its run)
+
+**The question, from the user's goal ("money made and not lost significantly"):** the backtests assume 1 tick of
+slippage on every market fill and stop. Live fills, on fast days and at 10-15 contracts, can be worse. G29 re-runs
+the settings the account trades (growth mode with G6's time stop) at 2 and 3 ticks of slippage per fill. Nothing is
+being chosen here; this checks how safe the current bot is.
+
+**It holds up only if all hold, in both the chart's and NinjaTrader's execution, at 2 ticks:**
+- net above $0 on every set and both bar lengths;
+- the trailing floor never touched;
+- no day at −$1,000 or worse beyond the baseline's.
+
+3 ticks is reported for how much margin there is. If 2 ticks fails, the user is told plainly.
