@@ -1319,3 +1319,21 @@ entries until the next week (`week_stop` in mnqbot/noise.py). This has not been 
 
 The drawdown and the largest loss are reported too. If it cuts the drawdown but costs net, it goes on file as a
 lower-risk option like G32.
+
+**G34 result (run once, 2026-11-02): rejected; a weekly brake is not needed.** On the window neither brake ever
+triggered: the 21 months had no week down $1,500 in closed P/L, so the results are identical.
+- **$1,500 brake:** on the histories it trimmed the drawdown 7-11% but cost $5-13k on NQ and $1-5k on the index (5
+  minutes).
+- **$2,500 brake:** it barely triggered (within $1.4k everywhere).
+
+Neither beat the baseline on all sets, and the window never needed it.
+
+| Net, 5 min (chart / NinjaTrader) | no brake (now) | $1,500 a week | $2,500 a week |
+|---|---|---|---|
+| window | $18,516 / $18,549 | the same | the same |
+| NQ | $277,322 / $267,571 | $264,098 / $261,796 | $277,050 / $267,303 |
+| index | $407,796 / $404,250 | $402,573 / $399,166 | $409,160 / $405,462 |
+| drawdown NQ / index (NinjaTrader) | $16,633 / $19,255 | $15,493 / $18,146 | $16,680 / $19,255 |
+
+(`verification/noise_v2/g34_week_stop_growth.csv`) The daily $900 limit already keeps bad weeks small. The window's
+worst stretch was $1,852.
