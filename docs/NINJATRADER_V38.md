@@ -1377,3 +1377,25 @@ left.
 
 *The re-run.* By the pre-registered rule (more than 5% of starts lost), every start is re-run with G30's gentle start
 and with G32's 10-contract cap.
+
+**G35 result (re-run with the at-the-floor measure, 2026-11-02).**
+
+| 21-month accounts, NinjaTrader, 5 min | growth mode (now) | gentle start | cap 10 |
+|---|---|---|---|
+| NQ starts lost (at the floor) | 7 of 35 (20%) | 7 of 35 | 7 of 35 |
+| index starts lost | 6 of 54 (11%) | 8 of 54 | 6 of 54 |
+| median net, NQ / index | $22,925 / $23,070 | $26,574 / $22,861 | $22,746 / $24,992 |
+| 10th percentile net, NQ / index | −$460 / $444 | −$99 / $3 | −$460 / $444 |
+
+**What the losses are:**
+- the lost starts cluster in 2015, 2019-early 2020, 2011 and 2013, periods when the bot lost its first $2,000 before
+  making it, or made $2,000 and gave it back;
+- each ends with $1-$33 of room left. Every trade is sized to the room above the floor, and a squeezed 1-contract
+  trade may risk all of it, so in a bad stretch the bot spends the cushion to the last dollar.
+
+Neither G30 nor G32 changes that. The fix has to keep a reserve: never risk the last part of the room, or risk less
+until the cushion is built.
+
+**For the user:** a fresh 50K funded account on this bot made a median of about $23,000 in 21 months. About 1 in 9
+(index) to 1 in 5 (NQ) such accounts would have been lost along the way. That is the honest risk, and it is higher than
+the single January 2025 window suggested. G36 tests the reserve.
