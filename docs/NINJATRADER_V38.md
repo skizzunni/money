@@ -1337,3 +1337,25 @@ Neither beat the baseline on all sets, and the window never needed it.
 
 (`verification/noise_v2/g34_week_stop_growth.csv`) The daily $900 limit already keeps bad weeks small. The window's
 worst stretch was $1,852.
+
+## G35: a new account on any start date (registered 2026-11-02, before its run)
+
+**The question, from the user's goal ("money made and not lost significantly"):** the window is one start date
+(January 2025). G35 starts a fresh account every quarter and runs it for 21 months, the window's length. That covers
+NQ futures 2015 to 2023 and the index 2011 to 2024. The settings are growth mode as it trades, with G6's time stop,
+on NinjaTrader's execution and 5-minute bars, with 16:00 bars added. Nothing is chosen here. It measures what to
+expect.
+
+**Reported for each start:**
+- the net after 21 months;
+- whether the trailing floor (stopping at the starting balance) was ever touched;
+- the lowest the account went below its start;
+- whether it reached +$2,000 (the floor stops there).
+
+**Read as:**
+- the share of starts that touch the floor (a lost account);
+- the share that end below the start;
+- the median net and the worst net.
+
+If more than 5% of starts touch the floor, the same starts are re-run with G30's gentle start and G32's 10-contract
+cap, and the user is told which one to switch on.
