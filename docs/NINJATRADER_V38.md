@@ -1263,3 +1263,21 @@ This is a second look at a setting already chosen, so the bar is all six 5-minut
 
 (`verification/noise_v2/g32_max_qty_growth.csv`) "Most contracts" is already a setting in MnqNoiseV38.cs (Custom
 mode). Funded growth keeps 15.
+
+## G33: a "Funded safe" preset (registered 2026-11-02, before its run)
+
+**The idea:** the user's goal is "money made and not lost significantly". Two tested settings cut risk at a small
+cost: the 10-contract cap (G32: a third smaller largest loss, 14-20% smaller drawdowns, −4% net on the index) and the
+gentle start (G30: no floor hit even at 3 ticks of slippage). G33 measures them together as a preset the user can
+choose. It is not a change to Funded growth, so there is no adoption rule. The results are reported as they come:
+- net at 1 and 3 ticks;
+- the largest loss;
+- the drawdown;
+- floor touches.
+
+**The preset:** growth mode with G6's time stop, `size_up_to` 10 and `steps_after_lock` on. Baseline: growth mode as
+it trades.
+
+**It becomes a Mode in MnqNoiseV38.cs only if:**
+- the floor is never touched at 1 or 3 ticks, on any 5-minute set, in both executions;
+- the largest loss and the drawdown are no larger than the baseline's on every 5-minute set.
