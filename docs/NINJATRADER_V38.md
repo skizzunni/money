@@ -854,3 +854,22 @@ the time stop existed.
 - no more days at −$1,000 or worse.
 
 This is a second look at a setting already chosen, so the bar is all six 5-minute runs, as for G9.
+
+**G21 result (run once, 2026-11-02): rejected; 0.35 stays.**
+- **A later lock (0.5)** made more on the window: +$3.2k chart, +$5.3k NinjaTrader on 5-minute bars. It made much
+  less on the histories: NQ −$30-37k, the index −$65-90k. One 30-minute NQ run (chart execution) went to the floor
+  and stopped.
+- **An earlier lock (0.25)** raised the winners to 64-66% and cut the net on every 5-minute set.
+
+0.35 is the only trigger that holds up on all of them.
+
+| Net, 5 min (chart / NinjaTrader) | 0.35 (now) | 0.25 | 0.5 |
+|---|---|---|---|
+| window | $18,516 / $18,549 | $16,069 / $15,603 | $21,740 / $23,891 |
+| NQ | $277,322 / $267,571 | $224,794 / $224,508 | $240,071 / $237,561 |
+| index | $407,796 / $404,250 | $336,802 / $333,091 | $342,639 / $314,725 |
+| winners (NinjaTrader window) | 61.5% | 65.7% | 56.9% |
+
+(`verification/noise_v2/g21_lock_at_growth.csv`) A setting that wins only on the recent window, by $5k, and loses
+$30-90k over ten years is the classic sign of fitting the recent past. That is what the all-sets rule is there to
+catch.
