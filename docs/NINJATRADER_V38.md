@@ -902,3 +902,19 @@ wider stop on the index (−$40k).
 
 (`verification/noise_v2/g22_stop_buffer_growth.csv`) With G9 (time stop) and G21 (lock trigger), the three main
 exit settings have now each been re-checked with the time stop in place, and each current value held.
+
+## G23: the range-position filter, re-checked with the time stop (registered 2026-11-02, before its run)
+
+**The idea:** the bot's "don't trade the middle of the chop" filter needs a long's check close in the top 35% of the
+day's range so far (`range_pos_min` 0.65; the mirror for a short). It was chosen in v2.9, before the time stop. With
+the time stop cutting failed breakouts at 60 minutes, a looser filter may now pay (more trades, the bad ones cut
+early). A tighter one may pay more (only clean breakouts).
+
+**Variants:** `range_pos_min` 0.55 and 0.75. Baseline: growth mode with G6's time stop (0.65).
+
+**Adopt only if all hold, in both the chart's and NinjaTrader's execution:**
+- on 5-minute bars it has a higher net than the baseline on NQ, the index and the window;
+- it never touches the trailing floor;
+- no more days at −$1,000 or worse.
+
+This is a second look at a setting already chosen, so the bar is all six 5-minute runs.
