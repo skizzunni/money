@@ -1054,3 +1054,19 @@ executions:
 | index | $407,796 / $404,250 | $369,101 / $367,269 | $389,743 / $382,807 |
 
 (`verification/noise_v2/g27_big_day_growth.csv`)
+
+## G28: the calm-stretch threshold (registered 2026-11-02, before its run)
+
+**The idea:** no new entries while the last 10 sessions' average range is under 0.7 times the last 40 sessions'
+(`calm_k` 0.7, from v2.5). It is the last of the bot's filters not yet re-checked with growth mode and the time stop.
+G18 found that sitting out storms costs money, so the bot needs movement. Maybe sitting out calm stretches more
+strictly (0.8) helps, or sitting out less of them (0.6) does.
+
+**Variants:** `calm_k` 0.6 and 0.8. Baseline: growth mode with G6's time stop (0.7).
+
+**Adopt only if all hold, in both the chart's and NinjaTrader's execution:**
+- on 5-minute bars it has a higher net than the baseline on NQ, the index and the window;
+- it never touches the trailing floor;
+- no more days at −$1,000 or worse.
+
+This is a second look at a setting already chosen, so the bar is all six 5-minute runs.
