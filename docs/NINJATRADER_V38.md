@@ -945,3 +945,15 @@ checked in growth mode.
 - no more days at −$1,000 or worse.
 
 This is a second look at a setting already chosen, so the bar is all six 5-minute runs.
+
+**G24 result (run once, 2026-11-02): rejected; 14 stays.** Both lookbacks made far less on the window: $9.7k (10)
+and $13.3k (20) against $18.5k, NinjaTrader's execution, 5-minute bars. On NQ, 6 of the 8 runs at 10 or 20 ran down
+to the floor and stopped. The 14-session noise area, the source paper's, is the one that survives every history.
+
+| Net, 5 min (chart / NinjaTrader) | 14 (now) | 10 | 20 |
+|---|---|---|---|
+| window | $18,516 / $18,549 | $9,714 / $9,707 | $13,234 / $13,250 |
+| NQ | $277,322 / $267,571 | $253,479 / **$2, stuck** | **$0 / $7, stuck** |
+| index | $407,796 / $404,250 | $341,724 / $337,638 | $379,574 / $390,723 |
+
+(`verification/noise_v2/g24_lookback_growth.csv`)
