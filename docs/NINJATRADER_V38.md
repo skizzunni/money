@@ -553,3 +553,19 @@ extreme and an all-day hold.
 **Pass (stage 1, the edge per contract):** daily P/L t-stat ≥ 2.24 on the index 2011-2018, then ≥ 1.65 on 2019-2022,
 on 2023-Sep 2026, and on NQ futures 2015-2025. All four, run once. Only if it passes does stage 2 test it on the
 account alongside the bot.
+
+**G12 result (run once, 2026-11-02): rejected at stage 1; no edge.** The clips' days are real: the best trades made
+123, 92, 69 and 64 times their risk. But about 95 trades in 100 are stopped out, often within minutes, and over the
+years the big winners only about pay for them:
+
+| Per MNQ | Trades | Winners | Stopped out | $ / trade | Average R | Best R | Daily t |
+|---|---|---|---|---|---|---|---|
+| index 2011-2018 | 1,478 | 4.3% | 95.7% | −$3.92 | −0.12 | 122.9 | −1.05 |
+| index 2019-2022 | 574 | 5.9% | 93.9% | +$14.73 | +0.30 | 68.6 | 1.60 |
+| index 2023-Sep 2026 | 593 | 3.9% | 96.1% | −$2.32 | +0.01 | 92.5 | −0.40 |
+| NQ 2015-2025 | 1,820 | 5.5% | 94.5% | +$2.54 | +0.03 | 63.8 | 0.65 |
+
+The pass bar was a t of 2.24, then 1.65 on each later set. It missed on all four: two sets lost money, and the two
+that made money were not reliably different from zero. On the account it would also mean long losing streaks. At 95%
+losers, 30 or more stop-outs in a row are routine, and a 1-in-20 winner can't be counted on before the floor.
+(`verification/noise_v2/g12_overnight_inflection.csv`, `research/g12_overnight_inflection.py`)
