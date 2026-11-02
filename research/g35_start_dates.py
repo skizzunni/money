@@ -46,9 +46,14 @@ def one(job):
     tf = tf[tf.entry_time >= s0]
     eq = np.r_[0.0, np.cumsum(tf.pnl.to_numpy())]
     tr = S.trail_stats(name, tf)
+    # the floor at the end: the highest end-of-day equity less $2,000, stopping at the start; an account within $100 of
+    # it can't size a trade any more (and at most firms, at it, has failed)
+    eod = tf.groupby(tf.exit_time.dt.tz_convert(NY).dt.date).pnl.sum().cumsum()
+    floor = min(max(0.0, float(eod.max()) if len(eod) else 0.0) - 2000.0, 0.0)
+    room = float(eq[-1]) - floor
     return {"set": name, "start": start, "trades": len(tf), "net $": round(float(eq[-1])),
             "lowest $": round(float(eq.min())), "reached +2000": bool(eq.max() >= 2000),
-            "floor touched": tr[f"{name} tb0"] > 0}
+            "floor touched": tr[f"{name} tb0"] > 0, "room at end $": round(room), "lost": room < 100.0}
 
 
 def main() -> None:
@@ -61,7 +66,7 @@ def main() -> None:
     d = pd.DataFrame(rows)
     d.to_csv(f"verification/noise_v2/g35_start_dates_{VARIANT}.csv", index=False)
     for name, g in d.groupby("set"):
-        print(name, VARIANT, "starts", len(g), "floor touched", int(g["floor touched"].sum()),
+        print(name, VARIANT, "starts", len(g), "lost (at the floor)", int(g["lost"].sum()),
               "below start", int((g["net $"] < 0).sum()), "median net", int(g["net $"].median()),
               "worst net", int(g["net $"].min()), "lowest point", int(g["lowest $"].min()),
               "reached +2000", int(g["reached +2000"].sum()), flush=True)

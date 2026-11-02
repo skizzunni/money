@@ -1359,3 +1359,21 @@ expect.
 
 If more than 5% of starts touch the floor, the same starts are re-run with G30's gentle start and G32's 10-contract
 cap, and the user is told which one to switch on.
+
+**G35, first look, and a correction (2026-11-02).**
+
+*What was wrong.* The first run counted a floor touch only when the closed equity went below the floor. Several starts
+instead ended at the floor and stopped trading, with 41-127 trades in 21 months against about 280 normally:
+- some had a trailing floor that rose with an early peak and was then reached;
+- some reached +$2,000, which stops the floor at the start, and then fell back to the start.
+
+At most firms an account at its floor has failed, so these count as lost.
+
+*What it changes.* Earlier G rounds used the same "below the floor" check, and their "floor never touched" means
+"never below it". The runs that stalled at the floor were caught by eye, as "net $0-$7, stuck".
+
+*The fix.* The runner now reports the room above the floor at the end and counts a start as lost when under $100 is
+left.
+
+*The re-run.* By the pre-registered rule (more than 5% of starts lost), every start is re-run with G30's gentle start
+and with G32's 10-contract cap.
