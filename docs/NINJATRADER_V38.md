@@ -794,3 +794,17 @@ by the time since the fill; G19 locks by the clock.
 - no more days at −$1,000 or worse.
 
 If both pass, take the one with the higher NinjaTrader window net.
+
+**G19 result (run once, 2026-11-02): rejected.** Locking late winners raises the winners by 1-2 points but cuts the
+afternoon runners that close at 16:00 well in profit. The window lost money at both times, most of all on
+NinjaTrader's execution (−$3.8k from 15:00, −$2.2k from 15:30). The histories were mixed, within ±$17k.
+
+| Net, 5 min (chart / NinjaTrader) | baseline | lock from 15:00 | lock from 15:30 |
+|---|---|---|---|
+| window | $18,516 / $18,549 | $16,549 / $14,741 | $18,502 / $16,338 |
+| NQ | $277,322 / $267,571 | $272,934 / $270,160 | $274,464 / $265,035 |
+| index | $407,796 / $404,250 | $393,496 / $387,208 | $404,699 / $399,450 |
+
+(`verification/noise_v2/g19_late_lock_growth.csv`) G13, G17 and G19 now agree: every rule that takes profit off the
+table early (by time in the trade, by the day's gains, or by the clock) costs more than it saves. The bot's money is
+in the runners.
