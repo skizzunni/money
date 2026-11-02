@@ -1133,3 +1133,25 @@ being chosen here; this checks how safe the current bot is.
 - no day at −$1,000 or worse beyond the baseline's.
 
 3 ticks is reported for how much margin there is. If 2 ticks fails, the user is told plainly.
+
+**G29 result (run once, 2026-11-02): the bot holds up at 2 ticks.** At 2 ticks of slippage on every fill (double the
+backtests'), every set made money on both bar lengths and in both executions. The floor was never touched, and no
+day reached −$1,000 beyond the baseline's one NQ gap day. 2 ticks costs about 10-20% of the net:
+
+| Net, 5 min (chart / NinjaTrader) | 1 tick (backtests) | 2 ticks | 3 ticks |
+|---|---|---|---|
+| window | $18,516 / $18,549 | $15,892 / $14,571 | $11,197 / $13,096 |
+| NQ | $277,322 / $267,571 | $244,361 / $246,956 | **$2 / $236,003** |
+| index | $407,796 / $404,250 | $386,688 / $384,795 | $375,744 / $371,519 |
+
+**The warning, at 3 ticks:** one run, NQ on 5-minute bars with the chart's execution, lost the early cushion and sat
+at the floor after 144 trades. That is a new account, early on: the first few months, before the floor has stopped
+at the starting balance, are the account's weakest point. NinjaTrader's execution at 3 ticks held there ($236k).
+Every 30-minute run held at 3 ticks.
+
+**For live trading:**
+- Check the journal's fills against the model's after the first weeks.
+- If slippage runs at 3 ticks or more, the first months are where the account is at risk. Running at the evaluation's
+  1 contract until the first $2,000 is banked (the floor then stops) is the safe start.
+
+(`verification/noise_v2/g29_slippage_growth.csv`)
