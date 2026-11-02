@@ -15,7 +15,8 @@ from mnqbot.noise import NoiseConfig, run
 
 NY = "America/New_York"
 VARIANT = sys.argv[4] if len(sys.argv) > 4 else "base"
-EXTRA = {"base": {}, "gentle": {"steps_after_lock": True}, "cap10": {"size_up_to": 10}}[VARIANT]
+EXTRA = {"base": {}, "gentle": {"steps_after_lock": True}, "cap10": {"size_up_to": 10},
+         "reserve500": {"trail_buffer": 500.0}, "half": {"trail_frac": 0.5}}[VARIANT]
 
 
 def with_1600(bars: pd.DataFrame, m: int) -> pd.DataFrame:
@@ -53,7 +54,9 @@ def one(job):
     room = float(eq[-1]) - floor
     return {"set": name, "start": start, "trades": len(tf), "net $": round(float(eq[-1])),
             "lowest $": round(float(eq.min())), "reached +2000": bool(eq.max() >= 2000),
-            "floor touched": tr[f"{name} tb0"] > 0, "room at end $": round(room), "lost": room < 100.0}
+            "floor touched": tr[f"{name} tb0"] > 0, "room at end $": round(room), "lost": room < 100.0,
+            # frozen: no trade in the last 90 days of the 21 months (stopped above the floor, but no longer trading)
+            "frozen": bool(len(tf) == 0 or (s1 - tf.exit_time.max()).days > 90)}
 
 
 def main() -> None:
@@ -67,6 +70,7 @@ def main() -> None:
     d.to_csv(f"verification/noise_v2/g35_start_dates_{VARIANT}.csv", index=False)
     for name, g in d.groupby("set"):
         print(name, VARIANT, "starts", len(g), "lost (at the floor)", int(g["lost"].sum()),
+              "dead (lost or frozen)", int((g["lost"] | g["frozen"]).sum()),
               "below start", int((g["net $"] < 0).sum()), "median net", int(g["net $"].median()),
               "worst net", int(g["net $"].min()), "lowest point", int(g["lowest $"].min()),
               "reached +2000", int(g["reached +2000"].sum()), flush=True)

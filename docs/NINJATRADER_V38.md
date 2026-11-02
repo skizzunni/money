@@ -1399,3 +1399,21 @@ until the cushion is built.
 **For the user:** a fresh 50K funded account on this bot made a median of about $23,000 in 21 months. About 1 in 9
 (index) to 1 in 5 (NQ) such accounts would have been lost along the way. That is the honest risk, and it is higher than
 the single January 2025 window suggested. G36 tests the reserve.
+
+## G36: a reserve above the floor (registered 2026-11-02, before its run)
+
+**The idea, from G35:** each lost account spent its cushion to the last dollar, because every trade is sized to the
+room above the floor. A reserve keeps part of that room off-limits. Two existing options, in mnqbot/noise.py:
+- `trail_buffer` $500: never risk the last $500 above the floor;
+- `trail_frac` 0.5: never risk more than half of the room that is left.
+
+**The test:** G35's 89 start dates (a new account every quarter, 21 months each, NinjaTrader's execution, 5-minute
+bars), for each option and the baseline. An account that stops at its reserve doesn't fail, but it may stop trading.
+So besides "lost" (under $100 above the floor) it counts "frozen" (no trade in the last 90 days), and "dead" (lost or
+frozen).
+
+**Adopt (as Funded growth's default) only if all hold:**
+- fewer dead accounts than the baseline on both NQ and the index;
+- a median net of at least 95% of the baseline's on both;
+- and then the usual all-sets check on the window, NQ and the index (G-runner, both executions): no more than 5%
+  less net on any 5-minute set, and the floor never touched.
