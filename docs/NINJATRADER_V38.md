@@ -646,3 +646,19 @@ The bar was a t of 2.24, then 1.65 on each later set; none came close, and the r
 the confirmation the clips rely on doesn't predict the next 2R. The clips' results come from discretion that rules
 can't capture, or from the 20-28 accounts each trade is copied to, not from this pattern
 (`verification/noise_v2/g14_sweep_ifvg.csv`, `research/g14_sweep_ifvg.py`).
+
+## G15: enter only on a strong break, "displacement" (registered 2026-11-02, before its run)
+
+**The idea, from the @jacotradez clips:** they want "displacement", a move that leaves the level decisively, not a
+close that just pokes past it. The bot enters on any close past the noise line. G15 enters only when the check's close
+is past a wider line, `entry_k` times the noise from the reference price (`entry_k` in mnqbot/noise.py). The stop
+stays at the normal line, so a strong break also starts further from its stop.
+
+**Variants:** `entry_k` 1.25 and 1.5. Baseline: growth mode with G6's 60-minute time stop (`entry_k` 1).
+
+**Adopt only if all hold, in both the chart's and NinjaTrader's execution:**
+- on 5-minute bars it has a higher net than the baseline on NQ, the index and the window;
+- it never touches the trailing floor;
+- no more days at −$1,000 or worse.
+
+If both pass, take the one with the higher NinjaTrader window net.
