@@ -601,3 +601,32 @@ index were mixed (+$11k chart, −$0.3k NinjaTrader on NQ).
 | winners (NinjaTrader window) | 61.5% | 70.7% | 65.7% |
 
 (`verification/noise_v2/g13_time_lock_growth.csv`) A higher win rate is available this way, but it costs profit.
+
+## G14: a liquidity sweep and an inversion fair value gap (registered 2026-11-02, before its run)
+
+**The idea, from the user's six @jacotradez clips (transcribed).** Price takes out a "liquidity pool", a prior
+high or low. They enter when a 1-minute fair value gap left by the sweep is "inverted": price closes back through it.
+The target is the opposite liquidity. They trade mostly the evening (Asian) session. Their big days are one trade
+copied to 20-28 prop accounts, about $250-$2,000 a day per account. G12 tested a sweep with a plain reversal and no
+target; G14 adds their confirmation and a target.
+
+**Rules (1-minute bars, New York time):**
+- **The liquidity:** the previous regular session's (09:30-16:00) high and low.
+- **The window:** from 19:00 to 02:00 the next morning, one trade a night, the first trigger.
+- **A long:**
+  - the sweep: a bar whose low is below the session low;
+  - a bearish fair value gap (three bars k-2, k-1, k with high[k] < low[k-2]; its top is low[k-2]), formed from 30
+    bars before the sweep up to the bar before the trigger;
+  - the trigger: a close above the top of the most recent such gap, while the price is still within 30 bars of
+    the sweep;
+  - entry at the next bar's open, stop one tick below the lowest low from the sweep to the trigger.
+- **A short:** the mirror, at the session high, with a bullish gap (low[k] > high[k-2]; its bottom is high[k-2]).
+- **Skips:** a trade whose stop is under 3 points or over 40 points from the entry.
+- **The exit:** a target at 2 times the risk, the stop (a bar that reaches both counts as the stop), or the close
+  of the 09:25 bar, before the bot's session.
+- **Costs per MNQ:** $1.24 in fees and 2 ticks of slippage on the entry and on stop and time exits; the target is a
+  limit with no slippage.
+
+**Pass (stage 1, the edge per contract):** daily P/L t-stat ≥ 2.24 on the index 2011-2018, then ≥ 1.65 on 2019-2022,
+on 2023-Sep 2026, and on NQ futures 2015-2025. All four, run once. Only if it passes does stage 2 test it on the
+account.
