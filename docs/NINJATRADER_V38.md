@@ -630,3 +630,19 @@ target; G14 adds their confirmation and a target.
 **Pass (stage 1, the edge per contract):** daily P/L t-stat ≥ 2.24 on the index 2011-2018, then ≥ 1.65 on 2019-2022,
 on 2023-Sep 2026, and on NQ futures 2015-2025. All four, run once. Only if it passes does stage 2 test it on the
 account.
+
+**G14 result (run once, 2026-11-02): rejected at stage 1; no edge.** The sweep and inversion gap hit its 2R target on
+30-38% of trades and was stopped on the rest. That is the coin-flip rate for a 2R target (a third). Costs take what
+is left:
+
+| Per MNQ | Trades | Target hit | $ / trade | Average R | Daily t |
+|---|---|---|---|---|---|
+| index 2011-2018 | 679 | 37.6% | +$0.76 | +0.02 | 0.40 |
+| index 2019-2022 | 374 | 33.4% | −$2.03 | −0.06 | −0.65 |
+| index 2023-Sep 2026 | 336 | 30.1% | −$5.42 | −0.16 | −1.82 |
+| NQ 2015-2025 | 955 | 33.8% | −$1.13 | −0.06 | −0.60 |
+
+The bar was a t of 2.24, then 1.65 on each later set; none came close, and the recent years are the worst. As coded,
+the confirmation the clips rely on doesn't predict the next 2R. The clips' results come from discretion that rules
+can't capture, or from the 20-28 accounts each trade is copied to, not from this pattern
+(`verification/noise_v2/g14_sweep_ifvg.csv`, `research/g14_sweep_ifvg.py`).
