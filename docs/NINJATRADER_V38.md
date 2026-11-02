@@ -675,3 +675,18 @@ new account. (Net $0-$7 after 66-102 trades: index 1.25x, NQ 1.5x.)
 | index | $407,796 / $404,250 | **$7 / $0, stuck** | $256,117 / $250,089 |
 
 (`verification/noise_v2/g15_entry_k_growth.csv`)
+
+## G16: no wider stop after a loser (registered 2026-11-02, before its run)
+
+**The idea:** since v2.2 the trade after a losing trade may risk $250 a contract instead of $187.50 (a wider max
+loss, so a re-entry isn't stopped out by the same noise). That was chosen long before the 60-minute time stop. With
+the time stop now cutting slow losers, the wider stop may only make the second loss bigger. G16 turns it off: every
+trade risks at most $187.50 a contract (`after_loss_ml_mult` 1).
+
+**Variant:** `after_loss_ml_mult` 1.0 (and "Max loss after a loser" = $187.50 in MnqNoiseV38.cs). Baseline: growth
+mode with G6's time stop ($250 after a loser).
+
+**Adopt only if all hold, in both the chart's and NinjaTrader's execution:**
+- on 5-minute bars it has a higher net than the baseline on NQ, the index and the window;
+- it never touches the trailing floor;
+- no more days at −$1,000 or worse.
