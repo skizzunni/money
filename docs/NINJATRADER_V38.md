@@ -1003,3 +1003,25 @@ executions, and a pass would still be reported with this caution.
 - on 5-minute bars it has a higher net than the baseline on NQ, the index and the window;
 - it never touches the trailing floor;
 - no more days at −$1,000 or worse.
+
+**G26 result (run once, 2026-11-02): rejected by the rule; the strongest result on the histories so far.** Together,
+G16 and G25 made far more on the ten-year histories, with smaller losses (NinjaTrader's execution, 5-minute bars):
+- NQ +$44k, with the largest loss −$2,839 instead of −$3,776 and the drawdown $14.3k instead of $16.6k;
+- the index +$52k;
+- winners up to 63-65%.
+
+On the window, the period the account trades now, it made $2.2k less on 5-minute bars and $7.6k less on 30-minute
+bars, and its drawdown there was $3.4k against $1.9k. It fails the all-sets rule and is not adopted.
+
+| Net, 5 min (chart / NinjaTrader) | baseline | G16 + G25 |
+|---|---|---|
+| window | $18,516 / $18,549 | $16,435 / $16,347 |
+| NQ | $277,322 / $267,571 | $313,860 / $311,931 |
+| index | $407,796 / $404,250 | $451,683 / $456,550 |
+| largest loss (NinjaTrader NQ) | −$3,776 | −$2,839 |
+| drawdown (NinjaTrader window / NQ) | $1,852 / $16,633 | $3,350 / $14,267 |
+
+(`verification/noise_v2/g26_g16_g25_growth.csv`) **For the user to decide.** Over ten-plus years the evidence favors
+G16 + G25 clearly. On the 21 months the account trades now, the current settings did better. The window is one
+stretch of the market. The histories hold many such stretches, but they are older. As the caution above says, both
+parts were picked after seeing results, so the histories' margin may be smaller going forward than it looks here.
