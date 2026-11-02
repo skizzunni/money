@@ -1198,3 +1198,19 @@ to turn on.
 - **Tested:** `test_v38_gentle_start_agrees` runs NinjaTrader's code against the Python model with it on, at 5 and 30
   minutes: the same trades to the cent, with the sizes changed.
 - **When to switch it on:** if the journal shows fills 3 or more ticks worse than the model's on a new account.
+
+## G31: the squeeze threshold (registered 2026-11-02, before its run)
+
+**The idea:** when not one contract of the next trade fits today's room or the room above the floor, the bot still
+takes 1 contract with its stop cut to the room left, if that leaves at least 20 points (`squeeze_min` 20, from v3.1).
+It is the last setting not yet re-checked with growth mode and the time stop. A lower minimum takes more squeezed
+trades (more chances late in a bad day); a higher one sits out more of them.
+
+**Variants:** `squeeze_min` 10 and 30. Baseline: growth mode with G6's time stop (20).
+
+**Adopt only if all hold, in both the chart's and NinjaTrader's execution:**
+- on 5-minute bars it has a higher net than the baseline on NQ, the index and the window;
+- it never touches the trailing floor;
+- no more days at −$1,000 or worse.
+
+This is a second look at a setting already chosen, so the bar is all six 5-minute runs.
