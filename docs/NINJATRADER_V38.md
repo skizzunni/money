@@ -690,3 +690,23 @@ mode with G6's time stop ($250 after a loser).
 - on 5-minute bars it has a higher net than the baseline on NQ, the index and the window;
 - it never touches the trailing floor;
 - no more days at −$1,000 or worse.
+
+**G16 result (run once, 2026-11-02): rejected by the rule, but the closest call so far.** Without the wider stop after
+a loser:
+- the histories made much more: NQ +$25-28k, the index +$8-13k on 5-minute bars;
+- the largest single loss shrank from about −$3,776 to −$2,839;
+- there were more winners: 64.0% against 61.5% on the window.
+
+The window, the period the account trades now, made a little less (−$839 chart, −$1,112 NinjaTrader on 5-minute bars),
+so it fails the pre-registered rule and isn't adopted. On 30-minute bars the window fell further (−$4.6k NinjaTrader).
+
+| Net, 5 min (chart / NinjaTrader) | $250 after a loser (now) | $187.50 always |
+|---|---|---|
+| window | $18,516 / $18,549 | $17,677 / $17,437 |
+| NQ | $277,322 / $267,571 | $302,035 / $295,625 |
+| index | $407,796 / $404,250 | $420,552 / $412,643 |
+| winners (NinjaTrader window) | 61.5% | 64.0% |
+| largest loss (NinjaTrader NQ) | −$3,776 | −$2,839 |
+
+The floor was never touched. One NinjaTrader index day reached −$942, still under −$1,000
+(`verification/noise_v2/g16_after_loss_growth.csv`).
