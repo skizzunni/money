@@ -207,6 +207,9 @@ class NoiseConfig:
     # research (G30): no profit steps until the trailing floor has stopped at the starting equity plus trail_cap (a
     # new account trades its starting contracts until then)
     steps_after_lock: bool = False
+    # research (G34): a weekly loss brake. Once the closed P/L since this week's first session is week_stop or more
+    # in the red, no new entries until next week (0 = off)
+    week_stop: float = 0.0
     # with the money budget: when not even 1 contract fits, still take 1 with its max loss cut to the room left (less
     # costs), if that leaves at least squeeze_min points of stop; 0 = off (no entry)
     squeeze_min: float = 0.0
@@ -383,6 +386,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
     prev_side = 0  # confirm: the last check today closed above its upper line (1), below its lower (-1), or inside
     target_today = False  # after_target_done: a take-profit filled today
     day_pnl = 0.0  # daily_loss_limit: today's realized P/L
+    week_key, week_start_eq = None, 0.0  # week_stop: this week, and the closed equity at its first session
     trail_base = trail_peak = math.nan  # trail_dd: the closed equity at its start, the highest end-of-day equity
     tom_days: set = set()
     if cfg.tom_no_shorts or cfg.tom_mult != 1.0:  # the turn of the month, from the chart's trading days
@@ -507,6 +511,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
         if against_trend(d) and not cfg.trend_qty_div:
             return False
         if calm and not cfg.calm_div:
+            return False
+        if cfg.week_stop and eq_curve[-1] - week_start_eq <= -cfg.week_stop:
             return False
         if cfg.confirm and prev_side != d:
             return False
@@ -768,6 +774,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             block_dir = 0
             target_today = False
             day_pnl = 0.0
+            if t.isocalendar()[:2] != week_key:
+                week_key, week_start_eq = t.isocalendar()[:2], eq_curve[-1]
             if cfg.trail_dd > 0 and t.strftime("%Y-%m-%d") >= cfg.trail_from:  # yesterday's end-of-day equity
                 if math.isnan(trail_base):
                     trail_base = trail_peak = eq_curve[-1]

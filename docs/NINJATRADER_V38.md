@@ -1303,3 +1303,19 @@ it trades.
 (`verification/noise_v2/g33_safe_growth.csv`) Both parts stay available as settings:
 - "Most contracts" 10, in Custom mode;
 - "Gentle start", the G30 switch.
+
+## G34: a weekly loss brake (registered 2026-11-02, before its run)
+
+**The idea, for "not lost significantly":** the $900 daily limit caps a bad day, but a bad week can string several
+together. Once the closed P/L since the week's first session is `week_stop` or more in the red, the bot takes no new
+entries until the next week (`week_stop` in mnqbot/noise.py). This has not been tested before.
+
+**Variants:** `week_stop` $1,500 and $2,500. Baseline: growth mode with G6's time stop (no weekly brake).
+
+**Adopt only if all hold, in both the chart's and NinjaTrader's execution:**
+- on 5-minute bars it has a higher net than the baseline on NQ, the index and the window;
+- it never touches the trailing floor;
+- no more days at −$1,000 or worse.
+
+The drawdown and the largest loss are reported too. If it cuts the drawdown but costs net, it goes on file as a
+lower-risk option like G32.
