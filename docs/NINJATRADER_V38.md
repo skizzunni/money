@@ -930,3 +930,18 @@ and stopped (net $0-$8, both executions). The looser 0.55 made more on the index
 | index | $407,796 / $404,250 | $426,364 / $424,110 | $359,338 / $358,735 |
 
 (`verification/noise_v2/g23_range_pos_growth.csv`)
+
+## G24: the noise lookback (registered 2026-11-02, before its run)
+
+**The idea:** the noise area is the average of the last 14 sessions' moves at each check (`lookback` 14, from the
+source paper). A shorter lookback adapts faster to a changing market; a longer one is steadier. It has not been
+checked in growth mode.
+
+**Variants:** `lookback` 10 and 20. Baseline: growth mode with G6's time stop (14).
+
+**Adopt only if all hold, in both the chart's and NinjaTrader's execution:**
+- on 5-minute bars it has a higher net than the baseline on NQ, the index and the window;
+- it never touches the trailing floor;
+- no more days at −$1,000 or worse.
+
+This is a second look at a setting already chosen, so the bar is all six 5-minute runs.
