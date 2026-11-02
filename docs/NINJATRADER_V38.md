@@ -569,3 +569,21 @@ The pass bar was a t of 2.24, then 1.65 on each later set. It missed on all four
 that made money were not reliably different from zero. On the account it would also mean long losing streaks. At 95%
 losers, 30 or more stop-outs in a row are routine, and a 1-in-20 winner can't be counted on before the floor.
 (`verification/noise_v2/g12_overnight_inflection.csv`, `research/g12_overnight_inflection.py`)
+
+## G13: a time lock (registered 2026-11-02, before its run)
+
+**The idea:** the other half of G6's time stop. At 60 minutes a losing trade is closed. A trade that is up but hasn't
+reached the lock's trigger keeps its full stop and can still turn into a full loss. The time lock locks it instead:
+at a bar close T minutes or more after the fill, a trade not yet locked and in profit at that close gets the lock's
+stop (the entry plus 2.5 points) from the next bar (`time_lock` in mnqbot/noise.py). If the price is already within
+2.5 points of the entry, that stop is above it, so the trade closes at the next open ("Stop passed").
+
+**Variants:** T = 60 (with the time stop, every trade still open at 60 minutes is then either closed or locked) and
+T = 30. Baseline: growth mode with G6's 60-minute time stop.
+
+**Adopt only if all hold, in both the chart's and NinjaTrader's execution:**
+- on 5-minute bars it has a higher net than the baseline on NQ, the index and the window;
+- it never touches the trailing floor;
+- no more days at −$1,000 or worse.
+
+If both pass, take the one with the higher NinjaTrader window net.

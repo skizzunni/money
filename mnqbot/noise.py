@@ -271,6 +271,9 @@ class NoiseConfig:
     # research (G6, docs/NINJATRADER_V38.md): a time stop. A trade not yet locked that is losing at a bar close
     # time_stop minutes or more after its fill is closed at the next bar's open (a market order sent at that close).
     time_stop: int = 0
+    # research (G13): a time lock. A trade not yet locked that is in profit at a bar close time_lock minutes or more
+    # after its fill is locked (its stop to the entry plus lock_plus, from the next bar)
+    time_lock: int = 0
     partial_at: float = 0.0
     partial_frac: float = 0.5
     partial_next_bar: bool = False  # the part's limit works from the bar after the fill (as NinjaTrader can send it)
@@ -735,6 +738,10 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             if cfg.lock1_at > 0 and not locked1:
                 t1 = cfg.lock1_at * ml_trade / q_trade / cfg.point_value
                 locked1 = pos * ((h[i] if pos > 0 else l[i]) - entry_px) >= t1
+
+        if (cfg.time_lock and use_stop and pos and not locked and (i + 1 - entry_bar) * minutes >= cfg.time_lock
+                and pos * (c[i] - entry_px) > 0):
+            locked = True
 
         if pos and (not in_rth or t_min == RTH_OPEN):  # a session ended early (half day, data gap)
             close_pos(i, c[i] - pos * slip, "Session ended")
