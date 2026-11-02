@@ -972,3 +972,17 @@ blocks shorts through more of a bull market.
 - no more days at −$1,000 or worse.
 
 This is a second look at a setting already chosen, so the bar is all six 5-minute runs.
+
+**G25 result (run once, 2026-11-02): rejected by the rule, a near miss like G16; 50 stays.** A 30-session trend made
+more on the histories, on both bar lengths and in both executions: NQ +$5k to +$15k, the index +$12k to +$23k. On the
+window it made a few hundred dollars less on 5-minute bars (−$423 chart, −$296 NinjaTrader) and −$2.3k on 30-minute
+bars, so it fails the all-sets rule. A 100-session trend made much less on the window (−$5.7k).
+
+| Net, 5 min (chart / NinjaTrader) | 50 (now) | 30 | 100 |
+|---|---|---|---|
+| window | $18,516 / $18,549 | $18,093 / $18,253 | $12,832 / $12,888 |
+| NQ | $277,322 / $267,571 | $282,231 / $280,910 | $264,398 / $256,527 |
+| index | $407,796 / $404,250 | $419,596 / $427,694 | $425,317 / $431,180 |
+
+(`verification/noise_v2/g25_trend_n_growth.csv`) Like G16, a choice the user can make. Over the long run the evidence
+leans to 30, but it isn't better on the window, so the rule keeps 50.
