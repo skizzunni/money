@@ -662,3 +662,16 @@ stays at the normal line, so a strong break also starts further from its stop.
 - no more days at −$1,000 or worse.
 
 If both pass, take the one with the higher NinjaTrader window net.
+
+**G15 result (run once, 2026-11-02): rejected.** Waiting for a stronger break gives up the trades that pay. Net fell
+by half or more on the window, and several histories ran down to the floor and stopped. Waiting puts the entry
+further from the stop, so each contract risks more and fewer fit the room. A few early losers at that risk drained a
+new account. (Net $0-$7 after 66-102 trades: index 1.25x, NQ 1.5x.)
+
+| Net, 5 min (chart / NinjaTrader) | baseline (any close past the line) | 1.25x the noise | 1.5x the noise |
+|---|---|---|---|
+| window | $18,516 / $18,549 | $8,744 / $8,694 | $2,353 / $2,384 |
+| NQ | $277,322 / $267,571 | $204,769 / $202,230 | **$1 / $1, stuck** |
+| index | $407,796 / $404,250 | **$7 / $0, stuck** | $256,117 / $250,089 |
+
+(`verification/noise_v2/g15_entry_k_growth.csv`)
