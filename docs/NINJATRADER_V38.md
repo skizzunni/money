@@ -1417,3 +1417,24 @@ frozen).
 - a median net of at least 95% of the baseline's on both;
 - and then the usual all-sets check on the window, NQ and the index (G-runner, both executions): no more than 5%
   less net on any 5-minute set, and the floor never touched.
+
+**G36 result (run once, 2026-11-02): rejected; a reserve doesn't save the bad starts.**
+
+| 89 start dates, 21 months each | growth mode (now) | $500 reserve | half the room |
+|---|---|---|---|
+| NQ: lost / frozen / dead of 35 | 7 / 7 / 7 | 0 / 15 / 15 | 7 / 6 / 7 |
+| index: lost / frozen / dead of 54 | 6 / 7 / 7 | 0 / 20 / 20 | 6 / 7 / 7 |
+| median net, NQ / index | $22,925 / $23,070 | $12,637 / $18,960 | $22,925 / $23,070 |
+
+**What happened:**
+- **The $500 reserve.** No account reached the floor, but more than twice as many froze about $500 above it. They
+  could no longer size a trade and stopped for good, with a lower median.
+- **Half the room.** It barely changes anything: a 1-contract trade already fits half of most rooms.
+
+**What it says.** The lost starts are not a sizing accident at the end. In those periods (2011, 2013, 2015, 2019-early
+2020) the bot lost money for months at 1 contract, its smallest size. The $2,000 trailing drawdown is about 10 of its
+full $187.50 losses. On this edge, with this drawdown, about 1 in 9 (index) to 1 in 5 (NQ) fresh accounts fail inside
+21 months, and the rest make a median of about $23,000.
+
+The remaining lever is a smaller loss per trade from the start, so a bad stretch costs less of the $2,000: a
+$100-125 max loss until the floor has stopped. That is G37.
