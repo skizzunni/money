@@ -918,3 +918,15 @@ early). A tighter one may pay more (only clean breakouts).
 - no more days at −$1,000 or worse.
 
 This is a second look at a setting already chosen, so the bar is all six 5-minute runs.
+
+**G23 result (run once, 2026-11-02): rejected; 0.65 stays.** Both made less on the window: −$4.2k (0.55) and −$6.8k
+(0.75) on NinjaTrader's execution, 5-minute bars. Both made less on NQ, and on 30-minute bars both ran NQ to the floor
+and stopped (net $0-$8, both executions). The looser 0.55 made more on the index (+$20k), the only set it won.
+
+| Net, 5 min (chart / NinjaTrader) | 0.65 (now) | 0.55 | 0.75 |
+|---|---|---|---|
+| window | $18,516 / $18,549 | $14,244 / $14,301 | $11,801 / $11,774 |
+| NQ | $277,322 / $267,571 | $259,650 / $257,075 | $232,764 / $231,349 |
+| index | $407,796 / $404,250 | $426,364 / $424,110 | $359,338 / $358,735 |
+
+(`verification/noise_v2/g23_range_pos_growth.csv`)
