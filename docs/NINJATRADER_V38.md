@@ -1040,3 +1040,17 @@ threshold blocks more chasing after big days; a higher one blocks only the extre
 - no more days at −$1,000 or worse.
 
 This is a second look at a setting already chosen, so the bar is all six 5-minute runs.
+
+**G27 result (run once, 2026-11-02): rejected; 1.5 stays.** Both thresholds made less on every 5-minute set in both
+executions:
+- **1.25** blocks too much: the window fell from $18.5k to $8.5k.
+- **2.0** blocks too little: the window fell to $9.1k on the chart and $16.0k on NinjaTrader, and the index added a
+  day past −$1,000 (chart).
+
+| Net, 5 min (chart / NinjaTrader) | 1.5 (now) | 1.25 | 2.0 |
+|---|---|---|---|
+| window | $18,516 / $18,549 | $8,514 / $8,516 | $9,057 / $16,038 |
+| NQ | $277,322 / $267,571 | $245,105 / $242,967 | $261,009 / $258,697 |
+| index | $407,796 / $404,250 | $369,101 / $367,269 | $389,743 / $382,807 |
+
+(`verification/noise_v2/g27_big_day_growth.csv`)
