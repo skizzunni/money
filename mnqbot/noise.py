@@ -173,6 +173,9 @@ class NoiseConfig:
     # all of it), so a loser leaves room for the next; and once today's closed P/L is above day_up_from, day_up_mult
     # times the contracts (the same stop distance), still within the budget
     budget_frac: float = 1.0
+    # research (G17, docs/NINJATRADER_V38.md): this share of today's closed profit is kept, not risked again (0: the
+    # day's room is the daily limit plus all of today's profit; 1: never more than the daily limit)
+    day_keep: float = 0.0
     # research (after v2.8): shorts take short_mult x the contracts (the same stop distance); 0 = no short entries
     short_mult: float = 1.0
     # research (after v2.8): an entry needs the check's close in the top range_pos_min of the day's range so far (its
@@ -522,7 +525,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
         """What a new trade may risk: the rest of today's loss limit and the room above the trailing floor."""
         room = math.inf
         if cfg.daily_loss_limit > 0:
-            room = cfg.budget_frac * (cfg.daily_loss_limit + day_pnl)
+            room = cfg.budget_frac * (cfg.daily_loss_limit + day_pnl - cfg.day_keep * max(day_pnl, 0.0))
         if cfg.trail_dd > 0 and not math.isnan(trail_peak):
             floor = trail_peak - cfg.trail_dd
             if cfg.trail_cap >= 0:

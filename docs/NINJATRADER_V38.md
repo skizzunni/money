@@ -710,3 +710,21 @@ so it fails the pre-registered rule and isn't adopted. On 30-minute bars the win
 
 The floor was never touched. One NinjaTrader index day reached −$942, still under −$1,000
 (`verification/noise_v2/g16_after_loss_growth.csv`).
+
+## G17: keep part of today's profit (registered 2026-11-02, before its run)
+
+**The idea, from the user:** "these kinds of wins but not these kinds of losses". The worst day in growth mode is
+never below −$900, yet single trades lose up to −$3,776. The daily room is $900 plus all of today's closed profit,
+so after a +$3,000 morning one trade may risk most of it (up to 15 contracts at $250). G17 keeps part of the day's
+profit off-limits: the day's room is $900 + today's P/L − `day_keep` × today's profit, when it is positive
+(`day_keep` in mnqbot/noise.py).
+
+**Variants:** `day_keep` 0.5 (half of today's profit is kept) and 1.0 (a trade never risks more than the $900 limit,
+whatever the day has made). Baseline: growth mode with G6's time stop (`day_keep` 0).
+
+**Adopt only if all hold, in both the chart's and NinjaTrader's execution:**
+- on 5-minute bars it has a higher net than the baseline on NQ, the index and the window;
+- it never touches the trailing floor;
+- no more days at −$1,000 or worse.
+
+If both pass, take the one with the higher NinjaTrader window net. The largest single loss is reported too.
