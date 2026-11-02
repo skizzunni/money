@@ -764,3 +764,17 @@ day whose last 10 sessions' average range is above `storm_k` times the last 100 
 - no more days at −$1,000 or worse.
 
 If both pass, take the one with the higher NinjaTrader window net.
+
+**G18 result (run once, 2026-11-02): rejected; the storms pay.** Sitting out stormy stretches cut the net everywhere.
+The window fell from $18.5k to $12.1k on 5-minute bars; it was itself a volatile stretch (April 2025). The profit
+factor on the window rose (1.82 to 2.07 at 1.5x) and the window's drawdown halved, but the trades given up made more
+than they lost. The largest single losses (−$3,776) were not in the skipped days: they stayed.
+
+| Net, 5 min (chart / NinjaTrader) | baseline | storm 1.5x | storm 2x |
+|---|---|---|---|
+| window | $18,516 / $18,549 | $12,148 / $12,175 | $12,099 / $12,097 |
+| NQ | $277,322 / $267,571 | $209,649 / $207,530 | $252,296 / $249,051 |
+| index | $407,796 / $404,250 | $336,450 / $332,781 | $376,563 / $372,433 |
+
+(`verification/noise_v2/g18_storm_growth.csv`) Together with the calm filter's history, it fits a pattern. The bot is
+a volatility trader: it needs movement, and it earns most when the market is wild.
