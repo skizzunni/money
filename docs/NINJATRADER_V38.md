@@ -1243,3 +1243,23 @@ more profit on its best days. The $900 daily room and the floor still size every
 - no more days at −$1,000 or worse.
 
 This is a second look at a setting already chosen, so the bar is all six 5-minute runs.
+
+**G32 result (run once, 2026-11-02): rejected by the rule; a cap of 10 is the lower-risk option.**
+- **Cap 10:**
+  - made slightly more on the window (+$189 chart, +$205 NinjaTrader) and about the same on NQ (−$1.1k chart,
+    +$1.0k NinjaTrader);
+  - made less on the index (−$16-18k, about 4%), so it fails the all-sets rule;
+  - cut the largest single loss by a third (−$3,776 to −$2,517);
+  - cut the closed drawdown by 14-20% (NQ $16.6k to $14.3k, the index $19.3k to $15.3k, NinjaTrader).
+- **Cap 20:** made less on the histories and its largest loss grew to −$5,035.
+
+| 5 min, NinjaTrader | cap 15 (now) | cap 10 | cap 20 |
+|---|---|---|---|
+| net, window | $18,549 | $18,754 | $18,549 |
+| net, NQ | $267,571 | $268,544 | $265,737 |
+| net, index | $404,250 | $386,561 | $391,950 |
+| largest loss, NQ | −$3,776 | −$2,517 | −$5,035 |
+| drawdown, NQ / index | $16,633 / $19,255 | $14,298 / $15,326 | $17,107 / $18,680 |
+
+(`verification/noise_v2/g32_max_qty_growth.csv`) "Most contracts" is already a setting in MnqNoiseV38.cs (Custom
+mode). Funded growth keeps 15.
