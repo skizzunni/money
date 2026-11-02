@@ -1025,3 +1025,18 @@ bars, and its drawdown there was $3.4k against $1.9k. It fails the all-sets rule
 G16 + G25 clearly. On the 21 months the account trades now, the current settings did better. The window is one
 stretch of the market. The histories hold many such stretches, but they are older. As the caution above says, both
 parts were picked after seeing results, so the histories' margin may be smaller going forward than it looks here.
+
+## G27: the big-day rule's threshold (registered 2026-11-02, before its run)
+
+**The idea:** after a session whose range was over 1.5 times its 10-session average, the bot takes no entries the next
+day in the direction the big day closed (`big_day_k` 1.5, from v2.3, before growth mode and the time stop). A lower
+threshold blocks more chasing after big days; a higher one blocks only the extreme ones.
+
+**Variants:** `big_day_k` 1.25 and 2.0. Baseline: growth mode with G6's time stop (1.5).
+
+**Adopt only if all hold, in both the chart's and NinjaTrader's execution:**
+- on 5-minute bars it has a higher net than the baseline on NQ, the index and the window;
+- it never touches the trailing floor;
+- no more days at −$1,000 or worse.
+
+This is a second look at a setting already chosen, so the bar is all six 5-minute runs.
