@@ -838,3 +838,19 @@ steps.
 
 (`verification/noise_v2/g20_trend_tp_growth.csv`) The 2-unit take-profit (chosen walk-forward in round twenty-six)
 stays.
+
+## G21: the lock trigger, re-checked with the time stop (registered 2026-11-02, before its run)
+
+**The idea:** the time stop (G6) only closes trades that are not locked, so the lock trigger now decides which slow
+trades the time stop can cut. With a lower trigger, more trades lock early (a small win, never a time-stop loss);
+with a higher one, more of them stay open to the time stop. The trigger, 0.35 times the max loss, was chosen before
+the time stop existed.
+
+**Variants:** `lock_at` 0.25 and 0.5. Baseline: growth mode with G6's time stop (0.35).
+
+**Adopt only if all hold, in both the chart's and NinjaTrader's execution:**
+- on 5-minute bars it has a higher net than the baseline on NQ, the index and the window;
+- it never touches the trailing floor;
+- no more days at −$1,000 or worse.
+
+This is a second look at a setting already chosen, so the bar is all six 5-minute runs, as for G9.
