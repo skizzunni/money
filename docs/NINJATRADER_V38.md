@@ -1214,3 +1214,17 @@ trades (more chances late in a bad day); a higher one sits out more of them.
 - no more days at −$1,000 or worse.
 
 This is a second look at a setting already chosen, so the bar is all six 5-minute runs.
+
+**G31 result (run once, 2026-11-02): rejected; 20 stays, and the setting barely matters.** Every run was within
+about $2k (0.7%) of the baseline: the squeeze binds on few trades in growth mode. 10 points tied the window exactly
+(no squeezed trade there). 30 points made $47-56 more on the window and $1.9k less on NQ (chart). Neither beat the
+baseline on all six 5-minute runs.
+
+| Net, 5 min (chart / NinjaTrader) | 20 (now) | 10 | 30 |
+|---|---|---|---|
+| window | $18,516 / $18,549 | $18,516 / $18,549 | $18,563 / $18,605 |
+| NQ | $277,322 / $267,571 | $277,531 / $268,398 | $275,437 / $268,044 |
+| index | $407,796 / $404,250 | $407,413 / $405,252 | $405,550 / $405,684 |
+
+(`verification/noise_v2/g31_squeeze_growth.csv`) With G31, every setting growth mode uses has been re-checked with
+the time stop in place.
