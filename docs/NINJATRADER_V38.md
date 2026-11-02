@@ -1151,7 +1151,8 @@ Every 30-minute run held at 3 ticks.
 
 **For live trading:**
 - Check the journal's fills against the model's after the first weeks.
-- If slippage runs at 3 ticks or more, the first months are where the account is at risk. Running at the evaluation's
-  1 contract until the first $2,000 is banked (the floor then stops) is the safe start.
+- If slippage runs at 3 ticks or more, the first months are where the account is at risk. Growth mode already
+  starts at 1 contract. A slower start (no contract steps until the floor has stopped) would be the next thing to
+  test; it hasn't been tested yet.
 
 (`verification/noise_v2/g29_slippage_growth.csv`)
