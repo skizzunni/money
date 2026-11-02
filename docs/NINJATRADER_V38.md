@@ -1281,3 +1281,25 @@ it trades.
 **It becomes a Mode in MnqNoiseV38.cs only if:**
 - the floor is never touched at 1 or 3 ticks, on any 5-minute set, in both executions;
 - the largest loss and the drawdown are no larger than the baseline's on every 5-minute set.
+
+**G33 result (run once, 2026-11-02): not made a Mode; it misses its own bar on the window by small amounts.**
+- **On the histories it is what it promises.** The largest loss falls from about −$3,776 to −$2,517 everywhere. The
+  drawdown falls 14-20%. The floor is never touched at 1 or 3 ticks (growth mode's 3-tick chart run on NQ sat at the
+  floor).
+- **What it costs.** About 4% of the net on the index and 9% on NinjaTrader's window at 1 tick. NQ is about even.
+- **Where it misses.** On the window, a new account, where the 10-contract cap barely binds and the gentle start
+  reshuffles the early trades, two numbers came out a little larger than growth mode's:
+  - the drawdown on NinjaTrader's execution at 1 tick: $1,918 against $1,852;
+  - the largest loss on the chart's execution at 3 ticks: −$759 against −$569.
+
+  The bar was "no larger on every 5-minute set".
+
+| 5 min, NinjaTrader, 1 tick | growth (now) | safe preset |
+|---|---|---|
+| net: window / NQ / index | $18,549 / $267,571 / $404,250 | $16,812 / $274,813 / $383,702 |
+| largest loss: window / NQ / index | −$852 / −$3,776 / −$3,776 | −$792 / −$2,517 / −$2,517 |
+| drawdown: window / NQ / index | $1,852 / $16,633 / $19,255 | $1,918 / $14,298 / $15,326 |
+
+(`verification/noise_v2/g33_safe_growth.csv`) Both parts stay available as settings:
+- "Most contracts" 10, in Custom mode;
+- "Gentle start", the G30 switch.
