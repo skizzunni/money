@@ -522,3 +522,34 @@ and two or three bad weeks at double size used it up. On 30-minute bars and on t
 
 **Sizing, so far:** G5, G10 and G11 all failed the same way. Growth mode's sizing is already about as large as one
 account's $2,000 floor survives through a bad stretch.
+
+## G12: the overnight "inflection", a sweep of the Asian range, then a reversal (registered 2026-11-02, before its run)
+
+**The idea, from the user's two TikTok clips (an NQ trader).** About 02:30-03:00 New York time, price runs past the
+overnight extreme and snaps back. They enter against the run with a stop a few points past the new extreme (4.25
+points in one clip, 15 in the other), hold for hours, and make 135 times the risk on the day shown. It is a
+reversal, the opposite of the bot's breakout, so it would be a second, separate setup. Close relatives tested before
+(docs/RESULTS.md):
+- flipping a failed breakout, rounds 19 and 94;
+- the previous-day sweep, the pattern study;
+- the bot's breakout logic overnight, round 23.
+
+This exact version hasn't been tested: an overnight sweep of the Asian range with a tight stop at the sweep's
+extreme and an all-day hold.
+
+**Rules (1-minute bars, New York time):**
+- **The Asian range:** the high and low from 18:00 the evening before to 02:59.
+- **A long:** from 03:00 to 09:25, a 1-minute bar whose low goes below the Asian low, followed within 5 bars (that
+  bar included) by a 1-minute close back above the Asian low. The first such sweep and close of the day counts.
+  Enter at the next bar's open.
+- **Its stop:** one tick below the lowest low from the sweeping bar to the close back above.
+- **A short:** the mirror, at the Asian high.
+- **Skips:** a trade whose stop is under 2 points or over 30 points from the entry.
+- **One a day:** the first trigger, either side.
+- **The exit:** the stop, or the 15:59 bar's close (flat by 16:00). No target, as in the clips.
+- **Costs per MNQ:** $1.24 in fees, and 2 ticks of slippage on every fill (the overnight market is thinner); a stop
+  that gaps fills at the bar's open.
+
+**Pass (stage 1, the edge per contract):** daily P/L t-stat ≥ 2.24 on the index 2011-2018, then ≥ 1.65 on 2019-2022,
+on 2023-Sep 2026, and on NQ futures 2015-2025. All four, run once. Only if it passes does stage 2 test it on the
+account alongside the bot.
