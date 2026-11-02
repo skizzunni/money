@@ -1105,3 +1105,17 @@ Switch Funded growth mode to G26 only if all hold:
 - the floor is never touched.
 
 Otherwise keep the current settings and close G26.
+
+**G26 decision (run once, 2026-11-02): keep the current settings; G26 is closed.**
+
+| NinjaTrader, 5 min | NQ 2015-2025 | index 2011-2026 |
+|---|---|---|
+| years G26 made more | **8 of 11 (73%)** | **10 of 16 (62.5%)**, short of 70% |
+| worst year, now / G26 | +$2,367 / +$6,970 | −$2,918 / −$2,664 |
+| total, now / G26 | $267,571 / $311,931 | $404,250 / $456,550 |
+
+G26's ten-year lead is real, but on the index it comes from a handful of big years: 2017 +$16.5k, 2020 +$10.6k,
+2022 +$11.9k, 2024 +$7.4k and 2025 +$13.3k. In the other years it trailed about as often as it led, including 2012
+(−$13.3k) and the current 2026 (−$1.1k). The rule needs it to win year in, year out on both histories, and it
+doesn't, so the current settings stay. Every year in both histories was profitable or close to flat under both
+settings: the worst was −$2,918 (index, 2019) (`verification/noise_v2/g26_by_year.csv`).

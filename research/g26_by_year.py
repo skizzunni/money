@@ -8,11 +8,24 @@ import sys
 import pandas as pd
 import t1_eval as T
 import v24_scan as S
-from g6_time_stop import with_1600
 
 from mnqbot.noise import NoiseConfig, run
 
 S.init({}, *sys.argv[1:4])
+
+
+def with_1600(bars: pd.DataFrame, m: int) -> pd.DataFrame:
+    """A 16:00 bar at the last price where a session's data stops at 16:00 (as research/g6_time_stop.py)."""
+    t = bars.index.tz_convert("America/New_York")
+    mins = t.hour * 60 + t.minute
+    last = (mins + m == 960) & ~pd.Series(mins == 960).shift(-1, fill_value=False).to_numpy()
+    add = bars[last].copy()
+    add.index = add.index + pd.Timedelta(minutes=m)
+    for k in ("open", "high", "low"):
+        add[k] = add["close"]
+    return pd.concat([bars, add]).sort_index()
+
+
 rows = []
 for name, (bars, first, skip) in S.D.items():
     if name == "win":
