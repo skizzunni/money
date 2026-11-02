@@ -1173,3 +1173,22 @@ at the same slippage.
   a little, not much);
 - the floor is never touched at 1, 2 or 3 ticks on any 5-minute set, in both executions;
 - no more days at −$1,000 or worse.
+
+**G30 result (run once, 2026-11-02): rejected by the rule; the safety it buys is real.**
+- **What it fixes.** At 3 ticks the NQ run that sat at the floor now makes $241,762. No run at 1, 2 or 3 ticks
+  touched the floor, on either bar length or execution.
+- **What it costs.** At 1 tick it is within 1% of the baseline everywhere except NinjaTrader's window: $16,819
+  against $18,549, or 90.7%. The window starts a new account, so that is where holding 1 contract costs most. The
+  rule asked for 95%.
+- **Why it isn't adopted.** The one floor hit it prevents came in the chart's execution at 3 ticks. NinjaTrader's
+  execution, the one the account trades, held at 3 ticks without it.
+
+| Net, 5 min, NinjaTrader | baseline 1 / 2 / 3 ticks | gentle start 1 / 2 / 3 ticks |
+|---|---|---|
+| window | $18,549 / $14,571 / $13,096 | $16,819 / $15,929 / $11,233 |
+| NQ | $267,571 / $246,956 / $236,003 | $274,916 / $252,147 / $241,525 |
+| index | $404,250 / $384,795 / $371,519 | $399,804 / $381,626 / $368,701 |
+| **chart execution, NQ, 3 ticks** | **$2, stuck at the floor** | **$241,762** |
+
+(`verification/noise_v2/g30_gentle_start_growth.csv`) If live fills turn out worse than 2 ticks, this is the setting
+to turn on: `steps_after_lock`, still to be added to MnqNoiseV38.cs.
