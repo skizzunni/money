@@ -778,3 +778,19 @@ than they lost. The largest single losses (−$3,776) were not in the skipped da
 
 (`verification/noise_v2/g18_storm_growth.csv`) Together with the calm filter's history, it fits a pattern. The bot is
 a volatility trader: it needs movement, and it earns most when the market is wild.
+
+## G19: a late-day lock (registered 2026-11-02, before its run)
+
+**The idea:** a trade still open late in the day has little time left to reach the take-profit, but plenty to give
+back a gain before the 16:00 exit. From the bar closing at T, a trade not yet locked and in profit at that close is
+locked: the stop goes to the entry plus 2.5 points, from the next bar (`late_lock_from` in mnqbot/noise.py). G13 locked
+by the time since the fill; G19 locks by the clock.
+
+**Variants:** T = 15:00 and 15:30. Baseline: growth mode with G6's time stop.
+
+**Adopt only if all hold, in both the chart's and NinjaTrader's execution:**
+- on 5-minute bars it has a higher net than the baseline on NQ, the index and the window;
+- it never touches the trailing floor;
+- no more days at −$1,000 or worse.
+
+If both pass, take the one with the higher NinjaTrader window net.

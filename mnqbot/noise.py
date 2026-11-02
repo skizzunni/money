@@ -281,6 +281,9 @@ class NoiseConfig:
     # research (G13): a time lock. A trade not yet locked that is in profit at a bar close time_lock minutes or more
     # after its fill is locked (its stop to the entry plus lock_plus, from the next bar)
     time_lock: int = 0
+    # research (G19): a late-day lock. From the bar closing at late_lock_from (minute of day, e.g. 900 = 15:00), a trade
+    # not yet locked and in profit at the close is locked, from the next bar (0 = off)
+    late_lock_from: int = 0
     partial_at: float = 0.0
     partial_frac: float = 0.5
     partial_next_bar: bool = False  # the part's limit works from the bar after the fill (as NinjaTrader can send it)
@@ -747,6 +750,9 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                 locked1 = pos * ((h[i] if pos > 0 else l[i]) - entry_px) >= t1
 
         if (cfg.time_lock and use_stop and pos and not locked and (i + 1 - entry_bar) * minutes >= cfg.time_lock
+                and pos * (c[i] - entry_px) > 0):
+            locked = True
+        if (cfg.late_lock_from and use_stop and pos and not locked and in_rth and end >= cfg.late_lock_from
                 and pos * (c[i] - entry_px) > 0):
             locked = True
 
