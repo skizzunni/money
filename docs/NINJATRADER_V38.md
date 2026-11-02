@@ -1089,3 +1089,19 @@ its neighbours with the time stop in place. The results:
   ten-year histories and lose a little on the window.
 
 The current settings are where the evidence points.
+
+## G26 decision: year by year (registered 2026-11-02, before its run)
+
+**The user's call, handed to me:** "I just want money to be made and not lost significantly." G26 (G16 + G25)
+won on the ten-year histories and lost $2.2k on the 21-month window. A total over ten years can come from one or two
+lucky years. The fair tiebreak is how often it wins.
+
+**The rule, fixed before running:** on NinjaTrader's execution with 5-minute bars, compare G26 with the current
+settings calendar year by calendar year, on NQ futures (2015-2025) and on the index (2011-2026).
+
+Switch Funded growth mode to G26 only if all hold:
+- it has a higher net in at least 70% of the years on each history;
+- its worst calendar year is no worse than the current settings' worst year on each history;
+- the floor is never touched.
+
+Otherwise keep the current settings and close G26.
