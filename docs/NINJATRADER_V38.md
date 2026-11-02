@@ -824,3 +824,16 @@ the 2-noise-unit take-profit (`trend_with_tp` in mnqbot/noise.py).
 - no more days at −$1,000 or worse.
 
 If both pass, take the one with the higher NinjaTrader window net.
+
+**G20 result (run once, 2026-11-02): rejected.** A farther take-profit for trades with the trend raised the profit
+factor on the histories (1.53 to 1.61 on NQ, NinjaTrader) but made less on the window and on the index. Fewer
+contracts got added: with fewer targets filled, the account reached each $1,500 step later. Overall net fell.
+
+| Net, 5 min (chart / NinjaTrader) | baseline (2 noise units) | 3 with the trend | 4 with the trend |
+|---|---|---|---|
+| window | $18,516 / $18,549 | $16,144 / $16,120 | $15,163 / $12,398 |
+| NQ | $277,322 / $267,571 | $260,844 / $250,046 | $270,152 / $271,806 |
+| index | $407,796 / $404,250 | $373,111 / $371,019 | $375,611 / $373,223 |
+
+(`verification/noise_v2/g20_trend_tp_growth.csv`) The 2-unit take-profit (chosen walk-forward in round twenty-six)
+stays.
