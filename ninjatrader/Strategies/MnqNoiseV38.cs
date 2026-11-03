@@ -615,18 +615,25 @@ namespace NinjaTrader.NinjaScript.Strategies
                 setupWarnings.Clear();
                 // the mode, whatever its case or spaces: a typo would otherwise run Custom's settings unnoticed
                 string m = (Mode ?? "").Trim();
-                if (string.Equals(m, "Funded growth", StringComparison.OrdinalIgnoreCase)) Mode = "Funded growth";
+                string mc = System.Text.RegularExpressions.Regex.Replace(m, @"\s+", " ");
+                if (string.Equals(mc, "Funded growth", StringComparison.OrdinalIgnoreCase)) Mode = "Funded growth";
+                else if (string.Equals(mc, "Funded growth 100K", StringComparison.OrdinalIgnoreCase)) Mode = "Funded growth 100K";
+                else if (string.Equals(mc, "Funded growth 150K", StringComparison.OrdinalIgnoreCase)) Mode = "Funded growth 150K";
                 else if (string.Equals(m, "Evaluation", StringComparison.OrdinalIgnoreCase)) Mode = "Evaluation";
                 else if (string.Equals(m, "Custom", StringComparison.OrdinalIgnoreCase)) Mode = "Custom";
                 else
                 {
-                    setupWarnings.Add("Mode \"" + Mode + "\" isn't Funded growth, Evaluation or Custom: running the settings below as Custom");
+                    setupWarnings.Add("Mode \"" + Mode + "\" isn't Funded growth (50K, 100K or 150K), Evaluation or Custom: running the settings below as Custom");
                     Mode = "Custom";
                 }
-                if (Mode == "Funded growth")  // the tested growth settings (docs/NINJATRADER_V38.md), whatever is set below
+                if (Mode.StartsWith("Funded growth"))  // the tested growth settings (docs/NINJATRADER_V38.md), whatever is set below
                 {
                     Contracts = 1; MaxLoss = 187.5; AfterLossMaxLoss = 250; DailyLoss = 900; TrailDD = 2000;
                     ProfitStep = 1500; MaxContracts = 15; SizeByOwnStop = true; TimeStop = 60;
+                    // G40: a bigger account trades the 50K's size; its larger limits are cushion (a $2,000 / $3,000
+                    // daily loss and a $3,000 / $4,500 trailing drawdown; the bot's budget is 90% of the daily loss)
+                    if (Mode == "Funded growth 100K") { DailyLoss = 1800; TrailDD = 3000; LossGuard = 1900; }
+                    if (Mode == "Funded growth 150K") { DailyLoss = 2700; TrailDD = 4500; LossGuard = 2850; }
                 }
                 else if (Mode == "Evaluation")  // v3.8: 1 MNQ, $260 a trade, $900 a day
                 {
@@ -674,8 +681,9 @@ namespace NinjaTrader.NinjaScript.Strategies
                     setupWarnings.Add("trading hours are \"" + Bars.TradingHours + "\": use CME US Index Futures ETH so the 16:00 exit fills at 16:00");
                 if (LossGuard > 0 && DailyLoss > 0 && LossGuard < DailyLoss)
                     setupWarnings.Add("the loss guard ($" + LossGuard + ") is below the daily budget ($" + DailyLoss + "): it will cut trades the budget allows");
-                if (LossGuard > 1000 || LossGuard <= 0)
-                    setupWarnings.Add("the loss guard is " + (LossGuard <= 0 ? "off" : "$" + LossGuard) + ": the $1,000 daily rule has no live backstop");
+                if (LossGuard <= 0 || (DailyLoss > 0 && LossGuard > DailyLoss / 0.9))
+                    setupWarnings.Add("the loss guard is " + (LossGuard <= 0 ? "off" : "$" + LossGuard + ", past the account's daily loss rule") +
+                                      ": the daily rule has no live backstop");
                 foreach (string w in setupWarnings)
                     Print("MnqNoiseV38 WARNING: " + w);
                 Print("MnqNoiseV38 (" + Mode + "): " + Instrument.FullName + ", " + minutes + " " + BarsPeriod.BarsPeriodType + ", " + Contracts +
@@ -1028,7 +1036,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         #region Properties
         [NinjaScriptProperty]
-        [Display(Name = "Mode: Funded growth, Evaluation, or Custom (the settings below)", Order = 0, GroupName = "1. Size and risk")]
+        [Display(Name = "Mode: Funded growth (50K), Funded growth 100K, Funded growth 150K, Evaluation, or Custom (the settings below)", Order = 0, GroupName = "1. Size and risk")]
         public string Mode { get; set; }
 
         [NinjaScriptProperty]

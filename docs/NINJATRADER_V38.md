@@ -1671,3 +1671,33 @@ A bad start then has $3,000-4,500 to burn through instead of $2,000.
 - fewer dead accounts than the 50K on both NQ and the index;
 - a median net at least the 50K's on both;
 - and on the window: at least the 50K's net, the floor never touched, and no day at its daily limit.
+
+**G40 result (run once, 2026-11-03): adopted as two new modes.** The 50K's size on a bigger account's limits passes
+every part of the rule.
+
+| | 50K (Funded growth) | 100K at the 50K's size | 150K at the 50K's size |
+|---|---|---|---|
+| dead, of 35 NQ starts | 7 | 5 | 4 |
+| dead, of 54 index starts | 7 | 3 | 1 |
+| median net per 21-month account, NQ / index | $22,925 / $23,070 | $27,233 / $35,363 | $27,990 / $35,397 |
+| mean net, NQ / index | $21,333 / $22,498 | $32,385 / $34,361 | $37,440 / $41,421 |
+| 10th percentile, NQ / index | −$460 / $444 | $1 / $4,807 | $930 / $5,756 |
+| window, 5 / 30 min (NinjaTrader) | $18,549 / $28,620 | $24,041 / $44,330 | $27,314 / $51,171 |
+| worst day on the window, 5 min (daily loss rule) | −$899 ($1,000) | −$1,720 ($2,000) | −$1,962 ($3,000) |
+
+The floor was never touched on the window, NQ or the index, at either bar length.
+
+**Why it works:**
+- the larger trailing drawdown absorbs the bad starts that end 50K accounts;
+- the larger daily budget lets the bot keep trading on its strong days, where the 50K's $900 stopped it.
+
+The size per trade and the steps are the 50K's, so the bigger account adds cushion, not risk
+(`verification/noise_v2/g40_account_cushion.csv`, `g35_start_dates_cush*.csv`).
+
+**In MnqNoiseV38.cs:**
+- **Funded growth 100K:** budget $1,800 a day, a $3,000 trailing floor, loss guard $1,900.
+- **Funded growth 150K:** budget $2,700, a $4,500 floor, loss guard $2,850.
+
+Everything else is Funded growth's. The startup check's loss-guard warning now follows the account's daily rule.
+`test_v38_bigger_accounts_agree` checks NinjaTrader against the Python model, trade for trade, for both modes at 5 and
+30 minutes, with each mode's budget and guard applied. All 21 NinjaTrader v3.8 tests pass.

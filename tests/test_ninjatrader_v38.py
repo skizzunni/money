@@ -226,7 +226,8 @@ def test_v38_startup_checks(sim, sample_1m, tmp_path):  # noqa: F811
     loose, warn, _ = go("Mode=  funded GROWTH ")
     assert loose == ok_trades and warn == [], "the mode is read whatever its case and spaces"
     _, warn, dash = go("Mode=Funded")
-    assert any("isn't Funded growth, Evaluation or Custom" in x for x in warn) and "SETUP WARNING (1)" in dash
+    assert any("isn't Funded growth (50K, 100K or 150K), Evaluation or Custom" in x for x in warn)
+    assert "SETUP WARNING (1)" in dash
     _, warn, _ = go("Mode=Funded growth", "SimInstrument=NQ 12-26")
     assert any("the bot was built and tested on MNQ" in x for x in warn)
     _, warn, _ = go("Mode=Funded growth", "SimTradingHours=CME US Index Futures RTH")
@@ -382,3 +383,31 @@ def test_v38_day_summary(sim, sample_1m, tmp_path):  # noqa: F811
         d, sign, amt, n = re.match(r"Day done (\S+): ([+-])\$([\d.]+) in (\d+) trades", msg).groups()
         assert math.isclose(float(sign + amt), float(dl.loc[d, "day P/L"]), abs_tol=0.006), msg
         assert int(n) == int(dl.loc[d, "trades today"]), msg
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+@pytest.mark.parametrize(("mode", "daily", "trail"), [("Funded growth 100K", 1800.0, 3000.0),
+                                                      ("Funded growth 150K", 2700.0, 4500.0)])
+@pytest.mark.parametrize("minutes", [5, 30])
+def test_v38_bigger_accounts_agree(sim, sample_1m, minutes, mode, daily, trail, tmp_path):  # noqa: F811
+    """G40's modes: a 100K / 150K account at the 50K's size, its limits as cushion. NinjaTrader's code agrees with the
+    Python model trade for trade, and the mode applies its limits (the daily budget and the loss guard)."""
+    bars = resample(sample_1m, f"{minutes}min")
+    path = tmp_path / "bars.csv"
+    with path.open("w") as f:
+        for t, r in zip(bars.index, bars.itertuples(), strict=True):
+            f.write(f"{t:%Y-%m-%d %H:%M},{r.open!r},{r.high!r},{r.low!r},{r.close!r}\n")
+    r = subprocess.run([DOTNET, str(sim), str(path), str(minutes), "Strategy=V38", f"Mode={mode}"],
+                       capture_output=True, text=True, env=ENV)
+    assert r.returncode == 0, r.stderr[-2000:]
+    assert not [x for x in r.stdout.splitlines() if x.startswith("P,") and "WARNING" in x]
+    nt = [x.split(",")[1:] for x in r.stdout.splitlines() if x.startswith("T,")]
+    py = run(bars, dataclasses.replace(GROW, daily_loss_limit=daily, trail_dd=trail), minutes=minutes).trades
+    assert len(nt) == len(py) >= 20
+    for a, t in zip(nt, py, strict=True):
+        assert (int(a[0]), int(a[1]), int(a[3])) == (t.direction, t.entry_bar, t.exit_bar), (a, t)
+        assert float(a[2]) == t.entry and float(a[4]) == t.exit, (a, t)
+        assert math.isclose(float(a[6]), t.pnl, abs_tol=1e-6), (a, t)
+    printed = "\n".join(x for x in r.stdout.splitlines() if x.startswith(("P,", "D,")))
+    assert f"${daily:.0f} a day" in printed, "the startup line shows the mode's daily budget"
+    assert f"flat at -${daily / 1800 * 1900:.0f} today" in printed, "the loss guard follows the account"

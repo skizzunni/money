@@ -1,0 +1,19 @@
+execution,bars,account,set,trades,net $,pf,win %,largest loss $,closed dd $,worst day $,days <= -1000,floor touches
+NinjaTrader,5,50K,proxy,291,18549,1.824,61.5,-852,1852,-899,0,0
+NinjaTrader,5,50K,nq,2336,267571,1.528,62.2,-3776,16633,-899,0,0
+NinjaTrader,5,50K,index,3245,404250,1.57,61.2,-3776,19255,-900,0,0
+NinjaTrader,5,100K cushion,proxy,290,24041,1.92,61.4,-1324,2017,-1720,4,0
+NinjaTrader,5,100K cushion,nq,2411,507700,1.591,61.9,-3776,27737,-1800,364,0
+NinjaTrader,5,100K cushion,index,3312,724817,1.586,61.3,-3776,25047,-1805,543,0
+NinjaTrader,5,150K cushion,proxy,290,27314,1.979,61.4,-1762,2603,-1962,3,0
+NinjaTrader,5,150K cushion,nq,2404,657501,1.597,61.9,-3776,36353,-2700,370,0
+NinjaTrader,5,150K cushion,index,3344,919377,1.618,61.2,-3776,27965,-2699,512,0
+NinjaTrader,30,50K,proxy,252,28620,1.881,53.6,-1634,3935,-899,0,0
+NinjaTrader,30,50K,nq,1905,257756,1.478,50.0,-3776,21242,-899,0,0
+NinjaTrader,30,50K,index,2679,310560,1.395,48.6,-3776,28505,-899,0,0
+NinjaTrader,30,100K cushion,proxy,252,44330,1.949,54.0,-1713,5956,-1799,15,0
+NinjaTrader,30,100K cushion,nq,1953,485904,1.523,50.3,-3776,28182,-1799,363,0
+NinjaTrader,30,100K cushion,index,2746,555144,1.408,48.7,-3776,38266,-1800,562,0
+NinjaTrader,30,150K cushion,proxy,252,51171,2.025,54.0,-2649,7777,-2699,16,0
+NinjaTrader,30,150K cushion,nq,2008,655739,1.558,50.0,-3776,38390,-2700,361,0
+NinjaTrader,30,150K cushion,index,2812,790805,1.467,48.9,-3776,40828,-2700,556,0
