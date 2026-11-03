@@ -3024,3 +3024,18 @@ once the account has its cushion? One variant: `gap_go_locked_qty` 5.
 - the floor never touched;
 - no more days at −$1,000;
 - on G35's 89 start dates, no more lost or frozen accounts (11).
+
+**G68 result (run once, 2026-11-03): rejected; 5 contracts lose NQ's account.**
+
+| 5-minute, chart / NinjaTrader | up to 3 (as it is) | up to 5 |
+|---|---|---|
+| window | $30,161 / $29,836 | $34,828 / $34,689 |
+| NQ 2015-Jul 2025 | $356,039 / $359,943 | **$3 / −$2, the account lost in its first months** |
+| index | $508,291 / $498,705 | $546,846 / $539,061 (a −$1,054 day, chart) |
+
+The window and the index make more, but NQ's 2015 account goes back to the start, in both executions. 3 stays. The
+30-minute chart has no gap trades (they need the 09:30-09:35 bar), so G67b and G68 don't change it
+(`verification/noise_v2/g68_locked5.txt`).
+
+**Scorecard, G44-G68:** 25 rounds. Adopted: G60 (gap and go, U19), G67b (3 gap contracts once the floor has
+stopped, U20), plus the data fix that G67 found. Rejected: 22 (G54 and G55 were measurements).
