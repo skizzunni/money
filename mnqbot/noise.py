@@ -324,6 +324,7 @@ class NoiseConfig:
     # research (G70): the fill-in trades (small gaps, drives, trend_small's shorts) only once the trailing floor has
     # stopped at the start (trail_cap)
     fill_after_lock: bool = False
+    fill_min_room: float = 0.0  # G71: and only while the account is at least this far above the trailing floor
     # research (G67): once the trailing floor has stopped at the start (trail_cap), a gap trade may take up to this
     # many contracts in place of gap_go_max_qty (0 = off)
     gap_go_locked_qty: int = 0
@@ -558,7 +559,16 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
 
     def fill_ok() -> bool:
         """G70: may a fill-in trade be taken now?"""
-        return not cfg.fill_after_lock or floor_stopped()
+        if cfg.fill_after_lock and not floor_stopped():
+            return False
+        if cfg.fill_min_room > 0:
+            if math.isnan(trail_peak):
+                return False
+            floor = trail_peak - cfg.trail_dd
+            if cfg.trail_cap >= 0:
+                floor = min(floor, trail_base + cfg.trail_cap)
+            return eq_curve[-1] - floor >= cfg.fill_min_room
+        return True
 
     def study_ok(d: int, past_margin: bool) -> bool:
         """The v2.1 study's rules (all off by default): may a signal on side d be taken?"""

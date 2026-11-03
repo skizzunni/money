@@ -34,7 +34,12 @@ PACK = {"P0": {}, "P1": {"gap_go_small_k": 0.0}, "P2": {"gap_go_small_k": 0.0, "
         "P3": {"gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5},
         # G70: the same fill-in trades only once the floor has stopped
         "P2L": {"gap_go_small_k": 0.0, "trend_small": True, "fill_after_lock": True},
-        "P3L": {"gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True}}
+        "P3L": {"gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True},
+        # G71: with a cushion, and today's gains don't widen today's budget
+        "A": {"gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
+              "fill_min_room": 3000.0, "day_keep": 1.0},
+        "B": {"gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
+              "fill_min_room": 4000.0, "day_keep": 1.0}}
 for pk in (sys.argv[4].split(",") if len(sys.argv) > 4 else list(PACK)):
     for name, (bars, first, skip) in S.D.items():
         if name == "win":
