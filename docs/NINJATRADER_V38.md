@@ -2846,3 +2846,24 @@ more days (more trading days, more early profit at 1 contract); at 0.75 on fewer
 - the floor never touched;
 - no more days at −$1,000;
 - on G35's 89 start dates, no more lost or frozen accounts (11).
+
+**G64 result (run once, 2026-11-03): rejected; 0.5 stays.**
+- **0.25** (more gap trades, 49.5-55.6% of days traded): less on the window in the chart's execution ($18,562) and a
+  −$1,042 day on the index.
+- **0.75:** more on the window ($20,533 / $21,088), but less on the index in both executions and on NQ in
+  NinjaTrader's ($302,240 against $304,106).
+
+(`verification/noise_v2/g64_gap_k.txt`.)
+
+## G65: shorts in an uptrend at 1 contract (registered 2026-11-03, before its run)
+
+**The idea, from G55:** the trend filter blocks every short while the last close is above its 50-session average. With
+shorts allowed at full size, 14 more days in 100 traded, but the window and the index made less (G55). Here those shorts
+trade at 1 contract (`trend_qty_div` 100: the contracts divided by 100, at least 1). They add the trading days with
+little at risk.
+
+**Adopt only if, against today's default:**
+- a higher net on all three 5-minute sets in both executions;
+- the floor never touched;
+- no more days at −$1,000;
+- on G35's 89 start dates, no more lost or frozen accounts (11).
