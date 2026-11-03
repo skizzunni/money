@@ -2178,3 +2178,21 @@ the idea; it is run as registered.)
 - there are no more days at −$1,000.
 
 The 30-minute runs are reported, not judged.
+
+**G51 result (run once, 2026-11-03): rejected; the fixed $187.50 stays.**
+
+| 5-minute net, chart / NinjaTrader | fixed $187.50 (as it is) | 0.42 × noise | 0.47 × noise |
+|---|---|---|---|
+| window | **$18,516 / $18,549** | $12,441 / $9,651 | $15,142 / $14,121 |
+| NQ from 2015 | $277,322 / $267,571 | $283,587 / $293,949 | $287,327 / $285,063 |
+| index from 2011 | **$407,796 / $404,250** | $389,200 / $371,638 | $376,278 / $365,062 |
+| days past −$1,000, index (chart) | 0 | 4 | 3 |
+
+- **More winners, less money.** The win rate rose to 65-66% on the window, but the net fell $3,400-8,900. Early
+  checks have little noise, so their stops are tight and normal moves hit them; late checks have wide stops and lose
+  more when they're wrong.
+- **It broke the daily rule.** On the index, in the chart's execution, 3-4 days went past −$1,000 (worst −$1,351);
+  the fixed stop has none.
+- **30 minutes (reported, not judged).** On the chart's execution, both variants lost the NQ account in its first months.
+
+Only NQ improved. `ml_sigma` stays in `mnqbot/noise.py`, off (`verification/noise_v2/g51_ml_sigma.csv`).
