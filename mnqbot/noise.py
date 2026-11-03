@@ -326,6 +326,7 @@ class NoiseConfig:
     fill_after_lock: bool = False
     fill_min_room: float = 0.0  # G71: and only while the account is at least this far above the trailing floor
     fill_no_steps: bool = False  # G73: the fill-in trades' P/L doesn't count toward the contract steps
+    gap_no_budget: bool = False  # G74: a gap-slot trade's profit doesn't widen the rest of the day's budget
     # research (G67): once the trailing floor has stopped at the start (trail_cap), a gap trade may take up to this
     # many contracts in place of gap_go_max_qty (0 = off)
     gap_go_locked_qty: int = 0
@@ -435,6 +436,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
     prev_side = 0  # confirm: the last check today closed above its upper line (1), below its lower (-1), or inside
     target_today = False  # after_target_done: a take-profit filled today
     day_pnl = 0.0  # daily_loss_limit: today's realized P/L
+    gap_day_pnl = 0.0  # gap_no_budget: today's gap-slot P/L
     week_key, week_start_eq = None, 0.0  # week_stop: this week, and the closed equity at its first session
     trail_base = trail_peak = math.nan  # trail_dd: the closed equity at its start, the highest end-of-day equity
     tom_days: set = set()
@@ -634,7 +636,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
         """What a new trade may risk: the rest of today's loss limit and the room above the trailing floor."""
         room = math.inf
         if cfg.daily_loss_limit > 0:
-            room = cfg.budget_frac * (cfg.daily_loss_limit + day_pnl - cfg.day_keep * max(day_pnl, 0.0))
+            room = cfg.budget_frac * (cfg.daily_loss_limit + day_pnl - cfg.day_keep * max(day_pnl, 0.0)
+                                      - (max(gap_day_pnl, 0.0) if cfg.gap_no_budget else 0.0))
         if cfg.trail_dd > 0 and not math.isnan(trail_peak):
             floor = trail_peak - cfg.trail_dd
             if cfg.trail_cap >= 0:
@@ -663,13 +666,14 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
 
     def gap_close(i: int, price: float, reason: str) -> None:
         """gap_go: close the gap trade; its P/L counts in today's budget and the account's equity."""
-        nonlocal gg, day_pnl, fill_pnl
+        nonlocal gg, day_pnl, fill_pnl, gap_day_pnl
         g = gg
         pnl = g["d"] * (price - g["px"]) * g["q"] * cfg.point_value - 2 * cfg.commission_per_side * g["q"]
         trades.append(NoiseTrade(g["d"], g["q"], g["bar"], idx[g["bar"]], g["px"], i, idx[i], price, reason, pnl, 1.0))
         if cfg.eq_n or cfg.trail_dd > 0:
             eq_curve.append(eq_curve[-1] + pnl)
         day_pnl += pnl
+        gap_day_pnl += pnl
         if g.get("fill"):
             fill_pnl += pnl
         gg = None
@@ -938,7 +942,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
         if t_min == RTH_OPEN:
             block_dir = 0
             target_today = False
-            day_pnl = 0.0
+            day_pnl = gap_day_pnl = 0.0
             if t.isocalendar()[:2] != week_key:
                 week_key, week_start_eq = t.isocalendar()[:2], eq_curve[-1]
             if cfg.trail_dd > 0 and t.strftime("%Y-%m-%d") >= cfg.trail_from:  # yesterday's end-of-day equity

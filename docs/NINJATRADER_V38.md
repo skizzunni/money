@@ -3170,3 +3170,29 @@ can't put bigger bot trades into a crash, and their profit is extra cushion abov
 **Packages:** A3 = A2 + `fill_no_steps`, B3 = B2 + `fill_no_steps`.
 
 **Stage 1 and stage 2:** G71's (days ≥ 70% on all three, A3 first; then G69's rule against today's default).
+
+**G73 result (run once, 2026-11-03): rejected; NQ's 2015 account still lost.** A3 ($3,000 cushion): 72.8% / 4.5% /
+80.6% of days, window $33,523 / $33,393, index $525,666 / $521,756 (a −$1,042 day, chart), NQ $1 / −$2. B3 alike
+(`verification/noise_v2/g73_no_steps.txt`).
+
+**Why NQ from January 2015 decides every test (measured after G73, research only):** today's default itself ends
+October 2015 **$41** above its floor on that path. A3's fill-in trades netted −$217 in June-August 2015, and that alone
+took it to the floor. A test passes or fails there on whether a change is $41 better or worse in one summer, which says
+little about the change. G35's 89 start dates (35 of them on NQ, from April 2015 on) measure a new account's survival
+far better.
+
+## G74: the fill-ins judged on the 89 start dates, and gap wins don't widen the day (registered 2026-11-03, before its run)
+
+**The package (A4):** G72's A2 (G69's P3 fill-in trades at 1 MNQ, only once the floor has stopped and while $3,000
+above it) plus `gap_no_budget`: a 09:35 trade's profit doesn't widen the rest of that day's budget (the cause of G70's
+−$1,042 day; the bot's own profits still do, unlike G71's `day_keep`).
+
+**Adopt as the default only if all hold, against today's default (U20), 5-minute bars:**
+- trades on at least 70% of sessions on the window, NQ and the index (the chart's execution);
+- a higher net on the window and the index, in both executions;
+- the floor never touched, and no more days at −$1,000, on the window and the index, in both executions;
+- **on G35's 89 start dates (21 months each), no more lost or frozen accounts than the default's 11.**
+- **NQ from January 2015** is reported, not a gate (the default's own margin there is $41).
+
+**As a switch** ("More trading days", off) if only the 70%, the floor, the −$1,000 days and the 89 start dates hold.
+Otherwise rejected.

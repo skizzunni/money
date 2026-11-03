@@ -49,7 +49,10 @@ PACK = {"P0": {}, "P1": {"gap_go_small_k": 0.0}, "P2": {"gap_go_small_k": 0.0, "
         "A3": {"gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
                "fill_min_room": 3000.0, "fill_no_steps": True},
         "B3": {"gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
-               "fill_min_room": 4000.0, "fill_no_steps": True}}
+               "fill_min_room": 4000.0, "fill_no_steps": True},
+        # G74: A2 and a gap win doesn't widen the day's budget
+        "A4": {"gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
+               "fill_min_room": 3000.0, "gap_no_budget": True}}
 for pk in (sys.argv[4].split(",") if len(sys.argv) > 4 else list(PACK)):
     for name, (bars, first, skip) in S.D.items():
         if name == "win":
