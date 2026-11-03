@@ -3276,3 +3276,9 @@ trend day's afternoon at 10-15 contracts on the morning's profit. Capped, the in
 **Scorecard, G44-G75:** 32 rounds. Adopted: G60 (gap and go, U19), G67b (3 gap contracts once the floor has stopped,
 U20) and G67's data fix. Shipped as a switch, off: G72's A2 ("More trading days", U21). Rejected: 27 (G54 and G55
 were measurements).
+
+**U21 review fixes (2026-11-03):**
+- "More trading days" now does nothing on any chart but 5-minute (it was tested there only; on 30-minute it would have
+  traded untested uptrend shorts).
+- The dashboard's "today" line: on a calm stretch it says the 09:35 gap trade can still come (it can, since U19), and
+  with "More trading days" on and the cushion there, uptrend shorts read "1 MNQ only" instead of "no".

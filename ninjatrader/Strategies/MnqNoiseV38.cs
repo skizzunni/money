@@ -170,7 +170,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         // G72: may a fill-in trade be taken now? The floor stopped at the start, and FillMinRoom above it
         bool FillOk()
         {
-            if (!s.MoreDays || s.TrailDD <= 0 || double.IsNaN(trailPeak)) return false;
+            if (!s.MoreDays || minutes != 5 || s.TrailDD <= 0 || double.IsNaN(trailPeak)) return false;  // tested on 5-minute bars only
             if (trailPeak - s.TrailDD < trailBase) return false;
             double floor = Math.Min(trailPeak - s.TrailDD, trailBase);
             return EqEff - floor >= s.FillMinRoom;
@@ -182,11 +182,13 @@ namespace NinjaTrader.NinjaScript.Strategies
             get
             {
                 if (SkipToday) return "no entries (holiday / half day)";
-                if (calm) return "no entries (calm stretch: the last 10 sessions' ranges are small)";
+                if (calm) return "no entries (calm stretch: the last 10 sessions' ranges are small)" +
+                                 (s.GapGo ? "; the 09:35 gap trade still can" : "");
                 if (s.DailyLoss > 0 && DayRoom <= 0) return "no entries (today's loss budget is used up)";
                 string longs = blockDir == 1 ? "no (after a big up day)" : "yes";
                 string shorts = blockDir == -1 ? "no (after a big down day)"
-                              : s.TrendN > 0 && trend == 1 ? "no (uptrend: above the 50-session average)"
+                              : s.TrendN > 0 && trend == 1 ? (FillOk() ? "1 MNQ only (uptrend; More trading days)"
+                                                                        : "no (uptrend: above the 50-session average)")
                               : FedToday && s.FedNoShorts ? "after 14:00 (Fed day)" : "yes";
                 return "longs " + longs + "; shorts " + shorts;
             }
