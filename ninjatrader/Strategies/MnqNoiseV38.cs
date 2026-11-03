@@ -550,6 +550,11 @@ namespace NinjaTrader.NinjaScript.Strategies
         double weekStart, monthStart;
         int realTrades, realWins;
         DateTime paceFrom = DateTime.MinValue, lastSession = DateTime.MinValue;
+        // fill quality: the price each order was planned at (the close when the entry or a market exit was sent, the
+        // resting stop), and the running ticks paid worse than that
+        double entryRef = double.NaN, exitRef = double.NaN, stopRef = double.NaN, entryStopPts = double.NaN;
+        double entrySlipSum, exitSlipSum;
+        int entrySlipN, exitSlipN;
         string realDay = "";
         string journalPath = "", liveJournalPath = "";
         double net, peak, maxDd, worstDay, dayNet;
@@ -649,6 +654,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                     journalPath = Path.Combine(dir, "MnqNoiseV38_backtest.csv");
                     liveJournalPath = Path.Combine(dir, "MnqNoiseV38_live_" + Safe(Account == null ? "none" : Account.Name) + ".csv");
                     File.WriteAllText(journalPath, JournalHeader);
+                    if (File.Exists(liveJournalPath) && File.ReadAllText(liveJournalPath).Split('\n')[0] + "\n" != JournalHeader)
+                        File.Move(liveJournalPath, liveJournalPath.Replace(".csv", "_until_" + DateTime.Now.ToString("yyyyMMdd_HHmmss", CultureInfo.InvariantCulture) + ".csv"));
                     if (!File.Exists(liveJournalPath))
                         File.WriteAllText(liveJournalPath, JournalHeader);
                 }
@@ -759,6 +766,9 @@ namespace NinjaTrader.NinjaScript.Strategies
                     SetProfitTarget(name, CalculationMode.Ticks, Math.Max(1, Math.Round(engine.NewTpPts / TickSize)));
                 if (engine.NewEntry > 0) EnterLong(engine.NewQty, name);
                 else EnterShort(engine.NewQty, name);
+                entryRef = Close[0];
+                entryStopPts = Math.Max(1, Math.Round(engine.NewStopPts / TickSize)) * TickSize;
+                stopRef = double.NaN;
                 Say("entry", (engine.NewEntry > 0 ? "BUY " : "SELL ") + engine.NewQty + " MNQ at market (noise breakout), stop " +
                     engine.NewStopPts.ToString("0.00", CultureInfo.InvariantCulture) + " points" +
                     (double.IsNaN(engine.NewTpPts) ? "" : ", target " + engine.NewTpPts.ToString("0.00", CultureInfo.InvariantCulture) + " points"));
@@ -779,6 +789,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                     else
                     {
                         SetStopLoss(name, CalculationMode.Price, stop, false);
+                        stopRef = stop;
                         double tp = engine.PeekTarget(avg);
                         if (!double.IsNaN(tp))
                             SetProfitTarget(name, CalculationMode.Price, tp);
@@ -791,13 +802,13 @@ namespace NinjaTrader.NinjaScript.Strategies
             Dashboard(endNy);
         }
 
-        const string JournalHeader = "kind,entry time,exit time,side,contracts,trades today,entry,exit,exit kind,P/L,day P/L,total P/L,room today,room above floor,next contracts\n";
+        const string JournalHeader = "kind,entry time,exit time,side,contracts,trades today,entry,exit,exit kind,P/L,day P/L,total P/L,room today,room above floor,next contracts,entry slip ticks,exit slip ticks\n";
 
         // a day's line: the same 15 columns as a trade's, with the date, the day's trades, its P/L and the total
         void JournalDay(double cum)
         {
             Journal(string.Join(",", new[] { "DAY", realDay, "", "", "", realDayTrades.ToString(CultureInfo.InvariantCulture),
-                                             "", "", "", "", F(cum - realDayStart), F(cum), "", "", "" }), false);
+                                             "", "", "", "", F(cum - realDayStart), F(cum), "", "", "", "", "" }), false);
         }
 
         static string F(double x) { return double.IsNaN(x) ? "" : x.ToString("0.00", CultureInfo.InvariantCulture); }
@@ -839,11 +850,19 @@ namespace NinjaTrader.NinjaScript.Strategies
                 DateTime en = TimeZoneInfo.ConvertTime(DateTime.SpecifyKind(t.Entry.Time, DateTimeKind.Unspecified), platform, newYork);
                 DateTime ex = TimeZoneInfo.ConvertTime(DateTime.SpecifyKind(t.Exit.Time, DateTimeKind.Unspecified), platform, newYork);
                 string side = t.Entry.Name == ShortName ? "SHORT" : "LONG";
+                int dir = side == "LONG" ? 1 : -1;
+                double inSlip = double.IsNaN(entryRef) ? double.NaN : dir * (t.Entry.Price - entryRef) / TickSize;
+                double outRef = t.Exit.Name == "Stop loss" ? (double.IsNaN(stopRef) ? t.Entry.Price - dir * entryStopPts : stopRef)
+                              : t.Exit.Name == "Profit target" || t.Exit.Name == "Exit on session close" ? double.NaN : exitRef;
+                double outSlip = double.IsNaN(outRef) ? double.NaN : dir * (outRef - t.Exit.Price) / TickSize;
+                if (!double.IsNaN(inSlip)) { entrySlipSum += inSlip; entrySlipN++; }
+                if (!double.IsNaN(outSlip)) { exitSlipSum += outSlip; exitSlipN++; }
+                entryRef = exitRef = stopRef = double.NaN;
                 Journal("TRADE," + en.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture) + "," +
                         ex.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture) + "," + side + "," + t.Quantity + "," +
                         realDayTrades + "," + F(t.Entry.Price) + "," + F(t.Exit.Price) + "," + t.Exit.Name + "," + F(t.ProfitCurrency) + "," +
                         F(cum - realDayStart) + "," + F(cum) + "," + F(engine.DayRoom) + "," + F(engine.TrailFloorRoom) + "," +
-                        engine.NextQty, State == State.Realtime);
+                        engine.NextQty + "," + F(inSlip) + "," + F(outSlip), State == State.Realtime);
                 Say("exit", "Closed " + side + " " + t.Quantity + " MNQ (" + t.Exit.Name + "): " + (t.ProfitCurrency >= 0 ? "+$" : "-$") +
                     Math.Abs(t.ProfitCurrency).ToString("0.00", CultureInfo.InvariantCulture) + ", today " +
                     (cum - realDayStart).ToString("0.00", CultureInfo.InvariantCulture));
@@ -874,6 +893,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 return;
             guardTripped = true;
             Print("MnqNoiseV38: loss guard at " + today.ToString("0.00", CultureInfo.InvariantCulture) + " today: flat, no more entries until tomorrow");
+            exitRef = price;
             Say("guard", "LOSS GUARD: " + today.ToString("0.00", CultureInfo.InvariantCulture) + " today, flat and done for the day");
             if (real != 0)
                 Flatten(real, "Loss guard");
@@ -887,6 +907,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         void Flatten(int real, string why)
         {
+            if (double.IsNaN(exitRef)) exitRef = Close[0];  // the price the exit was sent at (the guard sets its tick's)
             if (real > 0) ExitLong(why, "");
             else ExitShort(why, "");
         }
@@ -916,6 +937,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                          (setupWarnings.Count > 0 ? "SETUP WARNING (" + setupWarnings.Count + "): " + setupWarnings[0] + "\n" : "Setup: OK\n") +
                          "Trades today: " + realDayTrades + "\n" +
                          ProgressLines(cumReal, sinceStart) +
+                         FillLine() +
                          (LossGuard > 0 ? "Loss guard: " + (guardTripped ? "TRIPPED, flat and done for today" :
                           "flat at -$" + LossGuard.ToString("0", CultureInfo.InvariantCulture) + " today, closed + open (live)") + "\n" : "") +
                          OpenTradeLine() +
@@ -949,6 +971,19 @@ namespace NinjaTrader.NinjaScript.Strategies
                       " more months to the goal" : ", no progress yet") + "\n";
             }
             return s;
+        }
+
+        // fill quality, for the dashboard: the average ticks paid worse than planned, and a warning past 2 ticks
+        string FillLine()
+        {
+            if (entrySlipN == 0)
+                return "";
+            double inAvg = entrySlipSum / entrySlipN, outAvg = exitSlipN > 0 ? exitSlipSum / exitSlipN : 0.0;
+            string s = "Fills vs plan: entries " + inAvg.ToString("+0.0;-0.0;0.0", CultureInfo.InvariantCulture) + " ticks (" + entrySlipN +
+                       "), stops and market exits " + outAvg.ToString("+0.0;-0.0;0.0", CultureInfo.InvariantCulture) + " ticks (" + exitSlipN + ")";
+            if (entrySlipN >= 20 && (inAvg + outAvg) / 2 > 2.0 && !StepsAfterLock)
+                s += " -- worse than 2 ticks: consider Gentle start";
+            return s + "\n";
         }
 
         // the open trade, for the dashboard: side and size, entry, the stop and the target for the next bar, the lock, and

@@ -118,6 +118,12 @@ def main() -> None:
         when = ("goal reached" if left <= 0 else f"about {int(np.ceil(left / pace))} more months to {money(goal)}"
                 if pace > 0 else "no progress yet")
         print(f"\n**Pace:** {money(pace)} a month over {span:.1f} months; {when}.")
+    if "entry slip ticks" in t:
+        es, xs = t["entry slip ticks"].dropna(), t["exit slip ticks"].dropna()
+        if len(es):
+            print(f"\n**Fills vs plan:** entries {es.mean():+.1f} ticks on average ({len(es)} trades), stops and market "
+                  f"exits {xs.mean() if len(xs) else 0:+.1f} ({len(xs)}). The backtests assume 1 tick; at 3 or more, turn "
+                  "on Gentle start (docs/NINJATRADER_V38.md, G29-G30).")
     print("\n## Checks\n")
     ok_total = abs(float(t["total P/L"].iloc[-1]) - (float(t["total P/L"].iloc[0]) - p[0] + p.sum())) < 0.05
     ok_days = len(d) == 0 or abs(float(d["day P/L"].astype(float).sum()) - p.sum()) < 0.05 * max(1, len(d))

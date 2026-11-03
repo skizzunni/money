@@ -308,3 +308,48 @@ def test_v38_progress_matches_the_journal(sim, sample_1m, tmp_path):  # noqa: F8
                          capture_output=True, text=True)
     assert rep.returncode == 0, rep.stderr[-2000:]
     assert "**Weeks**" in rep.stdout and "**Pace:**" in rep.stdout and "NO" not in rep.stdout.split("## Checks")[1]
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+def test_v38_fill_quality(sim, sample_1m, tmp_path):  # noqa: F811
+    """Fill quality: each trade's entry slip (ticks paid past the close the order was sent at) and stop slip (past the
+    resting stop) in the journal match the simulator's fills exactly; the dashboard averages them; at 3 ticks of
+    slippage it warns to consider Gentle start. The trades themselves are unchanged."""
+    import re
+
+    bars = resample(sample_1m, "5min")
+    path = tmp_path / "bars.csv"
+    with path.open("w") as f:
+        for t, r in zip(bars.index, bars.itertuples(), strict=True):
+            f.write(f"{t:%Y-%m-%d %H:%M},{r.open!r},{r.high!r},{r.low!r},{r.close!r}\n")
+    closes = bars["close"].to_numpy()
+
+    def go(slip):
+        data = tmp_path / f"nt8_{slip}"
+        data.mkdir()
+        r = subprocess.run([DOTNET, str(sim), str(path), "5", "Strategy=V38", *GROW_ARGS, f"SimUserDataDir={data}",
+                            f"SimSlippageTicks={slip}"], capture_output=True, text=True, env=ENV)
+        assert r.returncode == 0, r.stderr[-2000:]
+        lines = r.stdout.splitlines()
+        trades = [x.split(",")[1:] for x in lines if x.startswith("T,")]
+        return trades, pd.read_csv(data / "MnqNoiseV38_backtest.csv"), [x for x in lines if x.startswith("D,")][0]
+
+    trades, j, dash = go(1)
+    tr = j[j.kind == "TRADE"].reset_index(drop=True)
+    assert len(tr) == len(trades)
+    for (d, eb, entry, *_), slip in zip(trades, tr["entry slip ticks"], strict=True):
+        want = int(d) * (float(entry) - closes[int(eb) - 1]) / 0.25
+        assert math.isclose(slip, want, abs_tol=1e-6), (eb, slip, want)
+    stops = tr[tr["exit kind"] == "Stop loss"]["exit slip ticks"].dropna()
+    assert len(stops) >= 10 and (stops >= 1 - 1e-9).all() and math.isclose(stops.median(), 1.0)
+    assert tr[tr["exit kind"] == "Profit target"]["exit slip ticks"].isna().all(), "a limit has no slippage"
+    m = re.search(r"Fills vs plan: entries ([+-]?[\d.]+) ticks \((\d+)\)", dash)
+    assert m and int(m.group(2)) == len(tr)
+    assert math.isclose(float(m.group(1)), tr["entry slip ticks"].mean(), abs_tol=0.05)
+    assert "consider Gentle start" not in dash
+    _, j3, dash3 = go(3)
+    stops3 = j3[(j3.kind == "TRADE") & (j3["exit kind"] == "Stop loss")]["exit slip ticks"].dropna()
+    assert (stops3 >= 3 - 1e-9).all() and "consider Gentle start" in dash3
+    plain = subprocess.run([DOTNET, str(sim), str(path), "5", "Strategy=V38", *GROW_ARGS], capture_output=True,
+                           text=True, env=ENV)
+    assert [x.split(",")[1:] for x in plain.stdout.splitlines() if x.startswith("T,")] == trades
