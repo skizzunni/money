@@ -2681,3 +2681,17 @@ the typical account, and a real chance that a 09:35 fill goes past its stop and 
 first entry in the same bar can collide (an exit and a reverse sent together). So the gap trade closes at the 09:55
 open (`gap_go_exit` 595), a bar before the bot's first fill can come. Otherwise it is stage 2 (no wait for the floor,
 no cap). Reported as stage 2, for the switch's description; it is not made the default whatever the result.
+
+**G60 stage 4 result (run once, 2026-11-03): too dangerous.**
+- **Chart's execution:** the window made $26,296 and the index $609,678, but the NQ account was lost and the index had
+  a −$1,347 day.
+- **NinjaTrader's execution:** the window's own account was lost early (a −$1,661 day) and NQ's too; the index made
+  $600,244.
+
+Sized like the bot's trades (up to 15 contracts, with stops only 20-50 points away), a fast open can carry a gap trade
+far past its stop.
+
+**G60 stage 5 (registered 2026-11-03, before its run): stage 4 with each gap trade at 1 contract
+(`gap_go_max_qty` 1).** The point is the extra trading days at a risk too small to hurt the account. Adopt as the
+default only on stage 2's rule (a higher net on all three 5-minute sets in both executions, the floor never touched,
+no more days at −$1,000).

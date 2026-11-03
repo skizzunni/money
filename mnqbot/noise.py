@@ -312,6 +312,7 @@ class NoiseConfig:
     # the minute of day whose bar's open closes the gap trade (595: 09:55, a bar before the bot's first fill at 10:00,
     # so the two never meet in one bar; 600 was G60's first test)
     gap_go_exit: int = 595
+    gap_go_max_qty: int = 0  # G60 stage 5: the most contracts a gap trade takes (0: as the bot's trades)
     gap_go_skip_month_first: bool = False
     # research (G13): a time lock. A trade not yet locked that is in profit at a bar close time_lock minutes or more
     # after its fill is locked (its stop to the entry plus lock_plus, from the next bar)
@@ -665,6 +666,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                         room = money_room()
                         if math.isfinite(room):
                             q = min(q, math.floor(room / per_c + 1e-9))
+                        if cfg.gap_go_max_qty > 0:
+                            q = min(q, cfg.gap_go_max_qty)
                         if q >= 1:
                             gg = {"d": d, "q": q, "bar": i, "px": o[i] + d * slip, "stop": stop_px}
                             events.append((i - 1, "GAP BUY" if d > 0 else "GAP SELL"))

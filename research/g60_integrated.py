@@ -37,7 +37,7 @@ for opex in (False, True):
             continue
         cfg = NoiseConfig(**{**S.V23, **T.REFERENCE, "daily_loss_limit": 900.0, "trail_dd": 2000.0,
                              "time_stop": 60, "gap_go": opex, "gap_go_skip_month_first": opex and name != "proxy",
-                             "gap_go_exit": 595})
+                             "gap_go_exit": 595, "gap_go_max_qty": 1})
         if NT:
             cfg.tv_path, cfg.nt_execution, cfg.round_prices, cfg.target_on_fill_bar = False, True, True, True
         if isinstance(skip, str):
