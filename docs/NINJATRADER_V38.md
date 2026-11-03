@@ -2834,6 +2834,9 @@ The NQ start of 2015 is the bot's narrowest escape (its lowest room is $238-459)
 (`verification/noise_v2/g63_steps.txt`. G62's start-date run, for the record: 10 lost or frozen, median $38,045 NQ /
 $31,129 index; it was already rejected.)
 
+G63's start-date run, for the record: **18 lost or frozen of 89** (index 8, NQ 10) against today's 11, median
+$33,430 index / $36,278 NQ. It confirms the rejection (`verification/noise_v2/g35_start_dates_gapgo1s1000.csv`).
+
 ## G64: the gap and go trigger (registered 2026-11-03, before its run)
 
 **The idea:** gap and go fires when the gap is at least 0.5 times the last 14 sessions' average. At 0.25 it fires on
@@ -2879,3 +2882,7 @@ at risk.
 It trades 7-11 more days in 100 and makes more on the window and NQ, but 0.5-0.9% less on the index. The index's long
 bull years punish shorts in an uptrend, even at 1 contract. The rule asks for more on all three, so it stays out.
 `trend_small` stays in the model, off (`verification/noise_v2/g65_trend_small.txt`).
+
+G65's start-date run, for the record: **17 lost or frozen of 89** (index 9, NQ 8) against today's 11, median
+$30,413 index / $36,193 NQ. The extra shorts cost new accounts more often, which confirms the rejection
+(`verification/noise_v2/g35_start_dates_gapgo1trend.csv`).
