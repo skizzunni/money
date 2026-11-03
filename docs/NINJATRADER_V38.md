@@ -2220,3 +2220,15 @@ This bot makes its money on trend days, so its breakouts may fail more on those 
 - there are no more days at −$1,000.
 
 The 30-minute runs are reported, not judged.
+
+**G52 result (run once, 2026-11-03): rejected; the bot trades expiration Fridays.**
+
+| 5-minute net, chart / NinjaTrader | as it is | no entries on the third Friday |
+|---|---|---|
+| window | $18,516 / $18,549 | $19,539 / $19,556 |
+| NQ from 2015 | **$277,322 / $267,571** | $262,800 / $259,487 |
+| index from 2011 | **$407,796 / $404,250** | $397,904 / $370,819 |
+
+Skipping them helped a little on the window (+$1,000), but cost $8,000-15,000 on NQ and $10,000-33,000 on the index.
+Over the long run, expiration Fridays are profitable days for the bot, not pinned ones. 30-minute bars agree (less
+everywhere). (`verification/noise_v2/g52_opex.csv`.)
