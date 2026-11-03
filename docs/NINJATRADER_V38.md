@@ -3339,3 +3339,18 @@ days at −$1,000 on any set.
 between. `gap_go_locked_qty` 4.
 
 **Adopt on the rule above**, against today's default (3).
+
+**G78 result (run once, 2026-11-03): rejected; the window makes a little less.** Window $30,053 / $29,798 (against
+$30,161 / $29,836); index $533,907 / $525,209 (against $508,291 / $498,705); NQ from 2015 lost (reported). 89 start
+dates: 11 lost or frozen (as the default), medians $36,647 NQ / $28,805 index (against $34,564 / $27,703)
+(`verification/noise_v2/g78_locked4.txt`).
+
+## G79: "More trading days" with the 2-point sizing allowance, as the default (registered 2026-11-03, before its run)
+
+**The idea:** U21's switch (G72's A2) missed only on a −$1,042 index day and NQ's 2015 path. G76's 2-point sizing
+allowance removed that day (A2s: no −$1,000 day on any set, either execution). Against today's default, A2s already
+showed: window $33,962 / $33,773 (default $30,161 / $29,836), index $521,452 / $515,363 (default $508,291 / $498,705),
+72-81% of days. What is missing for G78's rule is the 89 start dates.
+
+**Adopt A2s as the default on G78's rule:** the numbers above stand (run once in G76; not re-run), and on G35's 89 start
+dates no more lost or frozen accounts than 11.
