@@ -1939,3 +1939,20 @@ the time stop and runs to its target, its line stop or the lock. Moving the lock
 - there are no more days at −$1,000.
 
 The 30-minute runs are reported, not judged.
+
+**G46 result (run once, 2026-11-03): rejected; 2.5 stays.**
+
+| 5-minute net, chart / NinjaTrader | 1.0 | 2.5 (as it is) | 5.0 |
+|---|---|---|---|
+| window | $18,175 / $18,297 | **$18,516 / $18,549** | $12,296 / $14,395 |
+| NQ from 2015 | $276,503 / $274,007 | $277,322 / $267,571 | $256,364 / $255,589 |
+| index from 2011 | $410,206 / $406,767 | $407,796 / $404,250 | $425,144 / $420,220 |
+
+- **1.0 is close to a tie.** It made more on the index in both executions and on NQ in NinjaTrader's (+$6,436), but
+  less on the window (−$341 / −$252) and on NQ in the chart's (−$819). The window is the market the user trades, so
+  the rule keeps 2.5.
+- **5.0** made the most on the index, and far less on the window (−$6,220).
+- **30 minutes (reported, not judged).** 1.0 made more on the window ($28,125 / $31,233 against $25,834 / $28,620)
+  and the index, and less on NQ.
+
+The floor was never touched (`verification/noise_v2/g46_lock_plus.csv`).
