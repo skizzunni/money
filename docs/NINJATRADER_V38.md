@@ -2203,3 +2203,20 @@ The 30-minute runs are reported, not judged.
 - **30 minutes (reported, not judged).** On the chart's execution, both variants lost the NQ account in its first months.
 
 Only NQ improved. `ml_sigma` stays in `mnqbot/noise.py`, off (`verification/noise_v2/g51_ml_sigma.csv`).
+
+## G52: no entries on monthly options expiration days (registered 2026-11-03, before its run)
+
+**The idea (not tested in any round before):** on the third Friday of each month, the monthly index options expire.
+Dealers' hedging of large open positions near the strikes tends to pin the price there ("pinning"), damping trends.
+This bot makes its money on trend days, so its breakouts may fail more on those days.
+
+**The variant:** Funded growth, with every month's third Friday (2011-2026) added to the dates with no new trades
+(`skip_dates`, as the holidays are); a trade already open runs as usual. Everything else as it is.
+
+**Adopt only if, against Funded growth as it is:**
+- a higher net on all three 5-minute sets (the window, NQ from 2015, the index from 2011), in both the chart's
+  execution and NinjaTrader's;
+- the floor is never touched;
+- there are no more days at −$1,000.
+
+The 30-minute runs are reported, not judged.
