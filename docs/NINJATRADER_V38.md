@@ -1867,3 +1867,22 @@ The 30-minute runs are reported, not judged.
 
 The time stop stays as G6 adopted it, with re-entries allowed (`verification/noise_v2/g44_ts_block.csv`;
 `ts_block` stays in `mnqbot/noise.py`, off).
+
+## G45: the take-profit distance, re-checked with the time stop (registered 2026-11-03, before its run)
+
+**The idea:** the take-profit (2 noise units from the fill) was set before G6's time stop. Since then, slow trades
+end at 60 minutes, so the trades still open later are the ones that are already working. A different target may now
+pay more, in either direction:
+- nearer, banking more of the winners that later fall back to the lock;
+- farther, letting the working trades run.
+
+**The variants:** Funded growth with `take_profit` 1.75 and 2.5; everything else as it is, with the 60-minute time
+stop.
+
+**Adopt (the better by window net) only if, against 2.0:**
+- a higher net on all three 5-minute sets (the window, NQ from 2015, the index from 2011), in both the chart's
+  execution and NinjaTrader's;
+- the floor is never touched;
+- there are no more days at −$1,000.
+
+The 30-minute runs are reported, not judged.
