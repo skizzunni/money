@@ -71,7 +71,10 @@ def one(job):
             "frozen": bool(len(tf) == 0 or (s1 - tf.exit_time.max()).days > 90),
             # G43: the months from the start to the first close at +$50,000 (none: not within the horizon)
             "months to 50k": (round((tf.exit_time.iloc[int(np.argmax(eq[1:] >= 50000))] - s0).days / 30.44, 1)
-                              if (eq[1:] >= 50000).any() else None)}
+                              if (eq[1:] >= 50000).any() else None),
+            # the days from the start to the first close at +$3,000 (a 50K at $53,000; none: not within the horizon)
+            "days to 3k": ((tf.exit_time.iloc[int(np.argmax(eq[1:] >= 3000))] - s0).days
+                           if (eq[1:] >= 3000).any() else None)}
 
 
 def main() -> None:
