@@ -1613,6 +1613,18 @@ All 26 NinjaTrader v3.8 tests pass. Re-import the file to get it.
 input set to something else. It also checks that the time stop fires, that Custom keeps the inputs, and that the default
 is Funded growth. The other Pine tests now name Custom. Re-paste the script on TradingView to get it.
 
+**U10 (2026-11-03): the TradingView dashboard, closer to NinjaTrader's.**
+- **The fix.** With a preset on (U9), the dashboard's title still read "Evaluation, 1 MNQ" from the old account tick
+  box. It now names the preset and the contracts the account is at, e.g. "Funded growth 100K, 4 MNQ".
+- **Room above the floor.** A new row shows the room left above the trailing floor and the next trade's size: "$3,412.50,
+  next trade up to 4 MNQ". It turns orange under $500.
+- **The goal.** A new row compares the profit since the start date against "Profit goal for the dashboard" (Display
+  group, default $50,000, 0 = hide): "$12,345.00 since the start (24.7%)", then "goal reached".
+
+`test_pine_dashboard_goal_and_room` checks the title, the room against the floor computed from the script's own trades
+(its end-of-day peak), and the goal row's amount and share, to the cent. The trades are unchanged. Re-paste the script
+on TradingView to get it.
+
 ## G38: trapped buyers at the high of the day, order flow from volume (registered 2026-11-03, before its run)
 
 **The idea, from the user's @chicago_trades clip.** At the high of the day: retail stops are run, fresh sellers fill,

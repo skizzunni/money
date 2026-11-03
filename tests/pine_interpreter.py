@@ -448,6 +448,8 @@ class PineRuntime:
                 return f"{x:.0f}"
             if fmt == "#.##":
                 return f"{x:.2f}"
+            if fmt == "0.0":
+                return f"{x:.1f}"
             if isinstance(x, float) and x.is_integer():
                 return str(int(x))
             return str(x)

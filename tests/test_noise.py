@@ -863,6 +863,32 @@ def test_pine_presets(preset, daily, trail):
 
 
 @pytest.mark.slow
+def test_pine_dashboard_goal_and_room():
+    """U10: the dashboard names the preset, and shows the room above the trailing floor with the next trade's size, and
+    the profit since the start against the goal, to the cent of the script's own closed trades."""
+    pytest.importorskip("pynescript", reason="pip install pynescript to check the .pine files")
+    from pine_interpreter import PineRuntime, load_pine
+
+    bars = synth_bars(sessions=90, seed=3)
+    rt = PineRuntime(load_pine(NOISE_PINE), bars, {PRESET: "Funded growth 100K", TRAIL_FROM: 0,
+                                                   "Profit goal for the dashboard, $ (0 = hide)": 1000.0},
+                     timeframe_seconds=300)
+    rt.run(lambda i, g: None)
+    dash = [t.grid() for t in rt.tables if t.columns == 2 and t.grid() and t.grid()[0][0].startswith("MNQ Noise")][0]
+    assert dash[0][0].startswith("MNQ Noise Momentum v3.8: Funded growth 100K, "), dash[0][0]
+    net = sum(t["pnl"] for t in rt.strategy.closed)
+    room, goal = dash[15][1], dash[16][1]
+    assert dash[15][0] == "Room above the floor" and re.fullmatch(r"-?\$[\d,]+\.\d\d, next trade up to \d+ MNQ", room)
+    t = bars.index.tz_convert(NY)
+    opens = [i for i in range(len(bars)) if t[i].hour * 60 + t[i].minute == 570]  # each session's first bar
+    peak = max(sum(x["pnl"] for x in rt.strategy.closed if x["exit_bar"] < i) for i in opens)
+    assert money(room.split(", next")[0]) == pytest.approx(net - min(peak - 3000.0, 0.0), abs=0.01), room
+    assert dash[16][0] == "Goal $1,000.00" and money(goal.split(" since")[0]) == pytest.approx(net, abs=0.01), goal
+    assert goal.endswith(": goal reached") == (net >= 1000.0)
+    assert f"({100 * net / 1000.0:.1f}%)" in goal
+
+
+@pytest.mark.slow
 def test_pine_webhooks():
     bars, p = scenario(above_all_day)
     tp = (p * 1.002 + 0.25) * (1 + 1.5 * 0.001)

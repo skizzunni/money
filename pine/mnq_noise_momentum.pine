@@ -281,6 +281,8 @@ showDash  = input.bool(true, "Show dashboard", group = grpV)
 showLog   = input.bool(true, "Show trade log", group = grpV,
      tooltip = "A table at the bottom right with every trade the bot took, newest first: the time it opened and closed (New York, month-day hour:minute), side and contracts, entry and exit prices, P/L after fees, and why it closed. The open trade, if any, is on top.")
 logRows   = input.int(10, "Trades in the log", minval = 1, maxval = 30, group = grpV)
+goalUsd   = input.float(50000, "Profit goal for the dashboard, $ (0 = hide)", minval = 0, step = 1000, group = grpV,
+     tooltip = "U10: the dashboard shows the profit since the account's start date (the trailing drawdown's date, else the first bar) against this, as the NinjaTrader strategy's dashboard does.")
 grpE = "Evaluation tracker"
 evalStart = input.int(0, "Evaluation start date, YYYYMMDD (0 = off)", minval = 0, group = grpE,
      tooltip = "The day your evaluation began, e.g. 20261020. A table at the bottom left then follows it from the strategy's trades since that day, by the rules below (end-of-day balances): profit toward the target, the trailing drawdown floor and how many full losers fit above it, your best day against the consistency rule, and what it takes to pass. It reads the trades only; it changes nothing.")
@@ -742,7 +744,7 @@ plot(showBands and inRth ? ub : na, "Upper noise line", color.teal, 2, plot.styl
 plot(showBands and inRth ? lb : na, "Lower noise line", color.maroon, 2, plot.style_linebr)
 bgcolor(shadeTrades and strategy.position_size > 0 ? color.new(color.teal, 88) : shadeTrades and strategy.position_size < 0 ? color.new(color.maroon, 88) : na)
 
-var table dash = table.new(position.top_right, 2, 15, bgcolor = color.new(color.black, 15), border_width = 1, border_color = color.new(color.gray, 60))
+var table dash = table.new(position.top_right, 2, 17, bgcolor = color.new(color.black, 15), border_width = 1, border_color = color.new(color.gray, 60))
 if showDash and (barstate.islastconfirmedhistory or barstate.isrealtime)
     pos = strategy.position_size
     status = not validTf ? "Use a 1/5/10/15/30 min chart" : filled < lookback ? "Building history" : pos > 0 ? "LONG" : pos < 0 ? "SHORT" : skipToday and inRth ? "No trades today (date list)" : "Flat"
@@ -750,7 +752,7 @@ if showDash and (barstate.islastconfirmedhistory or barstate.isrealtime)
     closed = strategy.closedtrades
     todayPnlDash = strategy.netprofit - dayStartNet
     wins = strategy.wintrades
-    table.cell(dash, 0, 0, "MNQ Noise Momentum v3.8: " + account + ", " + str.tostring(qty) + " MNQ", text_color = color.white, text_size = size.small)
+    table.cell(dash, 0, 0, "MNQ Noise Momentum v3.8: " + (growth ? preset : account) + ", " + str.tostring(qBase) + " MNQ", text_color = color.white, text_size = size.small)
     table.cell(dash, 1, 0, status, text_color = statusColor, text_size = size.small)
     table.cell(dash, 0, 1, "Sessions of history", text_color = color.silver, text_size = size.small)
     table.cell(dash, 1, 1, str.tostring(math.min(filled, lookback)) + " / " + str.tostring(lookback), text_color = color.white, text_size = size.small)
@@ -803,6 +805,15 @@ if showDash and (barstate.islastconfirmedhistory or barstate.isrealtime)
     table.cell(dash, 0, 14, "Max loss per contract", text_color = color.silver, text_size = size.small)
     table.cell(dash, 1, 14, maxLoss <= 0 ? "off" : usd(perContract) + (tight ? ": tight, normal moves hit it (about $117 tested best)" : ""),
          text_color = tight ? color.orange : color.white, text_size = size.small)
+    // U10: the room above the trailing floor and the next trade's size, and the profit since the start against the goal
+    table.cell(dash, 0, 15, "Room above the floor", text_color = color.silver, text_size = size.small)
+    table.cell(dash, 1, 15, na(roomTrail) ? "-" : usd(roomTrail) + ", next trade up to " + str.tostring(budgetOk ? qNext : 0) + " MNQ",
+         text_color = not na(roomTrail) and roomTrail < 500 ? color.orange : color.white, text_size = size.small)
+    sinceStart = na(trailBase) ? strategy.netprofit : strategy.netprofit - trailBase
+    if goalUsd > 0
+        table.cell(dash, 0, 16, "Goal " + usd(goalUsd), text_color = color.silver, text_size = size.small)
+        table.cell(dash, 1, 16, usd(sinceStart) + " since the start (" + str.tostring(100 * sinceStart / goalUsd, "0.0") + "%)" + (sinceStart >= goalUsd ? ": goal reached" : ""),
+             text_color = sinceStart >= goalUsd ? color.lime : color.white, text_size = size.small)
     table.cell(dash, 0, 5, "Backtest net", text_color = color.silver, text_size = size.small)
     table.cell(dash, 1, 5, (strategy.netprofit < 0 ? "-$" : "$") + str.tostring(math.abs(strategy.netprofit), "#,##0.00"),
          text_color = strategy.netprofit >= 0 ? color.lime : color.red, text_size = size.small)
