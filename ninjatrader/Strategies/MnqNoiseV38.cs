@@ -34,6 +34,7 @@ using NinjaTrader.Cbi;
 using NinjaTrader.Data;
 using NinjaTrader.NinjaScript;
 using NinjaTrader.NinjaScript.DrawingTools;
+using System.Windows.Media;
 #endregion
 
 namespace NinjaTrader.NinjaScript.Strategies
@@ -590,6 +591,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 TimeStop = 0;
                 StepsAfterLock = false;
                 LossGuard = 950;
+                AlertsOn = true;
+                SoundAlerts = true;
             }
             else if (State == State.DataLoaded)
             {
@@ -664,6 +667,11 @@ namespace NinjaTrader.NinjaScript.Strategies
                       " MNQ, max loss $" + MaxLoss + " a trade, $" + DailyLoss + " a day, take-profit " + TakeProfit +
                       (badChart ? "  -- use a minute chart whose length divides 30 (5 or 30)" : ""));
             }
+            else if (State == State.Realtime)
+            {
+                foreach (string w in setupWarnings)  // once, as the strategy goes live
+                    Say("setup", "SETUP WARNING: " + w);
+            }
             else if (State == State.Terminated && engine != null)
             {
                 if (realDay.Length > 0)
@@ -728,6 +736,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             else if (real != 0 && engine.Position == real && engine.TimeStopNow)
             {
                 Flatten(real, "Time stop");  // still losing this long after the fill: out at the next open
+                Say("timestop", "Time stop: the trade is still losing " + engine.MinutesInTrade + " min after its fill, closing at market");
             }
             else if (real == 0 && engine.NewEntry != 0 && PlaceOrders && !guardTripped)
             {
@@ -738,6 +747,9 @@ namespace NinjaTrader.NinjaScript.Strategies
                     SetProfitTarget(name, CalculationMode.Ticks, Math.Max(1, Math.Round(engine.NewTpPts / TickSize)));
                 if (engine.NewEntry > 0) EnterLong(engine.NewQty, name);
                 else EnterShort(engine.NewQty, name);
+                Say("entry", (engine.NewEntry > 0 ? "BUY " : "SELL ") + engine.NewQty + " MNQ at market (noise breakout), stop " +
+                    engine.NewStopPts.ToString("0.00", CultureInfo.InvariantCulture) + " points" +
+                    (double.IsNaN(engine.NewTpPts) ? "" : ", target " + engine.NewTpPts.ToString("0.00", CultureInfo.InvariantCulture) + " points"));
             }
             else if (real != 0 && engine.Position == real)
             {
@@ -818,7 +830,21 @@ namespace NinjaTrader.NinjaScript.Strategies
                         realDayTrades + "," + F(t.Entry.Price) + "," + F(t.Exit.Price) + "," + t.Exit.Name + "," + F(t.ProfitCurrency) + "," +
                         F(cum - realDayStart) + "," + F(cum) + "," + F(engine.DayRoom) + "," + F(engine.TrailFloorRoom) + "," +
                         engine.NextQty, State == State.Realtime);
+                Say("exit", "Closed " + side + " " + t.Quantity + " MNQ (" + t.Exit.Name + "): " + (t.ProfitCurrency >= 0 ? "+$" : "-$") +
+                    Math.Abs(t.ProfitCurrency).ToString("0.00", CultureInfo.InvariantCulture) + ", today " +
+                    (cum - realDayStart).ToString("0.00", CultureInfo.InvariantCulture));
             }
+        }
+
+        // a live alert (NinjaTrader's Alerts window and, with SoundAlerts, a sound), and the Output window
+        void Say(string id, string msg)
+        {
+            if (State != State.Realtime)
+                return;
+            Print("MnqNoiseV38: " + msg);
+            if (AlertsOn)
+                Alert("v38_" + id, Priority.High, msg, SoundAlerts ? NinjaTrader.Core.Globals.InstallDir + @"\sounds\Alert1.wav" : "",
+                      0, Brushes.Black, Brushes.White);
         }
 
         // the loss guard (live only): today's closed P/L plus the open trade's at this price at -LossGuard or worse
@@ -834,6 +860,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 return;
             guardTripped = true;
             Print("MnqNoiseV38: loss guard at " + today.ToString("0.00", CultureInfo.InvariantCulture) + " today: flat, no more entries until tomorrow");
+            Say("guard", "LOSS GUARD: " + today.ToString("0.00", CultureInfo.InvariantCulture) + " today, flat and done for the day");
             if (real != 0)
                 Flatten(real, "Loss guard");
         }
@@ -972,6 +999,14 @@ namespace NinjaTrader.NinjaScript.Strategies
         [Range(0, 10000)]
         [Display(Name = "Loss guard, live: flat and done for the day at this loss today, closed + open, $ (0 = off)", Order = 13, GroupName = "1. Size and risk")]
         public double LossGuard { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Alerts (live): entries, exits, time stop, loss guard, setup warnings", Order = 0, GroupName = "5. Alerts")]
+        public bool AlertsOn { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Alerts with a sound", Order = 1, GroupName = "5. Alerts")]
+        public bool SoundAlerts { get; set; }
 
         [NinjaScriptProperty]
         [Range(0, 200)]

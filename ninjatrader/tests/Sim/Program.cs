@@ -64,6 +64,8 @@ static class Program
             Console.WriteLine("D," + d.Replace("\n", " | "));
         foreach (string x in s.Printed)
             Console.WriteLine("P," + x);
+        foreach (string x in s.AlertLog)
+            Console.WriteLine("A," + x);
         if (Array.IndexOf(args, "DashHistory") >= 0)  // tests: the dashboard at every bar
             foreach (string x in Draw.History)
                 Console.WriteLine("DH," + x);

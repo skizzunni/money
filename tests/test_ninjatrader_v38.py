@@ -235,3 +235,40 @@ def test_v38_startup_checks(sim, sample_1m, tmp_path):  # noqa: F811
     assert any("no live backstop" in x for x in warn)
     _, warn, _ = go("Mode=Funded growth", "LossGuard=500")
     assert any("below the daily budget" in x for x in warn)
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+def test_v38_alerts(sim, sample_1m, tmp_path):  # noqa: F811
+    """Alerts, live only: an entry ("BUY/SELL n MNQ ..."), every closed trade with its P/L, the time stop; setup
+    warnings once on going live; with a sound unless SoundAlerts is off; none with AlertsOn off, and the trades the
+    same either way."""
+    bars = resample(sample_1m, "5min")
+    path = tmp_path / "bars.csv"
+    with path.open("w") as f:
+        for t, r in zip(bars.index, bars.itertuples(), strict=True):
+            f.write(f"{t:%Y-%m-%d %H:%M},{r.open!r},{r.high!r},{r.low!r},{r.close!r}\n")
+
+    def go(*extra):
+        r = subprocess.run([DOTNET, str(sim), str(path), "5", "Strategy=V38", *GROW_ARGS, *extra], capture_output=True,
+                           text=True, env=ENV)
+        assert r.returncode == 0, r.stderr[-2000:]
+        lines = r.stdout.splitlines()
+        return [x for x in lines if x.startswith("T,")], [x.split(",", 4) for x in lines if x.startswith("A,")]
+
+    live = 1000
+    trades, alerts = go(f"SimRealtimeFrom={live}")
+    assert alerts and all(int(a[1]) >= live for a in alerts), "alerts only once live"
+    kinds = {a[2] for a in alerts}
+    assert {"v38_entry", "v38_exit"} <= kinds
+    assert any(a[4].startswith(("BUY ", "SELL ")) and " MNQ at market" in a[4] for a in alerts)
+    assert any(a[4].startswith("Closed ") and "today" in a[4] for a in alerts)
+    closed_live = sum(int(t.split(",")[4]) >= live for t in trades)  # trades whose exit bar is live
+    assert abs(sum(a[2] == "v38_exit" for a in alerts) - closed_live) <= 1, "one alert per closed trade"
+    assert all(a[3] == "sound" for a in alerts)
+    quiet_trades, quiet = go(f"SimRealtimeFrom={live}", "AlertsOn=False")
+    assert quiet == [] and quiet_trades == trades
+    _, silent = go(f"SimRealtimeFrom={live}", "SoundAlerts=False")
+    assert silent and all(a[3] == "silent" for a in silent)
+    _, warned = go(f"SimRealtimeFrom={live}", "LossGuard=0")
+    setup = [a for a in warned if a[2] == "v38_setup"]
+    assert len(setup) == 1 and int(setup[0][1]) in (live - 1, live) and "no live backstop" in setup[0][4]

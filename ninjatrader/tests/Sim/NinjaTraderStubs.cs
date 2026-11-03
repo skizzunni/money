@@ -207,8 +207,12 @@ namespace NinjaTrader.NinjaScript
             v[Values.Length] = new Series<double>();
             Values = v;
         }
+        public readonly List<string> AlertLog = new List<string>();  // tests: every alert raised, with its bar
         public void Alert(string id, Priority priority, string message, string soundLocation, int rearmSeconds,
-                          System.Windows.Media.Brush backBrush, System.Windows.Media.Brush foreBrush) { }
+                          System.Windows.Media.Brush backBrush, System.Windows.Media.Brush foreBrush)
+        {
+            AlertLog.Add(CurrentBar + "," + id + "," + (soundLocation.Length > 0 ? "sound" : "silent") + "," + message);
+        }
     }
 }
 

@@ -1519,3 +1519,19 @@ tests pass. Re-import the file to get it; it is on by default at $950.
 
 `test_v38_startup_checks` covers each warning, "Setup: OK", and that "  funded GROWTH " gives exactly Funded growth's
 trades. All 217 NinjaTrader and simulator tests pass. Re-import the file to get it.
+
+**U4 (2026-11-03): live alerts.** In NinjaTrader's Alerts window, with a sound ("5. Alerts": "Alerts (live)" and
+"Alerts with a sound", both on by default), and in the Output window. Each alert fires live only:
+- an entry: "BUY 3 MNQ at market (noise breakout), stop 21.50 points, target 54.00 points";
+- every closed trade, with its exit and P/L: "Closed LONG 3 MNQ (Profit target): +$310.24, today 452.10";
+- the time stop: "Time stop: the trade is still losing 60 min after its fill, closing at market";
+- the loss guard: "LOSS GUARD: -955.00 today, flat and done for the day";
+- each setup warning, once, as the strategy goes live.
+
+`test_v38_alerts` checks:
+- alerts only once live, one per closed trade;
+- the sound setting;
+- none with alerts off, and the same trades either way;
+- the setup warning on going live.
+
+All 218 NinjaTrader and simulator tests pass. Re-import the file to get it.
