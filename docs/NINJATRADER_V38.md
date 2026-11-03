@@ -2695,3 +2695,21 @@ far past its stop.
 (`gap_go_max_qty` 1).** The point is the extra trading days at a risk too small to hurt the account. Adopt as the
 default only on stage 2's rule (a higher net on all three 5-minute sets in both executions, the floor never touched,
 no more days at −$1,000).
+
+**G60 stage 5 result (run once, 2026-11-03): passes. Gap and go at 1 contract, out at 09:55, beside the bot.**
+
+| 5-minute | days with a trade | net, chart / NinjaTrader | worst day, chart / NinjaTrader |
+|---|---|---|---|
+| window: as it is | 28.9% | $18,516 / $18,549 | −$900 / −$899 |
+| window: with gap and go | **44.0%** | **$19,618 / $19,626** | −$892 / −$899 |
+| NQ: as it is | 36.6% | $277,322 / $267,571 | −$1,023 / −$899 |
+| NQ: with gap and go | **51.5%** | **$306,951 / $304,106** | −$1,038 / −$899 |
+| index: as it is | 35.7% | $407,796 / $404,250 | −$988 / −$900 |
+| index: with gap and go | **49.4%** | **$447,417 / $438,285** | −$996 / −$900 |
+
+- **Higher net in all six runs**, the floor never touched, and no more days at −$1,000 (NQ's one day in the chart's
+  execution was already there; NinjaTrader's execution has none).
+- **About 1.3 gap trades a week**, and the days with a trade go from a third to a half.
+
+Next, before it is made the default: G35's 89 start dates with it on (variant `gapgo1`), then MnqNoiseV38.cs and the
+parity tests (`verification/noise_v2/g60_stage5.txt`).
