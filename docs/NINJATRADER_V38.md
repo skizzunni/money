@@ -1453,3 +1453,24 @@ is then at the max loss or the line, whichever is closer. After that, growth mod
   median net of at least 95% of the baseline's;
 - the usual runner on the window, NQ and the index, both executions: at least 95% of the baseline's net on every
   5-minute set, and the floor never touched.
+
+**G37 result (run once, 2026-11-03): rejected; the failure rate barely moves.**
+
+| 89 start dates, 21 months each | growth mode (now) | $125 early | $100 early |
+|---|---|---|---|
+| NQ: dead of 35 | 7 | 5 | 6 |
+| index: dead of 54 | 7 | 8 | 9 |
+| median net, NQ / index | $22,925 / $23,070 | $27,145 / $26,074 | $23,019 / $24,048 |
+
+$125 saved two NQ accounts and lost one more on the index. The rule needed fewer on both. A tighter stop gets hit
+more often, so a bad stretch costs about as much in total. The medians rose, but the lost-account count is what this
+test was about.
+
+**After G35-G37.** Three kinds of fix were tried: sizing (gentle start, cap 10), a reserve ($500, half the room) and a
+smaller early loss ($125, $100). None lowers the share of fresh accounts lost on both histories. On this edge, with a
+$2,000 trailing drawdown, about 1 in 9 (index) to 1 in 5 (NQ) fresh accounts fail within 21 months. The bad starts
+are bad stretches of the market for this strategy (2011, 2013, 2015, 2019-early 2020). No sizing rule turns a
+losing stretch into a winning one. What it means for the user is a fact to plan with, not something to tune away:
+- a lost account costs a new evaluation, not more than that;
+- expect about one restart in five to nine accounts;
+- weighed against a median of about $23,000 per 21-month account.
