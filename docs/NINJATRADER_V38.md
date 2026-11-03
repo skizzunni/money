@@ -2914,3 +2914,18 @@ trade with no gap needed: when the gap rule doesn't fire and the 09:30 bar's bod
 On the window and NQ the drive trades lose at the start, the account reaches the floor in its first weeks and stops
 (days traded falls to 4-8%). The index's long run makes more, but a new account doesn't survive to see it.
 `gap_go_drive_k` stays in the model, off (`verification/noise_v2/g66_drive.txt`).
+
+## G67: a bigger gap trade once the floor has stopped (registered 2026-11-03, before its run)
+
+**The idea, from G61:** 2-contract gap trades made 7-11% more in the chart's execution but lost new accounts in
+NinjaTrader's, in their first months, before any cushion. Here the gap trade stays at 1 contract until the trailing
+floor has stopped at the starting balance (the account's first $2,000 made). After that it takes up to
+`gap_go_locked_qty` contracts, still sized down to today's room and the room above the floor.
+
+**The variants:** today's default with `gap_go_locked_qty` 2 and 3.
+
+**Adopt (the better by window net) only if, against today's default:**
+- a higher net on all three 5-minute sets in both executions;
+- the floor never touched;
+- no more days at −$1,000;
+- on G35's 89 start dates, no more lost or frozen accounts (11).
