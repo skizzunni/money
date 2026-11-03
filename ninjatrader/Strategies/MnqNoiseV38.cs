@@ -541,6 +541,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         int journaled;                   // the account's closed trades already written to the journal
         double realDayStart;
         int realDayTrades;
+        bool guardTripped;  // the loss guard closed out today: no new entries until tomorrow
         string realDay = "";
         string journalPath = "", liveJournalPath = "";
         double net, peak, maxDd, worstDay, dayNet;
@@ -587,6 +588,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 SizeByOwnStop = false;
                 TimeStop = 0;
                 StepsAfterLock = false;
+                LossGuard = 950;
             }
             else if (State == State.DataLoaded)
             {
@@ -678,6 +680,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 realDay = start.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
                 realDayStart = cum;
                 realDayTrades = 0;
+                guardTripped = false;
             }
             engine.ExtEquity = cum;
             engine.ExtDayPnl = cum - realDayStart;
@@ -686,6 +689,13 @@ namespace NinjaTrader.NinjaScript.Strategies
             for (int k = before; k < engine.Trades.Count; k++)
                 Tally(start, engine.Trades[k].Pnl);
             int real = Position.MarketPosition == MarketPosition.Long ? 1 : Position.MarketPosition == MarketPosition.Short ? -1 : 0;
+            CheckLossGuard(Close[0]);
+            if (guardTripped && real != 0)
+            {
+                Flatten(real, "Loss guard");  // again, in case the first exit didn't fill
+                Dashboard(endNy);
+                return;
+            }
 
             if (real != 0 && engine.FlatNow)
             {
@@ -695,7 +705,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             {
                 Flatten(real, "Time stop");  // still losing this long after the fill: out at the next open
             }
-            else if (real == 0 && engine.NewEntry != 0 && PlaceOrders)
+            else if (real == 0 && engine.NewEntry != 0 && PlaceOrders && !guardTripped)
             {
                 // the bracket first, in ticks from the fill, so it is attached the moment the entry fills
                 string name = engine.NewEntry > 0 ? LongName : ShortName;
@@ -787,6 +797,29 @@ namespace NinjaTrader.NinjaScript.Strategies
             }
         }
 
+        // the loss guard (live only): today's closed P/L plus the open trade's at this price at -LossGuard or worse
+        // (a gap or bad fills past the bracket) closes the position at market and stops new entries for the day
+        void CheckLossGuard(double price)
+        {
+            if (LossGuard <= 0 || State != State.Realtime || guardTripped)
+                return;
+            int real = Position.MarketPosition == MarketPosition.Long ? 1 : Position.MarketPosition == MarketPosition.Short ? -1 : 0;
+            double today = SystemPerformance.AllTrades.TradesPerformance.Currency.CumProfit - realDayStart +
+                           (real != 0 ? Position.GetUnrealizedProfitLoss(PerformanceUnit.Currency, price) : 0.0);
+            if (today > -LossGuard)
+                return;
+            guardTripped = true;
+            Print("MnqNoiseV38: loss guard at " + today.ToString("0.00", CultureInfo.InvariantCulture) + " today: flat, no more entries until tomorrow");
+            if (real != 0)
+                Flatten(real, "Loss guard");
+        }
+
+        protected override void OnMarketData(MarketDataEventArgs marketDataUpdate)
+        {
+            if (marketDataUpdate.MarketDataType == MarketDataType.Last && engine != null)
+                CheckLossGuard(marketDataUpdate.Price);
+        }
+
         void Flatten(int real, string why)
         {
             if (real > 0) ExitLong(why, "");
@@ -816,6 +849,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                          ", today $" + (cumReal - realDayStart).ToString("0.00", CultureInfo.InvariantCulture) + "\n" +
                          "Next trade: " + engine.NextQty + " MNQ, room today $" + (double.IsNaN(engine.DayRoom) ? "-" : Math.Max(0, engine.DayRoom).ToString("0", CultureInfo.InvariantCulture)) + "\n" +
                          "Trades today: " + realDayTrades + "\n" +
+                         (LossGuard > 0 ? "Loss guard: " + (guardTripped ? "TRIPPED, flat and done for today" :
+                          "flat at -$" + LossGuard.ToString("0", CultureInfo.InvariantCulture) + " today, closed + open (live)") + "\n" : "") +
                          OpenTradeLine() +
                          "MNQ Noise Momentum v3.8, " + Mode + (engine.TradeQty > 0 && engine.Position != 0 ? ", " + engine.TradeQty + " MNQ" : "") + "\n" +
                          "Data from " + firstBar + " (results need data from 50 sessions before)\n" +
@@ -907,6 +942,11 @@ namespace NinjaTrader.NinjaScript.Strategies
         [NinjaScriptProperty]
         [Display(Name = "Gentle start: no contract steps until the trailing floor has stopped (turn on if live fills are 3+ ticks worse)", Order = 12, GroupName = "1. Size and risk")]
         public bool StepsAfterLock { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, 10000)]
+        [Display(Name = "Loss guard, live: flat and done for the day at this loss today, closed + open, $ (0 = off)", Order = 13, GroupName = "1. Size and risk")]
+        public double LossGuard { get; set; }
 
         [NinjaScriptProperty]
         [Range(0, 200)]

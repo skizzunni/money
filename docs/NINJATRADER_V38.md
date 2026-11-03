@@ -1486,3 +1486,22 @@ losing stretch into a winning one. What it means for the user is a fact to plan 
 
 No trading logic changed: the trades are identical with and without it (`test_v38_dashboard_shows_the_open_trade`
 checks every bar of the 5-minute sample). All 215 NinjaTrader and simulator tests pass. Re-import the file to see it.
+
+**U2 (2026-11-03): a live loss guard for the $1,000 daily rule.** Every trade is sized to stay inside $900 a day, but a
+gap or bad fills in a fast market can carry an open trade past its stop before the stop fills. The guard watches
+every live tick (`OnMarketData`) and every bar close.
+- **What it does.** Once today's closed P/L plus the open trade's P/L at the current price reaches −$950 ("Loss guard,
+  live", group 1, default 950, 0 = off), it closes the position at market ("Loss guard"). It sends the exit again on
+  each bar until it fills, and takes no new entry until the next session.
+- **The dashboard** shows "Loss guard: flat at -$950 today, closed + open (live)", or "TRIPPED, flat and done for
+  today".
+- **The Output window** logs when it fires.
+
+It works live only. Backtests and the trade-for-trade parity with the Python model are unchanged.
+`test_v38_live_loss_guard` covers it:
+- live with the guard off, the trades equal the backtest's;
+- with a tight test guard ($150), it fires on the sample, the exit is named "Loss guard", and no entry follows that
+  day.
+
+The simulator now sends a live bar's ticks (open, low, high, close) before its close. All 216 NinjaTrader and simulator
+tests pass. Re-import the file to get it; it is on by default at $950.

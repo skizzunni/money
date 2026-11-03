@@ -118,6 +118,8 @@ namespace NinjaTrader.Cbi
 
 namespace NinjaTrader.Data
 {
+    public enum MarketDataType { Ask, Bid, Last }
+    public class MarketDataEventArgs { public MarketDataType MarketDataType; public double Price; }  // a tick
     public enum BarsPeriodType { Tick, Second, Minute, Day }
     public class BarsPeriod { public BarsPeriodType BarsPeriodType = BarsPeriodType.Minute; public int Value = 5; }
     public class TradingHours
@@ -196,6 +198,7 @@ namespace NinjaTrader.NinjaScript
         internal int ThrowAt = -1;  // tests: the dashboard call throws on this bar (a runtime error inside OnBarUpdate)
         protected virtual void OnStateChange() { }
         protected virtual void OnBarUpdate() { }
+        protected virtual void OnMarketData(NinjaTrader.Data.MarketDataEventArgs marketDataUpdate) { }
         public void Print(object o) { Printed.Add(o == null ? "" : o.ToString()); }
         public void AddPlot(System.Windows.Media.Brush brush, string name)
         {
@@ -825,6 +828,14 @@ namespace NinjaTrader.NinjaScript.Strategies
                     dayFirstBar = i;
                     dayStartCum = SystemPerformance.AllTrades.TradesPerformance.Currency.CumProfit;
                 }
+                if (State == State.Realtime)  // live: the bar's ticks before its close (the open, the low, the high, the close)
+                    foreach (double tick in new[] { o[i], l[i], h[i], c[i] })
+                    {
+                        NinjaTrader.Data.MarketDataEventArgs md = new NinjaTrader.Data.MarketDataEventArgs();
+                        md.MarketDataType = NinjaTrader.Data.MarketDataType.Last;
+                        md.Price = tick;
+                        OnMarketData(md);
+                    }
                 try
                 {
                     OnBarUpdate();

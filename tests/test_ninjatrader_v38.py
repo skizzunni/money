@@ -166,3 +166,37 @@ def test_v38_dashboard_shows_the_open_trade(sim, sample_1m, tmp_path):  # noqa: 
     assert all(" MNQ @ " in x and ", stop " in x and " min in, " in x for x in open_)
     assert any("time stop in " in x for x in open_), "the countdown while a trade is losing room to run"
     assert any("locked (can't lose)" in x for x in open_)
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+def test_v38_live_loss_guard(sim, sample_1m, tmp_path):  # noqa: F811
+    """The live loss guard: with a tight guard ($150, to make it fire on the sample), live from the first month on,
+    today's closed + open loss at the guard closes the position ("Loss guard") and no new entry is taken that day.
+    Off (0), or in a backtest, the trades are exactly the model's."""
+    bars = resample(sample_1m, "5min")
+    path = tmp_path / "bars.csv"
+    with path.open("w") as f:
+        for t, r in zip(bars.index, bars.itertuples(), strict=True):
+            f.write(f"{t:%Y-%m-%d %H:%M},{r.open!r},{r.high!r},{r.low!r},{r.close!r}\n")
+    base = [DOTNET, str(sim), str(path), "5", "Strategy=V38", *GROW_ARGS]
+
+    def trades(*extra):
+        r = subprocess.run([*base, *extra], capture_output=True, text=True, env=ENV)
+        assert r.returncode == 0, r.stderr[-2000:]
+        return [x.split(",")[1:] for x in r.stdout.splitlines() if x.startswith("T,")], r.stdout
+
+    hist, _ = trades()
+    off, _ = trades("SimRealtimeFrom=1000", "LossGuard=0")
+    assert off == hist, "live with the guard off: the same trades"
+    nt = [x.split(",")[1:] for x in subprocess.run(base, capture_output=True, text=True, env=ENV).stdout.splitlines()
+          if x.startswith("T,")]
+    py = run(bars, GROW, minutes=5).trades
+    assert len(nt) == len(py), "a backtest (never live): the model's trades, guard or not"
+    guarded, out = trades("SimRealtimeFrom=1000", "LossGuard=150")
+    fired = [t for t in guarded if t[5] == "Loss guard"]
+    assert fired, "the guard fired at least once on the sample"
+    assert "P,MnqNoiseV38: loss guard at -" in out
+    day = [ts.date() for ts in bars.index]
+    for g in fired:  # no new entry later on the day the guard fired
+        xb = int(g[3])
+        assert not [t for t in guarded if int(t[1]) > xb and day[int(t[1])] == day[xb]], g
