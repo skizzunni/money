@@ -1769,3 +1769,20 @@ The 100K / 150K modes are Topstep's ($2,000 / $3,000 daily, $3,000 / $4,500 trai
 
 `test_v38_bigger_accounts_agree` now covers all four modes at 5 and 30 minutes, trade for trade. All 25 NinjaTrader
 v3.8 tests pass.
+
+## G43: how long to +$50,000, by account (registered 2026-11-03, before its run)
+
+**The question, the user's goal:** how long one account takes to reach +$50,000, and how often it is lost first.
+
+**The test:**
+- **Starts:** a new account every six months, run for up to 60 months: NQ from April 2015 to July 2020, the index
+  from April 2011 to September 2021.
+- **Accounts:** growth mode (50K), and the four bigger-account modes (G40, G42).
+- **Execution:** NinjaTrader's, 5-minute bars.
+
+**Reported for each mode:**
+- the share that reach +$50,000 within 5 years;
+- the median months to get there (among those that do);
+- the share lost or frozen first.
+
+Nothing is chosen here. It tells the user which account to trade for the goal.

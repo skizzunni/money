@@ -3,6 +3,7 @@ time stop, NinjaTrader's execution, 5-minute bars, on NQ and the index.
 
     python research/g35_start_dates.py <data dir> <MNQ 09-26 file> <MNQ 12-26 file> [variant: base|gentle|cap10]
 """
+import os
 import sys
 from concurrent.futures import ProcessPoolExecutor
 
@@ -15,6 +16,7 @@ from mnqbot.noise import NoiseConfig, run
 
 NY = "America/New_York"
 VARIANT = sys.argv[4] if len(sys.argv) > 4 else "base"
+MONTHS = int(os.environ.get("HORIZON_MONTHS", "21"))  # G43: 60, and the months to +$50,000
 EXTRA = {"base": {}, "gentle": {"steps_after_lock": True}, "cap10": {"size_up_to": 10},
          "reserve500": {"trail_buffer": 500.0}, "half": {"trail_frac": 0.5},
          "early125": {"early_ml": 125.0}, "early100": {"early_ml": 100.0},
@@ -44,7 +46,7 @@ def one(job):
     name, start = job
     bars, _, skip = S.D[name]
     s0 = pd.Timestamp(start, tz=NY)
-    s1 = s0 + pd.DateOffset(months=21)
+    s1 = s0 + pd.DateOffset(months=MONTHS)
     b = bars[(bars.index >= s0 - pd.Timedelta(days=150)) & (bars.index < s1)]  # history for the noise and the trend
     cfg = NoiseConfig(**{**S.V23, **T.REFERENCE, "daily_loss_limit": 900.0, "trail_dd": 2000.0, "time_stop": 60,
                          **EXTRA})
@@ -66,18 +68,28 @@ def one(job):
             "lowest $": round(float(eq.min())), "reached +2000": bool(eq.max() >= cfg.trail_dd),
             "floor touched": tr[f"{name} tb0"] > 0, "room at end $": round(room), "lost": room < 100.0,
             # frozen: no trade in the last 90 days of the 21 months (stopped above the floor, but no longer trading)
-            "frozen": bool(len(tf) == 0 or (s1 - tf.exit_time.max()).days > 90)}
+            "frozen": bool(len(tf) == 0 or (s1 - tf.exit_time.max()).days > 90),
+            # G43: the months from the start to the first close at +$50,000 (none: not within the horizon)
+            "months to 50k": (round((tf.exit_time.iloc[int(np.argmax(eq[1:] >= 50000))] - s0).days / 30.44, 1)
+                              if (eq[1:] >= 50000).any() else None)}
 
 
 def main() -> None:
     S.init({}, *sys.argv[1:4])
     S.D = {k: (with_1600(b, 5), first, skip) for k, (b, first, skip) in S.D.items() if k != "win"}
-    jobs = [("nq", d.strftime("%Y-%m-%d")) for d in pd.date_range("2015-04-01", "2023-10-01", freq="QS")]
-    jobs += [("index", d.strftime("%Y-%m-%d")) for d in pd.date_range("2011-04-01", "2024-07-01", freq="QS")]
+    if MONTHS == 21:
+        jobs = [("nq", d.strftime("%Y-%m-%d")) for d in pd.date_range("2015-04-01", "2023-10-01", freq="QS")]
+        jobs += [("index", d.strftime("%Y-%m-%d")) for d in pd.date_range("2011-04-01", "2024-07-01", freq="QS")]
+    else:  # G43: every six months, with the whole horizon in the data
+        last_nq = pd.Timestamp("2025-07-01") - pd.DateOffset(months=MONTHS)
+        last_ix = pd.Timestamp("2026-09-01") - pd.DateOffset(months=MONTHS)
+        jobs = [("nq", d.strftime("%Y-%m-%d")) for d in pd.date_range("2015-04-01", last_nq, freq="6MS")]
+        jobs += [("index", d.strftime("%Y-%m-%d")) for d in pd.date_range("2011-04-01", last_ix, freq="6MS")]
     with ProcessPoolExecutor(4) as ex:
         rows = list(ex.map(one, jobs))
     d = pd.DataFrame(rows)
-    d.to_csv(f"verification/noise_v2/g35_start_dates_{VARIANT}.csv", index=False)
+    tag = "" if MONTHS == 21 else f"_{MONTHS}m"
+    d.to_csv(f"verification/noise_v2/g35_start_dates_{VARIANT}{tag}.csv", index=False)
     for name, g in d.groupby("set"):
         print(name, VARIANT, "starts", len(g), "lost (at the floor)", int(g["lost"].sum()),
               "dead (lost or frozen)", int((g["lost"] | g["frozen"]).sum()),
