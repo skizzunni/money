@@ -68,6 +68,56 @@ real MNQ data will differ somewhat. The stand-in has flattered this strategy bef
   is in a position the model has closed, the strategy closes it at market ("Model flat"); it never holds a position the
   model doesn't manage.
 
+## Go live (2026-11-03)
+
+**The backtest of the file you trade** (`research/v38_ninjatrader_run.py grow`, the strategy's own code on the NinjaTrader
+simulator, Funded growth, from 2025-01-02, 1 tick of slippage, $0.62 a side;
+`verification/noise_v2/v38g_nt_2026-11-03.csv` and the trade lists beside it):
+
+| Jan 2, 2025 – Oct 2026 | 5-minute bars | 30-minute bars |
+|---|---|---|
+| Trades | 291 | 252 |
+| Net | $18,541.72 | $28,620.10 |
+| Winners | 61.5% | 53.6% |
+| Profit factor | 1.823 | 1.881 |
+| Closed drawdown | $1,851.89 | $3,934.78 |
+| Largest loss | −$851.94 | −$1,634.41 |
+| Worst day | −$899.24 | −$899.20 |
+| Most contracts | 12 | 15 |
+
+**It matches the Python model, trade for trade.**
+- **30-minute bars:** all 303 trades are identical.
+- **5-minute bars:** all but one of 344. That one is a warm-up trade (before the window) on 12/24/2024, a half day
+  where the stand-in data stops at 13:10. The model closes it at the next open's close and the strategy at that open,
+  0.25 points apart ($0.50). Live, 12/24 is on the no-trade list and MNQ trades to 13:15, so this can't recur.
+
+**U16: a go-live check for the start date.** With the trailing drawdown on and "Trailing drawdown and contract steps
+from date" blank, the floor and the contract steps count from the chart's first bar. Live, that counts the strategy's
+backtest on the loaded history as the account's profit, so a new account could start at 4-5 contracts with a floor it
+doesn't have. Going live with it blank now raises a setup warning, on the dashboard and as an alert, to set it to the
+account's first trading day. `test_v38_alerts` checks the warning, and that it doesn't fire with the date set.
+
+**The checklist:**
+1. **The file.** Copy `MnqNoiseV38.cs` to `Documents\NinjaTrader 8\bin\Custom\Strategies\`. Open New → NinjaScript
+   Editor and press F5: no errors.
+2. **The chart.** MNQ (front month, 12-26 now), **5 minute**, Trading hours **CME US Index Futures ETH**, Days to load
+   **120** (the filters need 50 sessions).
+3. **The strategy** (right-click the chart → Strategies → MnqNoiseV38):
+   - Mode **Funded growth** (or the 100K/150K/Apex mode of your account);
+   - **Trailing drawdown and contract steps from date: your account's first trading day**, yyyy-MM-dd (today if it
+     is new);
+   - Account: your prop account; Calculate: On bar close; leave the rest as they are.
+4. **Enable it** and read the dashboard (top right):
+   - "Setup: OK";
+   - "Next trade: 1 MNQ" on a new account;
+   - "Room above the trailing floor: $2000";
+   - the "Today:" line.
+
+   Any SETUP WARNING: fix it before the open.
+5. **Every day:** leave NinjaTrader running from before 09:30 to after 16:00 New York. Alerts tell you each entry,
+   exit, the day's and the week's summary.
+6. **Every week:** `python research/journal_report.py MnqNoiseV38_live_<account>.csv`, and check "Live vs tested".
+
 ## Funded growth mode (2026-10-31)
 
 **The user's rule, clarified:** a trade may risk more than $300, as long as the day never reaches the $1,000 loss
@@ -1698,7 +1748,7 @@ without reading the code.
 
 `test_v38_today_line` reads the line at every bar of the 5-minute sample. It checks that no entry was taken against it:
 a long only under "longs yes", a short only under "shorts yes" (or after 14:00 on a Fed day). It also checks the next
-check's time and countdown at every bar from 10:00 to 15:00, and that the trades are unchanged. All 29 NinjaTrader
+check's time and countdown at every bar from 10:00 to 15:00, and that the trades are unchanged. All 28 NinjaTrader
 v3.8 tests pass. Re-import the file to get it.
 
 ## G38: trapped buyers at the high of the day, order flow from volume (registered 2026-11-03, before its run)

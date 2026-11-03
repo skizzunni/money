@@ -719,6 +719,15 @@ namespace NinjaTrader.NinjaScript.Strategies
             }
             else if (State == State.Realtime)
             {
+                // U16: live with a trailing drawdown counted from the chart's first bar, the chart's history (the model's
+                // backtest there) counts as the account's profit: the steps and the floor's room would start too high
+                if (TrailDD > 0 && string.IsNullOrWhiteSpace(TrailFrom))
+                {
+                    string w = "\"Trailing drawdown and contract steps from date\" is blank: set it to the account's first trading day " +
+                               "(yyyy-MM-dd). Blank counts the chart's history as the account's profit, so the first trades would be too big";
+                    setupWarnings.Add(w);
+                    Print("MnqNoiseV38 WARNING: " + w);
+                }
                 foreach (string w in setupWarnings)  // once, as the strategy goes live
                     Say("setup", "SETUP WARNING: " + w);
                 milestoneDone = MilestoneStep > 0 ? (int)Math.Floor(Math.Max(0, SinceStart()) / MilestoneStep) : 0;

@@ -305,7 +305,7 @@ def test_v38_alerts(sim, sample_1m, tmp_path):  # noqa: F811
 
     live = 1000
     trades, alerts = go(f"SimRealtimeFrom={live}")
-    assert alerts and all(int(a[1]) >= live for a in alerts), "alerts only once live"
+    assert alerts and all(int(a[1]) >= live - (a[2] == "v38_setup") for a in alerts), "alerts only once live"
     kinds = {a[2] for a in alerts}
     assert {"v38_entry", "v38_exit"} <= kinds
     assert any(a[4].startswith(("BUY ", "SELL ")) and " MNQ at market" in a[4] for a in alerts)
@@ -318,8 +318,14 @@ def test_v38_alerts(sim, sample_1m, tmp_path):  # noqa: F811
     _, silent = go(f"SimRealtimeFrom={live}", "SoundAlerts=False")
     assert silent and all(a[3] == "silent" for a in silent)
     _, warned = go(f"SimRealtimeFrom={live}", "LossGuard=0")
-    setup = [a for a in warned if a[2] == "v38_setup"]
-    assert len(setup) == 1 and int(setup[0][1]) in (live - 1, live) and "no live backstop" in setup[0][4]
+    setup = [a for a in warned if a[2] == "v38_setup" and "no live backstop" in a[4]]
+    assert len(setup) == 1 and int(setup[0][1]) in (live - 1, live)
+    # U16: live with the trailing drawdown counted from the chart's first bar (TrailFrom blank), one more warning;
+    # with the account's first day set, none
+    blank = [a for a in warned if a[2] == "v38_setup" and "is blank" in a[4]]
+    assert len(blank) == 1 and "the account's first trading day" in blank[0][4]
+    _, dated = go(f"SimRealtimeFrom={live}", "TrailFrom=2026-08-03")
+    assert not [a for a in dated if a[2] == "v38_setup"]
 
 
 @pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
