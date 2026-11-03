@@ -78,6 +78,8 @@ namespace NinjaTrader.NinjaScript.Strategies
         // the last 14 sessions' average body, its way) in the 09:35-09:55 slot, and the shorts the trend filter blocks
         public bool MoreDays = false;
         public double FillSmallK = 0.0, FillDriveK = 0.5, FillMinRoom = 3000;
+        // G76: the bot's sizing counts this many points more slippage at the stop (0 = off)
+        public double SizeSlipPts = 0;
     }
 
     public sealed class V38Trade
@@ -576,11 +578,11 @@ namespace NinjaTrader.NinjaScript.Strategies
             if ((s.DailyLoss > 0 || s.TrailDD > 0) && ml > 0)  // the loss budget
             {
                 double costs = 2 * s.CommissionPerSide + 2 * slip * s.PointValue;
-                double perC = ml / q + costs;
+                double perC = ml / q + costs + s.SizeSlipPts * s.PointValue;
                 if (s.SizeByOwnStop)  // a contract's risk is its initial stop: the line's or the max loss
                 {
                     double pts = Math.Min(Math.Abs(c + d * slip - LineStop(d)), ml / q / s.PointValue);
-                    perC = pts * s.PointValue + costs;
+                    perC = pts * s.PointValue + costs + s.SizeSlipPts * s.PointValue;
                 }
                 double room = MoneyRoom();
                 int fit = double.IsInfinity(room) ? q : (int)Math.Floor(room / perC + 1e-9);
@@ -772,6 +774,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 GapGoLocked = 3;  // G67b
                 MoreDays = false;  // G72: off by default (it missed G74's rule by one -$1,042 day, chart execution)
                 MoreDaysCushion = 3000;
+                SizeSlip = 0;  // G76
                 TestedWinRate = 61.2;
             }
             else if (State == State.DataLoaded)
@@ -826,6 +829,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 st.GapGoLockedQty = GapGoLocked;  // G67
                 st.MoreDays = MoreDays && st.GapGo;  // G72: the fill-in trades (5-minute chart, not in Evaluation)
                 st.FillMinRoom = MoreDaysCushion;
+                st.SizeSlipPts = SizeSlip;  // G76
                 st.Tick = TickSize;
                 st.PointValue = Instrument.MasterInstrument.PointValue;
                 if (!badChart)
@@ -1499,6 +1503,11 @@ namespace NinjaTrader.NinjaScript.Strategies
         [Range(0, 100000)]
         [Display(Name = "More trading days: only while the account is at least this far above the trailing floor, $", Order = 17, GroupName = "1. Size and risk")]
         public double MoreDaysCushion { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, 50)]
+        [Display(Name = "Sizing: count this many points more slippage at each stop (room kept for a jump past it)", Order = 18, GroupName = "1. Size and risk")]
+        public double SizeSlip { get; set; }
 
         [NinjaScriptProperty]
         [Range(0, 200)]
