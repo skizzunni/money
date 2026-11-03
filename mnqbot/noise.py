@@ -294,6 +294,9 @@ class NoiseConfig:
     # research (G51): the max loss scales with the noise. At each check, max_loss_per_trade becomes ml_sigma x the
     # noise (sigma) x the close x point_value x qty, for the trades that check sizes and sends (0 = the fixed $)
     ml_sigma: float = 0.0
+    # research (G53): on a day that opens more than gap_block (a fraction, 0.01 = 1%) away from the prior close, no
+    # entries against the gap's direction (0 = off)
+    gap_block: float = 0.0
     # research (G13): a time lock. A trade not yet locked that is in profit at a bar close time_lock minutes or more
     # after its fill is locked (its stop to the entry plus lock_plus, from the next bar)
     time_lock: int = 0
@@ -411,6 +414,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
     eq_curve: list[float] = [0.0]  # eq_n: the closed P&L after each position
     side_cd = {1: 0, -1: 0}  # signals still to skip on a side today (side_cooldown)
     ts_done = {1: False, -1: False}  # ts_block: a side closed by the time stop today
+    gap_dir = 0  # gap_block: today's opening gap direction when it is past the threshold
     side_lost = {1: False, -1: False}  # a loser on that side today (side_margin)
     side_run = {1: 0, -1: 0}  # losers in a row on each side, across days (side_run_k)
     side_skip = {1: 0, -1: 0}  # signals still to skip on each side (side_run_k)
@@ -519,6 +523,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
         if cfg.after_target_done and target_today:
             return False
         if ts_done[d]:
+            return False
+        if gap_dir and d == -gap_dir:
             return False
         if block_dir and (d == block_dir or cfg.big_day_both):
             return False
@@ -816,6 +822,9 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             vwap_now = vwap_used = math.nan
             prev_close = last_rth_close
             day_open = o[i]
+            gap_dir = 0
+            if cfg.gap_block > 0 and not math.isnan(prev_close) and abs(day_open / prev_close - 1) > cfg.gap_block:
+                gap_dir = 1 if day_open > prev_close else -1
             losers_today = 0
             side_cd[1] = side_cd[-1] = 0
             ts_done[1] = ts_done[-1] = False

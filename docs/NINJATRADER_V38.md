@@ -2317,3 +2317,21 @@ The 30-minute runs are reported, not judged.
 Skipping them helped a little on the window (+$1,000), but cost $8,000-15,000 on NQ and $10,000-33,000 on the index.
 Over the long run, expiration Fridays are profitable days for the bot, not pinned ones. 30-minute bars agree (less
 everywhere). (`verification/noise_v2/g52_opex.csv`.)
+
+## G53: no entries against a big opening gap (registered 2026-11-03, before its run)
+
+**The idea (not tested in any round before; the gap was only tested as a separate fade setup):** a day that opens far
+from the prior close has its news already in the price. A breakout against the gap goes against the day's information
+and may fail more often.
+
+**The variant:** Funded growth, with `gap_block` 0.01. On a day whose 09:30 open is more than 1% from the prior 16:00
+close, no entries against the gap's direction: no shorts after a gap up, no longs after a gap down. Everything else as
+it is.
+
+**Adopt only if, against Funded growth as it is:**
+- a higher net on all three 5-minute sets (the window, NQ from 2015, the index from 2011), in both the chart's
+  execution and NinjaTrader's;
+- the floor is never touched;
+- there are no more days at −$1,000.
+
+The 30-minute runs are reported, not judged.
