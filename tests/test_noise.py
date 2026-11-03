@@ -8,6 +8,7 @@ from __future__ import annotations
 import json
 import math
 import random
+import re
 from pathlib import Path
 
 import numpy as np
@@ -44,6 +45,7 @@ TREND = "No shorts while the last close is above its average of this many sessio
 SQUEEZE = ("Never stuck: when no contract fits, 1 with its stop cut to the room left, if at least this many points "
            "(0 = off)")  # 20 (v3.1)
 TIME_STOP = "Time stop: close a losing trade not yet locked this many minutes after its fill (0 = off)"  # 0 (G6)
+PRESET = "Preset (as NinjaTrader's Mode)"  # U9: "Funded growth" by default; the tests below set "Custom" unless named
 V21 = {"max_loss_per_trade": 260.0, "lock_at": 0.35, "max_losers": 0, "take_profit": 2.0, "tighten_only": True,
        "after_loss_qty_div": 1.0, "after_loss_ml_mult": 1.0, "last_entry_end": 900,
        "big_day_k": 1.5, "big_day_n": 10, "calm_k": 0.7, "calm_short": 10, "calm_long": 40,
@@ -417,7 +419,7 @@ def run_pine(bars, inputs=None, minutes=5):
     pytest.importorskip("pynescript", reason="pip install pynescript to check the .pine files")
     from pine_interpreter import PineRuntime, load_pine
 
-    rt = PineRuntime(load_pine(NOISE_PINE), bars, inputs or {}, timeframe_seconds=60 * minutes)
+    rt = PineRuntime(load_pine(NOISE_PINE), bars, {PRESET: "Custom", **(inputs or {})}, timeframe_seconds=60 * minutes)
     bands = []
 
     def on_bar(i, g):
@@ -777,7 +779,7 @@ def test_pine_evaluation_tracker(target):
     pytest.importorskip("pynescript", reason="pip install pynescript to check the .pine files")
     from pine_interpreter import PineRuntime, load_pine
 
-    rt = PineRuntime(load_pine(NOISE_PINE), bars, inputs, timeframe_seconds=300)
+    rt = PineRuntime(load_pine(NOISE_PINE), bars, {PRESET: "Custom", **inputs}, timeframe_seconds=300)
     rt.run(lambda i, g: None)
     tf = run(bars, NoiseConfig(qty=10, max_loss_per_trade=350.0)).trades_frame()
     tf = tf[tf.exit_time.dt.date >= start]
@@ -803,7 +805,8 @@ def test_pine_dashboard_shows_the_next_checks_lines():
     res = run(full, NoiseConfig())
     i, upper, lower = res.bands[-5]  # a check late in the data; cut the bars ten minutes before it
     cut = full.iloc[: i - 1]
-    rt = PineRuntime(load_pine(NOISE_PINE), cut, {FUNDED: True, "Contracts on a funded account": 1, LOCK: 1.0,
+    rt = PineRuntime(load_pine(NOISE_PINE), cut, {PRESET: "Custom", FUNDED: True, LOCK: 1.0,
+                                                    "Contracts on a funded account": 1,
                                                     TIGHTEN: False, MAX_LOSS: 350.0, TP: 1.5,
                                                     AFTER_QTY: 0, AFTER_ML: 0.0, LAST_ENTRY: "15:30",
                                                     BIG_K: 0.0, CALM: 0.0, DAILY: 0.0, TRAIL: 0.0, TREND: 0},
@@ -833,6 +836,30 @@ def test_pine_account_switch(funded, eval_qty, qty):
     res = run(bars, cfg)
     assert trades == trades_of(res) and events == res.events and heads == res.headsups
     assert len(trades) >= 10
+
+
+@pytest.mark.slow
+@pytest.mark.parametrize(("preset", "daily", "trail"), [("Funded growth", 900.0, 2000.0),
+                                                        ("Funded growth 100K", 1800.0, 3000.0),
+                                                        ("Funded growth 150K", 2700.0, 4500.0),
+                                                        ("Funded growth Apex 100K", 1350.0, 3000.0),
+                                                        ("Funded growth Apex 150K", 1800.0, 4000.0)])
+def test_pine_presets(preset, daily, trail):
+    """U9: each preset (the default is Funded growth) trades the sizing MnqNoiseV38.cs's Mode of that name sets,
+    whatever the inputs it overrides say; Custom keeps the inputs."""
+    bars = synth_bars(sessions=90, seed=3)
+    cfg = NoiseConfig(qty=1, **{**V21, "max_loss_per_trade": 187.5, "after_loss_ml_mult": 250 / 187.5,
+                                "daily_loss_limit": daily, "trail_dd": trail, "profit_step": 1500.0,
+                                "size_up_to": 15, "budget_actual": True, "time_stop": 60})
+    res = run(bars, cfg)
+    junk = {MAX_LOSS: 500.0, DAILY: 400.0, TRAIL: 0.0, STEP: 0.0, TIME_STOP: 0, OWN_STOP: False}  # overridden
+    trades, events, _, _, _, _ = run_pine(bars, {PRESET: preset, **junk}, 5)
+    assert trades == trades_of(res) and events == res.events
+    assert len(trades) >= 10 and any(t[6] == "Time stop" for t in trades)
+    custom, _, _, _, _, _ = run_pine(bars, {PRESET: "Custom", **junk}, 5)
+    assert custom != trades, "Custom keeps the inputs"
+    default = re.search(r'preset = input\.string\("Funded growth",', NOISE_PINE.read_text())
+    assert default, "the default preset is NinjaTrader's default Mode"
 
 
 @pytest.mark.slow

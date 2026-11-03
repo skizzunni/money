@@ -1596,6 +1596,23 @@ unchanged. `test_v38_milestones` checks:
 
 All 26 NinjaTrader v3.8 tests pass. Re-import the file to get it.
 
+**U9 (2026-11-03): one Preset setting on TradingView, as NinjaTrader's Mode.**
+- **The problem.** To match NinjaTrader's Funded growth, `pine/mnq_noise_momentum.pine` needed seven sizing inputs set
+  by hand ($187.50 max loss, $250 after a loser, the $2,000 trailing drawdown, a contract per $1,500 up to 15, the
+  trade's own stop, the 60-minute time stop). A missed one tests a different bot.
+- **The setting.** A new first input, "Preset (as NinjaTrader's Mode)", whose options are NinjaTrader's Modes:
+  - Funded growth (the default, as in NinjaTrader);
+  - Funded growth 100K and 150K (Topstep's rules);
+  - Funded growth Apex 100K and Apex 150K;
+  - Custom: the inputs as set, as before.
+
+  Any Funded growth preset sets the sizing and the account's daily budget and trailing drawdown, whatever those inputs
+  say.
+
+`test_pine_presets` checks each preset against the Python model of that mode, trade for trade, with every overridden
+input set to something else. It also checks that the time stop fires, that Custom keeps the inputs, and that the default
+is Funded growth. The other Pine tests now name Custom. Re-paste the script on TradingView to get it.
+
 ## G38: trapped buyers at the high of the day, order flow from volume (registered 2026-11-03, before its run)
 
 **The idea, from the user's @chicago_trades clip.** At the high of the day: retail stops are run, fresh sellers fill,
@@ -1886,3 +1903,21 @@ stop.
 - there are no more days at −$1,000.
 
 The 30-minute runs are reported, not judged.
+
+**G45 result (run once, 2026-11-03): rejected; 2.0 stays.** Both distances made less on every 5-minute set, in both
+executions.
+
+| 5-minute net, chart / NinjaTrader | 1.75 | 2.0 (as it is) | 2.5 |
+|---|---|---|---|
+| window | $15,524 / $15,608 | **$18,516 / $18,549** | $16,438 / $16,068 |
+| NQ from 2015 | $262,411 / $254,828 | **$277,322 / $267,571** | $268,409 / $266,595 |
+| index from 2011 | $355,721 / $349,475 | **$407,796 / $404,250** | $373,933 / $371,535 |
+
+- **The nearer target** won about as often (61.4% vs 61.2% on the window) and took more trades, but each winner was
+  smaller.
+- **The farther target** raised the profit factor on NQ (1.591 vs 1.541), but cost about $2,000 on the window and $34,000
+  on the index.
+- **30 minutes (reported, not judged).** 1.75 made more on the window in NinjaTrader's execution ($30,665 vs $28,620),
+  and less on both histories.
+
+The floor was never touched (`verification/noise_v2/g45_take_profit.csv`).
