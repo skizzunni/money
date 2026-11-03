@@ -2886,3 +2886,19 @@ bull years punish shorts in an uptrend, even at 1 contract. The rule asks for mo
 G65's start-date run, for the record: **17 lost or frozen of 89** (index 9, NQ 8) against today's 11, median
 $30,413 index / $36,193 NQ. The extra shorts cost new accounts more often, which confirms the rejection
 (`verification/noise_v2/g35_start_dates_gapgo1trend.csv`).
+
+## G66: an "opening drive" for the gap and go slot (registered 2026-11-03, before its run)
+
+**The idea:** gap and go (G60) trades 09:35-09:55 only when the open gaps. Many days without a gap still open with a
+strong first 5 minutes, and the bot leaves 09:35-10:00 unused on those days. Here a strong 09:30 bar takes the same
+trade with no gap needed: when the gap rule doesn't fire and the 09:30 bar's body |close − open| is at least
+`gap_go_drive_k` × the average body of the last 14 sessions' 09:30 bars, go its way at the 09:35 open, stop at the
+09:30 open, out at the 09:55 open, 1 contract (as gap and go). It adds trading days.
+
+**The variants:** today's default with `gap_go_drive_k` 1.0 and 1.5.
+
+**Adopt (the better by window net) only if, against today's default:**
+- a higher net on all three 5-minute sets in both executions;
+- the floor never touched;
+- no more days at −$1,000;
+- on G35's 89 start dates, no more lost or frozen accounts (11).
