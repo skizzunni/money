@@ -3295,3 +3295,26 @@ the room is kept for a fill past the stop. It costs a contract only when the roo
 **Pass, for each, against itself without it, both executions, all three 5-minute sets:** no day at −$1,000 or worse,
 the floor never touched where it wasn't, and a net at most 1% lower. If the default passes, it becomes the default; if
 U21-on passes, U21 is judged again on G74's rule.
+
+**G76 result (run once, 2026-11-03): rejected; a near miss for U21.**
+
+| 5-minute, chart / NinjaTrader | window | NQ | index | days at −$1,000 |
+|---|---|---|---|---|
+| default | $30,161 / $29,836 | $356,039 / $359,943 | $508,291 / $498,705 | 1 |
+| default + 2 points | $29,812 / $29,552 | **lost** / $357,545 | $498,270 / $490,286 | 0 |
+| U21 on | $33,986 / $33,719 | lost / lost | $528,608 / $520,367 | 1 |
+| U21 on + 2 points | $33,962 / $33,773 | lost / lost | $521,452 / $515,363 | **0** |
+
+For U21 it removes the −$1,042 day for 0.1% on the window but 1.0-1.4% on the index, past the 1% registered. For the
+default it costs 1-2% and tips NQ's 2015 path in the chart's execution (`verification/noise_v2/g76_size_slip.txt`).
+
+## G77: the gap trade's stop to breakeven at +1R (registered 2026-11-03, before its run)
+
+**The idea:** the 09:35 gap trade's stop is the 09:30 open, and it is out at 09:55 either way. Once a bar closes with
+the trade up by its initial risk (entry − stop), its stop moves to the entry plus 1 tick (`gap_go_be` 1.0), so a
+gap trade that was up 1R can't become a full loser in the last minutes.
+
+**The variant:** today's default with `gap_go_be` 1.0.
+
+**Adopt only if, against today's default:** a higher net on all three 5-minute sets in both executions; the floor
+never touched; no more days at −$1,000; on G35's 89 start dates, no more lost or frozen accounts (11).
