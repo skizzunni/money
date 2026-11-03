@@ -2798,3 +2798,15 @@ Dates: `research/nfp_dates.csv` (BLS's rule).
 - the floor never touched;
 - no more days at −$1,000;
 - on G35's 89 start dates, no more lost or frozen accounts (11).
+
+**G62 result (run once, 2026-11-03): rejected; 2x on jobs-report days helps the window only.**
+
+| 5-minute, chart / NinjaTrader | as it is | 2x on jobs-report days |
+|---|---|---|
+| window | $19,618 / $19,626 | **$22,547 / $22,615** |
+| NQ | **$306,951 / $304,106** | $305,889 / $298,474 |
+| index | **$447,417 / $438,285** | $444,606 / $436,003 |
+
+It made $2,900 more on the window but less on both histories, in both executions. Round seventy-three's effect was
+measured on the bot's average day; with today's growth sizing and filters, the doubled jobs-report trades don't pay
+over the long run. (`verification/noise_v2/g62_nfp.txt`; `news_mult` stays in the model, off.)
