@@ -3259,3 +3259,20 @@ points past the stop crossed −$1,000. **G75 instead tests a $950 cap on the ro
 than $950 (90% of the daily budget's $900 plus today's P/L as now, but at most $950), so after a green morning the bot
 still sizes up, to $950 at most, and $50 of slippage past the stop stays above −$1,000. Variants and pass rule as
 registered above (today's default and U21 on, each against itself without it: no −$1,000 day, net at most 1% lower).
+
+**G75 result (run once, 2026-11-03): rejected; capping the room costs most of the profit.**
+
+| 5-minute, chart / NinjaTrader | window | NQ | index | days at −$1,000 |
+|---|---|---|---|---|
+| today's default | $30,161 / $29,836 | $356,039 / $359,943 | $508,291 / $498,705 | 1 (NQ, chart) |
+| default + $950 cap | $25,167 / $25,098 | **$1 / $1, lost** | $364,186 / $358,444 | 0 |
+| U21 on | $33,986 / $33,719 | lost / lost | $528,608 / $520,367 | 1 (index, chart) |
+| U21 on + $950 cap | $28,691-29,085 | lost | $365,216-365,462 | 0 |
+
+The cap removes the −$1,000 days, but the room after a green morning is where the bot's biggest trades come from: a
+trend day's afternoon at 10-15 contracts on the morning's profit. Capped, the index makes 28% less
+(`verification/noise_v2/g75_room_cap.txt`).
+
+**Scorecard, G44-G75:** 32 rounds. Adopted: G60 (gap and go, U19), G67b (3 gap contracts once the floor has stopped,
+U20) and G67's data fix. Shipped as a switch, off: G72's A2 ("More trading days", U21). Rejected: 27 (G54 and G55
+were measurements).
