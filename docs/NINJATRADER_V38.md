@@ -2929,3 +2929,35 @@ floor has stopped at the starting balance (the account's first $2,000 made). Aft
 - the floor never touched;
 - no more days at −$1,000;
 - on G35's 89 start dates, no more lost or frozen accounts (11).
+
+**G67 result (run once, 2026-11-03): rejected as run, and it found a data error.**
+
+| 5-minute, chart / NinjaTrader | as it is | up to 2 once stopped | up to 3 once stopped |
+|---|---|---|---|
+| window | $19,618 / $19,626 | **$1 / $1, the account lost** | **$1 / $1, the account lost** |
+| NQ | $306,951 / $304,106 | $335,883 / **−$2, lost early** | $356,039 / $359,943 |
+| index | $447,417 / $438,285 | $478,825 / $468,724 | $508,291 / $498,705 |
+
+**Why the window failed: the data, not the market.** Its account lost all its profit in one trade, a 2-contract gap
+trade on 2025-06-20 at −$1,661. That session's bars mix two contracts. It was June's expiration, after the
+Juneteenth closure. The 09:30 and 09:35 bars are September's contract (about 22,100). From 09:40 on they are the
+expired June contract, 445 points lower, at 78 contracts a bar against 9,300. The "fall" hit the gap trade's stop.
+No live chart had it. The NQ history has the same session (the window's 2025 part is built from it). G61's
+"window account lost (a −$1,661 day)" was this same bar.
+
+A scan of every set for a regular-hours bar more than 1.2% from the last close (`research/data_errors.py`) finds only
+this session, plus two real moves (2020-03-16 on NQ, 2023-03-10 on the index). From now on
+`research/v24_scan.py` drops it (`BAD_SESSIONS`) from the window proxy and the NQ history, and so does
+`research/v38_ninjatrader_run.py`. Today's default and G67 are re-run on the corrected data next (G67b), before any
+decision (`verification/noise_v2/g67_locked_qty.txt`).
+
+## G67b: G67 on the corrected data (registered 2026-11-03, before its run)
+
+**Why:** G67's window result came from the data error above, so it decided nothing. Run once more, unchanged, on the
+data without 2025-06-20, today's default with it. Known before this run: NQ and the index are hardly touched by the
+fix (one session in 10-15 years), and there `gap_go_locked_qty` 2 lost NQ's account in NinjaTrader's execution while
+3 didn't. What is new here is the window, and G35's start dates after it.
+
+**Adopt (the better by window net) only on G67's rule:** against today's default on the same corrected data, a
+higher net on all three 5-minute sets in both executions; the floor never touched; no more days at −$1,000; on G35's
+89 start dates, no more lost or frozen accounts than the default's on the corrected data.

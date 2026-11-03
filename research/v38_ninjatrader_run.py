@@ -10,7 +10,7 @@ S = "/tmp/claude-0/-home-user-money/b0ea31b5-d9fc-525a-a114-db6430eff3ed/scratch
 SIM = "ninjatrader/tests/Sim/bin/Release/net8.0/Sim"
 out = []
 for m in (30, 5):
-    bars = pd.read_pickle(f"{S}/proxy_{m}m.pkl")[["open", "high", "low", "close"]]
+    bars = VS.drop_bad(pd.read_pickle(f"{S}/proxy_{m}m.pkl"))[["open", "high", "low", "close"]]
     # where a session's data stops at 16:00 with no 16:00 bar after it, add one at the last price: on an ETH chart MNQ
     # keeps trading to 17:00, so NinjaTrader's 16:00 market exit fills there, not at the next morning's open
     t = bars.index.tz_convert("America/New_York")

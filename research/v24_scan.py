@@ -78,6 +78,18 @@ CONFIRM: dict = {}  # SPX_STATE=<pickle>: "confirm_map": "spx" in a variant load
 MIN = [5]  # the bar length: SCAN_MINUTES=30 runs every set on 30-minute bars
 
 
+# sessions whose bars mix two contracts (data errors found by research/data_errors.py): dropped from the sets, as if
+# the data had none. 2025-06-20, June's expiration: 09:30-09:35 is September's contract, 09:40 on the expired June
+# contract (78 contracts a bar, 445 points lower), a false fall no live chart had
+BAD_SESSIONS = ("2025-06-20",)
+
+
+def drop_bad(b: pd.DataFrame) -> pd.DataFrame:
+    """b without the BAD_SESSIONS (by New York date)."""
+    d = b.index.tz_convert(NY).strftime("%Y-%m-%d")
+    return b[~np.isin(d, BAD_SESSIONS)]
+
+
 def init(base: dict, data: str, sep: str, dec: str) -> None:
     BASE.update(base)
     MIN[0] = int(os.environ.get("SCAN_MINUTES", "5"))
@@ -87,9 +99,9 @@ def init(base: dict, data: str, sep: str, dec: str) -> None:
     def bars(b: pd.DataFrame) -> pd.DataFrame:
         return b if m == 5 else resample(b, f"{m}min")
     D["win"] = (bars(V.DATA["mnq"][0]), "2026-08-24", True)
-    D["proxy"] = (pd.read_pickle(f"{data}/proxy_{m}m.pkl"), "2025-01-02", True)
+    D["proxy"] = (drop_bad(pd.read_pickle(f"{data}/proxy_{m}m.pkl")), "2025-01-02", True)
     for name in ("nq", "index"):  # the histories skip closures and sessions with missing data (no 09:30 or 15:55 bar,
-        b = V.DATA[name][0]        # or under 70 five-minute bars): a trade there would be held to the next session
+        b = drop_bad(V.DATA[name][0])  # or under 70 five-minute bars): a trade there would be held to the next session
         t = b.index.tz_convert(NY)
         g = pd.DataFrame({"d": t.strftime("%Y-%m-%d"), "m": t.hour * 60 + t.minute}).groupby("d").m.agg(
             ["count", "min", "max"])

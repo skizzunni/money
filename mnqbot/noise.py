@@ -318,6 +318,9 @@ class NoiseConfig:
     # research (G66): an opening drive. When the gap rule doesn't fire, a 09:30 bar whose body |close - open| is at
     # least gap_go_drive_k x the average of the last 14 sessions' 09:30 bodies takes the same trade its way (0 = off)
     gap_go_drive_k: float = 0.0
+    # research (G67): once the trailing floor has stopped at the start (trail_cap), a gap trade may take up to this
+    # many contracts in place of gap_go_max_qty (0 = off)
+    gap_go_locked_qty: int = 0
     # research (G62): on these dates (YYYY-MM-DD, comma separated; the jobs-report days), news_mult x the contracts,
     # after the contract steps; the daily budget and the trailing floor still cap it
     news_dates: str = ""
@@ -683,7 +686,9 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                         room = money_room()
                         if math.isfinite(room):
                             q = min(q, math.floor(room / per_c + 1e-9))
-                        if cfg.gap_go_max_qty > 0:
+                        if cfg.gap_go_locked_qty > 0 and locked_floor:
+                            q = min(q, cfg.gap_go_locked_qty)
+                        elif cfg.gap_go_max_qty > 0:
                             q = min(q, cfg.gap_go_max_qty)
                         if q >= 1:
                             gg = {"d": d, "q": q, "bar": i, "px": o[i] + d * slip, "stop": stop_px}
