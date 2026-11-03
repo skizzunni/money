@@ -2452,3 +2452,19 @@ the Nasdaq's. `research/g56_mes.py`.
 78 of 89 got there. The median was 143 calendar days (about 4½ months): a quarter of starts within 97 days, a quarter
 after 234 days. 9 got there within 2 months, 19 within 3 and 47 within 6. 11 (12%) were lost or frozen first. The
 user's window, from 2025-01-02, took 13½ months (+$2,000 by late April 2025, then a flat stretch).
+
+**+$3,000 in one week? (measured 2026-11-03, at the user's question).** The bot's trades at a fixed size, every calendar
+week of the histories as a one-week try (NQ 2015-2025: 549 weeks; the index 2011-2026: 821 weeks), counting whether the
+closed P/L reached +$3,000 before −$2,000 within the week. At 1 MNQ the bot averages about $100-108 a week.
+
+| contracts on every trade | reached +$3,000 in the week, NQ / index | lost $2,000 first, NQ / index |
+|---|---|---|
+| 1 | 0% / 0% | 0% / 0% |
+| 5 | 12.6% / 10.8% | 7.3% / 6.6% |
+| 10 | 26.2% / 23.5% | 21.3% / 18.5% |
+| 20 | 29.9% / 27.0% | 38.4% / 34.6% |
+| 40 | 26.0% / 24.1% | 49.4% / 46.0% |
+
+This is the best case: it ignores the $1,000 daily loss rule (at 10 MNQ one full stop is $1,875) and losses inside a
+trade before it closes. No size makes +$3,000 in a week more likely than not. Past 10 contracts the account is lost more
+often than the target is reached.
