@@ -2599,3 +2599,28 @@ index 2019-Sep 2026), and is above 0 with t ≥ 2 on all four pooled.
 
 It reports the trades a week, the days it trades when the bot (Funded growth, 5-minute) doesn't, and the bot's net
 with and without it.
+
+**G60 result (run once, 2026-11-03): passes. Gap and go before 10:00 makes money in all four halves.**
+
+| 1 MNQ, 09:35-10:00 | trades a week | net | winners | profit factor | t |
+|---|---|---|---|---|---|
+| NQ 2015-2019 | 1.37 | +$5,751 | 37.0% | 1.41 | 2.34 |
+| NQ 2020-Jul 2025 | 1.34 | +$9,047 | 35.7% | 1.42 | 2.54 |
+| index 2011-2018 | 1.31 | +$4,731 | 31.7% | 1.21 | 1.59 |
+| index 2019-Sep 2026 | 1.13 | +$11,795 | 37.5% | 1.49 | 3.15 |
+| all 1,748 trades | | **+$31,324** | | | **4.85** |
+
+- **Fresh data:** Yahoo's MNQ bars, Aug 25 - Nov 3, 2026, which no round has seen. 14 trades, −$183 (4 winners). That
+  is within the spread expected of 14 trades (about +$20 a trade on average, with wide swings).
+- **The setup was picked from 24 in round seventy-one.** The exit by 10:00 is new here and the pass rule was fixed
+  before this run, but the data was not untouched. Live results are the real test.
+
+**Beside the bot, on the same account (a simple sum, `research/g60_combined.py`):**
+
+| | days with a trade | net | lowest room above the floor | worst day |
+|---|---|---|---|---|
+| NQ: bot / bot + gap | 36.6% / **51.4%** | $277,322 / **$291,958** | $459 / $238 | (bot ≤ $900) / −$1,112 |
+| index: bot / bot + gap | 35.7% / **49.0%** | $407,796 / **$424,322** | $1,229 / $989 | (bot ≤ $900) / −$1,280 |
+
+The simple sum ignores the shared $900 daily budget, which is why two days pass −$1,000. Next: gap and go inside the
+model and MnqNoiseV38.cs, sized from the same daily budget and trailing floor as the bot, then the same tests again.
