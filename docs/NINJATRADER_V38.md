@@ -2777,3 +2777,8 @@ the step between.
 In the chart's execution 2 contracts make 7-11% more. In NinjaTrader's, the window's and NQ's accounts go to the floor
 in their first months. A fast 09:35 open that gaps past the stop costs twice as much, and early on the account has no
 room for that. 1 contract stays (`verification/noise_v2/g61_gap_qty.txt`).
+
+**Not yet in the TradingView script:** gap and go (G60) is in the Python model and MnqNoiseV38.cs, not in
+`pine/mnq_noise_momentum.pine`. On a 30-minute TradingView chart it could not trade anyway (it needs the 09:30-09:35
+bar). On a 5-minute TradingView chart the script's results will be below NinjaTrader's by the gap trades, about 1.3 a
+week.
