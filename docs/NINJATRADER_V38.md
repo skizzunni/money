@@ -1505,3 +1505,17 @@ It works live only. Backtests and the trade-for-trade parity with the Python mod
 
 The simulator now sends a live bar's ticks (open, low, high, close) before its close. All 216 NinjaTrader and simulator
 tests pass. Re-import the file to get it; it is on by default at $950.
+
+**U3 (2026-11-03): a startup check, and the mode read safely.**
+- **The fix.** The Mode setting was matched exactly, so "funded growth" (lower case) or a stray space ran Custom's
+  settings without a word. It is now read whatever its case and spaces. An unknown mode runs as Custom, with a warning.
+- **The check.** At start the bot prints "MnqNoiseV38 WARNING: ..." to the Output window, and shows the first warning
+  on the dashboard ("SETUP WARNING (n): ..."; "Setup: OK" when there is none), for:
+  - a chart that isn't 5 or 30 minutes;
+  - an instrument that isn't MNQ;
+  - trading hours that aren't the ETH template (the 16:00 exit would fill late);
+  - a loss guard below the daily budget (it would cut trades the budget allows);
+  - a loss guard that is off or above $1,000 (no live backstop).
+
+`test_v38_startup_checks` covers each warning, "Setup: OK", and that "  funded GROWTH " gives exactly Funded growth's
+trades. All 217 NinjaTrader and simulator tests pass. Re-import the file to get it.

@@ -297,6 +297,8 @@ namespace NinjaTrader.NinjaScript.Strategies
             }
         }
         public string SimAccountName { get { return Account.Name; } set { Account.Name = value; } }
+        public string SimInstrument { get { return Instrument.FullName; } set { Instrument.FullName = value; } }  // tests
+        public string SimTradingHours { get { return Bars.TradingHours.Name; } set { Bars.TradingHours.Name = value; } }
         public string SimUserDataDir
         {
             get { return NinjaTrader.Core.Globals.UserDataDir; }

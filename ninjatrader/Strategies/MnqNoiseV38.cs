@@ -536,6 +536,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         TimeZoneInfo newYork;
         int minutes;
         bool badChart;
+        readonly List<string> setupWarnings = new List<string>();  // the startup check's findings, for the dashboard
         int nTrades;
         string firstBar = "";
         int journaled;                   // the account's closed trades already written to the journal
@@ -595,6 +596,17 @@ namespace NinjaTrader.NinjaScript.Strategies
                 newYork = NewYork();
                 minutes = BarsPeriod.Value;
                 badChart = BarsPeriod.BarsPeriodType != BarsPeriodType.Minute || minutes <= 0 || 30 % minutes != 0;
+                setupWarnings.Clear();
+                // the mode, whatever its case or spaces: a typo would otherwise run Custom's settings unnoticed
+                string m = (Mode ?? "").Trim();
+                if (string.Equals(m, "Funded growth", StringComparison.OrdinalIgnoreCase)) Mode = "Funded growth";
+                else if (string.Equals(m, "Evaluation", StringComparison.OrdinalIgnoreCase)) Mode = "Evaluation";
+                else if (string.Equals(m, "Custom", StringComparison.OrdinalIgnoreCase)) Mode = "Custom";
+                else
+                {
+                    setupWarnings.Add("Mode \"" + Mode + "\" isn't Funded growth, Evaluation or Custom: running the settings below as Custom");
+                    Mode = "Custom";
+                }
                 if (Mode == "Funded growth")  // the tested growth settings (docs/NINJATRADER_V38.md), whatever is set below
                 {
                     Contracts = 1; MaxLoss = 187.5; AfterLossMaxLoss = 250; DailyLoss = 900; TrailDD = 2000;
@@ -636,6 +648,18 @@ namespace NinjaTrader.NinjaScript.Strategies
                     journalPath = liveJournalPath = "";
                     Print("MnqNoiseV38: the journal can't be written (" + e.Message + ")");
                 }
+                if (badChart)
+                    setupWarnings.Add("the chart is " + BarsPeriod.Value + " " + BarsPeriod.BarsPeriodType + ": use a 5- or 30-minute chart");
+                if (!Instrument.FullName.StartsWith("MNQ", StringComparison.OrdinalIgnoreCase))
+                    setupWarnings.Add("the instrument is " + Instrument.FullName + ": the bot was built and tested on MNQ");
+                if (Bars != null && Bars.TradingHours != null && Bars.TradingHours.ToString().IndexOf("ETH", StringComparison.OrdinalIgnoreCase) < 0)
+                    setupWarnings.Add("trading hours are \"" + Bars.TradingHours + "\": use CME US Index Futures ETH so the 16:00 exit fills at 16:00");
+                if (LossGuard > 0 && DailyLoss > 0 && LossGuard < DailyLoss)
+                    setupWarnings.Add("the loss guard ($" + LossGuard + ") is below the daily budget ($" + DailyLoss + "): it will cut trades the budget allows");
+                if (LossGuard > 1000 || LossGuard <= 0)
+                    setupWarnings.Add("the loss guard is " + (LossGuard <= 0 ? "off" : "$" + LossGuard) + ": the $1,000 daily rule has no live backstop");
+                foreach (string w in setupWarnings)
+                    Print("MnqNoiseV38 WARNING: " + w);
                 Print("MnqNoiseV38 (" + Mode + "): " + Instrument.FullName + ", " + minutes + " " + BarsPeriod.BarsPeriodType + ", " + Contracts +
                       " MNQ, max loss $" + MaxLoss + " a trade, $" + DailyLoss + " a day, take-profit " + TakeProfit +
                       (badChart ? "  -- use a minute chart whose length divides 30 (5 or 30)" : ""));
@@ -848,6 +872,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             string txt = goal + "Account P/L (real fills): $" + cumReal.ToString("0.00", CultureInfo.InvariantCulture) +
                          ", today $" + (cumReal - realDayStart).ToString("0.00", CultureInfo.InvariantCulture) + "\n" +
                          "Next trade: " + engine.NextQty + " MNQ, room today $" + (double.IsNaN(engine.DayRoom) ? "-" : Math.Max(0, engine.DayRoom).ToString("0", CultureInfo.InvariantCulture)) + "\n" +
+                         (setupWarnings.Count > 0 ? "SETUP WARNING (" + setupWarnings.Count + "): " + setupWarnings[0] + "\n" : "Setup: OK\n") +
                          "Trades today: " + realDayTrades + "\n" +
                          (LossGuard > 0 ? "Loss guard: " + (guardTripped ? "TRIPPED, flat and done for today" :
                           "flat at -$" + LossGuard.ToString("0", CultureInfo.InvariantCulture) + " today, closed + open (live)") + "\n" : "") +

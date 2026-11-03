@@ -200,3 +200,38 @@ def test_v38_live_loss_guard(sim, sample_1m, tmp_path):  # noqa: F811
     for g in fired:  # no new entry later on the day the guard fired
         xb = int(g[3])
         assert not [t for t in guarded if int(t[1]) > xb and day[int(t[1])] == day[xb]], g
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+def test_v38_startup_checks(sim, sample_1m, tmp_path):  # noqa: F811
+    """The startup check: the mode read whatever its case or spaces (a typo once ran Custom's settings unnoticed);
+    a warning in the Output window and on the dashboard for an unknown mode, a non-MNQ instrument, RTH trading
+    hours and a loss guard that is off; "Setup: OK" when all is right."""
+    bars = resample(sample_1m, "30min")
+    path = tmp_path / "bars.csv"
+    with path.open("w") as f:
+        for t, r in zip(bars.index, bars.itertuples(), strict=True):
+            f.write(f"{t:%Y-%m-%d %H:%M},{r.open!r},{r.high!r},{r.low!r},{r.close!r}\n")
+
+    def go(*extra):
+        r = subprocess.run([DOTNET, str(sim), str(path), "30", "Strategy=V38", *extra], capture_output=True, text=True,
+                           env=ENV)
+        assert r.returncode == 0, r.stderr[-2000:]
+        lines = r.stdout.splitlines()
+        return ([x for x in lines if x.startswith("T,")], [x for x in lines if "WARNING" in x and x.startswith("P,")],
+                [x for x in lines if x.startswith("D,")][0])
+
+    ok_trades, ok_warn, ok_dash = go("Mode=Funded growth")
+    assert ok_warn == [] and "Setup: OK" in ok_dash
+    loose, warn, _ = go("Mode=  funded GROWTH ")
+    assert loose == ok_trades and warn == [], "the mode is read whatever its case and spaces"
+    _, warn, dash = go("Mode=Funded")
+    assert any("isn't Funded growth, Evaluation or Custom" in x for x in warn) and "SETUP WARNING (1)" in dash
+    _, warn, _ = go("Mode=Funded growth", "SimInstrument=NQ 12-26")
+    assert any("the bot was built and tested on MNQ" in x for x in warn)
+    _, warn, _ = go("Mode=Funded growth", "SimTradingHours=CME US Index Futures RTH")
+    assert any("use CME US Index Futures ETH" in x for x in warn)
+    _, warn, _ = go("Mode=Funded growth", "LossGuard=0")
+    assert any("no live backstop" in x for x in warn)
+    _, warn, _ = go("Mode=Funded growth", "LossGuard=500")
+    assert any("below the daily budget" in x for x in warn)
