@@ -1701,3 +1701,16 @@ The size per trade and the steps are the 50K's, so the bigger account adds cushi
 Everything else is Funded growth's. The startup check's loss-guard warning now follows the account's daily rule.
 `test_v38_bigger_accounts_agree` checks NinjaTrader against the Python model, trade for trade, for both modes at 5 and
 30 minutes, with each mode's budget and guard applied. All 21 NinjaTrader v3.8 tests pass.
+
+## G41: faster contract steps on the bigger accounts (registered 2026-11-03, before its run)
+
+**The idea, from G5 and G40:** on a 50K, a contract per $1,000 of profit (instead of $1,500) ran accounts into the
+$2,000 floor (G5). The 100K and 150K modes have $3,000-4,500 of floor and twice or three times the daily budget, so
+the faster growth may now survive.
+
+**Variants:** Funded growth 100K and 150K with `profit_step` $1,000; everything else as G40 adopted.
+
+**Adopt (in that mode) only if, against the same mode with $1,500:**
+- no more dead accounts on G35's 89 start dates, on NQ or the index;
+- a higher median net on both;
+- a higher window net at 5 and 30 minutes, the floor never touched, and no day at the daily limit.

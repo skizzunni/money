@@ -38,6 +38,12 @@ if "--cushion" in sys.argv:  # G40: the 50K's sizing, the bigger account's limit
     sys.argv.remove("--cushion")
     SIZES = {"50K": {}, "100K cushion": {"daily_loss_limit": 1800.0, "trail_dd": 3000.0},
              "150K cushion": {"daily_loss_limit": 2700.0, "trail_dd": 4500.0}}
+if "--steps1000" in sys.argv:  # G41: the cushion modes with a $1,000 contract step
+    sys.argv.remove("--steps1000")
+    SIZES = {"100K cushion": {"daily_loss_limit": 1800.0, "trail_dd": 3000.0},
+             "100K step 1000": {"daily_loss_limit": 1800.0, "trail_dd": 3000.0, "profit_step": 1000.0},
+             "150K cushion": {"daily_loss_limit": 2700.0, "trail_dd": 4500.0},
+             "150K step 1000": {"daily_loss_limit": 2700.0, "trail_dd": 4500.0, "profit_step": 1000.0}}
 for acct, extra in SIZES.items():
     for name, (bars, first, skip) in S.D.items():
         if name == "win":

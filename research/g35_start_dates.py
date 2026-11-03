@@ -21,7 +21,9 @@ EXTRA = {"base": {}, "gentle": {"steps_after_lock": True}, "cap10": {"size_up_to
          "acct100": {"qty": 2, "daily_loss_limit": 1800.0, "trail_dd": 3000.0, "size_up_to": 30},
          "acct150": {"qty": 3, "daily_loss_limit": 2700.0, "trail_dd": 4500.0, "size_up_to": 45},
          "cush100": {"daily_loss_limit": 1800.0, "trail_dd": 3000.0},
-         "cush150": {"daily_loss_limit": 2700.0, "trail_dd": 4500.0}}[VARIANT]
+         "cush150": {"daily_loss_limit": 2700.0, "trail_dd": 4500.0},
+         "cush100s1000": {"daily_loss_limit": 1800.0, "trail_dd": 3000.0, "profit_step": 1000.0},
+         "cush150s1000": {"daily_loss_limit": 2700.0, "trail_dd": 4500.0, "profit_step": 1000.0}}[VARIANT]
 
 
 def with_1600(bars: pd.DataFrame, m: int) -> pd.DataFrame:
