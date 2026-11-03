@@ -216,6 +216,38 @@ def test_v38_today_line(sim, sample_1m, tmp_path):  # noqa: F811
 
 
 @pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+def test_v38_data_check(sim, sample_1m, tmp_path):  # noqa: F811
+    """U17: the data check. On the full sample the dashboard says "Data check: n sessions, all complete" and nothing is
+    warned. With bars missing in most sessions (a thin contract's history), the dashboard and the Output window warn,
+    and name the fix; with too little data before the start date, it says so."""
+    bars = resample(sample_1m, "5min")
+
+    def go(b, *args):
+        path = tmp_path / f"bars_{len(list(tmp_path.iterdir()))}.csv"
+        with path.open("w") as f:
+            for t, r in zip(b.index, b.itertuples(), strict=True):
+                f.write(f"{t:%Y-%m-%d %H:%M},{r.open!r},{r.high!r},{r.low!r},{r.close!r}\n")
+        r = subprocess.run([DOTNET, str(sim), str(path), "5", "Strategy=V38", *GROW_ARGS, *args],
+                           capture_output=True, text=True, env=ENV)
+        assert r.returncode == 0, r.stderr[-2000:]
+        dash = [x for x in r.stdout.splitlines() if x.startswith("D,")][0]
+        warn = [x for x in r.stdout.splitlines() if x.startswith("P,") and "WARNING" in x]
+        return dash, warn
+
+    dash, warn = go(bars)
+    assert "Data check: " in dash and "all complete" in dash and not warn, (dash, warn)
+    thin = bars[(bars.index.minute % 15 != 5) | (bars.index.hour >= 16)]  # every third bar gone
+    dash, warn = go(thin)
+    assert "DATA WARNING: the price data has bars missing in " in dash
+    assert any("MNQ ##-##" in x for x in warn), warn
+    first = bars.index[0].strftime("%Y-%m-%d")
+    later = (bars.index[0] + pd.Timedelta(days=30)).strftime("%Y-%m-%d")
+    dash, warn = go(bars, f"TrailFrom={later}")
+    assert "sessions of data before the start date " + later in dash and "the filters need 50" in dash, dash
+    assert first < later
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
 def test_v38_live_loss_guard(sim, sample_1m, tmp_path):  # noqa: F811
     """The live loss guard: with a tight guard ($150, to make it fire on the sample), live from the first month on,
     today's closed + open loss at the guard closes the position ("Loss guard") and no new entry is taken that day.

@@ -566,6 +566,9 @@ namespace NinjaTrader.NinjaScript.Strategies
         double weekStart, monthStart;
         int realTrades, realWins;
         int weekTrades, weekWins;  // U14: this week's closed trades and winners
+        // U17: the data check: sessions (09:30-16:00, not on the no-trade list) and those with bars missing
+        string dqDay = "", dqFirstThin = "";
+        int dqBars, dqSessions, dqThin, dqBeforeStart;
         DateTime paceFrom = DateTime.MinValue, lastSession = DateTime.MinValue;
         // fill quality: the price each order was planned at (the close when the entry or a market exit was sent, the
         // resting stop), and the running ticks paid worse than that
@@ -587,7 +590,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (State == State.SetDefaults)
             {
                 Name = "MnqNoiseV38";
-                Description = "MNQ Noise-Area Momentum v3.8: 1 MNQ, $260 max loss per trade, $900 a day, take-profit 2 noise units (50K evaluation).";
+                Description = "MNQ Noise-Area Momentum v3.8, Funded growth: 1 MNQ to start, $187.50 max loss a contract ($250 after a loser), $900 a day, a $2,000 end-of-day trailing floor, a contract more per $1,500 of profit up to 15, the 60-minute time stop.";
                 Calculate = Calculate.OnBarClose;
                 EntriesPerDirection = 1;
                 EntryHandling = EntryHandling.UniqueEntries;
@@ -597,7 +600,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 StartBehavior = StartBehavior.WaitUntilFlat;
                 RealtimeErrorHandling = RealtimeErrorHandling.StopCancelClose;
                 Contracts = 1;
-                MaxLoss = 260;
+                MaxLoss = 187.5;   // U18: the defaults are Funded growth's (the default Mode), so the panel shows what it uses
                 DailyLoss = 900;
                 TakeProfit = 2.0;
                 LockAt = 0.35;
@@ -615,13 +618,13 @@ namespace NinjaTrader.NinjaScript.Strategies
                 PlaceOrders = true;
                 Mode = "Funded growth";
                 Goal = 50000;
-                AfterLossMaxLoss = 0;
-                TrailDD = 0;
+                AfterLossMaxLoss = 250;
+                TrailDD = 2000;
                 TrailFrom = "";
-                ProfitStep = 0;
+                ProfitStep = 1500;
                 MaxContracts = 15;
-                SizeByOwnStop = false;
-                TimeStop = 0;
+                SizeByOwnStop = true;
+                TimeStop = 60;
                 StepsAfterLock = false;
                 LossGuard = 950;
                 AlertsOn = true;
@@ -728,6 +731,12 @@ namespace NinjaTrader.NinjaScript.Strategies
                     setupWarnings.Add(w);
                     Print("MnqNoiseV38 WARNING: " + w);
                 }
+                string dqw = DataWarning();
+                if (dqw.Length > 0)
+                {
+                    setupWarnings.Add(dqw);
+                    Print("MnqNoiseV38 WARNING: " + dqw);
+                }
                 foreach (string w in setupWarnings)  // once, as the strategy goes live
                     Say("setup", "SETUP WARNING: " + w);
                 milestoneDone = MilestoneStep > 0 ? (int)Math.Floor(Math.Max(0, SinceStart()) / MilestoneStep) : 0;
@@ -735,6 +744,11 @@ namespace NinjaTrader.NinjaScript.Strategies
             }
             else if (State == State.Terminated && engine != null)
             {
+                FinishDataDay();
+                dqDay = "";
+                string dq = DataWarning();
+                if (dq.Length > 0)
+                    Print("MnqNoiseV38 WARNING: " + dq);
                 if (realDay.Length > 0)
                     JournalDay(SystemPerformance.AllTrades.TradesPerformance.Currency.CumProfit);
                 realDay = "";
@@ -760,6 +774,13 @@ namespace NinjaTrader.NinjaScript.Strategies
             DateTime start = endNy.AddMinutes(-minutes);
             if (firstBar.Length == 0)
                 firstBar = start.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+            int tMinDq = start.Hour * 60 + start.Minute;
+            if (tMinDq >= V38Engine.RthOpen && tMinDq < V38Engine.RthClose)
+            {
+                string d = start.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+                if (d != dqDay) { FinishDataDay(); dqDay = d; dqBars = 0; }
+                dqBars++;
+            }
             // the account's own numbers for the risk limits: its closed P/L, and today's from the 09:30 bar
             double cum = SystemPerformance.AllTrades.TradesPerformance.Currency.CumProfit;
             int tMin = start.Hour * 60 + start.Minute;
@@ -1044,6 +1065,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                          (setupWarnings.Count > 0 ? "SETUP WARNING (" + setupWarnings.Count + "): " + setupWarnings[0] + "\n" : "Setup: OK\n") +
                          "Trades today: " + realDayTrades + "\n" +
                          TodayLine(endNy) +
+                         DataLine() +
                          ProgressLines(cumReal, sinceStart) +
                          WinCheckLine() +
                          FillLine() +
@@ -1080,6 +1102,43 @@ namespace NinjaTrader.NinjaScript.Strategies
                       " more months to the goal" : ", no progress yet") + "\n";
             }
             return s;
+        }
+
+        // U17: a finished session's bar count: one with under 90% of its bars (outside the no-trade list) is thin data
+        void FinishDataDay()
+        {
+            if (dqDay.Length == 0 || (SkipDates ?? "").Contains(dqDay))
+                return;
+            dqSessions++;
+            if (!string.IsNullOrWhiteSpace(TrailFrom) && string.CompareOrdinal(dqDay, TrailFrom.Trim()) < 0)
+                dqBeforeStart++;
+            if (dqBars < 0.9 * (V38Engine.RthClose - V38Engine.RthOpen) / minutes)
+            {
+                dqThin++;
+                if (dqFirstThin.Length == 0) dqFirstThin = dqDay;
+            }
+        }
+
+        // U17: what is wrong with the price data, or "" when it is as the bot was tested on
+        string DataWarning()
+        {
+            string w = "";
+            if (dqSessions > 0 && dqThin > Math.Max(2, dqSessions / 20))
+                w = "the price data has bars missing in " + dqThin + " of " + dqSessions + " sessions (the first " + dqFirstThin +
+                    "): results won't match the tests. Use the instrument MNQ ##-## (or Merge back adjusted) and load the history in Tools > Historical Data";
+            if (!string.IsNullOrWhiteSpace(TrailFrom) && dqSessions > dqBeforeStart && dqBeforeStart < 50)
+                w += (w.Length > 0 ? "; " : "") + "only " + dqBeforeStart + " sessions of data before the start date " + TrailFrom.Trim() +
+                     ": the filters need 50, so start the data about 3 months earlier";
+            return w;
+        }
+
+        string DataLine()
+        {
+            if (dqSessions == 0)
+                return "";
+            string w = DataWarning();
+            return w.Length > 0 ? "DATA WARNING: " + w + "\n" : "Data check: " + dqSessions + " sessions, " +
+                   (dqThin == 0 ? "all complete" : dqThin + " with bars missing") + "\n";
         }
 
         // U15: what today's filters allow, and when the next entry check is (checks at the bar closes on :00 and :30)

@@ -118,6 +118,26 @@ account's first trading day. `test_v38_alerts` checks the warning, and that it d
    exit, the day's and the week's summary.
 6. **Every week:** `python research/journal_report.py MnqNoiseV38_live_<account>.csv`, and check "Live vs tested".
 
+**U17 (2026-11-03): the data check.** The user's Strategy Analyzer run on MNQ DEC26 alone gave 54 trades where the
+model gives about 125. Moving the start date earlier changed nothing, which means NinjaTrader had no earlier bars for
+that contract. The strategy now counts each session's 09:30-16:00 bars (the no-trade dates aside). It warns when more
+than 1 session in 20 (and over 2) is missing over a tenth of its bars, and when fewer than 50 sessions come before the
+start date. The warning shows on the dashboard ("DATA WARNING: …", or "Data check: n sessions, all complete"), goes to
+the Output window at the end of every backtest, and, live, is a setup alert. It names the fix: the instrument MNQ ##-##
+(or Merge back adjusted) and the history loaded in Tools > Historical Data.
+
+**U18 (2026-11-03): the settings panel shows Funded growth's values.** The defaults were the Evaluation's ($260, no
+trailing drawdown, no steps, no time stop), so the panel showed numbers Funded growth doesn't use. They are now Funded
+growth's: $187.50 / $250, $900, $2,000, $1,500 steps to 15, sized by its own stop, the 60-minute time stop. The trades
+are unchanged in every mode.
+
+`test_v38_data_check` covers three cases:
+- the full sample: no warning;
+- every third bar removed: a warning on the dashboard and in the Output window, naming MNQ ##-##;
+- a start date 30 days in: the 50-session warning.
+
+All 29 NinjaTrader v3.8 tests and 162 NinjaTrader tests pass.
+
 ## Funded growth mode (2026-10-31)
 
 **The user's rule, clarified:** a trade may risk more than $300, as long as the day never reaches the $1,000 loss
