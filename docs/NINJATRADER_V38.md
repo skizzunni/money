@@ -2504,3 +2504,28 @@ A pass gets a second test beside the day bot (the shared daily budget) before an
 Overnight, a move past the noise area is not momentum: winners are 33-49%, and every account ends at or past the floor.
 The bot's edge is the day session's. The user's overnight winners came from their own reading of the market, which no rule
 here reproduces (`research/g57_overnight.py`).
+
+## G58: the user's own style as rules (registered 2026-11-03, before its run)
+
+**Where the rules come from:** the user's 13 trades of Oct 30 - Nov 3 (+$3,804), set against Yahoo's 1-minute MNQ bars
+for those days. Every short went in near the top of the last 2 hours' range, after price had risen over the hour before.
+Every long went in at the bottom after a drop. The 5 shorts at the very top after a rise of 36+ points all won; the
+losers were shorts without that stretch. The stop averaged 43 points, and winners 107 points over about 2 hours. In
+percent of price, that is a 0.16% stop and a 0.38% target.
+
+**The rules (24 hours a day, 5-minute bars, one trade at a time):**
+- **Short:** at a bar close in the top 5% of the last 2 hours' range (24 bars), after a rise of at least 0.13% of price
+  over the last hour (12 bars). The mirror for longs: the bottom 5% after a fall of at least 0.13%.
+- **The trade:** in at the next bar's open, a stop 0.16% away, a target 0.38% away, out at market after 4 hours.
+- **Variant A (with the trend):** shorts only while the 5-minute 50-bar EMA is below the 200-bar EMA, longs only when
+  above. That is the user's case on 12 of 13 trades.
+- **Variant B:** both sides at all times.
+- **Costs:** 1 MNQ, $1.24 a round trip, a tick of slippage on every market and stop fill; the stop first when a bar
+  reaches both.
+
+**Passes only if, for a variant:**
+- NQ 2015-2019: net positive with t ≥ 2;
+- NQ 2020-Jul 2025 and the index 2011-2018 and 2019-Sep 2026: net positive;
+- the profit factor is at least 1.1 in all four.
+
+A pass goes on to sizing and the shared daily budget beside the day bot before anything goes into the user's file.
