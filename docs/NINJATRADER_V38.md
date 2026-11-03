@@ -3039,3 +3039,29 @@ The window and the index make more, but NQ's 2015 account goes back to the start
 
 **Scorecard, G44-G68:** 25 rounds. Adopted: G60 (gap and go, U19), G67b (3 gap contracts once the floor has
 stopped, U20), plus the data fix that G67 found. Rejected: 22 (G54 and G55 were measurements).
+
+## G69: a trade on 70% of days, with the same account rules (registered 2026-11-03, before its run)
+
+**The ask:** the user wants trades on about 70% of days (today about 44%), with the same limits ($900 daily budget
+under the $1,000 loss limit, the $2,000 end-of-day trailing floor). G55 showed most quiet days are quiet because price
+never leaves the noise area, so the bot's own filters can't add them. The added trades come in the free 09:35-09:55
+slot and against the trend, **each at 1 MNQ always** (never the contract steps or G67b's 3), and their P/L counts in
+the day's budget and the floor like any trade's:
+- **small gaps** (`gap_go_small_k` 0): a gap below gap and go's 0.5 x the average gap, the 09:30 bar closing the gap's
+  way: the same 09:35-09:55 trade, 1 MNQ;
+- **uptrend shorts** (`trend_small`, G65): the shorts the trend filter blocks, 1 MNQ at the usual $187.50 max loss;
+- **opening drive** (`gap_go_drive_k` 0.5, G66, now 1 MNQ always): no gap trade, and the 09:30 bar's body at least
+  half the last 14 sessions' average body: its way, 09:35-09:55, 1 MNQ.
+
+**Packages:** P1 = small gaps; P2 = P1 + uptrend shorts; P3 = P2 + opening drive.
+
+**Stage 1 (days only, no profit looked at):** 5-minute bars, the chart's execution. The first of P1, P2, P3 with a
+trade on at least 70% of sessions on the window, NQ and the index is the candidate. If none reaches 70%, P3 is, and the
+shortfall is reported.
+
+**Stage 2, the candidate against today's default (U20), both executions, all three sets:**
+- **as the default** if it has a higher net on all three, the floor never touched, no more days at −$1,000, and on
+  G35's 89 start dates no more lost or frozen accounts (11);
+- **as a switch** ("More trading days", off by default) if only the account rules hold: the floor never touched, no
+  more days at −$1,000 and no more lost or frozen accounts (11), with its cost in net reported;
+- otherwise rejected.
