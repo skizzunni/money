@@ -318,6 +318,9 @@ class NoiseConfig:
     # research (G66): an opening drive. When the gap rule doesn't fire, a 09:30 bar whose body |close - open| is at
     # least gap_go_drive_k x the average of the last 14 sessions' 09:30 bodies takes the same trade its way (0 = off)
     gap_go_drive_k: float = 0.0
+    # research (G69): small gaps. A gap at least gap_go_small_k x the average (but under gap_go_k), the 09:30 bar
+    # closing its way, takes the same trade at 1 contract (-1 = off). Drive and small-gap trades are always 1 contract
+    gap_go_small_k: float = -1.0
     # research (G67): once the trailing floor has stopped at the start (trail_cap), a gap trade may take up to this
     # many contracts in place of gap_go_max_qty (0 = off)
     gap_go_locked_qty: int = 0
@@ -667,10 +670,13 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                     d = 1 if gap > 0 else -1
                     body = c[i - 1] - day_open
                     fire = abs(gap) >= cfg.gap_go_k * avg and d * body > 0
+                    one = False  # G69: a small-gap or drive trade, 1 contract always
+                    if not fire and cfg.gap_go_small_k >= 0 and abs(gap) >= cfg.gap_go_small_k * avg and d * body > 0:
+                        fire = one = True
                     if not fire and cfg.gap_go_drive_k > 0 and len(drive_hist) >= 10 and body != 0:
                         bavg = sum(drive_hist[-14:]) / len(drive_hist[-14:])
                         if abs(body) >= cfg.gap_go_drive_k * bavg:
-                            d, fire = (1 if body > 0 else -1), True
+                            d, fire, one = (1 if body > 0 else -1), True, True
                     if fire:
                         stop_px = day_open
                         if cfg.gap_go_cap and ml_cfg > 0:  # no farther than the bot's max loss a contract
@@ -690,6 +696,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                             q = min(q, cfg.gap_go_locked_qty)
                         elif cfg.gap_go_max_qty > 0:
                             q = min(q, cfg.gap_go_max_qty)
+                        if one:
+                            q = min(q, 1)
                         if q >= 1:
                             gg = {"d": d, "q": q, "bar": i, "px": o[i] + d * slip, "stop": stop_px}
                             events.append((i - 1, "GAP BUY" if d > 0 else "GAP SELL"))
