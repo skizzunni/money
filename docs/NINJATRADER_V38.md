@@ -2562,3 +2562,19 @@ entry.
 - there are no more days at −$1,000.
 
 Days with a trade are reported for each.
+
+**G59 result (run once, 2026-11-03): rejected; a few more days, less on the window, and the NQ account lost at 0.9.**
+
+| 5-minute, the chart's execution | days with a trade: window / NQ / index | net: window / NQ / index |
+|---|---|---|
+| 1.0 (as it is) | 29% / 37% / 36% | **$18,516** / $277,322 / $407,796 |
+| 0.9 | 31% / account lost / 38% | $13,652 / $1 / $449,022 |
+| 0.85 | 33% / 42% / 40% | $10,640 / **$330,979** / **$478,238** |
+
+0.85 made 17-19% more on the histories but 43% less on the window, with a −$1,085 day on the index. 0.9 lost the NQ
+account in its first months. Either way only 2-5 more days in 100 trade (`verification/noise_v2/g59_band.txt`).
+
+**Where this leaves "more trading days" (G55-G59, 2026-11-03).** With every filter off, a narrower band, a second market
+(the S&P), overnight sessions, and the user's own style as rules, each either loses money over the histories or loses
+accounts. Most days the Nasdaq does not trend inside the day session, and none of the setups tested trades those days
+at a profit after costs.
