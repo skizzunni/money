@@ -2356,3 +2356,16 @@ NinjaTrader's 54 trades and $3,669.60 on DEC26. Before the September roll DEC26 
 its prices aren't the front-month market the bot was tested on. The warning for this case now says so plainly:
 "the data starts on 2026-05-03, after the start date 2026-01-02: this instrument has no earlier history here", and
 names the fix (load MNQ 03-26, 06-26, 09-26 and merge them, or move the start date). `test_v38_data_check` covers it.
+
+## G54: 30-minute bars for a new account (registered 2026-11-03, before its run)
+
+**The question, from the user ("net profit back up to $25k"):** the same bot on 30-minute bars made $28,620 on the
+window against $18,542 on 5-minute bars (NinjaTrader's execution; the user tests on 30-minute TradingView charts). Over
+the histories, 5-minute bars made more (index $404,250 against $310,560). Is the 30-minute chart as safe for a new 50K
+account?
+
+**The test:** G35's 89 start dates (21 months each), Funded growth on 30-minute bars, NinjaTrader's execution, against
+G35's 5-minute results (`research/g35_start_dates.py` with `SCAN_MINUTES=30`).
+
+**Recommend the 30-minute chart only if:** it loses (room under $100) or freezes no more accounts than 5 minutes on
+either NQ or the index, and its median net is at least 5 minutes' on both.

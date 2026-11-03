@@ -54,7 +54,7 @@ def one(job):
     if isinstance(skip, str):
         cfg.skip_dates, cfg.fed_dates = skip, ""
     cfg.trail_from = start
-    tf = run(b, cfg, minutes=5).trades_frame()
+    tf = run(b, cfg, minutes=S.MIN[0]).trades_frame()
     tf = tf[tf.entry_time >= s0]
     S.TRAIL = cfg.trail_dd  # the account's own trailing drawdown, for the floor checks
     eq = np.r_[0.0, np.cumsum(tf.pnl.to_numpy())]
@@ -76,7 +76,7 @@ def one(job):
 
 def main() -> None:
     S.init({}, *sys.argv[1:4])
-    S.D = {k: (with_1600(b, 5), first, skip) for k, (b, first, skip) in S.D.items() if k != "win"}
+    S.D = {k: (with_1600(b, S.MIN[0]), first, skip) for k, (b, first, skip) in S.D.items() if k != "win"}
     if MONTHS == 21:
         jobs = [("nq", d.strftime("%Y-%m-%d")) for d in pd.date_range("2015-04-01", "2023-10-01", freq="QS")]
         jobs += [("index", d.strftime("%Y-%m-%d")) for d in pd.date_range("2011-04-01", "2024-07-01", freq="QS")]
@@ -88,7 +88,7 @@ def main() -> None:
     with ProcessPoolExecutor(4) as ex:
         rows = list(ex.map(one, jobs))
     d = pd.DataFrame(rows)
-    tag = "" if MONTHS == 21 else f"_{MONTHS}m"
+    tag = ("" if MONTHS == 21 else f"_{MONTHS}m") + ("" if S.MIN[0] == 5 else f"_{S.MIN[0]}min")  # G54: 30-minute bars
     d.to_csv(f"verification/noise_v2/g35_start_dates_{VARIANT}{tag}.csv", index=False)
     for name, g in d.groupby("set"):
         print(name, VARIANT, "starts", len(g), "lost (at the floor)", int(g["lost"].sum()),
