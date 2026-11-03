@@ -3196,3 +3196,42 @@ above it) plus `gap_no_budget`: a 09:35 trade's profit doesn't widen the rest of
 
 **As a switch** ("More trading days", off) if only the 70%, the floor, the −$1,000 days and the 89 start dates hold.
 Otherwise rejected.
+
+**G72's A2 on the 89 start dates (21 months each):**
+
+| | lost or frozen, NQ / index | median net, NQ / index |
+|---|---|---|
+| today's default (U20) | 5 of 35 / 6 of 54 = **11** | $34,564 / $27,703 |
+| **A2, "More trading days"** | 5 of 35 / 6 of 54 = **11** | **$40,639 / $35,370** |
+
+A new account survives as often, and the typical one makes $6,000-7,700 more over 21 months
+(`verification/noise_v2/g35_start_dates_a2.csv`).
+
+**U21 (2026-11-03): "More trading days", a switch, off by default (G72's A2).** At the user's ask for trades on about
+70% of days. Group 1:
+- **"More trading days: 1-MNQ fill-in trades once the floor has stopped"** (off), and **"…only while the account is
+  at least this far above the trailing floor, $"** (3,000).
+- **What it adds**, each at 1 MNQ, never the contract steps, and only once the trailing floor has stopped at the start
+  and while the account is $3,000 or more above it:
+  - **small gaps:** any gap the 09:30 bar closes beyond the open its way, the 09:35-09:55 trade;
+  - **opening drive:** no gap trade, and the 09:30 bar's body at least half the last 14 sessions' average: its way,
+    09:35-09:55;
+  - **uptrend shorts:** the shorts the trend filter blocks, at the usual $187.50 max loss.
+- **The numbers (5-minute, chart / NinjaTrader's execution, the model):**
+
+| | days with a trade | window | NQ 2015-25 | index 2011-26 |
+|---|---|---|---|---|
+| off (the default) | 44% / 52% / 49% | $30,161 / $29,836 | $356,039 / $359,943 | $508,291 / $498,705 |
+| **on** | **72% / 82% / 81%** | **$33,986 / $33,719** | **lost** (Aug 2015) / lost | **$528,608 / $520,367** |
+
+  NinjaTrader's own code on the window with it on: **706 trades, $33,022.03**, worst day −$899.06, largest loss
+  −$1,006.91, closed drawdown $2,860. It matches the model trade for trade up to 2026-03-09, the data hole where the
+  stand-in data stops at 15:10; after that the two paths part (`verification/noise_v2/v38g_nt_moredays_2026-11-03.txt`).
+- **Why it is off by default (what it missed):**
+  - one −$1,042 day on the index, 2016-05-16, in the chart's execution only (NinjaTrader's: worst −$906). A morning gap
+    win widened that day's budget and the bot's next trade exited past its stop;
+  - NQ from January 2015 lost in August 2015. The default itself is only $41 above its floor there, so this one path
+    says little; on the 89 start dates it survives as often as the default.
+- **Tests:** `test_v38_more_days`: with a $600 trailing drawdown and a $100 cushion (Custom mode), so the fill-ins fire
+  within the sample, NinjaTrader's code and the model agree trade for trade, and the switch adds trading days; off, the
+  trades are the default's.

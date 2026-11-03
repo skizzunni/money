@@ -5,7 +5,11 @@ import e50_eval as E
 import t1_eval as T, v24_scan as VS
 GROW = len(sys.argv) > 1 and sys.argv[1] == "grow"
 LQ = int(os.environ.get("GAP_LOCKED", "3"))  # G67: gap and go's contracts once the floor has stopped
-NTARGS = ["Mode=Funded growth", "TrailFrom=2025-01-02", f"GapGoLocked={LQ}"] if GROW else ["Mode=Evaluation"]
+MORE = bool(os.environ.get("MORE_DAYS"))  # G72: the "More trading days" switch
+NTARGS = (["Mode=Funded growth", "TrailFrom=2025-01-02", f"GapGoLocked={LQ}", f"MoreDays={MORE}"] if GROW
+          else ["Mode=Evaluation"])
+FILL = ({"gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
+         "fill_min_room": 3000.0} if MORE else {})
 from mnqbot.noise import NoiseConfig, run
 S = "/tmp/claude-0/-home-user-money/b0ea31b5-d9fc-525a-a114-db6430eff3ed/scratchpad"
 SIM = "ninjatrader/tests/Sim/bin/Release/net8.0/Sim"
@@ -32,7 +36,7 @@ for m in (30, 5):
     nt = pd.DataFrame([(int(x[1]), int(x[2]), float(x[3]), int(x[4]), float(x[5]), x[6], float(x[7])) for x in nt],
                       columns=["d", "eb", "entry", "xb", "exit", "why", "pnl"])
     base = ({**VS.V23, **T.REFERENCE, "daily_loss_limit": 900.0, "trail_dd": 2000.0, "trail_from": "2025-01-02",
-             "time_stop": 60, "gap_go": True, "gap_go_max_qty": 1, "gap_go_locked_qty": LQ} if GROW
+             "time_stop": 60, "gap_go": True, "gap_go_max_qty": 1, "gap_go_locked_qty": LQ, **FILL} if GROW
             else {**E.config(1, 2.0, 260.0, 0), "daily_loss_limit": 900.0})
     cfg = NoiseConfig(**{**base, "tv_path": False, "nt_execution": True, "round_prices": True, "target_on_fill_bar": True})
     py = run(bars, cfg, minutes=m).trades_frame()

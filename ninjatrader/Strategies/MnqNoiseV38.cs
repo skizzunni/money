@@ -72,6 +72,12 @@ namespace NinjaTrader.NinjaScript.Strategies
         // G67: once the trailing floor has stopped at the starting balance, a gap trade may take up to this many
         // contracts in place of GapGoMaxQty (0 = off)
         public int GapGoLockedQty = 0;
+        // G72 ("More trading days"): 1-MNQ fill-in trades, only once the trailing floor has stopped at the start and
+        // while the account is at least FillMinRoom above it: small gaps (at least FillSmallK x the average gap, the
+        // 09:30 bar closing the gap's way), an opening drive (no gap trade, the 09:30 bar's body at least FillDriveK x
+        // the last 14 sessions' average body, its way) in the 09:35-09:55 slot, and the shorts the trend filter blocks
+        public bool MoreDays = false;
+        public double FillSmallK = 0.0, FillDriveK = 0.5, FillMinRoom = 3000;
     }
 
     public sealed class V38Trade
@@ -159,6 +165,16 @@ namespace NinjaTrader.NinjaScript.Strategies
         int gapPendingDir, gapPendingQty;
         double gapPendingStop;
         readonly List<double> gapHist = new List<double>();
+        readonly List<double> driveHist = new List<double>();  // G72: the 09:30 bars' |close - open|
+
+        // G72: may a fill-in trade be taken now? The floor stopped at the start, and FillMinRoom above it
+        bool FillOk()
+        {
+            if (!s.MoreDays || s.TrailDD <= 0 || double.IsNaN(trailPeak)) return false;
+            if (trailPeak - s.TrailDD < trailBase) return false;
+            double floor = Math.Min(trailPeak - s.TrailDD, trailBase);
+            return EqEff - floor >= s.FillMinRoom;
+        }
         public int LastEntryMinute { get { return s.LastEntryEnd; } }
         // U15: what today's filters allow, for the dashboard (set at the 09:30 bar; the day's loss budget live)
         public string TodayRules
@@ -306,7 +322,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         {
             if (s.LastEntryEnd > 0 && end > s.LastEntryEnd) { Note = "after the last entry check"; return false; }
             if (blockDir != 0 && d == blockDir) { Note = "after a big day, not its way"; return false; }
-            if (s.TrendN > 0 && d < 0 && trend == 1) { Note = "no shorts in the uptrend"; return false; }
+            if (s.TrendN > 0 && d < 0 && trend == 1 && !FillOk()) { Note = "no shorts in the uptrend"; return false; }
             if (calm) { Note = "calm stretch"; return false; }
             if (s.RangePosMin > 0 && dayHi > dayLo)
             {
@@ -550,6 +566,11 @@ namespace NinjaTrader.NinjaScript.Strategies
                 ml = ml / q * qUp;
                 q = qUp;
             }
+            if (s.MoreDays && s.TrendN > 0 && d < 0 && trend == 1)  // G72: a fill-in short in the uptrend, 1 MNQ at its max loss
+            {
+                ml = ml / q;
+                q = 1;
+            }
             if ((s.DailyLoss > 0 || s.TrailDD > 0) && ml > 0)  // the loss budget
             {
                 double costs = 2 * s.CommissionPerSide + 2 * slip * s.PointValue;
@@ -599,7 +620,20 @@ namespace NinjaTrader.NinjaScript.Strategies
                     avg += gapHist[k];
                 avg /= n;
                 int d = gap > 0 ? 1 : -1;
-                if (Math.Abs(gap) >= s.GapGoK * avg && d * (c - dayOpen) > 0)
+                double body = c - dayOpen;
+                bool fire = Math.Abs(gap) >= s.GapGoK * avg && d * body > 0, one = false;
+                if (!fire && s.MoreDays && Math.Abs(gap) >= s.FillSmallK * avg && d * body > 0 && FillOk())
+                    fire = one = true;  // G72: a small gap
+                if (!fire && s.MoreDays && driveHist.Count >= 10 && body != 0 && FillOk())
+                {
+                    int nb = Math.Min(14, driveHist.Count);
+                    double bavg = 0.0;
+                    for (int k = driveHist.Count - nb; k < driveHist.Count; k++)
+                        bavg += driveHist[k];
+                    bavg /= nb;
+                    if (Math.Abs(body) >= s.FillDriveK * bavg) { d = body > 0 ? 1 : -1; fire = one = true; }  // a drive
+                }
+                if (fire)
                 {
                     int q = s.Qty;
                     if (s.ProfitStep > 0 && !double.IsNaN(trailBase))
@@ -616,6 +650,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                         q = Math.Min(q, s.GapGoLockedQty);
                     else if (s.GapGoMaxQty > 0)
                         q = Math.Min(q, s.GapGoMaxQty);
+                    if (one)
+                        q = Math.Min(q, 1);
                     if (q >= 1)
                     {
                         gapPending = true; gapPendingDir = d; gapPendingQty = q; gapPendingStop = dayOpen;
@@ -624,6 +660,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 }
             }
             gapHist.Add(Math.Abs(gap));
+            driveHist.Add(Math.Abs(c - dayOpen));
         }
 
         static double Avg(List<double> x, int n)
@@ -731,6 +768,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 MilestoneStep = 5000;
                 GapGo = true;
                 GapGoLocked = 3;  // G67b
+                MoreDays = false;  // G72: off by default (it missed G74's rule by one -$1,042 day, chart execution)
+                MoreDaysCushion = 3000;
                 TestedWinRate = 61.2;
             }
             else if (State == State.DataLoaded)
@@ -783,6 +822,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 st.StepsAfterLock = StepsAfterLock;
                 st.GapGo = GapGo && Mode != "Evaluation";  // G60: on in the Funded growth modes (and Custom, as set)
                 st.GapGoLockedQty = GapGoLocked;  // G67
+                st.MoreDays = MoreDays && st.GapGo;  // G72: the fill-in trades (5-minute chart, not in Evaluation)
+                st.FillMinRoom = MoreDaysCushion;
                 st.Tick = TickSize;
                 st.PointValue = Instrument.MasterInstrument.PointValue;
                 if (!badChart)
@@ -1447,6 +1488,15 @@ namespace NinjaTrader.NinjaScript.Strategies
         [Range(0, 15)]
         [Display(Name = "Gap and go once the trailing floor has stopped at the start: up to this many MNQ (0 = 1 MNQ always)", Order = 15, GroupName = "1. Size and risk")]
         public int GapGoLocked { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "More trading days: 1-MNQ fill-in trades once the floor has stopped (about 72-81% of days; off = tested default)", Order = 16, GroupName = "1. Size and risk")]
+        public bool MoreDays { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, 100000)]
+        [Display(Name = "More trading days: only while the account is at least this far above the trailing floor, $", Order = 17, GroupName = "1. Size and risk")]
+        public double MoreDaysCushion { get; set; }
 
         [NinjaScriptProperty]
         [Range(0, 200)]
