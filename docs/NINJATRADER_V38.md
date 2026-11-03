@@ -1603,3 +1603,18 @@ traded volume.
 
 **Pass (stage 1, the edge per contract):** daily t ≥ 1.65 and positive net on each of NQ 2015-2018, 2019-2021 and
 2022-July 2025. If it passes, stage 2 adds it to the bot (in the trades the bot isn't in) on the account.
+
+**G38 result (run once, 2026-11-03): rejected; rare, and it loses.** On ten years of NQ futures the full setup came up
+52 times. All three of the clip's conditions together are rare on 5-minute bars: a new extreme on heavy volume, a
+trapped close, and a confirming close beyond the bar. It lost money in two of the three periods and was flat in the
+first. About 2 trades in 3 were stopped, and only 0-20% reached the low (high) of the day.
+
+| Per MNQ | Trades | Winners | Reached the target | $ / trade | Daily t |
+|---|---|---|---|---|---|
+| NQ 2015-2018 | 39 | 28.2% | 15.4% | −$0.09 | −0.01 |
+| NQ 2019-2021 | 8 | 12.5% | 0.0% | −$44.86 | −2.06 |
+| NQ 2022-Jul 2025 | 5 | 20.0% | 20.0% | −$17.44 | −0.34 |
+
+The clip's 241-point day is real, and the pattern did catch some big moves (a best trade of 6.4R). Read from price and
+total volume, though, the "trapped buyers" are not a repeatable edge. Whether bid/ask order flow (who hit what,
+at what size) adds one can only be tested with that data (`verification/noise_v2/g38_trapped.csv`).
