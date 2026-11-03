@@ -2902,3 +2902,15 @@ trade with no gap needed: when the gap rule doesn't fire and the 09:30 bar's bod
 - the floor never touched;
 - no more days at −$1,000;
 - on G35's 89 start dates, no more lost or frozen accounts (11).
+
+**G66 result (run once, 2026-11-03): rejected; the opening drive loses the account early.**
+
+| 5-minute, chart / NinjaTrader | days with a trade | net |
+|---|---|---|
+| window: as it is / drive 1.0 / drive 1.5 | 44.0% / 7.8% / 6.9% | $19,618 / $19,626 → **−$1,215 / −$1,211** → **−$1,251 / −$1,249** |
+| NQ | 51.5% / 4.9% / 4.3% | $306,951 / $304,106 → **$0 / $0** → **$0 / $1** |
+| index | 49.4% / 65.5% / 58.4% | $447,417 / $438,285 → $467,840 / $466,322 → $477,146 / $467,169 |
+
+On the window and NQ the drive trades lose at the start, the account reaches the floor in its first weeks and stops
+(days traded falls to 4-8%). The index's long run makes more, but a new account doesn't survive to see it.
+`gap_go_drive_k` stays in the model, off (`verification/noise_v2/g66_drive.txt`).

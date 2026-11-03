@@ -315,6 +315,9 @@ class NoiseConfig:
     # so the two never meet in one bar; 600 was G60's first test)
     gap_go_exit: int = 595
     gap_go_max_qty: int = 0  # G60 stage 5: the most contracts a gap trade takes (0: as the bot's trades)
+    # research (G66): an opening drive. When the gap rule doesn't fire, a 09:30 bar whose body |close - open| is at
+    # least gap_go_drive_k x the average of the last 14 sessions' 09:30 bodies takes the same trade its way (0 = off)
+    gap_go_drive_k: float = 0.0
     # research (G62): on these dates (YYYY-MM-DD, comma separated; the jobs-report days), news_mult x the contracts,
     # after the contract steps; the daily budget and the trailing floor still cap it
     news_dates: str = ""
@@ -440,6 +443,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
     gap_dir = 0  # gap_block: today's opening gap direction when it is past the threshold
     gg: dict | None = None  # gap_go: the open gap trade (side, contracts, entry bar and price, stop)
     gap_hist: list[float] = []  # gap_go: the last sessions' |gap|
+    drive_hist: list[float] = []  # gap_go_drive_k: the last sessions' 09:30 bar |body|
     news_set = set(cfg.news_dates.split(",")) if cfg.news_dates else set()  # G62
     sess_month = sess_month_prev = None  # gap_go_skip_month_first: this session's and the last one's month
     side_lost = {1: False, -1: False}  # a loser on that side today (side_margin)
@@ -658,7 +662,13 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                         and (locked_floor or not cfg.gap_go_after_lock):
                     avg = sum(gap_hist[-14:]) / len(gap_hist[-14:])
                     d = 1 if gap > 0 else -1
-                    if abs(gap) >= cfg.gap_go_k * avg and d * (c[i - 1] - day_open) > 0:
+                    body = c[i - 1] - day_open
+                    fire = abs(gap) >= cfg.gap_go_k * avg and d * body > 0
+                    if not fire and cfg.gap_go_drive_k > 0 and len(drive_hist) >= 10 and body != 0:
+                        bavg = sum(drive_hist[-14:]) / len(drive_hist[-14:])
+                        if abs(body) >= cfg.gap_go_drive_k * bavg:
+                            d, fire = (1 if body > 0 else -1), True
+                    if fire:
                         stop_px = day_open
                         if cfg.gap_go_cap and ml_cfg > 0:  # no farther than the bot's max loss a contract
                             cap = c[i - 1] + d * slip - d * ml_cfg / cfg.qty / cfg.point_value
@@ -680,6 +690,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                             events.append((i - 1, "GAP BUY" if d > 0 else "GAP SELL"))
                 if usable:
                     gap_hist.append(abs(gap))
+                drive_hist.append(abs(c[i - 1] - day_open))
             if gg is not None:  # its stop, from the fill bar on
                 gd = gg["d"]
                 if (l[i] <= gg["stop"]) if gd > 0 else (h[i] >= gg["stop"]):
