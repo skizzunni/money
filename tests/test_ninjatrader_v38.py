@@ -432,6 +432,46 @@ def test_v38_milestones(sim, sample_1m, tmp_path):  # noqa: F811
 
 
 @pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+def test_v38_win_rate_check(sim, sample_1m, tmp_path):  # noqa: F811
+    """U13: the dashboard's win-rate check equals research/journal_report.py's binomial tail for the journal's trades;
+    in line at the tested 61.2%, a warning (and one live alert) when the tested rate is set far above the real one."""
+    import re
+    import sys
+
+    sys.path.insert(0, "research")
+    from journal_report import below_tested
+
+    bars = resample(sample_1m, "5min")
+    path = tmp_path / "bars.csv"
+    with path.open("w") as f:
+        for t, r in zip(bars.index, bars.itertuples(), strict=True):
+            f.write(f"{t:%Y-%m-%d %H:%M},{r.open!r},{r.high!r},{r.low!r},{r.close!r}\n")
+
+    def go(*args):
+        data = tmp_path / f"nt8_{len(list(tmp_path.iterdir()))}"
+        data.mkdir()
+        r = subprocess.run([DOTNET, str(sim), str(path), "5", "Strategy=V38", *GROW_ARGS, f"SimUserDataDir={data}",
+                            "SimRealtimeFrom=1000", *args], capture_output=True, text=True, env=ENV)
+        assert r.returncode == 0, r.stderr[-2000:]
+        dash = [x for x in r.stdout.splitlines() if x.startswith("D,")][0]
+        alerts = [x for x in r.stdout.splitlines() if x.startswith("A,") and ",v38_winrate," in x]
+        tr = pd.read_csv(data / "MnqNoiseV38_backtest.csv").query("kind == 'TRADE'")
+        return dash, alerts, tr, [x for x in r.stdout.splitlines() if x.startswith("T,")]
+
+    dash, alerts, tr, t1 = go()
+    n, wins = len(tr), int((tr["P/L"] > 0).sum())
+    assert n >= 30 and not alerts
+    assert f"Win rate in line with the tests: {100 * wins / n:.1f}% in {n} trades (tested 61.2%)" in dash, dash
+    dash, alerts, _, t2 = go("TestedWinRate=90")
+    m = re.search(r"WIN RATE WARNING: ([\d.]+)% in (\d+) trades, below the tested 90.0% \(([\d.]+)% chance\)", dash)
+    assert m and int(m.group(2)) == n, dash
+    assert float(m.group(3)) == pytest.approx(100 * below_tested(wins, n, 0.9), abs=0.05)
+    assert len(alerts) == 1 and t2 == t1, "one alert, live; the trades unchanged"
+    dash, alerts, _, _ = go("TestedWinRate=0")
+    assert "Win rate" not in dash and not alerts
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
 @pytest.mark.parametrize(("mode", "daily", "trail"), [("Funded growth 100K", 1800.0, 3000.0),
                                                       ("Funded growth 150K", 2700.0, 4500.0),
                                                       ("Funded growth Apex 100K", 1350.0, 3000.0),

@@ -1667,6 +1667,18 @@ page shows them. It also checks that two contracts 100 points apart join into th
 for days like those in the user's Winter Trades clips (10/29, 11/2): export MNQ 12-26 1-minute bars through today and
 replay them.
 
+**U13 (2026-11-03): the win-rate check on NinjaTrader's dashboard.** U11's check, live, without running a script.
+From 30 trades, the dashboard compares the real win rate with the tested one ("Win rate check", group 5, default 61.2%,
+0 = off), using the same binomial tail as `research/journal_report.py`:
+- "Win rate in line with the tests: 63.3% in 49 trades (tested 61.2%)"; or
+- under a 5% chance, "WIN RATE WARNING: 48.0% in 50 trades, below the tested 61.2% (0.4% chance): check the fills, the
+  chart and the Mode". Live, it also sends one alert.
+
+Before 30 trades it shows "Win rate check: from 30 trades (n so far)". `test_v38_win_rate_check` checks that the line
+is in line at 61.2% and that a tested rate of 90% gives the warning. It checks the warning's chance against the
+report's to 0.05 points, one alert live, and the same trades. All 27 NinjaTrader v3.8 tests pass. Re-import the file to
+get it.
+
 ## G38: trapped buyers at the high of the day, order flow from volume (registered 2026-11-03, before its run)
 
 **The idea, from the user's @chicago_trades clip.** At the high of the day: retail stops are run, fresh sellers fill,

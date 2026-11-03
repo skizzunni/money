@@ -557,6 +557,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         int entrySlipN, exitSlipN;
         int realDayWins;          // today's winners, for the day's summary
         string summaryDay = "";   // the session the day's summary was sent for
+        bool winWarned;           // U13: the win-rate warning alerted
         bool goalDone;            // U8: the goal alerted or already reached when the strategy went live
         int milestoneDone;        // U8: the last milestone (multiples of MilestoneStep since the start) alerted or passed
         string realDay = "";
@@ -609,6 +610,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 AlertsOn = true;
                 SoundAlerts = true;
                 MilestoneStep = 5000;
+                TestedWinRate = 61.2;
             }
             else if (State == State.DataLoaded)
             {
@@ -1006,6 +1008,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                          (setupWarnings.Count > 0 ? "SETUP WARNING (" + setupWarnings.Count + "): " + setupWarnings[0] + "\n" : "Setup: OK\n") +
                          "Trades today: " + realDayTrades + "\n" +
                          ProgressLines(cumReal, sinceStart) +
+                         WinCheckLine() +
                          FillLine() +
                          (LossGuard > 0 ? "Loss guard: " + (guardTripped ? "TRIPPED, flat and done for today" :
                           "flat at -$" + LossGuard.ToString("0", CultureInfo.InvariantCulture) + " today, closed + open (live)") + "\n" : "") +
@@ -1040,6 +1043,42 @@ namespace NinjaTrader.NinjaScript.Strategies
                       " more months to the goal" : ", no progress yet") + "\n";
             }
             return s;
+        }
+
+        // U13: the real win rate against the tested one. From 30 trades, the chance of this few winners or fewer if the
+        // bot still won TestedWinRate% of its trades (binomial); under 5%, a warning (and, live, one alert)
+        string WinCheckLine()
+        {
+            if (TestedWinRate <= 0)
+                return "";
+            if (realTrades < 30)
+                return "Win rate check: from 30 trades (" + realTrades + " so far)\n";
+            double chance = BinomialTail(realWins, realTrades, TestedWinRate / 100.0);
+            string rate = (100.0 * realWins / realTrades).ToString("0.0", CultureInfo.InvariantCulture) + "% in " + realTrades + " trades";
+            string tested = TestedWinRate.ToString("0.0", CultureInfo.InvariantCulture) + "%";
+            if (chance >= 0.05)
+                return "Win rate in line with the tests: " + rate + " (tested " + tested + ")\n";
+            string msg = "WIN RATE WARNING: " + rate + ", below the tested " + tested + " (" +
+                         (100 * chance).ToString("0.0", CultureInfo.InvariantCulture) + "% chance): check the fills, the chart and the Mode";
+            if (State == State.Realtime && !winWarned)
+            {
+                winWarned = true;
+                Say("winrate", msg);
+            }
+            return msg + "\n";
+        }
+
+        // P(X <= k) for X binomial(n, p)
+        static double BinomialTail(int k, int n, double p)
+        {
+            double logC = 0.0, sum = 0.0;
+            for (int i = 0; i <= k; i++)
+            {
+                if (i > 0)
+                    logC += Math.Log(n - i + 1) - Math.Log(i);
+                sum += Math.Exp(logC + i * Math.Log(p) + (n - i) * Math.Log(1 - p));
+            }
+            return Math.Min(1.0, sum);
         }
 
         // fill quality, for the dashboard: the average ticks paid worse than planned, and a warning past 2 ticks
@@ -1150,6 +1189,11 @@ namespace NinjaTrader.NinjaScript.Strategies
         [Range(0, 1000000)]
         [Display(Name = "Milestone alerts (live): at each day's close, every this much profit since the start, $ (0 = off)", Order = 2, GroupName = "5. Alerts")]
         public double MilestoneStep { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, 99)]
+        [Display(Name = "Win rate check: the tested win rate, % (warns from 30 trades if well below it; 0 = off)", Order = 3, GroupName = "5. Alerts")]
+        public double TestedWinRate { get; set; }
 
         [NinjaScriptProperty]
         [Range(0, 200)]
