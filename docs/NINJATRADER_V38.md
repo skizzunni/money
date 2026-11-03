@@ -2102,3 +2102,18 @@ The 30-minute runs are reported, not judged.
 - there are no more days at −$1,000.
 
 The 30-minute runs are reported, not judged.
+
+**G49 result (run once, 2026-11-03): rejected; (10, 40) stays.**
+
+| 5-minute net, chart / NinjaTrader | 5 / 40 | 10 / 40 (as it is) | 10 / 60 |
+|---|---|---|---|
+| window | **$21,342 / $21,365** | $18,516 / $18,549 | $14,684 / $14,721 |
+| NQ from 2015 | $259,072 / $251,381 | **$277,322 / $267,571** | $244,790 / $241,848 |
+| index from 2011 | $396,542 / $390,894 | **$407,796 / $404,250** | $374,577 / $371,471 |
+
+- **5 / 40 made $2,800 more on the window** (and on 30-minute bars in NinjaTrader's execution, $32,879 against $28,620).
+  But it made $16,000-18,000 less on NQ and $11,000-13,000 less on the index. A gain on the recent window alone, with
+  losses over the ten and fifteen years, is a fit to the window, not an edge, which is what the rule guards against.
+- **10 / 60** made less everywhere.
+
+(`verification/noise_v2/g49_calm_windows.csv`.)
