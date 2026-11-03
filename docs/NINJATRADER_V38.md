@@ -1645,6 +1645,28 @@ within a few weeks, instead of months of losses.
 `test_v38_progress_matches_the_journal` checks the section's win rate against the simulator's journal. Run it on the
 live journal: `python research/journal_report.py MnqNoiseV38_live_<account>.csv`.
 
+**U12 (2026-11-03): replay any day.** `research/replay_day.py` runs the bot on chosen days of a NinjaTrader MNQ
+export and shows what it did:
+
+    python research/replay_day.py MNQ_12-26.Last.txt 2026-10-29 2026-11-02 --out replays
+
+- **For each day:** the trades (side, times, prices, why each closed, P/L), and `replay_<day>.html`. That page is a
+  candle chart with the noise lines from each half-hour check, every entry and every exit.
+- **The rules:** Funded growth's, at the starting size (1 MNQ, $187.50, $250 after a loser, $900 a day, the time stop),
+  on 5-minute bars in NinjaTrader's execution. A larger account's contracts multiply each trade's P/L; the trades are the
+  same.
+- **Two contracts:** given an old and a new export, it joins them at the first session both cover to 15:59, the older
+  back-adjusted by that close's difference, as `research/mnq_bars.py` does at the September roll. It warns when an
+  export has under 60 sessions before a day, because the calm and trend rules read that far back.
+
+On the user's data, 10/16/2026 replays as five shorts: −$60.74, −$251.74, +$476.76, +$572.26, +$3.26, so +$739.80 per
+MNQ. That is the kind of trend day the bot is built for.
+
+`tests/test_replay_day.py` checks that a replayed day equals the Python model's trades for it, exactly, and that the
+page shows them. It also checks that two contracts 100 points apart join into the newer one's prices throughout. It is
+for days like those in the user's Winter Trades clips (10/29, 11/2): export MNQ 12-26 1-minute bars through today and
+replay them.
+
 ## G38: trapped buyers at the high of the day, order flow from volume (registered 2026-11-03, before its run)
 
 **The idea, from the user's @chicago_trades clip.** At the high of the day: retail stops are run, fresh sellers fill,
