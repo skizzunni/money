@@ -2138,3 +2138,20 @@ Sizing follows: the daily budget and the floor's room fit contracts at the new s
 - there are no more days at −$1,000.
 
 The 30-minute runs are reported, not judged.
+
+**G50 result (run once, 2026-11-03): rejected; $187.50 stays. The window and the histories pull opposite ways.**
+
+| 5-minute net, chart / NinjaTrader | $150 / $200 | $187.50 / $250 (as it is) | $225 / $300 |
+|---|---|---|---|
+| window | $11,051 / $9,083 | $18,516 / $18,549 | **$19,792 / $20,036** |
+| NQ from 2015 | **$278,052 / $279,183** | $277,322 / $267,571 | $273,022 / $271,682 |
+| index from 2011 | **$429,264 / $425,660** | $407,796 / $404,250 | $373,844 / $343,016 |
+
+- **$150 made more on both histories,** up to $21,000 on the index, with more winners (62.6% against 61.7%). But it
+  made $7,500-9,500 less on the window: in 2025-2026's larger swings a nearer stop is hit by normal moves (profit
+  factor 1.42 against 1.82).
+- **$225 made more on the window** (+$1,300-1,500), but less on both histories (−$34,000 to −$61,000 on the index).
+- **$187.50 sits between them,** and is the only one that does well on all three. No variant passes the rule.
+
+On 30-minute bars (reported, not judged), $150 also made more on both histories and less on the window
+(`verification/noise_v2/g50_max_loss.csv`).
