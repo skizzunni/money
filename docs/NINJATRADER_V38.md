@@ -2430,3 +2430,19 @@ MNQ at 30,000. Fees $0.62 a side, a tick of slippage.
 
 **Reported:** the days it trades, how many of them the Nasdaq bot (the index set) doesn't trade, and the correlation of
 the two daily P/Ls.
+
+**G56 result (run once, 2026-11-03): rejected; the bot has no edge on the S&P.**
+
+| | 2011-2018 | 2019-Sep 2026 |
+|---|---|---|
+| MES trades / net | 1,819 / +$42,740 | 162 / **−$991, the account at the floor ($8 of room)** |
+| MES winners / profit factor | 51.1% / 1.15 | 49.4% / 0.79 |
+| MES worst day | **−$9,300** | −$599 |
+| days MES traded and the Nasdaq bot didn't | 287 of 855 | 40 of 76 |
+| correlation of the two daily P/Ls | 0.35 | 0.53 |
+
+It would add trading days (about a third of its days are days the Nasdaq bot sits out). But from 2019 its account went
+to the floor in its first months. 2011-2018 has a −$9,300 day, which only a data fault (a gap in the S&P bars held
+across it) could make under a $900 budget; either way it fails. (The Nasdaq column for 2019 was the same single start
+date, which G35 already counts among the lost starts.) This agrees with rounds forty-seven and forty-eight: the edge is
+the Nasdaq's. `research/g56_mes.py`.
