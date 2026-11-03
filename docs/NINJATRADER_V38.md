@@ -2117,3 +2117,24 @@ The 30-minute runs are reported, not judged.
 - **10 / 60** made less everywhere.
 
 (`verification/noise_v2/g49_calm_windows.csv`.)
+
+## G50: the max loss per contract, re-checked with the time stop (registered 2026-11-03, before its run)
+
+**The idea:** each trade's stop is the line (0.24 noise units past it) or $187.50 a contract from the fill, whichever
+is nearer ($250 after a loser), from v3.6's sizing scan. The time stop now closes most slow losers before either is
+reached, so the cap matters mostly for fast moves against the trade. The variants:
+- **nearer, $150 / $200:** cuts those fast losses;
+- **farther, $225 / $300:** lets the line stop do more of the work.
+
+Sizing follows: the daily budget and the floor's room fit contracts at the new stop.
+
+**The variants:** Funded growth with `max_loss_per_trade` 150 and 225; the after-loss stop keeps its 4:3 ratio
+(`after_loss_ml_mult` 250 / 187.5); everything else as it is.
+
+**Adopt (the better by window net) only if, against $187.50:**
+- a higher net on all three 5-minute sets (the window, NQ from 2015, the index from 2011), in both the chart's
+  execution and NinjaTrader's;
+- the floor is never touched;
+- there are no more days at −$1,000.
+
+The 30-minute runs are reported, not judged.
