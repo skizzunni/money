@@ -2502,5 +2502,5 @@ A pass gets a second test beside the day bot (the shared daily budget) before an
 | index 2019-2026 | −$3,092, 0.83 (floor passed) | +$4, 1.00 (at the floor) |
 
 Overnight, a move past the noise area is not momentum: winners are 33-49%, and every account ends at or past the floor.
-The bot's edge is the day session's. The user's overnight winners came from his own reading of the market, which no rule
+The bot's edge is the day session's. The user's overnight winners came from their own reading of the market, which no rule
 here reproduces (`research/g57_overnight.py`).
