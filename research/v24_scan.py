@@ -101,7 +101,9 @@ def init(base: dict, data: str, sep: str, dec: str) -> None:
     D["win"] = (bars(V.DATA["mnq"][0]), "2026-08-24", True)
     D["proxy"] = (drop_bad(pd.read_pickle(f"{data}/proxy_{m}m.pkl")), "2025-01-02", True)
     for name in ("nq", "index"):  # the histories skip closures and sessions with missing data (no 09:30 or 15:55 bar,
-        b = drop_bad(V.DATA[name][0])  # or under 70 five-minute bars): a trade there would be held to the next session
+        b = V.DATA[name][0]        # or under 70 five-minute bars): a trade there would be held to the next session
+        if name == "nq":  # the index's data is clean there
+            b = drop_bad(b)
         t = b.index.tz_convert(NY)
         g = pd.DataFrame({"d": t.strftime("%Y-%m-%d"), "m": t.hour * 60 + t.minute}).groupby("d").m.agg(
             ["count", "min", "max"])

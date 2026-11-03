@@ -1,10 +1,11 @@
-import subprocess, sys
+import os, subprocess, sys
 sys.path.insert(0, "research"); sys.path.insert(0, ".")
 import numpy as np, pandas as pd
 import e50_eval as E
 import t1_eval as T, v24_scan as VS
 GROW = len(sys.argv) > 1 and sys.argv[1] == "grow"
-NTARGS = ["Mode=Funded growth", "TrailFrom=2025-01-02"] if GROW else ["Mode=Evaluation"]
+LQ = int(os.environ.get("GAP_LOCKED", "0"))  # G67: gap and go's contracts once the floor has stopped
+NTARGS = ["Mode=Funded growth", "TrailFrom=2025-01-02", f"GapGoLocked={LQ}"] if GROW else ["Mode=Evaluation"]
 from mnqbot.noise import NoiseConfig, run
 S = "/tmp/claude-0/-home-user-money/b0ea31b5-d9fc-525a-a114-db6430eff3ed/scratchpad"
 SIM = "ninjatrader/tests/Sim/bin/Release/net8.0/Sim"
@@ -31,7 +32,7 @@ for m in (30, 5):
     nt = pd.DataFrame([(int(x[1]), int(x[2]), float(x[3]), int(x[4]), float(x[5]), x[6], float(x[7])) for x in nt],
                       columns=["d", "eb", "entry", "xb", "exit", "why", "pnl"])
     base = ({**VS.V23, **T.REFERENCE, "daily_loss_limit": 900.0, "trail_dd": 2000.0, "trail_from": "2025-01-02",
-             "time_stop": 60, "gap_go": True, "gap_go_max_qty": 1} if GROW
+             "time_stop": 60, "gap_go": True, "gap_go_max_qty": 1, "gap_go_locked_qty": LQ} if GROW
             else {**E.config(1, 2.0, 260.0, 0), "daily_loss_limit": 900.0})
     cfg = NoiseConfig(**{**base, "tv_path": False, "nt_execution": True, "round_prices": True, "target_on_fill_bar": True})
     py = run(bars, cfg, minutes=m).trades_frame()
@@ -54,6 +55,15 @@ for m in (30, 5):
     win_same = (len(w) == len(pw) and (w.d.values == pw.direction.values).all() and (w.eb.values == pw.entry_bar.values).all()
                 and (w.xb.values == pw.exit_bar.values).all() and np.allclose(w.entry.values, pw.entry.values)
                 and np.allclose(w.exit.values, pw.exit.values) and np.allclose(w.pnl.values, pw.pnl.values, atol=0.01))
+    if not win_same:  # the window's first difference
+        n = min(len(w), len(pw))
+        bad = [j for j in range(n) if not (w.eb[j] == pw.entry_bar[j] and w.xb[j] == pw.exit_bar[j]
+                                           and abs(w.exit[j] - pw.exit[j]) < 1e-6 and abs(w.pnl[j] - pw.pnl[j]) < 0.01)]
+        j = bad[0] if bad else n
+        print("window: first difference at trade", j, "of", len(w), len(pw), "differences", len(bad))
+        print(w.iloc[max(0, j - 1):j + 2].to_string())
+        print(pw.iloc[max(0, j - 1):j + 2][["direction", "qty", "entry_bar", "entry", "exit_bar", "exit", "reason",
+                                             "pnl"]].to_string())
     w.assign(entry_time=[t[j].strftime("%Y-%m-%d %H:%M") for j in w.eb], exit_time=[t[j].strftime("%Y-%m-%d %H:%M") for j in w.xb]).to_csv(f"{S}/v38{'g' if GROW else ''}_nt_trades_{m}.csv", index=False)
     p = w.pnl.to_numpy()
     e = np.r_[0.0, np.cumsum(p)]

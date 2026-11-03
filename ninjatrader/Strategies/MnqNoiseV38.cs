@@ -69,6 +69,9 @@ namespace NinjaTrader.NinjaScript.Strategies
         public bool GapGo = false;
         public double GapGoK = 0.5;
         public int GapGoMaxQty = 1, GapGoExit = 595;
+        // G67: once the trailing floor has stopped at the starting balance, a gap trade may take up to this many
+        // contracts in place of GapGoMaxQty (0 = off)
+        public int GapGoLockedQty = 0;
     }
 
     public sealed class V38Trade
@@ -608,7 +611,10 @@ namespace NinjaTrader.NinjaScript.Strategies
                     double room = MoneyRoom();
                     if (!double.IsInfinity(room))
                         q = Math.Min(q, (int)Math.Floor(room / perC + 1e-9));
-                    if (s.GapGoMaxQty > 0)
+                    bool floorStopped = !double.IsNaN(trailPeak) && trailPeak - s.TrailDD >= trailBase;
+                    if (s.GapGoLockedQty > 0 && floorStopped)
+                        q = Math.Min(q, s.GapGoLockedQty);
+                    else if (s.GapGoMaxQty > 0)
                         q = Math.Min(q, s.GapGoMaxQty);
                     if (q >= 1)
                     {
@@ -724,6 +730,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 SoundAlerts = true;
                 MilestoneStep = 5000;
                 GapGo = true;
+                GapGoLocked = 0;
                 TestedWinRate = 61.2;
             }
             else if (State == State.DataLoaded)
@@ -775,6 +782,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 st.TimeStop = TimeStop;
                 st.StepsAfterLock = StepsAfterLock;
                 st.GapGo = GapGo && Mode != "Evaluation";  // G60: on in the Funded growth modes (and Custom, as set)
+                st.GapGoLockedQty = GapGoLocked;  // G67
                 st.Tick = TickSize;
                 st.PointValue = Instrument.MasterInstrument.PointValue;
                 if (!badChart)
@@ -1434,6 +1442,11 @@ namespace NinjaTrader.NinjaScript.Strategies
         [NinjaScriptProperty]
         [Display(Name = "Gap and go: 1 MNQ with a big opening gap, 09:35-09:55 (5-minute chart)", Order = 14, GroupName = "1. Size and risk")]
         public bool GapGo { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, 15)]
+        [Display(Name = "Gap and go once the trailing floor has stopped at the start: up to this many MNQ (0 = 1 MNQ always)", Order = 15, GroupName = "1. Size and risk")]
+        public int GapGoLocked { get; set; }
 
         [NinjaScriptProperty]
         [Range(0, 200)]
