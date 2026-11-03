@@ -3282,3 +3282,16 @@ were measurements).
   traded untested uptrend shorts).
 - The dashboard's "today" line: on a calm stretch it says the 09:35 gap trade can still come (it can, since U19), and
   with "More trading days" on and the cushion there, uptrend shorts read "1 MNQ only" instead of "no".
+
+## G76: size for a stop that fills 2 points worse (registered 2026-11-03, before its run)
+
+**The idea, from G75:** a −$1,000 day comes from a bot trade sized to all of the day's room whose stop is passed by
+a bar's open (2016-05-16: 5 points past). Capping the room cost 17-28%. Here the room stays, and each contract's risk
+in the sizing counts 2 points more slippage at the stop (`size_slip_pts` 2, $4 a contract): at 12 contracts, $48 of
+the room is kept for a fill past the stop. It costs a contract only when the room is what limits the size.
+
+**Variants:** today's default and U21's "More trading days" on, each with `size_slip_pts` 2.
+
+**Pass, for each, against itself without it, both executions, all three 5-minute sets:** no day at −$1,000 or worse,
+the floor never touched where it wasn't, and a net at most 1% lower. If the default passes, it becomes the default; if
+U21-on passes, U21 is judged again on G74's rule.
