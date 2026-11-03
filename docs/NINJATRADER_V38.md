@@ -1714,3 +1714,15 @@ the faster growth may now survive.
 - no more dead accounts on G35's 89 start dates, on NQ or the index;
 - a higher median net on both;
 - a higher window net at 5 and 30 minutes, the floor never touched, and no day at the daily limit.
+
+**G41 result (run once, 2026-11-03): rejected; faster steps still lose accounts on a bigger account.**
+
+| 89 start dates, 21 months | 100K, $1,500 | 100K, $1,000 | 150K, $1,500 | 150K, $1,000 |
+|---|---|---|---|---|
+| dead, NQ / index | 5 / 3 | 6 / 7 | 4 / 1 | 4 / 5 |
+| median net, NQ / index | $27,233 / $35,363 | $37,871 / $39,020 | $27,990 / $35,397 | $47,432 / $43,235 |
+| NQ from 2015, 30 min (NinjaTrader) | $485,904 | **$1, at the floor** | $655,739 | **$1, at the floor** |
+
+The $1,000 step makes the typical account more, but it loses more of them. On NQ from 2015, both bigger accounts
+went back to the floor early on 30-minute bars, as the 50K did in G5. The $1,500 step stays in all three Funded growth
+modes (`verification/noise_v2/g41_steps_big.csv`, `g35_start_dates_cush*s1000.csv`).
