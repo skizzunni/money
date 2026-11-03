@@ -16,7 +16,8 @@ from mnqbot.noise import NoiseConfig, run
 NY = "America/New_York"
 VARIANT = sys.argv[4] if len(sys.argv) > 4 else "base"
 EXTRA = {"base": {}, "gentle": {"steps_after_lock": True}, "cap10": {"size_up_to": 10},
-         "reserve500": {"trail_buffer": 500.0}, "half": {"trail_frac": 0.5}}[VARIANT]
+         "reserve500": {"trail_buffer": 500.0}, "half": {"trail_frac": 0.5},
+         "early125": {"early_ml": 125.0}, "early100": {"early_ml": 100.0}}[VARIANT]
 
 
 def with_1600(bars: pd.DataFrame, m: int) -> pd.DataFrame:

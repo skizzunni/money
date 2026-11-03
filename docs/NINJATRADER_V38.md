@@ -1438,3 +1438,18 @@ full $187.50 losses. On this edge, with this drawdown, about 1 in 9 (index) to 1
 
 The remaining lever is a smaller loss per trade from the start, so a bad stretch costs less of the $2,000: a
 $100-125 max loss until the floor has stopped. That is G37.
+
+## G37: a smaller loss per trade until the cushion is built (registered 2026-11-03, before its run)
+
+**The idea, from G35 and G36:** the lost accounts had a bad stretch before the floor stopped at the starting balance.
+At 1 contract, each full loss is $187.50 (or $250 after a loser), so about 10 of them use up the $2,000. Until the
+floor has stopped, G37 caps every trade's max loss at `early_ml` a contract (`early_ml` in mnqbot/noise.py). The stop
+is then at the max loss or the line, whichever is closer. After that, growth mode as now.
+
+**Variants:** `early_ml` $125 and $100. Baseline: growth mode with G6's time stop.
+
+**Adopt (as Funded growth's default) only if all hold:**
+- on G35's 89 start dates: fewer dead accounts (lost or frozen) than the baseline on both NQ and the index, and a
+  median net of at least 95% of the baseline's;
+- the usual runner on the window, NQ and the index, both executions: at least 95% of the baseline's net on every
+  5-minute set, and the floor never touched.
