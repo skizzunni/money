@@ -2036,3 +2036,18 @@ sessions, has not been re-checked since v2.3. The variants:
 - there are no more days at −$1,000.
 
 The 30-minute runs are reported, not judged.
+
+**G48 result (run once, 2026-11-03): rejected; 10 stays.**
+
+| 5-minute net, chart / NinjaTrader | 5 sessions | 10 (as it is) | 20 sessions |
+|---|---|---|---|
+| window | $8,919 / $14,971 | **$18,516 / $18,549** | $17,459 / $16,928 |
+| NQ from 2015 | **$1 / $1, at the floor after 139 trades** | $277,322 / $267,571 | $282,013 / $269,195 |
+| index from 2011 | $385,619 / $383,372 | $407,796 / $404,250 | $409,538 / $402,921 |
+
+- **5 sessions lost the NQ account in its first months** and froze it at the floor, on both executions. A short average
+  marks too many days as big, and the bot is then kept out of the next day's move.
+- **20 sessions** made a little more on NQ and the index in the chart's execution, but less on the window in both
+  executions (−$1,057 / −$1,621).
+
+(`verification/noise_v2/g48_big_day_n.csv`.)
