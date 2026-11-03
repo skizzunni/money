@@ -325,6 +325,7 @@ class NoiseConfig:
     # stopped at the start (trail_cap)
     fill_after_lock: bool = False
     fill_min_room: float = 0.0  # G71: and only while the account is at least this far above the trailing floor
+    fill_no_steps: bool = False  # G73: the fill-in trades' P/L doesn't count toward the contract steps
     # research (G67): once the trailing floor has stopped at the start (trail_cap), a gap trade may take up to this
     # many contracts in place of gap_go_max_qty (0 = off)
     gap_go_locked_qty: int = 0
@@ -500,6 +501,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
     headsups: list[tuple[int, int]] = []
 
     q_next = q_trade = cfg.qty  # contracts of the pending entry and of the open trade (after_loss_qty_div)
+    fill_next = fill_trade = False  # G73: is the pending / open trade a fill-in (trend_small's 1-contract short)?
+    fill_pnl = 0.0  # G73: the fill-in trades' P/L so far
     lock_next = lock_trade = cfg.lock_at  # their lock triggers, in max losses (after_loss_lock)
     ml_cfg = cfg.max_loss_per_trade  # G51: the max loss in force (ml_sigma: set at each check)
     ml_next = ml_trade = ml_cfg  # their max losses, $ (after_loss_ml_mult)
@@ -507,14 +510,15 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
 
     def open_pos(i: int, d: int) -> None:
         nonlocal pos, entry_px, entry_bar, r_trade, br_trade, q_trade, lock_trade, ml_trade, tp_trade
-        nonlocal in_grace
+        nonlocal in_grace, fill_trade
         in_grace = True
+        fill_trade = fill_next
         pos, entry_px, entry_bar, r_trade, br_trade = d, o[i] + d * slip, i, r_next, br_next
         q_trade, lock_trade, ml_trade, tp_trade = q_next, lock_next, ml_next, tp_next
 
     def close_pos(i: int, price: float, reason: str) -> None:
         nonlocal pos, held, locked, losers_today, rest, part_pnl, best, consec, skip_left, loss_side, tp_dist
-        nonlocal add_px, add_due, target_today, locked1, fav, lock_px, day_pnl
+        nonlocal add_px, add_due, target_today, locked1, fav, lock_px, day_pnl, fill_pnl
         pnl = rest * (pos * (price - entry_px) * q_trade * cfg.point_value - 2 * cfg.commission_per_side * q_trade)
         trades.append(NoiseTrade(pos, q_trade, entry_bar, idx[entry_bar], entry_px, i, idx[i], price, reason, pnl,
                                  rest))
@@ -528,6 +532,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
         if cfg.eq_n or cfg.trail_dd > 0:
             eq_curve.append(eq_curve[-1] + pnl + part_pnl)
         day_pnl += pnl
+        if fill_trade:
+            fill_pnl += pnl + part_pnl
         if reason == "Target":
             target_today = True
         if reason == "Time stop" and cfg.ts_block:
@@ -556,6 +562,10 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
         """Has the trailing floor stopped at the start (the account's first trail_dd made)?"""
         return (not math.isnan(trail_peak) and cfg.trail_cap >= 0
                 and trail_peak - cfg.trail_dd >= trail_base + cfg.trail_cap)
+
+    def steps_off() -> float:
+        """G73: the equity the contract steps leave out (the fill-in trades' P/L)."""
+        return fill_pnl if cfg.fill_no_steps else 0.0
 
     def fill_ok() -> bool:
         """G70: may a fill-in trade be taken now?"""
@@ -653,13 +663,15 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
 
     def gap_close(i: int, price: float, reason: str) -> None:
         """gap_go: close the gap trade; its P/L counts in today's budget and the account's equity."""
-        nonlocal gg, day_pnl
+        nonlocal gg, day_pnl, fill_pnl
         g = gg
         pnl = g["d"] * (price - g["px"]) * g["q"] * cfg.point_value - 2 * cfg.commission_per_side * g["q"]
         trades.append(NoiseTrade(g["d"], g["q"], g["bar"], idx[g["bar"]], g["px"], i, idx[i], price, reason, pnl, 1.0))
         if cfg.eq_n or cfg.trail_dd > 0:
             eq_curve.append(eq_curve[-1] + pnl)
         day_pnl += pnl
+        if g.get("fill"):
+            fill_pnl += pnl
         gg = None
 
     def close_part(i: int, price: float, f: float | None = None) -> None:
@@ -707,7 +719,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                             stop_px = max(stop_px, cap) if d > 0 else min(stop_px, cap)
                         q = cfg.qty
                         if cfg.profit_step > 0 and not math.isnan(trail_base):
-                            q += int(max(0.0, eq_curve[-1] - trail_base) // cfg.profit_step)
+                            q += int(max(0.0, eq_curve[-1] - steps_off() - trail_base) // cfg.profit_step)
                             if cfg.size_up_to > 0:
                                 q = min(q, cfg.size_up_to)
                         per_c = (abs(c[i - 1] + d * slip - stop_px) * cfg.point_value
@@ -722,7 +734,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                         if one:
                             q = min(q, 1)
                         if q >= 1:
-                            gg = {"d": d, "q": q, "bar": i, "px": o[i] + d * slip, "stop": stop_px}
+                            gg = {"d": d, "q": q, "bar": i, "px": o[i] + d * slip, "stop": stop_px, "fill": one}
                             events.append((i - 1, "GAP BUY" if d > 0 else "GAP SELL"))
                 if usable:
                     gap_hist.append(abs(gap))
@@ -1029,6 +1041,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                     mm = (cfg.after_loss2_ml_mult or 1.0) if tier2 else cfg.after_loss_ml_mult
                     q_next = max(1, round(cfg.qty / qd)) if after_loss else cfg.qty
                     ml_next = ml_cfg * (mm if after_loss else 1.0)
+                    fill_next = False
                     if cfg.cap_sigma > 0:
                         ml_next = cfg.cap_sigma * sigma * c[i] * q_next * cfg.point_value * (mm if after_loss else 1.0)
                     if tom_today and cfg.tom_mult != 1.0:
@@ -1040,7 +1053,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                                                  and trail_peak - cfg.trail_dd >= trail_base + cfg.trail_cap):
                         ml_next = min(ml_next, cfg.early_ml * q_next)
                     if cfg.profit_step > 0 and not math.isnan(trail_base) and step_ok:  # a contract more per step
-                        q_up = q_next + int(max(0.0, eq_curve[-1] - trail_base) // cfg.profit_step)
+                        q_up = q_next + int(max(0.0, eq_curve[-1] - steps_off() - trail_base) // cfg.profit_step)
                         if cfg.size_up_to > 0:
                             q_up = min(q_up, cfg.size_up_to)
                         ml_next, q_next = ml_next / q_next * q_up, q_up
@@ -1048,7 +1061,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                         q_n = max(1, round(q_next * cfg.news_mult))
                         ml_next, q_next = ml_next / q_next * q_n, q_n
                     if cfg.trend_small and against_trend(d):  # G65: 1 contract, its max loss a contract
-                        ml_next, q_next = ml_next / q_next, 1
+                        ml_next, q_next, fill_next = ml_next / q_next, 1, True
                     elif cfg.trend_qty_div and against_trend(d):
                         q_next = max(1, round(q_next / cfg.trend_qty_div))
                         ml_next *= cfg.trend_ml_mult

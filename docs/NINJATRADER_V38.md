@@ -3147,3 +3147,26 @@ August 2015 and the chart's NQ account lived (`verification/noise_v2/g71_cushion
 **Packages:** A2 (`fill_min_room` 3000), B2 (4000), both G69's P3 fill-ins with `fill_after_lock`.
 
 **Stage 1 and stage 2:** G71's (days ≥ 70% on all three sets, A2 first; then G69's rule against today's default).
+
+**G72 result (run once, 2026-11-03): rejected; more money, but NQ's account lost.**
+
+| 5-minute, chart / NinjaTrader | days: window / NQ / index | window | NQ | index |
+|---|---|---|---|---|
+| today's default (U20) | 43.9% / 51.5% / 49.4% | $30,161 / $29,836 | $356,039 / $359,943 | $508,291 / $498,705 |
+| A2 ($3,000 cushion) | 72.4% / **4.5%** / 80.6% | **$33,986 / $33,719** | **−$2 / −$6, lost** | $528,608 / $520,367 |
+| B2 ($4,000 cushion) | 68.7% / 4.4% (chart) / 80.5% | $34,401 / $34,441 | $1 / $381,707 | $528,618 / $523,395 |
+
+The fill-ins make more where the account lives (window +$3,800, index +$20,000), but NQ's 2015 account goes back to the
+start in August 2015 in 3 of 4 runs. The cushion stops the fill-ins in the drawdown, yet their earlier profits had
+already raised the contract steps, so the bot's own trades were bigger going into the crash. The index's chart run
+also had the −$1,042 day (`verification/noise_v2/g72_cushion_no_keep.txt`).
+
+## G73: fill-in trades that don't raise the contract steps (registered 2026-11-03, before its run)
+
+**From G72:** the fill-in trades' P/L still counts in the account, the day's budget and the floor, but not toward the
+bot's contract steps (`fill_no_steps`): the bot sizes as if the fill-ins hadn't traded. Then a fill-in winning streak
+can't put bigger bot trades into a crash, and their profit is extra cushion above the floor.
+
+**Packages:** A3 = A2 + `fill_no_steps`, B3 = B2 + `fill_no_steps`.
+
+**Stage 1 and stage 2:** G71's (days ≥ 70% on all three, A3 first; then G69's rule against today's default).
