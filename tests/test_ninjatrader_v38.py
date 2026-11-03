@@ -386,6 +386,48 @@ def test_v38_day_summary(sim, sample_1m, tmp_path):  # noqa: F811
 
 
 @pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+def test_v38_milestones(sim, sample_1m, tmp_path):  # noqa: F811
+    """U8: live, at a day's close, one alert for the highest new multiple of the milestone step of profit since the
+    start (none for levels passed before going live), and one when the goal is reached; the same trades on or off."""
+    import re
+
+    bars = resample(sample_1m, "5min")
+    path = tmp_path / "bars.csv"
+    with path.open("w") as f:
+        for t, r in zip(bars.index, bars.itertuples(), strict=True):
+            f.write(f"{t:%Y-%m-%d %H:%M},{r.open!r},{r.high!r},{r.low!r},{r.close!r}\n")
+
+    def go(*args):
+        data = tmp_path / f"nt8_{len(list(tmp_path.iterdir()))}"
+        data.mkdir()
+        r = subprocess.run([DOTNET, str(sim), str(path), "5", "Strategy=V38", *GROW_ARGS, f"SimUserDataDir={data}",
+                            "SimRealtimeFrom=1000", *args], capture_output=True, text=True, env=ENV)
+        assert r.returncode == 0, r.stderr[-2000:]
+        alerts = [x.split(",", 4)[4] for x in r.stdout.splitlines() if x.startswith("A,")]
+        trades = [x for x in r.stdout.splitlines() if x.startswith("T,")]
+        return alerts, trades, pd.read_csv(data / "MnqNoiseV38_backtest.csv")
+
+    off, t_off, _ = go("MilestoneStep=0", "Goal=0")
+    assert not [a for a in off if "Milestone" in a or "GOAL" in a]
+    step = 250
+    j = None
+    alerts, t_on, j = go(f"MilestoneStep={step}", "Goal=0")
+    assert t_on == t_off, "milestones never change the trades"
+    days = j[j.kind == "DAY"]
+    totals = days["total P/L"].astype(float).to_numpy()
+    ms = [int(re.search(r"Milestone: \+\$(\d+) since the start", a).group(1)) for a in alerts if "Milestone" in a]
+    assert len(ms) >= 2, alerts[-5:]
+    assert ms == sorted(set(ms)) and all(m % step == 0 for m in ms), "each level once, rising, on the step"
+    assert ms[-1] == int(max(totals.max(), 0) // step) * step, "the highest level reached is the last alerted"
+    assert ms[0] > int(max(totals[0], 0) // step) * step, "nothing for the levels before going live"
+    goal = ms[0] + step // 2  # between two levels: the goal alert must still come, once
+    alerts, _, j = go(f"MilestoneStep={step}", f"Goal={goal}")
+    g = [a for a in alerts if a.startswith("GOAL REACHED")]
+    assert len(g) == 1, g
+    assert float(re.search(r"\+\$(\d+)", g[0]).group(1)) >= goal
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
 @pytest.mark.parametrize(("mode", "daily", "trail"), [("Funded growth 100K", 1800.0, 3000.0),
                                                       ("Funded growth 150K", 2700.0, 4500.0),
                                                       ("Funded growth Apex 100K", 1350.0, 3000.0),

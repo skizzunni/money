@@ -557,6 +557,8 @@ namespace NinjaTrader.NinjaScript.Strategies
         int entrySlipN, exitSlipN;
         int realDayWins;          // today's winners, for the day's summary
         string summaryDay = "";   // the session the day's summary was sent for
+        bool goalDone;            // U8: the goal alerted or already reached when the strategy went live
+        int milestoneDone;        // U8: the last milestone (multiples of MilestoneStep since the start) alerted or passed
         string realDay = "";
         string journalPath = "", liveJournalPath = "";
         double net, peak, maxDd, worstDay, dayNet;
@@ -606,6 +608,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 LossGuard = 950;
                 AlertsOn = true;
                 SoundAlerts = true;
+                MilestoneStep = 5000;
             }
             else if (State == State.DataLoaded)
             {
@@ -699,6 +702,8 @@ namespace NinjaTrader.NinjaScript.Strategies
             {
                 foreach (string w in setupWarnings)  // once, as the strategy goes live
                     Say("setup", "SETUP WARNING: " + w);
+                milestoneDone = MilestoneStep > 0 ? (int)Math.Floor(Math.Max(0, SinceStart()) / MilestoneStep) : 0;
+                goalDone = Goal > 0 && SinceStart() >= Goal;
             }
             else if (State == State.Terminated && engine != null)
             {
@@ -841,6 +846,38 @@ namespace NinjaTrader.NinjaScript.Strategies
                 " in " + realDayTrades + " trades (" + realDayWins + " winners), total $" + cum.ToString("0.00", CultureInfo.InvariantCulture) +
                 (double.IsNaN(engine.TrailFloorRoom) ? "" : ", room above the floor $" + engine.TrailFloorRoom.ToString("0", CultureInfo.InvariantCulture)) +
                 ", tomorrow up to " + engine.NextQty + " MNQ");
+            CheckMilestone();
+        }
+
+        // the account's profit since its start: above the trailing floor's base when there is one, else the real fills'
+        double SinceStart()
+        {
+            double cumReal = SystemPerformance.AllTrades.TradesPerformance.Currency.CumProfit;
+            return double.IsNaN(engine.TrailBase) ? cumReal : engine.Equity - engine.TrailBase;
+        }
+
+        // U8: live, at a day's close, once for each new multiple of MilestoneStep of profit since the start (none for the
+        // levels already passed when the strategy went live), and the goal when it is reached
+        void CheckMilestone()
+        {
+            if (MilestoneStep <= 0 || State != State.Realtime)
+                return;
+            double since = SinceStart();
+            int level = (int)Math.Floor(Math.Max(0, since) / MilestoneStep);
+            bool goalNow = Goal > 0 && since >= Goal && !goalDone;
+            if (level <= milestoneDone && !goalNow)
+                return;
+            milestoneDone = Math.Max(milestoneDone, level);
+            goalDone = goalDone || goalNow;
+            string amt = (level * MilestoneStep).ToString("0", CultureInfo.InvariantCulture);
+            string room = double.IsNaN(engine.TrailFloorRoom) ? "" : "; room above the floor $" + engine.TrailFloorRoom.ToString("0", CultureInfo.InvariantCulture);
+            if (goalNow)
+                Say("goal", "GOAL REACHED: +$" + since.ToString("0", CultureInfo.InvariantCulture) + " since the start (goal $" +
+                    Goal.ToString("0", CultureInfo.InvariantCulture) + ")" + room + ". Check your firm's payout rules before withdrawing");
+            else
+                Say("milestone", "Milestone: +$" + amt + " since the start" +
+                    (Goal > 0 ? " (" + (100 * level * MilestoneStep / Goal).ToString("0", CultureInfo.InvariantCulture) + "% of the $" +
+                     Goal.ToString("0", CultureInfo.InvariantCulture) + " goal)" : "") + room + ", next trade up to " + engine.NextQty + " MNQ");
         }
 
         static string F(double x) { return double.IsNaN(x) ? "" : x.ToString("0.00", CultureInfo.InvariantCulture); }
@@ -959,7 +996,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         void Dashboard(DateTime endNy)
         {
             double cumReal = SystemPerformance.AllTrades.TradesPerformance.Currency.CumProfit;
-            double sinceStart = double.IsNaN(engine.TrailBase) ? cumReal : engine.Equity - engine.TrailBase;
+            double sinceStart = SinceStart();
             string goal = Goal > 0 ? "Goal $" + Goal.ToString("0", CultureInfo.InvariantCulture) + ": $" +
                           sinceStart.ToString("0", CultureInfo.InvariantCulture) + " so far (" +
                           (100 * sinceStart / Goal).ToString("0.0", CultureInfo.InvariantCulture) + "%)\n" : "";
@@ -1108,6 +1145,11 @@ namespace NinjaTrader.NinjaScript.Strategies
         [NinjaScriptProperty]
         [Display(Name = "Alerts with a sound", Order = 1, GroupName = "5. Alerts")]
         public bool SoundAlerts { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, 1000000)]
+        [Display(Name = "Milestone alerts (live): at each day's close, every this much profit since the start, $ (0 = off)", Order = 2, GroupName = "5. Alerts")]
+        public double MilestoneStep { get; set; }
 
         [NinjaScriptProperty]
         [Range(0, 200)]

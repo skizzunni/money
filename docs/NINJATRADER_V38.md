@@ -1580,6 +1580,22 @@ ticks and unchanged trades. All 16 NinjaTrader v3.8 tests pass. Re-import the fi
 journal DAY line has them, and the DAY lines' new fields. All 17 NinjaTrader v3.8 tests pass. Re-import the file to
 get it.
 
+**U8 (2026-11-03): milestone and goal alerts.** Live, at the day's close (with the "Day done" summary):
+- **Milestones.** Each time the profit since the start passes a new multiple of "Milestone alerts" (group 5, default
+  $5,000, 0 = off), one alert: "Milestone: +$10000 since the start (20% of the $50000 goal); room above the floor
+  $12000, next trade up to 7 MNQ". A day that passes several levels gives one alert, for the highest.
+- **The goal.** The day the profit since the start reaches the Goal setting ($50,000), once: "GOAL REACHED: +$50210
+  since the start (goal $50000); ... Check your firm's payout rules before withdrawing".
+
+Levels already passed when the strategy goes live give no alert, so a restart doesn't repeat them. The trades are
+unchanged. `test_v38_milestones` checks:
+- one alert per level, rising, the last at the highest level reached;
+- none for the levels before going live;
+- one goal alert, even for a goal between two levels;
+- the same trades with the alerts on or off.
+
+All 26 NinjaTrader v3.8 tests pass. Re-import the file to get it.
+
 ## G38: trapped buyers at the high of the day, order flow from volume (registered 2026-11-03, before its run)
 
 **The idea, from the user's @chicago_trades clip.** At the high of the day: retail stops are run, fresh sellers fill,
@@ -1835,3 +1851,19 @@ comes back at a later half-hour check the same day, and the bot buys (or sells) 
 - there are no more days at −$1,000.
 
 The 30-minute runs are reported, not judged.
+
+**G44 result (run once, 2026-11-03): rejected; the second try after a time stop pays.**
+
+| 5-minute net | as it is | side | day |
+|---|---|---|---|
+| window, chart / NinjaTrader | $18,516 / $18,549 | $17,246 / $17,354 | $17,246 / $17,354 |
+| NQ from 2015, chart / NinjaTrader | $277,322 / $267,571 | $255,838 / $252,107 | $253,524 / $251,161 |
+| index from 2011, chart / NinjaTrader | $407,796 / $404,250 | $395,045 / $389,234 | $392,643 / $386,830 |
+
+- **Both variants made less on every set, in both executions.** The win rate rose a little (61.2% to 62.8% on the
+  window), but the blocked re-entries were worth more than the losers they avoided.
+- **30-minute bars (reported, not judged).** On the chart's execution, NQ from 2015 with either block went back to the
+  floor after 118 trades and stopped there ($0 net). As it is, the same run made $210,145.
+
+The time stop stays as G6 adopted it, with re-entries allowed (`verification/noise_v2/g44_ts_block.csv`;
+`ts_block` stays in `mnqbot/noise.py`, off).
