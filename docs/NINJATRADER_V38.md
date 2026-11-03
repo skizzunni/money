@@ -1579,3 +1579,27 @@ ticks and unchanged trades. All 16 NinjaTrader v3.8 tests pass. Re-import the fi
 `test_v38_day_summary` checks one summary per live session, each with the day's P/L and trade count exactly as its
 journal DAY line has them, and the DAY lines' new fields. All 17 NinjaTrader v3.8 tests pass. Re-import the file to
 get it.
+
+## G38: trapped buyers at the high of the day, order flow from volume (registered 2026-11-03, before its run)
+
+**The idea, from the user's @chicago_trades clip.** At the high of the day: retail stops are run, fresh sellers fill,
+and the most aggressive buyers are trapped (the candle closes below where they bought, with a large upper wick). The
+next candle closes below them. Then short, with the stop above the high and the target at the low of the day. The
+mirror applies at the low. The clip uses bid/ask order flow. The closest test the data allows uses NQ futures' real
+traded volume.
+
+**Rules (NQ futures, 5-minute bars from 1-minute, New York time, regular session):**
+- **The trap bar, at the high (a short):** from 10:00 to 15:00, a bar whose high is a new high of the day. Its volume
+  is at least 1.5 times the average of the 20 bars before it, the stops being run. It closes in the lower half of
+  its range, with an upper wick at least half the bar, so the buyers are trapped.
+- **The confirmation:** the next bar closes below the trap bar's low.
+- **Entry:** at the open of the bar after the confirmation. The stop is one tick above the trap bar's high. The
+  target is the low of the day as it stands at the entry, but at least 1R away; if the low is nearer, the target is
+  1R.
+- **The exit:** the stop, the target, or the 15:55 bar's close. A bar that reaches both counts as the stop.
+- **A long:** the mirror, at a new low of the day.
+- **Limits:** one trade a day per side, and a stop distance of 4-40 points.
+- **Costs per MNQ:** $1.24 in fees, 1 tick of slippage on the entry and on stop and time exits; the target is a limit.
+
+**Pass (stage 1, the edge per contract):** daily t ≥ 1.65 and positive net on each of NQ 2015-2018, 2019-2021 and
+2022-July 2025. If it passes, stage 2 adds it to the bot (in the trades the bot isn't in) on the account.
