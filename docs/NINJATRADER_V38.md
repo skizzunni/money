@@ -1786,3 +1786,35 @@ v3.8 tests pass.
 - the share lost or frozen first.
 
 Nothing is chosen here. It tells the user which account to trade for the goal.
+
+**G43 result (run once, 2026-11-03): the 150K reaches +$50,000 fastest, and loses the fewest accounts first.**
+
+| starts every 6 months, up to 5 years | 50K | Topstep 100K | Topstep 150K | Apex 100K | Apex 150K |
+|---|---|---|---|---|---|
+| reached +$50,000, NQ (11 starts) | 8 | 9 | 9 | 9 | 9 |
+| reached +$50,000, index (21 starts) | 18 | 20 | **21** | 20 | **21** |
+| median months to +$50,000, NQ | 28.0 | 26.8 | **25.5** | 27.1 | 26.8 |
+| median months to +$50,000, index | 29.4 | 23.6 | **20.9** | 24.5 | 24.3 |
+| quickest quarter of starts, index | 27.7 | 19.1 | **17.5** | 20.6 | 19.3 |
+| slowest start that got there, index | 46.3 | 42.1 | **38.8** | 44.9 | 42.1 |
+| lost or frozen before +$50,000, NQ / index | 3 / 3 | 2 / 1 | 2 / **0** | 2 / 1 | 2 / **0** |
+| median net after 5 years, NQ / index | $95,972 / $108,909 | $184,866 / $193,629 | $243,845 / $246,712 | $156,133 / $163,989 | $184,866 / $193,629 |
+
+**Every lost account died in its first few months.** It made under 200 trades, and none had reached +$50,000:
+- On the 50K: NQ starting 2015-04, 2019-04 and 2019-10; the index starting 2011-04, 2013-04 and 2019-04.
+- On the 150K: only NQ starting 2019-04 and 2019-10.
+
+Two kinds of death:
+- Some fell to the floor before the first +$2,000.
+- Others got far enough up for the floor to lock at the start balance, then came back to it.
+
+**Once an account is a few months in and well above its floor, none was lost before the goal.**
+
+**Caveats:**
+- **Overlap.** The starts overlap, so they are not independent tries.
+- **No withdrawals.** The test takes no payouts. Withdrawing profit lowers the balance and slows the next contract
+  steps.
+- **Firm rules not modelled.** It ignores the firms' consistency and payout rules, and the bigger accounts' higher fees.
+- **A backtest.** These are past markets, not a promise.
+
+(`verification/noise_v2/g35_start_dates_{base,cush100,cush150,apex100,apex150}_60m.csv`.)
