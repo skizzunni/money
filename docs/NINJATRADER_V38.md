@@ -2655,3 +2655,24 @@ early.**
 The rule is stage 2's (a higher net on all three 5-minute sets in both executions, the floor never touched, no more
 days at −$1,000). G35's 89 start dates are also run, with no more lost accounts allowed than the bot's (7 on NQ, 7 on
 the index).
+
+**G60 stage 3 result (run once, 2026-11-03): rejected; worse than stage 2.**
+- **The window:** $12,111 / $12,115 (against $18,516 / $18,549), with a −$1,661 day.
+- **NQ:** the account was lost in 2015 again.
+- **The index:** $474,679 / $468,546, with the same −$1,347 day.
+
+Waiting for the floor to lock left the early months unchanged on NQ (the bot alone nearly died there), and the cap does
+not reach the real fault: a gap trade stopped on its fill bar after the 09:35 open moved past the price it was sized
+on.
+
+**Stage 2 on G35's 89 start dates** (`g35_start_dates_gapgo.csv`):
+
+| 89 start dates, 21 months | the bot | the bot + gap and go |
+|---|---|---|
+| lost or frozen: NQ / index | 7 of 35 / 7 of 54 | **10 of 35** / **4 of 54** |
+| median net: NQ / index | $22,925 / $23,070 | **$32,644 / $30,596** |
+
+The same number of accounts lost in all (14 of 89), more on NQ and fewer on the index, and the typical account makes
+about 35-40% more. It fails the rule set before the run (more lost NQ accounts, days past −$1,000). It is not made the
+default. As a switch, its trade-off is: half of all days with a trade instead of a third, about a third more profit in
+the typical account, and a real chance that a 09:35 fill goes past its stop and a day goes past the $1,000 limit.
