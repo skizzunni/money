@@ -74,22 +74,24 @@ real MNQ data will differ somewhat. The stand-in has flattered this strategy bef
 simulator, Funded growth, from 2025-01-02, 1 tick of slippage, $0.62 a side;
 `verification/noise_v2/v38g_nt_2026-11-03.csv` and the trade lists beside it):
 
-| Jan 2, 2025 – Oct 2026 | 5-minute bars | 30-minute bars |
+| Jan 2, 2025 – Oct 2026 (updated 2026-11-03, U20) | 5-minute bars | 30-minute bars |
 |---|---|---|
-| Trades | 291 | 252 |
-| Net | $18,541.72 | $28,620.10 |
-| Winners | 61.5% | 53.6% |
-| Profit factor | 1.823 | 1.881 |
-| Closed drawdown | $1,851.89 | $3,934.78 |
-| Largest loss | −$851.94 | −$1,634.41 |
-| Worst day | −$899.24 | −$899.20 |
-| Most contracts | 12 | 15 |
+| Trades | 401 | 252 |
+| Net | **$29,820.65** | $28,620.10 |
+| Winners | 53.6% | 53.6% |
+| Profit factor | 1.709 | 1.881 |
+| Closed drawdown | $3,648.08 | $3,934.78 |
+| Largest loss | −$1,006.91 | −$1,634.41 |
+| Worst day | −$899.11 | −$899.20 |
+| Most contracts | 15 | 15 |
+
+The 5-minute chart includes gap and go (U19, U20) and the data fix (G67): it trades on about 44% of days, against 29%
+before gap and go. Gap and go needs the 5-minute chart, so **trade the 5-minute chart**.
 
 **It matches the Python model, trade for trade.**
 - **30-minute bars:** all 303 trades are identical.
-- **5-minute bars:** all but one of 344. That one is a warm-up trade (before the window) on 12/24/2024, a half day
-  where the stand-in data stops at 13:10. The model closes it at the next open's close and the strategy at that open,
-  0.25 points apart ($0.50). Live, 12/24 is on the no-trade list and MNQ trades to 13:15, so this can't recur.
+- **5-minute bars:** all but one of the window's 401. That one is on 2026-03-09, where the stand-in data stops at
+  15:10: the model closes at that bar, the strategy at the next open. Live, MNQ trades to 16:00, so it can't recur.
 
 **U16: a go-live check for the start date.** With the trailing drawdown on and "Trailing drawdown and contract steps
 from date" blank, the floor and the contract steps count from the chart's first bar. Live, that counts the strategy's
@@ -3011,3 +3013,14 @@ NinjaTrader): the false 445-point fall on 2025-06-20 had cost the gap trade and 
   3. The test's Funded growth config now stops its floor at the start (`trail_cap` 0), as NinjaTrader's always does.
 - **The data:** `research/data_errors.py` scans every set; `research/v24_scan.py` drops `BAD_SESSIONS` (2025-06-20)
   from the window proxy and the NQ history.
+
+## G68: up to 5 gap contracts once the floor has stopped (registered 2026-11-03, before its run)
+
+**The idea:** G67b's 3 contracts made 14-30% more with no more lost accounts. Does the gap trade have room for more
+once the account has its cushion? One variant: `gap_go_locked_qty` 5.
+
+**Adopt only if, against today's default (3, U20), on the corrected data:**
+- a higher net on all three 5-minute sets in both executions;
+- the floor never touched;
+- no more days at −$1,000;
+- on G35's 89 start dates, no more lost or frozen accounts (11).
