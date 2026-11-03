@@ -2713,3 +2713,14 @@ no more days at −$1,000).
 
 Next, before it is made the default: G35's 89 start dates with it on (variant `gapgo1`), then MnqNoiseV38.cs and the
 parity tests (`verification/noise_v2/g60_stage5.txt`).
+
+**G60 stage 5 on G35's 89 start dates (21 months; `g35_start_dates_gapgo1.csv`): adopted.**
+
+| | lost or frozen: NQ / index | median net: NQ / index | worst 10%: NQ / index | best 10%: NQ / index |
+|---|---|---|---|---|
+| the bot | 7 of 35 / 7 of 54 | $22,925 / $23,070 | −$461 / $444 | $39,277 / $39,303 |
+| the bot + gap and go (1 contract) | **6 of 35 / 5 of 54** | **$32,382 / $30,180** | **$1 / $4,638** | **$49,328 / $48,485** |
+
+Fewer lost accounts (11 of 89 against 14) and about 35% more in the typical account. The gap trades at 1 contract add a
+little profit, and they make it early, which brings the contract steps sooner. **Gap and go goes on by default in
+Funded growth**, at 1 contract, 09:35-09:55.
