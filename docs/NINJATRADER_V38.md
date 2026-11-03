@@ -3318,3 +3318,24 @@ gap trade that was up 1R can't become a full loser in the last minutes.
 
 **Adopt only if, against today's default:** a higher net on all three 5-minute sets in both executions; the floor
 never touched; no more days at −$1,000; on G35's 89 start dates, no more lost or frozen accounts (11).
+
+**G77 result (run once, 2026-11-03): rejected; NQ's 2015 path again.** Window $30,568 / $30,165 (against $30,161 /
+$29,836), index $511,074 / $498,921 (against $508,291 / $498,705), NQ $0 / $1: lost in its first months
+(`verification/noise_v2/g77_gap_be.txt`).
+
+## The rule from G78 on (set 2026-11-03, before G78's run)
+
+NQ's single path from January 2015 has decided G61, G63, G68, G72, G73, G76 and G77. Today's default clears it by $41
+(G73's note), so it measures one summer's luck, not the change. **From G78 on:** survival is judged on G35's 89 start
+dates (35 on NQ from April 2015, 54 on the index), no more lost or frozen accounts than the default's 11. The full NQ
+history's net is still a gate wherever the account lives in the default's run; if the change loses that account, it is
+reported, and the change is judged on the 89 start dates. The other parts stay: a higher net on the window and the index
+(both executions; NQ too where its account lives), the floor never touched on the window and the index, and no more
+days at −$1,000 on any set.
+
+## G78: up to 4 gap contracts once the floor has stopped (registered 2026-11-03, before its run)
+
+**The idea:** G67b's 3 passed and G68's 5 failed only on NQ's 2015 path and one −$1,054 index day. 4 is the step
+between. `gap_go_locked_qty` 4.
+
+**Adopt on the rule above**, against today's default (3).
