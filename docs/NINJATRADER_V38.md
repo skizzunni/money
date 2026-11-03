@@ -2468,3 +2468,26 @@ closed P/L reached +$3,000 before −$2,000 within the week. At 1 MNQ the bot av
 This is the best case: it ignores the $1,000 daily loss rule (at 10 MNQ one full stop is $1,875) and losses inside a
 trade before it closes. No size makes +$3,000 in a week more likely than not. Past 10 contracts the account is lost more
 often than the target is reached.
+
+## G57: the bot's rules overnight (registered 2026-11-03, before its run)
+
+**The idea, from the user's own trades (Oct 30 - Nov 3: 13 trades, +$3,804; all 3 trades opened between 18:00 and
+03:00 New York won):** the bot trades only 09:30-16:00, and about 70% of days have no trade there (G55). The noise-area
+breakout has never been run in the overnight sessions. (Round seven's half-hour "overnight drift" stream and G12's
+Asian-range sweep were different setups.)
+
+**The test:** Funded growth's rules, unchanged, run on two overnight sessions as if each were a day session of 6½
+hours:
+- **Asia:** 18:00-00:30 New York;
+- **London:** 02:00-08:30.
+
+Each session's own open, the close before it and its own 14-session noise make the lines. The entry checks run every
+half hour from 30 minutes in until 1½ hours before its end, as by day, with every exit rule and the flat time at its
+end. 5-minute bars, the chart's execution, NQ futures 2015-Jul 2025 and the index (CFD) 2011-Sep 2026, each split into
+halves. Each session trades its own 50K, as a separate account.
+
+**Passes (for a session) only if,** in all four halves (NQ 2015-2019, 2020-2025; the index 2011-2018, 2019-2026):
+- the net is positive and the profit factor is at least 1.2;
+- the account never reaches the floor.
+
+A pass gets a second test beside the day bot (the shared daily budget) before any change to the file the user runs.
