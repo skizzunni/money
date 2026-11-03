@@ -1968,3 +1968,20 @@ The 30-minute runs are reported, not judged.
   and the index, and less on NQ.
 
 The floor was never touched (`verification/noise_v2/g46_lock_plus.csv`).
+
+## G47: an earlier last entry (registered 2026-11-03, before its run)
+
+**The idea, from G8:** entries at the 15:30 check changed little (G8). The other way has not been tried with the time
+stop on. A trade entered at the 14:30 or 15:00 check has at most 60-90 minutes before the 16:00 exit, so it often
+can't reach its take-profit (2 noise units), while it can still take its full stop.
+
+**The variants:** Funded growth with the last entry check at 14:00 (`last_entry_end` 840) and at 14:30 (870), instead
+of 15:00 (900); everything else as it is.
+
+**Adopt (the better by window net) only if, against 15:00:**
+- a higher net on all three 5-minute sets (the window, NQ from 2015, the index from 2011), in both the chart's
+  execution and NinjaTrader's;
+- the floor is never touched;
+- there are no more days at −$1,000.
+
+The 30-minute runs are reported, not judged.
