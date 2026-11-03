@@ -327,6 +327,7 @@ class NoiseConfig:
     fill_min_room: float = 0.0  # G71: and only while the account is at least this far above the trailing floor
     fill_no_steps: bool = False  # G73: the fill-in trades' P/L doesn't count toward the contract steps
     gap_no_budget: bool = False  # G74: a gap-slot trade's profit doesn't widen the rest of the day's budget
+    size_slip_pts: float = 0.0  # G76: the bot's sizing counts this many points more slippage at the stop
     # research (G67): once the trailing floor has stopped at the start (trail_cap), a gap trade may take up to this
     # many contracts in place of gap_go_max_qty (0 = off)
     gap_go_locked_qty: int = 0
@@ -1102,12 +1103,14 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                         q_next = max(1, min(cfg.risk_max_qty, q_r))
                         ml_next = cfg.risk_per_trade
                     if (cfg.daily_loss_limit > 0 or cfg.trail_dd > 0) and ml_cfg > 0:  # loss budget
-                        per_c = ml_next / q_next + 2 * cfg.commission_per_side + 2 * slip * cfg.point_value
+                        per_c = (ml_next / q_next + 2 * cfg.commission_per_side + 2 * slip * cfg.point_value
+                                 + cfg.size_slip_pts * cfg.point_value)
                         if cfg.budget_actual and use_stop:  # the initial stop: the line's or the max loss
                             sb = cfg.stop_buffer * sigma
                             ln_stop = upper * (1 - sb) if d > 0 else lower * (1 + sb)
                             pts = min(abs(c[i] + d * slip - ln_stop), ml_next / q_next / cfg.point_value)
-                            per_c = pts * cfg.point_value + 2 * cfg.commission_per_side + 2 * slip * cfg.point_value
+                            per_c = (pts * cfg.point_value + 2 * cfg.commission_per_side + 2 * slip * cfg.point_value
+                                     + cfg.size_slip_pts * cfg.point_value)
                         room = money_room()
                         fit = math.floor(room / per_c + 1e-9) if math.isfinite(room) else q_next
                         costs = 2 * cfg.commission_per_side + 2 * slip * cfg.point_value
