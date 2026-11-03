@@ -309,6 +309,10 @@ def test_v38_progress_matches_the_journal(sim, sample_1m, tmp_path):  # noqa: F8
                          capture_output=True, text=True)
     assert rep.returncode == 0, rep.stderr[-2000:]
     assert "**Weeks**" in rep.stdout and "**Pace:**" in rep.stdout and "NO" not in rep.stdout.split("## Checks")[1]
+    live = rep.stdout.split("## Live vs tested")[1].split("## Checks")[0]  # U11
+    wr = 100 * (tr["P/L"] > 0).mean()
+    assert f"| win % | {round(wr, 1)} | 61.2 to 62.2 |" in live, live
+    assert "in line with the tests" in live or "WARNING" in live or "too few" in live
 
 
 @pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")

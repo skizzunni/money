@@ -6,6 +6,7 @@ the rules held (no day at the $1,000 limit, the journal's own totals adding up).
 """
 from __future__ import annotations
 
+import math
 import sys
 
 import numpy as np
@@ -31,6 +32,42 @@ def group(t: pd.DataFrame, key) -> pd.DataFrame:
         rows.append({key: k, "trades": len(x), "losers": len(lost), "net": money(x["P/L"].sum()),
                      "lost on losers": money(lost.sum()), "average loss": money(lost.mean()) if len(lost) else "-"})
     return pd.DataFrame(rows)
+
+
+# U11: Funded growth as tested, 5-minute bars, NinjaTrader's execution (docs/NINJATRADER_V38.md, G44-G46's "as it is"
+# rows; verification/noise_v2/g46_lock_plus.csv): the window (Jan 2025 - Oct 2026), NQ 2015-2025, the index 2011-2026
+TESTED = {"win %": (61.2, 62.2), "profit factor": (1.53, 1.82), "trades a month": (13.4, 18.4),
+          "time stops %": (6.0, 11.7)}
+TESTED_WIN = 0.612  # the lowest of the three
+
+
+def below_tested(wins: int, n: int, p: float = TESTED_WIN) -> float:
+    """The chance of this few winners or fewer in n trades if the bot still wins p of its trades (binomial)."""
+    return sum(math.comb(n, k) * p ** k * (1 - p) ** (n - k) for k in range(wins + 1))
+
+
+def vs_tested(t: pd.DataFrame, span: float) -> None:
+    """U11: the live journal's win rate, profit factor, trade count and time stops against the tested ranges."""
+    p = t["P/L"].to_numpy(float)
+    n, wins = len(p), int((p > 0).sum())
+    pf = p[p > 0].sum() / -p[p <= 0].sum() if (p <= 0).any() else float("inf")
+    ts = 100 * float((t["exit kind"] == "Time stop").mean())
+    rows = [("win %", round(100 * wins / n, 1)), ("profit factor", round(float(pf), 2)),
+            ("trades a month", round(n / span, 1) if span >= 1 else "-"), ("time stops %", round(ts, 1))]
+    print("\n## Live vs tested\n")
+    print(table(pd.DataFrame([{"measure": k, "this journal": v, "tested": f"{TESTED[k][0]} to {TESTED[k][1]}"}
+                              for k, v in rows])))
+    if n < 30:
+        print(f"\n{n} trades: too few to judge yet (30 or more).")
+        return
+    chance = below_tested(wins, n)
+    if chance < 0.05:
+        print(f"\n**WARNING: the win rate is below what was tested.** {wins} winners in {n} trades would happen "
+              f"{100 * chance:.1f}% of the time if the bot still won {100 * TESTED_WIN:.1f}% of its trades. Check "
+              "the fills (above), the chart (5 minutes, the ETH session) and the Mode, before trading on.")
+    else:
+        print(f"\nThe win rate is in line with the tests ({wins} winners in {n} trades; this few or fewer happens "
+              f"{100 * chance:.0f}% of the time at the tested {100 * TESTED_WIN:.1f}%).")
 
 
 def main() -> None:
@@ -125,6 +162,7 @@ def main() -> None:
             print(f"\n**Fills vs plan:** entries {es.mean():+.1f} ticks on average ({len(es)} trades), stops and "
                   f"market exits {xm:+.1f} ({len(xs)}). The backtests assume 1 tick; at 3 or more, turn on Gentle "
                   "start (docs/NINJATRADER_V38.md, G29-G30).")
+    vs_tested(t, span)
     print("\n## Checks\n")
     ok_total = abs(float(t["total P/L"].iloc[-1]) - (float(t["total P/L"].iloc[0]) - p[0] + p.sum())) < 0.05
     ok_days = len(d) == 0 or abs(float(d["day P/L"].astype(float).sum()) - p.sum()) < 0.05 * max(1, len(d))

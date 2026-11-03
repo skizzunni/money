@@ -888,6 +888,19 @@ def test_pine_dashboard_goal_and_room():
     assert f"({100 * net / 1000.0:.1f}%)" in goal
 
 
+def test_journal_report_flags_a_low_win_rate():
+    """U11: the binomial check behind "Live vs tested": 45 winners in 100 trades is far below 61.2% (flagged), 58 is
+    within chance (not flagged); the chance is the exact binomial tail."""
+    import sys
+
+    sys.path.insert(0, str(ROOT / "research"))
+    from journal_report import below_tested
+
+    assert below_tested(45, 100) < 0.001
+    assert below_tested(58, 100) > 0.05
+    assert below_tested(2, 3, 0.5) == pytest.approx(7 / 8)
+
+
 @pytest.mark.slow
 def test_pine_webhooks():
     bars, p = scenario(above_all_day)

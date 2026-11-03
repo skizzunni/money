@@ -1625,6 +1625,26 @@ is Funded growth. The other Pine tests now name Custom. Re-paste the script on T
 (its end-of-day peak), and the goal row's amount and share, to the cent. The trades are unchanged. Re-paste the script
 on TradingView to get it.
 
+**U11 (2026-11-03): live vs tested, in the journal report.** `research/journal_report.py` has a new section,
+"Live vs tested". It sets the journal's numbers against the ranges Funded growth showed in testing (5-minute bars,
+NinjaTrader's execution, on the window, NQ 2015-2025 and the index 2011-2026):
+
+| measure | tested range |
+|---|---|
+| win % | 61.2 to 62.2 |
+| profit factor | 1.53 to 1.82 |
+| trades a month | 13.4 to 18.4 |
+| time stops % | 6.0 to 11.7 |
+
+From 30 trades on, it works out how likely so few winners would be if the bot still won 61.2% of its trades. Under 5%,
+it warns: "WARNING: the win rate is below what was tested", and says to check the fills, the chart and the Mode before
+trading on. That catches a live setup that isn't the tested bot (bad fills, a wrong chart or session, a wrong Mode)
+within a few weeks, instead of months of losses.
+
+`test_journal_report_flags_a_low_win_rate` checks the binomial tail exactly (45 winners in 100 flagged, 58 not).
+`test_v38_progress_matches_the_journal` checks the section's win rate against the simulator's journal. Run it on the
+live journal: `python research/journal_report.py MnqNoiseV38_live_<account>.csv`.
+
 ## G38: trapped buyers at the high of the day, order flow from volume (registered 2026-11-03, before its run)
 
 **The idea, from the user's @chicago_trades clip.** At the high of the day: retail stops are run, fresh sellers fill,
@@ -1985,3 +2005,16 @@ of 15:00 (900); everything else as it is.
 - there are no more days at −$1,000.
 
 The 30-minute runs are reported, not judged.
+
+**G47 result (run once, 2026-11-03): rejected; the 15:00 check stays.** An earlier last entry made far less
+everywhere.
+
+| 5-minute net, chart / NinjaTrader | 14:00 | 14:30 | 15:00 (as it is) |
+|---|---|---|---|
+| window | $8,626 / $10,781 | $12,056 / $12,069 | **$18,516 / $18,549** |
+| NQ from 2015 | $198,550 / $195,919 | $229,325 / $226,166 | **$277,322 / $267,571** |
+| index from 2011 | $323,144 / $326,147 | $355,633 / $355,300 | **$407,796 / $404,250** |
+
+The afternoon entries are among the bot's best: dropping the 14:30 and 15:00 checks lost about $10,000 on the window
+and $80,000 on NQ. The profit factor rose on 30-minute bars (2.17 against 1.89 on the window), but the net still fell.
+Together with G8 (15:30 changed little), 15:00 is the right last check (`verification/noise_v2/g47_last_entry.csv`).
