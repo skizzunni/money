@@ -29,9 +29,15 @@ CFG = NoiseConfig(**{**V21, "qty": 1, "lookback": 14, "trail_from": "", "tv_path
 GROW = NoiseConfig(**{**V21, "qty": 1, "lookback": 14, "max_loss_per_trade": 187.5, "after_loss_ml_mult": 250 / 187.5,
                       "trail_dd": 2000.0, "trail_from": "", "profit_step": 1500.0, "size_up_to": 15,
                       "budget_actual": True, "time_stop": 60, "tv_path": False, "gap_go": True, "gap_go_max_qty": 1,
-                      "gap_go_locked_qty": 3, "trail_cap": 0.0},
+                      "gap_go_locked_qty": 3, "trail_cap": 0.0,
+                      # G79: More trading days and the 2-point sizing allowance
+                      "gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
+                      "fill_min_room": 3000.0, "size_slip_pts": 2.0},
                    nt_execution=True, round_prices=True, target_on_fill_bar=True)
 GROW_ARGS = ["Mode=Funded growth"]  # the default; its settings are the tested ones above
+# G72's fill-in trades off (NinjaTrader's More trading days needs gap and go on)
+NO_FILL = {"gap_go_small_k": -1.0, "trend_small": False, "gap_go_drive_k": 0.0, "fill_after_lock": False,
+           "fill_min_room": 0.0}
 
 
 @pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
@@ -273,7 +279,7 @@ def test_v38_gap_go(sim, sample_1m, tmp_path):  # noqa: F811
 
     for on in (True, False):
         nt, names = go(f"GapGo={on}")
-        py = run(bars, dataclasses.replace(GROW, gap_go=on), minutes=5).trades
+        py = run(bars, dataclasses.replace(GROW, gap_go=on, **({} if on else NO_FILL)), minutes=5).trades
         assert len(nt) == len(py) >= 20
         for a, t in zip(nt, py, strict=True):
             assert (int(a[0]), int(a[1]), int(a[3])) == (t.direction, t.entry_bar, t.exit_bar), (a, t)
@@ -687,7 +693,7 @@ def test_v38_more_days(sim, sample_1m, tmp_path):  # noqa: F811
                             f"MoreDays={on}", "MoreDaysCushion=100"], capture_output=True, text=True, env=ENV)
         assert r.returncode == 0, r.stderr[-2000:]
         nt = [x.split(",")[1:] for x in r.stdout.splitlines() if x.startswith("T,")]
-        py = run(bars, dataclasses.replace(GROW, trail_dd=600.0, **(fill if on else {})), minutes=5).trades
+        py = run(bars, dataclasses.replace(GROW, trail_dd=600.0, **(fill if on else NO_FILL)), minutes=5).trades
         assert len(nt) == len(py) >= 20
         for a, t in zip(nt, py, strict=True):
             assert (int(a[0]), int(a[1]), int(a[3])) == (t.direction, t.entry_bar, t.exit_bar), (a, t)

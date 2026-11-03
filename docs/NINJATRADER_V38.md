@@ -74,24 +74,25 @@ real MNQ data will differ somewhat. The stand-in has flattered this strategy bef
 simulator, Funded growth, from 2025-01-02, 1 tick of slippage, $0.62 a side;
 `verification/noise_v2/v38g_nt_2026-11-03.csv` and the trade lists beside it):
 
-| Jan 2, 2025 – Oct 2026 (updated 2026-11-03, U20) | 5-minute bars | 30-minute bars |
+| Jan 2, 2025 – Oct 2026 (updated 2026-11-03, U22) | 5-minute bars | 30-minute bars |
 |---|---|---|
-| Trades | 401 | 252 |
-| Net | **$29,820.65** | $28,620.10 |
-| Winners | 53.6% | 53.6% |
-| Profit factor | 1.709 | 1.881 |
-| Closed drawdown | $3,648.08 | $3,934.78 |
+| Trades | 710 | 252 |
+| Net | **$33,011.82** | $28,620.10 |
+| Winners | 51.2% | 53.6% |
+| Profit factor | 1.585 | 1.881 |
+| Closed drawdown | $2,859.94 | $3,934.78 |
 | Largest loss | −$1,006.91 | −$1,634.41 |
-| Worst day | −$899.11 | −$899.20 |
+| Worst day | −$899.06 | −$899.20 |
 | Most contracts | 15 | 15 |
+| Days with a trade (the model) | about 72% | about 29% |
 
-The 5-minute chart includes gap and go (U19, U20) and the data fix (G67): it trades on about 44% of days, against 29%
-before gap and go. Gap and go needs the 5-minute chart, so **trade the 5-minute chart**.
+The 5-minute chart includes gap and go (U19, U20), More trading days with the 2-point sizing allowance (U22) and the
+data fix (G67). They need the 5-minute chart, so **trade the 5-minute chart**.
 
 **It matches the Python model, trade for trade.**
 - **30-minute bars:** all 303 trades are identical.
-- **5-minute bars:** all but one of the window's 401. That one is on 2026-03-09, where the stand-in data stops at
-  15:10: the model closes at that bar, the strategy at the next open. Live, MNQ trades to 16:00, so it can't recur.
+- **5-minute bars:** identical to 2026-03-09, where the stand-in data stops at 15:10: the model closes at that bar, the
+  strategy at the next open, and the paths part from there. Live, MNQ trades to 16:00, so it can't happen.
 
 **U16: a go-live check for the start date.** With the trailing drawdown on and "Trailing drawdown and contract steps
 from date" blank, the floor and the contract steps count from the chart's first bar. Live, that counts the strategy's
@@ -3354,3 +3355,24 @@ showed: window $33,962 / $33,773 (default $30,161 / $29,836), index $521,452 / $
 
 **Adopt A2s as the default on G78's rule:** the numbers above stand (run once in G76; not re-run), and on G35's 89 start
 dates no more lost or frozen accounts than 11.
+
+**G79 result (2026-11-03): passes; adopted.** On G35's 89 start dates: **11 lost or frozen** (5 of 35 NQ, 6 of 54
+index), as the default; medians **$40,443 NQ / $34,289 index** (default $34,564 / $27,703). With G76's numbers
+(window $33,962 / $33,773, index $521,452 / $515,363, no −$1,000 day on any set, 72-81% of days), every part of G78's
+rule holds. NQ from January 2015 is lost (reported, as the rule says) (`verification/noise_v2/g35_start_dates_a2s.csv`).
+
+**U22 (2026-11-03): "More trading days" on by default, with the 2-point sizing allowance (G79).**
+- **Defaults:** "More trading days" **on** (cushion $3,000), and "Sizing: count this many points more slippage at
+  each stop" **2**. Both work on 5-minute charts only (where they were tested); on a 30-minute chart the strategy is
+  exactly as before. Evaluation mode has neither.
+- **The file you trade, on the NinjaTrader simulator** (`research/v38_ninjatrader_run.py grow`, from 2025-01-02):
+  - **5-minute: 710 trades, $33,011.82, 51.2% winners, profit factor 1.585, closed drawdown $2,859.94, worst day
+    −$899.06, largest loss −$1,006.91.** It matches the model trade for trade to 2026-03-09, the stand-in data's hole
+    (the data stops at 15:10; live, MNQ trades to 16:00); the paths part there.
+  - 30-minute: unchanged, all 303 trades identical, $28,620.10.
+  (`verification/noise_v2/v38g_nt_g79_2026-11-03.txt` and the trade lists beside it.)
+- **Tests:** the Funded growth test config now has the fill-ins and the 2-point allowance; `test_v38_gap_go` and
+  `test_v38_more_days` switch the fill-ins off where they test without them.
+
+**Scorecard, G44-G79:** 36 rounds. Adopted: G60 (U19), G67b (U20), G67's data fix, G79 (U22, from G72 and G76).
+Rejected: 30 (G54 and G55 were measurements).
