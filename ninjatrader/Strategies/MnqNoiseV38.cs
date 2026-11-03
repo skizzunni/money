@@ -689,7 +689,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (State == State.SetDefaults)
             {
                 Name = "MnqNoiseV38";
-                Description = "MNQ Noise-Area Momentum v3.8, Funded growth: 1 MNQ to start, $187.50 max loss a contract ($250 after a loser), $900 a day, a $2,000 end-of-day trailing floor, a contract more per $1,500 of profit up to 15, the 60-minute time stop.";
+                Description = "MNQ Noise-Area Momentum v3.8, Funded growth: 1 MNQ to start, $187.50 max loss a contract ($250 after a loser), $900 a day, a $2,000 end-of-day trailing floor, a contract more per $1,500 of profit up to 15, the 60-minute time stop; gap and go at 1 MNQ, up to 3 once the trailing floor has stopped at the start.";
                 Calculate = Calculate.OnBarClose;
                 EntriesPerDirection = 1;
                 EntryHandling = EntryHandling.UniqueEntries;
@@ -730,7 +730,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 SoundAlerts = true;
                 MilestoneStep = 5000;
                 GapGo = true;
-                GapGoLocked = 0;
+                GapGoLocked = 3;  // G67b
                 TestedWinRate = 61.2;
             }
             else if (State == State.DataLoaded)
@@ -1440,7 +1440,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         public double TestedWinRate { get; set; }
 
         [NinjaScriptProperty]
-        [Display(Name = "Gap and go: 1 MNQ with a big opening gap, 09:35-09:55 (5-minute chart)", Order = 14, GroupName = "1. Size and risk")]
+        [Display(Name = "Gap and go: a trade with a big opening gap, 09:35-09:55 (5-minute chart)", Order = 14, GroupName = "1. Size and risk")]
         public bool GapGo { get; set; }
 
         [NinjaScriptProperty]

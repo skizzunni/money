@@ -28,7 +28,8 @@ CFG = NoiseConfig(**{**V21, "qty": 1, "lookback": 14, "trail_from": "", "tv_path
 # G6's 60-minute time stop
 GROW = NoiseConfig(**{**V21, "qty": 1, "lookback": 14, "max_loss_per_trade": 187.5, "after_loss_ml_mult": 250 / 187.5,
                       "trail_dd": 2000.0, "trail_from": "", "profit_step": 1500.0, "size_up_to": 15,
-                      "budget_actual": True, "time_stop": 60, "tv_path": False, "gap_go": True, "gap_go_max_qty": 1},
+                      "budget_actual": True, "time_stop": 60, "tv_path": False, "gap_go": True, "gap_go_max_qty": 1,
+                      "gap_go_locked_qty": 3, "trail_cap": 0.0},
                    nt_execution=True, round_prices=True, target_on_fill_bar=True)
 GROW_ARGS = ["Mode=Funded growth"]  # the default; its settings are the tested ones above
 
@@ -283,7 +284,7 @@ def test_v38_gap_go(sim, sample_1m, tmp_path):  # noqa: F811
         if on:
             assert len(gaps) >= 3 and len(nt_gaps) == len(gaps)
             for t in gaps:
-                assert t.qty == 1 and t.entry_time.strftime("%H:%M") == "09:35"
+                assert t.qty <= 3 and t.entry_time.strftime("%H:%M") == "09:35"
                 assert t.reason == "Gap stop" or t.exit_time.strftime("%H:%M") == "09:55"
         else:
             assert not gaps and not nt_gaps
@@ -639,3 +640,29 @@ def test_v38_bigger_accounts_agree(sim, sample_1m, minutes, mode, daily, trail, 
     printed = "\n".join(x for x in r.stdout.splitlines() if x.startswith(("P,", "D,")))
     assert f"${daily:.0f} a day" in printed, "the startup line shows the mode's daily budget"
     assert f"flat at -${daily / 1800 * 1900:.0f} today" in printed, "the loss guard follows the account"
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+def test_v38_gap_go_locked(sim, sample_1m, tmp_path):  # noqa: F811
+    """G67b: once the trailing floor has stopped at the start, a gap trade takes up to GapGoLocked contracts (3 in
+    Funded growth), 1 before. A $600 trailing drawdown (Custom mode) makes the floor stop within the sample. NinjaTrader's code and
+    the model agree trade for trade at 3 and at 0 (1 contract always), and only the locked account's gap trades grow."""
+    bars = resample(sample_1m, "5min")
+    path = tmp_path / "bars.csv"
+    with path.open("w") as f:
+        for t, r in zip(bars.index, bars.itertuples(), strict=True):
+            f.write(f"{t:%Y-%m-%d %H:%M},{r.open!r},{r.high!r},{r.low!r},{r.close!r}\n")
+    sizes = {}
+    for lq in (3, 0):
+        r = subprocess.run([DOTNET, str(sim), str(path), "5", "Strategy=V38", "Mode=Custom", "TrailDD=600",
+                            f"GapGoLocked={lq}"], capture_output=True, text=True, env=ENV)
+        assert r.returncode == 0, r.stderr[-2000:]
+        nt = [x.split(",")[1:] for x in r.stdout.splitlines() if x.startswith("T,")]
+        py = run(bars, dataclasses.replace(GROW, trail_dd=600.0, gap_go_locked_qty=lq), minutes=5).trades
+        assert len(nt) == len(py) >= 20
+        for a, t in zip(nt, py, strict=True):
+            assert (int(a[0]), int(a[1]), int(a[3])) == (t.direction, t.entry_bar, t.exit_bar), (a, t)
+            assert float(a[2]) == t.entry and float(a[4]) == t.exit, (a, t)
+            assert math.isclose(float(a[6]), t.pnl, abs_tol=1e-6), (a, t)
+        sizes[lq] = [t.qty for t in py if t.reason.startswith("Gap")]
+    assert max(sizes[0]) == 1 and max(sizes[3]) > 1 and max(sizes[3]) <= 3

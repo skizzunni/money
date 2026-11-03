@@ -1,0 +1,2 @@
+index gapgo1lq3 starts 54 lost (at the floor) 6 dead (lost or frozen) 6 below start 3 median net 27703 worst net -710 lowest point -1635 reached +2000 52
+nq gapgo1lq3 starts 35 lost (at the floor) 5 dead (lost or frozen) 5 below start 2 median net 34564 worst net -1125 lowest point -1125 reached +2000 33

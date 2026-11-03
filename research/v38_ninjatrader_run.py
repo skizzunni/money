@@ -4,7 +4,7 @@ import numpy as np, pandas as pd
 import e50_eval as E
 import t1_eval as T, v24_scan as VS
 GROW = len(sys.argv) > 1 and sys.argv[1] == "grow"
-LQ = int(os.environ.get("GAP_LOCKED", "0"))  # G67: gap and go's contracts once the floor has stopped
+LQ = int(os.environ.get("GAP_LOCKED", "3"))  # G67: gap and go's contracts once the floor has stopped
 NTARGS = ["Mode=Funded growth", "TrailFrom=2025-01-02", f"GapGoLocked={LQ}"] if GROW else ["Mode=Evaluation"]
 from mnqbot.noise import NoiseConfig, run
 S = "/tmp/claude-0/-home-user-money/b0ea31b5-d9fc-525a-a114-db6430eff3ed/scratchpad"

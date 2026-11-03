@@ -2961,3 +2961,53 @@ fix (one session in 10-15 years), and there `gap_go_locked_qty` 2 lost NQ's acco
 **Adopt (the better by window net) only on G67's rule:** against today's default on the same corrected data, a
 higher net on all three 5-minute sets in both executions; the floor never touched; no more days at −$1,000; on G35's
 89 start dates, no more lost or frozen accounts than the default's on the corrected data.
+
+**G67b result (run once, 2026-11-03): passes. Gap trades take up to 3 contracts once the floor has stopped.**
+
+On the corrected data (the window and NQ without 2025-06-20; the index as it was, clean there):
+
+| 5-minute, chart / NinjaTrader | today's default | up to 2 once stopped | **up to 3 once stopped** |
+|---|---|---|---|
+| window | $23,081 / $22,731 | $27,976 / $27,683 | **$30,161 / $29,836** |
+| NQ 2015-Jul 2025 | $306,951 / $304,106 | $335,883 / **−$2, lost early** | **$356,039 / $359,943** |
+| index 2011-Sep 2026 | $447,417 / $438,285 | $478,825 / $468,724 | **$508,291 / $498,705** |
+| days at −$1,000 or worse (chart NQ) | 1 | 1 | 1 |
+| floor touched | never | NQ, NinjaTrader's | **never** |
+
+**G35's 89 start dates (21 months each), corrected data:**
+
+| | lost or frozen, NQ / index | median net, NQ / index |
+|---|---|---|
+| today's default (1 contract) | 6 of 35 / 5 of 54 = **11** | $32,382 / $30,180 |
+| **up to 3 once stopped** | 5 of 35 / 6 of 54 = **11** | $34,564 / $27,703 |
+
+Every part of the rule holds for 3 (2 fails: NQ's account in NinjaTrader's execution), so **3 is adopted**.
+
+**The data fix alone** raised today's default on the window from $19,618 / $19,626 to $23,081 / $22,731 (chart /
+NinjaTrader): the false 445-point fall on 2025-06-20 had cost the gap trade and every contract step after it.
+
+**What to keep in mind:**
+- **2 failing where 3 passes** shows NQ's 2015 start is still on the edge: a small change in the path decides that
+  account. The 89 start dates are the better guide (11 either way).
+- **The typical 21-month index account makes a little less** ($27,703 against $30,180). The long histories and NQ's
+  typical account make more.
+- **The window's closed drawdown is larger**, $3,706 against $2,600 (chart). The floor is never touched.
+
+(`verification/noise_v2/g67b_locked_qty.txt`, `g35_start_dates_gapgo1.csv` and `g35_start_dates_gapgo1lq3.csv`.)
+
+**U20 (2026-11-03): gap and go at up to 3 MNQ once the floor has stopped (G67b), and the data fix.**
+- **The setting:** group 1, "Gap and go once the trailing floor has stopped at the start: up to this many MNQ (0 = 1
+  MNQ always)", **3 by default**. Until the account's highest end-of-day balance is $2,000 above the start (the floor
+  then stops at the start balance for good), each gap trade is 1 MNQ, as before. After that, up to 3, still sized
+  down to the day's budget and the room above the floor.
+- **The file you trade, on the NinjaTrader simulator** (`research/v38_ninjatrader_run.py grow`, 5-minute, from
+  2025-01-02): **401 trades, $29,820.65, 53.6% winners, profit factor 1.709, closed drawdown $3,648, worst day
+  −$899.11, largest loss −$1,006.91.** It matches the model trade for trade except one: 2026-03-09, where the window's
+  data stops at 15:10 (the model closes at that bar, the strategy at the next open; live, MNQ trades to 16:00). The
+  30-minute chart is unchanged (gap and go needs 5-minute bars): $28,620.10, all 303 trades identical
+  (`verification/noise_v2/v38g_nt_lq3_2026-11-03.txt` and the trade list beside it).
+- **Tests:** `test_v38_gap_go_locked`: with a $600 trailing drawdown (Custom mode), so the floor stops within the
+  sample, NinjaTrader's code and the model agree trade for trade at 3 and at 0, gap trades grow only at 3, and never past
+  3. The test's Funded growth config now stops its floor at the start (`trail_cap` 0), as NinjaTrader's always does.
+- **The data:** `research/data_errors.py` scans every set; `research/v24_scan.py` drops `BAD_SESSIONS` (2025-06-20)
+  from the window proxy and the NQ history.
