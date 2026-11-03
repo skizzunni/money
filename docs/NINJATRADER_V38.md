@@ -2529,3 +2529,20 @@ percent of price, that is a 0.16% stop and a 0.38% target.
 - the profit factor is at least 1.1 in all four.
 
 A pass goes on to sizing and the shared daily budget beside the day bot before anything goes into the user's file.
+
+**G58 result (run once, 2026-11-03): rejected; as rules, the style loses everywhere.**
+
+| 1 MNQ | A, with the trend: trades a week, net, t, profit factor | B, both sides |
+|---|---|---|
+| NQ 2015-2019 | 14.0, −$8,260, t −1.01, 0.96 | 30.1, −$25,577, t −1.86, 0.95 |
+| NQ 2020-Jul 2025 | 17.9, −$46,700, t −3.05, 0.87 | 41.2, −$78,203, t −3.95, 0.90 |
+| index 2011-2018 | 15.9, −$33,754, t −2.54, 0.92 | 32.9, −$56,648, t −2.80, 0.94 |
+| index 2019-Sep 2026 | 18.6, −$76,114, t −3.98, 0.86 | 41.6, −$128,832, t −5.03, 0.89 |
+
+- **Trades every day, and loses.** 32-36% winners, about a fifth of trades reaching the 0.38% target, the rest stopped
+  or timed out. Over thousands of trades the loss is far beyond luck.
+- **The user's week, by these rules (Yahoo's MNQ bars):** Oct 30 - Nov 3 gives 9 trades and −$34 (A), or 28 trades and
+  +$76 (B). Aug 25 - Oct 29 gives −$2,103 (A) or +$1,670 (B). So the rules don't reproduce the +$3,804: that week came
+  from the user's own choices of which stretched moves to sell, in a one-way fall.
+
+The day bot stays as it is (`research/g58_fade_extremes.py`).
