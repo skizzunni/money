@@ -2752,3 +2752,16 @@ leaves it alone.
   drawdown $2,416, worst day −$899.09.
 - **Against the model:** all 481 trades agree except the known 12/24/2024 warm-up trade ($0.50).
 - **30-minute bars:** unchanged (gap and go needs the 09:30 bar).
+
+## G61: gap and go at 2 contracts (registered 2026-11-03, before its run)
+
+**The idea:** G60 adopted gap and go at 1 contract. Its stage 4, at the bot's full size, lost accounts. 2 contracts is
+the step between.
+
+**The variant:** Funded growth with gap and go at up to 2 contracts (`gap_go_max_qty` 2), against today's default (1).
+
+**Adopt only if, against 1 contract:**
+- a higher net on all three 5-minute sets in both executions;
+- the floor never touched;
+- no more days at −$1,000;
+- on G35's 89 start dates, no more lost or frozen accounts than 1 contract's (11).

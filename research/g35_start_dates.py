@@ -31,7 +31,8 @@ EXTRA = {"base": {}, "gentle": {"steps_after_lock": True}, "cap10": {"size_up_to
          "gapgo": {"gap_go": True, "gap_go_skip_month_first": True},
          "gapgo3": {"gap_go": True, "gap_go_skip_month_first": True, "gap_go_after_lock": True,
                     "gap_go_cap": True},
-         "gapgo1": {"gap_go": True, "gap_go_skip_month_first": True, "gap_go_max_qty": 1}}[VARIANT]
+         "gapgo1": {"gap_go": True, "gap_go_skip_month_first": True, "gap_go_max_qty": 1},
+         "gapgo2": {"gap_go": True, "gap_go_skip_month_first": True, "gap_go_max_qty": 2}}[VARIANT]
 
 
 def with_1600(bars: pd.DataFrame, m: int) -> pd.DataFrame:
