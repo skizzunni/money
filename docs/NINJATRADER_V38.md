@@ -2824,3 +2824,25 @@ profit grows.
 - the floor never touched;
 - no more days at −$1,000;
 - on G35's 89 start dates, no more lost or frozen accounts (11).
+
+**G63 result (run once, 2026-11-03): rejected; $1,000 steps still lose the NQ account.**
+- **The window:** $20,191 / $22,320 (against $19,618 / $19,626).
+- **The index:** $450,619 / $445,250 (against $447,417 / $438,285).
+- **NQ from 2015:** **$0 / $1, at the floor in its first months**, in both executions.
+
+The NQ start of 2015 is the bot's narrowest escape (its lowest room is $238-459), and faster steps take it over the edge.
+(`verification/noise_v2/g63_steps.txt`. G62's start-date run, for the record: 10 lost or frozen, median $38,045 NQ /
+$31,129 index; it was already rejected.)
+
+## G64: the gap and go trigger (registered 2026-11-03, before its run)
+
+**The idea:** gap and go fires when the gap is at least 0.5 times the last 14 sessions' average. At 0.25 it fires on
+more days (more trading days, more early profit at 1 contract); at 0.75 on fewer, larger gaps.
+
+**The variants:** today's default with `gap_go_k` 0.25 and 0.75.
+
+**Adopt (the better by window net) only if, against 0.5:**
+- a higher net on all three 5-minute sets in both executions;
+- the floor never touched;
+- no more days at −$1,000;
+- on G35's 89 start dates, no more lost or frozen accounts (11).

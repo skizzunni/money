@@ -10,3 +10,5 @@
 {'bars': 5, 'nt': True, 'news mult': 2.0, 'set': 'proxy', 'days traded %': 44.0, 'gap trades': 117, 'trades': 406, 'net $': 22615, 'pf': 1.722, 'win %': 53.9, 'time stops': 34, 'closed dd $': 2483, 'worst day $': -899, 'days <= -1000': 0, 'floor touches': 0}
 {'bars': 5, 'nt': True, 'news mult': 2.0, 'set': 'nq', 'days traded %': 51.5, 'gap trades': 746, 'trades': 3073, 'net $': 298474, 'pf': 1.525, 'win %': 55.9, 'time stops': 140, 'closed dd $': 17629, 'worst day $': -900, 'days <= -1000': 0, 'floor touches': 0}
 {'bars': 5, 'nt': True, 'news mult': 2.0, 'set': 'index', 'days traded %': 49.4, 'gap trades': 1022, 'trades': 4249, 'net $': 436003, 'pf': 1.57, 'win %': 54.6, 'time stops': 230, 'closed dd $': 19062, 'worst day $': -900, 'days <= -1000': 0, 'floor touches': 0}
+index nfp2 starts 54 lost (at the floor) 6 dead (lost or frozen) 6 below start 3 median net 31129 worst net -710 lowest point -1681 reached +2000 51
+nq nfp2 starts 35 lost (at the floor) 4 dead (lost or frozen) 4 below start 2 median net 38045 worst net -1125 lowest point -1175 reached +2000 33
