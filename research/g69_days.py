@@ -39,7 +39,12 @@ PACK = {"P0": {}, "P1": {"gap_go_small_k": 0.0}, "P2": {"gap_go_small_k": 0.0, "
         "A": {"gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
               "fill_min_room": 3000.0, "day_keep": 1.0},
         "B": {"gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
-              "fill_min_room": 4000.0, "day_keep": 1.0}}
+              "fill_min_room": 4000.0, "day_keep": 1.0},
+        # G72: G71 without day_keep
+        "A2": {"gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
+               "fill_min_room": 3000.0},
+        "B2": {"gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
+               "fill_min_room": 4000.0}}
 for pk in (sys.argv[4].split(",") if len(sys.argv) > 4 else list(PACK)):
     for name, (bars, first, skip) in S.D.items():
         if name == "win":

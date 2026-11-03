@@ -3123,3 +3123,27 @@ escapes that stretch by a few hundred dollars; anything more on those days tips 
 on all three sets is the candidate; if neither, B, with the shortfall reported.
 
 **Stage 2:** G69's rule, against today's default (U20).
+
+**G71 result (run once, 2026-11-03): rejected; 70% of days reached, but the money and an account lost.**
+
+| 5-minute | days with a trade: window / NQ / index | net: window / NQ / index |
+|---|---|---|
+| today's default (U20), chart | 43.9% / 51.5% / 49.4% | $30,161 / $356,039 / $508,291 |
+| **A** ($3,000 cushion), chart | **72.4% / 82.3% / 80.6%** | $26,220 / $266,571 / $341,283 |
+| A, NinjaTrader's | 72.6% / **4.4%, lost** / 80.6% | $26,177 / $1 / $342,229 |
+| B ($4,000 cushion), chart | 68.7% / 82.6% / 80.5% | $26,557 / $274,988 / $341,293 |
+
+Stage 1 chose A, the first at 70% on all three. Stage 2 rejects it: less net everywhere, and NQ's account lost in
+NinjaTrader's execution. Until the floor stops, A differs from the default only by `day_keep`, so that is what lost NQ
+(a smaller trade after a green morning changes the early path) and most of the lost money: a green morning's bigger
+afternoon trades are where the bot makes its profit. The cushion itself did its job: the fill-ins stopped in NQ's
+August 2015 and the chart's NQ account lived (`verification/noise_v2/g71_cushion.txt`).
+
+## G72: G71 without `day_keep` (registered 2026-11-03, before its run)
+
+**From G71:** keep the fill-in trades with a cushion (after the floor stops, while $3,000 / $4,000 above it), drop the
+`day_keep` change.
+
+**Packages:** A2 (`fill_min_room` 3000), B2 (4000), both G69's P3 fill-ins with `fill_after_lock`.
+
+**Stage 1 and stage 2:** G71's (days ≥ 70% on all three sets, A2 first; then G69's rule against today's default).
