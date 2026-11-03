@@ -2446,3 +2446,9 @@ to the floor in its first months. 2011-2018 has a −$9,300 day, which only a da
 across it) could make under a $900 budget; either way it fails. (The Nasdaq column for 2019 was the same single start
 date, which G35 already counts among the lost starts.) This agrees with rounds forty-seven and forty-eight: the edge is
 the Nasdaq's. `research/g56_mes.py`.
+
+**How long to $53,000 on a new 50K (+$3,000), 2026-11-03.** G35's 89 start dates, 21 months each, Funded growth on
+5-minute bars (`verification/noise_v2/g35_start_dates_base.csv`, column "days to 3k"; every other column unchanged):
+78 of 89 got there. The median was 143 calendar days (about 4½ months): a quarter of starts within 97 days, a quarter
+after 234 days. 9 got there within 2 months, 19 within 3 and 47 within 6. 11 (12%) were lost or frozen first. The
+user's window, from 2025-01-02, took 13½ months (+$2,000 by late April 2025, then a flat stretch).
