@@ -2676,3 +2676,8 @@ The same number of accounts lost in all (14 of 89), more on NQ and fewer on the 
 about 35-40% more. It fails the rule set before the run (more lost NQ accounts, days past −$1,000). It is not made the
 default. As a switch, its trade-off is: half of all days with a trade instead of a third, about a third more profit in
 the typical account, and a real chance that a 09:35 fill goes past its stop and a day goes past the $1,000 limit.
+
+**G60 stage 4 (registered 2026-11-03, before its run): stage 2, out at 09:55.** In NinjaTrader an exit and the bot's
+first entry in the same bar can collide (an exit and a reverse sent together). So the gap trade closes at the 09:55
+open (`gap_go_exit` 595), a bar before the bot's first fill can come. Otherwise it is stage 2 (no wait for the floor,
+no cap). Reported as stage 2, for the switch's description; it is not made the default whatever the result.

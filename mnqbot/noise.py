@@ -309,6 +309,9 @@ class NoiseConfig:
     # made), and each one's stop no farther than the bot's max loss a contract from the expected fill
     gap_go_after_lock: bool = False
     gap_go_cap: bool = False
+    # the minute of day whose bar's open closes the gap trade (595: 09:55, a bar before the bot's first fill at 10:00,
+    # so the two never meet in one bar; 600 was G60's first test)
+    gap_go_exit: int = 595
     gap_go_skip_month_first: bool = False
     # research (G13): a time lock. A trade not yet locked that is in profit at a bar close time_lock minutes or more
     # after its fill is locked (its stop to the entry plus lock_plus, from the next bar)
@@ -634,8 +637,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
         in_rth = t_min >= RTH_OPEN and end <= RTH_CLOSE
 
         if cfg.gap_go:  # G60: gap and go, 09:35-10:00, before the bot's first fill
-            if gg is not None and (t_min >= FIRST_CHECK or t.date() != idx[gg["bar"]].date()):
-                gap_close(i, o[i] - gg["d"] * slip, "Gap 10:00")
+            if gg is not None and (t_min >= cfg.gap_go_exit or t.date() != idx[gg["bar"]].date()):
+                gap_close(i, o[i] - gg["d"] * slip, "Gap exit")
             if t_min == RTH_OPEN + 5 and i > 0 and idx[i - 1].date() == t.date() \
                     and idx[i - 1].hour * 60 + idx[i - 1].minute == RTH_OPEN and not math.isnan(prev_close):
                 gap = day_open - prev_close
