@@ -1644,3 +1644,30 @@ Contracts are still added per $1,500 of profit.
 - the share of dead accounts is no higher than the 50K's on both NQ and the index;
 - the median net is higher than the 50K's on both;
 - the window's net is higher, the floor never touched, and no day reaches its account's daily limit.
+
+**G39 result (run once, 2026-11-03): rejected; scaling the size up with the account loses more accounts.**
+
+| 89 start dates, 21 months | 50K (now) | 100K, 2 to 30 contracts | 150K, 3 to 45 contracts |
+|---|---|---|---|
+| dead, NQ / index | 7 / 7 | 14 / 19 | 15 / 23 |
+| median net, NQ / index | $22,925 / $23,070 | $13,329 / $23,241 | $10,614 / $10,242 |
+| mean net, NQ / index | $21,333 / $22,498 | $30,192 / $33,696 | $60,480 / $40,263 |
+
+The means rise: the accounts that survive make far more (NQ from 2015: $572k at 100K, $1.09M at 150K). But starting at
+2-3 contracts risks the larger floor as fast as it grows. More than twice as many accounts die, and the window itself
+sat at its floor from early on (5-minute bars: −$1,621 at 100K, −$1,939 at 150K)
+(`verification/noise_v2/g39_account_size.csv`, `g35_start_dates_acct*.csv`).
+
+## G40: a bigger account at the 50K's size (registered 2026-11-03, before its run)
+
+**The idea, from G39:** keep the 50K's trading exactly (1 starting contract, +1 per $1,500, up to 15, $187.50 a
+contract). Let the bigger account's limits act as cushion, not size:
+- **100K:** daily budget $1,800, trailing drawdown $3,000;
+- **150K:** daily budget $2,700, trailing drawdown $4,500.
+
+A bad start then has $3,000-4,500 to burn through instead of $2,000.
+
+**Adopt (as Modes "Funded growth 100K" and "Funded growth 150K") only if, on G35's 89 start dates:**
+- fewer dead accounts than the 50K on both NQ and the index;
+- a median net at least the 50K's on both;
+- and on the window: at least the 50K's net, the floor never touched, and no day at its daily limit.

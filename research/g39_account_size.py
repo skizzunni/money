@@ -34,6 +34,10 @@ if NT:
     S.D = {k: (with_1600(b, S.MIN[0]), first, skip) for k, (b, first, skip) in S.D.items()}
 SIZES = {"50K": {}, "100K": {"qty": 2, "daily_loss_limit": 1800.0, "trail_dd": 3000.0, "size_up_to": 30},
          "150K": {"qty": 3, "daily_loss_limit": 2700.0, "trail_dd": 4500.0, "size_up_to": 45}}
+if "--cushion" in sys.argv:  # G40: the 50K's sizing, the bigger account's limits as cushion
+    sys.argv.remove("--cushion")
+    SIZES = {"50K": {}, "100K cushion": {"daily_loss_limit": 1800.0, "trail_dd": 3000.0},
+             "150K cushion": {"daily_loss_limit": 2700.0, "trail_dd": 4500.0}}
 for acct, extra in SIZES.items():
     for name, (bars, first, skip) in S.D.items():
         if name == "win":
