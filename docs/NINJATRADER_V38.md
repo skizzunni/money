@@ -3094,3 +3094,32 @@ window's, NQ's and the index's sessions is the candidate; if neither, P3L, with 
 **Stage 2:** G69's (as the default if a higher net on all three in both executions, the floor never touched, no more
 days at −$1,000, and no more lost or frozen accounts on G35's 89 start dates (11); as a switch if only the account
 rules hold; otherwise rejected).
+
+**G70 result (run once, 2026-11-03): rejected; NQ's 2015 account is still lost.**
+
+| 5-minute, chart's execution | days with a trade: window / NQ / index | net: window / NQ / index |
+|---|---|---|
+| today's default (U20) | 43.9% / 51.5% / 49.4% | $30,161 / $356,039 / $508,291 |
+| P2L | 60.0% / **4.1%, lost** / 63.3% | $32,325 / $0 / $503,134 |
+| P3L | **80.7%** / **4.8%, lost** / **81.0%** | $31,217 / −$3 / $522,078 (a −$1,042 day) |
+
+NQ's account (from January 2015) reached +$6,387 by July 2015, then the August 2015 crash took it back to the floor:
+mostly the bot's own 4-5 contract losses and 3-contract gap stops, with the fill-in losers on top. The default
+escapes that stretch by a few hundred dollars; anything more on those days tips it over. The index's −$1,042 day
+(2016-05-16): a +$115 gap trade raised that day's budget, and the bot's next trade, sized to it, exited past its stop at
+−$1,156. NinjaTrader's execution was not run to the end: stage 2 was already decided
+(`verification/noise_v2/g70_fill_after_lock.txt`).
+
+## G71: fill-in trades only with a cushion, and today's gains don't raise today's risk (registered 2026-11-03, before its run)
+
+**From G70, two changes:**
+- **A cushion for the fill-ins** (`fill_min_room`): G69's P3 fill-in trades only while the account is at least
+  $3,000 (variant A) or $4,000 (variant B) above the trailing floor. They stop in a drawdown like August 2015's and
+  start again once it's made back. The floor must also have stopped (`fill_after_lock`).
+- **Today's gains don't widen today's budget** (`day_keep` 1): the bot's room for the day is $900 plus today's losses,
+  never plus today's profits, so a morning gap win can't size a bigger trade that day.
+
+**Stage 1 (days only):** 5-minute, the chart's execution. A, then B: the first with trades on at least 70% of sessions
+on all three sets is the candidate; if neither, B, with the shortfall reported.
+
+**Stage 2:** G69's rule, against today's default (U20).
