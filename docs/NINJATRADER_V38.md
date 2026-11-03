@@ -1743,3 +1743,29 @@ modes (`verification/noise_v2/g41_steps_big.csv`, `g35_start_dates_cush*s1000.cs
 - fewer dead accounts on both NQ and the index (G35's 89 start dates);
 - a median net at least the 50K's on both;
 - a window net at least the 50K's at 5 and 30 minutes, the floor never touched, and no day at the daily limit.
+
+**G42 result (run once, 2026-11-03): adopted as two more modes.** On Apex's rules both pass G40's bar against the 50K.
+
+| | 50K | Apex 100K | Apex 150K |
+|---|---|---|---|
+| dead, NQ / index | 7 / 7 | 5 / 2 | 4 / 2 |
+| median net, NQ / index | $22,925 / $23,070 | $28,447 / $34,472 | $27,454 / $35,363 |
+| 10th percentile, NQ / index | −$460 / $444 | $1 / $5,843 | $987 / $6,748 |
+| window, 5 / 30 min | $18,549 / $28,620 | $20,512 / $37,838 | $24,041 / $44,330 |
+| worst day, window to histories (daily loss rule) | −$899 ($1,000) | −$1,352 ($1,500) | −$1,805 ($2,000) |
+
+The floor was never touched (`verification/noise_v2/g42_apex.csv`, `g35_start_dates_apex*.csv`).
+
+**In MnqNoiseV38.cs:**
+- **Funded growth Apex 100K:** $1,350 a day, a $3,000 floor, loss guard $1,425.
+- **Funded growth Apex 150K:** $1,800, $4,000, $1,900.
+
+The 100K / 150K modes are Topstep's ($2,000 / $3,000 daily, $3,000 / $4,500 trailing).
+
+**Caveats:**
+- **Where Apex's trail stops.** Published sources differ: at the start plus $100, or later. The bot assumes the start,
+  as with the others, so an account whose trail stops higher has a little less cushion than modelled.
+- **The source of the rules.** These come from third-party summaries of 2026's rules; check them on the firm's site.
+
+`test_v38_bigger_accounts_agree` now covers all four modes at 5 and 30 minutes, trade for trade. All 25 NinjaTrader
+v3.8 tests pass.

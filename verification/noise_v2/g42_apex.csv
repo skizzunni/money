@@ -1,0 +1,13 @@
+execution,bars,account,set,trades,net $,pf,win %,largest loss $,closed dd $,worst day $,days <= -1000,floor touches
+NinjaTrader,5,Apex 100K,proxy,287,20512,1.821,61.0,-1324,2351,-1324,3,0
+NinjaTrader,5,Apex 100K,nq,2314,409079,1.583,61.8,-3776,21501,-1349,333,0
+NinjaTrader,5,Apex 100K,index,3198,587373,1.58,61.1,-3776,22788,-1352,507,0
+NinjaTrader,5,Apex 150K,proxy,290,24041,1.92,61.4,-1324,2017,-1720,4,0
+NinjaTrader,5,Apex 150K,nq,2411,507700,1.591,61.9,-3776,27737,-1800,364,0
+NinjaTrader,5,Apex 150K,index,3312,724817,1.586,61.3,-3776,25047,-1805,543,0
+NinjaTrader,30,Apex 100K,proxy,248,37838,1.867,54.4,-1634,5764,-1325,14,0
+NinjaTrader,30,Apex 100K,nq,1893,390122,1.511,50.2,-3776,26045,-1350,340,0
+NinjaTrader,30,Apex 100K,index,2669,439168,1.391,48.6,-3776,35745,-1349,542,0
+NinjaTrader,30,Apex 150K,proxy,252,44330,1.949,54.0,-1713,5956,-1799,15,0
+NinjaTrader,30,Apex 150K,nq,1953,485904,1.523,50.3,-3776,28182,-1799,363,0
+NinjaTrader,30,Apex 150K,index,2746,555144,1.408,48.7,-3776,38266,-1800,562,0

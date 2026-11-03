@@ -226,7 +226,7 @@ def test_v38_startup_checks(sim, sample_1m, tmp_path):  # noqa: F811
     loose, warn, _ = go("Mode=  funded GROWTH ")
     assert loose == ok_trades and warn == [], "the mode is read whatever its case and spaces"
     _, warn, dash = go("Mode=Funded")
-    assert any("isn't Funded growth (50K, 100K or 150K), Evaluation or Custom" in x for x in warn)
+    assert any("isn't Funded growth (50K, 100K, 150K, Apex 100K or Apex 150K), Evaluation or Custom" in x for x in warn)
     assert "SETUP WARNING (1)" in dash
     _, warn, _ = go("Mode=Funded growth", "SimInstrument=NQ 12-26")
     assert any("the bot was built and tested on MNQ" in x for x in warn)
@@ -387,7 +387,9 @@ def test_v38_day_summary(sim, sample_1m, tmp_path):  # noqa: F811
 
 @pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
 @pytest.mark.parametrize(("mode", "daily", "trail"), [("Funded growth 100K", 1800.0, 3000.0),
-                                                      ("Funded growth 150K", 2700.0, 4500.0)])
+                                                      ("Funded growth 150K", 2700.0, 4500.0),
+                                                      ("Funded growth Apex 100K", 1350.0, 3000.0),
+                                                      ("Funded growth Apex 150K", 1800.0, 4000.0)])
 @pytest.mark.parametrize("minutes", [5, 30])
 def test_v38_bigger_accounts_agree(sim, sample_1m, minutes, mode, daily, trail, tmp_path):  # noqa: F811
     """G40's modes: a 100K / 150K account at the 50K's size, its limits as cushion. NinjaTrader's code agrees with the

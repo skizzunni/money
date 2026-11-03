@@ -619,11 +619,13 @@ namespace NinjaTrader.NinjaScript.Strategies
                 if (string.Equals(mc, "Funded growth", StringComparison.OrdinalIgnoreCase)) Mode = "Funded growth";
                 else if (string.Equals(mc, "Funded growth 100K", StringComparison.OrdinalIgnoreCase)) Mode = "Funded growth 100K";
                 else if (string.Equals(mc, "Funded growth 150K", StringComparison.OrdinalIgnoreCase)) Mode = "Funded growth 150K";
+                else if (string.Equals(mc, "Funded growth Apex 100K", StringComparison.OrdinalIgnoreCase)) Mode = "Funded growth Apex 100K";
+                else if (string.Equals(mc, "Funded growth Apex 150K", StringComparison.OrdinalIgnoreCase)) Mode = "Funded growth Apex 150K";
                 else if (string.Equals(m, "Evaluation", StringComparison.OrdinalIgnoreCase)) Mode = "Evaluation";
                 else if (string.Equals(m, "Custom", StringComparison.OrdinalIgnoreCase)) Mode = "Custom";
                 else
                 {
-                    setupWarnings.Add("Mode \"" + Mode + "\" isn't Funded growth (50K, 100K or 150K), Evaluation or Custom: running the settings below as Custom");
+                    setupWarnings.Add("Mode \"" + Mode + "\" isn't Funded growth (50K, 100K, 150K, Apex 100K or Apex 150K), Evaluation or Custom: running the settings below as Custom");
                     Mode = "Custom";
                 }
                 if (Mode.StartsWith("Funded growth"))  // the tested growth settings (docs/NINJATRADER_V38.md), whatever is set below
@@ -634,6 +636,9 @@ namespace NinjaTrader.NinjaScript.Strategies
                     // daily loss and a $3,000 / $4,500 trailing drawdown; the bot's budget is 90% of the daily loss)
                     if (Mode == "Funded growth 100K") { DailyLoss = 1800; TrailDD = 3000; LossGuard = 1900; }
                     if (Mode == "Funded growth 150K") { DailyLoss = 2700; TrailDD = 4500; LossGuard = 2850; }
+                    // G42: Apex's end-of-day accounts, a tighter day: a $1,500 / $2,000 daily loss, a $3,000 / $4,000 trail
+                    if (Mode == "Funded growth Apex 100K") { DailyLoss = 1350; TrailDD = 3000; LossGuard = 1425; }
+                    if (Mode == "Funded growth Apex 150K") { DailyLoss = 1800; TrailDD = 4000; LossGuard = 1900; }
                 }
                 else if (Mode == "Evaluation")  // v3.8: 1 MNQ, $260 a trade, $900 a day
                 {
@@ -1036,7 +1041,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         #region Properties
         [NinjaScriptProperty]
-        [Display(Name = "Mode: Funded growth (50K), Funded growth 100K, Funded growth 150K, Evaluation, or Custom (the settings below)", Order = 0, GroupName = "1. Size and risk")]
+        [Display(Name = "Mode: Funded growth (50K), Funded growth 100K / 150K (Topstep), Funded growth Apex 100K / Apex 150K, Evaluation, or Custom", Order = 0, GroupName = "1. Size and risk")]
         public string Mode { get; set; }
 
         [NinjaScriptProperty]
