@@ -2335,3 +2335,16 @@ it is.
 - there are no more days at −$1,000.
 
 The 30-minute runs are reported, not judged.
+
+**G53 result (run once, 2026-11-03): rejected; trades against a big gap pay.**
+
+| 5-minute net, chart / NinjaTrader | as it is | no entries against a gap over 1% |
+|---|---|---|
+| window | **$18,516 / $18,549** | $16,714 / $16,285 |
+| NQ from 2015 | **$277,322 / $267,571** | $266,338 / $263,007 |
+| index from 2011 | **$407,796 / $404,250** | $402,941 / $398,392 |
+
+Blocking breakouts against the gap made less on every set, in both executions (−$1,800 to −$2,300 on the window). When
+price breaks the noise line against a big gap, it is a reversal of the gap the bot does well to follow. 30-minute bars
+were mixed (more on the index in the chart's execution, less on the window). `gap_block` stays in `mnqbot/noise.py`,
+off (`verification/noise_v2/g53_gap.csv`).
