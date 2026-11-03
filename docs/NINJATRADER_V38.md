@@ -2765,3 +2765,15 @@ the step between.
 - the floor never touched;
 - no more days at −$1,000;
 - on G35's 89 start dates, no more lost or frozen accounts than 1 contract's (11).
+
+**G61 result (run once, 2026-11-03): rejected; 2 contracts loses accounts in NinjaTrader's execution.**
+
+| 5-minute, chart / NinjaTrader | 1 contract (as it is) | 2 contracts |
+|---|---|---|
+| window | $19,618 / $19,626 | $21,681 / **$2, the account lost (a −$1,661 day)** |
+| NQ | $306,951 / $304,106 | $335,880 / **$2, the account lost** |
+| index | $447,417 / $438,285 | $478,825 / $468,724 (a −$1,009 day, chart) |
+
+In the chart's execution 2 contracts make 7-11% more. In NinjaTrader's, the window's and NQ's accounts go to the floor
+in their first months. A fast 09:35 open that gaps past the stop costs twice as much, and early on the account has no
+room for that. 1 contract stays (`verification/noise_v2/g61_gap_qty.txt`).
