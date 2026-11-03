@@ -3235,3 +3235,19 @@ A new account survives as often, and the typical one makes $6,000-7,700 more ove
 - **Tests:** `test_v38_more_days`: with a $600 trailing drawdown and a $100 cushion (Custom mode), so the fill-ins fire
   within the sample, NinjaTrader's code and the model agree trade for trade, and the switch adds trading days; off, the
   trades are the default's.
+
+## G75: the live loss guard in the backtest (registered 2026-11-03, before its run)
+
+**The idea:** MnqNoiseV38.cs has a live-only loss guard (`LossGuard` $950 in Funded growth). On every tick, when the
+day's closed P/L plus the open trade's reaches −$950, it closes the position at market and stops entries for the day.
+The backtests (the model's and the strategy's) don't have it, so a bar-close exit past the stop can show a day below
+−$1,000 that live trading would have cut near −$950: G70-G72's −$1,042 index day. Here the model gets it
+(`loss_guard` 950). Within a bar, the bot's stop orders fill first (at their price). Then, if the bar's worst price
+puts the day at −$950 or worse, the trade closes at the price where the day is −$950 (or the bar's open, if it opened
+past it), less the usual slippage. No more entries that day.
+
+**Variants:** today's default and U21's "More trading days" on, each with `loss_guard` 950.
+
+**Pass, for each:** against itself without the guard, both executions, all three 5-minute sets: no day at −$1,000 or
+worse, and a net no more than 1% lower (the guard only cuts a few days). If both pass, the guard goes into the
+NinjaTrader backtest too (the live guard is already there), and U21 is judged again on G74's rule.
