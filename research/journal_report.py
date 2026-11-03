@@ -2,7 +2,7 @@
 Documents\\NinjaTrader 8): the results, every loss broken down, the streaks, the days and the months, and checks that
 the rules held (no day at the $1,000 limit, the journal's own totals adding up).
 
-    python research/journal_report.py <journal.csv> [daily limit, default 1000]
+    python research/journal_report.py <journal.csv> [daily limit, default 1000] [goal, default 50000]
 """
 from __future__ import annotations
 
@@ -36,6 +36,7 @@ def group(t: pd.DataFrame, key) -> pd.DataFrame:
 def main() -> None:
     j = pd.read_csv(sys.argv[1])
     limit = float(sys.argv[2]) if len(sys.argv) > 2 else 1000.0
+    goal = float(sys.argv[3]) if len(sys.argv) > 3 else 50000.0
     t = j[j.kind == "TRADE"].copy()
     d = j[j.kind == "DAY"].copy()
     if t.empty:
@@ -97,10 +98,26 @@ def main() -> None:
               f"{money(dp.max())}, worst {money(dp.min())}.\n")
         print(f"Days at or past -{money(limit)[1:]}: {int((dp <= -limit).sum())}; days past -$800: "
               f"{int((dp <= -800).sum())}.\n")
+    print("**Weeks** (Monday to Friday, by exit)\n")
+    week = t["exit time"].dt.normalize() - pd.to_timedelta(t["exit time"].dt.weekday, unit="D")
+    w = t.groupby(week.dt.strftime("%Y-%m-%d"))["P/L"].agg(["count", "sum"]).reset_index()
+    w.columns = ["week of", "trades", "net"]
+    print(f"{len(w)} weeks: {int((w.net > 0).sum())} green, {int((w.net < 0).sum())} red; best {money(w.net.max())}, "
+          f"worst {money(w.net.min())}.\n")
+    w["net"] = w["net"].map(money)
+    print(table(w.tail(12)))
+    print("\n**Months**\n")
     m = t.groupby(t["exit time"].dt.strftime("%Y-%m"))["P/L"].agg(["count", "sum"]).reset_index()
     m.columns = ["month", "trades", "net"]
     m["net"] = m["net"].map(money)
     print(table(m))
+    span = (t["exit time"].max() - t["entry time"].min()).days / 30.44
+    if span >= 1:
+        pace = p.sum() / span
+        left = goal - p.sum()
+        when = ("goal reached" if left <= 0 else f"about {int(np.ceil(left / pace))} more months to {money(goal)}"
+                if pace > 0 else "no progress yet")
+        print(f"\n**Pace:** {money(pace)} a month over {span:.1f} months; {when}.")
     print("\n## Checks\n")
     ok_total = abs(float(t["total P/L"].iloc[-1]) - (float(t["total P/L"].iloc[0]) - p[0] + p.sum())) < 0.05
     ok_days = len(d) == 0 or abs(float(d["day P/L"].astype(float).sum()) - p.sum()) < 0.05 * max(1, len(d))

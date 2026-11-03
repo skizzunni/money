@@ -1535,3 +1535,15 @@ trades. All 217 NinjaTrader and simulator tests pass. Re-import the file to get 
 - the setup warning on going live.
 
 All 218 NinjaTrader and simulator tests pass. Re-import the file to get it.
+
+**U5 (2026-11-03): progress tracking.**
+- **The dashboard** now shows, from the account's own fills:
+  - "This week $X, this month $Y; real fills: N trades, W% winners";
+  - once a month of trading has passed, "Pace: $P a month since <date>, about M more months to the goal".
+- **`research/journal_report.py`** gains:
+  - a weekly table (the last 12 weeks, with green and red weeks, the best and the worst);
+  - the pace to the goal ($50,000 by default, or a third argument).
+
+`test_v38_progress_matches_the_journal` checks the dashboard's week, month, trade count and win rate against the
+journal's own trades to the cent, and the report's weeks and pace. All 15 NinjaTrader v3.8 tests pass. Re-import the
+file to get it.

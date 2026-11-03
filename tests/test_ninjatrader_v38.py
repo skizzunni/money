@@ -272,3 +272,39 @@ def test_v38_alerts(sim, sample_1m, tmp_path):  # noqa: F811
     _, warned = go(f"SimRealtimeFrom={live}", "LossGuard=0")
     setup = [a for a in warned if a[2] == "v38_setup"]
     assert len(setup) == 1 and int(setup[0][1]) in (live - 1, live) and "no live backstop" in setup[0][4]
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+def test_v38_progress_matches_the_journal(sim, sample_1m, tmp_path):  # noqa: F811
+    """The dashboard's progress (this week, this month, the real win rate, the pace) agrees with the journal's own
+    trades to the cent, and research/journal_report.py prints the weeks and the pace."""
+    import re
+    import sys
+
+    bars = resample(sample_1m, "5min")
+    path = tmp_path / "bars.csv"
+    with path.open("w") as f:
+        for t, r in zip(bars.index, bars.itertuples(), strict=True):
+            f.write(f"{t:%Y-%m-%d %H:%M},{r.open!r},{r.high!r},{r.low!r},{r.close!r}\n")
+    data = tmp_path / "nt8"
+    data.mkdir()
+    r = subprocess.run([DOTNET, str(sim), str(path), "5", "Strategy=V38", *GROW_ARGS, f"SimUserDataDir={data}"],
+                       capture_output=True, text=True, env=ENV)
+    assert r.returncode == 0, r.stderr[-2000:]
+    dash = [x for x in r.stdout.splitlines() if x.startswith("D,")][0]
+    week, month = (float(v) for v in re.search(r"This week \$(-?[\d.]+), this month \$(-?[\d.]+)", dash).groups())
+    n, pct = re.search(r"real fills: (\d+) trades, ([\d.]+)% winners", dash).groups()
+    j = pd.read_csv(data / "MnqNoiseV38_backtest.csv")
+    tr = j[j.kind == "TRADE"].copy()
+    tr["exit"] = pd.to_datetime(tr["exit time"])
+    last = tr["exit"].max()
+    monday = (last - pd.Timedelta(days=last.weekday())).normalize()
+    assert math.isclose(month, tr.loc[tr["exit"].dt.strftime("%Y-%m") == last.strftime("%Y-%m"), "P/L"].sum(),
+                        abs_tol=0.02)
+    assert math.isclose(week, tr.loc[tr["exit"] >= monday, "P/L"].sum(), abs_tol=0.02)
+    assert int(n) == len(tr) and math.isclose(float(pct), 100 * (tr["P/L"] > 0).mean(), abs_tol=0.05)
+    assert re.search(r"Pace: \$-?\d+ a month since \d{4}-\d{2}-\d{2}", dash)
+    rep = subprocess.run([sys.executable, "research/journal_report.py", str(data / "MnqNoiseV38_backtest.csv")],
+                         capture_output=True, text=True)
+    assert rep.returncode == 0, rep.stderr[-2000:]
+    assert "**Weeks**" in rep.stdout and "**Pace:**" in rep.stdout and "NO" not in rep.stdout.split("## Checks")[1]

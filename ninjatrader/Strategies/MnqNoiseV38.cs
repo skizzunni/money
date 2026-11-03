@@ -544,6 +544,12 @@ namespace NinjaTrader.NinjaScript.Strategies
         double realDayStart;
         int realDayTrades;
         bool guardTripped;  // the loss guard closed out today: no new entries until tomorrow
+        // progress, from the account's own fills: this week's and this month's P/L, the closed trades and winners, and
+        // the first session the bot could trade (for the pace to the goal)
+        string weekKey = "", monthKey = "";
+        double weekStart, monthStart;
+        int realTrades, realWins;
+        DateTime paceFrom = DateTime.MinValue, lastSession = DateTime.MinValue;
         string realDay = "";
         string journalPath = "", liveJournalPath = "";
         double net, peak, maxDd, worstDay, dayNet;
@@ -713,6 +719,12 @@ namespace NinjaTrader.NinjaScript.Strategies
                 realDayStart = cum;
                 realDayTrades = 0;
                 guardTripped = false;
+                string wk = start.Date.AddDays(-(((int)start.DayOfWeek + 6) % 7)).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+                string mo = start.ToString("yyyy-MM", CultureInfo.InvariantCulture);
+                if (wk != weekKey) { weekKey = wk; weekStart = cum; }
+                if (mo != monthKey) { monthKey = mo; monthStart = cum; }
+                if (paceFrom == DateTime.MinValue && engine.Ready) paceFrom = start.Date;
+                lastSession = start.Date;
             }
             engine.ExtEquity = cum;
             engine.ExtDayPnl = cum - realDayStart;
@@ -822,6 +834,8 @@ namespace NinjaTrader.NinjaScript.Strategies
             {
                 Trade t = SystemPerformance.AllTrades[journaled++];
                 realDayTrades++;
+                realTrades++;
+                if (t.ProfitCurrency > 0) realWins++;
                 DateTime en = TimeZoneInfo.ConvertTime(DateTime.SpecifyKind(t.Entry.Time, DateTimeKind.Unspecified), platform, newYork);
                 DateTime ex = TimeZoneInfo.ConvertTime(DateTime.SpecifyKind(t.Exit.Time, DateTimeKind.Unspecified), platform, newYork);
                 string side = t.Entry.Name == ShortName ? "SHORT" : "LONG";
@@ -901,6 +915,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                          "Next trade: " + engine.NextQty + " MNQ, room today $" + (double.IsNaN(engine.DayRoom) ? "-" : Math.Max(0, engine.DayRoom).ToString("0", CultureInfo.InvariantCulture)) + "\n" +
                          (setupWarnings.Count > 0 ? "SETUP WARNING (" + setupWarnings.Count + "): " + setupWarnings[0] + "\n" : "Setup: OK\n") +
                          "Trades today: " + realDayTrades + "\n" +
+                         ProgressLines(cumReal, sinceStart) +
                          (LossGuard > 0 ? "Loss guard: " + (guardTripped ? "TRIPPED, flat and done for today" :
                           "flat at -$" + LossGuard.ToString("0", CultureInfo.InvariantCulture) + " today, closed + open (live)") + "\n" : "") +
                          OpenTradeLine() +
@@ -915,6 +930,25 @@ namespace NinjaTrader.NinjaScript.Strategies
                          ", drawdown $" + maxDd.ToString("0.00", CultureInfo.InvariantCulture) + "\n" +
                          (engine.Note.Length > 0 ? "Last check: " + engine.Note : "");
             Draw.TextFixed(this, "v38_dash", txt, TextPosition.TopRight);
+        }
+
+        // progress, for the dashboard: this week and month, the real win rate, and the pace to the goal
+        string ProgressLines(double cumReal, double sinceStart)
+        {
+            string s = "This week $" + (cumReal - weekStart).ToString("0.00", CultureInfo.InvariantCulture) +
+                       ", this month $" + (cumReal - monthStart).ToString("0.00", CultureInfo.InvariantCulture) +
+                       "; real fills: " + realTrades + " trades, " +
+                       (realTrades > 0 ? (100.0 * realWins / realTrades).ToString("0.0", CultureInfo.InvariantCulture) : "0.0") + "% winners\n";
+            double months = paceFrom == DateTime.MinValue ? 0 : (lastSession - paceFrom).TotalDays / 30.44;
+            if (Goal > 0 && months >= 1)
+            {
+                double pace = sinceStart / months;
+                s += "Pace: $" + pace.ToString("0", CultureInfo.InvariantCulture) + " a month since " +
+                     paceFrom.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) +
+                     (sinceStart >= Goal ? ", goal reached" : pace > 0 ? ", about " + Math.Ceiling((Goal - sinceStart) / pace).ToString("0", CultureInfo.InvariantCulture) +
+                      " more months to the goal" : ", no progress yet") + "\n";
+            }
+            return s;
         }
 
         // the open trade, for the dashboard: side and size, entry, the stop and the target for the next bar, the lock, and
