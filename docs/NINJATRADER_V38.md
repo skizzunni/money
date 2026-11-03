@@ -2491,3 +2491,16 @@ halves. Each session trades its own 50K, as a separate account.
 - the account never reaches the floor.
 
 A pass gets a second test beside the day bot (the shared daily budget) before any change to the file the user runs.
+
+**G57 result (run once, 2026-11-03): rejected; the bot's breakout loses overnight in every period.**
+
+| | Asia 18:00-00:30: net, profit factor | London 02:00-08:30: net, profit factor |
+|---|---|---|
+| NQ 2015-2019 | −$3,644, 0.72 (floor passed) | −$950, 0.88 (floor passed) |
+| NQ 2020-2025 | −$1,383, 0.67 (at the floor) | −$1,902, 0.29 (at the floor) |
+| index 2011-2018 | −$1,772, 0.83 (floor passed) | −$1,819, 0.85 (floor passed) |
+| index 2019-2026 | −$3,092, 0.83 (floor passed) | +$4, 1.00 (at the floor) |
+
+Overnight, a move past the noise area is not momentum: winners are 33-49%, and every account ends at or past the floor.
+The bot's edge is the day session's. The user's overnight winners came from his own reading of the market, which no rule
+here reproduces (`research/g57_overnight.py`).
