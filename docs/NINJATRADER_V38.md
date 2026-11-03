@@ -2410,3 +2410,23 @@ the chart's execution, Funded growth; `research/g55_filters_off.py`, `verificati
 More trading days, with this bot, means more losing trades. The way to trade more days without that is a second,
 separate market (the same bot on the S&P 500 or the Russell 2000), whose trend days are not always the Nasdaq's. That
 needs S&P data, not yet in hand.
+
+## G56: the same bot on the S&P 500, as a second market (registered 2026-11-03, before its run)
+
+**The idea, from G55 and the user ("that many days without trading is horrible"):** with this bot, more trading days in
+the Nasdaq means more losing trades (G55). A second market whose trend days are not always the Nasdaq's can add trading
+days without that. Rounds forty-seven and forty-eight found no edge on the S&P, but with v2.x's fixed 10 contracts and
+$350 stop; today's Funded growth (its own-stop sizing, lock, take-profit, time stop, filters) was never run there.
+
+**The test:** Funded growth on MES (the S&P 500, $5 a point; HistData SPXUSD 1-minute bars scaled to the futures, as
+round forty-seven), 5-minute bars, NinjaTrader's execution, its own $900 daily budget and $2,000 trailing floor. The max
+loss per contract is the MNQ's in percent of price: $120 a contract ($160 after a loser), as $187.50 is about 0.31% of
+MNQ at 30,000. Fees $0.62 a side, a tick of slippage.
+
+**Passes only if:**
+- it makes money in 2011-2018 and in 2019-Sep 2026, each on its own;
+- its account never reaches the floor in either period;
+- it has no day at −$1,000.
+
+**Reported:** the days it trades, how many of them the Nasdaq bot (the index set) doesn't trade, and the correlation of
+the two daily P/Ls.
