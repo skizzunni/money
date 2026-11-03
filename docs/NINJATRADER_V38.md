@@ -2546,3 +2546,19 @@ A pass goes on to sizing and the shared daily budget beside the day bot before a
   from the user's own choices of which stretched moves to sell, in a one-way fall.
 
 The day bot stays as it is (`research/g58_fade_extremes.py`).
+
+## G59: a narrower entry band, for more trading days (registered 2026-11-03, before its run)
+
+**The idea (the user: "it goes days without trading"):** a new entry needs a close past the noise line. Entering at 0.9
+or 0.85 of the line's distance from the open (`entry_k`) takes the breakouts that stop short of it, so more days trade.
+The stop stays 0.24 noise units past the full line, so 0.85 is the narrowest that keeps the stop on the far side of the
+entry.
+
+**Variants:** Funded growth with `entry_k` 0.9 and 0.85.
+
+**Adopt (the better by window net) only if, against 1.0:**
+- a higher net on all three 5-minute sets (the window, NQ from 2015, the index from 2011), in the chart's execution;
+- the floor is never touched;
+- there are no more days at −$1,000.
+
+Days with a trade are reported for each.
