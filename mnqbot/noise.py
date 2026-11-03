@@ -321,6 +321,9 @@ class NoiseConfig:
     # research (G69): small gaps. A gap at least gap_go_small_k x the average (but under gap_go_k), the 09:30 bar
     # closing its way, takes the same trade at 1 contract (-1 = off). Drive and small-gap trades are always 1 contract
     gap_go_small_k: float = -1.0
+    # research (G70): the fill-in trades (small gaps, drives, trend_small's shorts) only once the trailing floor has
+    # stopped at the start (trail_cap)
+    fill_after_lock: bool = False
     # research (G67): once the trailing floor has stopped at the start (trail_cap), a gap trade may take up to this
     # many contracts in place of gap_go_max_qty (0 = off)
     gap_go_locked_qty: int = 0
@@ -548,6 +551,15 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
         pos, held, locked, rest, part_pnl, best, tp_dist = 0, math.nan, False, 1.0, 0.0, math.nan, math.nan
         locked1, fav, lock_px = False, math.nan, math.nan
 
+    def floor_stopped() -> bool:
+        """Has the trailing floor stopped at the start (the account's first trail_dd made)?"""
+        return (not math.isnan(trail_peak) and cfg.trail_cap >= 0
+                and trail_peak - cfg.trail_dd >= trail_base + cfg.trail_cap)
+
+    def fill_ok() -> bool:
+        """G70: may a fill-in trade be taken now?"""
+        return not cfg.fill_after_lock or floor_stopped()
+
     def study_ok(d: int, past_margin: bool) -> bool:
         """The v2.1 study's rules (all off by default): may a signal on side d be taken?"""
         nonlocal skip_left
@@ -568,7 +580,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
         if side_skip[d] > 0:
             side_skip[d] -= 1
             return False
-        if against_trend(d) and not cfg.trend_qty_div and not cfg.trend_small:
+        if against_trend(d) and not cfg.trend_qty_div and not (cfg.trend_small and fill_ok()):
             return False
         if calm and not cfg.calm_div:
             return False
@@ -671,9 +683,10 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                     body = c[i - 1] - day_open
                     fire = abs(gap) >= cfg.gap_go_k * avg and d * body > 0
                     one = False  # G69: a small-gap or drive trade, 1 contract always
-                    if not fire and cfg.gap_go_small_k >= 0 and abs(gap) >= cfg.gap_go_small_k * avg and d * body > 0:
+                    if not fire and cfg.gap_go_small_k >= 0 and abs(gap) >= cfg.gap_go_small_k * avg and d * body > 0 \
+                            and fill_ok():
                         fire = one = True
-                    if not fire and cfg.gap_go_drive_k > 0 and len(drive_hist) >= 10 and body != 0:
+                    if not fire and cfg.gap_go_drive_k > 0 and len(drive_hist) >= 10 and body != 0 and fill_ok():
                         bavg = sum(drive_hist[-14:]) / len(drive_hist[-14:])
                         if abs(body) >= cfg.gap_go_drive_k * bavg:
                             d, fire, one = (1 if body > 0 else -1), True, True

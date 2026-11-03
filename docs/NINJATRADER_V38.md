@@ -3065,3 +3065,32 @@ shortfall is reported.
 - **as a switch** ("More trading days", off by default) if only the account rules hold: the floor never touched, no
   more days at −$1,000 and no more lost or frozen accounts (11), with its cost in net reported;
 - otherwise rejected.
+
+**G69 result (run once, 2026-11-03): rejected; the fill-in trades lose new accounts.**
+
+| 5-minute, chart's execution | days with a trade: window / NQ / index | net: window / NQ / index |
+|---|---|---|
+| today's default (U20) | 43.9% / 51.5% / 49.4% | $30,161 / $356,039 / $508,291 |
+| P1 small gaps | 55.0% / **4.3%** / 57.9% | $29,578 / **$0, lost** / $501,196 |
+| P2 + uptrend shorts | 62.6% / 65.9% / 63.4% | $32,315 / $390,236 / $502,197 |
+| P3 + opening drive | **86.3% / 84.9%** / **1.6%** | $36,044 / $400,334 / **−$8, lost** |
+
+Stage 1: none reaches 70% on all three (P3 does on the window and NQ but loses the index's account), so P3 was the
+candidate, and stage 2 rejects it: its index account is lost in its first weeks. Where the accounts live, the fill-in
+trades make more (P3: +$5,900 on the window, +$44,000 on NQ). What kills an account is when they come: in its first
+weeks, with no cushion above the floor (`verification/noise_v2/g69_days.txt`).
+
+## G70: the fill-in trades only once the floor has stopped (registered 2026-11-03, before its run)
+
+**The idea, from G69:** G69's 1-MNQ fill-in trades add days and money where an account lives, and lose accounts at
+their start. G67b's lesson again: wait for the cushion. Here they trade only once the trailing floor has stopped at
+the starting balance (the account's first $2,000 made, `fill_after_lock`). Until then the bot is today's default.
+
+**Packages:** P2L = G69's P2 and P3L = G69's P3, each with `fill_after_lock`.
+
+**Stage 1 (days only):** 5-minute, the chart's execution. The first of P2L, P3L with a trade on at least 70% of the
+window's, NQ's and the index's sessions is the candidate; if neither, P3L, with the shortfall reported.
+
+**Stage 2:** G69's (as the default if a higher net on all three in both executions, the floor never touched, no more
+days at −$1,000, and no more lost or frozen accounts on G35's 89 start dates (11); as a switch if only the account
+rules hold; otherwise rejected).
