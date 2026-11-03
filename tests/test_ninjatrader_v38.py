@@ -245,6 +245,8 @@ def test_v38_data_check(sim, sample_1m, tmp_path):  # noqa: F811
     dash, warn = go(bars, f"TrailFrom={later}")
     assert "sessions of data before the start date " + later in dash and "the filters need 50" in dash, dash
     assert first < later
+    dash, _ = go(bars, "TrailFrom=2020-01-02")  # all the data is after the start date
+    assert f"the data starts on {first}, after the start date 2020-01-02" in dash, dash
 
 
 @pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")

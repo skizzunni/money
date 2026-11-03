@@ -1127,8 +1127,12 @@ namespace NinjaTrader.NinjaScript.Strategies
                 w = "the price data has bars missing in " + dqThin + " of " + dqSessions + " sessions (the first " + dqFirstThin +
                     "): results won't match the tests. Use the instrument MNQ ##-## (or Merge back adjusted) and load the history in Tools > Historical Data";
             if (!string.IsNullOrWhiteSpace(TrailFrom) && dqSessions > dqBeforeStart && dqBeforeStart < 50)
-                w += (w.Length > 0 ? "; " : "") + "only " + dqBeforeStart + " sessions of data before the start date " + TrailFrom.Trim() +
-                     ": the filters need 50, so start the data about 3 months earlier";
+                w += (w.Length > 0 ? "; " : "") + (dqBeforeStart == 0
+                     ? "the data starts on " + firstBar + ", after the start date " + TrailFrom.Trim() + ": this instrument has no earlier " +
+                       "history here. The filters need 50 sessions before the start, so load the earlier contracts (MNQ 03-26, 06-26, 09-26) " +
+                       "in Tools > Historical Data and merge them (Merge back adjusted), or move the start date to about 3 months after " + firstBar
+                     : "only " + dqBeforeStart + " sessions of data before the start date " + TrailFrom.Trim() +
+                       ": the filters need 50, so start the data about 3 months earlier");
             return w;
         }
 

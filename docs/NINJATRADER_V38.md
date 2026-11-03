@@ -2348,3 +2348,11 @@ Blocking breakouts against the gap made less on every set, in both executions (â
 price breaks the noise line against a big gap, it is a reversal of the gap the bot does well to follow. 30-minute bars
 were mixed (more on the index in the chart's execution, less on the window). `gap_block` stays in `mnqbot/noise.py`,
 off (`verification/noise_v2/g53_gap.csv`).
+
+**The user's Strategy Analyzer run, explained (2026-11-03).** The Output window said "data from 2026-05-03":
+NinjaTrader's MNQ DEC26 history starts May 3, 2026, so no January-April bars existed and the start date changed
+nothing. Given only data from May 3, the model makes 82 trades and $8,620.84 to Oct 16 on the stand-in data, against
+NinjaTrader's 54 trades and $3,669.60 on DEC26. Before the September roll DEC26 was the back month, thinly traded, so
+its prices aren't the front-month market the bot was tested on. The warning for this case now says so plainly:
+"the data starts on 2026-05-03, after the start date 2026-01-02: this instrument has no earlier history here", and
+names the fix (load MNQ 03-26, 06-26, 09-26 and merge them, or move the start date). `test_v38_data_check` covers it.
