@@ -2073,3 +2073,20 @@ The 30-minute runs are reported, not judged.
   executions (−$1,057 / −$1,621).
 
 (`verification/noise_v2/g48_big_day_n.csv`.)
+
+## G49: the calm-stretch rule's windows (registered 2026-11-03, before its run)
+
+**The idea:** no new entries while the last 10 sessions' average range is under 0.7 times the last 40 sessions'
+(v2.5). G28 re-checked the 0.7 with the time stop on; the two windows have not been re-checked since v2.5. The variants:
+- **5 against 40:** reacts to a quiet spell, and its end, twice as fast;
+- **10 against 60:** a longer baseline, so a long run of large ranges sets a higher bar for "calm".
+
+**The variants:** Funded growth with (`calm_short`, `calm_long`) = (5, 40) and (10, 60); everything else as it is.
+
+**Adopt (the better by window net) only if, against (10, 40):**
+- a higher net on all three 5-minute sets (the window, NQ from 2015, the index from 2011), in both the chart's
+  execution and NinjaTrader's;
+- the floor is never touched;
+- there are no more days at −$1,000.
+
+The 30-minute runs are reported, not judged.
