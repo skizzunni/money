@@ -10,3 +10,5 @@
 {'bars': 5, 'nt': True, 'step': 1000.0, 'set': 'proxy', 'days traded %': 44.0, 'gap trades': 117, 'trades': 406, 'net $': 22320, 'pf': 1.631, 'win %': 53.9, 'time stops': 34, 'closed dd $': 2743, 'worst day $': -899, 'days <= -1000': 0, 'floor touches': 0}
 {'bars': 5, 'nt': True, 'step': 1000.0, 'set': 'nq', 'days traded %': 3.6, 'gap trades': 50, 'trades': 189, 'net $': 1, 'pf': 1.0, 'win %': 55.0, 'time stops': 10, 'closed dd $': 5825, 'worst day $': -881, 'days <= -1000': 0, 'floor touches': 0}
 {'bars': 5, 'nt': True, 'step': 1000.0, 'set': 'index', 'days traded %': 49.4, 'gap trades': 1022, 'trades': 4252, 'net $': 445250, 'pf': 1.581, 'win %': 54.7, 'time stops': 230, 'closed dd $': 19062, 'worst day $': -900, 'days <= -1000': 0, 'floor touches': 0}
+index gapgo1s1000 starts 54 lost (at the floor) 8 dead (lost or frozen) 8 below start 4 median net 33430 worst net -711 lowest point -1635 reached +2000 52
+nq gapgo1s1000 starts 35 lost (at the floor) 10 dead (lost or frozen) 10 below start 3 median net 36278 worst net -1125 lowest point -1125 reached +2000 33

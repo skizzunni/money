@@ -2867,3 +2867,15 @@ at risk.
 - the floor never touched;
 - no more days at −$1,000;
 - on G35's 89 start dates, no more lost or frozen accounts (11).
+
+**G65 result (run once, 2026-11-03): rejected by the rule; a near miss.**
+
+| 5-minute, chart / NinjaTrader | days with a trade | net |
+|---|---|---|
+| window: as it is / uptrend shorts at 1 | 44.0% / **55.1%** | $19,618 / $19,626 → **$21,365 / $21,228** |
+| NQ | 51.5% / **58.9%** | $306,951 / $304,106 → **$336,124 / $326,342** |
+| index | 49.4% / **56.5%** | **$447,417 / $438,285** → $444,983 / $434,318 |
+
+It trades 7-11 more days in 100 and makes more on the window and NQ, but 0.5-0.9% less on the index. The index's long
+bull years punish shorts in an uptrend, even at 1 contract. The rule asks for more on all three, so it stays out.
+`trend_small` stays in the model, off (`verification/noise_v2/g65_trend_small.txt`).
