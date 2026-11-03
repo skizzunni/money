@@ -1,0 +1,18 @@
+all four off|proxy|51%|578|13727|-893|0
+all four off|nq|3%|226|0|-896|0
+all four off|index|53%|5066|313115|-1207|0
+current|proxy|29%|289|18516|-900|0
+current|nq|37%|2323|277322|-1023|0
+current|index|36%|3210|407796|-988|0
+no big-day rule|proxy|31%|315|9060|-882|0
+no big-day rule|nq|39%|2515|251746|-1023|0
+no big-day rule|index|38%|3465|382762|-1080|0
+no calm filter|proxy|32%|313|13199|-886|0
+no calm filter|nq|39%|2448|271131|-1023|0
+no calm filter|index|38%|3375|399800|-988|0
+no range-position filter|proxy|29%|306|17824|-900|0
+no range-position filter|nq|37%|2430|259075|-1023|0
+no range-position filter|index|36%|3338|410742|-988|0
+shorts in uptrends too|proxy|43%|453|16058|-900|0
+shorts in uptrends too|nq|46%|3025|293623|-1023|0
+shorts in uptrends too|index|45%|4145|390564|-988|0

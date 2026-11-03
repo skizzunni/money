@@ -2385,3 +2385,28 @@ more, but on NQ 3 more accounts in 35 were lost. The rule asked for no more lost
 recommendation. It is the user's choice: 30 minutes trades for more profit with a higher chance of losing the account
 (`verification/noise_v2/g35_start_dates_base_30min.csv`; MnqNoiseV38.cs runs on either chart, trade for trade with the
 model).
+
+## G55: why most days have no trade (measured 2026-11-03, at the user's question)
+
+The user asked why the bot doesn't trade on about 7 days in 10. Each day filter was turned off in turn (5-minute bars,
+the chart's execution, Funded growth; `research/g55_filters_off.py`, `verification/noise_v2/g55_filters_off.txt`):
+
+| | days with a trade: window / NQ / index | net: window / NQ / index |
+|---|---|---|
+| **as it is** | 29% / 37% / 36% | **$18,516 / $277,322 / $407,796** |
+| no calm-stretch filter | 32% / 39% / 38% | $13,199 / $271,131 / $399,800 |
+| no range-position filter | 29% / 37% / 36% | $17,824 / $259,075 / $410,742 |
+| no big-day rule | 31% / 39% / 38% | $9,060 / $251,746 / $382,762 |
+| shorts in uptrends too | 43% / 46% / 45% | $16,058 / $293,623 / $390,564 |
+| all four off | 51% / account lost / 53% | $13,727 / $0 / $313,115 |
+
+- **Most quiet days are quiet because price never leaves the noise area.** The filters block only 2-3 days in 100
+  each. Even with all of them off, half the days have no breakout.
+- **Every filter that adds days costs money.** The days they block are mostly failed breakouts. With all four off, the
+  NQ account was lost in its first months, and the index had a −$1,207 day.
+- **Shorts in uptrends** adds the most days (+14 in 100). It made more on NQ (+$16,000) but less on the window
+  (−$2,500) and the index (−$17,000).
+
+More trading days, with this bot, means more losing trades. The way to trade more days without that is a second,
+separate market (the same bot on the S&P 500 or the Russell 2000), whose trend days are not always the Nasdaq's. That
+needs S&P data, not yet in hand.
