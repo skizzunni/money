@@ -3251,3 +3251,11 @@ past it), less the usual slippage. No more entries that day.
 **Pass, for each:** against itself without the guard, both executions, all three 5-minute sets: no day at −$1,000 or
 worse, and a net no more than 1% lower (the guard only cuts a few days). If both pass, the guard goes into the
 NinjaTrader backtest too (the live guard is already there), and U21 is judged again on G74's rule.
+
+**G75 amended before any run (2026-11-03).** Reading the stop code first: on 2016-05-16 the bot's stop was passed by
+the bar's open (a 5-point jump), and a live tick-level guard would fill at that same open, so modelling the guard
+can't remove that day. The cause is the room: after the morning's +$115 gap win, the day's room was $1,015, so a few
+points past the stop crossed −$1,000. **G75 instead tests a $950 cap on the room (`trade_risk_cap` 950, G3's option):** the room for a new trade is never more
+than $950 (90% of the daily budget's $900 plus today's P/L as now, but at most $950), so after a green morning the bot
+still sizes up, to $950 at most, and $50 of slippage past the stop stays above −$1,000. Variants and pass rule as
+registered above (today's default and U21 on, each against itself without it: no −$1,000 day, net at most 1% lower).
