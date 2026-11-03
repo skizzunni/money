@@ -1921,3 +1921,21 @@ executions.
   and less on both histories.
 
 The floor was never touched (`verification/noise_v2/g45_take_profit.csv`).
+
+## G46: how much the lock keeps, re-checked with the time stop (registered 2026-11-03, before its run)
+
+**The idea:** once a trade has been 0.35 max losses in profit, its stop moves to the entry plus 2.5 points ($5 a
+contract), so it can't become a loser. That 2.5 was set before the time stop. Since then, a locked trade is exempt from
+the time stop and runs to its target, its line stop or the lock. Moving the lock's stop changes what those trades keep:
+- nearer the entry, fewer locked trades are shaken out by a pullback;
+- farther, more is banked when they are.
+
+**The variants:** Funded growth with `lock_plus` 1.0 and 5.0 points; everything else as it is.
+
+**Adopt (the better by window net) only if, against 2.5:**
+- a higher net on all three 5-minute sets (the window, NQ from 2015, the index from 2011), in both the chart's
+  execution and NinjaTrader's;
+- the floor is never touched;
+- there are no more days at −$1,000.
+
+The 30-minute runs are reported, not judged.
