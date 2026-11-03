@@ -34,7 +34,9 @@ EXTRA = {"base": {}, "gentle": {"steps_after_lock": True}, "cap10": {"size_up_to
          "gapgo1": {"gap_go": True, "gap_go_skip_month_first": True, "gap_go_max_qty": 1},
          "gapgo2": {"gap_go": True, "gap_go_skip_month_first": True, "gap_go_max_qty": 2},
          "nfp2": {"gap_go": True, "gap_go_skip_month_first": True, "gap_go_max_qty": 1, "news_mult": 2.0,
-                  "news_dates": ",".join(pd.read_csv("research/nfp_dates.csv").date)}}[VARIANT]
+                  "news_dates": ",".join(pd.read_csv("research/nfp_dates.csv").date)},
+         "gapgo1s1000": {"gap_go": True, "gap_go_skip_month_first": True, "gap_go_max_qty": 1,
+                         "profit_step": 1000.0}}[VARIANT]
 
 
 def with_1600(bars: pd.DataFrame, m: int) -> pd.DataFrame:

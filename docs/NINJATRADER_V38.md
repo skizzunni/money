@@ -2810,3 +2810,17 @@ Dates: `research/nfp_dates.csv` (BLS's rule).
 It made $2,900 more on the window but less on both histories, in both executions. Round seventy-three's effect was
 measured on the bot's average day; with today's growth sizing and filters, the doubled jobs-report trades don't pay
 over the long run. (`verification/noise_v2/g62_nfp.txt`; `news_mult` stays in the model, off.)
+
+## G63: a contract per $1,000 again, now with gap and go (registered 2026-11-03, before its run)
+
+**The idea:** G5 rejected $1,000 steps because new accounts went to the floor early. Gap and go (G60) has since made the
+early months safer (11 lost or frozen of 89 against 14). Faster steps bring the larger size sooner, which is where the
+profit grows.
+
+**The variant:** today's default with `profit_step` 1000 (was 1500).
+
+**Adopt only if, against today's default:**
+- a higher net on all three 5-minute sets in both executions;
+- the floor never touched;
+- no more days at −$1,000;
+- on G35's 89 start dates, no more lost or frozen accounts (11).
