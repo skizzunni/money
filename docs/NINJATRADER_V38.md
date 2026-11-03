@@ -1547,3 +1547,25 @@ All 218 NinjaTrader and simulator tests pass. Re-import the file to get it.
 `test_v38_progress_matches_the_journal` checks the dashboard's week, month, trade count and win rate against the
 journal's own trades to the cent, and the report's weeks and pace. All 15 NinjaTrader v3.8 tests pass. Re-import the
 file to get it.
+
+**U6 (2026-11-03): fill quality, tracked on every trade.** For each trade the bot records the ticks paid worse than
+planned:
+- **the entry:** against the close the market order was sent at;
+- **a stop:** against the resting stop price;
+- **a market exit:** against the price it was sent at (time stop, 16:00, stop passed, the loss guard's tick);
+- **a target:** a limit, nothing to measure.
+
+**Where it shows:**
+- two new journal columns, "entry slip ticks" and "exit slip ticks";
+- the dashboard's "Fills vs plan: entries +x ticks (n), stops and market exits +y ticks (m)";
+- a "Fills vs plan" line in `research/journal_report.py`.
+
+Once 20 trades average more than 2 ticks, the dashboard adds "consider Gentle start". G29-G30 found that 3 ticks is
+where a new account's first months are at risk.
+
+A live journal from before this version, with the old columns, is moved aside as `..._until_<time>.csv`, so no file
+mixes the two layouts.
+
+`test_v38_fill_quality` checks each trade's entry slip against the simulator's fill and the bar it was sent at,
+exactly. It also checks every stop's slip at 1 and 3 ticks, no slip on targets, the dashboard average, the warning at 3
+ticks and unchanged trades. All 16 NinjaTrader v3.8 tests pass. Re-import the file to get it.
