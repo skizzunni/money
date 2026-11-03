@@ -328,6 +328,9 @@ class NoiseConfig:
     fill_no_steps: bool = False  # G73: the fill-in trades' P/L doesn't count toward the contract steps
     gap_no_budget: bool = False  # G74: a gap-slot trade's profit doesn't widen the rest of the day's budget
     size_slip_pts: float = 0.0  # G76: the bot's sizing counts this many points more slippage at the stop
+    # research (G77): once a bar closes with the gap trade up gap_go_be x its initial risk, its stop goes to the entry
+    # plus a tick, from the next bar (0 = off)
+    gap_go_be: float = 0.0
     # research (G67): once the trailing floor has stopped at the start (trail_cap), a gap trade may take up to this
     # many contracts in place of gap_go_max_qty (0 = off)
     gap_go_locked_qty: int = 0
@@ -749,6 +752,10 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                 if (l[i] <= gg["stop"]) if gd > 0 else (h[i] >= gg["stop"]):
                     fill = min(o[i], gg["stop"]) if gd > 0 else max(o[i], gg["stop"])
                     gap_close(i, fill - gd * slip, "Gap stop")
+                elif cfg.gap_go_be > 0 and not gg.get("be"):
+                    risk = abs(gg["px"] - gg["stop"])
+                    if risk > 0 and gd * (c[i] - gg["px"]) >= cfg.gap_go_be * risk:
+                        gg["stop"], gg["be"] = gg["px"] + gd * cfg.tick, True
 
         # market orders from the previous bar fill at this bar's open
         if pending is not None:
