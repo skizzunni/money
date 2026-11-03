@@ -142,3 +142,27 @@ def test_v38_gentle_start_agrees(sim, sample_1m, minutes, tmp_path):  # noqa: F8
         assert math.isclose(float(a[6]), t.pnl, abs_tol=1e-6), (a, t)
     plain = run(bars, GROW, minutes=minutes).trades
     assert [t.qty for t in py] != [t.qty for t in plain], "the gentle start changes the sizes"
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+def test_v38_dashboard_shows_the_open_trade(sim, sample_1m, tmp_path):  # noqa: F811
+    """The dashboard at every bar: the trades today, and while a trade is open its side, size, entry, stop, target,
+    lock and time-stop countdown; "none" when flat. The trades are the same as without the dashboard history."""
+    bars = resample(sample_1m, "5min")
+    path = tmp_path / "bars.csv"
+    with path.open("w") as f:
+        for t, r in zip(bars.index, bars.itertuples(), strict=True):
+            f.write(f"{t:%Y-%m-%d %H:%M},{r.open!r},{r.high!r},{r.low!r},{r.close!r}\n")
+    base = [DOTNET, str(sim), str(path), "5", "Strategy=V38", *GROW_ARGS]
+    r = subprocess.run([*base, "DashHistory"], capture_output=True, text=True, env=ENV)
+    assert r.returncode == 0, r.stderr[-2000:]
+    plain = subprocess.run(base, capture_output=True, text=True, env=ENV)
+    trades = [x for x in r.stdout.splitlines() if x.startswith("T,")]
+    assert trades == [x for x in plain.stdout.splitlines() if x.startswith("T,")]
+    dash = [x for x in r.stdout.splitlines() if x.startswith("DH,v38_dash,")]
+    assert len(dash) > 1000 and all("Trades today: " in x for x in dash)
+    open_ = [x for x in dash if "Open trade: LONG" in x or "Open trade: SHORT" in x]
+    assert len(open_) >= 20 and sum("Open trade: none" in x for x in dash) >= 100
+    assert all(" MNQ @ " in x and ", stop " in x and " min in, " in x for x in open_)
+    assert any("time stop in " in x for x in open_), "the countdown while a trade is losing room to run"
+    assert any("locked (can't lose)" in x for x in open_)

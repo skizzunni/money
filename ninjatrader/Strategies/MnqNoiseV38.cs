@@ -115,6 +115,8 @@ namespace NinjaTrader.NinjaScript.Strategies
         double EqEff { get { return double.IsNaN(ExtEquity) ? equity : Math.Min(equity, ExtEquity); } }
         public double Equity { get { return EqEff; } }
         public double TrailBase { get { return trailBase; } }
+        public int TimeStopMinutes { get { return s.TimeStop; } }
+        public int MinutesInTrade { get { return Position != 0 ? (Bar + 1 - EntryBar) * minutes : 0; } }  // at this close
         // the contract steps may apply: always, or with StepsAfterLock once the floor has stopped at the start
         bool StepsOk { get { return !s.StepsAfterLock || (!double.IsNaN(trailPeak) && trailPeak - s.TrailDD >= trailBase); } }
         public int NextQty
@@ -813,6 +815,8 @@ namespace NinjaTrader.NinjaScript.Strategies
             string txt = goal + "Account P/L (real fills): $" + cumReal.ToString("0.00", CultureInfo.InvariantCulture) +
                          ", today $" + (cumReal - realDayStart).ToString("0.00", CultureInfo.InvariantCulture) + "\n" +
                          "Next trade: " + engine.NextQty + " MNQ, room today $" + (double.IsNaN(engine.DayRoom) ? "-" : Math.Max(0, engine.DayRoom).ToString("0", CultureInfo.InvariantCulture)) + "\n" +
+                         "Trades today: " + realDayTrades + "\n" +
+                         OpenTradeLine() +
                          "MNQ Noise Momentum v3.8, " + Mode + (engine.TradeQty > 0 && engine.Position != 0 ? ", " + engine.TradeQty + " MNQ" : "") + "\n" +
                          "Data from " + firstBar + " (results need data from 50 sessions before)\n" +
                          "Sessions of history: " + engine.SessionsLoaded + " / 14\n" +
@@ -824,6 +828,27 @@ namespace NinjaTrader.NinjaScript.Strategies
                          ", drawdown $" + maxDd.ToString("0.00", CultureInfo.InvariantCulture) + "\n" +
                          (engine.Note.Length > 0 ? "Last check: " + engine.Note : "");
             Draw.TextFixed(this, "v38_dash", txt, TextPosition.TopRight);
+        }
+
+        // the open trade, for the dashboard: side and size, entry, the stop and the target for the next bar, the lock, and
+        // how long until the time stop can close it
+        string OpenTradeLine()
+        {
+            int real = Position.MarketPosition == MarketPosition.Long ? 1 : Position.MarketPosition == MarketPosition.Short ? -1 : 0;
+            if (real == 0)
+                return "Open trade: none\n";
+            double avg = Position.AveragePrice;
+            double stop = engine.PeekStop(avg), tp = engine.PeekTarget(avg);
+            string line = "Open trade: " + (real > 0 ? "LONG " : "SHORT ") + Position.Quantity + " MNQ @ " + avg.ToString("0.00", CultureInfo.InvariantCulture) +
+                          (double.IsNaN(stop) ? "" : ", stop " + stop.ToString("0.00", CultureInfo.InvariantCulture)) +
+                          (double.IsNaN(tp) ? "" : ", target " + tp.ToString("0.00", CultureInfo.InvariantCulture)) +
+                          ", " + engine.MinutesInTrade + " min in, " + (engine.Locked ? "locked (can't lose)" : "lock not reached");
+            if (engine.TimeStopMinutes > 0 && !engine.Locked)
+            {
+                int left = engine.TimeStopMinutes - engine.MinutesInTrade;
+                line += left > 0 ? ", time stop in " + left + " min if losing" : ", time stop: out at the next bar if losing";
+            }
+            return line + "\n";
         }
 
         #region Properties

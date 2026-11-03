@@ -1474,3 +1474,15 @@ losing stretch into a winning one. What it means for the user is a fact to plan 
 - a lost account costs a new evaluation, not more than that;
 - expect about one restart in five to nine accounts;
 - weighed against a median of about $23,000 per 21-month account.
+
+## Upgrades (shipped improvements to the bot the user runs)
+
+**U1 (2026-11-03): the dashboard shows the open trade.** Two new dashboard lines in MnqNoiseV38.cs:
+- **Trades today:** the account's closed trades this session.
+- **Open trade:** side and contracts, the fill price, the stop and the target set for the next bar, the minutes in
+  the trade, and whether the lock has armed ("locked (can't lose)" or "lock not reached"). While unlocked, it also
+  shows the time-stop countdown ("time stop in 25 min if losing", or "out at the next bar if losing"). It says "none"
+  when flat.
+
+No trading logic changed: the trades are identical with and without it (`test_v38_dashboard_shows_the_open_trade`
+checks every bar of the 5-minute sample). All 215 NinjaTrader and simulator tests pass. Re-import the file to see it.

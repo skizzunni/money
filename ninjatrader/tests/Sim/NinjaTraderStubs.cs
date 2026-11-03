@@ -216,11 +216,13 @@ namespace NinjaTrader.NinjaScript.DrawingTools
     public static class Draw
     {
         public static readonly Dictionary<string, string> Texts = new Dictionary<string, string>();
+        public static readonly List<string> History = new List<string>();  // tests: every text drawn, with its bar
         public static TextFixed TextFixed(NinjaScriptBase owner, string tag, string text, TextPosition textPosition)
         {
             if (owner.CurrentBar == owner.ThrowAt)
                 throw new InvalidOperationException("test error on bar " + owner.CurrentBar);
             Texts[tag] = text;
+            History.Add(tag + "," + owner.CurrentBar + "," + text.Replace("\n", " | "));
             TextFixed t = new TextFixed();
             t.Text = text;
             return t;

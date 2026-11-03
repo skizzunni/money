@@ -45,7 +45,7 @@ static class Program
             for (int a = 2; a < args.Length; a++)
             {
                 if (args[a] == "Strategy=Runner" || args[a] == "Strategy=C" || args[a] == "Strategy=D" || args[a] == "Strategy=FOMC" ||
-                    args[a] == "Strategy=V38") continue;
+                    args[a] == "Strategy=V38" || args[a] == "DashHistory") continue;
                 string[] kv = args[a].Split(new[] { '=' }, 2);
                 PropertyInfo pi = s.GetType().GetProperty(kv[0]);  // the strategy's, or the stand-in's
                 if (pi == null) throw new ArgumentException("unknown property " + kv[0]);
@@ -64,6 +64,9 @@ static class Program
             Console.WriteLine("D," + d.Replace("\n", " | "));
         foreach (string x in s.Printed)
             Console.WriteLine("P," + x);
+        if (Array.IndexOf(args, "DashHistory") >= 0)  // tests: the dashboard at every bar
+            foreach (string x in Draw.History)
+                Console.WriteLine("DH," + x);
         return 0;
     }
 }
