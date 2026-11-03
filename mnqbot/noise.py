@@ -313,6 +313,10 @@ class NoiseConfig:
     # so the two never meet in one bar; 600 was G60's first test)
     gap_go_exit: int = 595
     gap_go_max_qty: int = 0  # G60 stage 5: the most contracts a gap trade takes (0: as the bot's trades)
+    # research (G62): on these dates (YYYY-MM-DD, comma separated; the jobs-report days), news_mult x the contracts,
+    # after the contract steps; the daily budget and the trailing floor still cap it
+    news_dates: str = ""
+    news_mult: float = 1.0
     gap_go_skip_month_first: bool = False
     # research (G13): a time lock. A trade not yet locked that is in profit at a bar close time_lock minutes or more
     # after its fill is locked (its stop to the entry plus lock_plus, from the next bar)
@@ -434,6 +438,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
     gap_dir = 0  # gap_block: today's opening gap direction when it is past the threshold
     gg: dict | None = None  # gap_go: the open gap trade (side, contracts, entry bar and price, stop)
     gap_hist: list[float] = []  # gap_go: the last sessions' |gap|
+    news_set = set(cfg.news_dates.split(",")) if cfg.news_dates else set()  # G62
     sess_month = sess_month_prev = None  # gap_go_skip_month_first: this session's and the last one's month
     side_lost = {1: False, -1: False}  # a loser on that side today (side_margin)
     side_run = {1: 0, -1: 0}  # losers in a row on each side, across days (side_run_k)
@@ -990,6 +995,9 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                         if cfg.size_up_to > 0:
                             q_up = min(q_up, cfg.size_up_to)
                         ml_next, q_next = ml_next / q_next * q_up, q_up
+                    if cfg.news_mult != 1.0 and t.strftime("%Y-%m-%d") in news_set:  # G62: the jobs-report days
+                        q_n = max(1, round(q_next * cfg.news_mult))
+                        ml_next, q_next = ml_next / q_next * q_n, q_n
                     if cfg.trend_qty_div and against_trend(d):
                         q_next = max(1, round(q_next / cfg.trend_qty_div))
                         ml_next *= cfg.trend_ml_mult

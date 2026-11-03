@@ -2782,3 +2782,19 @@ room for that. 1 contract stays (`verification/noise_v2/g61_gap_qty.txt`).
 `pine/mnq_noise_momentum.pine`. On a 30-minute TradingView chart it could not trade anyway (it needs the 09:30-09:35
 bar). On a 5-minute TradingView chart the script's results will be below NinjaTrader's by the gap trades, about 1.3 a
 week.
+
+## G62: double size on jobs-report days (registered 2026-11-03, before its run)
+
+**The idea, from round seventy-three:** on the monthly jobs-report days (8:30 New York, about 12 a year) the bot made
+2.5-3.4 times its usual dollars a day, in the same direction on 2011-18, 2019-26 and NQ futures. 2x size there was
+positive everywhere (t 1.84 / 1.30 / 1.71) but under that round's bar. Here it is tried inside today's bot.
+
+**The variant:** today's default (Funded growth with gap and go at 1 contract), with the bot's entries on jobs-report
+days at 2x its contracts, after the contract steps. The daily budget and the trailing floor still cap each trade.
+Dates: `research/nfp_dates.csv` (BLS's rule).
+
+**Adopt only if, against today's default:**
+- a higher net on all three 5-minute sets in both executions;
+- the floor never touched;
+- no more days at −$1,000;
+- on G35's 89 start dates, no more lost or frozen accounts (11).
