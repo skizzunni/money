@@ -549,6 +549,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         string weekKey = "", monthKey = "";
         double weekStart, monthStart;
         int realTrades, realWins;
+        int weekTrades, weekWins;  // U14: this week's closed trades and winners
         DateTime paceFrom = DateTime.MinValue, lastSession = DateTime.MinValue;
         // fill quality: the price each order was planned at (the close when the entry or a market exit was sent, the
         // resting stop), and the running ticks paid worse than that
@@ -751,7 +752,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 guardTripped = false;
                 string wk = start.Date.AddDays(-(((int)start.DayOfWeek + 6) % 7)).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
                 string mo = start.ToString("yyyy-MM", CultureInfo.InvariantCulture);
-                if (wk != weekKey) { weekKey = wk; weekStart = cum; }
+                if (wk != weekKey) { weekKey = wk; weekStart = cum; weekTrades = 0; weekWins = 0; }
                 if (mo != monthKey) { monthKey = mo; monthStart = cum; }
                 if (paceFrom == DateTime.MinValue && engine.Ready) paceFrom = start.Date;
                 lastSession = start.Date;
@@ -849,6 +850,15 @@ namespace NinjaTrader.NinjaScript.Strategies
                 (double.IsNaN(engine.TrailFloorRoom) ? "" : ", room above the floor $" + engine.TrailFloorRoom.ToString("0", CultureInfo.InvariantCulture)) +
                 ", tomorrow up to " + engine.NextQty + " MNQ");
             CheckMilestone();
+            // U14: on Fridays, the week's summary too
+            DateTime d = DateTime.ParseExact(realDay, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+            if (d.DayOfWeek == DayOfWeek.Friday)
+            {
+                double week = cum - weekStart, month = cum - monthStart;
+                Say("week", "Week done (from " + weekKey + "): " + (week >= 0 ? "+$" : "-$") + Math.Abs(week).ToString("0.00", CultureInfo.InvariantCulture) +
+                    " in " + weekTrades + " trades (" + weekWins + " winners); this month " + (month >= 0 ? "+$" : "-$") +
+                    Math.Abs(month).ToString("0.00", CultureInfo.InvariantCulture) + ", total $" + cum.ToString("0.00", CultureInfo.InvariantCulture));
+            }
         }
 
         // the account's profit since its start: above the trailing floor's base when there is one, else the real fills'
@@ -917,7 +927,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 Trade t = SystemPerformance.AllTrades[journaled++];
                 realDayTrades++;
                 realTrades++;
-                if (t.ProfitCurrency > 0) { realWins++; realDayWins++; }
+                weekTrades++;
+                if (t.ProfitCurrency > 0) { realWins++; realDayWins++; weekWins++; }
                 DateTime en = TimeZoneInfo.ConvertTime(DateTime.SpecifyKind(t.Entry.Time, DateTimeKind.Unspecified), platform, newYork);
                 DateTime ex = TimeZoneInfo.ConvertTime(DateTime.SpecifyKind(t.Exit.Time, DateTimeKind.Unspecified), platform, newYork);
                 string side = t.Entry.Name == ShortName ? "SHORT" : "LONG";

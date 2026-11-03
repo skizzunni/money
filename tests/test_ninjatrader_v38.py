@@ -387,6 +387,19 @@ def test_v38_day_summary(sim, sample_1m, tmp_path):  # noqa: F811
         d, sign, amt, n = re.match(r"Day done (\S+): ([+-])\$([\d.]+) in (\d+) trades", msg).groups()
         assert math.isclose(float(sign + amt), float(dl.loc[d, "day P/L"]), abs_tol=0.006), msg
         assert int(n) == int(dl.loc[d, "trades today"]), msg
+    # U14: on each live Friday, the week's summary: its P/L and trades are the sum of that week's journal days
+    weeks = [x.split(",", 4)[4] for x in r.stdout.splitlines() if x.startswith("A,") and ",v38_week," in x]
+    fridays = [d for d in live_days if pd.Timestamp(d).dayofweek == 4]
+    assert len(weeks) == len(fridays) >= 3
+    dd = dl.copy()
+    dd.index = pd.to_datetime(dd.index)
+    for msg, fri in zip(weeks, fridays, strict=True):
+        mon, sign, amt, n, w = re.match(r"Week done \(from (\S+)\): ([+-])\$([\d.]+) in (\d+) trades \((\d+) winners\)",
+                                        msg).groups()
+        assert pd.Timestamp(mon) == pd.Timestamp(fri) - pd.Timedelta(days=4), msg
+        wk = dd[(dd.index >= pd.Timestamp(mon)) & (dd.index <= pd.Timestamp(fri))]
+        assert math.isclose(float(sign + amt), wk["day P/L"].astype(float).sum(), abs_tol=0.02), msg
+        assert int(n) == int(wk["trades today"].sum()), msg
 
 
 @pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")

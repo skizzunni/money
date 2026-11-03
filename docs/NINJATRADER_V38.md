@@ -1679,6 +1679,13 @@ is in line at 61.2% and that a tested rate of 90% gives the warning. It checks t
 report's to 0.05 points, one alert live, and the same trades. All 27 NinjaTrader v3.8 tests pass. Re-import the file to
 get it.
 
+**U14 (2026-11-03): the week's summary.** Live, on Fridays, after the day's summary (U7), one more alert and Output
+line: "Week done (from 2026-11-02): +$1,234.50 in 9 trades (6 winners); this month +$2,345.00, total $8,214.00". The
+week runs Monday to Friday by the 09:30 session. A Friday holiday sends none that week.
+
+`test_v38_day_summary` now also checks one week summary per live Friday, its Monday, and its P/L and trade count
+against the sum of that week's journal DAY lines. The trades are unchanged. Re-import the file to get it.
+
 ## G38: trapped buyers at the high of the day, order flow from volume (registered 2026-11-03, before its run)
 
 **The idea, from the user's @chicago_trades clip.** At the high of the day: retail stops are run, fresh sellers fill,
