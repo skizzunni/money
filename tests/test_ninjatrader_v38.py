@@ -28,8 +28,8 @@ CFG = NoiseConfig(**{**V21, "qty": 1, "lookback": 14, "trail_from": "", "tv_path
 # G6's 60-minute time stop
 GROW = NoiseConfig(**{**V21, "qty": 1, "lookback": 14, "max_loss_per_trade": 187.5, "after_loss_ml_mult": 250 / 187.5,
                       "trail_dd": 2000.0, "trail_from": "", "profit_step": 1500.0, "size_up_to": 15,
-                      "budget_actual": True, "time_stop": 60, "tv_path": False}, nt_execution=True, round_prices=True,
-                   target_on_fill_bar=True)
+                      "budget_actual": True, "time_stop": 60, "tv_path": False, "gap_go": True, "gap_go_max_qty": 1},
+                   nt_execution=True, round_prices=True, target_on_fill_bar=True)
 GROW_ARGS = ["Mode=Funded growth"]  # the default; its settings are the tested ones above
 
 
@@ -190,7 +190,9 @@ def test_v38_today_line(sim, sample_1m, tmp_path):  # noqa: F811
             m = re.search(r"Today: (.*?); (next entry check [^|]*|no more entry checks today[^|]*)\s*\|", text)
             assert m, text
             today[int(b)] = (m.group(1), m.group(2).strip())
-    trades = [x.split(",") for x in r.stdout.splitlines() if x.startswith("T,")]
+    names = [x.split(",")[1] for x in r.stdout.splitlines() if x.startswith("TN,")]
+    trades = [x.split(",") for x, n in zip([y for y in r.stdout.splitlines() if y.startswith("T,")], names, strict=True)
+              if not n.startswith("Gap")]  # gap and go (G60) is outside the day's filters, by design
     assert len(trades) >= 20
     for t in trades:
         d, signal = int(t[1]), int(t[2]) - 1  # the entry is sent at the close of the bar before its fill
@@ -247,6 +249,44 @@ def test_v38_data_check(sim, sample_1m, tmp_path):  # noqa: F811
     assert first < later
     dash, _ = go(bars, "TrailFrom=2020-01-02")  # all the data is after the start date
     assert f"the data starts on {first}, after the start date 2020-01-02" in dash, dash
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+def test_v38_gap_go(sim, sample_1m, tmp_path):  # noqa: F811
+    """G60: gap and go (on in Funded growth, 5-minute bars). NinjaTrader's code and the Python model agree trade for
+    trade, gap trades included; each is 1 contract, opened at 09:35 and closed by its stop or at 09:55. With the switch
+    off, no gap trades, and the trades are the model's without it."""
+    bars = resample(sample_1m, "5min")
+    path = tmp_path / "bars.csv"
+    with path.open("w") as f:
+        for t, r in zip(bars.index, bars.itertuples(), strict=True):
+            f.write(f"{t:%Y-%m-%d %H:%M},{r.open!r},{r.high!r},{r.low!r},{r.close!r}\n")
+
+    def go(*args):
+        r = subprocess.run([DOTNET, str(sim), str(path), "5", "Strategy=V38", *GROW_ARGS, *args], capture_output=True,
+                           text=True, env=ENV)
+        assert r.returncode == 0, r.stderr[-2000:]
+        lines = r.stdout.splitlines()
+        return [x.split(",")[1:] for x in lines if x.startswith("T,")], [x.split(",")[1:] for x in lines if
+                                                                          x.startswith("TN,")]
+
+    for on in (True, False):
+        nt, names = go(f"GapGo={on}")
+        py = run(bars, dataclasses.replace(GROW, gap_go=on), minutes=5).trades
+        assert len(nt) == len(py) >= 20
+        for a, t in zip(nt, py, strict=True):
+            assert (int(a[0]), int(a[1]), int(a[3])) == (t.direction, t.entry_bar, t.exit_bar), (a, t)
+            assert float(a[2]) == t.entry and float(a[4]) == t.exit, (a, t)
+            assert math.isclose(float(a[6]), t.pnl, abs_tol=1e-6), (a, t)
+        gaps = [t for t in py if t.reason.startswith("Gap")]
+        nt_gaps = [n for n in names if n[0].startswith("Gap")]
+        if on:
+            assert len(gaps) >= 3 and len(nt_gaps) == len(gaps)
+            for t in gaps:
+                assert t.qty == 1 and t.entry_time.strftime("%H:%M") == "09:35"
+                assert t.reason == "Gap stop" or t.exit_time.strftime("%H:%M") == "09:55"
+        else:
+            assert not gaps and not nt_gaps
 
 
 @pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")

@@ -2724,3 +2724,31 @@ parity tests (`verification/noise_v2/g60_stage5.txt`).
 Fewer lost accounts (11 of 89 against 14) and about 35% more in the typical account. The gap trades at 1 contract add a
 little profit, and they make it early, which brings the contract steps sooner. **Gap and go goes on by default in
 Funded growth**, at 1 contract, 09:35-09:55.
+
+**U19 (2026-11-03): gap and go is in MnqNoiseV38.cs, on by default (G60).** A new switch in group 1, "Gap and go: 1 MNQ
+with a big opening gap, 09:35-09:55 (5-minute chart)", on by default. It applies in the Funded growth modes and Custom,
+never in Evaluation, and does nothing on a 30-minute chart.
+
+At the 09:30 bar's close, when the open is at least half the last 14 sessions' average gap away from the prior close
+and the bar closed beyond the open the gap's way:
+- **The entry:** 1 MNQ at market ("GapLong"/"GapShort"), with a stop at the 09:30 open attached;
+- **The exit:** a market exit at the 09:50 bar's close fills at the 09:55 open ("Gap exit"), so it never meets the
+  bot's first fill at 10:00;
+- **Sizing:** the trade must fit the day's budget and the room above the floor;
+- **Bookkeeping:** its P/L counts like any trade's;
+- **Live:** an alert ("SELL 1 MNQ at market (gap and go), stop …, out at 09:55") and the dashboard's open-trade line.
+
+It is outside the bot's day filters (calm stretch, trend, big day) by design, as tested. The "Model flat" safety check
+leaves it alone.
+
+**Tests:**
+- `test_v38_gap_go`: NinjaTrader's code and the model agree trade for trade with it on (gap trades included, each 1
+  contract, in at 09:35, out by its stop or at 09:55) and off (no gap trades).
+- Every Funded growth parity test now runs with it on. All 30 NinjaTrader v3.8 tests pass.
+
+**The backtest of the file** (`research/v38_ninjatrader_run.py grow`, 5-minute, from 2025-01-02;
+`verification/noise_v2/v38g_nt_gapgo_2026-11-03.csv`):
+- **The result:** 404 trades in the window, **$19,618.65** (was $18,541.72), 53.7% winners, profit factor 1.69, closed
+  drawdown $2,416, worst day −$899.09.
+- **Against the model:** all 481 trades agree except the known 12/24/2024 warm-up trade ($0.50).
+- **30-minute bars:** unchanged (gap and go needs the 09:30 bar).

@@ -63,6 +63,12 @@ namespace NinjaTrader.NinjaScript.Strategies
         public int TimeStop = 0;
         // a gentle start (G30): no contract steps until the trailing floor has stopped at the starting balance
         public bool StepsAfterLock = false;
+        // gap and go (G60): when the 09:30 open is at least GapGoK times the last 14 sessions' average gap from the
+        // prior close and the 09:30 bar closes beyond its open the gap's way, a market entry that way at the 09:35
+        // open, a stop at the 09:30 open, out at the GapGoExit bar's open (595 = 09:55); GapGoMaxQty contracts at most
+        public bool GapGo = false;
+        public double GapGoK = 0.5;
+        public int GapGoMaxQty = 1, GapGoExit = 595;
     }
 
     public sealed class V38Trade
@@ -140,6 +146,16 @@ namespace NinjaTrader.NinjaScript.Strategies
         public bool FlatNow;          // this bar is the 16:00 bar: close at market
         public bool TimeStopNow;      // the time stop: close at market now
         public string Note = "";      // what this bar's check found, for the dashboard
+        // gap and go (G60): its own trade, never open at the same time as the main one
+        public int GapPos, GapQty, GapBar;
+        public double GapEntry, GapStop = double.NaN;
+        public int GapNewEntry, GapNewQty;  // this bar's gap signal: send now at market (0: none)
+        public double GapNewStop = double.NaN;  // its stop price
+        public bool GapExitNow;               // close the gap trade at market now (it fills at the next open)
+        bool gapPending, gapExitPending;
+        int gapPendingDir, gapPendingQty;
+        double gapPendingStop;
+        readonly List<double> gapHist = new List<double>();
         public int LastEntryMinute { get { return s.LastEntryEnd; } }
         // U15: what today's filters allow, for the dashboard (set at the 09:30 bar; the day's loss budget live)
         public string TodayRules
@@ -270,6 +286,19 @@ namespace NinjaTrader.NinjaScript.Strategies
             fav = double.NaN;
         }
 
+        void GapClose(int i, double price, string reason)
+        {
+            double pnl = GapPos * (price - GapEntry) * GapQty * s.PointValue - 2 * s.CommissionPerSide * GapQty;
+            V38Trade t = new V38Trade();
+            t.Direction = GapPos; t.Qty = GapQty; t.EntryBar = GapBar; t.Entry = GapEntry;
+            t.ExitBar = i; t.Exit = price; t.Reason = reason; t.Pnl = pnl;
+            Trades.Add(t);
+            DayPnl += pnl;
+            equity += pnl;
+            GapPos = 0;
+            GapStop = double.NaN;
+        }
+
         bool StudyOk(int d, int end, double c)
         {
             if (s.LastEntryEnd > 0 && end > s.LastEntryEnd) { Note = "after the last entry check"; return false; }
@@ -294,6 +323,26 @@ namespace NinjaTrader.NinjaScript.Strategies
             FlatNow = false;
             TimeStopNow = false;
             Note = "";
+            GapNewEntry = 0;
+            GapExitNow = false;
+
+            if (s.GapGo)  // G60: the gap trade's market orders fill at this open, then its stop
+            {
+                if (GapPos != 0 && (gapExitPending || tMin >= s.GapGoExit))
+                    GapClose(i, o - GapPos * slip, "Gap exit");
+                gapExitPending = false;
+                if (gapPending)
+                {
+                    gapPending = false;
+                    if (tMin == RthOpen + 5 && Position == 0 && GapPos == 0)
+                    {
+                        GapPos = gapPendingDir; GapQty = gapPendingQty; GapBar = i;
+                        GapEntry = o + GapPos * slip; GapStop = gapPendingStop;
+                    }
+                }
+                if (GapPos != 0 && (GapPos > 0 ? l <= GapStop : h >= GapStop))
+                    GapClose(i, (GapPos > 0 ? Math.Min(o, GapStop) : Math.Max(o, GapStop)) - GapPos * slip, "Gap stop");
+            }
 
             if (pendingKind != 0)  // market orders from the last bar fill at this bar's open
             {
@@ -405,6 +454,14 @@ namespace NinjaTrader.NinjaScript.Strategies
                 lastRthClose = c;
                 dayHi = double.IsNaN(dayHi) ? h : Math.Max(dayHi, h);
                 dayLo = double.IsNaN(dayLo) ? l : Math.Min(dayLo, l);
+            }
+
+            if (s.GapGo && tMin == RthOpen && minutes == 5 && !double.IsNaN(prevClose) && !double.IsNaN(dayOpen))
+                GapSignal(c);
+            if (s.GapGo && GapPos != 0 && end == s.GapGoExit)
+            {
+                GapExitNow = true;  // a market exit at this close, filled at the exit bar's open
+                gapExitPending = true;
             }
 
             if (inRth && !double.IsNaN(dayOpen) && end >= FirstCheck && end <= LastCheck && (end - FirstCheck) % Step == 0)
@@ -527,6 +584,42 @@ namespace NinjaTrader.NinjaScript.Strategies
             NewTpPts = brTpNext;
         }
 
+        // G60: at the 09:30 bar's close, gap and go's signal for the 09:35 open (5-minute bars only)
+        void GapSignal(double c)
+        {
+            double gap = dayOpen - prevClose;
+            if (gapHist.Count >= 10 && gap != 0 && !SkipToday && Position == 0 && GapPos == 0)
+            {
+                int n = Math.Min(14, gapHist.Count);
+                double avg = 0.0;
+                for (int k = gapHist.Count - n; k < gapHist.Count; k++)
+                    avg += gapHist[k];
+                avg /= n;
+                int d = gap > 0 ? 1 : -1;
+                if (Math.Abs(gap) >= s.GapGoK * avg && d * (c - dayOpen) > 0)
+                {
+                    int q = s.Qty;
+                    if (s.ProfitStep > 0 && !double.IsNaN(trailBase))
+                    {
+                        q += (int)Math.Floor(Math.Max(0.0, EqEff - trailBase) / s.ProfitStep);
+                        if (s.MaxContracts > 0) q = Math.Min(q, s.MaxContracts);
+                    }
+                    double perC = Math.Abs(c + d * slip - dayOpen) * s.PointValue + 2 * s.CommissionPerSide + 2 * slip * s.PointValue;
+                    double room = MoneyRoom();
+                    if (!double.IsInfinity(room))
+                        q = Math.Min(q, (int)Math.Floor(room / perC + 1e-9));
+                    if (s.GapGoMaxQty > 0)
+                        q = Math.Min(q, s.GapGoMaxQty);
+                    if (q >= 1)
+                    {
+                        gapPending = true; gapPendingDir = d; gapPendingQty = q; gapPendingStop = dayOpen;
+                        GapNewEntry = d; GapNewQty = q; GapNewStop = dayOpen;
+                    }
+                }
+            }
+            gapHist.Add(Math.Abs(gap));
+        }
+
         static double Avg(List<double> x, int n)
         {
             double sum = 0.0;
@@ -538,7 +631,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
     public class MnqNoiseV38 : Strategy
     {
-        const string LongName = "Long", ShortName = "Short";
+        const string LongName = "Long", ShortName = "Short", GapLongName = "GapLong", GapShortName = "GapShort";
         const string SkipDefault =
             "2025-01-01,2025-01-09,2025-01-20,2025-02-17,2025-04-18,2025-05-26,2025-06-19,2025-07-03,2025-07-04,2025-09-01," +
             "2025-11-27,2025-11-28,2025-12-24,2025-12-25," +
@@ -630,6 +723,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 AlertsOn = true;
                 SoundAlerts = true;
                 MilestoneStep = 5000;
+                GapGo = true;
                 TestedWinRate = 61.2;
             }
             else if (State == State.DataLoaded)
@@ -680,6 +774,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 st.ProfitStep = ProfitStep; st.MaxContracts = MaxContracts; st.SizeByOwnStop = SizeByOwnStop;
                 st.TimeStop = TimeStop;
                 st.StepsAfterLock = StepsAfterLock;
+                st.GapGo = GapGo && Mode != "Evaluation";  // G60: on in the Funded growth modes (and Custom, as set)
                 st.Tick = TickSize;
                 st.PointValue = Instrument.MasterInstrument.PointValue;
                 if (!badChart)
@@ -829,6 +924,25 @@ namespace NinjaTrader.NinjaScript.Strategies
                 Flatten(real, "Time stop");  // still losing this long after the fill: out at the next open
                 Say("timestop", "Time stop: the trade is still losing " + engine.MinutesInTrade + " min after its fill, closing at market");
             }
+            else if (real != 0 && engine.GapPos == real && engine.GapExitNow)
+            {
+                exitRef = Close[0];
+                if (real > 0) ExitLong("Gap exit", GapLongName);
+                else ExitShort("Gap exit", GapShortName);
+            }
+            else if (real == 0 && engine.GapNewEntry != 0 && PlaceOrders && !guardTripped)
+            {
+                // G60: gap and go, a market entry with its stop at the 09:30 open attached first
+                string name = engine.GapNewEntry > 0 ? GapLongName : GapShortName;
+                SetStopLoss(name, CalculationMode.Price, engine.GapNewStop, false);
+                if (engine.GapNewEntry > 0) EnterLong(engine.GapNewQty, name);
+                else EnterShort(engine.GapNewQty, name);
+                entryRef = Close[0];
+                stopRef = engine.GapNewStop;
+                entryStopPts = Math.Abs(Close[0] - engine.GapNewStop);
+                Say("entry", (engine.GapNewEntry > 0 ? "BUY " : "SELL ") + engine.GapNewQty + " MNQ at market (gap and go), stop " +
+                    engine.GapNewStop.ToString("0.00", CultureInfo.InvariantCulture) + ", out at 09:55");
+            }
             else if (real == 0 && engine.NewEntry != 0 && PlaceOrders && !guardTripped)
             {
                 // the bracket first, in ticks from the fill, so it is attached the moment the entry fills
@@ -868,7 +982,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                     }
                 }
             }
-            else if (real != 0 && engine.Position == 0)
+            else if (real != 0 && engine.Position == 0 && engine.GapPos != real)
                 Flatten(real, "Model flat");  // the model closed (a fill elsewhere): don't hold an unmanaged position
             WriteTrades(platform);
             Dashboard(endNy);
@@ -977,7 +1091,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 if (t.ProfitCurrency > 0) { realWins++; realDayWins++; weekWins++; }
                 DateTime en = TimeZoneInfo.ConvertTime(DateTime.SpecifyKind(t.Entry.Time, DateTimeKind.Unspecified), platform, newYork);
                 DateTime ex = TimeZoneInfo.ConvertTime(DateTime.SpecifyKind(t.Exit.Time, DateTimeKind.Unspecified), platform, newYork);
-                string side = t.Entry.Name == ShortName ? "SHORT" : "LONG";
+                string side = t.Entry.Name == ShortName || t.Entry.Name == GapShortName ? "SHORT" : "LONG";
                 int dir = side == "LONG" ? 1 : -1;
                 double inSlip = double.IsNaN(entryRef) ? double.NaN : dir * (t.Entry.Price - entryRef) / TickSize;
                 double outRef = t.Exit.Name == "Stop loss" ? (double.IsNaN(stopRef) ? t.Entry.Price - dir * entryStopPts : stopRef)
@@ -1220,6 +1334,10 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (real == 0)
                 return "Open trade: none\n";
             double avg = Position.AveragePrice;
+            if (engine.GapPos == real && engine.Position == 0)  // G60: the gap and go trade
+                return "Open trade: " + (real > 0 ? "LONG " : "SHORT ") + Position.Quantity + " MNQ @ " + avg.ToString("0.00", CultureInfo.InvariantCulture) +
+                       " (gap and go), stop " + engine.GapStop.ToString("0.00", CultureInfo.InvariantCulture) + ", " +
+                       (engine.Bar + 1 - engine.GapBar) * BarsPeriod.Value + " min in, out at 09:55\n";
             double stop = engine.PeekStop(avg), tp = engine.PeekTarget(avg);
             string line = "Open trade: " + (real > 0 ? "LONG " : "SHORT ") + Position.Quantity + " MNQ @ " + avg.ToString("0.00", CultureInfo.InvariantCulture) +
                           (double.IsNaN(stop) ? "" : ", stop " + stop.ToString("0.00", CultureInfo.InvariantCulture)) +
@@ -1312,6 +1430,10 @@ namespace NinjaTrader.NinjaScript.Strategies
         [Range(0, 99)]
         [Display(Name = "Win rate check: the tested win rate, % (warns from 30 trades if well below it; 0 = off)", Order = 3, GroupName = "5. Alerts")]
         public double TestedWinRate { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Gap and go: 1 MNQ with a big opening gap, 09:35-09:55 (5-minute chart)", Order = 14, GroupName = "1. Size and risk")]
+        public bool GapGo { get; set; }
 
         [NinjaScriptProperty]
         [Range(0, 200)]
