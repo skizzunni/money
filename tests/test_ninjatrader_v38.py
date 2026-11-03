@@ -353,3 +353,32 @@ def test_v38_fill_quality(sim, sample_1m, tmp_path):  # noqa: F811
     plain = subprocess.run([DOTNET, str(sim), str(path), "5", "Strategy=V38", *GROW_ARGS], capture_output=True,
                            text=True, env=ENV)
     assert [x.split(",")[1:] for x in plain.stdout.splitlines() if x.startswith("T,")] == trades
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+def test_v38_day_summary(sim, sample_1m, tmp_path):  # noqa: F811
+    """The day's summary: live, once a session, after its 16:00 exit, with the day's P/L and trades exactly as the
+    journal's DAY line has them; and the DAY lines carry the room above the floor and the next day's contracts."""
+    import re
+
+    bars = resample(sample_1m, "5min")
+    path = tmp_path / "bars.csv"
+    with path.open("w") as f:
+        for t, r in zip(bars.index, bars.itertuples(), strict=True):
+            f.write(f"{t:%Y-%m-%d %H:%M},{r.open!r},{r.high!r},{r.low!r},{r.close!r}\n")
+    data = tmp_path / "nt8"
+    data.mkdir()
+    live = 1000
+    r = subprocess.run([DOTNET, str(sim), str(path), "5", "Strategy=V38", *GROW_ARGS, f"SimUserDataDir={data}",
+                        f"SimRealtimeFrom={live}"], capture_output=True, text=True, env=ENV)
+    assert r.returncode == 0, r.stderr[-2000:]
+    days = [x.split(",", 4)[4] for x in r.stdout.splitlines() if x.startswith("A,") and ",v38_day," in x]
+    j = pd.read_csv(data / "MnqNoiseV38_backtest.csv")
+    dl = j[j.kind == "DAY"].set_index("entry time")  # a DAY line's date sits in the "entry time" column
+    assert dl["room above floor"].notna().all() and dl["next contracts"].notna().all()
+    live_days = sorted({ts.strftime("%Y-%m-%d") for ts in bars.index[live:] if ts.hour * 60 + ts.minute >= 960})
+    assert len(days) == len(live_days) >= 20
+    for msg in days:
+        d, sign, amt, n = re.match(r"Day done (\S+): ([+-])\$([\d.]+) in (\d+) trades", msg).groups()
+        assert math.isclose(float(sign + amt), float(dl.loc[d, "day P/L"]), abs_tol=0.006), msg
+        assert int(n) == int(dl.loc[d, "trades today"]), msg

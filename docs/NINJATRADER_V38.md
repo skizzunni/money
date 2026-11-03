@@ -1569,3 +1569,13 @@ mixes the two layouts.
 `test_v38_fill_quality` checks each trade's entry slip against the simulator's fill and the bar it was sent at,
 exactly. It also checks every stop's slip at 1 and 3 ticks, no slip on targets, the dashboard average, the warning at 3
 ticks and unchanged trades. All 16 NinjaTrader v3.8 tests pass. Re-import the file to get it.
+
+**U7 (2026-11-03): the day's summary.**
+- **The alert.** Live, once a session, on the first bar from 16:00 on (after the 16:00 exit has filled), an alert and
+  an Output line: "Day done 2026-11-03: +$412.50 in 3 trades (2 winners), total $8214.00, room above the floor $6214,
+  tomorrow up to 6 MNQ".
+- **The journal.** The DAY lines now fill in the room above the trailing floor and the next day's contracts.
+
+`test_v38_day_summary` checks one summary per live session, each with the day's P/L and trade count exactly as its
+journal DAY line has them, and the DAY lines' new fields. All 17 NinjaTrader v3.8 tests pass. Re-import the file to
+get it.

@@ -555,6 +555,8 @@ namespace NinjaTrader.NinjaScript.Strategies
         double entryRef = double.NaN, exitRef = double.NaN, stopRef = double.NaN, entryStopPts = double.NaN;
         double entrySlipSum, exitSlipSum;
         int entrySlipN, exitSlipN;
+        int realDayWins;          // today's winners, for the day's summary
+        string summaryDay = "";   // the session the day's summary was sent for
         string realDay = "";
         string journalPath = "", liveJournalPath = "";
         double net, peak, maxDd, worstDay, dayNet;
@@ -725,6 +727,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 realDay = start.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
                 realDayStart = cum;
                 realDayTrades = 0;
+                realDayWins = 0;
                 guardTripped = false;
                 string wk = start.Date.AddDays(-(((int)start.DayOfWeek + 6) % 7)).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
                 string mo = start.ToString("yyyy-MM", CultureInfo.InvariantCulture);
@@ -733,6 +736,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 if (paceFrom == DateTime.MinValue && engine.Ready) paceFrom = start.Date;
                 lastSession = start.Date;
             }
+            if (tMin >= V38Engine.RthClose)
+                DaySummary(cum);
             engine.ExtEquity = cum;
             engine.ExtDayPnl = cum - realDayStart;
             int before = engine.Trades.Count;
@@ -808,7 +813,21 @@ namespace NinjaTrader.NinjaScript.Strategies
         void JournalDay(double cum)
         {
             Journal(string.Join(",", new[] { "DAY", realDay, "", "", "", realDayTrades.ToString(CultureInfo.InvariantCulture),
-                                             "", "", "", "", F(cum - realDayStart), F(cum), "", "", "", "", "" }), false);
+                                             "", "", "", "", F(cum - realDayStart), F(cum), "", F(engine.TrailFloorRoom),
+                                             engine.NextQty.ToString(CultureInfo.InvariantCulture), "", "" }), false);
+        }
+
+        // the day's summary, live, once the session's 16:00 exit has filled (the first bar from 16:00 on)
+        void DaySummary(double cum)
+        {
+            if (State != State.Realtime || summaryDay == realDay || realDay.Length == 0)
+                return;
+            summaryDay = realDay;
+            double day = cum - realDayStart;
+            Say("day", "Day done " + realDay + ": " + (day >= 0 ? "+$" : "-$") + Math.Abs(day).ToString("0.00", CultureInfo.InvariantCulture) +
+                " in " + realDayTrades + " trades (" + realDayWins + " winners), total $" + cum.ToString("0.00", CultureInfo.InvariantCulture) +
+                (double.IsNaN(engine.TrailFloorRoom) ? "" : ", room above the floor $" + engine.TrailFloorRoom.ToString("0", CultureInfo.InvariantCulture)) +
+                ", tomorrow up to " + engine.NextQty + " MNQ");
         }
 
         static string F(double x) { return double.IsNaN(x) ? "" : x.ToString("0.00", CultureInfo.InvariantCulture); }
@@ -846,7 +865,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 Trade t = SystemPerformance.AllTrades[journaled++];
                 realDayTrades++;
                 realTrades++;
-                if (t.ProfitCurrency > 0) realWins++;
+                if (t.ProfitCurrency > 0) { realWins++; realDayWins++; }
                 DateTime en = TimeZoneInfo.ConvertTime(DateTime.SpecifyKind(t.Entry.Time, DateTimeKind.Unspecified), platform, newYork);
                 DateTime ex = TimeZoneInfo.ConvertTime(DateTime.SpecifyKind(t.Exit.Time, DateTimeKind.Unspecified), platform, newYork);
                 string side = t.Entry.Name == ShortName ? "SHORT" : "LONG";
