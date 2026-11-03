@@ -2578,3 +2578,24 @@ account in its first months. Either way only 2-5 more days in 100 trade (`verifi
 (the S&P), overnight sessions, and the user's own style as rules, each either loses money over the histories or loses
 accounts. Most days the Nasdaq does not trend inside the day session, and none of the setups tested trades those days
 at a profit after costs.
+
+## G60: "gap and go" before 10:00, beside the bot (registered 2026-11-03, before its run)
+
+**The idea:** round seventy-one's best setup, gap and go, was positive in every Nasdaq data set (t 2.0 / 3.4 / 3.5) and
+on the S&P, the DAX and the Nikkei (t 1.8 / 2.4 / 1.8). It failed the strict confirmation bar, but nothing else came
+closer. It trades in 09:30-10:00, when the bot never does. Here it gets an exit before the bot's first entry can fill
+(10:05), so the two never hold a position at once.
+
+**The rules (1 MNQ, 5-minute bars):**
+- **When:** the 09:30 open is at least 0.5 times the average of the last 14 sessions' gaps away from the prior 16:00
+  close, and the 09:30 bar closes beyond its open in the gap's direction.
+- **The trade:** in at the 09:35 open in the gap's direction, a stop at the 09:30 open, out at the 10:00 open.
+- **Costs:** $1.24 a round trip and a tick of slippage on each market and stop fill.
+- **Left out:** each month's first session (the scaled data's monthly rescale makes a false gap there), and the
+  no-trade dates.
+
+**Passes only if:** the net is positive in all four halves (NQ 2015-2019, NQ 2020-Jul 2025, the index 2011-2018, the
+index 2019-Sep 2026), and is above 0 with t ≥ 2 on all four pooled.
+
+It reports the trades a week, the days it trades when the bot (Funded growth, 5-minute) doesn't, and the bot's net
+with and without it.
