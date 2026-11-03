@@ -17,7 +17,9 @@ NY = "America/New_York"
 VARIANT = sys.argv[4] if len(sys.argv) > 4 else "base"
 EXTRA = {"base": {}, "gentle": {"steps_after_lock": True}, "cap10": {"size_up_to": 10},
          "reserve500": {"trail_buffer": 500.0}, "half": {"trail_frac": 0.5},
-         "early125": {"early_ml": 125.0}, "early100": {"early_ml": 100.0}}[VARIANT]
+         "early125": {"early_ml": 125.0}, "early100": {"early_ml": 100.0},
+         "acct100": {"qty": 2, "daily_loss_limit": 1800.0, "trail_dd": 3000.0, "size_up_to": 30},
+         "acct150": {"qty": 3, "daily_loss_limit": 2700.0, "trail_dd": 4500.0, "size_up_to": 45}}[VARIANT]
 
 
 def with_1600(bars: pd.DataFrame, m: int) -> pd.DataFrame:
@@ -46,15 +48,16 @@ def one(job):
     cfg.trail_from = start
     tf = run(b, cfg, minutes=5).trades_frame()
     tf = tf[tf.entry_time >= s0]
+    S.TRAIL = cfg.trail_dd  # the account's own trailing drawdown, for the floor checks
     eq = np.r_[0.0, np.cumsum(tf.pnl.to_numpy())]
     tr = S.trail_stats(name, tf)
     # the floor at the end: the highest end-of-day equity less $2,000, stopping at the start; an account within $100 of
     # it can't size a trade any more (and at most firms, at it, has failed)
     eod = tf.groupby(tf.exit_time.dt.tz_convert(NY).dt.date).pnl.sum().cumsum()
-    floor = min(max(0.0, float(eod.max()) if len(eod) else 0.0) - 2000.0, 0.0)
+    floor = min(max(0.0, float(eod.max()) if len(eod) else 0.0) - cfg.trail_dd, 0.0)
     room = float(eq[-1]) - floor
     return {"set": name, "start": start, "trades": len(tf), "net $": round(float(eq[-1])),
-            "lowest $": round(float(eq.min())), "reached +2000": bool(eq.max() >= 2000),
+            "lowest $": round(float(eq.min())), "reached +2000": bool(eq.max() >= cfg.trail_dd),
             "floor touched": tr[f"{name} tb0"] > 0, "room at end $": round(room), "lost": room < 100.0,
             # frozen: no trade in the last 90 days of the 21 months (stopped above the floor, but no longer trading)
             "frozen": bool(len(tf) == 0 or (s1 - tf.exit_time.max()).days > 90)}

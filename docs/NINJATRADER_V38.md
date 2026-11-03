@@ -1618,3 +1618,29 @@ first. About 2 trades in 3 were stopped, and only 0-20% reached the low (high) o
 The clip's 241-point day is real, and the pattern did catch some big moves (a best trade of 6.4R). Read from price and
 total volume, though, the "trapped buyers" are not a repeatable edge. Whether bid/ask order flow (who hit what,
 at what size) adds one can only be tested with that data (`verification/noise_v2/g38_trapped.csv`).
+
+## G39: the same bot on a 100K or 150K account (registered 2026-11-03, before its run)
+
+**The idea:** one 50K account caps the bot at $900 a day and a $2,000 trailing floor. Every sizing fix since G5 has
+run into those two numbers. A bigger account raises both, and the bot's sizing follows its limits automatically.
+The rules used, typical for these sizes (Topstep-style):
+- **100K:** a $3,000 end-of-day trailing drawdown and a $2,000 daily loss.
+- **150K:** a $4,500 trailing drawdown and a $3,000 daily loss.
+
+**The variants.** Growth mode with G6's time stop, its money limits scaled by the account (x2 or x3). Every trading
+rule and the max loss per contract are unchanged.
+- **100K:** daily budget $1,800, trailing drawdown $2,000 x 1.5 = $3,000, 2 starting contracts, up to 30.
+- **150K:** daily budget $2,700, trailing drawdown $4,500, 3 starting contracts, up to 45.
+
+Contracts are still added per $1,500 of profit.
+
+**Measured:**
+- G35's 89 start dates (a new account every quarter, 21 months each, NinjaTrader's execution, 5-minute bars): the
+  median and mean net, the 10th percentile, and the share of accounts lost (under $100 above their own floor) or
+  frozen;
+- the window (Jan 2025-Oct 2026) with the usual runner.
+
+**Adopt (as new Modes "Funded growth 100K" and "Funded growth 150K" in MnqNoiseV38.cs) only if:**
+- the share of dead accounts is no higher than the 50K's on both NQ and the index;
+- the median net is higher than the 50K's on both;
+- the window's net is higher, the floor never touched, and no day reaches its account's daily limit.
