@@ -1818,3 +1818,20 @@ Two kinds of death:
 - **A backtest.** These are past markets, not a promise.
 
 (`verification/noise_v2/g35_start_dates_{base,cush100,cush150,apex100,apex150}_60m.csv`.)
+
+## G44: no second try after the time stop (registered 2026-11-03, before its run)
+
+**The idea, from G6:** the time stop closes a trade that is still losing an hour after its fill. That signal often
+comes back at a later half-hour check the same day, and the bot buys (or sells) the same stalled move again.
+
+**The variants** (`ts_block` in `mnqbot/noise.py`, on Funded growth with its 60-minute time stop):
+- **side:** after a time-stop exit, no new entry on that side for the rest of the session;
+- **day:** after a time-stop exit, no new entry at all for the rest of the session.
+
+**Adopt (the better of the two by window net) only if, against Funded growth as it is:**
+- a higher net on all three 5-minute sets (the window, NQ from 2015, the index from 2011), in both the chart's
+  execution and NinjaTrader's;
+- the floor is never touched;
+- there are no more days at −$1,000.
+
+The 30-minute runs are reported, not judged.

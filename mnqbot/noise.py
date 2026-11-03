@@ -288,6 +288,9 @@ class NoiseConfig:
     # research (G6, docs/NINJATRADER_V38.md): a time stop. A trade not yet locked that is losing at a bar close
     # time_stop minutes or more after its fill is closed at the next bar's open (a market order sent at that close).
     time_stop: int = 0
+    # research (G44): after a time-stop exit, no new entry on that side ("side") or on either side ("day") for the rest
+    # of the session ("" = off)
+    ts_block: str = ""
     # research (G13): a time lock. A trade not yet locked that is in profit at a bar close time_lock minutes or more
     # after its fill is locked (its stop to the entry plus lock_plus, from the next bar)
     time_lock: int = 0
@@ -404,6 +407,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
     n_checks_seen = 0  # touch_entry: checks so far
     eq_curve: list[float] = [0.0]  # eq_n: the closed P&L after each position
     side_cd = {1: 0, -1: 0}  # signals still to skip on a side today (side_cooldown)
+    ts_done = {1: False, -1: False}  # ts_block: a side closed by the time stop today
     side_lost = {1: False, -1: False}  # a loser on that side today (side_margin)
     side_run = {1: 0, -1: 0}  # losers in a row on each side, across days (side_run_k)
     side_skip = {1: 0, -1: 0}  # signals still to skip on each side (side_run_k)
@@ -477,6 +481,10 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
         day_pnl += pnl
         if reason == "Target":
             target_today = True
+        if reason == "Time stop" and cfg.ts_block:
+            ts_done[pos] = True
+            if cfg.ts_block == "day":
+                ts_done[-pos] = True
         if pnl + part_pnl < 0 and reason != "Session ended":  # a trade closed in parts is one trade
             losers_today += 1
             consec += 1
@@ -505,6 +513,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
         if cfg.skip_checks and str(end) in cfg.skip_checks.split(","):
             return False
         if cfg.after_target_done and target_today:
+            return False
+        if ts_done[d]:
             return False
         if block_dir and (d == block_dir or cfg.big_day_both):
             return False
@@ -804,6 +814,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             day_open = o[i]
             losers_today = 0
             side_cd[1] = side_cd[-1] = 0
+            ts_done[1] = ts_done[-1] = False
             side_lost[1] = side_lost[-1] = False
             upper = lower = sigma = math.nan
             today = [math.nan] * N_CHECKS
