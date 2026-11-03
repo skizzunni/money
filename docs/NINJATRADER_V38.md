@@ -2018,3 +2018,21 @@ everywhere.
 The afternoon entries are among the bot's best: dropping the 14:30 and 15:00 checks lost about $10,000 on the window
 and $80,000 on NQ. The profit factor rose on 30-minute bars (2.17 against 1.89 on the window), but the net still fell.
 Together with G8 (15:30 changed little), 15:00 is the right last check (`verification/noise_v2/g47_last_entry.csv`).
+
+## G48: the big-day rule's lookback (registered 2026-11-03, before its run)
+
+**The idea:** after a session whose range was over 1.5 times the average range, the bot takes no entries the next
+day in that session's direction (v2.3). G27 re-checked the 1.5 with the time stop on; the average's length, 10
+sessions, has not been re-checked since v2.3. The variants:
+- **5 sessions:** a shorter average follows a change of pace faster;
+- **20 sessions:** a longer one marks fewer days as big in a stretch of large ranges.
+
+**The variants:** Funded growth with `big_day_n` 5 and 20; everything else as it is.
+
+**Adopt (the better by window net) only if, against 10:**
+- a higher net on all three 5-minute sets (the window, NQ from 2015, the index from 2011), in both the chart's
+  execution and NinjaTrader's;
+- the floor is never touched;
+- there are no more days at −$1,000.
+
+The 30-minute runs are reported, not judged.
