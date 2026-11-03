@@ -1686,6 +1686,21 @@ week runs Monday to Friday by the 09:30 session. A Friday holiday sends none tha
 `test_v38_day_summary` now also checks one week summary per live Friday, its Monday, and its P/L and trade count
 against the sum of that week's journal DAY lines. The trades are unchanged. Re-import the file to get it.
 
+**U15 (2026-11-03): "Today" on the dashboard: what the bot may do, and when it next looks.** A new line under
+"Trades today", for example:
+- "Today: longs yes; shorts no (uptrend: above the 50-session average); next entry check 11:30 (in 12 min)";
+- "Today: longs no (after a big up day); shorts yes; …";
+- "Today: no entries (calm stretch: the last 10 sessions' ranges are small); …";
+- "Today: no entries (today's loss budget is used up)", "… (holiday / half day)", and "shorts after 14:00 (Fed day)".
+
+After the 15:00 check it says "no more entry checks today (the last is 15:00)". It answers "why isn't it trading?"
+without reading the code.
+
+`test_v38_today_line` reads the line at every bar of the 5-minute sample. It checks that no entry was taken against it:
+a long only under "longs yes", a short only under "shorts yes" (or after 14:00 on a Fed day). It also checks the next
+check's time and countdown at every bar from 10:00 to 15:00, and that the trades are unchanged. All 29 NinjaTrader
+v3.8 tests pass. Re-import the file to get it.
+
 ## G38: trapped buyers at the high of the day, order flow from volume (registered 2026-11-03, before its run)
 
 **The idea, from the user's @chicago_trades clip.** At the high of the day: retail stops are run, fresh sellers fill,

@@ -140,6 +140,22 @@ namespace NinjaTrader.NinjaScript.Strategies
         public bool FlatNow;          // this bar is the 16:00 bar: close at market
         public bool TimeStopNow;      // the time stop: close at market now
         public string Note = "";      // what this bar's check found, for the dashboard
+        public int LastEntryMinute { get { return s.LastEntryEnd; } }
+        // U15: what today's filters allow, for the dashboard (set at the 09:30 bar; the day's loss budget live)
+        public string TodayRules
+        {
+            get
+            {
+                if (SkipToday) return "no entries (holiday / half day)";
+                if (calm) return "no entries (calm stretch: the last 10 sessions' ranges are small)";
+                if (s.DailyLoss > 0 && DayRoom <= 0) return "no entries (today's loss budget is used up)";
+                string longs = blockDir == 1 ? "no (after a big up day)" : "yes";
+                string shorts = blockDir == -1 ? "no (after a big down day)"
+                              : s.TrendN > 0 && trend == 1 ? "no (uptrend: above the 50-session average)"
+                              : FedToday && s.FedNoShorts ? "after 14:00 (Fed day)" : "yes";
+                return "longs " + longs + "; shorts " + shorts;
+            }
+        }
 
         public V38Engine(V38Settings settings, int barMinutes)
         {
@@ -1018,6 +1034,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                          "Next trade: " + engine.NextQty + " MNQ, room today $" + (double.IsNaN(engine.DayRoom) ? "-" : Math.Max(0, engine.DayRoom).ToString("0", CultureInfo.InvariantCulture)) + "\n" +
                          (setupWarnings.Count > 0 ? "SETUP WARNING (" + setupWarnings.Count + "): " + setupWarnings[0] + "\n" : "Setup: OK\n") +
                          "Trades today: " + realDayTrades + "\n" +
+                         TodayLine(endNy) +
                          ProgressLines(cumReal, sinceStart) +
                          WinCheckLine() +
                          FillLine() +
@@ -1054,6 +1071,24 @@ namespace NinjaTrader.NinjaScript.Strategies
                       " more months to the goal" : ", no progress yet") + "\n";
             }
             return s;
+        }
+
+        // U15: what today's filters allow, and when the next entry check is (checks at the bar closes on :00 and :30)
+        string TodayLine(DateTime endNy)
+        {
+            int m = endNy.Hour * 60 + endNy.Minute;
+            int last = engine.LastEntryMinute > 0 ? engine.LastEntryMinute : 930;
+            string next;
+            if (m < 600 || m >= V38Engine.RthClose)
+                next = "next entry check 10:00";
+            else if (m >= last)
+                next = "no more entry checks today (the last is " + (last / 60) + ":" + (last % 60).ToString("00", CultureInfo.InvariantCulture) + ")";
+            else
+            {
+                int n = (m / 30 + 1) * 30;
+                next = "next entry check " + (n / 60) + ":" + (n % 60).ToString("00", CultureInfo.InvariantCulture) + " (in " + (n - m) + " min)";
+            }
+            return "Today: " + engine.TodayRules + "; " + next + "\n";
         }
 
         // U13: the real win rate against the tested one. From 30 trades, the chance of this few winners or fewer if the

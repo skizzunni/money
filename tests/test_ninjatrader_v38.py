@@ -169,6 +169,53 @@ def test_v38_dashboard_shows_the_open_trade(sim, sample_1m, tmp_path):  # noqa: 
 
 
 @pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+def test_v38_today_line(sim, sample_1m, tmp_path):  # noqa: F811
+    """U15: the dashboard's "Today" line at every bar. No entry is ever taken against it: a long only when it says
+    "longs yes", a short only when "shorts yes" (or after 14:00 on a Fed day); none on a "no entries" day. The next
+    entry check it names is the next half hour from 10:00 to 15:00. The trades are unchanged."""
+    import re
+
+    bars = resample(sample_1m, "5min")
+    path = tmp_path / "bars.csv"
+    with path.open("w") as f:
+        for t, r in zip(bars.index, bars.itertuples(), strict=True):
+            f.write(f"{t:%Y-%m-%d %H:%M},{r.open!r},{r.high!r},{r.low!r},{r.close!r}\n")
+    base = [DOTNET, str(sim), str(path), "5", "Strategy=V38", *GROW_ARGS]
+    r = subprocess.run([*base, "DashHistory"], capture_output=True, text=True, env=ENV)
+    assert r.returncode == 0, r.stderr[-2000:]
+    today = {}
+    for x in r.stdout.splitlines():
+        if x.startswith("DH,v38_dash,"):
+            _, _, b, text = x.split(",", 3)
+            m = re.search(r"Today: (.*?); (next entry check [^|]*|no more entry checks today[^|]*)\s*\|", text)
+            assert m, text
+            today[int(b)] = (m.group(1), m.group(2).strip())
+    trades = [x.split(",") for x in r.stdout.splitlines() if x.startswith("T,")]
+    assert len(trades) >= 20
+    for t in trades:
+        d, signal = int(t[1]), int(t[2]) - 1  # the entry is sent at the close of the bar before its fill
+        rule = today[signal][0]
+        hhmm = bars.index[signal] + pd.Timedelta(minutes=5)
+        if d > 0:
+            assert "longs yes" in rule, (t, rule)
+        else:
+            assert "shorts yes" in rule or ("shorts after 14:00" in rule and hhmm.hour >= 14), (t, rule)
+    rules = {v[0] for v in today.values()}
+    assert any("shorts no (uptrend" in x for x in rules) and any("longs yes; shorts yes" in x for x in rules), rules
+    for b, (_, nxt) in today.items():
+        end = bars.index[b] + pd.Timedelta(minutes=5)
+        m = end.hour * 60 + end.minute
+        if 600 <= m < 900:
+            n = (m // 30 + 1) * 30
+            assert nxt == f"next entry check {n // 60}:{n % 60:02d} (in {n - m} min)", (end, nxt)
+        elif 900 <= m < 960:
+            assert nxt.startswith("no more entry checks today"), (end, nxt)
+    plain = subprocess.run(base, capture_output=True, text=True, env=ENV)
+    assert [x for x in plain.stdout.splitlines() if x.startswith("T,")] == [x for x in r.stdout.splitlines()
+                                                                             if x.startswith("T,")]
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
 def test_v38_live_loss_guard(sim, sample_1m, tmp_path):  # noqa: F811
     """The live loss guard: with a tight guard ($150, to make it fire on the sample), live from the first month on,
     today's closed + open loss at the guard closes the position ("Loss guard") and no new entry is taken that day.
