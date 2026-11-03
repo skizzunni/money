@@ -2624,3 +2624,11 @@ with and without it.
 
 The simple sum ignores the shared $900 daily budget, which is why two days pass −$1,000. Next: gap and go inside the
 model and MnqNoiseV38.cs, sized from the same daily budget and trailing floor as the bot, then the same tests again.
+
+**G60 stage 2 (registered 2026-11-03, before its run): gap and go inside the bot.** `gap_go` in `mnqbot/noise.py` (off by
+default) sizes each gap trade like the bot's own: its contract steps, and the trade's own stop against today's budget
+and the trailing floor. While a gap trade is open, its risk to the stop is held back from the bot's budget. Its P/L
+counts in the day and the equity like any trade. Funded growth, 5-minute bars (gap and go needs the 09:30 bar),
+`research/g60_integrated.py`. **Adopt (on by default in Funded growth) only if, against Funded growth as it is,** on
+all three 5-minute sets in both executions: a higher net, the floor never touched, and no more days at −$1,000. The
+share of days with a trade is reported.

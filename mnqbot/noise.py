@@ -297,6 +297,15 @@ class NoiseConfig:
     # research (G53): on a day that opens more than gap_block (a fraction, 0.01 = 1%) away from the prior close, no
     # entries against the gap's direction (0 = off)
     gap_block: float = 0.0
+    # research (G60): gap and go before the day's checks (5-minute bars). When the 09:30 open is at least gap_go_k
+    # times the average of the last 14 sessions' gaps from the prior close and the 09:30 bar closes beyond its open
+    # in the gap's direction: in at the 09:35 open that way, a stop at the 09:30 open, out at the 10:00 open. Sized
+    # like the bot's trades (its contract steps, the trade's own stop against today's budget and the trailing floor),
+    # and its open risk is held back from the bot's budget until it closes. gap_go_skip_month_first: research data
+    # rescaled by month has a false gap at each month's first session (off for real prices)
+    gap_go: bool = False
+    gap_go_k: float = 0.5
+    gap_go_skip_month_first: bool = False
     # research (G13): a time lock. A trade not yet locked that is in profit at a bar close time_lock minutes or more
     # after its fill is locked (its stop to the entry plus lock_plus, from the next bar)
     time_lock: int = 0
@@ -415,6 +424,9 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
     side_cd = {1: 0, -1: 0}  # signals still to skip on a side today (side_cooldown)
     ts_done = {1: False, -1: False}  # ts_block: a side closed by the time stop today
     gap_dir = 0  # gap_block: today's opening gap direction when it is past the threshold
+    gg: dict | None = None  # gap_go: the open gap trade (side, contracts, entry bar and price, stop)
+    gap_hist: list[float] = []  # gap_go: the last sessions' |gap|
+    sess_month = sess_month_prev = None  # gap_go_skip_month_first: this session's and the last one's month
     side_lost = {1: False, -1: False}  # a loser on that side today (side_margin)
     side_run = {1: 0, -1: 0}  # losers in a row on each side, across days (side_run_k)
     side_skip = {1: 0, -1: 0}  # signals still to skip on each side (side_run_k)
@@ -573,6 +585,9 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             room = min(room, cfg.trail_frac * (eq_curve[-1] - floor - cfg.trail_buffer))
         if cfg.trade_risk_cap > 0:
             room = min(room, cfg.trade_risk_cap)
+        if gg is not None:  # gap_go: an open gap trade's risk to its stop is not for the bot to use
+            room -= gg["q"] * (abs(gg["px"] - gg["stop"]) * cfg.point_value + 2 * cfg.commission_per_side
+                               + slip * cfg.point_value)
         return room
 
     def budget_fits() -> bool:
@@ -589,6 +604,17 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
     def against_trend(d: int) -> bool:
         return bool(cfg.trend_n) and d == -trend and cfg.trend_side in (0, d)
 
+    def gap_close(i: int, price: float, reason: str) -> None:
+        """gap_go: close the gap trade; its P/L counts in today's budget and the account's equity."""
+        nonlocal gg, day_pnl
+        g = gg
+        pnl = g["d"] * (price - g["px"]) * g["q"] * cfg.point_value - 2 * cfg.commission_per_side * g["q"]
+        trades.append(NoiseTrade(g["d"], g["q"], g["bar"], idx[g["bar"]], g["px"], i, idx[i], price, reason, pnl, 1.0))
+        if cfg.eq_n or cfg.trail_dd > 0:
+            eq_curve.append(eq_curve[-1] + pnl)
+        day_pnl += pnl
+        gg = None
+
     def close_part(i: int, price: float, f: float | None = None) -> None:
         nonlocal rest, part_pnl
         f = cfg.partial_frac if f is None else f
@@ -602,6 +628,40 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
         t_min = t.hour * 60 + t.minute
         end = t_min + minutes
         in_rth = t_min >= RTH_OPEN and end <= RTH_CLOSE
+
+        if cfg.gap_go:  # G60: gap and go, 09:35-10:00, before the bot's first fill
+            if gg is not None and (t_min >= FIRST_CHECK or t.date() != idx[gg["bar"]].date()):
+                gap_close(i, o[i] - gg["d"] * slip, "Gap 10:00")
+            if t_min == RTH_OPEN + 5 and i > 0 and idx[i - 1].date() == t.date() \
+                    and idx[i - 1].hour * 60 + idx[i - 1].minute == RTH_OPEN and not math.isnan(prev_close):
+                gap = day_open - prev_close
+                first_of_month = sess_month != sess_month_prev
+                usable = not (cfg.gap_go_skip_month_first and first_of_month)
+                if usable and len(gap_hist) >= 10 and gap != 0 and not skip_today and pos == 0 and gg is None:
+                    avg = sum(gap_hist[-14:]) / len(gap_hist[-14:])
+                    d = 1 if gap > 0 else -1
+                    if abs(gap) >= cfg.gap_go_k * avg and d * (c[i - 1] - day_open) > 0:
+                        stop_px = day_open
+                        q = cfg.qty
+                        if cfg.profit_step > 0 and not math.isnan(trail_base):
+                            q += int(max(0.0, eq_curve[-1] - trail_base) // cfg.profit_step)
+                            if cfg.size_up_to > 0:
+                                q = min(q, cfg.size_up_to)
+                        per_c = (abs(c[i - 1] + d * slip - stop_px) * cfg.point_value
+                                 + 2 * cfg.commission_per_side + 2 * slip * cfg.point_value)
+                        room = money_room()
+                        if math.isfinite(room):
+                            q = min(q, math.floor(room / per_c + 1e-9))
+                        if q >= 1:
+                            gg = {"d": d, "q": q, "bar": i, "px": o[i] + d * slip, "stop": stop_px}
+                            events.append((i - 1, "GAP BUY" if d > 0 else "GAP SELL"))
+                if usable:
+                    gap_hist.append(abs(gap))
+            if gg is not None:  # its stop, from the fill bar on
+                gd = gg["d"]
+                if (l[i] <= gg["stop"]) if gd > 0 else (h[i] >= gg["stop"]):
+                    fill = min(o[i], gg["stop"]) if gd > 0 else max(o[i], gg["stop"])
+                    gap_close(i, fill - gd * slip, "Gap stop")
 
         # market orders from the previous bar fill at this bar's open
         if pending is not None:
@@ -822,6 +882,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             vwap_now = vwap_used = math.nan
             prev_close = last_rth_close
             day_open = o[i]
+            sess_month_prev, sess_month = sess_month, t.month
             gap_dir = 0
             if cfg.gap_block > 0 and not math.isnan(prev_close) and abs(day_open / prev_close - 1) > cfg.gap_block:
                 gap_dir = 1 if day_open > prev_close else -1
