@@ -38,6 +38,10 @@ if "--cushion" in sys.argv:  # G40: the 50K's sizing, the bigger account's limit
     sys.argv.remove("--cushion")
     SIZES = {"50K": {}, "100K cushion": {"daily_loss_limit": 1800.0, "trail_dd": 3000.0},
              "150K cushion": {"daily_loss_limit": 2700.0, "trail_dd": 4500.0}}
+if "--apex" in sys.argv:  # G42: Apex's end-of-day rules
+    sys.argv.remove("--apex")
+    SIZES = {"Apex 100K": {"daily_loss_limit": 1350.0, "trail_dd": 3000.0},
+             "Apex 150K": {"daily_loss_limit": 1800.0, "trail_dd": 4000.0}}
 if "--steps1000" in sys.argv:  # G41: the cushion modes with a $1,000 contract step
     sys.argv.remove("--steps1000")
     SIZES = {"100K cushion": {"daily_loss_limit": 1800.0, "trail_dd": 3000.0},

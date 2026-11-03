@@ -1726,3 +1726,20 @@ the faster growth may now survive.
 The $1,000 step makes the typical account more, but it loses more of them. On NQ from 2015, both bigger accounts
 went back to the floor early on 30-minute bars, as the 50K did in G5. The $1,500 step stays in all three Funded growth
 modes (`verification/noise_v2/g41_steps_big.csv`, `g35_start_dates_cush*s1000.csv`).
+
+## G42: the bigger-account modes on Apex's rules (registered 2026-11-03, before its run)
+
+**The rules, as published for 2026 (third-party summaries; the user should confirm on the firm's site).**
+- **Topstep:** a $3,000 / $4,500 maximum loss on the 100K / 150K, trailing the closing balance up to the start, with a
+  $2,000 / $3,000 daily loss limit. That is what Funded growth 100K / 150K (G40) assume.
+- **Apex, end-of-day accounts:** a $3,000 / $4,000 trailing drawdown with a $1,500 / $2,000 daily loss limit, so a
+  tighter day.
+
+**The variants:** G40's sizing (the 50K's), with the bot's daily budget at 90% of Apex's limit:
+- **Apex 100K:** $1,350 a day, a $3,000 trailing floor.
+- **Apex 150K:** $1,800 a day, a $4,000 floor.
+
+**Adopt (as Modes "Funded growth Apex 100K" / "Apex 150K") on G40's rule against the 50K:**
+- fewer dead accounts on both NQ and the index (G35's 89 start dates);
+- a median net at least the 50K's on both;
+- a window net at least the 50K's at 5 and 30 minutes, the floor never touched, and no day at the daily limit.
