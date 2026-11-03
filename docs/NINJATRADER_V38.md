@@ -2632,3 +2632,26 @@ counts in the day and the equity like any trade. Funded growth, 5-minute bars (g
 `research/g60_integrated.py`. **Adopt (on by default in Funded growth) only if, against Funded growth as it is,** on
 all three 5-minute sets in both executions: a higher net, the floor never touched, and no more days at −$1,000. The
 share of days with a trade is reported.
+
+**G60 stage 2 result (run once, 2026-11-03): fails the rule. More days and more money, but the NQ account was lost
+early.**
+
+| 5-minute, chart / NinjaTrader | days with a trade | net |
+|---|---|---|
+| window: as it is / with gap and go | 28.9% / **44.0%** | $18,516 / $18,549 → **$22,539 / $23,935** |
+| NQ: as it is / with gap and go | 36.6% / 3.8% | $277,322 / $267,571 → **$0 / $1, the account lost in 2015** |
+| index: as it is / with gap and go | 35.7% / **49.4%** | $407,796 / $404,250 → **$486,458 / $476,571**, one −$1,347 day |
+
+- **NQ:** the bot alone came within $459 of the floor in its first months from 2015. The early gap losses took it the
+  rest of the way.
+- **The −$1,347 day (Aug 26, 2015):** a 14-contract gap trade was sized from the 09:30 close, filled at a 09:35 open
+  farther from its stop, and was stopped on the fill bar.
+
+**G60 stage 3 (registered 2026-11-03, before its run).** Two changes, for the two faults:
+- **`gap_go_after_lock`:** gap trades only once the trailing floor has stopped at the start (the account's first $2,000
+  made), so the first months stay the bot's alone, as G43 found they are the dangerous ones;
+- **`gap_go_cap`:** each gap trade's stop no farther than the bot's $187.50 a contract from the expected fill.
+
+The rule is stage 2's (a higher net on all three 5-minute sets in both executions, the floor never touched, no more
+days at −$1,000). G35's 89 start dates are also run, with no more lost accounts allowed than the bot's (7 on NQ, 7 on
+the index).

@@ -305,6 +305,10 @@ class NoiseConfig:
     # rescaled by month has a false gap at each month's first session (off for real prices)
     gap_go: bool = False
     gap_go_k: float = 0.5
+    # G60 stage 3: gap trades only once the trailing floor has stopped at the start (the account's first $trail_dd
+    # made), and each one's stop no farther than the bot's max loss a contract from the expected fill
+    gap_go_after_lock: bool = False
+    gap_go_cap: bool = False
     gap_go_skip_month_first: bool = False
     # research (G13): a time lock. A trade not yet locked that is in profit at a bar close time_lock minutes or more
     # after its fill is locked (its stop to the entry plus lock_plus, from the next bar)
@@ -637,11 +641,17 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                 gap = day_open - prev_close
                 first_of_month = sess_month != sess_month_prev
                 usable = not (cfg.gap_go_skip_month_first and first_of_month)
-                if usable and len(gap_hist) >= 10 and gap != 0 and not skip_today and pos == 0 and gg is None:
+                locked_floor = (not math.isnan(trail_peak) and cfg.trail_cap >= 0
+                                and trail_peak - cfg.trail_dd >= trail_base + cfg.trail_cap)
+                if usable and len(gap_hist) >= 10 and gap != 0 and not skip_today and pos == 0 and gg is None \
+                        and (locked_floor or not cfg.gap_go_after_lock):
                     avg = sum(gap_hist[-14:]) / len(gap_hist[-14:])
                     d = 1 if gap > 0 else -1
                     if abs(gap) >= cfg.gap_go_k * avg and d * (c[i - 1] - day_open) > 0:
                         stop_px = day_open
+                        if cfg.gap_go_cap and ml_cfg > 0:  # no farther than the bot's max loss a contract
+                            cap = c[i - 1] + d * slip - d * ml_cfg / cfg.qty / cfg.point_value
+                            stop_px = max(stop_px, cap) if d > 0 else min(stop_px, cap)
                         q = cfg.qty
                         if cfg.profit_step > 0 and not math.isnan(trail_base):
                             q += int(max(0.0, eq_curve[-1] - trail_base) // cfg.profit_step)

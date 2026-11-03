@@ -36,7 +36,8 @@ for opex in (False, True):
         if name == "win":  # the real MNQ weeks, too short to judge (as G6)
             continue
         cfg = NoiseConfig(**{**S.V23, **T.REFERENCE, "daily_loss_limit": 900.0, "trail_dd": 2000.0,
-                             "time_stop": 60, "gap_go": opex, "gap_go_skip_month_first": opex and name != "proxy"})
+                             "time_stop": 60, "gap_go": opex, "gap_go_skip_month_first": opex and name != "proxy",
+                             "gap_go_after_lock": opex, "gap_go_cap": opex})
         if NT:
             cfg.tv_path, cfg.nt_execution, cfg.round_prices, cfg.target_on_fill_bar = False, True, True, True
         if isinstance(skip, str):
@@ -56,7 +57,8 @@ for opex in (False, True):
         e = np.r_[0.0, np.cumsum(p)]
         dayp = tf.groupby(tf.exit_time.dt.date).pnl.sum()
         tr = S.trail_stats(name, tf)
-        print({"bars": S.MIN[0], "nt": NT, "gap go": opex, "set": name, "days traded %": round(traded, 1), "gap trades": gaps,
+        print({"bars": S.MIN[0], "nt": NT, "gap go": opex, "set": name, "days traded %": round(traded, 1),
+               "gap trades": gaps,
                "trades": len(p),
                "net $": round(float(p.sum())), "pf": round(float(p[p > 0].sum() / -p[p <= 0].sum()), 3),
                "win %": round(100 * float((p > 0).mean()), 1), "time stops": int((tf.reason == "Time stop").sum()),

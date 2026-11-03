@@ -27,7 +27,10 @@ EXTRA = {"base": {}, "gentle": {"steps_after_lock": True}, "cap10": {"size_up_to
          "cush100s1000": {"daily_loss_limit": 1800.0, "trail_dd": 3000.0, "profit_step": 1000.0},
          "cush150s1000": {"daily_loss_limit": 2700.0, "trail_dd": 4500.0, "profit_step": 1000.0},
          "apex100": {"daily_loss_limit": 1350.0, "trail_dd": 3000.0},
-         "apex150": {"daily_loss_limit": 1800.0, "trail_dd": 4000.0}}[VARIANT]
+         "apex150": {"daily_loss_limit": 1800.0, "trail_dd": 4000.0},
+         "gapgo": {"gap_go": True, "gap_go_skip_month_first": True},
+         "gapgo3": {"gap_go": True, "gap_go_skip_month_first": True, "gap_go_after_lock": True,
+                    "gap_go_cap": True}}[VARIANT]
 
 
 def with_1600(bars: pd.DataFrame, m: int) -> pd.DataFrame:
