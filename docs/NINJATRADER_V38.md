@@ -2155,3 +2155,26 @@ The 30-minute runs are reported, not judged.
 
 On 30-minute bars (reported, not judged), $150 also made more on both histories and less on the window
 (`verification/noise_v2/g50_max_loss.csv`).
+
+## G51: a max loss that follows the noise (registered 2026-11-03, before its run)
+
+**The idea, from G50:** a fixed $150 stop did best on the histories, a fixed $225 on the window. If that is the market's
+noise level speaking, a max loss set from the noise should do well everywhere. At each half-hour check, the max loss
+per contract becomes k times the noise (sigma, the line's distance) times the price times $2. The after-loss stop keeps
+its 4:3 ratio, and the contracts are sized from it as now.
+
+**Calibration (before the run, from the noise only, no results):** the median noise at a check is $446 a contract on
+the index (2011-2026), $458 on NQ and $402 on the window. So $187.50 is 0.42 of the index's median noise and 0.47 of the
+window's.
+
+**The variants:** Funded growth with `ml_sigma` 0.42 and 0.47 (`mnqbot/noise.py`, off by default); everything else as
+it is. (The measurement found the window slightly calmer than the scaled histories, not wilder, which argues against
+the idea; it is run as registered.)
+
+**Adopt (the better by window net) only if, against the fixed $187.50:**
+- a higher net on all three 5-minute sets (the window, NQ from 2015, the index from 2011), in both the chart's
+  execution and NinjaTrader's;
+- the floor is never touched;
+- there are no more days at −$1,000.
+
+The 30-minute runs are reported, not judged.

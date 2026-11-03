@@ -291,6 +291,9 @@ class NoiseConfig:
     # research (G44): after a time-stop exit, no new entry on that side ("side") or on either side ("day") for the rest
     # of the session ("" = off)
     ts_block: str = ""
+    # research (G51): the max loss scales with the noise. At each check, max_loss_per_trade becomes ml_sigma x the
+    # noise (sigma) x the close x point_value x qty, for the trades that check sizes and sends (0 = the fixed $)
+    ml_sigma: float = 0.0
     # research (G13): a time lock. A trade not yet locked that is in profit at a bar close time_lock minutes or more
     # after its fill is locked (its stop to the entry plus lock_plus, from the next bar)
     time_lock: int = 0
@@ -453,7 +456,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
 
     q_next = q_trade = cfg.qty  # contracts of the pending entry and of the open trade (after_loss_qty_div)
     lock_next = lock_trade = cfg.lock_at  # their lock triggers, in max losses (after_loss_lock)
-    ml_next = ml_trade = cfg.max_loss_per_trade  # their max losses, $ (after_loss_ml_mult)
+    ml_cfg = cfg.max_loss_per_trade  # G51: the max loss in force (ml_sigma: set at each check)
+    ml_next = ml_trade = ml_cfg  # their max losses, $ (after_loss_ml_mult)
     tp_next = tp_trade = cfg.take_profit  # their take-profits, noise units (after_loss_tp)
 
     def open_pos(i: int, d: int) -> None:
@@ -567,11 +571,11 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
 
     def budget_fits() -> bool:
         """daily_loss_limit: does one contract of the next trade (its after-loss size and max loss) fit today?"""
-        if (cfg.daily_loss_limit <= 0 and cfg.trail_dd <= 0) or cfg.max_loss_per_trade <= 0:
+        if (cfg.daily_loss_limit <= 0 and cfg.trail_dd <= 0) or ml_cfg <= 0:
             return True
         after = consec > 0
         q = max(1, round(cfg.qty / cfg.after_loss_qty_div)) if after else cfg.qty
-        ml = cfg.max_loss_per_trade * (cfg.after_loss_ml_mult if after else 1.0)
+        ml = ml_cfg * (cfg.after_loss_ml_mult if after else 1.0)
         per_c = ml / q + 2 * cfg.commission_per_side + 2 * slip * cfg.point_value
         room = money_room()
         return not math.isfinite(room) or math.floor(room / per_c + 1e-9) >= 1
@@ -630,9 +634,9 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             if d and touched[d] != n_checks_seen and study_ok(d, True):
                 after = consec > 0
                 q_next = max(1, round(cfg.qty / cfg.after_loss_qty_div)) if after else cfg.qty
-                ml_next = cfg.max_loss_per_trade * (cfg.after_loss_ml_mult if after else 1.0)
+                ml_next = ml_cfg * (cfg.after_loss_ml_mult if after else 1.0)
                 fits = True
-                if cfg.daily_loss_limit > 0 and cfg.max_loss_per_trade > 0:
+                if cfg.daily_loss_limit > 0 and ml_cfg > 0:
                     per_c = ml_next / q_next + 2 * cfg.commission_per_side + 2 * slip * cfg.point_value
                     fit = math.floor((cfg.daily_loss_limit + day_pnl) / per_c + 1e-9)
                     if fit < 1:
@@ -655,7 +659,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             reason = "Back inside"
             if cfg.grace and in_grace:  # research: no line stop yet, the max loss only
                 line = -math.inf if pos > 0 else math.inf
-            if cfg.max_loss_per_trade > 0:
+            if ml_cfg > 0:
                 # from the fill price; on the fill bar itself from the expected fill (signal close + slippage), as a
                 # bracket order placed with the entry would be
                 base = entry_px if entry_bar != i else est_px
@@ -701,7 +705,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                 hit = l[i] <= line if pos > 0 else h[i] >= line
                 price = line - pos * slip
             if (cfg.lock_intrabar and not locked and not hit and entry_bar != i and lock_trade > 0
-                    and cfg.max_loss_per_trade > 0):
+                    and ml_cfg > 0):
                 trig = lock_trade * ml_trade / q_trade / cfg.point_value
                 ext, adv = (h[i], l[i]) if pos > 0 else (l[i], h[i])
                 tp_px = entry_px * (1 + pos * tp_trade * sigma) if tp_trade > 0 else math.nan
@@ -760,7 +764,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             bp = h[i] if pos > 0 else l[i]
             best = bp if math.isnan(best) else (max(best, bp) if pos > 0 else min(best, bp))
 
-        if use_stop and pos and not locked and lock_trade > 0 and cfg.max_loss_per_trade > 0:
+        if use_stop and pos and not locked and lock_trade > 0 and ml_cfg > 0:
             # the lock arms when the bar reaches the trigger (high for a long, low for a short), from the next bar
             trigger = lock_trade * ml_trade / q_trade / cfg.point_value
             fav = (h[i] if pos > 0 else l[i]) if math.isnan(fav) else (max(fav, h[i]) if pos > 0 else min(fav, l[i]))
@@ -843,6 +847,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                 for d in range(lb_n):  # same summation order as the Pine loop
                     s += ring[d * N_CHECKS + k]
                 sigma = s / lb_n
+                if cfg.ml_sigma > 0:
+                    ml_cfg = cfg.ml_sigma * sigma * c[i] * cfg.point_value * cfg.qty
                 upper = max(day_open, prev_close) * (1 + sigma)
                 lower = min(day_open, prev_close) * (1 - sigma)
                 bands.append((i, upper, lower))
@@ -882,7 +888,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                     qd = (cfg.after_loss2_qty_div or 1.0) if tier2 else cfg.after_loss_qty_div
                     mm = (cfg.after_loss2_ml_mult or 1.0) if tier2 else cfg.after_loss_ml_mult
                     q_next = max(1, round(cfg.qty / qd)) if after_loss else cfg.qty
-                    ml_next = cfg.max_loss_per_trade * (mm if after_loss else 1.0)
+                    ml_next = ml_cfg * (mm if after_loss else 1.0)
                     if cfg.cap_sigma > 0:
                         ml_next = cfg.cap_sigma * sigma * c[i] * q_next * cfg.point_value * (mm if after_loss else 1.0)
                     if tom_today and cfg.tom_mult != 1.0:
@@ -933,7 +939,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                         q_r = int(cfg.risk_per_trade // (pts * cfg.point_value + costs_c)) if pts > 0 else 1
                         q_next = max(1, min(cfg.risk_max_qty, q_r))
                         ml_next = cfg.risk_per_trade
-                    if (cfg.daily_loss_limit > 0 or cfg.trail_dd > 0) and cfg.max_loss_per_trade > 0:  # loss budget
+                    if (cfg.daily_loss_limit > 0 or cfg.trail_dd > 0) and ml_cfg > 0:  # loss budget
                         per_c = ml_next / q_next + 2 * cfg.commission_per_side + 2 * slip * cfg.point_value
                         if cfg.budget_actual and use_stop:  # the initial stop: the line's or the max loss
                             sb = cfg.stop_buffer * sigma
@@ -969,7 +975,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                     if use_stop:  # the bracket: the closer of the line stop and the max loss, and the take-profit
                         stop = upper * (1 - cfg.stop_buffer * sigma) if d > 0 else lower * (1 + cfg.stop_buffer * sigma)
                         at_line = stop
-                        if cfg.max_loss_per_trade > 0:
+                        if ml_cfg > 0:
                             cap = est_px - d * ml_next / q_next / cfg.point_value
                             stop = max(stop, cap) if d > 0 else min(stop, cap)
                         if tp_next > 0:
