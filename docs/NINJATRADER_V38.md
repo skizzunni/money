@@ -3376,3 +3376,14 @@ rule holds. NQ from January 2015 is lost (reported, as the rule says) (`verifica
 
 **Scorecard, G44-G79:** 36 rounds. Adopted: G60 (U19), G67b (U20), G67's data fix, G79 (U22, from G72 and G76).
 Rejected: 30 (G54 and G55 were measurements).
+
+## G80: up to 5 gap contracts once the floor has stopped, on U22 (registered 2026-11-03, before its run)
+
+**The idea:** G68's 5 gap contracts made $4,700 more on the window and $38,000 on the index, and failed on NQ's 2015
+path (no longer a gate, G78's rule) and one −$1,054 index day, which U22's 2-point allowance may now prevent.
+
+**The variant:** today's default (U22) with `gap_go_locked_qty` 5.
+
+**Adopt on G78's rule**, against U22: a higher net on the window and the index in both executions (NQ too where its
+account lives), the floor never touched on the window and the index, no more days at −$1,000 on any set, and on the 89
+start dates no more lost or frozen accounts than U22's 11.

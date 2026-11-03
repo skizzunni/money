@@ -60,7 +60,10 @@ PACK = {"P0": {}, "P1": {"gap_go_small_k": 0.0}, "P2": {"gap_go_small_k": 0.0, "
         # G76: sizing with 2 points more stop slippage
         "P0s": {"size_slip_pts": 2.0},
         "A2s": {"gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
-                "fill_min_room": 3000.0, "size_slip_pts": 2.0}}
+                "fill_min_room": 3000.0, "size_slip_pts": 2.0},
+        # G80: U22 with up to 5 gap contracts once the floor has stopped
+        "U22q5": {"gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
+                  "fill_min_room": 3000.0, "size_slip_pts": 2.0, "gap_go_locked_qty": 5}}
 for pk in (sys.argv[4].split(",") if len(sys.argv) > 4 else list(PACK)):
     for name, (bars, first, skip) in S.D.items():
         if name == "win":
