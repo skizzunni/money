@@ -32,13 +32,13 @@ if NT:
     S.D = {k: (with_1600(b, S.MIN[0]), first, skip) for k, (b, first, skip) in S.D.items()}
 OPEX = ",".join(d.strftime("%Y-%m-%d") for d in pd.date_range("2011-01-01", "2027-01-01", freq="WOM-3FRI"))
 NFP = ",".join(pd.read_csv("research/nfp_dates.csv").date)
-for opex in (0.0, 100.0):
+for opex in (False, True):
     for name, (bars, first, skip) in S.D.items():
         if name == "win":  # the real MNQ weeks, too short to judge (as G6)
             continue
         cfg = NoiseConfig(**{**S.V23, **T.REFERENCE, "daily_loss_limit": 900.0, "trail_dd": 2000.0,
                              "time_stop": 60, "gap_go": True, "gap_go_skip_month_first": name != "proxy",
-                             "gap_go_exit": 595, "gap_go_max_qty": 1, "trend_qty_div": opex})
+                             "gap_go_exit": 595, "gap_go_max_qty": 1, "trend_small": opex})
         if NT:
             cfg.tv_path, cfg.nt_execution, cfg.round_prices, cfg.target_on_fill_bar = False, True, True, True
         if isinstance(skip, str):
@@ -58,7 +58,7 @@ for opex in (0.0, 100.0):
         e = np.r_[0.0, np.cumsum(p)]
         dayp = tf.groupby(tf.exit_time.dt.date).pnl.sum()
         tr = S.trail_stats(name, tf)
-        print({"bars": S.MIN[0], "nt": NT, "trend div": opex, "set": name, "days traded %": round(traded, 1),
+        print({"bars": S.MIN[0], "nt": NT, "trend small": opex, "set": name, "days traded %": round(traded, 1),
                "gap trades": gaps,
                "trades": len(p),
                "net $": round(float(p.sum())), "pf": round(float(p[p > 0].sum() / -p[p <= 0].sum()), 3),

@@ -132,6 +132,8 @@ class NoiseConfig:
     trend_n: int = 0
     trend_side: int = 0
     trend_qty_div: float = 0.0
+    # research (G65): a trade against the trend takes 1 contract at its usual max loss a contract, instead of none
+    trend_small: bool = False
     trend_ml_mult: float = 1.0  # the against-trend trade's max loss x this
     trend_with_mult: float = 1.0  # a trade with the trend: contracts and max loss x this (the same stop in points)
     trend_with_ml: float = 1.0  # a trade with the trend: its max loss x this (the same contracts)
@@ -556,7 +558,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
         if side_skip[d] > 0:
             side_skip[d] -= 1
             return False
-        if against_trend(d) and not cfg.trend_qty_div:
+        if against_trend(d) and not cfg.trend_qty_div and not cfg.trend_small:
             return False
         if calm and not cfg.calm_div:
             return False
@@ -998,7 +1000,9 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                     if cfg.news_mult != 1.0 and t.strftime("%Y-%m-%d") in news_set:  # G62: the jobs-report days
                         q_n = max(1, round(q_next * cfg.news_mult))
                         ml_next, q_next = ml_next / q_next * q_n, q_n
-                    if cfg.trend_qty_div and against_trend(d):
+                    if cfg.trend_small and against_trend(d):  # G65: 1 contract, its max loss a contract
+                        ml_next, q_next = ml_next / q_next, 1
+                    elif cfg.trend_qty_div and against_trend(d):
                         q_next = max(1, round(q_next / cfg.trend_qty_div))
                         ml_next *= cfg.trend_ml_mult
                     elif cfg.trend_n and d == trend:

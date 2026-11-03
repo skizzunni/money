@@ -2859,8 +2859,8 @@ more days (more trading days, more early profit at 1 contract); at 0.75 on fewer
 
 **The idea, from G55:** the trend filter blocks every short while the last close is above its 50-session average. With
 shorts allowed at full size, 14 more days in 100 traded, but the window and the index made less (G55). Here those shorts
-trade at 1 contract (`trend_qty_div` 100: the contracts divided by 100, at least 1). They add the trading days with
-little at risk.
+trade at 1 contract, at the usual $187.50 max loss a contract (`trend_small`). They add the trading days with little
+at risk.
 
 **Adopt only if, against today's default:**
 - a higher net on all three 5-minute sets in both executions;
