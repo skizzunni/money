@@ -2369,3 +2369,19 @@ G35's 5-minute results (`research/g35_start_dates.py` with `SCAN_MINUTES=30`).
 
 **Recommend the 30-minute chart only if:** it loses (room under $100) or freezes no more accounts than 5 minutes on
 either NQ or the index, and its median net is at least 5 minutes' on both.
+
+**G54 result (run once, 2026-11-03): not recommended by the rule; more profit, more lost accounts on NQ.**
+
+| 89 start dates, 21 months | 5-minute | 30-minute |
+|---|---|---|
+| lost or frozen, NQ | 7 of 35 (20%) | **10 of 35 (29%)** |
+| lost or frozen, index | 7 of 54 | 7 of 54 |
+| median net, NQ / index | $22,925 / $23,070 | **$28,713 / $24,081** |
+| best 10%, NQ / index | $39,277 / $39,303 | $62,903 / $44,049 |
+| worst 10%, NQ / index | −$461 / $444 | $1 / $396 |
+
+On 30-minute bars the typical account makes more ($24,000-29,000 against $23,000 in 21 months) and the best ones far
+more, but on NQ 3 more accounts in 35 were lost. The rule asked for no more lost accounts, so 5 minutes stays the
+recommendation. It is the user's choice: 30 minutes trades for more profit with a higher chance of losing the account
+(`verification/noise_v2/g35_start_dates_base_30min.csv`; MnqNoiseV38.cs runs on either chart, trade for trade with the
+model).
