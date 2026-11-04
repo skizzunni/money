@@ -3881,3 +3881,16 @@ brake on. G69/G70 tried this without the brake and lost new accounts.
 **Adopt on G99b's rule**, against U28 (U27's numbers): fewer lost or frozen than 10 on the 89 start dates... and, since
 the ask is days traded, also as a switch ("Fill-ins from day one", off) if it holds 10 or fewer with the nets at 95%.
 Also reported: days with a trade for a fresh 2026 account.
+
+**G102 result (run once, 2026-11-04): rejected; trading every day from the start loses new accounts.**
+
+| | days with a trade (window / NQ / index) | window | index | 89 start dates: lost or frozen |
+|---|---|---|---|---|
+| U28 | 72% / – / 81% | $45,340 / $45,396 | $639,432 / $629,489 | 10 |
+| fill-ins from day one | **86% / 85% / 1.6%** | $48,927 / $49,192 | **−$8 / −$18, lost in its first weeks** | **22** (NQ 8, index 14) |
+
+The giveback brake doesn't change G69's finding: before the account has a cushion, the fill-ins' losers take a new
+account to the floor about twice as often. The fill-ins stay behind the $3,000 cushion
+(`verification/noise_v2/g102_fill_day1.txt`).
+
+**Scorecard, G44-G102:** 59 rounds. Adopted 9 (and the data fix); rejected 47; measurements 3.
