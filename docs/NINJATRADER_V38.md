@@ -4034,3 +4034,8 @@ both executions (`verification/noise_v2/g112_range_pos.txt`).
 **The idea:** no entries while the last 10 sessions' average range is under 0.7 of the last 40's (`calm_k`), set
 before gap and go, the fill-ins and 20 contracts. **Variants:** U29 with 0.6 and 0.8. **Adopt (the better by window
 net) on G78's rule**, against U29.
+
+**G113 result (run once, 2026-11-04): rejected; 0.7 stays.** 0.6: window $44,978 / $43,860, index $647,297 / $548,086;
+0.8: window $27,716 / $27,712. Both below U29 (`verification/noise_v2/g113_calm.txt`).
+
+**Scorecard, G44-G113:** 70 rounds. Adopted 10 (and the data fix); rejected 57; measurements 3.
