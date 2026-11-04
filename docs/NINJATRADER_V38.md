@@ -5377,3 +5377,11 @@ other than U42's. **Stage A:** each on the 263 starts on the 1st (U42: 12). **St
 **G207 result (2026-11-04): none goes on.** 263 starts on the 1st, lost or frozen (U42 12): the best k39 **10**, k32 11
 (medians $35,176 / $53,658, against U42's $32,059 / $44,475), k29 / k40 12, the rest 13 or more. None reaches 8 or fewer;
 U42 stays. Log: `verification/noise_v2/g207_survival_search.txt`.
+
+## G208: G207's k32 and k39 on the full checks, against U42 (registered 2026-11-04, before its run)
+
+**Why:** k32 (`fill_min_room` 3,000, `size_slip_pts` 6, `giveback_brake` 0.4, `take_profit` 1.75, `trend_n` 40) lost 11
+of 263 with medians above U42's; k39 (`after_loss_ml_mult5` 0.9, `early_ml` 170, `big_day_k` 1.7) lost 10. Neither met
+G207's stage-B bar, so this is a separate test. **Run once each:** the mid-month starts and the full sets in both
+executions. **Adopt (the better window) on G78's rule** against U42 (higher nets on all three in both executions, no
+−$1,000 day, the floor never touched, no more than 28 of 526 lost).
