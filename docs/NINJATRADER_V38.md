@@ -5804,3 +5804,14 @@ k89 32, k3 35, k44 40, k911 42, k572 44, k776 46, k365 52, k660 66. k221, the on
 NQ at $512,806 (U44 $579,739). The screen used the chart's execution, and for the after-loss 0.95x rows NinjaTrader's
 NQ fell from about $600,000 to $492,000-513,000: the chart's screen is not a safe filter. Log:
 `verification/noise_v2/g240_stage2.txt`.
+
+## G241: 10,000 random combinations around U44, screened in NinjaTrader's execution (registered 2026-11-04, before its run)
+
+**Why, from G240:** the chart's screen let through settings that NinjaTrader's execution doesn't support, and most of the
+best lost more accounts. **The search** (`research/g241_nt_search.py`, seed 241, G240's 34 settings): 10,000
+combinations; row 0 reproduces U44 in NinjaTrader's execution ($57,475 / $579,739 / $828,138). **Stage 1:** each on the
+window, NQ and the index in NinjaTrader's execution; the screen: all three nets above U44's, no −$1,000 day, the floor
+never touched. **Stage 2:** the 40 best passing (by the sum of the three nets against U44's) on the 263 starts on the
+1st. **Stage 3:** of those with 12 or fewer lost there (U44 12), the 5 with the fewest (ties: the higher window) on the
+mid-month starts and the chart's execution. **Adopted:** the best window among those meeting G78's rule against U44
+(higher nets on all three in both executions, no −$1,000 day, the floor never touched, no more than 28 of 526 lost).
