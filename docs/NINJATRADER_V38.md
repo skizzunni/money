@@ -4734,3 +4734,9 @@ which wasn't the one registered, so it is not adopted. Log: `verification/noise_
 Every contract at $0.30 a side instead of $0.62 (as if every 10 MNQ went as 1 NQ at about $2 a side; in fact only
 10-lots convert): window $58,310 (+$3,431), NQ $581,502, index $815,160 (`verification/noise_v2/g162_comm.txt`). The
 real saving would be about half of that; routing two instruments in the live strategy isn't worth the risk for it.
+
+## G163: four more single settings on U34 (registered 2026-11-04, before its run)
+
+**Variants:** U34 with `max_losers` 2 (no entries after two losers in a day), `after_loss_qty_div` 2 (half the
+contracts after a loser), `fed_no_shorts` off, `lock_intrabar` (the lock armed inside the bar). G135's screen against
+U34, then confirmation for the best on G78's rule.
