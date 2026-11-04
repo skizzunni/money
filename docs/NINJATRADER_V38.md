@@ -5136,3 +5136,10 @@ G154 tried $150 only until the floor stops (on U34: more accounts lost). **The v
 `max_loss_per_trade` 150 on every trade, and (b) the same plus `gap_go_cap` (the gap trade's stop no farther than $150 a
 contract, 75 points). **Run once:** the 526 starts and the full sets in both executions. **Adopt (the fewest lost) on
 G78's rule** (no more than 38 lost, higher nets) or G99b's (at least 4 fewer lost, every net at least 95%).
+
+## G193: a very small stop, $100 and $50, on U41 (registered 2026-11-04, before its run)
+
+**The ask (the user):** "or something very small?" **The variants:** U41 with `max_loss_per_trade` (a) 100 (50 points)
+and (b) 50 (25 points) on every trade, the gap trade's stop capped the same (`gap_go_cap`). **Run once:** the 526
+starts and the full sets in both executions. **Adopt (the fewest lost) on G78's rule** (no more than 38 lost, higher
+nets) or G99b's (at least 4 fewer lost, every net at least 95%), against U41 (or against G192's winner, if adopted).
