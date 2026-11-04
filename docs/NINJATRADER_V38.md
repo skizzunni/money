@@ -4483,3 +4483,8 @@ the 5-minute chart, the contract steps are one per $1,500 up to $10,000 of profi
 settings "Faster contract steps" `FastSteps` 750, 0 = off, and `FastStepsFrom` 10,000); the 50 cap, the day's budget
 and the floor's room still cut each trade. `test_v38_fast_steps` checks NinjaTrader's code against the model with it
 on and off.
+
+## G143: the faster steps' threshold and size around U34 (registered 2026-11-04, before its run)
+
+**Variants:** U34 (row 0) with the faster steps from $6,000 (the 2-contract fill-in threshold), and per $500 above
+$15,000. G135's screen against U34, then NinjaTrader's execution and the 89 starts for the best, on G78's rule.
