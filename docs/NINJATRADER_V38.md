@@ -5468,3 +5468,11 @@ identical to the model on 30-minute bars, and on 5-minute bars up to the 2026-03
 `research/g213_weekly_u44.py` (`verification/noise_v2/g213_weekly_u44.txt`). Window, $10,000-30,000 up: 28 weeks,
 **$1,483** average (U43 $1,668 over 26 weeks: the account moves through the band faster), 10.7% at +$3,000 or more; NQ
 past $75,000 $1,256 a week, the index $1,067.
+
+## G214: one more step of the grown-phase search, around U44 (registered 2026-11-04, before its run)
+
+**The search** (`research/g214_grown_search.py`, seed 214): `profit_step_fast` 550-600, `profit_step_fast_from`
+$6,000-7,000, `fill_qty3_room` $6,000-7,000, `fill_qty2_room` $3,000-3,500, `gap_go_locked_qty` 11-12, `gap_go_k_locked`
+0.5-0.75, `size_up_to` 100; row 0 is U44. **Screen and adoption as G209's**, against U44 (no more than 28 lost). A
+caution: G209, G212 and this search climb on the same data, so each step needs the long histories and the 526 starts,
+not the window alone.
