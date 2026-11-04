@@ -4948,3 +4948,14 @@ NinjaTrader's execution and the 263 monthly starts, **adopted on G78's rule** (n
 `gap_go_drive_k` 0.6): window **$57,714**, NQ $564,991, index $786,675 (U38 $54,339 / $560,911 / $783,163); k8: $54,860
 / $563,204 / $788,266. k11 goes on to NinjaTrader's execution and the 263 starts. Log:
 `verification/noise_v2/g177_search.txt`.
+
+**G177 result (run once, 2026-11-04): k11 rejected by one account.** Chart / NinjaTrader: window $57,714 / **$56,949**
+(U38 $54,339 / $54,417), NQ $564,991 / $562,638 (U38 $560,911 / $558,360), index $786,675 / $779,569 (U38 $783,163 /
+$774,859); no −$1,000 day, the floor never touched; 263 starts **20** lost (NQ 11, index 9) against 19. Log:
+`verification/noise_v2/g177_k11.txt`.
+
+## G178: the opening-drive fill-in at 0.6 on U38 (registered 2026-11-04, before its run)
+
+**The idea, from G177:** k11 changed three settings; the drive trigger (`gap_go_drive_k` 0.6: a bigger 09:30 bar
+needed) is the one that touches every set's first half hour. **The variant:** U38 with 0.6 alone. **Run once:** the 263
+starts and the full sets in both executions. **Adopt on G78's rule** against U38 (or G99b's if it loses fewer).
