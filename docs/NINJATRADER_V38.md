@@ -4488,3 +4488,7 @@ on and off.
 
 **Variants:** U34 (row 0) with the faster steps from $6,000 (the 2-contract fill-in threshold), and per $500 above
 $15,000. G135's screen against U34, then NinjaTrader's execution and the 89 starts for the best, on G78's rule.
+
+**G143 result (run once, 2026-11-04): neither passes the screen.** U34: window $54,879, NQ $554,388, index $786,440.
+From $6,000: **$53,522** / $556,845 / $790,841; per $500 above $15,000: $58,039 / **$553,099** / **$784,191**. U34's
+$750 above $10,000 stays. Log: `verification/noise_v2/g143_steps2.txt`.

@@ -1,0 +1,3 @@
+{"k": 0, "proxy net": 54879, "proxy d1000": 0, "nq net": 554388, "nq d1000": 0, "index net": 786440, "index d1000": 0}
+{"k": 1, "profit_step_fast_from": 6000.0, "proxy net": 53522, "proxy d1000": 0, "nq net": 556845, "nq d1000": 0, "index net": 790841, "index d1000": 0}
+{"k": 2, "profit_step_fast": 500.0, "profit_step_fast_from": 15000.0, "proxy net": 58039, "proxy d1000": 0, "nq net": 553099, "nq d1000": 0, "index net": 784191, "index d1000": 0}
