@@ -338,6 +338,9 @@ class NoiseConfig:
     calm_small: bool = False  # G95: on a calm stretch, the bot's signals at 1 contract while fill_ok() (fill-ins)
     fill_qty2_room: float = 0.0  # G96: the fill-ins at 2 contracts while the account is this far above the floor
     gap_go_room_per_c: float = 0.0  # G98: once the floor has stopped, a gap trade's contracts at most room / this
+    # research (G99): once the floor has stopped, while the profit is under giveback_brake x the best end-of-day
+    # profit, every trade at 1 contract (0 = off)
+    giveback_brake: float = 0.0
     protect_dates: str = ""
     # research (G67): once the trailing floor has stopped at the start (trail_cap), a gap trade may take up to this
     # many contracts in place of gap_go_max_qty (0 = off)
@@ -593,9 +596,15 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
         """G73: the equity the contract steps leave out (the fill-in trades' P/L)."""
         return fill_pnl if cfg.fill_no_steps else 0.0
 
+    def braked() -> bool:
+        """G99: has the account given back more than (1 - giveback_brake) of its best profit since the floor stopped?"""
+        if cfg.giveback_brake <= 0 or not floor_stopped():
+            return False
+        return eq_curve[-1] - trail_base < cfg.giveback_brake * (trail_peak - trail_base)
+
     def fill_q() -> int:
         """G96: the fill-ins' contracts: 2 with fill_qty2_room above the floor, else 1."""
-        if cfg.fill_qty2_room <= 0 or math.isnan(trail_peak):
+        if cfg.fill_qty2_room <= 0 or math.isnan(trail_peak) or braked():
             return 1
         floor = trail_peak - cfg.trail_dd
         if cfg.trail_cap >= 0:
@@ -769,6 +778,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                             q = min(q, math.floor(room / per_c + 1e-9))
                         if cfg.gap_go_locked_qty > 0 and locked_floor:
                             q = min(q, cfg.gap_go_locked_qty)
+                            if braked():  # G99
+                                q = 1
                             if cfg.gap_go_room_per_c > 0:  # G98: grown with the cushion above the floor
                                 q = min(q, max(1, int((eq_curve[-1] - trail_base - cfg.trail_cap)
                                                       // cfg.gap_go_room_per_c)))
@@ -1147,6 +1158,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                         q_r = int(cfg.risk_per_trade // (pts * cfg.point_value + costs_c)) if pts > 0 else 1
                         q_next = max(1, min(cfg.risk_max_qty, q_r))
                         ml_next = cfg.risk_per_trade
+                    if braked():  # G99: the giveback brake, 1 contract at its max loss a contract
+                        ml_next, q_next = ml_next / q_next, 1
                     if (cfg.daily_loss_limit > 0 or cfg.trail_dd > 0) and ml_cfg > 0:  # loss budget
                         per_c = (ml_next / q_next + 2 * cfg.commission_per_side + 2 * slip * cfg.point_value
                                  + size_slip_c)

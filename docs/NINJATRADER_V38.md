@@ -3742,3 +3742,11 @@ contracts are at most 1 per $400 above the floor (`gap_go_room_per_c` 400: 5 at 
 **G98 result (run once, 2026-11-04): no effect; rejected.** Every number is U26's: the gap trade is already capped by
 the bot's own contract steps (1 + 1 per $1,500 of profit: 2 at +$2,000) and by the day's room, so 1 per $400 above
 the floor never binds (`verification/noise_v2/g98_gap_room.txt`).
+
+## G99: a giveback brake (registered 2026-11-04, before its run)
+
+**The idea:** 7 of the 11 lost accounts made the first $2,000 and then gave it all back. Once the floor has stopped,
+while the account's profit is under half of its best end-of-day profit (`giveback_brake` 0.5), every trade (the bot's,
+gap and go, the fill-ins) takes 1 MNQ. It keeps trading, so the recovery's winners are taken (unlike G87's gate), at
+the smallest size; above half of the best, everything is as now.
+**The variant:** U26 with `giveback_brake` 0.5. **Adopt on G78's rule**, against U26.
