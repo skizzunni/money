@@ -1,0 +1,10 @@
+{'nt': False, 'pack': 'U40ml3', 'set': 'proxy', 'days traded %': 71.7, 'gap trades': 284, 'trades': 700, 'net $': 54619, 'pf': 1.761, 'win %': 52.4, 'closed dd $': 5074, 'worst day $': -900, 'days <= -1000': 0, 'floor touches': 0}
+{'nt': False, 'pack': 'U40ml3', 'set': 'nq', 'days traded %': 81.9, 'gap trades': 1934, 'trades': 5023, 'net $': 563701, 'pf': 1.545, 'win %': 52.8, 'closed dd $': 29524, 'worst day $': -971, 'days <= -1000': 0, 'floor touches': 0}
+{'nt': False, 'pack': 'U40ml3', 'set': 'index', 'days traded %': 79.1, 'gap trades': 2756, 'trades': 7052, 'net $': 786583, 'pf': 1.553, 'win %': 52.3, 'closed dd $': 30283, 'worst day $': -985, 'days <= -1000': 0, 'floor touches': 0}
+{'nt': True, 'pack': 'U40ml3', 'set': 'proxy', 'days traded %': 71.7, 'gap trades': 284, 'trades': 701, 'net $': 54714, 'pf': 1.77, 'win %': 52.5, 'closed dd $': 5068, 'worst day $': -899, 'days <= -1000': 0, 'floor touches': 0}
+{'nt': True, 'pack': 'U40ml3', 'set': 'nq', 'days traded %': 81.9, 'gap trades': 1934, 'trades': 5018, 'net $': 561325, 'pf': 1.542, 'win %': 52.7, 'closed dd $': 29430, 'worst day $': -925, 'days <= -1000': 0, 'floor touches': 0}
+{'nt': True, 'pack': 'U40ml3', 'set': 'index', 'days traded %': 79.1, 'gap trades': 2756, 'trades': 7049, 'net $': 774737, 'pf': 1.545, 'win %': 52.0, 'closed dd $': 30851, 'worst day $': -985, 'days <= -1000': 0, 'floor touches': 0}
+index u40ml3 starts 160 lost (at the floor) 13 dead (lost or frozen) 13 below start 6 median net 36743 worst net -1999 lowest point -1999 reached +2000 154
+nq u40ml3 starts 103 lost (at the floor) 10 dead (lost or frozen) 10 below start 9 median net 49226 worst net -1999 lowest point -1999 reached +2000 96
+index u40ml3 starts 160 lost (at the floor) 12 dead (lost or frozen) 13 below start 6 median net 36523 worst net -1999 lowest point -1999 reached +2000 154
+nq u40ml3 starts 103 lost (at the floor) 14 dead (lost or frozen) 14 below start 8 median net 50372 worst net -1999 lowest point -1999 reached +2000 95

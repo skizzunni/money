@@ -5077,3 +5077,6 @@ $54,700), NQ $570,957 / $567,981, index $785,535 / $774,439; 526 starts **47** l
 
 **The variant:** U40 with `max_losers` 3 (G116 tested it on U29 only). **Run once:** the 526 starts and the full sets
 in both executions. **Adopt on G78's rule** (no more lost than 42), or G99b's with a gain of at least 4 of the 526.
+
+**G188 result (run once, 2026-11-04): rejected.** 526 starts: **50** lost or frozen (U40 42); nets within 0.1%. Log:
+`verification/noise_v2/g188_max_losers3.txt`.
