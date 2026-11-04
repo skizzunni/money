@@ -4330,3 +4330,15 @@ The floor never touched. 4x's worst day is $2 from the line, so before adoption 
 **The check:** G132's 4x with `guard_slip_pts` 2 (every "Day guard" fill 2 points worse: up to $200 on 50 MNQ, a fast
 market). **Pass:** no day at −$1,000 or worse and the floor never touched on any set in both executions, 89 starts no
 worse than 8. If it fails, 4x is not adopted as is.
+
+**G132r result (run once, 2026-11-04): fails; 4x is not adopted as is.** With the guard's fills 2 points worse:
+window $53,338 / $50,142 but 3 days at −$1,000 or worse, NQ 317 / 390 and the index 467 / 513 such days (worst
+−$1,125). The guard at −$900 leaves no room for its own slippage at 30-50 contracts. Log:
+`verification/noise_v2/g132r_guard_slip2.txt`.
+
+## G133: the guard leaves room for its own slippage (registered 2026-11-04, before its run)
+
+**The variant:** G132's 4x with the guard at $950 less 2 points a contract held (`guard_reserve_pts` 2, a new research
+setting: at 50 MNQ it fires at −$750, at 5 MNQ at −$930), **run under the stress** (`guard_slip_pts` 2: every guard
+fill 2 points worse). **Adopt on G78's rule** against U33 (no day at −$1,000 or worse, the floor never touched, more
+net on every set in both executions, 89 starts no more than 8 lost or frozen), all under the stress.

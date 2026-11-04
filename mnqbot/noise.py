@@ -151,6 +151,7 @@ class NoiseConfig:
     day_guard_locked: bool = False  # G130: the day guard only once the floor has stopped
     day_guard: float = 0.0
     guard_floor_buffer: float = 100.0
+    guard_reserve_pts: float = 0.0  # G133: the guard fires this many points per contract early (room for its own slippage)
     guard_slip_pts: float = 0.0  # research: the day guard's fill this many points worse (a fast market)
     day_stop_profit: float = 0.0  # research (G127): no new entries today once today's closed P/L is at least this, $
     skip_checks_early: bool = False  # research (G125): skip_checks only until the floor has stopped
@@ -983,6 +984,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                     if cfg.trail_cap >= 0:
                         fl = min(fl, trail_base + cfg.trail_cap)
                     allow = min(allow, eq_curve[-1] - fl - cfg.guard_floor_buffer)
+                allow -= rest * q_trade * cfg.guard_reserve_pts * cfg.point_value
                 gpx = entry_px - pos * (allow - 2 * cfg.commission_per_side * q_trade) / (rest * q_trade * cfg.point_value)
                 if pos * (gpx - line) > 0:
                     line, reason = gpx, "Day guard"
