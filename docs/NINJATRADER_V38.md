@@ -3930,3 +3930,13 @@ has stopped at the start (the first $2,000 made), with U27's giveback brake on: 
 then (`profit_step_locked` 1000), $1,500 before.
 **The variant:** U28 with `profit_step_locked` 1000. **Adopt on G78's rule**, against U28 (survival: no more lost or
 frozen than 10 on the 89 start dates).
+
+**G104 result (run once, 2026-11-04): rejected.** 89 start dates: 18 lost or frozen (NQ 8, index 10) against 10;
+window $44,141 / $44,199 (U28: $45,340 / $45,396). Faster steps still cost accounts, brake or not
+(`verification/noise_v2/g104_steps_locked.txt`).
+
+## G105: up to 20 contracts (registered 2026-11-04, before its run)
+
+**The idea:** the lost accounts die early, at small size; the most contracts (15) binds only on grown accounts, where
+the weekly profit is made. Every trade still fits the day's $900 budget and the room above the floor.
+**The variant:** U28 with `size_up_to` 20. **Adopt on G78's rule**, against U28 (no more lost or frozen than 10).
