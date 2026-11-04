@@ -331,7 +331,20 @@ PACK = {"P0": {}, "P1": {"gap_go_small_k": 0.0}, "P2": {"gap_go_small_k": 0.0, "
                     "fill_min_room": 3000.0, "size_slip_pts": 4.0, "gap_go_locked_qty": 10, "fill_qty2_room": 6000.0,
                     "giveback_brake": 0.5, "after_loss_ml_locked": 1.0, "size_up_to": 50, "skip_checks": "780,870",
                     "skip_checks_early": True, "profit_step_fast": 750.0, "day_guard": 950.0, "guard_reserve_pts": 2.0,
-                    "room_mult": 2.0, "room_mult_room": 3000.0, "day_guard_locked": True, "guard_slip_pts": 2.0}}
+                    "room_mult": 2.0, "room_mult_room": 3000.0, "day_guard_locked": True, "guard_slip_pts": 2.0},
+        # G152: U34 with early-phase protections
+        "U34gent": {"gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
+                    "fill_min_room": 3000.0, "size_slip_pts": 4.0, "gap_go_locked_qty": 10, "fill_qty2_room": 6000.0,
+                    "giveback_brake": 0.5, "after_loss_ml_locked": 1.0, "size_up_to": 50, "skip_checks": "780,870",
+                    "skip_checks_early": True, "profit_step_fast": 750.0, "steps_after_lock": True},
+        "U34half": {"gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
+                    "fill_min_room": 3000.0, "size_slip_pts": 4.0, "gap_go_locked_qty": 10, "fill_qty2_room": 6000.0,
+                    "giveback_brake": 0.5, "after_loss_ml_locked": 1.0, "size_up_to": 50, "skip_checks": "780,870",
+                    "skip_checks_early": True, "profit_step_fast": 750.0, "trail_frac": 0.5},
+        "U34res": {"gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
+                    "fill_min_room": 3000.0, "size_slip_pts": 4.0, "gap_go_locked_qty": 10, "fill_qty2_room": 6000.0,
+                    "giveback_brake": 0.5, "after_loss_ml_locked": 1.0, "size_up_to": 50, "skip_checks": "780,870",
+                    "skip_checks_early": True, "profit_step_fast": 750.0, "trail_buffer": 500.0}}
 for pk in (sys.argv[4].split(",") if len(sys.argv) > 4 else list(PACK)):
     for name, (bars, first, skip) in S.D.items():
         if name == "win":

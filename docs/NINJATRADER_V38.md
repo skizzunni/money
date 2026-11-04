@@ -4602,3 +4602,10 @@ U34, then confirmation for the best, on G78's rule.
 from each month's first day, NinjaTrader's execution. **32 of 263 lost or frozen (12.2%, as U33)**; median 21-month
 net **$39,454** (about $430 a week); +$3,000 within 7 days in none, within 30 days in 3.8%, median 138 days; +$50,000
 within 21 months in 45.6% (median 16.8 months).
+
+## G152: early-phase protections on U34, judged on 263 starts (registered 2026-11-04, before its run)
+
+**Variants:** U34 with `steps_after_lock` (no contract steps until the floor has stopped), `trail_frac` 0.5 (size to
+half the room above the floor), `trail_buffer` 500 (keep $500 of the room unused). **Adopt (the fewest lost) on G99b's
+survival-first rule:** fewer lost or frozen than U34's 32 of the 263 monthly starts, and the net at least 95% of U34's
+on the window, NQ and the index in both executions, no −$1,000 day, the floor never touched.
