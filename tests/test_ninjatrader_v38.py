@@ -29,7 +29,7 @@ CFG = NoiseConfig(**{**V21, "qty": 1, "lookback": 14, "trail_from": "", "tv_path
 GROW = NoiseConfig(**{**V21, "qty": 1, "lookback": 14, "max_loss_per_trade": 187.5, "after_loss_ml_mult": 250 / 187.5,
                       "trail_dd": 2000.0, "trail_from": "", "profit_step": 1500.0, "size_up_to": 15,
                       "budget_actual": True, "time_stop": 60, "tv_path": False, "gap_go": True, "gap_go_max_qty": 1,
-                      "gap_go_locked_qty": 5, "trail_cap": 0.0,
+                      "gap_go_locked_qty": 7, "trail_cap": 0.0,
                       # G79: More trading days and the 2-point sizing allowance
                       "gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
                       "fill_min_room": 3000.0, "size_slip_pts": 2.0},
@@ -290,7 +290,7 @@ def test_v38_gap_go(sim, sample_1m, tmp_path):  # noqa: F811
         if on:
             assert len(gaps) >= 3 and len(nt_gaps) == len(gaps)
             for t in gaps:
-                assert t.qty <= 5 and t.entry_time.strftime("%H:%M") == "09:35"
+                assert t.qty <= 7 and t.entry_time.strftime("%H:%M") == "09:35"
                 assert t.reason == "Gap stop" or t.exit_time.strftime("%H:%M") == "09:55"
         else:
             assert not gaps and not nt_gaps

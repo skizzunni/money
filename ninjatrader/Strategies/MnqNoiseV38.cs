@@ -731,7 +731,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (State == State.SetDefaults)
             {
                 Name = "MnqNoiseV38";
-                Description = "MNQ Noise-Area Momentum v3.8, Funded growth: 1 MNQ to start, $187.50 max loss a contract ($250 after a loser), $900 a day, a $2,000 end-of-day trailing floor, a contract more per $1,500 of profit up to 15, the 60-minute time stop; gap and go at 1 MNQ, up to 5 once the trailing floor has stopped at the start; More trading days (1-MNQ fill-in trades once $3,000 above the stopped floor); sizing with 2 points more stop slippage.";
+                Description = "MNQ Noise-Area Momentum v3.8, Funded growth: 1 MNQ to start, $187.50 max loss a contract ($250 after a loser), $900 a day, a $2,000 end-of-day trailing floor, a contract more per $1,500 of profit up to 15, the 60-minute time stop; gap and go at 1 MNQ, up to 7 once the trailing floor has stopped at the start; More trading days (1-MNQ fill-in trades once $3,000 above the stopped floor); sizing with 2 points more stop slippage.";
                 Calculate = Calculate.OnBarClose;
                 EntriesPerDirection = 1;
                 EntryHandling = EntryHandling.UniqueEntries;
@@ -772,7 +772,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 SoundAlerts = true;
                 MilestoneStep = 5000;
                 GapGo = true;
-                GapGoLocked = 5;  // G80 (G67b: 3)
+                GapGoLocked = 7;  // G82 (G67b: 3, G80: 5)
                 MoreDays = true;  // G79: on by default (with SizeSlip 2)
                 MoreDaysCushion = 3000;
                 SizeSlip = 2;  // G79
