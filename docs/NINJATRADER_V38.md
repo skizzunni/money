@@ -4972,3 +4972,8 @@ $50,083 / $39,579. Log: `verification/noise_v2/g178_drive06.txt`.
 **Variants:** U39 with `profit_step_fast` 600 from $15,000 (instead of 750 from $10,000), and U39 with `fill_qty2_room`
 5,000. **Run once:** the 263 starts and the full sets in both executions. **Adopt (the better window) on G78's rule**
 against U39 (no more than 19 lost).
+
+**G179 result (run once, 2026-11-04): both rejected.** U39: chart / NinjaTrader window $54,638 / $54,700, NQ $563,486
+/ $560,920, index $787,763 / $780,492; 19 lost. Steps per $600 from $15,000: window **$56,806 / $57,130**, NQ $563,830 /
+$561,265, index **$786,626 / $779,569** (−0.1%), 19 lost: fails G78 on the index by about $1,000. Fill-ins at 2 MNQ from
+$5,000: $54,694 / $54,862, $564,800 / $562,296, $787,969 / $780,492, **20** lost. Log: `verification/noise_v2/g179.txt`.
