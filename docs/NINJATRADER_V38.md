@@ -5708,3 +5708,8 @@ and the full sets in both executions. **Adopt (the fewer lost) on G78's rule** a
 
 **G232 result (run once, 2026-11-04): both rejected.** $2,000: 30 lost, nets equal to U44 or a little lower; $3,000: 31
 lost, the window $57,443 (U44 $57,475). The $2,500 cushion stays. Log: `verification/noise_v2/g232_fill_room.txt`.
+
+## G233: the giveback brake at 0.4 and 0.6, on U44 (registered 2026-11-04, before its run)
+
+**The variants:** U44 with `giveback_brake` (a) 0.4 and (b) 0.6 (0.5 now; G174 tried 0.55 / 0.6 on U38). **Run once:** the
+526 starts and the full sets in both executions. **Adopt (the fewer lost) on G78's rule** against U44, or G99b's.
