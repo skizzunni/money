@@ -4179,3 +4179,18 @@ $0, half the weeks negative), even at 50 contracts. The daily budget is the cap:
 for the day, so the day's risk is fixed whatever the balance, and the profit per week is the edge per dollar of
 that risk (about +0.2 of the day's budget a day). $3,000 a week needs about +0.67 a day. That's where the next rounds
 look: more profit per dollar of the day's risk (trade selection and exits on the full-size trades), not more size.
+
+## G123: U32's trades once the account is $10,000 up (a measurement, 2026-11-04)
+
+`research/g123_grown.py`, chart's execution (`verification/noise_v2/g123_grown.txt`). Contracts: median 2, 90th
+percentile 10: a trade is sized to the day's $900 at the $187.50 stop, so about 4 MNQ for the day's first trade,
+whatever the cap. By entry half-hour, the 13:00 and 14:30 entries lose on both long sets (NQ −$17,326 / −$18,953,
+index −$19,827 / −$16,891); the 12:00 to 14:00 entries are mixed; 13:30 and 15:00 make the most per trade. Profit
+comes from the targets and the 16:00 closes; the stops (back inside, max loss, gap stop) give most of it back.
+
+## G124: no entries at the 13:00 and 14:30 checks (registered 2026-11-04, before its run)
+
+**The variant:** U32 with `skip_checks` "780,870" (no new entry at the checks whose bar closes 13:00 and 14:30; exits
+unchanged), all phases. Chosen from G123's long sets, so the window and the 89 starts are the honest checks. **Adopt
+on G78's rule** against U32 (chart / NinjaTrader window $50,252 / $50,328, NQ $555,059 / $553,246, index $784,932 /
+$773,197; 9 lost or frozen of 89).
