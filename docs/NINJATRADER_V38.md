@@ -4434,3 +4434,12 @@ G135's screen, then NinjaTrader's execution and the 89 starts for the best, on G
 index $801,841**, no −$1,000 day (passes); both: $10,706 (out); `giveback_brake` 0.6: window $50,182 (out, below
 $50,219). The candidate is `trend_n` 100 (package `U33t100`, variant `u33t100`). Log:
 `verification/noise_v2/g140_trend_screen.txt`.
+
+**G140 result (run once, 2026-11-04): rejected by one account.** Chart / NinjaTrader: window $52,734 / $52,848 (U33
+$50,219 / $50,337), NQ $556,989 / $555,468 (U33 $546,409 / $549,379), index $801,841 / $825,888 (U33 $784,933 /
+$774,086); the floor never touched, no −$1,000 day; 89 starts **9 lost or frozen** (NQ 6, index 3) against 8.
+Log: `verification/noise_v2/g140_trend100.txt`.
+
+**Near misses so far (pass everything but one part of the rule):** G116 (after-loss 1.0, one account), G128b (2x with
+the guard, one account), G130 / G131 (2x once the floor stops: the window by $66 / $75), G140 (trend 100, one account).
+Each was registered and run once; none is adopted.
