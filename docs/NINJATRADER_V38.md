@@ -5288,3 +5288,8 @@ day, the floor never touched. But 526 starts: **59** lost or frozen (28 + 31; U4
 `fill_skip_braked` (no fill-in while the brake is on; the bot's own trades stay). **Run once:** the 526 starts and the
 full sets in both executions. **Adopt on G78's rule** (higher nets on all three in both executions, no more than 38
 lost) or G99b's (at least 4 fewer lost, every net at least 95%).
+
+**G202 result (run once, 2026-11-04): rejected (no better on two of three).** 526 starts: **38** lost or frozen, the
+same as U41. Chart / NinjaTrader: window $54,622 / $54,710 and index $787,157 / $776,319, identical to U41; NQ $563,636 /
+**$561,003** (U41 $563,437 / $553,165). G78 asks for a higher net on all three, and the window and the index are only
+equal; a braked account rarely meets a short fill-in. Log: `verification/noise_v2/g202_fill_skip_braked.txt`.
