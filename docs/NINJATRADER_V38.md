@@ -5794,3 +5794,7 @@ off-half-hour exits still act early (only the entries were held back). Log: `ver
 **G240 progress (2026-11-04, 22:42 UTC):** 196 of 1,000 done; 10 pass the screen so far (the best by the three nets: k44,
 window $61,789 / NQ $611,515 / index $897,334). Stage 2 waits for the full 1,000. Partial log:
 `verification/noise_v2/g240_mega_search_partial.txt`.
+
+**G240 stage 1 (2026-11-04): 51 of 1,000 pass the screen.** The 10 best (k44, k776, k89, k221, k572, k694, k660, k3,
+k365, k911) go to stage 2. Recurring settings among them: the after-loss max loss at 0.95x once grown, the trend over
+45 or 75 sessions, the gap trade's break-even at 0.75 or 1.5, a lock from 14:00. Log: `verification/noise_v2/g240_mega_search.txt`.
