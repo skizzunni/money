@@ -4555,3 +4555,13 @@ or the window by under $100).
 **The variant:** U34 with `day_guard` 900 (once the floor has stopped), `room_mult` 2.0 from $3,000 of room, run with
 `guard_slip_pts` 2 (every guard fill 2 points worse). U34's faster steps let the 2x bind more often than on U33.
 **Adopt on G78's rule** against U34 (unstressed), all of it under the stress.
+
+**G148 result (run once, 2026-11-04): rejected on the −$1,000 days.** Under the stress, chart / NinjaTrader: window
+**$69,795 / $69,069** (U34 $54,879 / $54,874), NQ $673,938 / $658,931, index $1,066,380 / $917,547; 89 starts 8; but
+the window has one day at −$1,013 and the long sets 95-175 days past −$1,000 (worst −$1,125): the guard at −$900
+leaves no room for its own slippage. Log: `verification/noise_v2/g148_room2_guard_stress.txt`.
+
+## G149: G148 with the guard leaving room for its slippage (registered 2026-11-04, before its run)
+
+**The variant:** G148 with `day_guard` 950 and `guard_reserve_pts` 2 (G133's size-aware guard: −$950 less 2 points a
+contract held), under the same stress. **Adopt on G78's rule** against U34, all of it under the stress.
