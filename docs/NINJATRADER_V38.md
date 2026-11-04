@@ -5446,3 +5446,8 @@ $1,022 (U42 $967).
 **The search** (`research/g212_grown_search.py`, seed 212): `profit_step_fast` 600-650, `profit_step_fast_from`
 $6,000-7,000, `fill_qty3_room` $7,000-10,000, `fill_qty2_room` $4,000-5,000, `gap_go_locked_qty` 11-12, `gap_go_k_locked`
 0.5-0.75, `size_up_to` 60-75; row 0 is U43. **Screen and adoption as G209's**, against U43 (no more than 28 lost).
+
+**G212 screen (2026-11-04): 5 of 30 pass.** The best window, **k18** (`profit_step_fast` 650, `fill_qty3_room` 8,000,
+`fill_qty2_room` 4,000, `size_up_to` 75): $57,446 / NQ $587,643 / index $849,992 (U43 $56,957 / $583,372 / $818,965), no
+−$1,000 day; it goes on. Every passing row raised the most contracts to 60-75 or moved the fill-in rooms down. Log:
+`verification/noise_v2/g212_grown_search.txt`.
