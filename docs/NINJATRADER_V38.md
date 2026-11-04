@@ -4028,3 +4028,9 @@ window net) on G78's rule**, against U29.
 **G112 result (run once, 2026-11-04): rejected; 0.65 stays.** 0.55: window $46,046 / $46,084 (index higher, $687,554 /
 $664,192); 0.75: window $46,750 / $46,077, index $578,777 / $576,408. Neither beats U29's window ($46,656 / $46,828) in
 both executions (`verification/noise_v2/g112_range_pos.txt`).
+
+## G113: the calm-stretch threshold re-checked on U29 (registered 2026-11-04, before its run)
+
+**The idea:** no entries while the last 10 sessions' average range is under 0.7 of the last 40's (`calm_k`), set
+before gap and go, the fill-ins and 20 contracts. **Variants:** U29 with 0.6 and 0.8. **Adopt (the better by window
+net) on G78's rule**, against U29.
