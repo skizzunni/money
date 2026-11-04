@@ -4936,3 +4936,10 @@ executions, no more than 19 lost, no −$1,000 day, the floor never touched).
 **G176 result (run once, 2026-11-04): rejected.** Chart / NinjaTrader: window $56,654 / $57,378 (U38 $54,339 /
 $54,417), NQ **$554,231 / $551,907** (U38 $560,911 / $558,360), index $798,034 / $825,904 (U38 $783,163 / $774,859);
 263 starts **20** lost (U38 19). Log: `verification/noise_v2/g176_trend100_u38.txt`.
+
+## G177: 23 random combinations of the growth-phase sizing around U38 (registered 2026-11-04, before its run)
+
+**Variants (seed 177):** `profit_step_fast` 600-850, `profit_step_fast_from` $8,000-15,000, `fill_qty2_room`
+$5,000-7,000, `gap_go_locked_qty` 9-11, `gap_go_drive_k` 0.4-0.6; row 0 is U38. **Screen:** G135's against U38 (the
+chart's nets at least U38's on all three sets, no −$1,000 day); the best window among those passing then goes on to
+NinjaTrader's execution and the 263 monthly starts, **adopted on G78's rule** (no more than 19 lost).
