@@ -5556,3 +5556,7 @@ the closest, k5 (a 30-minute time stop, a lock from 15:00): window $60,611, NQ $
 **The search** (`research/g221_filter_search.py`, seed 221): `calm_k` 0.6-0.8, `big_day_k` 1.3-1.7, `range_pos_min`
 0.65 / 0.75, `squeeze_min` 15 / 25, `entry_k` 0.95-1.1, `lookback` 12 / 16, `gap_go_k` 0.55 / 0.7; row 0 is U44. **Screen
 and adoption as G209's**, against U44 (no more than 28 lost).
+
+**G221 result (2026-11-04): none of 30 passes the screen.** The closest, k12 (range position 0.65, gap trigger 0.55):
+window $60,182, index $848,323 (99.8%), NQ $571,363 (97.2%). U44's filters stay. Log:
+`verification/noise_v2/g221_filter_search.txt`.
