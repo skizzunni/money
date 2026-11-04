@@ -3504,3 +3504,12 @@ it, one gap through the stop at the 09:35 open can break the daily limit (`verif
 
 **Scorecard, G44-G85:** 42 rounds. Adopted: G60 (U19), G67b (U20), G67's data fix, G79 (U22), G80 (U23), G82 (U24),
 G84 (U25). Rejected: 33 (G54 and G55 were measurements).
+
+## G86: size the gap trade for a jumped stop, then let it grow (registered 2026-11-04, before its run)
+
+**The idea, from G83 and G85:** past 10 contracts, one gap trade whose stop the market jumps at the open breaks the
+daily limit. Here each gap contract's risk in the sizing counts 5 points more slippage at its stop (`gap_slip_pts` 5,
+$10 a contract), so the trade is cut to what the day's room holds even with a jump; with that, it may take up to 15
+(`gap_go_locked_qty` 15).
+
+**The variant:** U25 with `gap_slip_pts` 5 and `gap_go_locked_qty` 15. **Adopt on G78's rule**, against U25.
