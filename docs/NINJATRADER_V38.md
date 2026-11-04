@@ -5001,3 +5001,9 @@ never touched. $3,500: 20 lost. Log: `verification/noise_v2/g181_cushion.txt`.
 
 **U40 (2026-11-04): More trading days from $2,500 above the stopped floor (G181; U22-U39: $3,000).** The setting
 "More trading days: cushion" defaults to 2,500.
+
+## G182: the More trading days cushion at $2,000 and $2,250 on U40 (registered 2026-11-04, before its run)
+
+**Variants:** U40 with `fill_min_room` 2,000 and 2,250 (U40: 2,500). **Run once:** the 263 starts and the full sets in
+both executions. **Adopt (the fewest lost) on G99b's survival-first rule** against U40 (fewer than 17, every net at
+least 95%), or G78's.
