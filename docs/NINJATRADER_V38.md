@@ -5503,6 +5503,13 @@ fewer, on the 526 starts and the full sets in both executions at 1 tick. **Adopt
 U44's 28 and every net is at least 95% of U44's, with no −$1,000 day and the floor never touched.
 
 **G216 result (2026-11-04): none goes on.** 526 starts at 2 ticks, lost or frozen (U44 51): (a) 8-point allowance 51,
-(b) $600 early day 49, (c) both 49. None reaches 45; the extra losses at 2 ticks are not the sizing or the early budget
-but the edge itself (each fill a tick worse, on many small trades). U44 stays. Log:
+(b) $600 early day 49, (c) both 49. None reaches 45: neither a bigger sizing allowance nor a smaller early budget wins back
+the accounts that worse fills cost. U44 stays. Log:
 `verification/noise_v2/g216_slip2_protect.txt`.
+
+## G217: 40 random combinations of the survival settings around U44 (registered 2026-11-04, before its run)
+
+**The search:** G207's (`research/g207_survival_search.py`, the same 18 settings) with seed 217, around U44. **Stage A:**
+each on the 263 starts on the 1st (U44: 12). **Stage B:** the fewest lost (ties: the higher median), if 8 or fewer, on
+the mid-month starts and the full sets in both executions. **Adopted on G99b's rule** against U44 (at least 4 fewer of
+the 526 than 28, every net at least 95% of U44's, no −$1,000 day, the floor never touched) or G78's.

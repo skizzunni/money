@@ -1,7 +1,7 @@
-"""G207 (docs/NINJATRADER_V38.md): 40 random combinations of the survival settings around U42, on the 263 starts on the
+"""G207 / G217 (docs/NINJATRADER_V38.md): 40 random combinations of the survival settings around U42 (G207) or U44 (G217, seed 217), on the 263 starts on the
 1st. Writes one VARIANT_JSON per line (tag, json) for g35_start_dates.py.
 
-    python research/g207_survival_search.py <U42 JS json file>
+    python research/g207_survival_search.py <U42 or U44 JS json file> [seed]
 """
 import json
 import random
@@ -14,7 +14,7 @@ SPACE = {"giveback_brake": [0.4, 0.6], "fill_min_room": [2000.0, 3000.0], "early
          "big_day_k": [1.3, 1.7], "range_pos_min": [0.65, 0.75], "gap_go_k": [0.5, 0.75],
          "fill_qty2_room": [5000.0, 8000.0], "after_loss_ml_mult5": [0.9, 1.1]}
 base = json.load(open(sys.argv[1]))
-rng = random.Random(207)
+rng = random.Random(int(sys.argv[2]) if len(sys.argv) > 2 else 207)  # G217: seed 217
 seen = []
 while len(seen) < 40:
     v = {k: rng.choice(c) for k, c in SPACE.items() if rng.random() < 0.25}
