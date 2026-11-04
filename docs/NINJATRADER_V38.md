@@ -5189,3 +5189,7 @@ settings, a new draw (seed 196, 299 combinations, `ORDER=long`). **Stage 1:** ea
 never touched; ranked by the sum of the two nets against U41's) on the window. **Stage 3:** any at least U41's net on
 the window too goes to NinjaTrader's execution and the 526 starts, best first, at most three; **adopted on G78's rule**
 (no more than 38 lost) or G99b's (at least 4 fewer lost, every net at least 95%).
+
+**U41 checks (2026-11-04):** the full suite, **670 passed**; the NinjaTrader growth run on the window $54,700.08
+(`verification/noise_v2/v38g_nt_u41.txt`), the same as U40's (the brake never acts there), identical to the model up to
+the 2026-03-09 data hole.
