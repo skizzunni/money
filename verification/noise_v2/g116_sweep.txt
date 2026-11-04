@@ -1,0 +1,19 @@
+{"k": 0, "proxy net": 46656, "proxy d1000": 0, "nq net": 495184, "nq d1000": 0, "index net": 661701, "index d1000": 0}
+{"k": 1, "max_loss_per_trade": 150.0, "proxy net": 45658, "proxy d1000": 0, "nq net": 494216, "nq d1000": 0, "index net": 679278, "index d1000": 0}
+{"k": 2, "max_loss_per_trade": 225.0, "proxy net": 42397, "proxy d1000": 0, "nq net": 464934, "nq d1000": 0, "index net": 593456, "index d1000": 0}
+{"k": 3, "max_loss_per_trade": 250.0, "proxy net": 42132, "proxy d1000": 0, "nq net": 464209, "nq d1000": 0, "index net": 614826, "index d1000": 0}
+{"k": 4, "after_loss_ml_mult": 1.0, "proxy net": 48001, "proxy d1000": 0, "nq net": 530631, "nq d1000": 0, "index net": 703794, "index d1000": 0}
+{"k": 5, "after_loss_ml_mult": 1.6667, "proxy net": 47652, "proxy d1000": 0, "nq net": 474659, "nq d1000": 0, "index net": 639758, "index d1000": 0}
+{"k": 6, "profit_step": 1250.0, "proxy net": 45983, "proxy d1000": 0, "nq net": 504922, "nq d1000": 0, "index net": 669421, "index d1000": 0}
+{"k": 7, "profit_step": 1750.0, "proxy net": 47802, "proxy d1000": 0, "nq net": 495007, "nq d1000": 0, "index net": 657015, "index d1000": 0}
+{"k": 8, "last_entry_end": 870, "proxy net": 13975, "proxy d1000": 0, "nq net": 449548, "nq d1000": 0, "index net": 598572, "index d1000": 0}
+{"k": 9, "last_entry_end": 930, "proxy net": 42493, "proxy d1000": 0, "nq net": 496060, "nq d1000": 0, "index net": 611842, "index d1000": 0}
+{"k": 10, "squeeze_min": 15.0, "proxy net": 46616, "proxy d1000": 0, "nq net": 495576, "nq d1000": 0, "index net": 660659, "index d1000": 0}
+{"k": 11, "squeeze_min": 25.0, "proxy net": 46656, "proxy d1000": 0, "nq net": 495172, "nq d1000": 0, "index net": 661270, "index d1000": 0}
+{"k": 12, "trend_n": 40, "proxy net": 45066, "proxy d1000": 0, "nq net": 507848, "nq d1000": 0, "index net": 696307, "index d1000": 0}
+{"k": 13, "trend_n": 60, "proxy net": 49094, "proxy d1000": 0, "nq net": 494270, "nq d1000": 0, "index net": 657520, "index d1000": 0}
+{"k": 14, "max_losers": 3, "proxy net": 46646, "proxy d1000": 0, "nq net": 494823, "nq d1000": 0, "index net": 662341, "index d1000": 0}
+{"k": 15, "lookback": 10, "proxy net": 10747, "proxy d1000": 0, "nq net": 393015, "nq d1000": 1, "index net": -1, "index d1000": 0}
+{"k": 16, "lookback": 20, "proxy net": 12618, "proxy d1000": 0, "nq net": 461837, "nq d1000": 0, "index net": 605694, "index d1000": 0}
+{"k": 17, "entry_k": 0.9, "proxy net": 45341, "proxy d1000": 0, "nq net": 1, "nq d1000": 0, "index net": 623644, "index d1000": 0}
+{"k": 18, "entry_k": 1.1, "proxy net": 12270, "proxy d1000": 0, "nq net": 446484, "nq d1000": 0, "index net": 0, "index d1000": 0}

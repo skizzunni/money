@@ -4076,3 +4076,9 @@ entry line were last checked on older defaults. 18 variants, one setting each: `
 40/60, `max_losers` 3, `lookback` 10/20, `entry_k` 0.9/1.1. **Screen and confirmation:** G115's (NQ and the index at
 least U29's on the chart's execution, no −$1,000 day; the best window net goes on to NinjaTrader's execution and the 89
 start dates on G78's rule). Row 0 is U29 itself, as the check.
+
+**Screen (G116):** row 0 reproduces U29 (window $46,656, NQ $495,184, index $661,701). Four rows pass: the after-loss
+max loss at 1.0 (window $48,001, NQ $530,631, index $703,794), `profit_step` 1,250 (window $45,983), `trend_n` 40
+(window $45,066). The highest window net is `after_loss_ml_mult` 1.0, the candidate (package `U29al1`, variant
+`u29al1`). A shorter lookback, a wider entry line and an earlier last entry each lose an account on some set. Log:
+`verification/noise_v2/g116_sweep.txt`.
