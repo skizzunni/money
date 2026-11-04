@@ -4860,3 +4860,9 @@ Log: `verification/noise_v2/g170_size_slip.txt`.
 
 **U38 (2026-11-04): the sizing counts a stop 5 points worse (G170; U29-U37: 4).** The "sizing allowance" setting
 (`SizeSlip`) defaults to 5, on the 5-minute chart.
+
+## G171: 20 random combinations of the exit settings around U38, on 263 starts (registered 2026-11-04, before its run)
+
+**Variants (seed 171), around U38:** `lock_at` 0.30-0.38, `lock_plus` 2 / 2.5 / 3 points, `stop_buffer` 0.22-0.26,
+`time_stop` 50 / 60 / 70. As G164: the fewest lost or frozen on the 263 starts (ties: the higher median) to the full
+sets in both executions; **adopt on G99b's survival-first rule** against U38 (fewer than 19, every net at least 95%).
