@@ -5106,3 +5106,13 @@ well below the others; otherwise none.
 on both sets ($410-876 a contract). The lowest efficiency quintile is the lowest on both (NQ $526, index $466 against
 $588-728), but only about 20% below the rest, and its share of stretches below −$300 (17%) is no higher than the others'
 (13-20%). The losing stretches don't show in these beforehand. Log: `verification/noise_v2/g190_regime.txt`.
+
+## G191: the gap trade in the giveback, on U40 (registered 2026-11-04, before its run)
+
+**Why:** five dead U40 starts traced trade by trade (`index` 2011-04, 2013-07, 2013-12; `nq` 2015-06, 2019-11): after
+the peak, the gap trades' stops cost $390-1,800 of each $2,000-3,300 giveback, and a 1-contract gap stop at the 09:30
+open lost up to $404 in the volatile weeks (2011-08, 2015-08-24), twice the bot's own max loss a contract. **The
+variants:** U40 with (a) `gap_go_cap` (the gap trade's stop no farther than the bot's max loss a contract) and (b)
+`gap_skip_braked` (no gap-slot trade while the giveback brake is on). **Run once:** the 526 starts and the full sets in
+both executions. **Adopt (the fewest lost) on G78's rule** (no more than 42 lost, higher nets) or G99b's (at least 4
+fewer lost, every net at least 95%).

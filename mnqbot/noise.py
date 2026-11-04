@@ -341,6 +341,7 @@ class NoiseConfig:
     gap_go_small_k: float = -1.0
     # research (G70): the fill-in trades (small gaps, drives, trend_small's shorts) only once the trailing floor has
     # stopped at the start (trail_cap)
+    gap_skip_braked: bool = False  # research (G191): no gap-slot trade while the giveback brake is on
     gap_fill_early: bool = False  # research (G189): the gap-slot fill-ins (small gap, drive) also before the floor stops
     fill_after_lock: bool = False
     fill_min_room: float = 0.0  # G71: and only while the account is at least this far above the trailing floor
@@ -847,6 +848,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                         bavg = sum(drive_hist[-14:]) / len(drive_hist[-14:])
                         if abs(body) >= cfg.gap_go_drive_k * bavg:
                             d, fire, one = (1 if body > 0 else -1), True, True
+                    if fire and cfg.gap_skip_braked and braked():  # G191
+                        fire = False
                     if fire:
                         stop_px = day_open
                         if cfg.gap_go_stop_frac > 0:  # G111: part way up the 09:30 bar's body, on the tick grid
