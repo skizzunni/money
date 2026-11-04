@@ -5615,3 +5615,9 @@ than 28 lost).
 $57,432 / $57,419; (b) four: 28 lost, window $57,435 / $57,458 (U44 $57,446 / $57,475), NQ and the index a little
 higher. Within $20 of U44 on the window: once grown the day's budget, not the loser count, ends the day. Log:
 `verification/noise_v2/g225_losers_locked.txt`.
+
+## G226: the grown gap trade at 11 or 12 contracts, on U44 (registered 2026-11-04, before its run)
+
+**Why:** G209's 15 gap contracts raised the nets but broke the $1,000 day; 11-12 were only tried inside combinations.
+**The variants:** U44 with `gap_go_locked_qty` (a) 11 and (b) 12 (10 now). **Run once:** the 526 starts and the full
+sets in both executions. **Adopt (the better window) on G78's rule** against U44.
