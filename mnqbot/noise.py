@@ -345,6 +345,7 @@ class NoiseConfig:
     gap_go_small_k: float = -1.0
     # research (G70): the fill-in trades (small gaps, drives, trend_small's shorts) only once the trailing floor has
     # stopped at the start (trail_cap)
+    fill_skip_braked: bool = False  # research (G202): no fill-in (trend_small's shorts included) while braked
     gap_skip_braked: bool = False  # research (G191): no gap-slot trade while the giveback brake is on
     gap_fill_early: bool = False  # research (G189): the gap-slot fill-ins (small gap, drive) also before the floor stops
     fill_after_lock: bool = False
@@ -688,6 +689,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
 
     def fill_ok() -> bool:
         """G70: may a fill-in trade be taken now?"""
+        if cfg.fill_skip_braked and braked():  # G202
+            return False
         if cfg.fill_after_lock and not floor_stopped():
             return False
         if cfg.fill_min_room > 0:

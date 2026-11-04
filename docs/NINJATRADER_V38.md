@@ -5280,3 +5280,11 @@ against the fade. G200's edge was the look-ahead. Log: `verification/noise_v2/g2
 NQ $556,292 / $554,575 (U41 $563,437 / $553,165), index $799,358 / **$828,069** (U41 $787,157 / $776,319); no −$1,000
 day, the floor never touched. But 526 starts: **59** lost or frozen (28 + 31; U41 38), on both start samples. Log:
 `verification/noise_v2/g199_trend100_u41.txt`.
+
+## G202: no fill-ins at all while the giveback brake is on, on U41 (registered 2026-11-04, before its run)
+
+**Why, from G191:** taking the gap slot away from a braked account saved 4 of 526. The other fill-ins (the
+1-contract shorts against the uptrend, `trend_small`) still trade while braked. **The variant:** U41 with
+`fill_skip_braked` (no fill-in while the brake is on; the bot's own trades stay). **Run once:** the 526 starts and the
+full sets in both executions. **Adopt on G78's rule** (higher nets on all three in both executions, no more than 38
+lost) or G99b's (at least 4 fewer lost, every net at least 95%).
