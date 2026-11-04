@@ -4429,3 +4429,8 @@ floor stop (+$2,000), most reached +$3,000, then gave it all back over months (5
 **Variants:** U33 with `trend_side` 0 (longs below the 50-session trend at 1 contract too, as shorts above it),
 `trend_n` 100, both, and `giveback_brake` 0.6 (G99's brake at 60%, for the slow giveback that loses the accounts).
 G135's screen, then NinjaTrader's execution and the 89 starts for the best, on G78's rule or G99b's.
+
+**G140 screen (2026-11-04):** `trend_side` 0: window $9,684 (out); `trend_n` 100: **window $52,734, NQ $556,989,
+index $801,841**, no −$1,000 day (passes); both: $10,706 (out); `giveback_brake` 0.6: window $50,182 (out, below
+$50,219). The candidate is `trend_n` 100 (package `U33t100`, variant `u33t100`). Log:
+`verification/noise_v2/g140_trend_screen.txt`.

@@ -1,0 +1,4 @@
+{"k": 0, "trend_side": 0, "proxy net": 9684, "proxy d1000": 0, "nq net": 348191, "nq d1000": 0, "index net": 415321, "index d1000": 0}
+{"k": 1, "trend_n": 100, "proxy net": 52734, "proxy d1000": 0, "nq net": 556989, "nq d1000": 0, "index net": 801841, "index d1000": 0}
+{"k": 2, "trend_n": 100, "trend_side": 0, "proxy net": 10706, "proxy d1000": 0, "nq net": 400731, "nq d1000": 0, "index net": 468358, "index d1000": 0}
+{"k": 3, "giveback_brake": 0.6, "proxy net": 50182, "proxy d1000": 0, "nq net": 555622, "nq d1000": 0, "index net": 790012, "index d1000": 0}
