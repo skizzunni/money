@@ -4000,3 +4000,9 @@ index $661,701 / $648,718 (U29: $661,701 / $648,812), 10 lost or frozen (`verifi
 **The idea:** in a grown account the day's budget is what caps a trade's size, and so the week's profit. $950 of the
 $1,000 rule (from $900), with U29's 4-point sizing allowance and the live loss guard at $950 for the gap past a stop.
 **The variant:** U29 with `daily_loss_limit` 950. **Adopt on G78's rule**, against U29 (no day at −$1,000 on any set).
+
+**G110 result (run once, 2026-11-04): rejected; a $950 budget breaks the $1,000 rule.** Index: 4 days (chart) / 3
+days (NinjaTrader's) at −$1,034; 11 lost or frozen of 89; window $46,808 / $45,676. $900 stays
+(`verification/noise_v2/g110_budget950.txt`).
+
+**Scorecard, G44-G110:** 67 rounds. Adopted 10 (and the data fix); rejected 54; measurements 3.
