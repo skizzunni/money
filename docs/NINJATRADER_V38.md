@@ -5633,3 +5633,8 @@ price. G86 (U25: 15 contracts, 5 points) failed the same way. **The variants:** 
 `gap_slip_pts` (a) 10 and (b) 20 (the gap trade's sizing counts that many points more slippage at its stop). **Run
 once:** the 526 starts and the full sets in both executions. **Adopt (the better window) on G78's rule** against U44.
 The NinjaTrader strategy doesn't have `gap_slip_pts` yet; a pass is built there before adoption.
+
+**G227 result (run once, 2026-11-04): both rejected.** The allowance removes the −$1,000 days (worst −$962 / −$941) and
+keeps 27 lost, but every net falls below U44's: 10 points window $54,379, NQ $575,044, index $815,753; 20 points $47,528
+/ $550,213 / $780,878 (U44 $57,475 / $579,739 / $828,138). The allowance costs more on ordinary gap days than the two
+extra contracts earn. Log: `verification/noise_v2/g227_gap_slip.txt`.
