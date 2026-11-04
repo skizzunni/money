@@ -5270,3 +5270,8 @@ wins by construction. So D can't be traded as measured; G201 measures the versio
 or at U41's first entry of the day after 10:00 (at that entry's price), whichever comes first. Per MNQ after costs, per
 year, on the window, NQ and the index; also split by whether U41 traded that day. **What would follow:** it goes on to a
 fill-in test in the bot (G202) only if it is positive on all three sets and in at least two thirds of the years.
+
+**G201 result (2026-11-04): no fill-in follows.** Traded as a bot could: window **+$1,253** per MNQ (1 of 2 years up), NQ
+**−$818** (7 of 11), index **−$21,611** (8 of 16). The days U41 later trades give back what the quiet days make
+(index −$89,468 against +$67,857): the bot's first entry is the fade's stop, and it comes after the move has gone
+against the fade. G200's edge was the look-ahead. Log: `verification/noise_v2/g201_fade.txt`.
