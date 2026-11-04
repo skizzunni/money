@@ -3738,3 +3738,7 @@ drawdown.
 the floor; one 09:35 stop then costs up to the whole day's $900. Here, once the floor has stopped, the gap trade's
 contracts are at most 1 per $400 above the floor (`gap_go_room_per_c` 400: 5 at $2,000, 10 from $4,000), up to 10.
 **The variant:** U26 with `gap_go_room_per_c` 400. **Adopt on G78's rule**, against U26 (and its 89 start dates' 11).
+
+**G98 result (run once, 2026-11-04): no effect; rejected.** Every number is U26's: the gap trade is already capped by
+the bot's own contract steps (1 + 1 per $1,500 of profit: 2 at +$2,000) and by the day's room, so 1 per $400 above
+the floor never binds (`verification/noise_v2/g98_gap_room.txt`).
