@@ -3989,3 +3989,8 @@ dates 10 lost or frozen, medians $47,442 / $35,758 (`verification/noise_v2/g108_
 
 **The idea:** G97's fill-ins go to 2 MNQ at $6,000 above the floor; at $5,000 the second contract comes sooner.
 **The variant:** U29 with `fill_qty2_room` 5000. **Adopt on G78's rule**, against U29.
+
+**G109 result (run once, 2026-11-04): rejected; no difference.** Window $47,053 / $46,807 (U29: $46,656 / $46,828),
+index $661,701 / $648,718 (U29: $661,701 / $648,812), 10 lost or frozen (`verification/noise_v2/g109_fill2_5000.txt`).
+
+**Scorecard, G44-G109:** 66 rounds. Adopted 10 (and the data fix); rejected 53; measurements 3.
