@@ -4161,3 +4161,21 @@ Log: `verification/noise_v2/g121_max40_50.txt`.
 **U31/U32 (2026-11-04): up to 50 MNQ (G120, G121).** In Funded growth (the 50K) on a 5-minute chart "Most contracts"
 is 50 (U29: 20); 15 elsewhere. 50 MNQ is 5 minis' worth, the usual 50K position limit. The bot steps one contract
 per $1,500 of profit, so it passes 20 only after about $28,500 and reaches 50 after about $73,500.
+
+## G122: U32's weekly P/L by the account's profit (a measurement, 2026-11-04)
+
+`research/g122_weekly.py`, chart's execution, 5-minute; each week grouped by the profit at its start
+(`verification/noise_v2/g122_weekly.csv`):
+
+| profit at the week's start | window: weeks / average / ≥ $3,000 | NQ 2015-25 | index 2011-26 |
+|---|---|---|---|
+| under $10,000 | 67 / $204 / 1.5% | 58 / $174 / 1.7% | 26 / $421 / 3.8% |
+| $10,000-30,000 | 24 / $1,462 / 16.7% | 16 / $1,425 / 12.5% | 42 / $876 / 19.0% |
+| $30,000-75,000 | 3 / $504 / 0% | 74 / $579 / 10.8% | 42 / $863 / 14.3% |
+| over $75,000 (up to 50 MNQ) | - | 401 / $1,195 / 15.7% | 711 / $986 / 14.1% |
+
+**What it shows:** past about $10,000 the average week stops growing with the account (about $1,000; the median near
+$0, half the weeks negative), even at 50 contracts. The daily budget is the cap: every trade is sized to the $900 left
+for the day, so the day's risk is fixed whatever the balance, and the profit per week is the edge per dollar of
+that risk (about +0.2 of the day's budget a day). $3,000 a week needs about +0.67 a day. That's where the next rounds
+look: more profit per dollar of the day's risk (trade selection and exits on the full-size trades), not more size.
