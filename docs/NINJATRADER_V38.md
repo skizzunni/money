@@ -5700,3 +5700,8 @@ grown on U34. **The variants:** U44 with `gap_go_k_locked` (a) 0.75 and (b) 1.0 
 **G231 result (run once, 2026-11-04): both rejected.** 0.75: 30 lost, NQ $569,653 / $562,087 (U44 $587,643 / $579,739);
 1.0: 32 lost, every net lower. Fewer grown gap trades cost more than they save. Log:
 `verification/noise_v2/g231_gap_k_locked.txt`.
+
+## G232: the fill-ins' cushion at $2,000 and $3,000, on U44 (registered 2026-11-04, before its run)
+
+**The variants:** U44 with `fill_min_room` (a) 2,000 and (b) 3,000 (2,500 now, G181 on U39). **Run once:** the 526 starts
+and the full sets in both executions. **Adopt (the fewer lost) on G78's rule** against U44, or G99b's.
