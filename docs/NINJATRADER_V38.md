@@ -5235,3 +5235,7 @@ candidates:** the 7 of G196 with both NQ and index nets at least 97% of U41's, n
 one with the fewest lost, if fewer than U41's 17 there, goes on to the 263 mid-month starts and the full sets in both
 executions. **Adopted on G99b's rule** (at least 4 fewer of the 526 lost than U41's 38, every net at least 95%, no
 −$1,000 day, the floor never touched) or G78's.
+
+**G198 result (run once, 2026-11-04): none goes on.** 263 starts on the 1st, lost or frozen (U41 **17**): k184 25, k27 25,
+k242 30, k17 22, k262 50, k237 34, k166 24. Each of G196's closest loses more accounts than U41; no stage B. Log:
+`verification/noise_v2/g198_survival.txt`.

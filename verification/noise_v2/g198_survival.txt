@@ -1,0 +1,14 @@
+index u41k184 starts 160 lost (at the floor) 14 dead (lost or frozen) 14 below start 7 median net 36014 worst net -1999 lowest point -1999 reached +2000 153
+nq u41k184 starts 103 lost (at the floor) 11 dead (lost or frozen) 11 below start 7 median net 43615 worst net -1994 lowest point -1994 reached +2000 98
+index u41k27 starts 160 lost (at the floor) 13 dead (lost or frozen) 13 below start 8 median net 34256 worst net -1999 lowest point -1999 reached +2000 154
+nq u41k27 starts 103 lost (at the floor) 12 dead (lost or frozen) 12 below start 8 median net 42011 worst net -1519 lowest point -1941 reached +2000 97
+index u41k242 starts 160 lost (at the floor) 20 dead (lost or frozen) 20 below start 16 median net 39778 worst net -1999 lowest point -1999 reached +2000 147
+nq u41k242 starts 103 lost (at the floor) 10 dead (lost or frozen) 10 below start 10 median net 47230 worst net -1999 lowest point -1999 reached +2000 95
+index u41k17 starts 160 lost (at the floor) 14 dead (lost or frozen) 14 below start 10 median net 25481 worst net -1999 lowest point -1999 reached +2000 151
+nq u41k17 starts 103 lost (at the floor) 8 dead (lost or frozen) 8 below start 8 median net 41536 worst net -1832 lowest point -1944 reached +2000 98
+index u41k262 starts 160 lost (at the floor) 34 dead (lost or frozen) 34 below start 26 median net 26502 worst net -2004 lowest point -2004 reached +2000 137
+nq u41k262 starts 103 lost (at the floor) 16 dead (lost or frozen) 16 below start 11 median net 31609 worst net -1999 lowest point -1999 reached +2000 98
+index u41k237 starts 160 lost (at the floor) 18 dead (lost or frozen) 18 below start 14 median net 45559 worst net -1999 lowest point -1999 reached +2000 148
+nq u41k237 starts 103 lost (at the floor) 16 dead (lost or frozen) 16 below start 13 median net 49819 worst net -1999 lowest point -1999 reached +2000 95
+index u41k166 starts 160 lost (at the floor) 15 dead (lost or frozen) 15 below start 7 median net 31908 worst net -1999 lowest point -1999 reached +2000 153
+nq u41k166 starts 103 lost (at the floor) 9 dead (lost or frozen) 9 below start 7 median net 40750 worst net -1999 lowest point -1999 reached +2000 97
