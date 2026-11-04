@@ -3609,3 +3609,12 @@ More trading days and 10-contract gap trades. With the trade mix changed this mu
 **Adopt (the better by window net) on G78's rule**, against U25 (60): a higher net on the window and the index in both
 executions, the floor never touched there, no more days at −$1,000 on any set, and on the 89 start dates no more lost
 or frozen accounts than 11.
+
+**G89 result (run once, 2026-11-04): rejected; 60 minutes stays.** 45 minutes: window $43,116 / $43,155, index
+$597,657 / $586,740 (U25: $43,463 / $43,740, $607,307 / $600,553); its NQ 2015 path lived ($444,071). 90 minutes:
+window $43,001 / $43,358, index $593,290 / $584,463 (`verification/noise_v2/g89_time_stop.txt`).
+
+## G90: the take-profit re-checked on U25 (registered 2026-11-04, before its run)
+
+**The idea:** G45 kept 2 noise units with the time stop, before gap and go, More trading days and 10-contract gap
+trades. **Variants:** U25 with `take_profit` 1.5 and 2.5. **Adopt (the better by window net) on G78's rule**, against U25.

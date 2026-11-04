@@ -99,7 +99,12 @@ PACK = {"P0": {}, "P1": {"gap_go_small_k": 0.0}, "P2": {"gap_go_small_k": 0.0, "
         "U25t45": {"gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
                    "fill_min_room": 3000.0, "size_slip_pts": 2.0, "gap_go_locked_qty": 10, "time_stop": 45},
         "U25t90": {"gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
-                   "fill_min_room": 3000.0, "size_slip_pts": 2.0, "gap_go_locked_qty": 10, "time_stop": 90}}
+                   "fill_min_room": 3000.0, "size_slip_pts": 2.0, "gap_go_locked_qty": 10, "time_stop": 90},
+        # G90: U25 with a take-profit of 1.5 or 2.5 noise units
+        "U25tp15": {"gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
+                    "fill_min_room": 3000.0, "size_slip_pts": 2.0, "gap_go_locked_qty": 10, "take_profit": 1.5},
+        "U25tp25": {"gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
+                    "fill_min_room": 3000.0, "size_slip_pts": 2.0, "gap_go_locked_qty": 10, "take_profit": 2.5}}
 for pk in (sys.argv[4].split(",") if len(sys.argv) > 4 else list(PACK)):
     for name, (bars, first, skip) in S.D.items():
         if name == "win":
