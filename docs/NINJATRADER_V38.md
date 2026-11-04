@@ -3750,3 +3750,15 @@ while the account's profit is under half of its best end-of-day profit (`givebac
 gap and go, the fill-ins) takes 1 MNQ. It keeps trading, so the recovery's winners are taken (unlike G87's gate), at
 the smallest size; above half of the best, everything is as now.
 **The variant:** U26 with `giveback_brake` 0.5. **Adopt on G78's rule**, against U26.
+
+**G99 result (run once, 2026-11-04): fails G78's rule by not being higher.** Window $45,340 / $45,396 (identical to
+U26), index $639,432 / $629,489 (U26: $639,474 / $629,316), and NQ's 2015 path lived in both executions ($472,623 /
+$470,273). The brake rarely acts where an account is doing well; what it is for is the accounts that give it back
+(`verification/noise_v2/g99_giveback.txt`).
+
+## G99b: the giveback brake on the survival-first rule (registered 2026-11-04, before the start dates are run)
+
+The same variant as G99, judged on G87's survival-first rule (the ask is fewer lost accounts with the results kept):
+**adopt only if**, on G35's 89 start dates, **fewer lost or frozen accounts than U26's 11**; the window's and the
+index's net at least 95% of U26's in both executions (already known: 100%); no day at −$1,000 on any set; the floor
+never touched on the window and the index.
