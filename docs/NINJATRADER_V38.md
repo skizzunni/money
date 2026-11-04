@@ -5239,3 +5239,10 @@ executions. **Adopted on G99b's rule** (at least 4 fewer of the 526 lost than U4
 **G198 result (run once, 2026-11-04): none goes on.** 263 starts on the 1st, lost or frozen (U41 **17**): k184 25, k27 25,
 k242 30, k17 22, k262 50, k237 34, k166 24. Each of G196's closest loses more accounts than U41; no stage B. Log:
 `verification/noise_v2/g198_survival.txt`.
+
+## G199: the trend over 100 sessions, re-checked on U41 and 526 starts (registered 2026-11-04, before its run)
+
+**Why:** `trend_n` 100 was a near miss three times (G140 on U33, G176 on U38: one account more of 263; G195's k87): it
+raises the window and the index and costs NQ about 1%. It was never judged on the 526 starts. **The variant:** U41 with
+`trend_n` 100. **Run once:** the 526 starts and the full sets in both executions. **Adopt on G78's rule** (higher nets
+on all three in both executions, no more than 38 lost) or G99b's (at least 4 fewer lost, every net at least 95%).
