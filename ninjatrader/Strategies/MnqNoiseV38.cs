@@ -83,6 +83,10 @@ namespace NinjaTrader.NinjaScript.Strategies
         // G99: once the floor has stopped at the start, while the profit is under GivebackBrake x the best end-of-day
         // profit, every trade at 1 MNQ (0 = off)
         public double GivebackBrake = 0;
+        // G103: a sprint: for the account's first SprintDays sessions, until its profit reaches SprintTarget, every bot and
+        // gap trade takes SprintQty contracts (still cut to the day's and the floor's room); then the usual sizing (0 = off)
+        public int SprintQty = 0, SprintDays = 5;
+        public double SprintTarget = 3000;
         // G76: the bot's sizing counts this many points more slippage at the stop (0 = off)
         public double SizeSlipPts = 0;
         // G87: within ProtectRoom of the trailing floor, no new trade on a session after a shadow (1-contract, paper)
@@ -192,6 +196,17 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (s.ProtectRoom <= 0 || !ProtectClosed || s.TrailDD <= 0 || double.IsNaN(trailPeak)) return false;
             double floor = Math.Min(trailPeak - s.TrailDD, trailBase);
             return EqEff - floor < s.ProtectRoom;
+        }
+
+        int sprintSessions;
+        bool sprintDone;
+
+        // G103: is the sprint on?
+        public bool SprintOn()
+        {
+            if (s.SprintQty <= 0 || sprintDone || double.IsNaN(trailBase)) return false;
+            if (EqEff - trailBase >= s.SprintTarget) { sprintDone = true; return false; }
+            return sprintSessions <= s.SprintDays;
         }
 
         // G99: has the account given back more than (1 - GivebackBrake) of its best profit since the floor stopped?
@@ -498,6 +513,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 {
                     if (double.IsNaN(trailBase)) trailBase = trailPeak = EqEff;  // yesterday's end-of-day equity
                     trailPeak = Math.Max(trailPeak, EqEff);
+                    sprintSessions++;  // G103
                 }
                 if (s.CalmK > 0 && dayRanges.Count >= s.CalmLong)
                     calm = Avg(dayRanges, s.CalmShort) < s.CalmK * Avg(dayRanges, s.CalmLong);
@@ -617,6 +633,11 @@ namespace NinjaTrader.NinjaScript.Strategies
                 ml = ml / q * qUp;
                 q = qUp;
             }
+            if (SprintOn())  // G103: the sprint's size (the day's and the floor's room still cut it below)
+            {
+                ml = ml / q * s.SprintQty;
+                q = s.SprintQty;
+            }
             if (s.MoreDays && s.TrendN > 0 && d < 0 && trend == 1)  // G72: a fill-in short in the uptrend at its max loss a contract
             {
                 int fq = FillQ();  // G97: 1 MNQ, or 2 well above the floor
@@ -701,8 +722,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                     }
                     double perC = Math.Abs(c + d * slip - dayOpen) * s.PointValue + 2 * s.CommissionPerSide + 2 * slip * s.PointValue;
                     double room = MoneyRoom();
-                    if (!double.IsInfinity(room))
-                        q = Math.Min(q, (int)Math.Floor(room / perC + 1e-9));
+                    int fitQ = double.IsInfinity(room) ? int.MaxValue : (int)Math.Floor(room / perC + 1e-9);
+                    q = Math.Min(q, fitQ);
                     bool floorStopped = !double.IsNaN(trailPeak) && trailPeak - s.TrailDD >= trailBase;
                     if (s.GapGoLockedQty > 0 && floorStopped)
                     {
@@ -713,6 +734,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                         q = Math.Min(q, s.GapGoMaxQty);
                     if (one)
                         q = Math.Min(q, FillQ());
+                    if (SprintOn() && !one)  // G103: the sprint's size, as the room allows
+                        q = Math.Min(s.SprintQty, fitQ);
                     if (q >= 1)
                     {
                         gapPending = true; gapPendingDir = d; gapPendingQty = q; gapPendingStop = dayOpen;
@@ -841,6 +864,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 PropStartBalance = 50000;
                 PropHighBalance = 0;
                 SizeToAccountRoom = true;
+                SprintContracts = 0;  // G103: off
                 NearFloorGate = 0;  // G87b: off (it lost more accounts)
                 TestedWinRate = 61.2;
             }
@@ -898,6 +922,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 st.FillMinRoom = MoreDaysCushion;
                 st.FillQty2Room = MoreDaysQty2Room;  // G97
                 st.GivebackBrake = Mode != "Evaluation" ? GivebackBrake : 0;  // G99
+                st.SprintQty = Mode != "Evaluation" ? SprintContracts : 0;  // G103
                 st.SizeSlipPts = Mode != "Evaluation" ? SizeSlip : 0;  // G79: the Funded growth modes and Custom
                 st.ProtectRoom = Mode != "Evaluation" ? NearFloorGate : 0;  // G87
                 st.Tick = TickSize;
@@ -1685,6 +1710,11 @@ namespace NinjaTrader.NinjaScript.Strategies
         [Range(0, 1)]
         [Display(Name = "Giveback brake: once the floor has stopped, 1 MNQ per trade while the profit is under this share of its best (0 = off)", Order = 21, GroupName = "1. Size and risk")]
         public double GivebackBrake { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, 15)]
+        [Display(Name = "Sprint: the first 5 sessions from the start date, until +$3,000, every trade this many MNQ (0 = off; see the odds in the docs)", Order = 22, GroupName = "1. Size and risk")]
+        public int SprintContracts { get; set; }
 
         [NinjaScriptProperty]
         [Range(0, 50)]

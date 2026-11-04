@@ -784,3 +784,31 @@ def test_v38_live_without_account_values(sim, sample_1m, tmp_path):  # noqa: F81
     live = [x for x in r.stdout.splitlines() if x.startswith("T,")]
     assert live == hist
     assert "Prop floor: waiting for the account's balance" in [x for x in r.stdout.splitlines() if x.startswith("D,")][0]
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+def test_v38_sprint(sim, sample_1m, tmp_path):  # noqa: F811
+    """G103's sprint: for the first 5 sessions from the start date, until +$3,000, every bot and gap trade takes
+    SprintContracts (cut to the day's and the floor's room). From a start date mid-sample, NinjaTrader's code and the
+    model agree trade for trade with it on (5) and off, and on, the sprint week's trades are bigger."""
+    bars = resample(sample_1m, "5min")
+    path = tmp_path / "bars.csv"
+    with path.open("w") as f:
+        for t, r in zip(bars.index, bars.itertuples(), strict=True):
+            f.write(f"{t:%Y-%m-%d %H:%M},{r.open!r},{r.high!r},{r.low!r},{r.close!r}\n")
+    days = sorted({ts.date() for ts in bars.index})
+    start = str(days[len(days) // 3])
+    qty = {}
+    for sq in (5, 0):
+        r = subprocess.run([DOTNET, str(sim), str(path), "5", "Strategy=V38", *GROW_ARGS, f"TrailFrom={start}",
+                            f"SprintContracts={sq}"], capture_output=True, text=True, env=ENV)
+        assert r.returncode == 0, r.stderr[-2000:]
+        nt = [x.split(",")[1:] for x in r.stdout.splitlines() if x.startswith("T,")]
+        py = run(bars, dataclasses.replace(GROW, trail_from=start, sprint_qty=sq), minutes=5).trades
+        assert len(nt) == len(py) >= 20
+        for a, t in zip(nt, py, strict=True):
+            assert (int(a[0]), int(a[1]), int(a[3])) == (t.direction, t.entry_bar, t.exit_bar), (a, t)
+            assert float(a[2]) == t.entry and float(a[4]) == t.exit, (a, t)
+            assert math.isclose(float(a[6]), t.pnl, abs_tol=1e-6), (a, t)
+        qty[sq] = [t.qty for t in py if str(t.entry_time.date()) >= start][:6]
+    assert sum(qty[5]) > sum(qty[0]), qty
