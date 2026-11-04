@@ -338,6 +338,7 @@ class NoiseConfig:
     calm_small: bool = False  # G95: on a calm stretch, the bot's signals at 1 contract while fill_ok() (fill-ins)
     fill_qty2_room: float = 0.0  # G96: the fill-ins at 2 contracts while the account is this far above the floor
     fill_qty3_room: float = 0.0  # G107: and at 3 from this far above it (0 = off)
+    gap_go_stop_frac: float = 0.0  # G111: the gap stop this far from the 09:30 open toward its close (0 = the open)
     gap_go_room_per_c: float = 0.0  # G98: once the floor has stopped, a gap trade's contracts at most room / this
     # research (G99): once the floor has stopped, while the profit is under giveback_brake x the best end-of-day
     # profit, every trade at 1 contract (0 = off)
@@ -791,6 +792,9 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                             d, fire, one = (1 if body > 0 else -1), True, True
                     if fire:
                         stop_px = day_open
+                        if cfg.gap_go_stop_frac > 0:  # G111: part way up the 09:30 bar's body, on the tick grid
+                            mid = day_open + cfg.gap_go_stop_frac * (c[i - 1] - day_open)
+                            stop_px = round(mid / cfg.tick) * cfg.tick
                         if cfg.gap_go_cap and ml_cfg > 0:  # no farther than the bot's max loss a contract
                             cap = c[i - 1] + d * slip - d * ml_cfg / cfg.qty / cfg.point_value
                             stop_px = max(stop_px, cap) if d > 0 else min(stop_px, cap)

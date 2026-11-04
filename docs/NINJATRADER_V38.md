@@ -4006,3 +4006,9 @@ days (NinjaTrader's) at −$1,034; 11 lost or frozen of 89; window $46,808 / $45
 (`verification/noise_v2/g110_budget950.txt`).
 
 **Scorecard, G44-G110:** 67 rounds. Adopted 10 (and the data fix); rejected 54; measurements 3.
+
+## G111: the gap trade's stop at the middle of the 09:30 bar (registered 2026-11-04, before its run)
+
+**The idea:** the gap trade's stop is the 09:30 open. At the middle of the 09:30 bar's body (`gap_go_stop_frac` 0.5)
+each contract risks half as much, so the same budget holds twice the contracts on a gap that keeps going.
+**The variant:** U29 with `gap_go_stop_frac` 0.5. **Adopt on G78's rule**, against U29.
