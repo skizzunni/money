@@ -4645,3 +4645,17 @@ NinjaTrader nets (U34 window $54,874, NQ $557,093, index $776,796): fill-ins off
 the drive fill-in off 33, $52,727 / $438,101 / $652,587; the brake off **35** (the brake saves accounts), $54,874 /
 $559,815 / $770,865; U30's after-loss rule off **30**, $52,850 / **$507,188** / $721,962 (NQ 91%, below G99b's 95%).
 Log: `verification/noise_v2/g155_ablations.txt`.
+
+## G156: U29, U33 and U34 at 2 ticks of slippage (a robustness measurement, 2026-11-04)
+
+`research/g156_slip2.py`, the chart's execution with every market fill 2 ticks worse instead of 1
+(`verification/noise_v2/g156_slip2.txt`):
+
+| 2 ticks | window | NQ | index | days at −$1,000 |
+|---|---|---|---|---|
+| U29 (before this session's U30-U34) | **$13,660** | $453,799 | $632,936 | 0 |
+| U33 | $47,194 | $505,409 | $740,858 | 0 |
+| **U34** | **$52,137** | $509,357 | $742,460 | 0 |
+
+U29's window account nearly stalls at 2 ticks; U34 keeps 95% of its 1-tick window net. The session's changes made the
+bot both more profitable and less fragile to fills.
