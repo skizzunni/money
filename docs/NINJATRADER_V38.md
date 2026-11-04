@@ -4745,3 +4745,11 @@ U34, then confirmation for the best on G78's rule.
 `after_loss_qty_div` 2: U34 to the dollar (the after-loss sizing already sets it); `fed_no_shorts` off: $53,837;
 `lock_intrabar`: $53,200 / $543,061 / $831,279 (U34 $54,879 / $554,388 / $786,440). Log:
 `verification/noise_v2/g163_singles2.txt`.
+
+## G164: 20 random combinations of the survival settings, on 263 starts (registered 2026-11-04, before its run)
+
+**Variants (seed 164), around U34:** `giveback_brake` 0.4-0.7, `fill_min_room` $2,000-4,000, `gap_go_locked_qty`
+6-12, `after_loss_ml_mult` 1.2 / 1.33 / 1.5, the early no-entry checks (13:00 + 14:30, 14:30, 13:00, 12:30 + 13:00 +
+14:30, 13:00 + 14:00 + 14:30). **Screen:** lost or frozen on the 263 monthly starts. **Then:** the fewest (ties: the
+higher median) on the window, NQ and the index in both executions; **adopt on G99b's survival-first rule** against
+U34 (fewer than 32 lost, every net at least 95% of U34's, no −$1,000 day, the floor never touched).

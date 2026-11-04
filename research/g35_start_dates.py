@@ -18,6 +18,8 @@ from mnqbot.noise import NoiseConfig, run
 NY = "America/New_York"
 VARIANT = sys.argv[4] if len(sys.argv) > 4 else "base"
 MONTHS = int(os.environ.get("HORIZON_MONTHS", "21"))  # G43: 60, and the months to +$50,000
+import json as _json  # G164: VARIANT "json" takes its settings from VARIANT_JSON and its name from VARIANT_TAG
+
 EXTRA = {"base": {}, "gentle": {"steps_after_lock": True}, "cap10": {"size_up_to": 10},
          "reserve500": {"trail_buffer": 500.0}, "half": {"trail_frac": 0.5},
          "early125": {"early_ml": 125.0}, "early100": {"early_ml": 100.0},
@@ -391,7 +393,10 @@ EXTRA = {"base": {}, "gentle": {"steps_after_lock": True}, "cap10": {"size_up_to
                     "gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
                     "fill_min_room": 3000.0, "size_slip_pts": 4.0, "fill_qty2_room": 6000.0,
                     "giveback_brake": 0.5, "after_loss_ml_locked": 1.0, "size_up_to": 50, "skip_checks": "870",
-                    "skip_checks_early": True, "profit_step_fast": 750.0}}[VARIANT]
+                    "skip_checks_early": True, "profit_step_fast": 750.0}}.get(VARIANT) if VARIANT != "json" \
+    else _json.loads(os.environ["VARIANT_JSON"])
+if VARIANT == "json":
+    VARIANT = os.environ.get("VARIANT_TAG", "json")
 
 
 def with_1600(bars: pd.DataFrame, m: int) -> pd.DataFrame:
