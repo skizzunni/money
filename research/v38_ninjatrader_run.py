@@ -17,7 +17,8 @@ PROTECT = float(os.environ.get("PROTECT", "0"))  # G87: the near-floor shadow ga
 NTARGS += [f"NearFloorGate={PROTECT}"] if GROW else []
 GIVEBACK = float(os.environ.get("GIVEBACK", "0.5"))  # G99: the giveback brake (0 = off)
 NTARGS += [f"GivebackBrake={GIVEBACK}"] if GROW else []
-FILL = {**FILL, "size_slip_pts": SLIP, "giveback_brake": GIVEBACK, "size_up_to": 20}  # G106: 20 on 5-minute bars
+FILL = {**FILL, "size_slip_pts": SLIP, "giveback_brake": GIVEBACK, "size_up_to": 20,
+        "after_loss_ml_locked": 1.0}  # G106: 20 on 5-minute bars; G119
 from mnqbot.noise import NoiseConfig, run
 S = "/tmp/claude-0/-home-user-money/b0ea31b5-d9fc-525a-a114-db6430eff3ed/scratchpad"
 SIM = "ninjatrader/tests/Sim/bin/Release/net8.0/Sim"

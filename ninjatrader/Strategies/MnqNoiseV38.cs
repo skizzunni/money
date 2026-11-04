@@ -83,6 +83,8 @@ namespace NinjaTrader.NinjaScript.Strategies
         // G99: once the floor has stopped at the start, while the profit is under GivebackBrake x the best end-of-day
         // profit, every trade at 1 MNQ (0 = off)
         public double GivebackBrake = 0;
+        // G119: once the floor has stopped at the start, the trade after a loser risks this instead (0 = AfterLossMaxLoss)
+        public double AfterLossLockedMaxLoss = 0;
         // G103: a sprint: for the account's first SprintDays sessions, until its profit reaches SprintTarget, every bot and
         // gap trade takes SprintQty contracts (still cut to the day's and the floor's room); then the usual sizing (0 = off)
         public int SprintQty = 0, SprintDays = 5;
@@ -625,7 +627,10 @@ namespace NinjaTrader.NinjaScript.Strategies
         {
             int q = s.Qty;
             bool afterLoss = consec > 0;
-            double ml = afterLoss && s.AfterLossMaxLoss > 0 ? s.AfterLossMaxLoss : s.MaxLoss;
+            double alMl = s.AfterLossMaxLoss;
+            if (s.AfterLossLockedMaxLoss > 0 && minutes == 5 && s.TrailDD > 0 && !double.IsNaN(trailPeak)
+                && trailPeak - s.TrailDD >= trailBase) alMl = s.AfterLossLockedMaxLoss;  // G119 (tested on 5-minute bars)
+            double ml = afterLoss && alMl > 0 ? alMl : s.MaxLoss;
             if (s.ProfitStep > 0 && !double.IsNaN(trailBase) && StepsOk)  // a contract more per step of profit
             {
                 int qUp = q + (int)Math.Floor(Math.Max(0.0, EqEff - trailBase) / s.ProfitStep);
@@ -861,6 +866,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 SizeSlip = 4;  // G106 (G79: 2, G97: 3)
                 MoreDaysQty2Room = 6000;  // G97
                 GivebackBrake = 0.5;  // G99c
+                AfterLossLocked = 187.5;  // G119
                 PropStartBalance = 50000;
                 PropHighBalance = 0;
                 SizeToAccountRoom = true;
@@ -923,6 +929,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 st.FillMinRoom = MoreDaysCushion;
                 st.FillQty2Room = MoreDaysQty2Room;  // G97
                 st.GivebackBrake = Mode != "Evaluation" ? GivebackBrake : 0;  // G99
+                st.AfterLossLockedMaxLoss = Mode != "Evaluation" ? AfterLossLocked : 0;  // G119
                 st.SprintQty = Mode != "Evaluation" ? SprintContracts : 0;  // G103
                 st.SizeSlipPts = Mode != "Evaluation" ? SizeSlip : 0;  // G79: the Funded growth modes and Custom
                 st.ProtectRoom = Mode != "Evaluation" ? NearFloorGate : 0;  // G87
@@ -1711,6 +1718,11 @@ namespace NinjaTrader.NinjaScript.Strategies
         [Range(0, 1)]
         [Display(Name = "Giveback brake: once the floor has stopped, 1 MNQ per trade while the profit is under this share of its best (0 = off)", Order = 21, GroupName = "1. Size and risk")]
         public double GivebackBrake { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, 5000)]
+        [Display(Name = "After a losing trade, once the floor has stopped: max loss per trade, $ (0 = as before it stopped)", Order = 25, GroupName = "1. Size and risk")]
+        public double AfterLossLocked { get; set; }
 
         [NinjaScriptProperty]
         [Range(0, 15)]

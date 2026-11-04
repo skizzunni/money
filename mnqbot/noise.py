@@ -597,7 +597,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
 
     def al_mult() -> float:
         """after_loss_ml_mult, or G119's after_loss_ml_locked once the floor has stopped."""
-        return cfg.after_loss_ml_locked if cfg.after_loss_ml_locked > 0 and floor_stopped() else cfg.after_loss_ml_mult
+        locked = cfg.after_loss_ml_locked > 0 and minutes == 5 and floor_stopped()  # tested on 5-minute bars
+        return cfg.after_loss_ml_locked if locked else cfg.after_loss_ml_mult
 
     protect_set = set(cfg.protect_dates.split(",")) if cfg.protect_room > 0 and cfg.protect_dates else set()
 

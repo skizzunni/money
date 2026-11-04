@@ -4108,3 +4108,13 @@ executions on all three sets, the 89 starts at most 10 lost or frozen).
 window $45,125, NQ $511,121, index $679,687, 10 lost or frozen (NQ 3, index 7); `profit_step` 1,250 window $45,783,
 NQ $494,952, index $665,123, 10 lost or frozen (NQ 5, index 5); U29's window $46,828. Log:
 `verification/noise_v2/g117_g118.txt`.
+
+**G119 result (run once, 2026-11-04): passes; adopted (U30).** Chart / NinjaTrader's execution: window **$48,035 /
+$48,108** (U29 $46,656 / $46,828), NQ $530,579 / $528,411 (U29 $495,184 / $492,844), index $697,942 / $689,202 (U29
+$661,701 / $648,812); the floor never touched, no −$1,000 day on any set (worst −$986). 89 start dates: **9 lost or
+frozen** (NQ 5, index 4) against U29's 10. Log: `verification/noise_v2/g119_after_loss_locked.txt`.
+
+**U30 (2026-11-04): once the floor has stopped, the trade after a loser risks $187.50 like the others (G119).** New
+setting "After a losing trade, once the floor has stopped: max loss per trade" (`AfterLossLocked`, default 187.5; 0 =
+U29's $250 throughout), in the Funded growth modes and Custom on the 5-minute chart. `test_v38_after_loss_locked`
+checks NinjaTrader's code against the model trade for trade with it on and off.
