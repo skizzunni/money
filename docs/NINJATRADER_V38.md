@@ -4390,7 +4390,7 @@ and the 89 starts for the best, on G78's rule or G99b's against U33.
 −$1,082 / −$1,594), 19-378 days at −$1,000 on the long sets: the added contracts' stop at the lock is far from their
 fill, so a reversal costs more than the day's budget. Log: `verification/noise_v2/g137_add.txt`.
 
-**U33 checks (2026-11-04):** the full suite, 667 passed; the NinjaTrader growth run (`research/v38_ninjatrader_run.py
+**U33 checks (2026-11-04):** the full suite, 667 passed (U34: 668); the NinjaTrader growth run (`research/v38_ninjatrader_run.py
 grow`, rebuilt simulator) on the window: 701 trades, **$50,096.63**, profit factor 1.712, closed drawdown $4,779.88,
 worst day −$899.31, at most 32 contracts; identical to the model up to the 2026-03-09 data hole, as before
 (`verification/noise_v2/v38g_nt_u33.txt`). The Go live table is updated.
@@ -4570,3 +4570,7 @@ contract held), under the same stress. **Adopt on G78's rule** against U34, all 
 NinjaTrader: window $63,249 / **$16,555**, NQ $679,368 / $664,638, index $1,064,621 / $923,254, one day past −$1,000
 on NQ and the index (worst −$1,051). The window's two executions part by $46,000 on a few early fills: the 2x-with-guard
 family (G128-G133, G148-G149) depends on fills too much to trust. Log: `verification/noise_v2/g149.txt`.
+
+**U34 checks (2026-11-04):** the full suite, 668 passed; the NinjaTrader growth run on the window, $54,772.31, profit
+factor 1.768, worst day −$899.31, up to 50 contracts, identical to the model up to the 2026-03-09 data hole
+(`verification/noise_v2/v38g_nt_u34.txt`).
