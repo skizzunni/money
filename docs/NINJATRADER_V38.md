@@ -5460,7 +5460,7 @@ net on the 526: $33,917 (U43 $33,395). Log: `verification/noise_v2/g212_k18.txt`
 **U44 (2026-11-04): $650 steps above $8,000, fill-ins at 2 MNQ from $4,000 and 3 from $8,000, up to 75 MNQ (G212).**
 `FastSteps` 650, `MoreDaysQty2Room` 4,000, `MoreDaysQty3Room` 8,000, and the 50K's 5-minute chart up to 75 contracts.
 
-**U44 checks (2026-11-04):** the NinjaTrader growth run on the window **$57,549.09** (`verification/noise_v2/v38g_nt_u44.txt`):
+**U44 checks (2026-11-04):** the full suite, **675 passed**; the NinjaTrader growth run on the window **$57,549.09** (`verification/noise_v2/v38g_nt_u44.txt`):
 identical to the model on 30-minute bars, and on 5-minute bars up to the 2026-03-09 data hole.
 
 ## G213: U44's weekly P/L by the account's profit (a measurement, 2026-11-04)
