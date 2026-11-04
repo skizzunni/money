@@ -4540,3 +4540,12 @@ $558,030, index $786,214 / **$773,831** (U34 $786,440 / $776,796); 89 starts **9
 0.22-0.26, `time_stop` 55 / 60 / 65, `max_loss_per_trade` $162.50-200 (narrower than G115's, around today's values;
 U30-U34 moved the bot since). Row 0 is U34. G135's screen against U34, then the best window among those passing on to
 NinjaTrader's execution and the 89 starts, on G78's rule.
+
+**G147 result (run once, 2026-11-04): none of the 23 passes the screen.** The best windows ($57,248, $56,097) each
+come with an index day at −$1,000 and an index net $40,000-50,000 below U34's. U34's exits are still the ridge.
+Log: `verification/noise_v2/g147_search.txt`.
+
+**Scorecard, G115-G147 (this session's continuous run):** 33 rounds and checks (some with several variants).
+Adopted: G119 (U30), G120 + G121 (U31/U32, up to 50 MNQ), G125 (U33), G142 (U34). Measurements: G122, G123, G134,
+G144, the lost-account anatomy, G141's monthly starts. The rest rejected, most on one part of the rule (one account,
+or the window by under $100).
