@@ -1,0 +1,6 @@
+{'nt': False, 'pack': 'U25g', 'set': 'proxy', 'days traded %': 72.4, 'gap trades': 289, 'trades': 706, 'net $': 42186, 'pf': 1.656, 'win %': 51.1, 'closed dd $': 3335, 'worst day $': -900, 'days <= -1000': 0, 'floor touches': 0}
+{'nt': False, 'pack': 'U25g', 'set': 'nq', 'days traded %': 4.4, 'gap trades': 78, 'trades': 229, 'net $': 0, 'pf': 1.0, 'win %': 52.8, 'closed dd $': 7190, 'worst day $': -859, 'days <= -1000': 0, 'floor touches': 0}
+{'nt': False, 'pack': 'U25g', 'set': 'index', 'days traded %': 80.6, 'gap trades': 2866, 'trades': 7074, 'net $': 612347, 'pf': 1.498, 'win %': 50.7, 'closed dd $': 24188, 'worst day $': -1155, 'days <= -1000': 1, 'floor touches': 0}
+{'nt': True, 'pack': 'U25g', 'set': 'proxy', 'days traded %': 72.6, 'gap trades': 290, 'trades': 710, 'net $': 42390, 'pf': 1.658, 'win %': 51.3, 'closed dd $': 3327, 'worst day $': -899, 'days <= -1000': 0, 'floor touches': 0}
+{'nt': True, 'pack': 'U25g', 'set': 'nq', 'days traded %': 4.5, 'gap trades': 81, 'trades': 232, 'net $': 10, 'pf': 1.0, 'win %': 51.7, 'closed dd $': 7308, 'worst day $': -859, 'days <= -1000': 0, 'floor touches': 0}
+{'nt': True, 'pack': 'U25g', 'set': 'index', 'days traded %': 80.6, 'gap trades': 2866, 'trades': 7100, 'net $': 603423, 'pf': 1.492, 'win %': 50.5, 'closed dd $': 25527, 'worst day $': -1155, 'days <= -1000': 1, 'floor touches': 0}

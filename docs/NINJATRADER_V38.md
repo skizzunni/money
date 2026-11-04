@@ -3513,3 +3513,10 @@ $10 a contract), so the trade is cut to what the day's room holds even with a ju
 (`gap_go_locked_qty` 15).
 
 **The variant:** U25 with `gap_slip_pts` 5 and `gap_go_locked_qty` 15. **Adopt on G78's rule**, against U25.
+
+**G86 result (run once, 2026-11-04): rejected.** Window $42,186 / $42,390 (U25: $43,463 / $43,740), index $612,347 /
+$603,423, and the −$1,155 index day is still there in both executions: it isn't the gap stop alone (a big gap win
+widens the day, and the bot's next trade, sized to it, takes the loss). U25 stays (`verification/noise_v2/g86_gap_slip.txt`).
+
+**Scorecard, G44-G86:** 43 rounds. Adopted: G60 (U19), G67b (U20), G67's data fix, G79 (U22), G80 (U23), G82 (U24),
+G84 (U25). Rejected: 34 (G54 and G55 were measurements).
