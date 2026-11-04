@@ -4921,3 +4921,7 @@ within `protect_room` of its floor) was tested near the floor ($1,000-1,500). He
 covers the whole phase before the floor stops (the room is at most $2,000 there) and turns off once the account is
 $2,100 above its floor. **The variant:** U38 with it. **Run once:** the 263 monthly starts and the full sets in both
 executions. **Adopt on G99b's survival-first rule** against U38 (fewer than 19, every net at least 95%).
+
+**G175 result (run once, 2026-11-04): rejected.** 263 monthly starts: 24 lost or frozen (U38 19), medians $29,145 /
+**$9,185**; NinjaTrader NQ $485,775 (87%). Sitting out the early losing stretches also sits out their recoveries.
+Log: `verification/noise_v2/g175_shadow_early.txt`.
