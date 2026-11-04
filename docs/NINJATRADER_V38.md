@@ -5278,6 +5278,5 @@ against the fade. G200's edge was the look-ahead. Log: `verification/noise_v2/g2
 
 **G199 result (run once, 2026-11-04): rejected.** Chart / NinjaTrader: window $57,513 / $57,653 (U41 $54,622 / $54,710),
 NQ $556,292 / $554,575 (U41 $563,437 / $553,165), index $799,358 / **$828,069** (U41 $787,157 / $776,319); no −$1,000
-day, the floor never touched. But 526 starts: **59** lost or frozen (28 + 31; U41 38): the slower trend lets the
-1-contract shorts against it run longer into the early accounts' losing stretches. Log:
+day, the floor never touched. But 526 starts: **59** lost or frozen (28 + 31; U41 38), on both start samples. Log:
 `verification/noise_v2/g199_trend100_u41.txt`.
