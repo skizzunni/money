@@ -5480,3 +5480,9 @@ not the window alone.
 **G214 result (2026-11-04): none of 30 passes the screen.** Half (15) have a day at −$1,000 or worse; the rest are lower
 somewhere than U44. Bigger and earlier grown-phase sizing has reached the daily limit: past U44, more size breaks the
 $1,000 day. U44 stays. Log: `verification/noise_v2/g214_grown_search.txt`.
+
+## G215: U44 at 2 ticks of slippage (a robustness measurement, registered 2026-11-04, before its run)
+
+**Why:** U44 sizes bigger once grown (up to 75 MNQ); G156 measured U34 at 2 ticks. **The measurement:** U44 with
+`slippage_ticks` 2 (every fill a tick worse than the tested 1) on the full sets in both executions and the 526 starts.
+Reported, not judged; a −$1,000 day or a floor touch at 2 ticks would be flagged as a risk to fix.
