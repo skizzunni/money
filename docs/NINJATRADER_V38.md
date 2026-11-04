@@ -4263,3 +4263,20 @@ own stop didn't fill; sized up, the stop sits past the guard, so it filled first
 **G128b (registered 2026-11-04, before its run):** G128 with the guard as a stop level: on every bar, wherever the
 guard's price is tighter than the bot's stop, it is the stop in force (filled at it, or at the open past it, less a
 tick; "Day guard"). Variants and pass rule as G128.
+
+**G128b result (run once, 2026-11-04): rejected by one account (both variants).**
+
+| | window, chart / NinjaTrader | NQ, chart / NinjaTrader | index, chart / NinjaTrader | worst day | 89 starts lost or frozen |
+|---|---|---|---|---|---|
+| U33 | $50,219 / $50,337 | $546,409 / $549,379 | $784,933 / $774,086 | −$986 | 8 |
+| 1.5x | $53,839 / $53,978 | $644,158 / $659,430 | $908,505 / $824,253 | **−$1,002** | 9 |
+| 2x | $53,988 / $53,692 | $689,320 / $690,819 | $1,104,428 / $1,028,705 | −$985 | 9 |
+
+The floor never touched. 2x passes everything but the lost accounts (NQ 4, index 5 against 4 / 4). Log:
+`verification/noise_v2/g128b_room_guard.txt`.
+
+## G129: G128b's 2x only once the floor has stopped (registered 2026-11-04, before its run)
+
+**The idea:** the extra lost start comes before the floor stops, where the larger room lets the steps' contracts fit
+sooner. **The variant:** U33 with `day_guard` 900, `room_mult` 2.0 and `room_mult_locked` (a new research setting:
+the 2x only once the floor has stopped). **Adopt on G78's rule or G99b's** against U33.

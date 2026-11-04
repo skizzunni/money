@@ -146,6 +146,7 @@ class NoiseConfig:
     # -day_guard (or the room above the trailing floor less guard_floor_buffer), at that price (or the bar's open past
     # it) less slippage; no more entries that day (0: off)
     room_mult: float = 1.0
+    room_mult_locked: bool = False  # G129: room_mult only once the floor has stopped
     day_guard: float = 0.0
     guard_floor_buffer: float = 100.0
     day_stop_profit: float = 0.0  # research (G127): no new entries today once today's closed P/L is at least this, $
@@ -731,7 +732,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
         """What a new trade may risk: the rest of today's loss limit and the room above the trailing floor."""
         room = math.inf
         if cfg.daily_loss_limit > 0:
-            room = (cfg.room_mult if bot else 1.0) * cfg.budget_frac * (cfg.daily_loss_limit + day_pnl - cfg.day_keep * max(day_pnl, 0.0)
+            big = bot and (not cfg.room_mult_locked or floor_stopped())
+            room = (cfg.room_mult if big else 1.0) * cfg.budget_frac * (cfg.daily_loss_limit + day_pnl - cfg.day_keep * max(day_pnl, 0.0)
                                       - (max(gap_day_pnl, 0.0) if cfg.gap_no_budget else 0.0))
         if cfg.trail_dd > 0 and not math.isnan(trail_peak):
             floor = trail_peak - cfg.trail_dd
