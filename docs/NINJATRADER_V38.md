@@ -4018,3 +4018,9 @@ frozen of 89. A stop at the middle of the 09:30 bar is inside its normal noise: 
 (`verification/noise_v2/g111_gap_stop_mid.txt`).
 
 **Scorecard, G44-G111:** 68 rounds. Adopted 10 (and the data fix); rejected 55; measurements 3.
+
+## G112: the range-position filter re-checked on U29 (registered 2026-11-04, before its run)
+
+**The idea:** the close must sit in the top (bottom) 35% of the day's range for a long (short), `range_pos_min` 0.65,
+set before gap and go, the fill-ins and 20 contracts. **Variants:** U29 with 0.55 and 0.75. **Adopt (the better by
+window net) on G78's rule**, against U29.
