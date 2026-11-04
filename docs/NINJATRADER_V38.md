@@ -4045,3 +4045,8 @@ net) on G78's rule**, against U29.
 **The idea:** after a day whose range is over 1.5x the 10-session average, no entries its way the next day
 (`big_day_k`), set before gap and go and the rest. **Variants:** U29 with 1.3 and 1.8. **Adopt (the better by window
 net) on G78's rule**, against U29.
+
+**G114 result (run once, 2026-11-04): rejected; 1.5 stays.** 1.3: window $9,670 / $14,885; 1.8: window $41,767 /
+$41,600, index $650,677 / $642,004. Both below U29 (`verification/noise_v2/g114_big_day.txt`).
+
+**Scorecard, G44-G114:** 71 rounds. Adopted 10 (and the data fix); rejected 58; measurements 3.
