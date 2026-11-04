@@ -5678,3 +5678,11 @@ U43 and U44 (faster grown-phase steps, 3-MNQ fill-ins, 75 MNQ: window $53,164 â†
 rejected or a measurement. **Not reached:** $3,000 a week on average, or zero lost accounts. Past U44, every extra
 contract or a bigger day budget broke the $1,000 day (G214, G219, G226), and the account's survival depends on fills
 near the tested 1 tick (G215, G222).
+
+## G230: a tighter stop for the trade after a loser, on U44 (registered 2026-11-04, before its run)
+
+**Why:** G207's k39 (10 of 263 lost) included `after_loss_ml_mult5` 0.9; it was never tried alone since U37's 1.0.
+**The variants:** U44 with the after-loss max loss at (a) 0.9x ($168.75) and (b) 0.8x ($150) on 5-minute bars, until
+and after the floor stops (`after_loss_ml_mult5`, `after_loss_ml_locked`). **Run once:** the 526 starts and the full sets
+in both executions. **Adopt (the fewer lost) on G78's rule** against U44, or G99b's (at least 4 fewer lost, every net at
+least 95%).
