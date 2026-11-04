@@ -1,0 +1,8 @@
+{"k": 0, "storm_k": 1.6, "proxy net": 15732, "proxy d1000": 0, "nq net": 464146, "nq d1000": 0, "index net": 678087, "index d1000": 0}
+{"k": 1, "storm_k": 2.0, "proxy net": 15809, "proxy d1000": 0, "nq net": 468913, "nq d1000": 0, "index net": 688340, "index d1000": 0}
+{"k": 2, "touch_entry": true, "proxy net": -540, "proxy d1000": 0, "nq net": -19048, "nq d1000": 2, "index net": -7041, "index d1000": 2}
+{"k": 3, "limit_entry_frac": 0.5, "proxy net": 2739, "proxy d1000": 0, "nq net": 152675, "nq d1000": 0, "index net": 207027, "index d1000": 0}
+{"k": 4, "side_cooldown": 1, "proxy net": 73577, "proxy d1000": 0, "nq net": 420757, "nq d1000": 0, "index net": 621503, "index d1000": 0}
+{"k": 5, "streak_k": 3, "proxy net": 50556, "proxy d1000": 0, "nq net": 547695, "nq d1000": 0, "index net": 768674, "index d1000": 0}
+{"k": 6, "eq_n": 20, "proxy net": 50434, "proxy d1000": 0, "nq net": 383200, "nq d1000": 0, "index net": 665178, "index d1000": 0}
+{"k": 7, "confirm": true, "proxy net": 14038, "proxy d1000": 0, "nq net": 399386, "nq d1000": 0, "index net": 491877, "index d1000": 0}

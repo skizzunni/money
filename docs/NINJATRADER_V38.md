@@ -4402,3 +4402,9 @@ the touch of the line, not the check), `limit_entry_frac` 0.5 (a limit halfway b
 `streak_k` 3 (skip a signal after three losers in a row), `eq_n` 20 (half size below the 20-trade equity average),
 `confirm` (the last check past the line too). G135's screen, then NinjaTrader's execution and the 89 starts for the
 best, on G78's rule or G99b's against U33.
+
+**G138 result (run once, 2026-11-04): none passes the screen.** U33: window $50,219, NQ $546,409, index $784,933.
+`storm_k` 1.6 / 2.0: $15,732 / $15,809 on the window; `touch_entry`: every account lost; `limit_entry_frac` 0.5:
+$2,739; `side_cooldown` 1: **$73,577** on the window but NQ $420,757 and index $621,503 (−23% / −21%: a window-only
+gain, not adopted); `streak_k` 3: $50,556 / $547,695 / **$768,674**; `eq_n` 20: $50,434 / $383,200 / $665,178;
+`confirm`: $14,038. Log: `verification/noise_v2/g138_untried.txt`.
