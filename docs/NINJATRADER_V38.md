@@ -3497,3 +3497,10 @@ G84 (U25). Rejected: 32 (G54 and G55 were measurements).
 
 **The idea:** 10 passed, 15 broke the daily limit once (G83). 12 is between. U25 with `gap_go_locked_qty` 12.
 **Adopt on G78's rule**, against U25.
+
+**G85 result (run once, 2026-11-04): rejected; a −$1,155 day.** Window $44,397 / $44,670, index $621,412 / $613,266,
+but a −$1,155 index day in both executions (a 12-contract gap stop jumped at the open). **10 is the ceiling**: past
+it, one gap through the stop at the 09:35 open can break the daily limit (`verification/noise_v2/g85_u25_q12.txt`).
+
+**Scorecard, G44-G85:** 42 rounds. Adopted: G60 (U19), G67b (U20), G67's data fix, G79 (U22), G80 (U23), G82 (U24),
+G84 (U25). Rejected: 33 (G54 and G55 were measurements).
