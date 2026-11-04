@@ -5764,3 +5764,14 @@ on G78's rule** against U44, or G99b's.
 
 **G238 result (run once, 2026-11-04): both rejected.** 0.3: 35 lost (U44 28), window $55,146; 0.4: 44 lost, the index
 $774,147. The 0.35 lock stays. Log: `verification/noise_v2/g238_lock_at.txt`.
+
+## G239: the 15-minute grid only once the floor has stopped (registered 2026-11-04, before its run)
+
+**Why, from G223-G224:** the 15-minute grid raised every net (NinjaTrader index +$77k) but lost 100 of 526 fresh accounts.
+Here a fresh account keeps U44's half-hour entries: the 15-minute checks are on (`check_step` 15), and the checks
+between the half hours (10:15, 10:45, ... 15:15) join U44's 13:00 and 14:30 in `skip_checks`, skipped only until the
+floor has stopped (`skip_checks_early`). After that, entries at every 15-minute check. **The variants:** (a) the last
+entry at 15:00 (U44's), (b) at 14:30 (G224's). **Run once:** the 526 starts and the full sets in both executions.
+**Adopt (the better window) on G78's rule** against U44 (higher nets on all three in both executions, no −$1,000 day, the
+floor never touched, no more than 28 lost). The NinjaTrader strategy has only the half-hour grid: a pass is built there,
+with parity tests, before it is adopted.
