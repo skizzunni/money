@@ -5029,3 +5029,5 @@ mid-month starts: U34 **28**, U37 **22**, U40 **25** (on the 1st-of-month starts
 gain of about 3 accounts in 100; U38-U40 are neutral on survival (and within 1% on net). U40 stays the file: as safe as
 U37 on the larger sample, with the same net. Medians on the mid-month starts: U40 $47,800 / $37,760, U37 $51,397 /
 $37,937, U34 $48,237 / $35,674. Log: `verification/noise_v2/g183_mid_month.txt`.
+
+**U40 checks (2026-11-04):** the full suite, **669 passed**; the NinjaTrader growth run on the window $54,700.08 (`verification/noise_v2/v38g_nt_u40.txt`), identical to the model up to the 2026-03-09 data hole.
