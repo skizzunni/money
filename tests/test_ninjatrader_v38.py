@@ -44,7 +44,9 @@ GROW = NoiseConfig(**{**V21, "qty": 1, "lookback": 14, "max_loss_per_trade": 187
                       # G125: no entries at 13:00 and 14:30 until the floor has stopped
                       "skip_checks": "780,870", "skip_checks_early": True,
                       # G142: a contract per $750 above $10,000 of profit
-                      "profit_step_fast": 750.0,
+                      "profit_step_fast": 700.0,
+                      # G210: $700 steps above $8,000, and 3-MNQ fill-ins from $9,000 above the floor
+                      "profit_step_fast_from": 8000.0, "fill_qty3_room": 9000.0,
                       # G165 / G167 / G168: the after-loss max loss as every trade's ($187.50) on 5-minute bars
                       "after_loss_ml_mult5": 1.0},
                    nt_execution=True, round_prices=True, target_on_fill_bar=True)
@@ -811,6 +813,36 @@ def test_v38_g204_rules(sim, sample_1m, args, kw, changes, tmp_path):  # noqa: F
         assert math.isclose(float(a[6]), t.pnl, abs_tol=1e-6), (a, t)
     base = run(bars, GROW, minutes=5).trades
     assert ([(t.entry_bar, t.qty) for t in py] != [(t.entry_bar, t.qty) for t in base]) == changes
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+def test_v38_fill_qty3(sim, sample_1m, tmp_path):  # noqa: F811
+    """G210: the fill-in trades at 3 MNQ while the account is MoreDaysQty3Room above the floor. A $600 trailing
+    drawdown (Custom mode) stops the floor within the sample, a $100 cushion lets the fill-ins trade, and a $700
+    threshold makes it act; NinjaTrader's code and
+    the model agree trade for trade with it at $700 and off, and at $700 the trades take more contracts."""
+    bars = resample(sample_1m, "5min")
+    path = tmp_path / "bars.csv"
+    with path.open("w") as f:
+        for t, r in zip(bars.index, bars.itertuples(), strict=True):
+            f.write(f"{t:%Y-%m-%d %H:%M},{r.open!r},{r.high!r},{r.low!r},{r.close!r}\n")
+    qtys = {}
+    for q3 in (700.0, 0.0):
+        r = subprocess.run([DOTNET, str(sim), str(path), "5", "Strategy=V38", "Mode=Custom", "TrailDD=600", "EarlyNoEntryChecks=",
+                            *PRE_G204_ARGS, "MoreDaysCushion=100", f"MoreDaysQty3Room={q3}"], capture_output=True,
+                           text=True, env=ENV)
+        assert r.returncode == 0, r.stderr[-2000:]
+        nt = [x.split(",")[1:] for x in r.stdout.splitlines() if x.startswith("T,")]
+        py = run(bars, dataclasses.replace(GROW, trail_dd=600.0, skip_checks="", **PRE_G204, fill_min_room=100.0,
+                                           fill_qty3_room=q3),
+                 minutes=5).trades
+        assert len(nt) == len(py) >= 20
+        for a, t in zip(nt, py, strict=True):
+            assert (int(a[0]), int(a[1]), int(a[3])) == (t.direction, t.entry_bar, t.exit_bar), (a, t)
+            assert float(a[2]) == t.entry and float(a[4]) == t.exit, (a, t)
+            assert math.isclose(float(a[6]), t.pnl, abs_tol=1e-6), (a, t)
+        qtys[q3] = sum(t.qty for t in py)
+    assert qtys[700.0] > qtys[0.0]
 
 
 @pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")

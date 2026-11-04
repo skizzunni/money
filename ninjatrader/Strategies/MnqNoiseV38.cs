@@ -84,6 +84,8 @@ namespace NinjaTrader.NinjaScript.Strategies
         public double FillSmallK = 0.0, FillDriveK = 0.6, FillMinRoom = 3000;
         // G97: the fill-ins at 2 MNQ while the account is FillQty2Room above the floor (0 = always 1)
         public double FillQty2Room = 0;
+        // G210: and at 3 MNQ from FillQty3Room above it (0 = off)
+        public double FillQty3Room = 0;
         // G99: once the floor has stopped at the start, while the profit is under GivebackBrake x the best end-of-day
         // profit, every trade at 1 MNQ (0 = off)
         public double GivebackBrake = 0;
@@ -245,6 +247,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         {
             if (s.FillQty2Room <= 0 || s.TrailDD <= 0 || double.IsNaN(trailPeak) || Braked()) return 1;
             double floor = Math.Min(trailPeak - s.TrailDD, trailBase);
+            if (s.FillQty3Room > 0 && EqEff - floor >= s.FillQty3Room) return 3;  // G210
             return EqEff - floor >= s.FillQty2Room ? 2 : 1;
         }
 
@@ -925,6 +928,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 MoreDaysCushion = 2500;  // G181 (G71: 3000)
                 SizeSlip = 5;  // G170 (G79: 2, G97: 3, G106: 4)
                 MoreDaysQty2Room = 6000;  // G97
+                MoreDaysQty3Room = 9000;  // G210
                 GivebackBrake = 0.5;  // G99c
                 GapSkipBraked = true;  // G191
                 MaxLosersPerDay = 3;  // G204
@@ -932,8 +936,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 GapTrigger = 0.6;  // G204 (G60: 0.5)
                 AfterLossLocked = 187.5;  // G119
                 EarlyNoEntryChecks = "13:00,14:30";  // G125
-                FastSteps = 750;  // G142
-                FastStepsFrom = 10000;
+                FastSteps = 700;  // G210 (G142: 750)
+                FastStepsFrom = 8000;  // G210 (G142: 10000)
                 PropStartBalance = 50000;
                 PropHighBalance = 0;
                 SizeToAccountRoom = true;
@@ -998,6 +1002,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 st.MoreDays = MoreDays && st.GapGo;  // G72: the fill-in trades (5-minute chart, not in Evaluation)
                 st.FillMinRoom = MoreDaysCushion;
                 st.FillQty2Room = MoreDaysQty2Room;  // G97
+                st.FillQty3Room = MoreDaysQty3Room;  // G210
                 st.GivebackBrake = Mode != "Evaluation" ? GivebackBrake : 0;  // G99
                 st.GapSkipBraked = Mode != "Evaluation" && GapSkipBraked;  // G191
                 bool g204 = Mode == "Funded growth" || Mode == "Custom";  // G204: tested on the 50K
@@ -1803,6 +1808,11 @@ namespace NinjaTrader.NinjaScript.Strategies
         [Range(0, 100000)]
         [Display(Name = "More trading days: fill-ins at 2 MNQ while the account is at least this far above the floor, $ (0 = always 1)", Order = 20, GroupName = "1. Size and risk")]
         public double MoreDaysQty2Room { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, 1000000)]
+        [Display(Name = "More trading days: fill-ins at 3 MNQ while the account is at least this far above the floor, $ (0 = off)", Order = 33, GroupName = "1. Size and risk")]
+        public double MoreDaysQty3Room { get; set; }
 
         [NinjaScriptProperty]
         [Range(0, 1)]
