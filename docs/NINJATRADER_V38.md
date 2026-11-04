@@ -5572,3 +5572,5 @@ advice stays if it loses clearly fewer (45 or fewer); otherwise the setting text
 **G222 result (2026-11-04): "Gentle start" doesn't help.** U44 with it, at 2 ticks: 526 starts **52** lost or frozen (U44
 51). The advice is withdrawn: the dashboard's fill warning now says to check the connection and order route, and the
 setting's text says it doesn't help on U44. Log: `verification/noise_v2/g222_gentle_slip2.txt`.
+
+**After G222 (2026-11-04):** the full suite, **675 passed**, on the final U44 file (the fill warning's new text).
