@@ -4719,3 +4719,7 @@ comes after the account has grown.
 **Variants:** U34 with the early no-entry checks (until the floor stops) at 13:00 only, 14:30 only, and 12:30 + 13:00
 + 14:30 (U34: 13:00 + 14:30). G135's screen against U34; the best window among those passing then on the 263
 monthly starts and NinjaTrader's execution, on G78's rule (no more than U34's 32 lost or frozen).
+
+**G161 screen (2026-11-04):** 13:00 only: $54,883 / $561,774 / $786,495 (passes); **14:30 only: $54,885 / $561,826 /
+$786,498** (passes, the best window by $2); 12:30 + 13:00 + 14:30: index $782,753 (out). Candidate: 14:30 only
+(package `U34sk870`, variant `u34sk870`). Log: `verification/noise_v2/g161_early_checks_screen.txt`.

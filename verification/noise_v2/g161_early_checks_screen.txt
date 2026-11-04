@@ -1,0 +1,4 @@
+{"k": 0, "proxy net": 54879, "proxy d1000": 0, "nq net": 554388, "nq d1000": 0, "index net": 786440, "index d1000": 0}
+{"k": 1, "skip_checks": "780", "proxy net": 54883, "proxy d1000": 0, "nq net": 561774, "nq d1000": 0, "index net": 786495, "index d1000": 0}
+{"k": 2, "skip_checks": "870", "proxy net": 54885, "proxy d1000": 0, "nq net": 561826, "nq d1000": 0, "index net": 786498, "index d1000": 0}
+{"k": 3, "skip_checks": "750,780,870", "proxy net": 55772, "proxy d1000": 0, "nq net": 554387, "nq d1000": 0, "index net": 782753, "index d1000": 0}
