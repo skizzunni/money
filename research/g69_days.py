@@ -94,7 +94,12 @@ PACK = {"P0": {}, "P1": {"gap_go_small_k": 0.0}, "P2": {"gap_go_small_k": 0.0, "
                     "daily_loss_limit": 1800.0, "trail_dd": 3000.0},
         "U25_150": {"gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
                     "fill_min_room": 3000.0, "size_slip_pts": 2.0, "gap_go_locked_qty": 10,
-                    "daily_loss_limit": 2700.0, "trail_dd": 4500.0}}
+                    "daily_loss_limit": 2700.0, "trail_dd": 4500.0},
+        # G89: U25 with a 45- or 90-minute time stop
+        "U25t45": {"gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
+                   "fill_min_room": 3000.0, "size_slip_pts": 2.0, "gap_go_locked_qty": 10, "time_stop": 45},
+        "U25t90": {"gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
+                   "fill_min_room": 3000.0, "size_slip_pts": 2.0, "gap_go_locked_qty": 10, "time_stop": 90}}
 for pk in (sys.argv[4].split(",") if len(sys.argv) > 4 else list(PACK)):
     for name, (bars, first, skip) in S.D.items():
         if name == "win":

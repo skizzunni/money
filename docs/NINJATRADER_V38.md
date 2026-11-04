@@ -3598,3 +3598,14 @@ A bigger account, or the same 50K's risk spread over more than one account, is w
 
 **Scorecard, G44-G88:** 45 rounds. Adopted: G60 (U19), G67b (U20), G67's data fix, G79 (U22), G80 (U23), G82 (U24),
 G84 (U25). Rejected: 35. Measurements: G54, G55, G88.
+
+## G89: the time stop re-checked on U25 (registered 2026-11-04, before its run)
+
+**The idea:** G6 chose 60 minutes (and G9 rejected longer) on a bot that traded on 3 days in 10, before gap and go,
+More trading days and 10-contract gap trades. With the trade mix changed this much, 45 and 90 minutes are re-checked.
+
+**Variants:** U25 with `time_stop` 45 and 90.
+
+**Adopt (the better by window net) on G78's rule**, against U25 (60): a higher net on the window and the index in both
+executions, the floor never touched there, no more days at −$1,000 on any set, and on the 89 start dates no more lost
+or frozen accounts than 11.
