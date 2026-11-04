@@ -4039,3 +4039,9 @@ net) on G78's rule**, against U29.
 0.8: window $27,716 / $27,712. Both below U29 (`verification/noise_v2/g113_calm.txt`).
 
 **Scorecard, G44-G113:** 70 rounds. Adopted 10 (and the data fix); rejected 57; measurements 3.
+
+## G114: the big-day threshold re-checked on U29 (registered 2026-11-04, before its run)
+
+**The idea:** after a day whose range is over 1.5x the 10-session average, no entries its way the next day
+(`big_day_k`), set before gap and go and the rest. **Variants:** U29 with 1.3 and 1.8. **Adopt (the better by window
+net) on G78's rule**, against U29.
