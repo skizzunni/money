@@ -365,6 +365,8 @@ class NoiseConfig:
     # sprint_target, every trade (the bot's, gap and go) takes sprint_qty contracts, still sized down to the day's room
     # and the floor's; then the usual sizing (0 = off)
     sprint_qty: int = 0
+    profit_step_fast: float = 0.0  # research (G142): above profit_step_fast_from of profit, a contract per this much
+    profit_step_fast_from: float = 10000.0
     profit_step_locked: float = 0.0  # G104: once the floor has stopped, a contract per this much profit (0: off)
     sprint_days: int = 5
     sprint_target: float = 3000.0
@@ -634,6 +636,13 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
         """G104: the profit per contract step: profit_step_locked once the floor has stopped, else profit_step."""
         return cfg.profit_step_locked if cfg.profit_step_locked > 0 and floor_stopped() else cfg.profit_step
 
+    def n_steps() -> int:
+        """The contract steps for the profit so far (G142: faster above profit_step_fast_from)."""
+        p = max(0.0, eq_curve[-1] - steps_off() - trail_base)
+        if cfg.profit_step_fast > 0 and p > cfg.profit_step_fast_from:
+            return int(cfg.profit_step_fast_from // step_now()) + int((p - cfg.profit_step_fast_from) // cfg.profit_step_fast)
+        return int(p // step_now())
+
     def sprint_on() -> bool:
         """G103: is the sprint on (the first sprint_days sessions, until the profit reaches sprint_target)?"""
         nonlocal sprint_done
@@ -836,7 +845,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                             stop_px = max(stop_px, cap) if d > 0 else min(stop_px, cap)
                         q = cfg.qty
                         if cfg.profit_step > 0 and not math.isnan(trail_base):
-                            q += int(max(0.0, eq_curve[-1] - steps_off() - trail_base) // step_now())
+                            q += n_steps()
                             if cfg.size_up_to > 0:
                                 q = min(q, cfg.size_up_to)
                         per_c = (abs(c[i - 1] + d * slip - stop_px) * cfg.point_value
@@ -1204,7 +1213,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                                                  and trail_peak - cfg.trail_dd >= trail_base + cfg.trail_cap):
                         ml_next = min(ml_next, cfg.early_ml * q_next)
                     if cfg.profit_step > 0 and not math.isnan(trail_base) and step_ok:  # a contract more per step
-                        q_up = q_next + int(max(0.0, eq_curve[-1] - steps_off() - trail_base) // step_now())
+                        q_up = q_next + n_steps()
                         if cfg.size_up_to > 0:
                             q_up = min(q_up, cfg.size_up_to)
                         ml_next, q_next = ml_next / q_next * q_up, q_up

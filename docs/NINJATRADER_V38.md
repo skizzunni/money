@@ -4457,3 +4457,14 @@ second look at G140 with a larger sample of the one part it failed, stated as su
 $39,324 / $44,160. **The larger sample's survival for U33 itself: about 1 fresh account in 8 is lost or frozen within
 21 months** (the quarterly 89 said 1 in 11). Logs: `verification/noise_v2/g141_monthly_starts.txt`,
 `verification/noise_v2/g35_start_dates_u32ske_MS.csv`.
+
+**U33's lost starts (G141's 263):** 17 of 32 made the floor stop and slid back to the start balance; they cluster in
+bad stretches (mid-2015, late 2019 to March 2020, mid-2022, 2011, 2013), so they're regime losses, not single days.
+
+## G142: faster contract steps once the account is well up (registered 2026-11-04, before its run)
+
+**The idea:** G134: the big trades come on days whose early wins widen the budget, and there the steps (1 per $1,500)
+cap the size. Faster steps only above $10,000 of profit (`profit_step_fast`, `profit_step_fast_from`, new research
+settings) leave the thin early zone, where the accounts are lost, as it is. **Variants:** U33 (row 0, the check) and
+U33 with a contract per $750 above $10,000, per $500 above $10,000, per $750 above $20,000. G135's screen, then
+NinjaTrader's execution and the 89 starts for the best, on G78's rule or G99b's.
