@@ -4565,3 +4565,8 @@ leaves no room for its own slippage. Log: `verification/noise_v2/g148_room2_guar
 
 **The variant:** G148 with `day_guard` 950 and `guard_reserve_pts` 2 (G133's size-aware guard: −$950 less 2 points a
 contract held), under the same stress. **Adopt on G78's rule** against U34, all of it under the stress.
+
+**G149 result (run once, 2026-11-04): rejected; the sized-up bot is parked for good.** Under the stress, chart /
+NinjaTrader: window $63,249 / **$16,555**, NQ $679,368 / $664,638, index $1,064,621 / $923,254, one day past −$1,000
+on NQ and the index (worst −$1,051). The window's two executions part by $46,000 on a few early fills: the 2x-with-guard
+family (G128-G133, G148-G149) depends on fills too much to trust. Log: `verification/noise_v2/g149.txt`.
