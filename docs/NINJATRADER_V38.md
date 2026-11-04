@@ -5369,3 +5369,11 @@ other than U42's. **Stage A:** each on the 263 starts on the 1st (U42: 12). **St
 (ties: the higher median), if 8 or fewer, goes on to the mid-month starts and the full sets in both executions.
 **Adopted on G99b's rule** against U42 (at least 4 fewer of the 526 than U42's 28, every net at least 95% of U42's, no
 −$1,000 day, the floor never touched) or G78's.
+
+**U42 checks (2026-11-04):** the full suite, **674 passed**; the NinjaTrader growth run on the window **$52,981.78**
+(`verification/noise_v2/v38g_nt_u42.txt`): identical to the model on 30-minute bars, and on 5-minute bars up to the
+2026-03-09 data hole.
+
+**G207 result (2026-11-04): none goes on.** 263 starts on the 1st, lost or frozen (U42 12): the best k39 **10**, k32 11
+(medians $35,176 / $53,658, against U42's $32,059 / $44,475), k29 / k40 12, the rest 13 or more. None reaches 8 or fewer;
+U42 stays. Log: `verification/noise_v2/g207_survival_search.txt`.
