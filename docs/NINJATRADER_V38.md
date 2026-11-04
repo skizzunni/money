@@ -4983,3 +4983,7 @@ $5,000: $54,694 / $54,862, $564,800 / $562,296, $787,969 / $780,492, **20** lost
 **Variants:** U39 with `gap_go_drive_k` 0.7, and U39 with `gap_go_small_k` 0.1 (a small gap at least 0.1x the average
 for the 1-contract fill-in; U39: any). **Run once:** the 263 starts and the full sets in both executions. **Adopt (the
 better window) on G78's rule** against U39 (no more than 19 lost), or G99b's if it loses fewer.
+
+**G180 result (run once, 2026-11-04): both rejected.** Drive 0.7: window **$54,518** / $55,128 (U39 $54,638 /
+$54,700), NQ $558,199 / $555,637 (lower), 19 lost. Small gap 0.1: window $54,638 / $54,700 (equal), index $788,154 /
+**$774,760**, **20** lost. U39's 0.6 drive stays. Log: `verification/noise_v2/g180.txt`.
