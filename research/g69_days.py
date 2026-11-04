@@ -87,7 +87,14 @@ PACK = {"P0": {}, "P1": {"gap_go_small_k": 0.0}, "P2": {"gap_go_small_k": 0.0, "
         "U25pA": {"gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
                   "fill_min_room": 3000.0, "size_slip_pts": 2.0, "gap_go_locked_qty": 10, "protect_room": 1000.0},
         "U25pB": {"gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
-                  "fill_min_room": 3000.0, "size_slip_pts": 2.0, "gap_go_locked_qty": 10, "protect_room": 1500.0}}
+                  "fill_min_room": 3000.0, "size_slip_pts": 2.0, "gap_go_locked_qty": 10, "protect_room": 1500.0},
+        # G88: U25 on the 100K and 150K limits
+        "U25_100": {"gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
+                    "fill_min_room": 3000.0, "size_slip_pts": 2.0, "gap_go_locked_qty": 10,
+                    "daily_loss_limit": 1800.0, "trail_dd": 3000.0},
+        "U25_150": {"gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
+                    "fill_min_room": 3000.0, "size_slip_pts": 2.0, "gap_go_locked_qty": 10,
+                    "daily_loss_limit": 2700.0, "trail_dd": 4500.0}}
 for pk in (sys.argv[4].split(",") if len(sys.argv) > 4 else list(PACK)):
     for name, (bars, first, skip) in S.D.items():
         if name == "win":
@@ -112,6 +119,7 @@ for pk in (sys.argv[4].split(",") if len(sys.argv) > 4 else list(PACK)):
         traded = 100 * tf.entry_time.dt.tz_convert("America/New_York").dt.date.nunique() / max(1, len(sess))
         e = np.r_[0.0, np.cumsum(p)]
         dayp = tf.groupby(tf.exit_time.dt.date).pnl.sum()
+        S.TRAIL = cfg.trail_dd  # the account's own trailing drawdown, for the floor check
         print({"nt": NT, "pack": pk, "set": name, "days traded %": round(traded, 1),
                "gap trades": int(tf.reason.str.startswith("Gap").sum()), "trades": len(p),
                "net $": round(float(p.sum())), "pf": round(float(p[p > 0].sum() / -p[p <= 0].sum()), 3),
