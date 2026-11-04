@@ -5755,3 +5755,9 @@ starts and the full sets in both executions. **Adopt (the better window) on G78'
 
 **G237 result (run once, 2026-11-04): rejected.** 29 lost (U44 28); every net lower (window $54,282, NQ $545,883, index
 $757,430 in NinjaTrader's execution). The trend shorts stay. Log: `verification/noise_v2/g237_no_trend_small.txt`.
+
+## G238: an earlier lock alone, on U44 (registered 2026-11-04, before its run)
+
+**The variants:** U44 with `lock_at` (a) 0.3 and (b) 0.4 (0.35 now): the stop moves to the entry once the trade is that
+many max losses in profit. **Run once:** the 526 starts and the full sets in both executions. **Adopt (the better window)
+on G78's rule** against U44, or G99b's.
