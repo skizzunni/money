@@ -5308,3 +5308,10 @@ in both executions. **Adopted on G99b's rule** (at least 4 fewer of the 526 than
 rest 18-44. k18 (`giveback_brake` 0.6, `early_daily_loss` $750, `max_losers` 3, `time_stop` 45, `range_pos_min` 0.7,
 `gap_go_k` 0.6) goes on to stage B; its medians are lower ($27,237 / $28,971 against U41's $34,175 / $49,488). Log:
 `verification/noise_v2/g203_survival_search.txt`.
+
+**G203 result (run once, 2026-11-04): k18 rejected by its nets.** 526 starts: **29** lost or frozen (12 + 17; U41 38),
+9 fewer, the most saved by any change today. But chart / NinjaTrader: window $50,556 / $50,756 (U41 $54,622 / $54,710:
+**92.8%**), NQ $535,793 / $535,359 (96.8%), index $777,279 / **$670,856** (86.4%); medians about $27,000-28,500 (U41
+about $34,000-49,000). G99b asks for every net at least 95%. It is the clearest survival-for-profit trade found: about
+1 account in 18 lost instead of 1 in 14, for about 7% less on the window and 14% less on the index in NinjaTrader's
+execution. Log: `verification/noise_v2/g203_k18.txt`.
