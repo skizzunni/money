@@ -3894,3 +3894,12 @@ account to the floor about twice as often. The fill-ins stay behind the $3,000 c
 (`verification/noise_v2/g102_fill_day1.txt`).
 
 **Scorecard, G44-G102:** 59 rounds. Adopted 9 (and the data fix); rejected 47; measurements 3.
+
+## G103: a one-week sprint to +$3,000 (registered 2026-11-04, before its run)
+
+**The ask:** +$3,000 on a fresh 50K within a week. **The rule (`sprint_qty`, `sprint_days` 5, `sprint_target`
+3000):** for the account's first 5 sessions, until its profit reaches $3,000, every bot and gap trade takes
+`sprint_qty` contracts (still cut to the day's $900 budget and the room above the floor); after that, U28's sizing.
+**Variants:** 5, 8 and 10 MNQ. **Measured on G35's 89 fresh-account starts:** the share at +$3,000 within 7 calendar
+days, lost or frozen within 21 months, and the median net. No adoption as the default; the best (the most at +$3,000
+in a week with lost or frozen at most 2x U28's 10) becomes an opt-in setting, with its odds stated.

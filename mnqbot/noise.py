@@ -344,6 +344,12 @@ class NoiseConfig:
     # research (G100): when the room can't fit 1 contract of the gap trade's stop, 1 contract with the stop cut to the
     # room (whole ticks), if that is at least 10 points
     gap_squeeze: bool = False
+    # research (G103): a sprint. For the first sprint_days sessions from trail_from, until the profit reaches
+    # sprint_target, every trade (the bot's, gap and go) takes sprint_qty contracts, still sized down to the day's room
+    # and the floor's; then the usual sizing (0 = off)
+    sprint_qty: int = 0
+    sprint_days: int = 5
+    sprint_target: float = 3000.0
     protect_dates: str = ""
     # research (G67): once the trailing floor has stopped at the start (trail_cap), a gap trade may take up to this
     # many contracts in place of gap_go_max_qty (0 = off)
@@ -523,6 +529,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
     q_next = q_trade = cfg.qty  # contracts of the pending entry and of the open trade (after_loss_qty_div)
     fill_next = fill_trade = False  # G73: is the pending / open trade a fill-in (trend_small's 1-contract short)?
     fill_pnl = 0.0  # G73: the fill-in trades' P/L so far
+    sprint_sessions, sprint_done = 0, False  # G103: sessions since the account's start; target reached
     size_slip_c = cfg.size_slip_pts * cfg.point_value if minutes == 5 else 0.0  # G79: tested on 5-minute bars
     lock_next = lock_trade = cfg.lock_at  # their lock triggers, in max losses (after_loss_lock)
     ml_cfg = cfg.max_loss_per_trade  # G51: the max loss in force (ml_sigma: set at each check)
@@ -598,6 +605,16 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
     def steps_off() -> float:
         """G73: the equity the contract steps leave out (the fill-in trades' P/L)."""
         return fill_pnl if cfg.fill_no_steps else 0.0
+
+    def sprint_on() -> bool:
+        """G103: is the sprint on (the first sprint_days sessions, until the profit reaches sprint_target)?"""
+        nonlocal sprint_done
+        if cfg.sprint_qty <= 0 or sprint_done or math.isnan(trail_base):
+            return False
+        if eq_curve[-1] - trail_base >= cfg.sprint_target:
+            sprint_done = True
+            return False
+        return sprint_sessions <= cfg.sprint_days
 
     def braked() -> bool:
         """G99: has the account given back more than (1 - giveback_brake) of its best profit since the floor stopped?"""
@@ -777,8 +794,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                                  + 2 * cfg.commission_per_side + 2 * slip * cfg.point_value
                                  + cfg.gap_slip_pts * cfg.point_value)
                         room = money_room()
-                        if math.isfinite(room):
-                            q = min(q, math.floor(room / per_c + 1e-9))
+                        fit_q = math.floor(room / per_c + 1e-9) if math.isfinite(room) else 10 ** 6
+                        q = min(q, fit_q)
                         if cfg.gap_go_locked_qty > 0 and locked_floor:
                             q = min(q, cfg.gap_go_locked_qty)
                             if braked():  # G99
@@ -790,6 +807,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                             q = min(q, cfg.gap_go_max_qty)
                         if one:
                             q = min(q, fill_q())
+                        if sprint_on() and not one:  # G103: the sprint's size, as the room allows
+                            q = min(cfg.sprint_qty, fit_q)
                         if q < 1 and cfg.gap_squeeze and math.isfinite(room):  # G100: the gap trade squeezed
                             costs = (2 * cfg.commission_per_side + 2 * slip * cfg.point_value
                                      + cfg.gap_slip_pts * cfg.point_value)
@@ -1012,6 +1031,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                 if math.isnan(trail_base):
                     trail_base = trail_peak = eq_curve[-1]
                 trail_peak = max(trail_peak, eq_curve[-1])
+                sprint_sessions += 1  # G103
             prev_side = 0
             if cfg.calm_k and len(day_ranges) >= cfg.calm_long:
                 cs, cl = cfg.calm_short, cfg.calm_long
@@ -1124,6 +1144,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                         if cfg.size_up_to > 0:
                             q_up = min(q_up, cfg.size_up_to)
                         ml_next, q_next = ml_next / q_next * q_up, q_up
+                    if sprint_on():  # G103: the sprint's size (the day's and the floor's room still cut it below)
+                        ml_next, q_next = ml_next / q_next * cfg.sprint_qty, cfg.sprint_qty
                     if cfg.news_mult != 1.0 and t.strftime("%Y-%m-%d") in news_set:  # G62: the jobs-report days
                         q_n = max(1, round(q_next * cfg.news_mult))
                         ml_next, q_next = ml_next / q_next * q_n, q_n
