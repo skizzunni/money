@@ -5690,3 +5690,9 @@ least 95%).
 **G230 result (run once, 2026-11-04): both rejected.** 0.9x: 526 starts **38** lost (U44 28), NQ $480,263 / $480,133
 (−18%); 0.8x: 37 lost, NQ $483,390, index $728,790 (−12%). The window gains ($59,383 / $62,131) but the tighter
 after-loss stop gets hit more on the long histories. Log: `verification/noise_v2/g230_after_loss.txt`.
+
+## G231: a bigger gap for the grown gap trade, on U44 (registered 2026-11-04, before its run)
+
+**Why:** the grown gap trade (10 contracts) is where the worst days come from (G226); G157 tried a bigger trigger once
+grown on U34. **The variants:** U44 with `gap_go_k_locked` (a) 0.75 and (b) 1.0 (0.6 now, as before the floor stops).
+**Run once:** the 526 starts and the full sets in both executions. **Adopt (the better window) on G78's rule** against U44.
