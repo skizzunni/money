@@ -4533,3 +4533,10 @@ parts of k9 that leave the early zone as it is). **Adopt on G78's rule** against
 **G146 result (run once, 2026-11-04): rejected.** Chart / NinjaTrader: window $57,170 / $57,330, NQ $560,431 /
 $558,030, index $786,214 / **$773,831** (U34 $786,440 / $776,796); 89 starts **9** (NQ 5, index 4) against 8. Log:
 `verification/noise_v2/g146.txt`.
+
+## G147: 23 random combinations of the exit settings around U34 (registered 2026-11-04, before its run)
+
+**Variants (seed 147):** `lock_at` 0.30-0.40, `lock_plus` 2-3 points, `take_profit` 1.9-2.15, `stop_buffer`
+0.22-0.26, `time_stop` 55 / 60 / 65, `max_loss_per_trade` $162.50-200 (narrower than G115's, around today's values;
+U30-U34 moved the bot since). Row 0 is U34. G135's screen against U34, then the best window among those passing on to
+NinjaTrader's execution and the 89 starts, on G78's rule.
