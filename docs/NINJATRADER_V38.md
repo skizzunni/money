@@ -5560,3 +5560,10 @@ and adoption as G209's**, against U44 (no more than 28 lost).
 **G221 result (2026-11-04): none of 30 passes the screen.** The closest, k12 (range position 0.65, gap trigger 0.55):
 window $60,182, index $848,323 (99.8%), NQ $571,363 (97.2%). U44's filters stay. Log:
 `verification/noise_v2/g221_filter_search.txt`.
+
+## G222: does "Gentle start" help when fills are a tick worse? (a check of the advice, registered 2026-11-04, before its run)
+
+**Why:** the advice (G215, the strategy's setting text) is to turn on "Gentle start" (`steps_after_lock`: no contract
+steps until the floor has stopped) if live fills run 3+ ticks worse. It was never measured on U44. **The measurement:**
+U44 with `steps_after_lock` on, at 2 ticks, on the 526 starts (U44 at 2 ticks: 51 lost). **What would follow:** the
+advice stays if it loses clearly fewer (45 or fewer); otherwise the setting text and the docs say it doesn't help.
