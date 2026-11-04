@@ -5400,3 +5400,9 @@ $5,000-7,000, `fill_qty3_room` $9,000-12,000, `gap_go_k_locked` 0.5-1.0, `after_
 **Screen:** the chart's nets at least U42's on all three sets, no −$1,000 day, the floor never touched. **Then:** the
 best window among those passing goes to NinjaTrader's execution and the 526 starts, **adopted on G78's rule** (higher
 nets on all three in both executions, no more than 28 lost).
+
+**G209 screen (2026-11-04): 8 of 30 pass**, every one with 3-MNQ fill-ins from $9,000-12,000 above the floor
+(`fill_qty3_room`; G107 tried $9,000 on U26). The best window, **k26** (`profit_step_fast` 700, `fill_qty3_room` 12,000,
+`after_loss_ml_locked` 1.1): $57,252 / NQ $568,020 / index $801,072 (U42 $53,124 / $543,263 / $775,728), no −$1,000 day.
+k26 goes on. (k17 and k1, with 15 gap contracts, made more but had an index day at −$1,000.) Log:
+`verification/noise_v2/g209_grown_search.txt`.
