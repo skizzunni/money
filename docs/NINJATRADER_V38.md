@@ -74,20 +74,21 @@ real MNQ data will differ somewhat. The stand-in has flattered this strategy bef
 simulator, Funded growth, from 2025-01-02, 1 tick of slippage, $0.62 a side;
 `verification/noise_v2/v38g_nt_2026-11-03.csv` and the trade lists beside it):
 
-| Jan 2, 2025 – Oct 2026 (updated 2026-11-04, U29) | 5-minute bars | 30-minute bars |
+| Jan 2, 2025 – Oct 2026 (updated 2026-11-04, U33) | 5-minute bars | 30-minute bars |
 |---|---|---|
-| Trades | 704 | 252 |
-| Net | **$46,711.93** | $28,620.10 |
-| Winners | 50.8% | 53.6% |
-| Profit factor | 1.656 | 1.881 |
-| Closed drawdown | $4,191.81 | $3,934.78 |
-| Largest loss | −$1,762.10 | −$1,634.41 |
+| Trades | 701 | 252 |
+| Net | **$50,096.63** | $28,620.10 |
+| Winners | 51.9% | 53.6% |
+| Profit factor | 1.712 | 1.881 |
+| Closed drawdown | $4,779.88 | $3,934.78 |
+| Largest loss | −$1,703.05 | −$1,634.41 |
 | Worst day | −$899.31 | −$899.20 |
-| Most contracts | 20 | 15 |
+| Most contracts | 32 (up to 50) | 15 |
 | Days with a trade (the model) | about 72% | about 29% |
 
-The 5-minute chart includes gap and go (U19, U20, U25: up to 10 MNQ once the floor has stopped), More trading days with the sizing allowance (U22, U26: 2-MNQ fill-ins from $6,000, 3 points) and the
-data fix (G67). They need the 5-minute chart, so **trade the 5-minute chart**.
+The 5-minute chart includes gap and go (U19, U20, U25: up to 10 MNQ once the floor has stopped), More trading days with the sizing allowance (U22, U26: 2-MNQ fill-ins from $6,000, 3 points), the
+data fix (G67), the after-loss max loss at $187.50 once the floor has stopped (U30), up to 50 MNQ (U32) and no entries
+at 13:00 and 14:30 until the floor has stopped (U33). They need the 5-minute chart, so **trade the 5-minute chart**.
 
 **It matches the Python model, trade for trade.**
 - **30-minute bars:** all 303 trades are identical.
@@ -4388,3 +4389,8 @@ and the 89 starts for the best, on G78's rule or G99b's against U33.
 **G137 result (run once, 2026-11-04): rejected.** `add_at_lock` 2 / 4 / 8: the window's account lost (−$1,161 /
 −$1,082 / −$1,594), 19-378 days at −$1,000 on the long sets: the added contracts' stop at the lock is far from their
 fill, so a reversal costs more than the day's budget. Log: `verification/noise_v2/g137_add.txt`.
+
+**U33 checks (2026-11-04):** the full suite, 667 passed; the NinjaTrader growth run (`research/v38_ninjatrader_run.py
+grow`, rebuilt simulator) on the window: 701 trades, **$50,096.63**, profit factor 1.712, closed drawdown $4,779.88,
+worst day −$899.31, at most 32 contracts; identical to the model up to the 2026-03-09 data hole, as before
+(`verification/noise_v2/v38g_nt_u33.txt`). The Go live table is updated.
