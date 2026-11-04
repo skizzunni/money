@@ -5256,3 +5256,17 @@ first half hour, (C) the opening-range breakout (first close beyond 09:30-10:00,
 16:00), (D) a fade of the first half hour from 10:00 to 16:00; per year on NQ, the index and the window. **What would
 follow:** a setup is registered as a fill-in (G201) only if it is positive on all three sets and in at least two thirds
 of the years.
+
+**G200 result (2026-11-04): D passes as measured, but the measure looks ahead.** Per MNQ after costs: D (the fade of the
+first half hour) **+$7,486** on the window (2 of 2 years up), **+$43,230** on NQ (10 of 11), **+$69,156** on the index
+(15 of 16); A and B are near zero, C (the breakout) loses every year (−$131,615 / −$153,695). But "a day U41 sits out"
+is known only after its last entry check (15:00): those are the days price stayed inside the noise area, where a fade
+wins by construction. So D can't be traded as measured; G201 measures the version a bot can trade. Log:
+`verification/noise_v2/g200_idle_days.txt`.
+
+## G201: the morning fade as it could be traded (a measurement, registered 2026-11-04, before its run)
+
+**The setup, on every session:** at 10:00 (the 09:55 bar's close), 1 MNQ against the 09:30-10:00 move; out at 16:00,
+or at U41's first entry of the day after 10:00 (at that entry's price), whichever comes first. Per MNQ after costs, per
+year, on the window, NQ and the index; also split by whether U41 traded that day. **What would follow:** it goes on to a
+fill-in test in the bot (G202) only if it is positive on all three sets and in at least two thirds of the years.
