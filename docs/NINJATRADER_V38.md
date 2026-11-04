@@ -5091,3 +5091,13 @@ sets in both executions. **Adopt on G78's rule** (no more lost than 42), or G99b
 **G189 result (run once, 2026-11-04): rejected.** 526 starts: **70** lost or frozen (36 + 34; U40 42). The window
 gained (NinjaTrader $57,807 against $54,710) but the index fell (NinjaTrader $768,257 against $774,954). Like G102,
 fill-ins before the floor stops cost accounts. Log: `verification/noise_v2/g189_gap_fill_early.txt`.
+
+## G190: do the losing stretches show in the market beforehand? (a measurement, registered 2026-11-04, before its run)
+
+**Why:** of U40's 42 dead starts, most made money first and gave it all back in a long losing stretch for this
+strategy (2011, 2013, 2015, 2019-20, 2022); G87/G175's shadow gate used the bot's own record and sat out the recoveries
+too. **The measurement** (`research/g190_regime.py`): U40's per-contract P/L over the next 20 sessions, by quintile of
+four things known the evening before: the open-to-close efficiency (last 20 sessions), the range against its
+100-session mean, the 5-minute returns' lag-1 autocorrelation (last 20 sessions), and the bot's own last 40 sessions.
+**What would follow:** a filter is registered (G191) only if one quintile is the lowest on both NQ and the index and
+well below the others; otherwise none.
