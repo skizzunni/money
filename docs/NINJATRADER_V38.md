@@ -74,21 +74,21 @@ real MNQ data will differ somewhat. The stand-in has flattered this strategy bef
 simulator, Funded growth, from 2025-01-02, 1 tick of slippage, $0.62 a side;
 `verification/noise_v2/v38g_nt_2026-11-03.csv` and the trade lists beside it):
 
-| Jan 2, 2025 – Oct 2026 (updated 2026-11-04, U33) | 5-minute bars | 30-minute bars |
+| Jan 2, 2025 – Oct 2026 (updated 2026-11-04, U34) | 5-minute bars | 30-minute bars |
 |---|---|---|
 | Trades | 701 | 252 |
-| Net | **$50,096.63** | $28,620.10 |
+| Net | **$54,772.31** | $28,620.10 |
 | Winners | 51.9% | 53.6% |
-| Profit factor | 1.712 | 1.881 |
+| Profit factor | 1.768 | 1.881 |
 | Closed drawdown | $4,779.88 | $3,934.78 |
 | Largest loss | −$1,703.05 | −$1,634.41 |
 | Worst day | −$899.31 | −$899.20 |
-| Most contracts | 32 (up to 50) | 15 |
+| Most contracts | 50 | 15 |
 | Days with a trade (the model) | about 72% | about 29% |
 
 The 5-minute chart includes gap and go (U19, U20, U25: up to 10 MNQ once the floor has stopped), More trading days with the sizing allowance (U22, U26: 2-MNQ fill-ins from $6,000, 3 points), the
 data fix (G67), the after-loss max loss at $187.50 once the floor has stopped (U30), up to 50 MNQ (U32) and no entries
-at 13:00 and 14:30 until the floor has stopped (U33). They need the 5-minute chart, so **trade the 5-minute chart**.
+at 13:00 and 14:30 until the floor has stopped (U33), and faster contract steps above $10,000 of profit (U34). They need the 5-minute chart, so **trade the 5-minute chart**.
 
 **It matches the Python model, trade for trade.**
 - **30-minute bars:** all 303 trades are identical.
