@@ -5790,3 +5790,7 @@ adopted. With 1,000 tries, some pass by chance; the 526 starts and NinjaTrader's
 12; the rule allows 28 of the 526), so the mid-month half can't save them. The window also splits between the
 executions: (a) chart **$11,785** against NinjaTrader $70,327; the 15-minute grid's results hang on single fills. The
 off-half-hour exits still act early (only the entries were held back). Log: `verification/noise_v2/g239_grid15_locked.txt`.
+
+**G240 progress (2026-11-04, 22:42 UTC):** 196 of 1,000 done; 10 pass the screen so far (the best by the three nets: k44,
+window $61,789 / NQ $611,515 / index $897,334). Stage 2 waits for the full 1,000. Partial log:
+`verification/noise_v2/g240_mega_search_partial.txt`.
