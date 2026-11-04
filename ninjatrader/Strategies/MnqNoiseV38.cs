@@ -887,7 +887,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 PlaceOrders = true;
                 Mode = "Funded growth";
                 Goal = 50000;
-                AfterLossMaxLoss = 225;  // G165 (Funded growth sets it by the chart: 225 on 5-minute, 250 otherwise)
+                AfterLossMaxLoss = 206.25;  // G167 (Funded growth sets it by the chart: 206.25 on 5-minute, 250 otherwise)
                 TrailDD = 2000;
                 TrailFrom = "";
                 ProfitStep = 1500;
@@ -941,7 +941,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 if (Mode.StartsWith("Funded growth"))  // the tested growth settings (docs/NINJATRADER_V38.md), whatever is set below
                 {
                     Contracts = 1; MaxLoss = 187.5; DailyLoss = 900; TrailDD = 2000;
-                    AfterLossMaxLoss = minutes == 5 ? 225 : 250;  // G165: 1.2x on the 5-minute chart (1.33x before)
+                    AfterLossMaxLoss = minutes == 5 ? 206.25 : 250;  // G167: 1.1x on the 5-minute chart (G165: 1.2x, before 1.33x)
                     ProfitStep = 1500; SizeByOwnStop = true; TimeStop = 60;
                     MaxContracts = Mode == "Funded growth" && minutes == 5 ? 50 : 15;  // G121: 50 on the 50K's 5-minute chart (G106: 20, G120: 30)
                     // G40: a bigger account trades the 50K's size; its larger limits are cushion (a $2,000 / $3,000

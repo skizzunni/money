@@ -40,8 +40,8 @@ GROW = NoiseConfig(**{**V21, "qty": 1, "lookback": 14, "max_loss_per_trade": 187
                       "skip_checks": "780,870", "skip_checks_early": True,
                       # G142: a contract per $750 above $10,000 of profit
                       "profit_step_fast": 750.0,
-                      # G165: the after-loss max loss at 1.2x ($225) on 5-minute bars
-                      "after_loss_ml_mult5": 1.2},
+                      # G165 / G167: the after-loss max loss at 1.1x ($206.25) on 5-minute bars
+                      "after_loss_ml_mult5": 1.1},
                    nt_execution=True, round_prices=True, target_on_fill_bar=True)
 GROW_ARGS = ["Mode=Funded growth"]  # the default; its settings are the tested ones above
 # G72's fill-in trades off (NinjaTrader's More trading days needs gap and go on)
@@ -830,17 +830,17 @@ def test_v38_fast_steps(sim, sample_1m, tmp_path):  # noqa: F811
 
 
 @pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
-def test_v38_after_loss_225(sim, sample_1m, tmp_path):  # noqa: F811
-    """G165: on the 5-minute chart the trade after a loser risks $225 (1.2x), not $250, until the floor stops. Custom
-    mode with AfterLossMaxLoss 225 (the default) and 250; NinjaTrader's code and the model agree trade for trade with
-    each, and it changes the trades."""
+def test_v38_after_loss_206(sim, sample_1m, tmp_path):  # noqa: F811
+    """G165 / G167: on the 5-minute chart the trade after a loser risks $206.25 (1.1x), not $250, until the floor
+    stops. Custom mode with AfterLossMaxLoss 206.25 (the default) and 250; NinjaTrader's code and the model agree trade
+    for trade with each, and it changes the trades."""
     bars = resample(sample_1m, "5min")
     path = tmp_path / "bars.csv"
     with path.open("w") as f:
         for t, r in zip(bars.index, bars.itertuples(), strict=True):
             f.write(f"{t:%Y-%m-%d %H:%M},{r.open!r},{r.high!r},{r.low!r},{r.close!r}\n")
     got = {}
-    for usd in (225.0, 250.0):
+    for usd in (206.25, 250.0):
         r = subprocess.run([DOTNET, str(sim), str(path), "5", "Strategy=V38", "Mode=Custom", f"AfterLossMaxLoss={usd}"],
                            capture_output=True, text=True, env=ENV)
         assert r.returncode == 0, r.stderr[-2000:]
@@ -852,7 +852,7 @@ def test_v38_after_loss_225(sim, sample_1m, tmp_path):  # noqa: F811
             assert float(a[2]) == t.entry and float(a[4]) == t.exit, (a, t)
             assert math.isclose(float(a[6]), t.pnl, abs_tol=1e-6), (a, t)
         got[usd] = [(t.qty, round(t.pnl, 6)) for t in py]
-    assert got[225.0] != got[250.0]
+    assert got[206.25] != got[250.0]
 
 
 @pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")

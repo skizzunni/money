@@ -4801,3 +4801,12 @@ $55,707), NQ $485,025 / $488,354, index $798,713 / $713,983. Log: `verification/
 **The idea, from G166:** both of G166's best (21 lost) have `after_loss_ml_mult` 1.1 ($206); it isn't yet run alone.
 **The variant:** U35 with `after_loss_ml_mult5` 1.1. **Run once:** the 263 monthly starts and the full sets in both
 executions. **Adopt on G99b's survival-first rule** against U35 (fewer than 26 lost, every net at least 95%).
+
+**G167 result (run once, 2026-11-04): passes G99b's survival-first rule by one account; adopted (U36).** Chart /
+NinjaTrader: window $54,876 / $54,872 (U35 $54,906 / $55,707: 98.5%), NQ $561,717 / $557,051, index $786,440 /
+$776,796 (as U35); no −$1,000 day, the floor never touched; 263 monthly starts **25 lost or frozen** (NQ 14, index 11)
+against U35's 26, medians $49,426 / $37,626. A small gain, at the edge of the rule. Log:
+`verification/noise_v2/g167_after_loss_11.txt`.
+
+**U36 (2026-11-04): the after-loss max loss at $206.25 (1.1x) on the 5-minute chart (G167; U35: $225).**
+`test_v38_after_loss_206` checks NinjaTrader's code against the model at $206.25 and $250.
