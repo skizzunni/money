@@ -5546,3 +5546,7 @@ $100 left under the firm's limit is what absorbs a stop that fills past its pric
 1-5, `time_stop` 30-60, `late_lock_from` 14:00 / 15:00, `time_lock` 30 / 60; row 0 is U44. **Screen and adoption as
 G209's**, against U44 (the chart's nets at least U44's on all three sets, no −$1,000 day, the floor never touched; then
 the best window to NinjaTrader's execution and the 526 starts, G78's rule, no more than 28 lost).
+
+**G220 result (2026-11-04): none of 30 passes the screen.** Every exit change is lower than U44 on at least one set;
+the closest, k5 (a 30-minute time stop, a lock from 15:00): window $60,611, NQ $575,382 (97.9%), index $836,675
+(98.4%). U44's exits stay. Log: `verification/noise_v2/g220_exit_search.txt`.
