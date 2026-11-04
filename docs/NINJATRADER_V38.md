@@ -4342,3 +4342,22 @@ window $53,338 / $50,142 but 3 days at −$1,000 or worse, NQ 317 / 390 and the 
 setting: at 50 MNQ it fires at −$750, at 5 MNQ at −$930), **run under the stress** (`guard_slip_pts` 2: every guard
 fill 2 points worse). **Adopt on G78's rule** against U33 (no day at −$1,000 or worse, the floor never touched, more
 net on every set in both executions, 89 starts no more than 8 lost or frozen), all under the stress.
+
+**G133 result (run once, 2026-11-04): rejected.** Under the 2-point stress: window $52,906 / **$46,496** (U33 $50,219 /
+$50,337), NQ $793,084 / $777,147, index $756,969 / **$704,696** (U33 $784,933 / $774,086), one index day at −$1,038;
+89 starts 8. At 30-50 contracts the guard pays its slippage on hundreds of days; that takes the gain. The sized-up bot
+(G128-G133) is parked: its gain depends on guard fills a fast market won't give. Log:
+`verification/noise_v2/g133_guard_reserve.txt`.
+
+## G134: U33's grown-phase trades by contracts (a measurement, 2026-11-04)
+
+`research/g134_sizes.py` (`verification/noise_v2/g134_sizes.txt`). Index, once $10,000 up: the bot's own trades make
+$11-30 a contract; the gap trades $5-15 (1,840 of them at 2 MNQ, $5 a contract). The gap slot spends the morning's
+budget for the least edge.
+
+## G135: the gap trade's trigger and size re-checked on U33 (registered 2026-11-04, before its run)
+
+**Screen (chart's execution, 5-minute):** U33 and seven variants, one setting each: `gap_go_k` 0.6 / 0.75 / 1.0,
+`gap_go_locked_qty` 5 / 15, `gap_go_drive_k` 0.7, `gap_go_small_k` 0.2. A variant passes the screen with the window,
+NQ and the index at least U33's and no −$1,000 day; the best window net goes on to NinjaTrader's execution and the 89
+starts, on G78's rule or G99b's against U33.
