@@ -5338,3 +5338,18 @@ the range filter carries the survival gain. "Without the brake" goes on to stage
 (`range_pos_min`) carries the survival gain. G112 last checked it on U29. **The variant:** U41 with `range_pos_min`
 0.7 alone. **Run once:** the 526 starts and the full sets in both executions. **Adopt on G78's rule** (higher nets on all
 three in both executions, no more than 38 lost) or G99b's (at least 4 fewer lost, every net at least 95%).
+
+**G204 result (run once, 2026-11-04): k18 without the 0.6 brake passes G99b's survival-first rule; adopted (U42).** 526
+starts: **28** lost or frozen (12 + 16; U41 38), 10 fewer. Chart / NinjaTrader: window $53,124 / $53,164 (U41 $54,622 /
+$54,710: 97.2%), NQ $543,263 / $542,956 (96.4% / 98.2%), index $775,728 / $757,333 (98.5% / 97.6%); no −$1,000 day, the
+floor never touched. Medians: $33,067 / $41,928 on the mid-month starts (U41 $33,994 / $42,358). Log:
+`verification/noise_v2/g204_stage_b.txt`.
+
+**G205 result (run once, 2026-11-04): rejected.** The range filter at 0.7 alone: 526 starts **39** lost or frozen (U41
+38); NinjaTrader NQ $537,642 (97.2%). The survival gain needs the combination, not the filter alone. Log:
+`verification/noise_v2/g205_range07.txt`.
+
+**U42 (2026-11-04): five settings together (G204).** On the 50K's Funded growth: no new entry after **three losing
+trades in a day** (`MaxLosersPerDay`), a **$750 day budget until the floor has stopped** (`EarlyDayBudget`; $900 after),
+a **45-minute time stop** (60 before), entries only in the top **70%** of the day's range (0.65 before), and the gap
+trade from **0.6x** the average gap (`GapTrigger`; 0.5 before). The giveback brake stays at 0.5.
