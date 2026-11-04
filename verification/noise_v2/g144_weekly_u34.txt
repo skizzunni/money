@@ -1,0 +1,17 @@
+  weeks = pd.Series(0.0, index=pd.Index(sorted({d.to_period("W-FRI") for d in t.normalize().unique()})))
+  set profit at the week's start  weeks  average week $  median week $  weeks >= $3,000 %  weeks < 0 %
+proxy     -1,000,000,000..10,000     67             202              5                1.5         37.3
+proxy             10,000..30,000     24            1660             23               16.7         50.0
+proxy             30,000..75,000      3             504           -581                0.0         66.7
+  weeks = pd.Series(0.0, index=pd.Index(sorted({d.to_period("W-FRI") for d in t.normalize().unique()})))
+set profit at the week's start  weeks  average week $  median week $  weeks >= $3,000 %  weeks < 0 %
+ nq     -1,000,000,000..10,000     62             181             11                1.6         37.1
+ nq             10,000..30,000     17            1305            720               11.8         29.4
+ nq             30,000..75,000     69             604           -305               10.1         60.9
+ nq  75,000..1,000,000,000,000    401            1195            -11               15.7         50.1
+  weeks = pd.Series(0.0, index=pd.Index(sorted({d.to_period("W-FRI") for d in t.normalize().unique()})))
+  set profit at the week's start  weeks  average week $  median week $  weeks >= $3,000 %  weeks < 0 %
+index     -1,000,000,000..10,000     28             770              5                7.1         39.3
+index             10,000..30,000     35             364           -388               17.1         62.9
+index             30,000..75,000     47            1089           -431               14.9         55.3
+index  75,000..1,000,000,000,000    711             986              0               14.1         47.8

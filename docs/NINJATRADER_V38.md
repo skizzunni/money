@@ -4492,3 +4492,16 @@ $15,000. G135's screen against U34, then NinjaTrader's execution and the 89 star
 **G143 result (run once, 2026-11-04): neither passes the screen.** U34: window $54,879, NQ $554,388, index $786,440.
 From $6,000: **$53,522** / $556,845 / $790,841; per $500 above $15,000: $58,039 / **$553,099** / **$784,191**. U34's
 $750 above $10,000 stays. Log: `verification/noise_v2/g143_steps2.txt`.
+
+## G144: U34's weekly P/L by the account's profit (a measurement, 2026-11-04)
+
+`research/g144_weekly_u34.py` (`verification/noise_v2/g144_weekly_u34.txt`), as G122 for U32:
+
+| profit at the week's start | window: weeks / average / ≥ $3,000 | NQ 2015-25 | index 2011-26 |
+|---|---|---|---|
+| under $10,000 | 67 / $202 / 1.5% | 62 / $181 / 1.6% | 28 / $770 / 7.1% |
+| $10,000-30,000 | 24 / **$1,660** / 16.7% | 17 / $1,305 / 11.8% | 35 / $364 / 17.1% |
+| $30,000-75,000 | 3 / $504 / 0% | 69 / $604 / 10.1% | 47 / $1,089 / 14.9% |
+| over $75,000 | - | 401 / $1,195 / 15.7% | 711 / $986 / 14.1% |
+
+Over $75,000 the weeks are U32's to the dollar: by then the day's $900 budget, not the steps, sets every trade's size.
