@@ -4925,3 +4925,10 @@ executions. **Adopt on G99b's survival-first rule** against U38 (fewer than 19, 
 **G175 result (run once, 2026-11-04): rejected.** 263 monthly starts: 24 lost or frozen (U38 19), medians $29,145 /
 **$9,185**; NinjaTrader NQ $485,775 (87%). Sitting out the early losing stretches also sits out their recoveries.
 Log: `verification/noise_v2/g175_shadow_early.txt`.
+
+## G176: the trend over 100 sessions on U38 (registered 2026-11-04, before its run)
+
+**The idea:** G140/G141: on U33, `trend_n` 100 raised every net (window +5%, index +7%) and lost one account more (33
+against 32 of 263). U35-U38 changed the early phase since. **The variant:** U38 with `trend_n` 100. **Run once:** the 263
+monthly starts and the full sets in both executions. **Adopt on G78's rule** against U38 (more net on every set in both
+executions, no more than 19 lost, no −$1,000 day, the floor never touched).
