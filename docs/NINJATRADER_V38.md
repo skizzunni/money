@@ -4639,3 +4639,9 @@ accounts than it earns. **Variants:** U34 without the fill-ins ("More trading da
 fill-in, without the giveback brake, without U30's after-loss rule. **Adopt (the fewest lost) on G99b's survival-first
 rule** on the 263 monthly starts (fewer than U34's 32, the net at least 95% of U34's on every set in both executions,
 no −$1,000 day).
+
+**G155 result (run once, 2026-11-04): every part of U34 stays.** 263 monthly starts (U34 32 lost or frozen) and the
+NinjaTrader nets (U34 window $54,874, NQ $557,093, index $776,796): fill-ins off 33, $48,992 / $415,122 / $635,693;
+the drive fill-in off 33, $52,727 / $438,101 / $652,587; the brake off **35** (the brake saves accounts), $54,874 /
+$559,815 / $770,865; U30's after-loss rule off **30**, $52,850 / **$507,188** / $721,962 (NQ 91%, below G99b's 95%).
+Log: `verification/noise_v2/g155_ablations.txt`.
