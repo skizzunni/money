@@ -4125,3 +4125,23 @@ checks NinjaTrader's code against the model trade for trade with it on and off.
 G106 took the cap from 15 to 20 with no lost account more. **Variants:** U30 with `size_up_to` 25 and 30. **Adopt (the
 better window net of those that pass) on G78's rule** against U30 (chart / NinjaTrader window $48,035 / $48,108, NQ
 $530,579 / $528,411, index $697,942 / $689,202; 9 lost or frozen of 89).
+
+**G120 result (run once, 2026-11-04): both pass; 30 adopted (U31).**
+
+| | window, chart / NinjaTrader | NQ, chart / NinjaTrader | index, chart / NinjaTrader | 89 starts lost or frozen | medians NQ / index |
+|---|---|---|---|---|---|
+| U30 (20) | $48,035 / $48,108 | $530,579 / $528,411 | $697,942 / $689,202 | 9 | $47,365 / $37,735 |
+| 25 | $49,866 / $49,942 | $543,338 / $541,620 | $716,440 / $708,036 | 9 | $47,364 / $36,263 |
+| **30** | **$50,246 / $50,322** | $544,740 / $543,365 | $731,161 / $721,212 | 9 | $46,920 / $35,536 |
+
+The floor never touched, no −$1,000 day on any set (worst −$986). The closed drawdown grows with the size (index
+$22,351 → $26,289; the window's stays $4,780), and the 21-month medians of the 89 starts slip a little (they aren't in
+G78's rule). 30 MNQ is 3 minis' worth, inside a 50K account's usual position limit (check yours). Log:
+`verification/noise_v2/g120_max25_30.txt`.
+
+## G121: up to 40 or 50 contracts on U31 (registered 2026-11-04, before its run)
+
+**The idea:** G120's 25 and 30 both passed with the window's drawdown unchanged. 50 MNQ is a 50K account's usual
+limit (5 minis). **Variants:** U31 (30) with `size_up_to` 40 and 50. **Adopt (the better window net of those that
+pass) on G78's rule** against U31 (chart / NinjaTrader window $50,246 / $50,322, NQ $544,740 / $543,365, index
+$731,161 / $721,212; 9 lost or frozen of 89).
