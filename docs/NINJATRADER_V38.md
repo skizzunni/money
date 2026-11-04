@@ -5798,3 +5798,9 @@ window $61,789 / NQ $611,515 / index $897,334). Stage 2 waits for the full 1,000
 **G240 stage 1 (2026-11-04): 51 of 1,000 pass the screen.** The 10 best (k44, k776, k89, k221, k572, k694, k660, k3,
 k365, k911) go to stage 2. Recurring settings among them: the after-loss max loss at 0.95x once grown, the trend over
 45 or 75 sessions, the gap trade's break-even at 0.75 or 1.5, a lock from 14:00. Log: `verification/noise_v2/g240_mega_search.txt`.
+
+**G240 result (2026-11-04): none of the 10 passes stage 2.** 526 starts, lost or frozen (U44 28): k221 **26**, k694 30,
+k89 32, k3 35, k44 40, k911 42, k572 44, k776 46, k365 52, k660 66. k221, the only one at 28 or fewer, has NinjaTrader's
+NQ at $512,806 (U44 $579,739). The screen used the chart's execution, and for the after-loss 0.95x rows NinjaTrader's
+NQ fell from about $600,000 to $492,000-513,000: the chart's screen is not a safe filter. Log:
+`verification/noise_v2/g240_stage2.txt`.
