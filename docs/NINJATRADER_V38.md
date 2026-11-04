@@ -4841,3 +4841,13 @@ As G164: the fewest lost or frozen on the 263 starts (ties: the higher median) t
 **G169 screen (2026-11-04), lost or frozen of 263 (U37 20):** k3 **16** (sizing allowance 6 points, brake 0.55,
 cushion $2,500; medians $29,536 / $46,371), then four at 19. k3 goes on to the full sets. Log:
 `verification/noise_v2/g169_survival_search.txt`.
+
+**G169 result (run once, 2026-11-04): k3 rejected.** Chart / NinjaTrader: window $52,629 / $52,802 (96%), NQ $556,997
+/ $555,092 (99%), index $777,906 / **$701,174** (90% of U37's $776,796). Log: `verification/noise_v2/g169_k3.txt`.
+
+## G170: a larger sizing allowance alone on U37 (registered 2026-11-04, before its run)
+
+**The idea, from G169:** the three best there have a 5-6 point sizing allowance (U37: 4): sizing each trade for a
+stop that fills that much worse gives fewer contracts when the stop is near. **Variants:** U37 with `size_slip_pts` 5
+and 6. **Run once:** the 263 monthly starts and the full sets in both executions. **Adopt (the fewest lost) on G99b's
+survival-first rule** against U37 (fewer than 20, every net at least 95%).
