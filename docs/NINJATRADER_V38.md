@@ -4096,3 +4096,15 @@ index $696,307). **Adopt on G78's rule** against U29 (NinjaTrader window $46,828
 
 **The variant:** U29 with `profit_step` 1,250, G116's third screen pass (window $45,983, NQ $504,922, index $669,421).
 **Adopt on G78's rule** against U29.
+
+## G119: the after-loss max loss as the others' once the floor has stopped (registered 2026-11-04, before its run)
+
+**The idea:** G116's after-loss max loss at 1.0 raised the net on every set in both executions but lost one more of
+the 89 starts. Most lost starts go before the floor stops; this keeps U29's 1.33 until then and uses 1.0 after
+(`after_loss_ml_locked` 1.0, a new research setting, off by default). **Adopt on G78's rule** against U29 (both
+executions on all three sets, the 89 starts at most 10 lost or frozen).
+
+**G117 and G118 results (run once, 2026-11-04): both rejected on the window.** NinjaTrader's execution: `trend_n` 40
+window $45,125, NQ $511,121, index $679,687, 10 lost or frozen (NQ 3, index 7); `profit_step` 1,250 window $45,783,
+NQ $494,952, index $665,123, 10 lost or frozen (NQ 5, index 5); U29's window $46,828. Log:
+`verification/noise_v2/g117_g118.txt`.

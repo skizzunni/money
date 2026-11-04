@@ -99,6 +99,7 @@ class NoiseConfig:
     # it only at a check on the hour
     after_loss_qty_div: float = 1.0
     after_loss_ml_mult: float = 1.0  # its max loss x this (the same contracts, a wider stop)
+    after_loss_ml_locked: float = 0.0  # research (G119): once the floor has stopped, after_loss_ml_mult is this (0: off)
     # a second tier for two or more losers in a row (0: the same as after one loser), and the rule on the losing
     # trade's side only (another side: the normal size)
     after_loss2_qty_div: float = 0.0
@@ -594,6 +595,10 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
         return (not math.isnan(trail_peak) and cfg.trail_cap >= 0
                 and trail_peak - cfg.trail_dd >= trail_base + cfg.trail_cap)
 
+    def al_mult() -> float:
+        """after_loss_ml_mult, or G119's after_loss_ml_locked once the floor has stopped."""
+        return cfg.after_loss_ml_locked if cfg.after_loss_ml_locked > 0 and floor_stopped() else cfg.after_loss_ml_mult
+
     protect_set = set(cfg.protect_dates.split(",")) if cfg.protect_room > 0 and cfg.protect_dates else set()
 
     def protected() -> bool:
@@ -730,7 +735,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             return True
         after = consec > 0
         q = max(1, round(cfg.qty / cfg.after_loss_qty_div)) if after else cfg.qty
-        ml = ml_cfg * (cfg.after_loss_ml_mult if after else 1.0)
+        ml = ml_cfg * (al_mult() if after else 1.0)
         per_c = ml / q + 2 * cfg.commission_per_side + 2 * slip * cfg.point_value
         room = money_room()
         return not math.isfinite(room) or math.floor(room / per_c + 1e-9) >= 1
@@ -881,7 +886,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             if d and touched[d] != n_checks_seen and study_ok(d, True):
                 after = consec > 0
                 q_next = max(1, round(cfg.qty / cfg.after_loss_qty_div)) if after else cfg.qty
-                ml_next = ml_cfg * (cfg.after_loss_ml_mult if after else 1.0)
+                ml_next = ml_cfg * (al_mult() if after else 1.0)
                 fits = True
                 if cfg.daily_loss_limit > 0 and ml_cfg > 0:
                     per_c = ml_next / q_next + 2 * cfg.commission_per_side + 2 * slip * cfg.point_value
@@ -1138,7 +1143,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                     after_loss = consec > 0 and (not cfg.after_loss_same_side or d == loss_side)
                     tier2 = after_loss and consec >= 2 and (cfg.after_loss2_qty_div or cfg.after_loss2_ml_mult)
                     qd = (cfg.after_loss2_qty_div or 1.0) if tier2 else cfg.after_loss_qty_div
-                    mm = (cfg.after_loss2_ml_mult or 1.0) if tier2 else cfg.after_loss_ml_mult
+                    mm = (cfg.after_loss2_ml_mult or 1.0) if tier2 else al_mult()
                     q_next = max(1, round(cfg.qty / qd)) if after_loss else cfg.qty
                     ml_next = ml_cfg * (mm if after_loss else 1.0)
                     fill_next = False
