@@ -3968,3 +3968,8 @@ U28's safety change aside. Rejected: 50. Measurements: 3.
 
 **The idea:** G97's fill-ins at 2 MNQ from $6,000 passed; one more contract each $3,000 of cushion, to 3 from $9,000
 (`fill_qty3_room` 9000). **The variant:** U29 with `fill_qty3_room` 9000. **Adopt on G78's rule**, against U29.
+
+**G107 result (run once, 2026-11-04): rejected on the window.** 89 start dates: 10 lost or frozen (as U29), medians
+**$56,526 NQ / $42,470 index** (U29: $46,477 / $36,500); index $695,858 / $659,294 and NQ $516,796 / $516,484 (above
+U29); but the window $46,145 / $46,283 against U29's $46,656 / $46,828. The rule asks for more on the window too
+(`verification/noise_v2/g107_fill3.txt`).
