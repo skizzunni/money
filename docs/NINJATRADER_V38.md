@@ -4443,3 +4443,11 @@ Log: `verification/noise_v2/g140_trend100.txt`.
 **Near misses so far (pass everything but one part of the rule):** G116 (after-loss 1.0, one account), G128b (2x with
 the guard, one account), G130 / G131 (2x once the floor stops: the window by $66 / $75), G140 (trend 100, one account).
 Each was registered and run once; none is adopted.
+
+## G141: the survival count on monthly starts (registered 2026-11-04, before its run)
+
+**The idea:** the 89 quarterly starts move by ±1 account on small changes; four near misses failed on exactly one.
+Monthly starts (`START_FREQ=MS`: 103 on NQ, 160 on the index, 263 in all, the 89 among them) measure the same thing with
+three times the sample. **The check:** U33 and G140's `trend_n` 100 (which passed every other part of G78's rule) on
+the monthly starts. **Adopt** `trend_n` 100 only if its lost-or-frozen count on the 263 is at most U33's. This is a
+second look at G140 with a larger sample of the one part it failed, stated as such; the other parts stand as run.

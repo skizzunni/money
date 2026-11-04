@@ -360,8 +360,9 @@ def main() -> None:
     S.init({}, *sys.argv[1:4])
     S.D = {k: (with_1600(b, S.MIN[0]), first, skip) for k, (b, first, skip) in S.D.items() if k != "win"}
     if MONTHS == 21:
-        jobs = [("nq", d.strftime("%Y-%m-%d")) for d in pd.date_range("2015-04-01", "2023-10-01", freq="QS")]
-        jobs += [("index", d.strftime("%Y-%m-%d")) for d in pd.date_range("2011-04-01", "2024-07-01", freq="QS")]
+        fq = os.environ.get("START_FREQ", "QS")  # G141: "MS", a start every month
+        jobs = [("nq", d.strftime("%Y-%m-%d")) for d in pd.date_range("2015-04-01", "2023-10-01", freq=fq)]
+        jobs += [("index", d.strftime("%Y-%m-%d")) for d in pd.date_range("2011-04-01", "2024-07-01", freq=fq)]
     else:  # G43: every six months, with the whole horizon in the data
         last_nq = pd.Timestamp("2025-07-01") - pd.DateOffset(months=MONTHS)
         last_ix = pd.Timestamp("2026-09-01") - pd.DateOffset(months=MONTHS)
@@ -371,6 +372,7 @@ def main() -> None:
         rows = list(ex.map(one, jobs))
     d = pd.DataFrame(rows)
     tag = ("" if MONTHS == 21 else f"_{MONTHS}m") + ("" if S.MIN[0] == 5 else f"_{S.MIN[0]}min")  # G54: 30-minute bars
+    tag += "" if os.environ.get("START_FREQ", "QS") == "QS" else "_" + os.environ["START_FREQ"]  # G141
     d.to_csv(f"verification/noise_v2/g35_start_dates_{VARIANT}{tag}.csv", index=False)
     for name, g in d.groupby("set"):
         print(name, VARIANT, "starts", len(g), "lost (at the floor)", int(g["lost"].sum()),
