@@ -5638,3 +5638,9 @@ The NinjaTrader strategy doesn't have `gap_slip_pts` yet; a pass is built there 
 keeps 27 lost, but every net falls below U44's: 10 points window $54,379, NQ $575,044, index $815,753; 20 points $47,528
 / $550,213 / $780,878 (U44 $57,475 / $579,739 / $828,138). The allowance costs more on ordinary gap days than the two
 extra contracts earn. Log: `verification/noise_v2/g227_gap_slip.txt`.
+
+## G228: a contract per $1,250 below $8,000, on U44 (registered 2026-11-04, before its run)
+
+**The variant:** U44 with `profit_step` 1,250 (1,500 now; G184's 1,750 lost more on U40). **Run once:** the 526 starts
+and the full sets in both executions. **Adopt on G78's rule** against U44 (higher nets on all three in both executions, no
+−$1,000 day, the floor never touched, no more than 28 lost).
