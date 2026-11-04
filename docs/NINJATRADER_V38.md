@@ -4066,3 +4066,13 @@ didn't rank on (NinjaTrader's execution, the 89 starts).
 with no −$1,000 day: 11 of 32 lost the account on at least one set (net near $0), 1 of 32 beat U29's window, and the
 best index net ($663,057, k=12) came with a $27,644 window and a −$1,000 day. U29's settings sit at a ridge: moving
 several together loses more than it gains. Log: `verification/noise_v2/g115_search.txt`.
+
+## G116: one setting at a time, the settings not re-checked on U29 (registered 2026-11-04, before its run)
+
+**The idea:** G89-G114 re-checked the exits and filters on U25-U29; the max loss per contract, the after-loss stop,
+the contract step, the last entry, the squeeze filter, the trend length, a loser limit, the noise lookback and the
+entry line were last checked on older defaults. 18 variants, one setting each: `max_loss_per_trade` 150/225/250,
+`after_loss_ml_mult` 1.0/1.67, `profit_step` 1,250/1,750, `last_entry_end` 14:30/15:30, `squeeze_min` 15/25, `trend_n`
+40/60, `max_losers` 3, `lookback` 10/20, `entry_k` 0.9/1.1. **Screen and confirmation:** G115's (NQ and the index at
+least U29's on the chart's execution, no −$1,000 day; the best window net goes on to NinjaTrader's execution and the 89
+start dates on G78's rule). Row 0 is U29 itself, as the check.
