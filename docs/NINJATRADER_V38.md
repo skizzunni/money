@@ -5501,3 +5501,8 @@ sizing counts a stop 8 points worse; 5 now), (b) `early_daily_loss` 600 (a $600 
 (c) both. **Stage A:** each on the 526 starts at 2 ticks. **Stage B:** the one with the fewest lost at 2 ticks, if 45 or
 fewer, on the 526 starts and the full sets in both executions at 1 tick. **Adopted** if at 1 tick it loses no more than
 U44's 28 and every net is at least 95% of U44's, with no −$1,000 day and the floor never touched.
+
+**G216 result (2026-11-04): none goes on.** 526 starts at 2 ticks, lost or frozen (U44 51): (a) 8-point allowance 51,
+(b) $600 early day 49, (c) both 49. None reaches 45; the extra losses at 2 ticks are not the sizing or the early budget
+but the edge itself (each fill a tick worse, on many small trades). U44 stays. Log:
+`verification/noise_v2/g216_slip2_protect.txt`.
