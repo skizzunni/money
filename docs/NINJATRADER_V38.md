@@ -3994,3 +3994,9 @@ dates 10 lost or frozen, medians $47,442 / $35,758 (`verification/noise_v2/g108_
 index $661,701 / $648,718 (U29: $661,701 / $648,812), 10 lost or frozen (`verification/noise_v2/g109_fill2_5000.txt`).
 
 **Scorecard, G44-G109:** 66 rounds. Adopted 10 (and the data fix); rejected 53; measurements 3.
+
+## G110: a $950 daily budget (registered 2026-11-04, before its run)
+
+**The idea:** in a grown account the day's budget is what caps a trade's size, and so the week's profit. $950 of the
+$1,000 rule (from $900), with U29's 4-point sizing allowance and the live loss guard at $950 for the gap past a stop.
+**The variant:** U29 with `daily_loss_limit` 950. **Adopt on G78's rule**, against U29 (no day at −$1,000 on any set).
