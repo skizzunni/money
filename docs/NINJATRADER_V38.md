@@ -4891,3 +4891,12 @@ The 1-contract gap trade helps a fresh account build the cushion that stops the 
 **The variant:** U38 with `gap_go_max_qty` 2 (up to 2 contracts before the floor stops, as the room allows; 10 after,
 unchanged). **Run once:** the 263 monthly starts and the full sets in both executions. **Adopt on G99b's survival-first
 rule** against U38 (fewer than 19, every net at least 95%).
+
+**G173 result (run once, 2026-11-04): rejected.** 263 monthly starts: 20 lost or frozen (U38 19); nets within 1%.
+One early gap contract stays. Log: `verification/noise_v2/g173_gap_qty2.txt`.
+
+## G174: the giveback brake at 0.55 and 0.6 on U38 (registered 2026-11-04, before its run)
+
+**The idea:** G155: the brake saves accounts (35 lost without it, 32 with, on U34); G169's best combinations had 0.55.
+**Variants:** U38 with `giveback_brake` 0.55 and 0.6. **Run once:** the 263 monthly starts and the full sets in both
+executions. **Adopt (the fewest lost) on G99b's survival-first rule** against U38 (fewer than 19, every net ≥ 95%).
