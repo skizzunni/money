@@ -74,30 +74,30 @@ real MNQ data will differ somewhat. The stand-in has flattered this strategy bef
 simulator, Funded growth, from 2025-01-02, 1 tick of slippage, $0.62 a side;
 `verification/noise_v2/v38g_nt_2026-11-03.csv` and the trade lists beside it):
 
-| Jan 2, 2025 – Oct 2026 (updated 2026-11-04, U43) | 5-minute bars | 30-minute bars |
+| Jan 2, 2025 – Oct 2026 (updated 2026-11-04, U44) | 5-minute bars | 30-minute bars |
 |---|---|---|
 | Trades | 760 | 244 |
-| Net | **$56,437.51** | $28,226.67 |
+| Net | **$57,549.09** | $28,226.67 |
 | Winners | 49.5% | 54.1% |
-| Profit factor | 1.682 | 2.025 |
+| Profit factor | 1.648 | 2.025 |
 | Closed drawdown | $6,013.72 | $3,268.44 |
 | Largest loss | −$1,703.05 | −$1,634.41 |
 | Worst day | −$899.24 | −$899.20 |
-| Most contracts | 50 | 15 |
+| Most contracts | 75 | 15 |
 | Days with a trade (the model) | about 72% | about 29% |
 
 The 5-minute chart includes gap and go (U19, U20, U25: up to 10 MNQ once the floor has stopped), More trading days with the sizing allowance (U22, U26: 2-MNQ fill-ins from $6,000, 3 points), the
 data fix (G67), the after-loss max loss at $187.50 once the floor has stopped (U30), up to 50 MNQ (U32) and no entries
-at 13:00 and 14:30 until the floor has stopped (U33), faster contract steps above $10,000 of profit (U34) and the after-loss max loss as every trade's, $187.50 (U35-U37), a 5-point sizing allowance (U38) the drive fill-in at 0.6x (U39) More trading days from a $2,500 cushion (U40) no gap trade while the giveback brake is on (U41) and G204's five survival settings (U42: three losers a day, a $750 day budget until the floor stops, a 45-minute time stop, the top 70% of the range, the gap trade from 0.6x; on the 50K's Funded growth, both charts) and $700 steps above $8,000 with 3-MNQ fill-ins from $9,000 (U43). They need the 5-minute chart, so **trade the 5-minute chart**.
+at 13:00 and 14:30 until the floor has stopped (U33), faster contract steps above $10,000 of profit (U34) and the after-loss max loss as every trade's, $187.50 (U35-U37), a 5-point sizing allowance (U38) the drive fill-in at 0.6x (U39) More trading days from a $2,500 cushion (U40) no gap trade while the giveback brake is on (U41) and G204's five survival settings (U42: three losers a day, a $750 day budget until the floor stops, a 45-minute time stop, the top 70% of the range, the gap trade from 0.6x; on the 50K's Funded growth, both charts) $700 steps above $8,000 with 3-MNQ fill-ins from $9,000 (U43), and $650 steps, fill-ins at 2 MNQ from $4,000 and 3 from $8,000, up to 75 MNQ (U44). They need the 5-minute chart, so **trade the 5-minute chart**.
 
 **What to expect (measured 2026-11-04, G141/G144/G165 and the 263 fresh starts):**
-- A fresh 50K account on U43: about **1 in 19 is lost or frozen** within 21 months (28 of 526 starts on the 1st and the
-  15th of each month; U42: 28; U41: 38; U40: 42; U34: 60, about 1 in 9); the median account makes **$33,395 in 21 months**
-  (about $370 a week; U42 $35,219, U41 $39,260); +$3,000 takes a median 153 days (within 30 days in 3.6%); +$50,000 within
-  21 months in 42.2% (median 16.0 months). U42-U43 trade some of the median's profit for 10 fewer lost accounts in 526;
+- A fresh 50K account on U44: about **1 in 19 is lost or frozen** within 21 months (28 of 526 starts on the 1st and the
+  15th of each month; U42-U43: 28; U41: 38; U40: 42; U34: 60, about 1 in 9); the median account makes **$33,917 in 21
+  months** (about $375 a week; U41 $39,260); +$3,000 takes a median 153 days (within 30 days in 3.6%); +$50,000 within
+  21 months in 40.7% (median 16.1 months). U42-U43 trade some of the median's profit for 10 fewer lost accounts in 526;
   U43's own gain is in the grown phase and on the long histories.
-- Once the account is $10,000-30,000 up: the window averaged **$1,668 a week** on U43 (12% of weeks at +$3,000 or more;
-  U42 $1,532, U40 $1,637; G211, `verification/noise_v2/g211_weekly_u43.txt`);
+- Once the account is $10,000-30,000 up: the window averaged **$1,483 a week** on U44 (11% of weeks at +$3,000 or more;
+  U43 $1,668, U42 $1,532; G213, `verification/noise_v2/g213_weekly_u44.txt`);
   past $30,000 the day's $900 budget caps every trade and the long histories average $600-1,200 a week.
 - At 2 ticks of slippage instead of 1, the window still makes $52,137 (G156).
 
@@ -5451,3 +5451,20 @@ $6,000-7,000, `fill_qty3_room` $7,000-10,000, `fill_qty2_room` $4,000-5,000, `ga
 `fill_qty2_room` 4,000, `size_up_to` 75): $57,446 / NQ $587,643 / index $849,992 (U43 $56,957 / $583,372 / $818,965), no
 −$1,000 day; it goes on. Every passing row raised the most contracts to 60-75 or moved the fill-in rooms down. Log:
 `verification/noise_v2/g212_grown_search.txt`.
+
+**G212 result (run once, 2026-11-04): k18 passes G78's rule; adopted (U44).** 526 starts: **28** lost or frozen (12 + 16;
+U43 28). Chart / NinjaTrader: window $57,446 / **$57,475** (U43 $56,957 / $57,000), NQ $587,643 / $579,739 (U43 $583,372 /
+$568,316), index $849,992 / **$828,138** (U43 $818,965 / $804,355); no −$1,000 day, the floor never touched. Median 21-month
+net on the 526: $33,917 (U43 $33,395). Log: `verification/noise_v2/g212_k18.txt`.
+
+**U44 (2026-11-04): $650 steps above $8,000, fill-ins at 2 MNQ from $4,000 and 3 from $8,000, up to 75 MNQ (G212).**
+`FastSteps` 650, `MoreDaysQty2Room` 4,000, `MoreDaysQty3Room` 8,000, and the 50K's 5-minute chart up to 75 contracts.
+
+**U44 checks (2026-11-04):** the NinjaTrader growth run on the window **$57,549.09** (`verification/noise_v2/v38g_nt_u44.txt`):
+identical to the model on 30-minute bars, and on 5-minute bars up to the 2026-03-09 data hole.
+
+## G213: U44's weekly P/L by the account's profit (a measurement, 2026-11-04)
+
+`research/g213_weekly_u44.py` (`verification/noise_v2/g213_weekly_u44.txt`). Window, $10,000-30,000 up: 28 weeks,
+**$1,483** average (U43 $1,668 over 26 weeks: the account moves through the band faster), 10.7% at +$3,000 or more; NQ
+past $75,000 $1,256 a week, the index $1,067.

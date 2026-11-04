@@ -927,8 +927,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 MoreDays = true;  // G79: on by default (with SizeSlip 2)
                 MoreDaysCushion = 2500;  // G181 (G71: 3000)
                 SizeSlip = 5;  // G170 (G79: 2, G97: 3, G106: 4)
-                MoreDaysQty2Room = 6000;  // G97
-                MoreDaysQty3Room = 9000;  // G210
+                MoreDaysQty2Room = 4000;  // G212 (G97: 6000)
+                MoreDaysQty3Room = 8000;  // G212 (G210: 9000)
                 GivebackBrake = 0.5;  // G99c
                 GapSkipBraked = true;  // G191
                 MaxLosersPerDay = 3;  // G204
@@ -936,7 +936,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 GapTrigger = 0.6;  // G204 (G60: 0.5)
                 AfterLossLocked = 187.5;  // G119
                 EarlyNoEntryChecks = "13:00,14:30";  // G125
-                FastSteps = 700;  // G210 (G142: 750)
+                FastSteps = 650;  // G212 (G142: 750, G210: 700)
                 FastStepsFrom = 8000;  // G210 (G142: 10000)
                 PropStartBalance = 50000;
                 PropHighBalance = 0;
@@ -973,7 +973,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                     ProfitStep = 1500; SizeByOwnStop = true;
                     TimeStop = Mode == "Funded growth" ? 45 : 60;  // G204 on the 50K (G6: 60)
                     RangePos = Mode == "Funded growth" ? 0.7 : 0.65;  // G204 on the 50K
-                    MaxContracts = Mode == "Funded growth" && minutes == 5 ? 50 : 15;  // G121: 50 on the 50K's 5-minute chart (G106: 20, G120: 30)
+                    MaxContracts = Mode == "Funded growth" && minutes == 5 ? 75 : 15;  // G212: 75 on the 50K's 5-minute chart (G106: 20, G120: 30, G121: 50)
                     // G40: a bigger account trades the 50K's size; its larger limits are cushion (a $2,000 / $3,000
                     // daily loss and a $3,000 / $4,500 trailing drawdown; the bot's budget is 90% of the daily loss)
                     if (Mode == "Funded growth 100K") { DailyLoss = 1800; TrailDD = 3000; LossGuard = 1900; }

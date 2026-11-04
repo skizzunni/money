@@ -27,12 +27,12 @@ CFG = NoiseConfig(**{**V21, "qty": 1, "lookback": 14, "trail_from": "", "tv_path
 # funded growth (docs/NINJATRADER_V38.md): v3.6's sizing at $900 a day and a $2,000 end-of-day trailing drawdown, and
 # G6's 60-minute time stop
 GROW = NoiseConfig(**{**V21, "qty": 1, "lookback": 14, "max_loss_per_trade": 187.5, "after_loss_ml_mult": 250 / 187.5,
-                      "trail_dd": 2000.0, "trail_from": "", "profit_step": 1500.0, "size_up_to": 50,
+                      "trail_dd": 2000.0, "trail_from": "", "profit_step": 1500.0, "size_up_to": 75,
                       "budget_actual": True, "time_stop": 45, "tv_path": False, "gap_go": True, "gap_go_max_qty": 1,
                       "gap_go_locked_qty": 10, "trail_cap": 0.0,
                       # G79: More trading days and the 2-point sizing allowance
                       "gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.6, "fill_after_lock": True,
-                      "fill_min_room": 2500.0, "size_slip_pts": 5.0, "fill_qty2_room": 6000.0,
+                      "fill_min_room": 2500.0, "size_slip_pts": 5.0, "fill_qty2_room": 4000.0,
                       "giveback_brake": 0.5,
                       # G191: no gap-slot trade while the giveback brake is on
                       "gap_skip_braked": True,
@@ -44,9 +44,9 @@ GROW = NoiseConfig(**{**V21, "qty": 1, "lookback": 14, "max_loss_per_trade": 187
                       # G125: no entries at 13:00 and 14:30 until the floor has stopped
                       "skip_checks": "780,870", "skip_checks_early": True,
                       # G142: a contract per $750 above $10,000 of profit
-                      "profit_step_fast": 700.0,
+                      "profit_step_fast": 650.0,
                       # G210: $700 steps above $8,000, and 3-MNQ fill-ins from $9,000 above the floor
-                      "profit_step_fast_from": 8000.0, "fill_qty3_room": 9000.0,
+                      "profit_step_fast_from": 8000.0, "fill_qty3_room": 8000.0,  # G212: 650 / 8,000 / 2 MNQ from 4,000 / 75
                       # G165 / G167 / G168: the after-loss max loss as every trade's ($187.50) on 5-minute bars
                       "after_loss_ml_mult5": 1.0},
                    nt_execution=True, round_prices=True, target_on_fill_bar=True)
