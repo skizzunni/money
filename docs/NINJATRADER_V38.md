@@ -4024,3 +4024,7 @@ frozen of 89. A stop at the middle of the 09:30 bar is inside its normal noise: 
 **The idea:** the close must sit in the top (bottom) 35% of the day's range for a long (short), `range_pos_min` 0.65,
 set before gap and go, the fill-ins and 20 contracts. **Variants:** U29 with 0.55 and 0.75. **Adopt (the better by
 window net) on G78's rule**, against U29.
+
+**G112 result (run once, 2026-11-04): rejected; 0.65 stays.** 0.55: window $46,046 / $46,084 (index higher, $687,554 /
+$664,192); 0.75: window $46,750 / $46,077, index $578,777 / $576,408. Neither beats U29's window ($46,656 / $46,828) in
+both executions (`verification/noise_v2/g112_range_pos.txt`).
