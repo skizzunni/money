@@ -1,0 +1,3 @@
+{"k": 0, "proxy net": 12987, "proxy d1000": 0, "nq net": 1, "nq d1000": 0, "index net": 705594, "index d1000": 0}
+{"k": 1, "proxy net": 52351, "proxy d1000": 0, "nq net": 541544, "nq d1000": 0, "index net": 754302, "index d1000": 1}
+{"k": 2, "proxy net": 12295, "proxy d1000": 0, "nq net": 496327, "nq d1000": 0, "index net": 695864, "index d1000": 0}

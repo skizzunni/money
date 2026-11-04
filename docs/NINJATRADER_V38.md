@@ -4673,3 +4673,23 @@ bot both more profitable and less fragile to fills.
 budget. `gap_go_k_locked` (a new research setting): once the floor has stopped, the main gap trade needs a gap of this
 x the average (0.5 before; the 1-contract small-gap and drive fill-ins unchanged). **Variants:** U34 with 0.75 and 1.0.
 G135's screen against U34, then confirmation for the best on G78's rule.
+
+**G157 result (run once, 2026-11-04): rejected.** 0.75: window $55,056, NQ $555,742, index **$765,364**; 1.0: $51,837
+/ $514,745 / $730,559 (U34 $54,879 / $554,388 / $786,440). The gap trades earn their place. Log:
+`verification/noise_v2/g157_gapk.txt`.
+
+## G158: U34 at higher costs (a measurement, 2026-11-04)
+
+`research/g158_costs.py` (`verification/noise_v2/g158_costs.txt`), the chart's execution:
+
+| U34 at | window | NQ | index | days at −$1,000 |
+|---|---|---|---|---|
+| 1 tick, $0.62 a side (as tested) | $54,879 | $554,388 | $786,440 | 0 |
+| 2 ticks (G156) | $52,137 | $509,357 | $742,460 | 0 |
+| **3 ticks** | **$12,987** | **lost** | $705,594 | 0 |
+| $1.00 a side | $52,351 | $541,544 | $754,302 | 1 (index) |
+| 2 ticks and $1.00 a side | $12,295 | $496,327 | $695,864 | 0 |
+
+**Live, the fills decide it:** at 1-2 ticks a fill the bot holds; at 3 ticks on every fill a fresh account can stall or
+be lost. The journal's "entry slip ticks" / "exit slip ticks" columns (U7) show the real fills: if they average 3 or
+more, stop and check the connection, the data feed and the order type.

@@ -1,0 +1,3 @@
+{"k": 0, "proxy net": 54879, "proxy d1000": 0, "nq net": 554388, "nq d1000": 0, "index net": 786440, "index d1000": 0}
+{"k": 1, "gap_go_k_locked": 0.75, "proxy net": 55056, "proxy d1000": 0, "nq net": 555742, "nq d1000": 0, "index net": 765364, "index d1000": 0}
+{"k": 2, "gap_go_k_locked": 1.0, "proxy net": 51837, "proxy d1000": 0, "nq net": 514745, "nq d1000": 0, "index net": 730559, "index d1000": 0}
