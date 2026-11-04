@@ -4977,3 +4977,9 @@ against U39 (no more than 19 lost).
 / $560,920, index $787,763 / $780,492; 19 lost. Steps per $600 from $15,000: window **$56,806 / $57,130**, NQ $563,830 /
 $561,265, index **$786,626 / $779,569** (−0.1%), 19 lost: fails G78 on the index by about $1,000. Fill-ins at 2 MNQ from
 $5,000: $54,694 / $54,862, $564,800 / $562,296, $787,969 / $780,492, **20** lost. Log: `verification/noise_v2/g179.txt`.
+
+## G180: the drive trigger at 0.7, and the small-gap trigger at 0.1, on U39 (registered 2026-11-04, before its run)
+
+**Variants:** U39 with `gap_go_drive_k` 0.7, and U39 with `gap_go_small_k` 0.1 (a small gap at least 0.1x the average
+for the 1-contract fill-in; U39: any). **Run once:** the 263 starts and the full sets in both executions. **Adopt (the
+better window) on G78's rule** against U39 (no more than 19 lost), or G99b's if it loses fewer.
