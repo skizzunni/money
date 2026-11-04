@@ -77,7 +77,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         // 09:30 bar closing the gap's way), an opening drive (no gap trade, the 09:30 bar's body at least FillDriveK x
         // the last 14 sessions' average body, its way) in the 09:35-09:55 slot, and the shorts the trend filter blocks
         public bool MoreDays = false;
-        public double FillSmallK = 0.0, FillDriveK = 0.5, FillMinRoom = 3000;
+        public double FillSmallK = 0.0, FillDriveK = 0.6, FillMinRoom = 3000;
         // G97: the fill-ins at 2 MNQ while the account is FillQty2Room above the floor (0 = always 1)
         public double FillQty2Room = 0;
         // G99: once the floor has stopped at the start, while the profit is under GivebackBrake x the best end-of-day

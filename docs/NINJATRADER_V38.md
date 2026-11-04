@@ -4959,3 +4959,10 @@ $774,859); no −$1,000 day, the floor never touched; 263 starts **20** lost (NQ
 **The idea, from G177:** k11 changed three settings; the drive trigger (`gap_go_drive_k` 0.6: a bigger 09:30 bar
 needed) is the one that touches every set's first half hour. **The variant:** U38 with 0.6 alone. **Run once:** the 263
 starts and the full sets in both executions. **Adopt on G78's rule** against U38 (or G99b's if it loses fewer).
+
+**G178 result (run once, 2026-11-04): passes G78's rule; adopted (U39).** Chart / NinjaTrader: window $54,638 /
+**$54,700** (U38 $54,339 / $54,417), NQ $563,486 / $560,920 (U38 $560,911 / $558,360), index $787,763 / $780,492 (U38
+$783,163 / $774,859); no −$1,000 day, the floor never touched; 263 starts **19** lost (as U38; NQ 10, index 9), medians
+$50,083 / $39,579. Log: `verification/noise_v2/g178_drive06.txt`.
+
+**U39 (2026-11-04): the opening-drive fill-in needs a 09:30 bar of 0.6x the average body (G178; U26-U38: 0.5).**

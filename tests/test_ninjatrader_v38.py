@@ -31,7 +31,7 @@ GROW = NoiseConfig(**{**V21, "qty": 1, "lookback": 14, "max_loss_per_trade": 187
                       "budget_actual": True, "time_stop": 60, "tv_path": False, "gap_go": True, "gap_go_max_qty": 1,
                       "gap_go_locked_qty": 10, "trail_cap": 0.0,
                       # G79: More trading days and the 2-point sizing allowance
-                      "gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
+                      "gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.6, "fill_after_lock": True,
                       "fill_min_room": 3000.0, "size_slip_pts": 5.0, "fill_qty2_room": 6000.0,
                       "giveback_brake": 0.5,
                       # G119: once the floor has stopped, the trade after a loser risks $187.50 like the others
@@ -703,7 +703,7 @@ def test_v38_more_days(sim, sample_1m, tmp_path):  # noqa: F811
     with path.open("w") as f:
         for t, r in zip(bars.index, bars.itertuples(), strict=True):
             f.write(f"{t:%Y-%m-%d %H:%M},{r.open!r},{r.high!r},{r.low!r},{r.close!r}\n")
-    fill = {"gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
+    fill = {"gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.6, "fill_after_lock": True,
             "fill_min_room": 100.0}
     days = {}
     for on in (True, False):

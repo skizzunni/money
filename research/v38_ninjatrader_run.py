@@ -9,7 +9,7 @@ LQ = int(os.environ.get("GAP_LOCKED", "10"))  # G67: gap and go's contracts once
 MORE = os.environ.get("MORE_DAYS", "1") == "1"  # G72/G79: the "More trading days" switch (on by default)
 NTARGS = (["Mode=Funded growth", "TrailFrom=2025-01-02", f"GapGoLocked={LQ}", f"MoreDays={MORE}"] if GROW
           else ["Mode=Evaluation"])
-FILL = ({"gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
+FILL = ({"gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.6, "fill_after_lock": True,
          "fill_min_room": 3000.0, "fill_qty2_room": 6000.0} if MORE else {})
 SLIP = float(os.environ.get("SIZE_SLIP", "5"))  # G170 (G76 2, G106 4): the sizing's extra stop slippage, points
 NTARGS += [f"SizeSlip={SLIP}"] if GROW else []
