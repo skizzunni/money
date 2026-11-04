@@ -5293,3 +5293,13 @@ lost) or G99b's (at least 4 fewer lost, every net at least 95%).
 same as U41. Chart / NinjaTrader: window $54,622 / $54,710 and index $787,157 / $776,319, identical to U41; NQ $563,636 /
 **$561,003** (U41 $563,437 / $553,165). G78 asks for a higher net on all three, and the window and the index are only
 equal; a braked account rarely meets a short fill-in. Log: `verification/noise_v2/g202_fill_skip_braked.txt`.
+
+## G203: 40 random combinations of the survival settings around U41 (registered 2026-11-04, before its run)
+
+**The search** (`research/g203_survival_search.py`, seed 203): 40 combinations, each moving about 4-5 of 18 settings
+(the brake level, the fill-in cushion and 2-MNQ room, the early daily budget and max loss, the contract step, the sizing
+allowance, the losers a day, the skipped checks, the lock, target, time stop, trend, calm, big-day and range filters,
+the gap trigger, the after-loss max loss). **Stage A:** each on the 263 starts on the 1st (U41: 17). **Stage B:** the one
+with the fewest lost (ties: the higher median), if 13 or fewer, goes on to the 263 mid-month starts and the full sets
+in both executions. **Adopted on G99b's rule** (at least 4 fewer of the 526 than U41's 38, every net at least 95%, no
+−$1,000 day, the floor never touched) or G78's.
