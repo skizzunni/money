@@ -5331,3 +5331,10 @@ than U41's 38, every net at least 95%) or G78's.
 without the early budget 14, without three losers 14, the early budget alone 16, **without the 0.7 range filter 29**:
 the range filter carries the survival gain. "Without the brake" goes on to stage B. Log:
 `verification/noise_v2/g204_k18_apart.txt`.
+
+## G205: the range-position filter at 0.7 alone, on U41 (registered 2026-11-04, before its run)
+
+**Why, from G204:** putting k18's range filter back to U41's 0.65 loses 29 of 263 instead of 12; the filter at 0.7
+(`range_pos_min`) carries the survival gain. G112 last checked it on U29. **The variant:** U41 with `range_pos_min`
+0.7 alone. **Run once:** the 526 starts and the full sets in both executions. **Adopt on G78's rule** (higher nets on all
+three in both executions, no more than 38 lost) or G99b's (at least 4 fewer lost, every net at least 95%).
