@@ -4837,3 +4837,7 @@ nets unchanged within 1%. The wider stop after a loss was costing accounts.
 `giveback_brake` 0.45-0.55, `fill_min_room` $2,500-3,500, the early no-entry checks (13:00 + 14:30, 14:30, 13:00).
 As G164: the fewest lost or frozen on the 263 starts (ties: the higher median) to the full sets in both executions;
 **adopt on G99b's survival-first rule** against U37 (fewer than 20, every net at least 95%).
+
+**G169 screen (2026-11-04), lost or frozen of 263 (U37 20):** k3 **16** (sizing allowance 6 points, brake 0.55,
+cushion $2,500; medians $29,536 / $46,371), then four at 19. k3 goes on to the full sets. Log:
+`verification/noise_v2/g169_survival_search.txt`.
