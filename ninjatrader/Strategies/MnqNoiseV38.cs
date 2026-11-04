@@ -80,6 +80,9 @@ namespace NinjaTrader.NinjaScript.Strategies
         public double FillSmallK = 0.0, FillDriveK = 0.5, FillMinRoom = 3000;
         // G97: the fill-ins at 2 MNQ while the account is FillQty2Room above the floor (0 = always 1)
         public double FillQty2Room = 0;
+        // G99: once the floor has stopped at the start, while the profit is under GivebackBrake x the best end-of-day
+        // profit, every trade at 1 MNQ (0 = off)
+        public double GivebackBrake = 0;
         // G76: the bot's sizing counts this many points more slippage at the stop (0 = off)
         public double SizeSlipPts = 0;
         // G87: within ProtectRoom of the trailing floor, no new trade on a session after a shadow (1-contract, paper)
@@ -188,10 +191,18 @@ namespace NinjaTrader.NinjaScript.Strategies
             return EqEff - floor < s.ProtectRoom;
         }
 
+        // G99: has the account given back more than (1 - GivebackBrake) of its best profit since the floor stopped?
+        public bool Braked()
+        {
+            if (s.GivebackBrake <= 0 || s.TrailDD <= 0 || double.IsNaN(trailPeak)) return false;
+            if (trailPeak - s.TrailDD < trailBase) return false;
+            return EqEff - trailBase < s.GivebackBrake * (trailPeak - trailBase);
+        }
+
         // G97: the fill-ins' contracts
         int FillQ()
         {
-            if (s.FillQty2Room <= 0 || s.TrailDD <= 0 || double.IsNaN(trailPeak)) return 1;
+            if (s.FillQty2Room <= 0 || s.TrailDD <= 0 || double.IsNaN(trailPeak) || Braked()) return 1;
             double floor = Math.Min(trailPeak - s.TrailDD, trailBase);
             return EqEff - floor >= s.FillQty2Room ? 2 : 1;
         }
@@ -222,7 +233,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                               : s.TrendN > 0 && trend == 1 ? (FillOk() ? "1 MNQ only (uptrend; More trading days)"
                                                                         : "no (uptrend: above the 50-session average)")
                               : FedToday && s.FedNoShorts ? "after 14:00 (Fed day)" : "yes";
-                return "longs " + longs + "; shorts " + shorts;
+                return "longs " + longs + "; shorts " + shorts + (Braked() ? "; giveback brake on: 1 MNQ a trade" : "");
             }
         }
 
@@ -607,6 +618,11 @@ namespace NinjaTrader.NinjaScript.Strategies
                 ml = ml / q * fq;
                 q = fq;
             }
+            if (Braked())  // G99: the giveback brake, 1 MNQ at its max loss a contract
+            {
+                ml = ml / q;
+                q = 1;
+            }
             if ((s.DailyLoss > 0 || s.TrailDD > 0) && ml > 0)  // the loss budget
             {
                 double costs = 2 * s.CommissionPerSide + 2 * slip * s.PointValue;
@@ -684,7 +700,10 @@ namespace NinjaTrader.NinjaScript.Strategies
                         q = Math.Min(q, (int)Math.Floor(room / perC + 1e-9));
                     bool floorStopped = !double.IsNaN(trailPeak) && trailPeak - s.TrailDD >= trailBase;
                     if (s.GapGoLockedQty > 0 && floorStopped)
+                    {
                         q = Math.Min(q, s.GapGoLockedQty);
+                        if (Braked()) q = Math.Min(q, 1);  // G99
+                    }
                     else if (s.GapGoMaxQty > 0)
                         q = Math.Min(q, s.GapGoMaxQty);
                     if (one)
@@ -812,6 +831,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 MoreDaysCushion = 3000;
                 SizeSlip = 3;  // G97 (G79: 2)
                 MoreDaysQty2Room = 6000;  // G97
+                GivebackBrake = 0;  // G99: set from G99c's result
                 NearFloorGate = 0;  // G87b: off (it lost more accounts)
                 TestedWinRate = 61.2;
             }
@@ -868,6 +888,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 st.MoreDays = MoreDays && st.GapGo;  // G72: the fill-in trades (5-minute chart, not in Evaluation)
                 st.FillMinRoom = MoreDaysCushion;
                 st.FillQty2Room = MoreDaysQty2Room;  // G97
+                st.GivebackBrake = Mode != "Evaluation" ? GivebackBrake : 0;  // G99
                 st.SizeSlipPts = Mode != "Evaluation" ? SizeSlip : 0;  // G79: the Funded growth modes and Custom
                 st.ProtectRoom = Mode != "Evaluation" ? NearFloorGate : 0;  // G87
                 st.Tick = TickSize;
@@ -1575,6 +1596,11 @@ namespace NinjaTrader.NinjaScript.Strategies
         [Range(0, 100000)]
         [Display(Name = "More trading days: fill-ins at 2 MNQ while the account is at least this far above the floor, $ (0 = always 1)", Order = 20, GroupName = "1. Size and risk")]
         public double MoreDaysQty2Room { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, 1)]
+        [Display(Name = "Giveback brake: once the floor has stopped, 1 MNQ per trade while the profit is under this share of its best (0 = off)", Order = 21, GroupName = "1. Size and risk")]
+        public double GivebackBrake { get; set; }
 
         [NinjaScriptProperty]
         [Range(0, 50)]

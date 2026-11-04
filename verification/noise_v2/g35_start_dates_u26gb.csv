@@ -1,5 +1,5 @@
 set,start,trades,net $,lowest $,reached +2000,floor touched,room at end $,lost,frozen,months to 50k,days to 3k
-nq,2015-04-01,412,2322,-745,True,True,2322,False,False,,103.0
+nq,2015-04-01,155,1,-421,True,False,1,True,True,,103.0
 nq,2015-07-01,74,-1125,-1125,False,False,1,True,True,,
 nq,2015-10-01,738,42881,-1061,True,False,42881,False,False,,210.0
 nq,2016-01-01,763,42843,-526,True,False,42843,False,False,,132.0
@@ -18,7 +18,7 @@ nq,2019-01-01,654,56122,-189,True,False,56122,False,False,20.1,160.0
 nq,2019-04-01,706,58746,-650,True,False,58746,False,False,17.8,269.0
 nq,2019-07-01,740,64100,-968,True,False,64100,False,False,14.8,218.0
 nq,2019-10-01,775,82393,0,True,False,82393,False,False,11.8,132.0
-nq,2020-01-01,755,69381,-186,True,True,69381,False,False,16.1,55.0
+nq,2020-01-01,59,1,-186,True,False,1,True,True,,55.0
 nq,2020-04-01,845,83403,0,True,False,83403,False,False,7.8,71.0
 nq,2020-07-01,889,69581,-182,True,False,69581,False,False,14.0,40.0
 nq,2020-10-01,850,60598,-958,True,False,60598,False,False,19.8,215.0
@@ -28,7 +28,7 @@ nq,2021-07-01,124,-256,-392,False,False,1,True,True,,
 nq,2021-10-01,926,65252,-1115,True,False,65252,False,False,19.1,146.0
 nq,2022-01-01,933,83539,-499,True,False,83539,False,False,16.8,80.0
 nq,2022-04-01,945,63362,-59,True,False,63362,False,False,13.8,25.0
-nq,2022-07-01,747,41576,-365,True,False,41576,False,False,,60.0
+nq,2022-07-01,76,5,-365,True,False,5,True,True,,60.0
 nq,2022-10-01,793,43053,0,True,False,43053,False,False,18.1,66.0
 nq,2023-01-01,798,8874,-681,True,False,8874,False,False,,145.0
 nq,2023-04-01,859,8884,0,True,False,8884,False,False,,55.0
@@ -65,7 +65,7 @@ index,2018-01-01,665,32249,0,True,False,32249,False,False,,288.0
 index,2018-04-01,667,37803,-1086,True,False,37803,False,False,,206.0
 index,2018-07-01,693,54279,-120,True,False,54279,False,False,19.3,107.0
 index,2018-10-01,784,66993,-130,True,False,66993,False,False,16.3,23.0
-index,2019-01-01,567,59259,-322,True,True,59259,False,False,20.1,399.0
+index,2019-01-01,161,1,-256,True,False,1,True,True,,
 index,2019-04-01,672,65766,-383,True,False,65766,False,False,17.1,269.0
 index,2019-07-01,688,69785,-888,True,False,69785,False,False,14.1,218.0
 index,2019-10-01,714,92394,0,True,False,92394,False,False,11.1,132.0
@@ -79,12 +79,12 @@ index,2021-07-01,795,45266,-379,True,False,45266,False,False,12.0,179.0
 index,2021-10-01,693,33574,-729,True,False,33574,False,False,,146.0
 index,2022-01-01,657,63734,-458,True,False,63734,False,False,19.6,102.0
 index,2022-04-01,682,47196,0,True,False,47196,False,False,16.9,18.0
-index,2022-07-01,487,6839,-381,True,False,6839,False,False,,60.0
+index,2022-07-01,79,4,-381,True,False,4,True,True,,60.0
 index,2022-10-01,536,9105,-81,True,False,9105,False,False,,97.0
 index,2023-01-01,445,2312,-103,True,False,2312,False,False,,235.0
 index,2023-04-01,463,2883,-13,True,False,2883,False,False,,145.0
 index,2023-07-01,547,2695,0,True,False,2695,False,False,,54.0
 index,2023-10-01,619,34355,-980,True,False,34355,False,False,,275.0
 index,2024-01-01,672,37354,0,True,False,37354,False,False,,183.0
-index,2024-04-01,585,6285,-306,True,True,6285,False,False,,120.0
+index,2024-04-01,605,6912,-306,True,False,6912,False,False,,120.0
 index,2024-07-01,605,9784,-509,True,False,9784,False,False,,193.0
