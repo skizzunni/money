@@ -4220,3 +4220,11 @@ growth modes and Custom on the 5-minute chart. `test_v38_early_no_entry_checks` 
 model with it on and off. **A fix found by its tests:** the milestone alert at a day's close counted the model's equity,
 which books the 16:00 close only after the check, so a level reached on the day's last trade was alerted a day late;
 it now counts the strategy's fills (`test_v38_milestones`).
+
+## G126: each trade risks part of the day's budget left (registered 2026-11-04, before its run)
+
+**The idea:** G122/G123: the day's first trades take the whole $900 left, so one loser ends the day before the
+strongest checks (10:00, 13:30, 15:00). With `budget_frac` below 1 a trade may risk only that share of what is left
+today (the steps and the cap unchanged). Last tested on v2.8 (`docs/RESULTS.md`), never with the growth sizing.
+**Variants:** U33 with `budget_frac` 0.6 and 0.8. **Adopt (the better window net of those that pass) on G78's rule or
+G99b's** against U33.
