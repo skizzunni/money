@@ -90,6 +90,13 @@ The 5-minute chart includes gap and go (U19, U20, U25: up to 10 MNQ once the flo
 data fix (G67), the after-loss max loss at $187.50 once the floor has stopped (U30), up to 50 MNQ (U32) and no entries
 at 13:00 and 14:30 until the floor has stopped (U33), and faster contract steps above $10,000 of profit (U34). They need the 5-minute chart, so **trade the 5-minute chart**.
 
+**What to expect from U34 (measured 2026-11-04, G141/G144 and the 263 fresh starts):**
+- A fresh 50K account: about **1 in 8 is lost or frozen** within 21 months (32 of 263 monthly starts); the median
+  account makes **$39,454 in 21 months**, about $430 a week; +$3,000 takes a median 138 days.
+- Once the account is $10,000-30,000 up: the window averaged **$1,660 a week** (17% of weeks at +$3,000 or more);
+  past $30,000 the day's $900 budget caps every trade and the long histories average $600-1,200 a week.
+- At 2 ticks of slippage instead of 1, the window still makes $52,137 (G156).
+
 **It matches the Python model, trade for trade.**
 - **30-minute bars:** all 303 trades are identical.
 - **5-minute bars:** identical to 2026-03-09, where the stand-in data stops at 15:10: the model closes at that bar, the
