@@ -4904,3 +4904,11 @@ executions. **Adopt (the fewest lost) on G99b's survival-first rule** against U3
 **G174 result (run once, 2026-11-04): both rejected on NinjaTrader's index.** 0.55: 18 lost or frozen of 263, nets
 99-100% except the index in NinjaTrader's execution, **$704,967** (91% of U38's $774,859); 0.6: 17 lost, the index
 **$637,763** (82%). Log: `verification/noise_v2/g174_brake.txt`.
+
+**U38 checks (2026-11-04):** the full suite, **669 passed**; the NinjaTrader growth run on the window $54,336.02
+(`verification/noise_v2/v38g_nt_u38.txt`), identical to the model up to the 2026-03-09 data hole.
+
+**G172-G174 and the lost starts (U38's 19 of 263):** 11 go before the floor stops, in the same bad stretches (mid-2015,
+late 2019 to March 2020, mid-2011, mid-2013, September 2023): a fresh account started into a losing regime. The early
+1-contract gap trade helps (G172), 2 contracts don't (G173), stronger brakes save one or two more but cost the index
+in NinjaTrader's execution (G174).
