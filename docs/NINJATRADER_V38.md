@@ -4529,3 +4529,7 @@ contracts in the thin early zone. Log: `verification/noise_v2/g145_k9.txt`.
 
 **The variant:** U34 with `profit_step_fast` 600 (above $10,000) and `giveback_brake` 0.4, the $1,500 step kept (the
 parts of k9 that leave the early zone as it is). **Adopt on G78's rule** against U34 (89 starts at most 8).
+
+**G146 result (run once, 2026-11-04): rejected.** Chart / NinjaTrader: window $57,170 / $57,330, NQ $560,431 /
+$558,030, index $786,214 / **$773,831** (U34 $786,440 / $776,796); 89 starts **9** (NQ 5, index 4) against 8. Log:
+`verification/noise_v2/g146.txt`.
