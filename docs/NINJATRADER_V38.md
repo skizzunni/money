@@ -5143,3 +5143,12 @@ G78's rule** (no more than 38 lost, higher nets) or G99b's (at least 4 fewer los
 and (b) 50 (25 points) on every trade, the gap trade's stop capped the same (`gap_go_cap`). **Run once:** the 526
 starts and the full sets in both executions. **Adopt (the fewest lost) on G78's rule** (no more than 38 lost, higher
 nets) or G99b's (at least 4 fewer lost, every net at least 95%), against U41 (or against G192's winner, if adopted).
+
+## G194: a small stop with no take-profit, on U41 (registered 2026-11-04, before its run)
+
+**The ask (the user):** "u can set take profit at like unlimited, but u can set stop loss [small]". G139 tried no
+take-profit only with the $187.50 stop (less net). **The variants:** U41 with no take-profit (`take_profit` 0) and no
+60-minute time stop (`time_stop` 0), so a trade ends at its stop, its lock (break-even once it is a max loss in profit)
+or 16:00, and the stop at (a) $100 and (b) $50 a contract, the gap trade's capped the same. **Run once:** the 526 starts
+and the full sets in both executions. **Adopt (the fewest lost) on G78's rule** (no more than 38 lost, higher nets) or
+G99b's (at least 4 fewer lost, every net at least 95%), against U41 (or G192/G193's winner, if adopted).
