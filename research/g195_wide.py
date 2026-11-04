@@ -1,12 +1,14 @@
-"""G195 (docs/NINJATRADER_V38.md): a wide random search around U41, 300 combinations of about 30 settings.
+"""G195/G196 (docs/NINJATRADER_V38.md): a wide random search around U41, 300 combinations of about 30 settings.
 
-Stage 1: every combination on the window (the chart's execution). Stage 2: the 15 best on the window (no -$1,000 day,
-at least U41's net) on NQ and the index. The output lists both stages; stage 3 (NinjaTrader's execution and the 526
+G195 (ORDER=window): stage 1 every combination on the window (the chart's execution), stage 2 the 15 best on the window
+(no -$1,000 day, at least U41's net) on NQ and the index. G196 (ORDER=long, SEED=196): stage 1 on NQ and the index,
+stage 2 the 15 best there (both at least U41's, no -$1,000 day) on the window. The output lists both stages; stage 3 (NinjaTrader's execution and the 526
 starts) is run separately for those passing stage 2.
 
     python research/g195_wide.py <data dir> <MNQ 09-26 file> <MNQ 12-26 file>
 """
 import json
+import os
 import random
 import sys
 from concurrent.futures import ProcessPoolExecutor
@@ -32,7 +34,8 @@ SPACE = {"lookback": [10, 12, 16, 20], "take_profit": [1.5, 1.75, 2.25, 2.5, 3.0
          "side_cooldown": [1, 2], "time_lock": [30, 60], "late_lock_from": [840, 900], "short_mult": [0.5, 1.5],
          "fill_min_room": [2000.0, 3000.0], "size_slip_pts": [3.0, 4.0, 6.0], "big_day_against_tp": [0.5, 1.0],
          "after_loss_tp": [1.0, 1.5], "day_keep": [0.25, 0.5]}
-rng = random.Random(195)
+rng = random.Random(int(os.environ.get("SEED", "195")))
+LONG = os.environ.get("ORDER", "window") == "long"
 VARIANTS = [{}]
 while len(VARIANTS) < 300:
     v = {k: rng.choice(c) for k, c in SPACE.items() if rng.random() < 0.25}
@@ -65,11 +68,13 @@ def one(job) -> dict:
 if __name__ == "__main__":
     S.init({}, *sys.argv[1:4])
     with ProcessPoolExecutor(4) as ex:
-        st1 = list(ex.map(one, [(k, ["proxy"]) for k in range(len(VARIANTS))], chunksize=4))
+        first, second = (["nq", "index"], ["proxy"]) if LONG else (["proxy"], ["nq", "index"])
+        st1 = list(ex.map(one, [(k, first) for k in range(len(VARIANTS))], chunksize=4))
         for r in st1:
             print("S1", json.dumps(r), flush=True)
-        base = st1[0]["proxy net"]
-        ok = [r for r in st1[1:] if r["proxy d1000"] == 0 and r["proxy floor"] == 0 and r["proxy net"] >= base]
-        top = sorted(ok, key=lambda r: -r["proxy net"])[:15]
-        for r in ex.map(one, [(k, ["nq", "index"]) for k in [0] + [t["k"] for t in top]]):
+        b = st1[0]
+        ok = [r for r in st1[1:] if all(r[f"{n} d1000"] == 0 and r[f"{n} floor"] == 0 and r[f"{n} net"] >= b[f"{n} net"]
+                                        for n in first)]
+        top = sorted(ok, key=lambda r: -sum(r[f"{n} net"] / b[f"{n} net"] for n in first))[:15]
+        for r in ex.map(one, [(k, second) for k in [0] + [t["k"] for t in top]]):
             print("S2", json.dumps(r), flush=True)

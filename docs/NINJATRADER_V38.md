@@ -5180,3 +5180,12 @@ The closest, k87 (`trend_n` 100, no time stop, the gap trade to break-even at 1x
 4-point sizing allowance): window $58,043, index **$806,551**, NQ $555,239 (98.5%), so it fails by NQ; k133 (lookback
 20, entry 0.9x, range position 0.55, last entry 15:30, at most four losers, $1,250 steps): NQ $550,705, index $608,681.
 Log: `verification/noise_v2/g195_wide.txt`.
+
+## G196: the wide search the other way round, judged first on NQ and the index (registered 2026-11-04, before its run)
+
+**Why:** G195 picked on the 21-month window and its picks failed on the long histories. **The search:** the same 30
+settings, a new draw (seed 196, 299 combinations, `ORDER=long`). **Stage 1:** each on NQ (2015-25) and the index
+(2011-26), the chart's execution. **Stage 2:** the 15 best there (both nets at least U41's, no −$1,000 day, the floor
+never touched; ranked by the sum of the two nets against U41's) on the window. **Stage 3:** any at least U41's net on
+the window too goes to NinjaTrader's execution and the 526 starts, best first, at most three; **adopted on G78's rule**
+(no more than 38 lost) or G99b's (at least 4 fewer lost, every net at least 95%).
