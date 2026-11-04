@@ -3922,3 +3922,11 @@ week, median $7; weeks at $3,000 or more: 5% overall, 0% in the first 15 months,
 (2026 Q2-Q3, at 10-15 contracts, average $800-1,640 a week). About 4 weeks in 10 lose money in every phase.
 
 **Scorecard, G44-G103:** 60 rounds. Adopted 9 (and the data fix); rejected 48; measurements 3.
+
+## G104: faster contract steps once the floor has stopped (registered 2026-11-04, before its run)
+
+**The idea:** the slow part is growth. G5/G63's faster steps lost accounts early; here they start only once the floor
+has stopped at the start (the first $2,000 made), with U27's giveback brake on: a contract per $1,000 of profit from
+then (`profit_step_locked` 1000), $1,500 before.
+**The variant:** U28 with `profit_step_locked` 1000. **Adopt on G78's rule**, against U28 (survival: no more lost or
+frozen than 10 on the 89 start dates).

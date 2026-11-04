@@ -149,7 +149,11 @@ PACK = {"P0": {}, "P1": {"gap_go_small_k": 0.0}, "P2": {"gap_go_small_k": 0.0, "
         # G102: U28 with the fill-ins from day one
         "U28day1": {"gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": False,
                     "fill_min_room": 0.0, "size_slip_pts": 3.0, "gap_go_locked_qty": 10, "fill_qty2_room": 6000.0,
-                    "giveback_brake": 0.5}}
+                    "giveback_brake": 0.5},
+        # G104: U28 with a contract per $1,000 once the floor has stopped
+        "U28s1000": {"gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
+                     "fill_min_room": 3000.0, "size_slip_pts": 3.0, "gap_go_locked_qty": 10, "fill_qty2_room": 6000.0,
+                     "giveback_brake": 0.5, "profit_step_locked": 1000.0}}
 for pk in (sys.argv[4].split(",") if len(sys.argv) > 4 else list(PACK)):
     for name, (bars, first, skip) in S.D.items():
         if name == "win":
