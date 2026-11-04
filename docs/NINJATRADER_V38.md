@@ -5715,5 +5715,4 @@ lost, the window $57,443 (U44 $57,475). The $2,500 cushion stays. Log: `verifica
 526 starts and the full sets in both executions. **Adopt (the fewer lost) on G78's rule** against U44, or G99b's.
 
 **G233 result (run once, 2026-11-04): both rejected.** 0.4: 32 lost, window unchanged, index $826,176 (lower); 0.6: 30
-lost and the window **$14,368** (the brake at 60% catches the window's 2025 giveback and holds the account at 1 MNQ
-through the recovery). 0.5 stays. Log: `verification/noise_v2/g233_brake.txt`.
+lost and the window **$14,368** (the brake at 60% acts on the window and costs most of its profit). 0.5 stays. Log: `verification/noise_v2/g233_brake.txt`.
