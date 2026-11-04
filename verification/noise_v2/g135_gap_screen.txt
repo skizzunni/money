@@ -1,0 +1,8 @@
+{"k": 0, "proxy net": 50219, "proxy d1000": 0, "nq net": 546409, "nq d1000": 0, "index net": 784933, "index d1000": 0}
+{"k": 1, "gap_go_k": 0.6, "proxy net": 49266, "proxy d1000": 0, "nq net": 564051, "nq d1000": 0, "index net": 780076, "index d1000": 0}
+{"k": 2, "gap_go_k": 0.75, "proxy net": 50522, "proxy d1000": 0, "nq net": 544905, "nq d1000": 0, "index net": 764952, "index d1000": 0}
+{"k": 3, "gap_go_k": 1.0, "proxy net": 48324, "proxy d1000": 0, "nq net": 507788, "nq d1000": 0, "index net": 730894, "index d1000": 0}
+{"k": 4, "gap_go_locked_qty": 5, "proxy net": 40774, "proxy d1000": 0, "nq net": 488356, "nq d1000": 0, "index net": 693291, "index d1000": 0}
+{"k": 5, "gap_go_locked_qty": 15, "proxy net": 52220, "proxy d1000": 0, "nq net": 576950, "nq d1000": 0, "index net": 829700, "index d1000": 1}
+{"k": 6, "gap_go_drive_k": 0.7, "proxy net": 51126, "proxy d1000": 0, "nq net": 542578, "nq d1000": 0, "index net": 794193, "index d1000": 0}
+{"k": 7, "gap_go_small_k": 0.2, "proxy net": 49733, "proxy d1000": 0, "nq net": 553817, "nq d1000": 0, "index net": 783550, "index d1000": 0}

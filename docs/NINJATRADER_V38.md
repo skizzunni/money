@@ -4361,3 +4361,14 @@ budget for the least edge.
 `gap_go_locked_qty` 5 / 15, `gap_go_drive_k` 0.7, `gap_go_small_k` 0.2. A variant passes the screen with the window,
 NQ and the index at least U33's and no −$1,000 day; the best window net goes on to NinjaTrader's execution and the 89
 starts, on G78's rule or G99b's against U33.
+
+**G135 result (run once, 2026-11-04): none passes the screen.** U33: window $50,219, NQ $546,409, index $784,933.
+`gap_go_locked_qty` 15: $52,220 / $576,950 / $829,700 but one index day at −$1,000; `gap_go_drive_k` 0.7: $51,126 /
+**$542,578** / $794,193; the rest lower somewhere. Log: `verification/noise_v2/g135_gap_screen.txt`.
+
+## G136: 15 gap contracts sized for a jumped stop (registered 2026-11-04, before its run)
+
+**The idea:** G135's 15 gap contracts failed only on one −$1,000 day, a gap stop filled past its price; G86's
+`gap_slip_pts` sizes the gap trade as if its stop fills that many points worse. **Variants:** U33 with
+`gap_go_locked_qty` 15 + `gap_slip_pts` 2, 15 + 4, 12 + 2. G135's screen, then NinjaTrader's execution and the 89 starts
+for the best, on G78's rule or G99b's against U33.
