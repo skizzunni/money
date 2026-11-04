@@ -3723,3 +3723,18 @@ is G96. **The variant:** U25 with `fill_qty2_room` 6000 and `size_slip_pts` 3. *
 
 **Scorecard, G44-G97:** 54 rounds. Adopted: G60 (U19), G67b (U20), G67's data fix, G79 (U22), G80 (U23), G82 (U24),
 G84 (U25), G97 (U26). Rejected: 43. Measurements: G54, G55, G88.
+
+## Measured (2026-11-04): no losing slice of trades
+
+At 1 contract over NQ 2015-25 and the index 2011-26 (`research/g98_trade_slices.py`), every slice of the bot's trades
+makes money: longs ($23 a trade, t 4.7-5.7), shorts ($25-27, t 3.6-4.6), gap trades ($13-19, t 2.9-3.3), every check
+time from 10:00 to 15:00, every weekday, and the trades after a loser ($29-30 a trade, more than the rest). So the
+lost accounts are not a bad kind of trade to drop: they are runs of ordinary losers at the wrong time for a $2,000
+drawdown.
+
+## G98: gap contracts that grow with the cushion (registered 2026-11-04, before its run)
+
+**The idea:** once the floor stops, the gap trade may take 10 MNQ at once, when the account is only about $2,000 above
+the floor; one 09:35 stop then costs up to the whole day's $900. Here, once the floor has stopped, the gap trade's
+contracts are at most 1 per $400 above the floor (`gap_go_room_per_c` 400: 5 at $2,000, 10 from $4,000), up to 10.
+**The variant:** U26 with `gap_go_room_per_c` 400. **Adopt on G78's rule**, against U26 (and its 89 start dates' 11).

@@ -337,6 +337,7 @@ class NoiseConfig:
     protect_room: float = 0.0
     calm_small: bool = False  # G95: on a calm stretch, the bot's signals at 1 contract while fill_ok() (fill-ins)
     fill_qty2_room: float = 0.0  # G96: the fill-ins at 2 contracts while the account is this far above the floor
+    gap_go_room_per_c: float = 0.0  # G98: once the floor has stopped, a gap trade's contracts at most room / this
     protect_dates: str = ""
     # research (G67): once the trailing floor has stopped at the start (trail_cap), a gap trade may take up to this
     # many contracts in place of gap_go_max_qty (0 = off)
@@ -768,6 +769,9 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                             q = min(q, math.floor(room / per_c + 1e-9))
                         if cfg.gap_go_locked_qty > 0 and locked_floor:
                             q = min(q, cfg.gap_go_locked_qty)
+                            if cfg.gap_go_room_per_c > 0:  # G98: grown with the cushion above the floor
+                                q = min(q, max(1, int((eq_curve[-1] - trail_base - cfg.trail_cap)
+                                                      // cfg.gap_go_room_per_c)))
                         elif cfg.gap_go_max_qty > 0:
                             q = min(q, cfg.gap_go_max_qty)
                         if one:
