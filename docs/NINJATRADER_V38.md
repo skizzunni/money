@@ -5193,3 +5193,9 @@ the window too goes to NinjaTrader's execution and the 526 starts, best first, a
 **U41 checks (2026-11-04):** the full suite, **670 passed**; the NinjaTrader growth run on the window $54,700.08
 (`verification/noise_v2/v38g_nt_u41.txt`), the same as U40's (the brake never acts there), identical to the model up to
 the 2026-03-09 data hole.
+
+**G193 result (run once, 2026-11-04): both rejected.** NinjaTrader's execution, window / NQ / index: $100 **$31,068** /
+$609,219 / $800,791; $50 **$1,776** / $774,367 / $787,199 (U41 $54,710 / $553,165 / $776,319). The long histories gain,
+but the window, where the account trades, loses 43% and 97%; at $50 only 40-48% of trades win (25 points is inside a
+5-minute bar's noise), and the chart's index has three days past −$1,000. 526 starts: $100 **88** lost or frozen, $50
+**66** (U41 38); medians $12,800-24,000 (U41 about $39,000). Log: `verification/noise_v2/g193_small_stops.txt`.
