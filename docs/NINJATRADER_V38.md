@@ -3854,3 +3854,30 @@ keeps a healthy account at 1 MNQ for long stretches. 0.5 stays (`verification/no
 **Scorecard, G44-G101:** 58 rounds. Adopted: G60 (U19), G67b (U20), G67's data fix, G79 (U22), G80 (U23), G82 (U24),
 G84 (U25), G97 (U26), G99c (U27). Rejected: 46. Measurements: G54, G55, G88. (U28, the live-account dashboard and
 room cap, is a safety change, not a G round.)
+
+## Measured (2026-11-04): why the user's NinjaTrader run shows 101 trades and $7,046
+
+The user's Strategy Analyzer run: MNQ DEC26, 5-minute, 1/1/2026-11/2/2026, 101 trades, $7,046.00, 0.98 trades a day
+(about 103 trading days). The model, U28, NinjaTrader's execution (`research/user_runs.py`):
+
+| | trades | days with a trade | net |
+|---|---|---|---|
+| account from 2025-01-02 (the reported window, 22 months) | 704 | 73% | $45,396 |
+| a fresh account from 2026-01-02 (to 2026-10-16) | 198 | 49% | $9,580 |
+| data from 2026-05-03 only (the user's DEC26 history), account from then | 139 | 58% | $9,600 |
+
+- **The user's data starts in May:** the MNQ DEC26 contract's history begins 2026-05-03 (found earlier), so January-
+  April has no bars; 101 trades at 0.98 a day is about five months.
+- **$45k is 22 months:** the window's account was +$3,000 by August 2025 and traded bigger and more often from there.
+  A fresh account in 2026 first reached +$3,000 in August 2026.
+- **The fill-ins (most of the extra days) start only $3,000 above the stopped floor**, so a new account trades on
+  about half the days until then.
+
+## G102: fill-ins from day one (registered 2026-11-04, before its run)
+
+**The ask:** trades every day. **The variant:** U28 with the fill-ins (small gaps, drives, uptrend shorts) from the
+start at 1 MNQ (`fill_after_lock` off, `fill_min_room` 0; 2 MNQ still from $6,000 above the floor), with the giveback
+brake on. G69/G70 tried this without the brake and lost new accounts.
+**Adopt on G99b's rule**, against U28 (U27's numbers): fewer lost or frozen than 10 on the 89 start dates... and, since
+the ask is days traded, also as a switch ("Fill-ins from day one", off) if it holds 10 or fewer with the nets at 95%.
+Also reported: days with a trade for a fresh 2026 account.
