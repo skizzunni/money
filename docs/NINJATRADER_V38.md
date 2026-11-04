@@ -4788,3 +4788,7 @@ stops U30's $187.50 applies. `test_v38_after_loss_225` checks NinjaTrader's code
 `fill_min_room` $2,500-3,500, `max_loss_per_trade` $175 / $187.50 / $200, the early no-entry checks (13:00 + 14:30,
 14:30, 13:00 + 14:00 + 14:30). As G164: the fewest lost or frozen on the 263 starts (ties: the higher median) goes on to
 the full sets in both executions; **adopt on G99b's survival-first rule** against U35 (fewer than 26).
+
+**G166 screen (2026-11-04), lost or frozen of 263 (U35 26):** k0 **21** (after-loss 1.1x, brake 0.6, cushion $3,000,
+max loss $175, the early check at 14:30 only; medians $38,603 / $45,192), k15 21 (medians $28,629 / $40,382), k1 22,
+k13 23. By the registered rule k0 goes on to the full sets. Log: `verification/noise_v2/g166_survival_search.txt`.

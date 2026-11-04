@@ -394,6 +394,8 @@ PACK = {"P0": {}, "P1": {"gap_go_small_k": 0.0}, "P2": {"gap_go_small_k": 0.0, "
                     "fill_min_room": 3000.0, "size_slip_pts": 4.0, "gap_go_locked_qty": 10, "fill_qty2_room": 6000.0,
                     "giveback_brake": 0.5, "after_loss_ml_locked": 1.0, "size_up_to": 50, "skip_checks": "780,870",
                     "skip_checks_early": True, "profit_step_fast": 750.0, "after_loss_ml_mult": 1.2}}
+if os.environ.get("PACK_JSON"):  # G166: a package given as JSON (PACK_NAME names it)
+    PACK[os.environ.get("PACK_NAME", "json")] = __import__("json").loads(os.environ["PACK_JSON"])
 for pk in (sys.argv[4].split(",") if len(sys.argv) > 4 else list(PACK)):
     for name, (bars, first, skip) in S.D.items():
         if name == "win":
