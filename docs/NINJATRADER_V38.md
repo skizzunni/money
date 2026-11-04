@@ -5527,3 +5527,10 @@ the full sets in both executions. **Adopt on G78's rule** against U44 (higher ne
 **G218 result (run once, 2026-11-04): rejected.** k20: the window **$15,044 / $7,545** (U44 $57,446 / $57,475) though NQ
 $601,417 / $602,205 and the index $850,045 / $828,426 are higher; 526 starts 26 lost (10 + 16). A setting set that fits
 the long histories and fails the window the account trades. Log: `verification/noise_v2/g218_k20.txt`.
+
+## G219: a $950 day budget once the floor has stopped, on U44 (registered 2026-11-04, before its run)
+
+**Why:** once grown, the $900 day budget caps every trade (G122, G185). G110 tried $950 on an old version. **The
+variant:** U44 with `daily_loss_limit` 950 (the $750 early budget unchanged, so it acts only once the floor has
+stopped). **Run once:** the 526 starts and the full sets in both executions. **Adopt on G78's rule** against U44 (higher
+nets on all three in both executions, **no day at −$1,000 or worse**, the floor never touched, no more than 28 lost).
