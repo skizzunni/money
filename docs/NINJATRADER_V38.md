@@ -5048,3 +5048,9 @@ rule** against U40 (fewer than 42 of 526 lost, every net at least 95%).
 $175-430 a week; $10,000-30,000 **$1,637** a week on the window (17% of weeks at +$3,000), $1,627 on NQ, $639 on the
 index; past $30,000 $714-1,177 a week, 12-15% of weeks at +$3,000. About the same as U34: today's later rounds bought
 survival, not weekly profit.
+
+## G186: no shorts at all in an uptrend, on U40, on 526 starts (registered 2026-11-04, before its run)
+
+**The variant:** U40 with `trend_small` off (above the 50-session trend, no shorts at all; U40: 1-contract shorts there
+once the floor stops). **Run once:** the 526 starts and the full sets in both executions. **Adopt on G78's rule**
+against U40 (no more than 42 of 526 lost), or G99b's if it loses fewer.
