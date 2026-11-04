@@ -3453,3 +3453,10 @@ $551,532). The $3,000 cushion stays (`verification/noise_v2/g81_cushion2000.txt`
 
 **Scorecard, G44-G82:** 39 rounds. Adopted: G60 (U19), G67b (U20), G67's data fix, G79 (U22), G80 (U23), G82 (U24).
 Rejected: 31 (G54 and G55 were measurements).
+
+## G83: the gap trade at the bot's size once the floor has stopped (registered 2026-11-04, before its run)
+
+**The idea:** 3, 5 and 7 each passed. With 15 (the most contracts), a gap trade after the floor stops takes the bot's
+own size (its contract steps, sized down to the day's room and the floor's room).
+
+**The variant:** U24 with `gap_go_locked_qty` 15. **Adopt on G78's rule**, against U24.
