@@ -3412,3 +3412,12 @@ has stopped at the start: up to this many MNQ" now defaults to **5** (was 3).
 
 **Scorecard, G44-G80:** 37 rounds. Adopted: G60 (U19), G67b (U20), G67's data fix, G79 (U22), G80 (U23). Rejected: 30
 (G54 and G55 were measurements).
+
+## G81: More trading days from a $2,000 cushion (registered 2026-11-04, before its run)
+
+**The idea:** the fill-ins wait for $3,000 above the stopped floor. At $2,000 they start the day the floor stops (the
+floor stops when the account is $2,000 up), so the account's second stretch trades more days.
+
+**The variant:** today's default (U23) with "More trading days" cushion $2,000 (`fill_min_room` 2000).
+
+**Adopt on G78's rule**, against U23 (and its 89 start dates' 11).
