@@ -5152,3 +5152,16 @@ take-profit only with the $187.50 stop (less net). **The variants:** U41 with no
 or 16:00, and the stop at (a) $100 and (b) $50 a contract, the gap trade's capped the same. **Run once:** the 526 starts
 and the full sets in both executions. **Adopt (the fewest lost) on G78's rule** (no more than 38 lost, higher nets) or
 G99b's (at least 4 fewer lost, every net at least 95%), against U41 (or G192/G193's winner, if adopted).
+
+## G195: a wide random search around U41, 300 combinations of 30 settings (registered 2026-11-04, before its run)
+
+**The ask (the user):** "keep thinking outside the box and run a million ways". Earlier searches (G115, G145, G147,
+G164-G177) moved 5-7 settings over about 23 combinations. **The search** (`research/g195_wide.py`, seed 195): 299
+combinations, each moving about 7 of 30 settings at once (the noise lookback, entry multiple, take-profit, lock, max
+loss, time stop, last entry, filters, trend, size steps, brake, gap trade, partial exits, cooldowns, short size,
+after-loss target, day keep...); row 0 is U41. **Stage 1:** each on the window (the chart's execution). **Stage 2:** the
+15 best on the window with no −$1,000 day, the floor never touched and at least U41's net, on NQ and the index.
+**Stage 3:** any passing stage 2 (at least U41's net on NQ and the index, no −$1,000 day) goes to NinjaTrader's
+execution and the 526 starts, best window first, at most three; **adopted on G78's rule** (no more than 38 lost) or
+G99b's (at least 4 fewer lost, every net at least 95%). With 299 tries some will beat U41 on the window by chance; NQ,
+the index and the 526 starts are the check against that.
