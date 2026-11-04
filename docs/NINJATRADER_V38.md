@@ -3762,3 +3762,11 @@ The same variant as G99, judged on G87's survival-first rule (the ask is fewer l
 **adopt only if**, on G35's 89 start dates, **fewer lost or frozen accounts than U26's 11**; the window's and the
 index's net at least 95% of U26's in both executions (already known: 100%); no day at −$1,000 on any set; the floor
 never touched on the window and the index.
+
+**G99b result (run once, 2026-11-04): passes.** 89 start dates: **5 lost or frozen** (NQ 2 of 35, index 3 of 54)
+against U26's 11; medians $43,402 NQ / $37,330 index (U26: $47,789 / $39,130); window and index nets 100% of U26's; no
+−$1,000 day; floor never touched (`g35_start_dates_u26gb.csv`).
+
+**A bug, found while building the NinjaTrader side:** with the brake on, the model set a gap trade to exactly 1
+contract, even on a day whose room fitted none (it should be at most 1). The fix (`min(q, 1)`) is re-run in full
+before adoption (G99c): the three sets in both executions and the 89 start dates, on G99b's rule.

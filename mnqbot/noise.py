@@ -779,7 +779,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                         if cfg.gap_go_locked_qty > 0 and locked_floor:
                             q = min(q, cfg.gap_go_locked_qty)
                             if braked():  # G99
-                                q = 1
+                                q = min(q, 1)
                             if cfg.gap_go_room_per_c > 0:  # G98: grown with the cushion above the floor
                                 q = min(q, max(1, int((eq_curve[-1] - trail_base - cfg.trail_cap)
                                                       // cfg.gap_go_room_per_c)))
