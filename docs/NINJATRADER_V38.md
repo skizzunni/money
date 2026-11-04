@@ -4830,3 +4830,10 @@ model at $187.50 and $250; `test_v38_after_loss_locked` keeps testing U30's swit
 
 **The after-loss line on the 263 starts:** 1.33x (U34) 32 lost, 1.2x (U35) 26, 1.1x (U36) 25, 1.0x (U37) 20, with the
 nets unchanged within 1%. The wider stop after a loss was costing accounts.
+
+## G169: 20 random combinations of the survival settings around U37 (registered 2026-11-04, before its run)
+
+**Variants (seed 169), around U37:** `profit_step` $1,500 / 1,750 / 2,000 (slower early steps), `size_slip_pts` 3-6,
+`giveback_brake` 0.45-0.55, `fill_min_room` $2,500-3,500, the early no-entry checks (13:00 + 14:30, 14:30, 13:00).
+As G164: the fewest lost or frozen on the 263 starts (ties: the higher median) to the full sets in both executions;
+**adopt on G99b's survival-first rule** against U37 (fewer than 20, every net at least 95%).
