@@ -5625,3 +5625,11 @@ sets in both executions. **Adopt (the better window) on G78's rule** against U44
 **G226 result (run once, 2026-11-04): both rejected: an index day past −$1,000.** 11 contracts: window $59,537, NQ
 $588,863, 28 lost, but an index day at **−$1,059**; 12: window $61,344, NQ $596,353, 28 lost, an index day at
 **−$1,155** (a gap trade stopped past its price at the open). 10 stays. Log: `verification/noise_v2/g226_gap_qty.txt`.
+
+## G227: 12 gap contracts sized for a stop 10 points worse, on U44 (registered 2026-11-04, before its run)
+
+**Why, from G226:** 12 gap contracts raise every net but one index day reached −$1,155, a gap stop filled past its
+price. G86 (U25: 15 contracts, 5 points) failed the same way. **The variants:** U44 with `gap_go_locked_qty` 12 and
+`gap_slip_pts` (a) 10 and (b) 20 (the gap trade's sizing counts that many points more slippage at its stop). **Run
+once:** the 526 starts and the full sets in both executions. **Adopt (the better window) on G78's rule** against U44.
+The NinjaTrader strategy doesn't have `gap_slip_pts` yet; a pass is built there before adoption.
