@@ -4451,3 +4451,9 @@ Monthly starts (`START_FREQ=MS`: 103 on NQ, 160 on the index, 263 in all, the 89
 three times the sample. **The check:** U33 and G140's `trend_n` 100 (which passed every other part of G78's rule) on
 the monthly starts. **Adopt** `trend_n` 100 only if its lost-or-frozen count on the 263 is at most U33's. This is a
 second look at G140 with a larger sample of the one part it failed, stated as such; the other parts stand as run.
+
+**G141 result (run once, 2026-11-04): `trend_n` 100 rejected.** On 263 monthly starts: U33 **32 lost or frozen** (NQ
+17 of 103, index 15 of 160: 12.2%), `trend_n` 100 33 (NQ 17, index 16). Medians U33 $46,629 / $37,252, trend 100
+$39,324 / $44,160. **The larger sample's survival for U33 itself: about 1 fresh account in 8 is lost or frozen within
+21 months** (the quarterly 89 said 1 in 11). Logs: `verification/noise_v2/g141_monthly_starts.txt`,
+`verification/noise_v2/g35_start_dates_u32ske_MS.csv`.

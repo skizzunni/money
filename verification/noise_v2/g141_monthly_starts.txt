@@ -1,0 +1,4 @@
+index u32ske starts 160 lost (at the floor) 15 dead (lost or frozen) 15 below start 10 median net 37252 worst net -1999 lowest point -1999 reached +2000 151
+nq u32ske starts 103 lost (at the floor) 17 dead (lost or frozen) 17 below start 8 median net 46629 worst net -1998 lowest point -1998 reached +2000 97
+index u33t100 starts 160 lost (at the floor) 16 dead (lost or frozen) 16 below start 12 median net 44160 worst net -1999 lowest point -1999 reached +2000 150
+nq u33t100 starts 103 lost (at the floor) 17 dead (lost or frozen) 17 below start 6 median net 39324 worst net -1996 lowest point -1996 reached +2000 99
