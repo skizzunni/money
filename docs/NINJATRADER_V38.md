@@ -4194,3 +4194,16 @@ comes from the targets and the 16:00 closes; the stops (back inside, max loss, g
 unchanged), all phases. Chosen from G123's long sets, so the window and the 89 starts are the honest checks. **Adopt
 on G78's rule** against U32 (chart / NinjaTrader window $50,252 / $50,328, NQ $555,059 / $553,246, index $784,932 /
 $773,197; 9 lost or frozen of 89).
+
+**G124 result (run once, 2026-11-04): rejected on the window.** Chart / NinjaTrader: window **$44,395 / $44,463**
+(U32 $50,252 / $50,328), NQ $578,056 / $565,909 (U32 $555,059 / $553,246), index $831,781 / $822,923 (U32 $784,932 /
+$773,197); the floor never touched, no −$1,000 day; 89 start dates **6 lost or frozen** (NQ 4, index 2) against 9.
+It held on the long sets it was chosen from and saved accounts, but lost 12% on the window, the set it wasn't chosen
+on. Log: `verification/noise_v2/g124_skip_1300_1430.txt`.
+
+## G125: G124 only until the floor has stopped (registered 2026-11-04, before its run)
+
+**The idea:** G124's gain in survival comes from the account's first weeks; its loss on the window may come later.
+**The variant:** U32 with `skip_checks` "780,870" and `skip_checks_early` (a new research setting): no entries at
+13:00 and 14:30 until the floor has stopped, as U32 after. **Adopt on G78's rule** against U32, or on G99b's
+survival-first rule (fewer lost or frozen, the net at least 95% of U32's on every set in both executions).
