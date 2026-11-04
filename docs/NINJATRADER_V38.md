@@ -5031,3 +5031,10 @@ U37 on the larger sample, with the same net. Medians on the mid-month starts: U4
 $37,937, U34 $48,237 / $35,674. Log: `verification/noise_v2/g183_mid_month.txt`.
 
 **U40 checks (2026-11-04):** the full suite, **669 passed**; the NinjaTrader growth run on the window $54,700.08 (`verification/noise_v2/v38g_nt_u40.txt`), identical to the model up to the 2026-03-09 data hole.
+
+## G184: a contract per $1,750 below $10,000 of profit, on U40, judged on 526 starts (registered 2026-11-04, before its run)
+
+**The idea:** the early steps add contracts while the account is still thin; G169's better combinations had $1,750.
+**The variant:** U40 with `profit_step` 1,750 (the faster $750 steps above $10,000 unchanged). **Run once:** the 526
+starts (the 1st and the 15th of each month) and the full sets in both executions. **Adopt on G99b's survival-first
+rule** against U40 (fewer than 42 of 526 lost, every net at least 95%).
