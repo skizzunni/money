@@ -10,6 +10,7 @@ from concurrent.futures import ProcessPoolExecutor
 import numpy as np
 import pandas as pd
 import t1_eval as T
+import shadow_gate as SG
 import v24_scan as S
 
 from mnqbot.noise import NoiseConfig, run
@@ -74,7 +75,14 @@ EXTRA = {"base": {}, "gentle": {"steps_after_lock": True}, "cap10": {"size_up_to
                     "fill_min_room": 3000.0, "size_slip_pts": 2.0},
          "u25g": {"gap_go": True, "gap_go_skip_month_first": True, "gap_go_max_qty": 1, "gap_go_locked_qty": 15,
                   "gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
-                  "fill_min_room": 3000.0, "size_slip_pts": 2.0, "gap_slip_pts": 5.0}}[VARIANT]
+                  "fill_min_room": 3000.0, "size_slip_pts": 2.0, "gap_slip_pts": 5.0},
+         # G87: U25 with the shadow gate near the floor
+         "u25pA": {"gap_go": True, "gap_go_skip_month_first": True, "gap_go_max_qty": 1, "gap_go_locked_qty": 10,
+                   "gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
+                   "fill_min_room": 3000.0, "size_slip_pts": 2.0, "protect_room": 1000.0},
+         "u25pB": {"gap_go": True, "gap_go_skip_month_first": True, "gap_go_max_qty": 1, "gap_go_locked_qty": 10,
+                   "gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
+                   "fill_min_room": 3000.0, "size_slip_pts": 2.0, "protect_room": 1500.0}}[VARIANT]
 
 
 def with_1600(bars: pd.DataFrame, m: int) -> pd.DataFrame:
@@ -101,6 +109,8 @@ def one(job):
     if isinstance(skip, str):
         cfg.skip_dates, cfg.fed_dates = skip, ""
     cfg.trail_from = start
+    if cfg.protect_room > 0:  # G87: the shadow gate's closed days on this account's data
+        cfg.protect_dates = SG.closed_days(b, cfg, S.MIN[0])
     tf = run(b, cfg, minutes=S.MIN[0]).trades_frame()
     tf = tf[tf.entry_time >= s0]
     S.TRAIL = cfg.trail_dd  # the account's own trailing drawdown, for the floor checks

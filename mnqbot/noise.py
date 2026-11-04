@@ -332,6 +332,10 @@ class NoiseConfig:
     # plus a tick, from the next bar (0 = off)
     gap_go_be: float = 0.0
     gap_slip_pts: float = 0.0  # G86: the gap trade's sizing counts this many points more slippage at its stop
+    # research (G87): within protect_room of the trailing floor, no new trade on protect_dates (YYYY-MM-DD, comma
+    # separated: the days after a shadow record of the bot closed below its recent average; research/shadow_gate.py)
+    protect_room: float = 0.0
+    protect_dates: str = ""
     # research (G67): once the trailing floor has stopped at the start (trail_cap), a gap trade may take up to this
     # many contracts in place of gap_go_max_qty (0 = off)
     gap_go_locked_qty: int = 0
@@ -571,6 +575,17 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
         return (not math.isnan(trail_peak) and cfg.trail_cap >= 0
                 and trail_peak - cfg.trail_dd >= trail_base + cfg.trail_cap)
 
+    protect_set = set(cfg.protect_dates.split(",")) if cfg.protect_room > 0 and cfg.protect_dates else set()
+
+    def protected() -> bool:
+        """G87: is the account within protect_room of its floor on a day the shadow gate is closed?"""
+        if not protect_set or math.isnan(trail_peak) or t.strftime("%Y-%m-%d") not in protect_set:
+            return False
+        floor = trail_peak - cfg.trail_dd
+        if cfg.trail_cap >= 0:
+            floor = min(floor, trail_base + cfg.trail_cap)
+        return eq_curve[-1] - floor < cfg.protect_room
+
     def steps_off() -> float:
         """G73: the equity the contract steps leave out (the fill-in trades' P/L)."""
         return fill_pnl if cfg.fill_no_steps else 0.0
@@ -592,6 +607,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
         """The v2.1 study's rules (all off by default): may a signal on side d be taken?"""
         nonlocal skip_left
         if cfg.after_loss_hourly and consec > 0 and end % 60:
+            return False
+        if protected():
             return False
         if cfg.last_entry_end and end > cfg.last_entry_end:
             return False
@@ -709,7 +726,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                 locked_floor = (not math.isnan(trail_peak) and cfg.trail_cap >= 0
                                 and trail_peak - cfg.trail_dd >= trail_base + cfg.trail_cap)
                 if usable and len(gap_hist) >= 10 and gap != 0 and not skip_today and pos == 0 and gg is None \
-                        and (locked_floor or not cfg.gap_go_after_lock):
+                        and (locked_floor or not cfg.gap_go_after_lock) and not protected():
                     avg = sum(gap_hist[-14:]) / len(gap_hist[-14:])
                     d = 1 if gap > 0 else -1
                     body = c[i - 1] - day_open

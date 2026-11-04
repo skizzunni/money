@@ -9,6 +9,7 @@ import sys
 import numpy as np
 import pandas as pd
 import t1_eval as T
+import shadow_gate as SG
 import v24_scan as S
 
 from mnqbot.noise import NoiseConfig, run
@@ -81,7 +82,12 @@ PACK = {"P0": {}, "P1": {"gap_go_small_k": 0.0}, "P2": {"gap_go_small_k": 0.0, "
                    "fill_min_room": 3000.0, "size_slip_pts": 2.0, "gap_go_locked_qty": 12},
         # G86: gap sizing with 5 points of stop slippage, up to 15 once stopped
         "U25g": {"gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
-                 "fill_min_room": 3000.0, "size_slip_pts": 2.0, "gap_go_locked_qty": 15, "gap_slip_pts": 5.0}}
+                 "fill_min_room": 3000.0, "size_slip_pts": 2.0, "gap_go_locked_qty": 15, "gap_slip_pts": 5.0},
+        # G87: U25 with the shadow gate near the floor
+        "U25pA": {"gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
+                  "fill_min_room": 3000.0, "size_slip_pts": 2.0, "gap_go_locked_qty": 10, "protect_room": 1000.0},
+        "U25pB": {"gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
+                  "fill_min_room": 3000.0, "size_slip_pts": 2.0, "gap_go_locked_qty": 10, "protect_room": 1500.0}}
 for pk in (sys.argv[4].split(",") if len(sys.argv) > 4 else list(PACK)):
     for name, (bars, first, skip) in S.D.items():
         if name == "win":
@@ -95,6 +101,8 @@ for pk in (sys.argv[4].split(",") if len(sys.argv) > 4 else list(PACK)):
             cfg.skip_dates, cfg.fed_dates = skip, ""
         if first:
             cfg.trail_from = first
+        if cfg.protect_room > 0:  # G87: the shadow gate's closed days
+            cfg.protect_dates = SG.closed_days(bars, cfg, S.MIN[0])
         tf = run(bars, cfg, minutes=S.MIN[0]).trades_frame()
         if first:
             tf = tf[tf.entry_time >= pd.Timestamp(first, tz="America/New_York")]
