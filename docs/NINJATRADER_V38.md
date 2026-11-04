@@ -4313,3 +4313,20 @@ no −$1,000 day; 89 starts 8 lost or frozen (as U33). On the window the 2x is n
 **The idea:** with the guard holding each day at −$900 whatever the size, a bigger room only makes the winners bigger
 and the guard days more frequent. **Variants:** G131 with `room_mult` 3.0 and 4.0. **Adopt (the better window net of
 those that pass) on G78's rule or G99b's** against U33.
+
+**G132 result (run once, 2026-11-04): 4x passes G78's rule; 3x fails (−$1,000 days).**
+
+| | window, chart / NinjaTrader | NQ, chart / NinjaTrader | index, chart / NinjaTrader | worst day | 89 starts lost or frozen |
+|---|---|---|---|---|---|
+| U33 | $50,219 / $50,337 | $546,409 / $549,379 | $784,933 / $774,086 | −$986 | 8 |
+| 3x | $54,593 / $53,617 | $857,367 / $860,118 | $1,149,209 / $1,082,025 | **−$1,193** | 8 |
+| **4x** | **$54,882 / $53,906** | **$853,467 / $879,638** | **$798,835 / $795,591** | −$998 | 8 |
+
+The floor never touched. 4x's worst day is $2 from the line, so before adoption it gets G132r. Log:
+`verification/noise_v2/g132_room3_4.txt`.
+
+## G132r: 4x with the guard's fills 2 points worse (registered 2026-11-04, before its run)
+
+**The check:** G132's 4x with `guard_slip_pts` 2 (every "Day guard" fill 2 points worse: up to $200 on 50 MNQ, a fast
+market). **Pass:** no day at −$1,000 or worse and the floor never touched on any set in both executions, 89 starts no
+worse than 8. If it fails, 4x is not adopted as is.
