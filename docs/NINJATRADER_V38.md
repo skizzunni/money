@@ -4932,3 +4932,7 @@ Log: `verification/noise_v2/g175_shadow_early.txt`.
 against 32 of 263). U35-U38 changed the early phase since. **The variant:** U38 with `trend_n` 100. **Run once:** the 263
 monthly starts and the full sets in both executions. **Adopt on G78's rule** against U38 (more net on every set in both
 executions, no more than 19 lost, no −$1,000 day, the floor never touched).
+
+**G176 result (run once, 2026-11-04): rejected.** Chart / NinjaTrader: window $56,654 / $57,378 (U38 $54,339 /
+$54,417), NQ **$554,231 / $551,907** (U38 $560,911 / $558,360), index $798,034 / $825,904 (U38 $783,163 / $774,859);
+263 starts **20** lost (U38 19). Log: `verification/noise_v2/g176_trend100_u38.txt`.
