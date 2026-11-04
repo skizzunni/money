@@ -5385,3 +5385,8 @@ of 263 with medians above U42's; k39 (`after_loss_ml_mult5` 0.9, `early_ml` 170,
 G207's stage-B bar, so this is a separate test. **Run once each:** the mid-month starts and the full sets in both
 executions. **Adopt (the better window) on G78's rule** against U42 (higher nets on all three in both executions, no
 −$1,000 day, the floor never touched, no more than 28 of 526 lost).
+
+**G208 result (run once, 2026-11-04): both rejected by the window.** k32: 526 starts **25** lost or frozen (11 + 14; U42
+28); NQ $600,213 / **$580,796** (U42 $543,263 / $542,956: +7%), index $777,163 / $753,984, but the window **$45,507** /
+$46,148 (U42 $53,124 / $53,164: −13%). k39: **23** lost (10 + 13); window $49,380 / $49,505 (−7%), NQ $544,043 /
+$543,826, index $770,155 / $751,338. G78 asks for a higher net on all three. Log: `verification/noise_v2/g208_k32_k39.txt`.
