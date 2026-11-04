@@ -5440,3 +5440,9 @@ identical to the model on 30-minute bars, and on 5-minute bars up to the 2026-03
 `research/g211_weekly_u43.py` (`verification/noise_v2/g211_weekly_u43.txt`). Window, $10,000-30,000 up: 26 weeks,
 **$1,668** average (U42 $1,532), 11.5% at +$3,000 or more; NQ past $75,000 **$1,256** a week (U42 $1,158), the index
 $1,022 (U42 $967).
+
+## G212: 30 random combinations of the grown-phase settings around U43 (registered 2026-11-04, before its run)
+
+**The search** (`research/g212_grown_search.py`, seed 212): `profit_step_fast` 600-650, `profit_step_fast_from`
+$6,000-7,000, `fill_qty3_room` $7,000-10,000, `fill_qty2_room` $4,000-5,000, `gap_go_locked_qty` 11-12, `gap_go_k_locked`
+0.5-0.75, `size_up_to` 60-75; row 0 is U43. **Screen and adoption as G209's**, against U43 (no more than 28 lost).
