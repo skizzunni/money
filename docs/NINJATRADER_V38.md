@@ -5775,3 +5775,13 @@ entry at 15:00 (U44's), (b) at 14:30 (G224's). **Run once:** the 526 starts and 
 **Adopt (the better window) on G78's rule** against U44 (higher nets on all three in both executions, no −$1,000 day, the
 floor never touched, no more than 28 lost). The NinjaTrader strategy has only the half-hour grid: a pass is built there,
 with parity tests, before it is adopted.
+
+## G240: 1,000 random combinations around U44 (registered 2026-11-04, before its run)
+
+**The ask (the user):** "1000 more diff trials". **The search** (`research/g240_mega_search.py`, seed 240): 1,000
+combinations, each moving 1-5 of 34 settings to values near U44's (entries and filters, exits, sizing and budget,
+survival, the gap slot and fill-ins); row 0 is U44. **Stage 1:** each on the window, NQ and the index (the chart's
+execution). **Screen:** all three nets at least U44's, no −$1,000 day, the floor never touched. **Stage 2:** the 10 best
+passing (by the sum of the three nets against U44's) go to NinjaTrader's execution and the 526 starts; **the best window
+among those meeting G78's rule** against U44 (higher nets on all three in both executions, no more than 28 lost) is
+adopted. With 1,000 tries, some pass by chance; the 526 starts and NinjaTrader's execution are the check.
