@@ -5597,3 +5597,8 @@ sets and the 526 starts. **Adopt on G78's rule** against U44 (higher nets on all
 the floor never touched, no more than 28 lost), **and** a robustness condition given G223's swings: the same at 2 ticks
 must lose no more of the 526 than U44 at 2 ticks (51). Adoption also needs the grid built in NinjaTrader with parity
 tests; if that can't be done and tested today, a pass is recorded as pending, not adopted.
+
+**G224 result (run once, 2026-11-04): rejected, by far.** NinjaTrader's execution: window $69,945, NQ $607,283, index
+$905,429 (all above U44), no −$1,000 day. But 526 starts: **100** lost or frozen (U44 28); at 2 ticks **136** (U44 51).
+The 15-minute grid trades more often at the start, and a fresh account can't carry the extra losers. Log:
+`verification/noise_v2/g224_grid15.txt`.

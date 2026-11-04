@@ -1,0 +1,14 @@
+{'nt': False, 'pack': 'U44g15', 'set': 'proxy', 'days traded %': 73.7, 'gap trades': 290, 'trades': 762, 'net $': 66707, 'pf': 1.703, 'win %': 51.2, 'closed dd $': 6006, 'worst day $': -899, 'days <= -1000': 0, 'floor touches': 0}
+{'nt': False, 'pack': 'U44g15', 'set': 'nq', 'days traded %': 81.8, 'gap trades': 1891, 'trades': 5286, 'net $': 606068, 'pf': 1.513, 'win %': 51.4, 'closed dd $': 27923, 'worst day $': -925, 'days <= -1000': 0, 'floor touches': 0}
+{'nt': False, 'pack': 'U44g15', 'set': 'index', 'days traded %': 78.0, 'gap trades': 2598, 'trades': 7270, 'net $': 929754, 'pf': 1.594, 'win %': 50.3, 'closed dd $': 29914, 'worst day $': -985, 'days <= -1000': 0, 'floor touches': 0}
+{'nt': True, 'pack': 'U44g15', 'set': 'proxy', 'days traded %': 80.7, 'gap trades': 328, 'trades': 805, 'net $': 69945, 'pf': 1.698, 'win %': 50.3, 'closed dd $': 5978, 'worst day $': -899, 'days <= -1000': 0, 'floor touches': 0}
+{'nt': True, 'pack': 'U44g15', 'set': 'nq', 'days traded %': 81.6, 'gap trades': 1880, 'trades': 5268, 'net $': 607283, 'pf': 1.515, 'win %': 51.4, 'closed dd $': 27779, 'worst day $': -925, 'days <= -1000': 0, 'floor touches': 0}
+{'nt': True, 'pack': 'U44g15', 'set': 'index', 'days traded %': 77.3, 'gap trades': 2547, 'trades': 7239, 'net $': 905429, 'pf': 1.583, 'win %': 50.5, 'closed dd $': 29772, 'worst day $': -985, 'days <= -1000': 0, 'floor touches': 0}
+index u44g15 starts 160 lost (at the floor) 22 dead (lost or frozen) 23 below start 16 median net 24949 worst net -1999 lowest point -1999 reached +2000 144
+nq u44g15 starts 103 lost (at the floor) 30 dead (lost or frozen) 30 below start 19 median net 16270 worst net -1993 lowest point -1993 reached +2000 86
+index u44g15 starts 160 lost (at the floor) 19 dead (lost or frozen) 20 below start 16 median net 27675 worst net -2002 lowest point -2002 reached +2000 145
+nq u44g15 starts 103 lost (at the floor) 27 dead (lost or frozen) 27 below start 18 median net 16856 worst net -1994 lowest point -1994 reached +2000 87
+index g224grid15s2 starts 160 lost (at the floor) 27 dead (lost or frozen) 29 below start 16 median net 15419 worst net -1999 lowest point -1999 reached +2000 144
+nq g224grid15s2 starts 103 lost (at the floor) 44 dead (lost or frozen) 44 below start 22 median net 2068 worst net -1993 lowest point -1993 reached +2000 83
+index g224grid15s2 starts 160 lost (at the floor) 22 dead (lost or frozen) 23 below start 18 median net 16554 worst net -1995 lowest point -1995 reached +2000 143
+nq g224grid15s2 starts 103 lost (at the floor) 40 dead (lost or frozen) 40 below start 22 median net 6003 worst net -1999 lowest point -1999 reached +2000 85
