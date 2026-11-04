@@ -5226,3 +5226,12 @@ $563,437 / $787,157). The closest: k184 (range position 0.6, no time stop, last 
 **$815,563**; k242 (a lock from 14:00) $557,079 / $806,500; k17 ($1,250 steps, brake 0.6, cushion $2,000) $561,161 /
 $799,057. With G195, about 600 random combinations of 30 settings: U41 sits at or near the top of this strategy's
 settings on the long histories. Log: `verification/noise_v2/g196_wide_long.txt`.
+
+## G198: G196's seven closest, judged on survival (registered 2026-11-04, before its run)
+
+**Why:** G196's best combinations are within 3% of U41 on both long histories; none was checked on survival. **The
+candidates:** the 7 of G196 with both NQ and index nets at least 97% of U41's, no −$1,000 day, the floor never touched
+(k184, k27, k242, k17, k262, k237, k166). **Stage A:** each on the 263 starts on the 1st of the month. **Stage B:** the
+one with the fewest lost, if fewer than U41's 17 there, goes on to the 263 mid-month starts and the full sets in both
+executions. **Adopted on G99b's rule** (at least 4 fewer of the 526 lost than U41's 38, every net at least 95%, no
+−$1,000 day, the floor never touched) or G78's.
