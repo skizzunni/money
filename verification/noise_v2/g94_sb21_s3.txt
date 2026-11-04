@@ -4,3 +4,5 @@
 {'nt': True, 'pack': 'U25sb21s3', 'set': 'proxy', 'days traded %': 67.2, 'gap trades': 258, 'trades': 645, 'net $': 44342, 'pf': 1.761, 'win %': 50.9, 'closed dd $': 3093, 'worst day $': -899, 'days <= -1000': 0, 'floor touches': 0}
 {'nt': True, 'pack': 'U25sb21s3', 'set': 'nq', 'days traded %': 82.9, 'gap trades': 1982, 'trades': 5029, 'net $': 427428, 'pf': 1.488, 'win %': 51.4, 'closed dd $': 15758, 'worst day $': -925, 'days <= -1000': 0, 'floor touches': 0}
 {'nt': True, 'pack': 'U25sb21s3', 'set': 'index', 'days traded %': 80.5, 'gap trades': 2859, 'trades': 7060, 'net $': 600942, 'pf': 1.502, 'win %': 50.2, 'closed dd $': 24176, 'worst day $': -985, 'days <= -1000': 0, 'floor touches': 0}
+index u25sb21s3 starts 54 lost (at the floor) 6 dead (lost or frozen) 6 below start 3 median net 37176 worst net -1468 lowest point -1607 reached +2000 51
+nq u25sb21s3 starts 35 lost (at the floor) 7 dead (lost or frozen) 7 below start 3 median net 27171 worst net -1289 lowest point -1289 reached +2000 32

@@ -3662,3 +3662,11 @@ allowance is what removed such days before; 3 points (from 2) keeps $6 a contrac
 **The variant:** U25 with `stop_buffer` 0.21 and `size_slip_pts` 3. **Adopt on G78's rule**, against U25.
 **Caution, written before the run:** this is the third stop-buffer variant in a row (G92, G93), so a pass carries
 more chance of luck than a first try; the 89 start dates are the check on that.
+
+**G94 result (run once, 2026-11-04): rejected on the 89 start dates.** Window $43,941 / $44,342, index $622,303 /
+$600,942, NQ's 2015 account lived, no −$1,000 day, but **13 lost or frozen of 89** (NQ 7, index 6) against U25's 11,
+and the NQ median fell to $27,171 (U25: $44,185). As the caution said, the gain on the three sets didn't hold for new
+accounts. 0.24 and 2 points stay (`verification/noise_v2/g94_sb21_s3.txt`, `g35_start_dates_u25sb21s3.csv`).
+
+**Scorecard, G44-G94:** 51 rounds. Adopted: G60 (U19), G67b (U20), G67's data fix, G79 (U22), G80 (U23), G82 (U24),
+G84 (U25). Rejected: 41. Measurements: G54, G55, G88.
