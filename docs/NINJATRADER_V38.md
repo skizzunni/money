@@ -3845,3 +3845,12 @@ backtest it replays on the chart's history before going live.
 **The variant:** U27 with `giveback_brake` 0.7. **Adopt on G99b's rule**, against U27 (fewer lost or frozen than 10 on
 the 89 start dates; the window's and the index's net at least 95% of U27's in both executions; no −$1,000 day; floor
 never touched on the window and the index).
+
+**G101 result (run once, 2026-11-04): rejected on the net.** 89 start dates: 8 lost or frozen (NQ 4, index 4) against
+U27's 10, but the index's net fell to 83% / 80% of U27's ($532,561 / $504,295), the window to $43,091 / $42,936 (95.0%
+/ 94.6%), and the index median to $16,634 (U27: $36,981). Braking at 70% of the best catches ordinary pullbacks and
+keeps a healthy account at 1 MNQ for long stretches. 0.5 stays (`verification/noise_v2/g101_giveback07.txt`).
+
+**Scorecard, G44-G101:** 58 rounds. Adopted: G60 (U19), G67b (U20), G67's data fix, G79 (U22), G80 (U23), G82 (U24),
+G84 (U25), G97 (U26), G99c (U27). Rejected: 46. Measurements: G54, G55, G88. (U28, the live-account dashboard and
+room cap, is a safety change, not a G round.)

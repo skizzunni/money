@@ -1,0 +1,8 @@
+{'nt': False, 'pack': 'U27gb7', 'set': 'proxy', 'days traded %': 72.4, 'gap trades': 289, 'trades': 702, 'net $': 43091, 'pf': 1.615, 'win %': 50.9, 'closed dd $': 4414, 'worst day $': -900, 'days <= -1000': 0, 'floor touches': 0}
+{'nt': False, 'pack': 'U27gb7', 'set': 'nq', 'days traded %': 83.2, 'gap trades': 1994, 'trades': 5031, 'net $': 468597, 'pf': 1.489, 'win %': 51.8, 'closed dd $': 16975, 'worst day $': -971, 'days <= -1000': 0, 'floor touches': 0}
+{'nt': False, 'pack': 'U27gb7', 'set': 'index', 'days traded %': 80.6, 'gap trades': 2866, 'trades': 7103, 'net $': 532561, 'pf': 1.446, 'win %': 50.6, 'closed dd $': 22456, 'worst day $': -985, 'days <= -1000': 0, 'floor touches': 0}
+{'nt': True, 'pack': 'U27gb7', 'set': 'proxy', 'days traded %': 72.6, 'gap trades': 290, 'trades': 704, 'net $': 42936, 'pf': 1.618, 'win %': 50.9, 'closed dd $': 4406, 'worst day $': -899, 'days <= -1000': 0, 'floor touches': 0}
+{'nt': True, 'pack': 'U27gb7', 'set': 'nq', 'days traded %': 83.0, 'gap trades': 1989, 'trades': 5031, 'net $': 474454, 'pf': 1.495, 'win %': 51.7, 'closed dd $': 16680, 'worst day $': -925, 'days <= -1000': 0, 'floor touches': 0}
+{'nt': True, 'pack': 'U27gb7', 'set': 'index', 'days traded %': 80.6, 'gap trades': 2866, 'trades': 7103, 'net $': 504295, 'pf': 1.438, 'win %': 50.4, 'closed dd $': 19316, 'worst day $': -985, 'days <= -1000': 0, 'floor touches': 0}
+index u27gb7 starts 54 lost (at the floor) 4 dead (lost or frozen) 4 below start 3 median net 16634 worst net -710 lowest point -1635 reached +2000 52
+nq u27gb7 starts 35 lost (at the floor) 4 dead (lost or frozen) 4 below start 2 median net 39975 worst net -1125 lowest point -1125 reached +2000 33
