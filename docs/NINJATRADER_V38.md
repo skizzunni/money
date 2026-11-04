@@ -5815,3 +5815,6 @@ never touched. **Stage 2:** the 40 best passing (by the sum of the three nets ag
 1st. **Stage 3:** of those with 12 or fewer lost there (U44 12), the 5 with the fewest (ties: the higher window) on the
 mid-month starts and the chart's execution. **Adopted:** the best window among those meeting G78's rule against U44
 (higher nets on all three in both executions, no −$1,000 day, the floor never touched, no more than 28 of 526 lost).
+
+**G241 progress (2026-11-04, 23:41 UTC):** 112 of 10,000 done in NinjaTrader's execution; 2 pass the screen so far (k74,
+k13). Partial log: `verification/noise_v2/g241_nt_search_partial.jsonl`.
