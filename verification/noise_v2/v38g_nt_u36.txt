@@ -1,0 +1,26 @@
+30 min: 16:00 bars added 410 of 486 sessions
+{'max qty': 15, 'bars': 30, 'identical in the window': True, 'identical overall': True, 'trades nt': 303, 'trades py': 303, 'window trades': 252, 'net $': 28620.1, 'win %': 53.6, 'pf': 1.881, 'closed dd $': 3934.78, 'largest loss $': -1634.41, 'worst day $': -899.2}
+5 min: 16:00 bars added 410 of 486 sessions
+first difference at trade 76 of 780 781
+    d    eb     entry    xb      exit         why     pnl
+74  1  4591  21643.75  4592  21619.50   Stop loss  -49.74
+75  1  4675  21903.50  4679  21905.75   Stop loss    3.26
+76  1  4681  21924.50  4715  21982.50  Model flat  114.76
+77 -1  4794  21774.50  4798  21711.75    Gap exit  124.26
+78 -1  4873  21350.00  4877  21324.50    Gap exit   49.76
+    direction  entry_bar     entry  exit_bar      exit         reason     pnl
+74          1       4591  21643.75      4592  21619.50       Gap stop  -49.74
+75          1       4675  21903.50      4679  21905.75           Lock    3.26
+76          1       4681  21924.50      4714  21982.75  Session ended  115.26
+77         -1       4794  21774.50      4798  21711.75       Gap exit  124.26
+78         -1       4873  21350.00      4877  21324.50       Gap exit   49.76
+window: first difference at trade 414 of 701 702 differences 287
+     d     eb         entry     xb          exit          why         pnl
+413  1  28377  25083.375181  28378  25085.750000    Stop loss   14.038553
+414  1  28383  25121.817139  28387  25185.769517   Model flat  506.659020
+415  1  28392  25284.436607  28398  25276.317861  Stop passed  -87.387461
+     direction  qty  entry_bar         entry  exit_bar          exit         reason         pnl
+413          1    4      28377  25083.375181     28378  25085.750000           Lock   14.038553
+414          1    4      28383  25121.817139     28386  25187.661623  Session ended  521.795868
+415          1    2      28387  25186.269517     28391  25260.236972       Gap exit  293.389823
+{'max qty': 50, 'bars': 5, 'identical in the window': False, 'identical overall': False, 'trades nt': 780, 'trades py': 781, 'window trades': 702, 'net $': 54770.89, 'win %': 52.1, 'pf': 1.768, 'closed dd $': 4779.88, 'largest loss $': -1703.05, 'worst day $': -899.31}

@@ -74,12 +74,12 @@ real MNQ data will differ somewhat. The stand-in has flattered this strategy bef
 simulator, Funded growth, from 2025-01-02, 1 tick of slippage, $0.62 a side;
 `verification/noise_v2/v38g_nt_2026-11-03.csv` and the trade lists beside it):
 
-| Jan 2, 2025 – Oct 2026 (updated 2026-11-04, U35) | 5-minute bars | 30-minute bars |
+| Jan 2, 2025 – Oct 2026 (updated 2026-11-04, U36) | 5-minute bars | 30-minute bars |
 |---|---|---|
-| Trades | 715 | 252 |
-| Net | **$55,547.74** | $28,620.10 |
-| Winners | 51.5% | 53.6% |
-| Profit factor | 1.747 | 1.881 |
+| Trades | 702 | 252 |
+| Net | **$54,770.89** | $28,620.10 |
+| Winners | 52.1% | 53.6% |
+| Profit factor | 1.768 | 1.881 |
 | Closed drawdown | $4,779.88 | $3,934.78 |
 | Largest loss | −$1,703.05 | −$1,634.41 |
 | Worst day | −$899.31 | −$899.20 |
@@ -88,11 +88,11 @@ simulator, Funded growth, from 2025-01-02, 1 tick of slippage, $0.62 a side;
 
 The 5-minute chart includes gap and go (U19, U20, U25: up to 10 MNQ once the floor has stopped), More trading days with the sizing allowance (U22, U26: 2-MNQ fill-ins from $6,000, 3 points), the
 data fix (G67), the after-loss max loss at $187.50 once the floor has stopped (U30), up to 50 MNQ (U32) and no entries
-at 13:00 and 14:30 until the floor has stopped (U33), faster contract steps above $10,000 of profit (U34) and the after-loss max loss at $225 (U35). They need the 5-minute chart, so **trade the 5-minute chart**.
+at 13:00 and 14:30 until the floor has stopped (U33), faster contract steps above $10,000 of profit (U34) and the after-loss max loss at $206.25 (U35, U36). They need the 5-minute chart, so **trade the 5-minute chart**.
 
 **What to expect (measured 2026-11-04, G141/G144/G165 and the 263 fresh starts):**
-- A fresh 50K account on U35: about **1 in 10 is lost or frozen** within 21 months (26 of 263 monthly starts; U34 32);
-  the median account makes **$41,201 in 21 months** (about $450 a week; U34 $39,454); +$3,000 takes a median 138 days
+- A fresh 50K account on U36: about **1 in 10 is lost or frozen** within 21 months (25 of 263 monthly starts; U34 32);
+  the median account makes about **$41,000 in 21 months** (about $450 a week; U35 $41,201, U34 $39,454); +$3,000 takes a median 138 days
   (within 30 days in 3.8%); +$50,000 within 21 months in 47.5% (median 16.3 months).
 - Once the account is $10,000-30,000 up: the window averaged **$1,660 a week** (17% of weeks at +$3,000 or more);
   past $30,000 the day's $900 budget caps every trade and the long histories average $600-1,200 a week.
