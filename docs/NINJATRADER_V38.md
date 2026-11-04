@@ -3460,3 +3460,12 @@ Rejected: 31 (G54 and G55 were measurements).
 own size (its contract steps, sized down to the day's room and the floor's room).
 
 **The variant:** U24 with `gap_go_locked_qty` 15. **Adopt on G78's rule**, against U24.
+
+**G83 result (run once, 2026-11-04): rejected; a −$1,347 day.** Window $44,769 / $45,045, index $626,877 / $618,646,
+but the index has a **−$1,347 day in both executions**: a gap trade at the bot's full size whose stop the market jumped
+past. That is a broken daily loss limit; 7 stays (`verification/noise_v2/g83_u24_q15.txt`).
+
+## G84: up to 10 gap contracts once the floor has stopped (registered 2026-11-04, before its run)
+
+**The idea:** 7 passed, 15 broke the daily limit once. 10 is between. U24 with `gap_go_locked_qty` 10.
+**Adopt on G78's rule**, against U24.

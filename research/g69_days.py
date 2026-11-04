@@ -72,7 +72,10 @@ PACK = {"P0": {}, "P1": {"gap_go_small_k": 0.0}, "P2": {"gap_go_small_k": 0.0, "
                   "fill_min_room": 3000.0, "size_slip_pts": 2.0, "gap_go_locked_qty": 7},
         # G83: U24 with the gap trade at the bot's size once stopped
         "U24q15": {"gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
-                   "fill_min_room": 3000.0, "size_slip_pts": 2.0, "gap_go_locked_qty": 15}}
+                   "fill_min_room": 3000.0, "size_slip_pts": 2.0, "gap_go_locked_qty": 15},
+        # G84: up to 10 gap contracts once stopped
+        "U24q10": {"gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
+                   "fill_min_room": 3000.0, "size_slip_pts": 2.0, "gap_go_locked_qty": 10}}
 for pk in (sys.argv[4].split(",") if len(sys.argv) > 4 else list(PACK)):
     for name, (bars, first, skip) in S.D.items():
         if name == "win":
