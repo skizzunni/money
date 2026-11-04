@@ -5208,3 +5208,8 @@ variants:** U41 with the max loss at most (a) $100 and (b) $125 a contract once 
 (`grown_ml`, `grown_from` 10,000; 5-minute bars), the gap trade unchanged. **Run once:** the 526 starts and the full
 sets in both executions. **Adopt (the better window) on G78's rule** (higher nets on all three in both executions, no
 −$1,000 day, the floor never touched, no more than 38 lost).
+
+**G194 result (run once, 2026-11-04): both rejected.** NinjaTrader's execution, window / NQ / index: $100 with no target
+**$34,294** / $540,598 / $539,582; $50 **$2,213** / $625,688 / $625,423 (U41 $54,710 / $553,165 / $776,319). Without the
+target the winners give back to the lock or the line before 16:00: less than with the target (G193) on every set. 526
+starts: **100** and **92** lost or frozen (U41 38). Log: `verification/noise_v2/g194_small_stop_no_target.txt`.
