@@ -4666,3 +4666,10 @@ Log: `verification/noise_v2/g155_ablations.txt`.
 
 U29's window account nearly stalls at 2 ticks; U34 keeps 95% of its 1-tick window net. The session's changes made the
 bot both more profitable and less fragile to fills.
+
+## G157: a bigger gap for the main gap trade once the floor has stopped (registered 2026-11-04, before its run)
+
+**The idea:** G134: once grown, the gap trades make $5-15 a contract at up to 10 contracts and spend the morning's
+budget. `gap_go_k_locked` (a new research setting): once the floor has stopped, the main gap trade needs a gap of this
+x the average (0.5 before; the 1-contract small-gap and drive fill-ins unchanged). **Variants:** U34 with 0.75 and 1.0.
+G135's screen against U34, then confirmation for the best on G78's rule.

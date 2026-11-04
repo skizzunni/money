@@ -323,6 +323,7 @@ class NoiseConfig:
     # rescaled by month has a false gap at each month's first session (off for real prices)
     gap_go: bool = False
     gap_go_k: float = 0.5
+    gap_go_k_locked: float = 0.0  # research (G157): once the floor has stopped, the main gap trigger is this (0: gap_go_k)
     # G60 stage 3: gap trades only once the trailing floor has stopped at the start (the account's first $trail_dd
     # made), and each one's stop no farther than the bot's max loss a contract from the expected fill
     gap_go_after_lock: bool = False
@@ -828,7 +829,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                     avg = sum(gap_hist[-14:]) / len(gap_hist[-14:])
                     d = 1 if gap > 0 else -1
                     body = c[i - 1] - day_open
-                    fire = abs(gap) >= cfg.gap_go_k * avg and d * body > 0
+                    gk = cfg.gap_go_k_locked if cfg.gap_go_k_locked > 0 and locked_floor else cfg.gap_go_k
+                    fire = abs(gap) >= gk * avg and d * body > 0
                     one = False  # G69: a small-gap or drive trade, 1 contract always
                     if not fire and cfg.gap_go_small_k >= 0 and abs(gap) >= cfg.gap_go_small_k * avg and d * body > 0 \
                             and fill_ok():
