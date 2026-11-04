@@ -5406,3 +5406,16 @@ nets on all three in both executions, no more than 28 lost).
 `after_loss_ml_locked` 1.1): $57,252 / NQ $568,020 / index $801,072 (U42 $53,124 / $543,263 / $775,728), no −$1,000 day.
 k26 goes on. (k17 and k1, with 15 gap contracts, made more but had an index day at −$1,000.) Log:
 `verification/noise_v2/g209_grown_search.txt`.
+
+**G209 result (run once, 2026-11-04): k26 rejected by two accounts.** Chart / NinjaTrader: window $57,252 / **$57,326**
+(U42 $53,124 / $53,164), NQ $568,020 / $568,270 (U42 $543,263 / $542,956), index $801,072 / $790,230 (U42 $775,728 /
+$757,333): higher everywhere, no −$1,000 day, the floor never touched. But 526 starts: **30** lost or frozen (12 + 18;
+U42 28). Log: `verification/noise_v2/g209_k26.txt`.
+
+## G210: G209's k14 and k15, without k26's after-loss change (registered 2026-11-04, before its run)
+
+**Why:** k26 raised every net but lost 2 more accounts; it also moved the after-loss max loss once grown (1.1x). k14
+(`profit_step_fast` 700 from $8,000, `fill_qty3_room` 9,000) and k15 (`profit_step_fast` 700, `fill_qty3_room` 9,000)
+passed G209's screen without that change. **Run once each:** NinjaTrader's execution and the 526 starts. **Adopt (the
+better window) on G78's rule** against U42 (higher nets on all three in both executions, no −$1,000 day, the floor never
+touched, no more than 28 lost).
