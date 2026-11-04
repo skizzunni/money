@@ -4693,3 +4693,9 @@ G135's screen against U34, then confirmation for the best on G78's rule.
 **Live, the fills decide it:** at 1-2 ticks a fill the bot holds; at 3 ticks on every fill a fresh account can stall or
 be lost. The journal's "entry slip ticks" / "exit slip ticks" columns (U7) show the real fills: if they average 3 or
 more, stop and check the connection, the data feed and the order type.
+
+## G159: a different target for late entries, on U34 (registered 2026-11-04, before its run)
+
+**The idea:** G123: the 13:30 and 15:00 entries make the most per trade; a 15:00 entry has an hour to reach a target
+set for a whole afternoon. **Variants:** U34 with `late_tp` 1.0 and 1.5 noise units for entries from the 15:00 check,
+and 2.5 from the 13:30 check. G135's screen against U34, then confirmation for the best on G78's rule.
