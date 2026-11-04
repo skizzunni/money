@@ -5610,3 +5610,8 @@ variants:** U44 with `max_losers_locked` (a new research setting: the loser limi
 limit) and (b) 4. **Run once:** the 526 starts and the full sets in both executions. **Adopt (the better window) on
 G78's rule** against U44 (higher nets on all three in both executions, no −$1,000 day, the floor never touched, no more
 than 28 lost).
+
+**G225 result (run once, 2026-11-04): both rejected (neutral).** (a) no limit once grown: 526 starts 29 lost, window
+$57,432 / $57,419; (b) four: 28 lost, window $57,435 / $57,458 (U44 $57,446 / $57,475), NQ and the index a little
+higher. Within $20 of U44 on the window: once grown the day's budget, not the loser count, ends the day. Log:
+`verification/noise_v2/g225_losers_locked.txt`.
