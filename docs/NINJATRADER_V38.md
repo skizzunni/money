@@ -4817,3 +4817,16 @@ against U35's 26, medians $49,426 / $37,626. A small gain, at the edge of the ru
 (On U29, G116's 1.0x lost one more of the 89.) **The variant:** U36 with `after_loss_ml_mult5` 1.0. **Run once:** the
 263 monthly starts and the full sets in both executions. **Adopt on G99b's survival-first rule** against U36 (fewer
 than 25 lost, every net at least 95%).
+
+**G168 result (run once, 2026-11-04): passes G99b's survival-first rule; adopted (U37).** Chart / NinjaTrader: window
+$54,710 / $54,865 (U36 $54,876 / $54,872), NQ $561,951 / $559,921 (U36 $561,717 / $557,051), index $786,440 / $776,796
+(as U36); no −$1,000 day, the floor never touched; 263 monthly starts **20 lost or frozen** (NQ 11, index 9) against
+U36's 25, medians $49,924 / $37,124; 89 quarterly starts 7 (U34-U36 8). Log: `verification/noise_v2/g168_after_loss_10.txt`.
+
+**U37 (2026-11-04): on the 5-minute chart the trade after a loser risks $187.50 like every trade (G168).** "After a
+losing trade: max loss per trade" is $187.50 in Funded growth on the 5-minute chart ($250 on others); U30's setting
+(after the floor stops) is now the same value there. `test_v38_after_loss_same` checks NinjaTrader's code against the
+model at $187.50 and $250; `test_v38_after_loss_locked` keeps testing U30's switch at $250.
+
+**The after-loss line on the 263 starts:** 1.33x (U34) 32 lost, 1.2x (U35) 26, 1.1x (U36) 25, 1.0x (U37) 20, with the
+nets unchanged within 1%. The wider stop after a loss was costing accounts.
