@@ -4580,3 +4580,14 @@ factor 1.768, worst day −$899.31, up to 50 contracts, identical to the model u
 **Variants:** U34 (row 0) with `gap_go_exit` 09:50 / 10:00, `lookback` 12 / 16 sessions, `size_slip_pts` 3 / 5. G135's
 screen against U34, then the best window among those passing on to NinjaTrader's execution and the 89 starts, on
 G78's rule.
+
+**G150 result (run once, 2026-11-04): none passes the screen.** Gap exit 09:50 / 10:00: window $46,002 / $38,434;
+lookback 12: NQ's account lost; lookback 16: index $660,553; sizing allowance 3 points: an index day at −$1,000; 5
+points: lower on every set. Log: `verification/noise_v2/g150_singles.txt`.
+
+## G151: six rarely used settings on U34 (registered 2026-11-04, before its run)
+
+**Variants:** U34 (row 0) with `tom_no_shorts` (no shorts at the turn of the month), `tom_mult` 1.5 (1.5x there),
+`late_lock_from` 15:00 (a trade in profit at 15:00 locks), `time_lock` 30 (in profit after 30 minutes, locks),
+`after_loss_same_side` (the after-loss rules only on the losing side), `big_day_against_tp` 1.0. G135's screen against
+U34, then confirmation for the best, on G78's rule.

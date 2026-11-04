@@ -1,0 +1,7 @@
+{"k": 0, "proxy net": 54879, "proxy d1000": 0, "nq net": 554388, "nq d1000": 0, "index net": 786440, "index d1000": 0}
+{"k": 1, "gap_go_exit": 590, "proxy net": 46002, "proxy d1000": 0, "nq net": 490266, "nq d1000": 0, "index net": 727636, "index d1000": 0}
+{"k": 2, "gap_go_exit": 600, "proxy net": 38434, "proxy d1000": 0, "nq net": 437412, "nq d1000": 0, "index net": 642309, "index d1000": 0}
+{"k": 3, "lookback": 12, "proxy net": 49957, "proxy d1000": 0, "nq net": 1, "nq d1000": 0, "index net": 752869, "index d1000": 0}
+{"k": 4, "lookback": 16, "proxy net": 55902, "proxy d1000": 0, "nq net": 516680, "nq d1000": 0, "index net": 660553, "index d1000": 0}
+{"k": 5, "size_slip_pts": 3.0, "proxy net": 55941, "proxy d1000": 0, "nq net": 557609, "nq d1000": 0, "index net": 791573, "index d1000": 1}
+{"k": 6, "size_slip_pts": 5.0, "proxy net": 54351, "proxy d1000": 0, "nq net": 553354, "nq d1000": 0, "index net": 783163, "index d1000": 0}
