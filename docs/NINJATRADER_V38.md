@@ -4713,3 +4713,9 @@ back elsewhere (NQ 2018 −$18,377, index 2014 −$16,889). The faster steps and
 comes after the account has grown.
 
 **The full suite after the live fill alert and the dashboard line: 668 passed.**
+
+## G161: other early no-entry checks, on U34 (registered 2026-11-04, before its run)
+
+**Variants:** U34 with the early no-entry checks (until the floor stops) at 13:00 only, 14:30 only, and 12:30 + 13:00
++ 14:30 (U34: 13:00 + 14:30). G135's screen against U34; the best window among those passing then on the 263
+monthly starts and NinjaTrader's execution, on G78's rule (no more than U34's 32 lost or frozen).
