@@ -4609,3 +4609,7 @@ within 21 months in 45.6% (median 16.8 months).
 half the room above the floor), `trail_buffer` 500 (keep $500 of the room unused). **Adopt (the fewest lost) on G99b's
 survival-first rule:** fewer lost or frozen than U34's 32 of the 263 monthly starts, and the net at least 95% of U34's
 on the window, NQ and the index in both executions, no −$1,000 day, the floor never touched.
+
+**G152 result (run once, 2026-11-04): all rejected.** On the 263 monthly starts (U34 32 lost or frozen):
+`steps_after_lock` 36, `trail_frac` 0.5 34 (its full-set nets are U34's to the dollar), `trail_buffer` 500 88 (it
+freezes: the window's account made −$802 on 61 trades). Log: `verification/noise_v2/g152_early_protection.txt`.
