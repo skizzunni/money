@@ -92,8 +92,8 @@ at 13:00 and 14:30 until the floor has stopped (U33), faster contract steps abov
 
 **What to expect (measured 2026-11-04, G141/G144/G165 and the 263 fresh starts):**
 - A fresh 50K account on U36: about **1 in 10 is lost or frozen** within 21 months (25 of 263 monthly starts; U34 32);
-  the median account makes about **$41,000 in 21 months** (about $450 a week; U35 $41,201, U34 $39,454); +$3,000 takes a median 138 days
-  (within 30 days in 3.8%); +$50,000 within 21 months in 47.5% (median 16.3 months).
+  the median account makes **$40,381 in 21 months** (about $440 a week; U35 $41,201, U34 $39,454); +$3,000 takes a median
+  145 days (within 30 days in 3.8%); +$50,000 within 21 months in 47.5% (median 16.8 months).
 - Once the account is $10,000-30,000 up: the window averaged **$1,660 a week** (17% of weeks at +$3,000 or more);
   past $30,000 the day's $900 budget caps every trade and the long histories average $600-1,200 a week.
 - At 2 ticks of slippage instead of 1, the window still makes $52,137 (G156).
