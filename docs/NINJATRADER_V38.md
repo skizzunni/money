@@ -5737,3 +5737,9 @@ with that caveat.
 $58,301, NQ $596,531, index $856,839 and NinjaTrader window $59,263, NQ $597,954, all above U44, but NinjaTrader's index
 **$824,406** against $828,138 (−0.45%). G78 asks for higher on all six; G99b for 4 fewer lost. Not adopted. Log:
 `verification/noise_v2/g235_combined.txt`.
+
+## G236: shorts at 0.75x and 1.25x, on U44 (registered 2026-11-04, before its run)
+
+**Why:** the index has an upward drift; the bot's shorts and longs take the same size (`short_mult` 1). G195 drew
+0.5 / 1.5 only inside combinations. **The variants:** U44 with `short_mult` (a) 0.75 and (b) 1.25. **Run once:** the 526
+starts and the full sets in both executions. **Adopt (the better window) on G78's rule** against U44, or G99b's.
