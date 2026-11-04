@@ -99,6 +99,7 @@ class NoiseConfig:
     # it only at a check on the hour
     after_loss_qty_div: float = 1.0
     after_loss_ml_mult: float = 1.0  # its max loss x this (the same contracts, a wider stop)
+    after_loss_ml_mult5: float = 0.0  # G165: on 5-minute bars, after_loss_ml_mult is this (0: off)
     after_loss_ml_locked: float = 0.0  # research (G119): once the floor has stopped, after_loss_ml_mult is this (0: off)
     # a second tier for two or more losers in a row (0: the same as after one loser), and the rule on the losing
     # trade's side only (another side: the normal size)
@@ -617,7 +618,9 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
     def al_mult() -> float:
         """after_loss_ml_mult, or G119's after_loss_ml_locked once the floor has stopped."""
         locked = cfg.after_loss_ml_locked > 0 and minutes == 5 and floor_stopped()  # tested on 5-minute bars
-        return cfg.after_loss_ml_locked if locked else cfg.after_loss_ml_mult
+        if locked:
+            return cfg.after_loss_ml_locked
+        return cfg.after_loss_ml_mult5 if cfg.after_loss_ml_mult5 > 0 and minutes == 5 else cfg.after_loss_ml_mult
 
     protect_set = set(cfg.protect_dates.split(",")) if cfg.protect_room > 0 and cfg.protect_dates else set()
 

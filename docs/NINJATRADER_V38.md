@@ -4770,3 +4770,13 @@ U34 with only that change: 26 lost or frozen of 263 (U34 32), medians $37,057 / 
 **The check not yet seen:** the window, NQ and the index in both executions, and the 89 quarterly starts. **Adopt on
 G99b's survival-first rule** (fewer lost on the 263, the net at least 95% of U34's on every set in both executions, no
 −$1,000 day, the floor never touched).
+
+**G165 result (run once, 2026-11-04): passes G99b's survival-first rule; adopted (U35).** Chart / NinjaTrader: window
+**$54,906 / $55,707** (U34 $54,879 / $54,874), NQ $554,446 / $557,104 (U34 $554,388 / $557,093), index $786,440 /
+$776,796 (as U34); the floor never touched, no −$1,000 day; 263 monthly starts **26 lost or frozen** (U34 32; NQ 13,
+index 13), medians $50,259 / $37,057; 89 quarterly starts 8 (as U34). The survival number comes from the search that
+suggested it (G164); the full sets are the check it hadn't seen. Log: `verification/noise_v2/g165_after_loss_12.txt`.
+
+**U35 (2026-11-04): the trade after a loser risks $225, not $250, until the floor has stopped (G165).** In Funded growth
+on the 5-minute chart "After a losing trade: max loss per trade" is $225 (1.2x; $250 on other charts); after the floor
+stops U30's $187.50 applies. `test_v38_after_loss_225` checks NinjaTrader's code against the model at $225 and $250.
