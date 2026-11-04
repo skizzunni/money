@@ -4880,3 +4880,7 @@ G156, G158, G160, G162.
 of U38's 19 lost starts go in that phase. `gap_go_after_lock` (an existing research setting): the gap trade only once
 the floor has stopped. **The variant:** U38 with it. **Run once:** the 263 monthly starts and the full sets in both
 executions. **Adopt on G99b's survival-first rule** against U38 (fewer than 19, every net at least 95%).
+
+**G172 result (run once, 2026-11-04): rejected.** 263 monthly starts: **27 lost or frozen** (U38 19); nets within 1%.
+The 1-contract gap trade helps a fresh account build the cushion that stops the floor. Log:
+`verification/noise_v2/g172_gap_after_lock.txt`.
