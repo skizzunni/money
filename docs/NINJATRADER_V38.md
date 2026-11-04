@@ -4792,3 +4792,12 @@ the full sets in both executions; **adopt on G99b's survival-first rule** agains
 **G166 screen (2026-11-04), lost or frozen of 263 (U35 26):** k0 **21** (after-loss 1.1x, brake 0.6, cushion $3,000,
 max loss $175, the early check at 14:30 only; medians $38,603 / $45,192), k15 21 (medians $28,629 / $40,382), k1 22,
 k13 23. By the registered rule k0 goes on to the full sets. Log: `verification/noise_v2/g166_survival_search.txt`.
+
+**G166 result (run once, 2026-11-04): k0 rejected.** Chart / NinjaTrader: window $47,800 / $47,923 (86% of U35's
+$55,707), NQ $485,025 / $488,354, index $798,713 / $713,983. Log: `verification/noise_v2/g166_k0.txt`.
+
+## G167: the after-loss max loss at 1.1x on U35 (registered 2026-11-04, before its run)
+
+**The idea, from G166:** both of G166's best (21 lost) have `after_loss_ml_mult` 1.1 ($206); it isn't yet run alone.
+**The variant:** U35 with `after_loss_ml_mult5` 1.1. **Run once:** the 263 monthly starts and the full sets in both
+executions. **Adopt on G99b's survival-first rule** against U35 (fewer than 26 lost, every net at least 95%).
