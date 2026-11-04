@@ -4912,3 +4912,12 @@ executions. **Adopt (the fewest lost) on G99b's survival-first rule** against U3
 late 2019 to March 2020, mid-2011, mid-2013, September 2023): a fresh account started into a losing regime. The early
 1-contract gap trade helps (G172), 2 contracts don't (G173), stronger brakes save one or two more but cost the index
 in NinjaTrader's execution (G174).
+
+## G175: the shadow gate through the whole early phase (registered 2026-11-04, before its run)
+
+**The idea:** U38's early losses come from starting into a losing stretch. G87's shadow gate (a 1-contract paper
+record of the bot; on a day its end-of-day equity is below its 20-session average, no new trade while the account is
+within `protect_room` of its floor) was tested near the floor ($1,000-1,500). Here `protect_room` 2,100: the gate
+covers the whole phase before the floor stops (the room is at most $2,000 there) and turns off once the account is
+$2,100 above its floor. **The variant:** U38 with it. **Run once:** the 263 monthly starts and the full sets in both
+executions. **Adopt on G99b's survival-first rule** against U38 (fewer than 19, every net at least 95%).
