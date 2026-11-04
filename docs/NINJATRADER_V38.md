@@ -4118,3 +4118,10 @@ frozen** (NQ 5, index 4) against U29's 10. Log: `verification/noise_v2/g119_afte
 setting "After a losing trade, once the floor has stopped: max loss per trade" (`AfterLossLocked`, default 187.5; 0 =
 U29's $250 throughout), in the Funded growth modes and Custom on the 5-minute chart. `test_v38_after_loss_locked`
 checks NinjaTrader's code against the model trade for trade with it on and off.
+
+## G120: up to 25 or 30 contracts on U30 (registered 2026-11-04, before its run)
+
+**The idea:** the weekly profit in the grown phase comes from the contract steps (one more per $1,500, up to 20). G105/
+G106 took the cap from 15 to 20 with no lost account more. **Variants:** U30 with `size_up_to` 25 and 30. **Adopt (the
+better window net of those that pass) on G78's rule** against U30 (chart / NinjaTrader window $48,035 / $48,108, NQ
+$530,579 / $528,411, index $697,942 / $689,202; 9 lost or frozen of 89).
