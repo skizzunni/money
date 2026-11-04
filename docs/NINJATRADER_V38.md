@@ -3618,3 +3618,13 @@ window $43,001 / $43,358, index $593,290 / $584,463 (`verification/noise_v2/g89_
 
 **The idea:** G45 kept 2 noise units with the time stop, before gap and go, More trading days and 10-contract gap
 trades. **Variants:** U25 with `take_profit` 1.5 and 2.5. **Adopt (the better by window net) on G78's rule**, against U25.
+
+**G90 result (run once, 2026-11-04): rejected; 2 noise units stays.** 1.5: the index's account lost in both executions
+(and NQ's in NinjaTrader's). 2.5: window $40,920 / $41,081, index $559,118 / $560,266, both below U25
+(`verification/noise_v2/g90_take_profit.txt`).
+
+## G91: the lock trigger re-checked on U25 (registered 2026-11-04, before its run)
+
+**The idea:** the lock (stop to the entry plus 2.5 points once the trade is up 0.35 of its max loss) was set in v3.2 and
+re-checked in G21, before gap and go and the rest. **Variants:** U25 with `lock_at` 0.25 and 0.5.
+**Adopt (the better by window net) on G78's rule**, against U25.
