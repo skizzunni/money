@@ -74,19 +74,19 @@ real MNQ data will differ somewhat. The stand-in has flattered this strategy bef
 simulator, Funded growth, from 2025-01-02, 1 tick of slippage, $0.62 a side;
 `verification/noise_v2/v38g_nt_2026-11-03.csv` and the trade lists beside it):
 
-| Jan 2, 2025 – Oct 2026 (updated 2026-11-04, U25) | 5-minute bars | 30-minute bars |
+| Jan 2, 2025 – Oct 2026 (updated 2026-11-04, U26) | 5-minute bars | 30-minute bars |
 |---|---|---|
-| Trades | 703 | 252 |
-| Net | **$43,966.90** | $28,620.10 |
-| Winners | 50.9% | 53.6% |
-| Profit factor | 1.685 | 1.881 |
-| Closed drawdown | $3,317.67 | $3,934.78 |
+| Trades | 704 | 252 |
+| Net | **$45,289.92** | $28,620.10 |
+| Winners | 50.8% | 53.6% |
+| Profit factor | 1.634 | 1.881 |
+| Closed drawdown | $4,333.80 | $3,934.78 |
 | Largest loss | −$1,762.10 | −$1,634.41 |
-| Worst day | −$899.06 | −$899.20 |
+| Worst day | −$899.44 | −$899.20 |
 | Most contracts | 15 | 15 |
 | Days with a trade (the model) | about 72% | about 29% |
 
-The 5-minute chart includes gap and go (U19, U20, U25: up to 10 MNQ once the floor has stopped), More trading days with the 2-point sizing allowance (U22) and the
+The 5-minute chart includes gap and go (U19, U20, U25: up to 10 MNQ once the floor has stopped), More trading days with the sizing allowance (U22, U26: 2-MNQ fill-ins from $6,000, 3 points) and the
 data fix (G67). They need the 5-minute chart, so **trade the 5-minute chart**.
 
 **It matches the Python model, trade for trade.**
@@ -3698,3 +3698,28 @@ stop (−$1,253) (`verification/noise_v2/g96_fill2.txt`).
 **The idea:** at 3 points (from 2), that 10:00 trade sizes to 12 contracts and the day ends near −$926. Everything else
 is G96. **The variant:** U25 with `fill_qty2_room` 6000 and `size_slip_pts` 3. **Adopt on G78's rule**, against U25.
 **Caution:** a fix aimed at one known day; the 89 start dates are the check.
+
+**G97 result (run once, 2026-11-04): passes; adopted.**
+
+| 5-minute, chart / NinjaTrader | U25 | **U25 + 2-MNQ fill-ins from $6,000 + 3-point allowance** |
+|---|---|---|
+| window | $43,463 / $43,740 | **$45,340 / $45,396** |
+| index | $607,307 / $600,553 | **$639,474 / $629,316** |
+| NQ 2015-25 | lost (reported) | $466,564 / lost (reported) |
+| days at −$1,000, floor touched | 0, never | 0, never |
+| 89 start dates: lost or frozen | 11 | **11** |
+| medians NQ / index | $44,185 / $36,305 | **$47,789 / $39,130** |
+
+(`verification/noise_v2/g97_fill2_s3.txt`, `g35_start_dates_u25f2s3.csv`.)
+
+**U26 (2026-11-04): fill-ins at 2 MNQ well above the floor, and a 3-point sizing allowance (G97).**
+- **New setting:** "More trading days: fill-ins at 2 MNQ while the account is at least this far above the floor, $"
+  (**6,000**); below it they stay at 1 MNQ. "Sizing: count this many points more slippage at each stop" now **3**.
+  Both act on 5-minute charts only.
+- **The file you trade, NinjaTrader simulator, 5-minute, from 2025-01-02: 704 trades, $45,289.92, 50.8% winners,
+  profit factor 1.634, closed drawdown $4,333.80, worst day −$899.44, largest loss −$1,762.10.** Trade for trade with
+  the model to 2026-03-09 (the data hole). 30-minute unchanged ($28,620.10, all 303 identical)
+  (`verification/noise_v2/v38g_nt_g97_2026-11-04.txt`).
+
+**Scorecard, G44-G97:** 54 rounds. Adopted: G60 (U19), G67b (U20), G67's data fix, G79 (U22), G80 (U23), G82 (U24),
+G84 (U25), G97 (U26). Rejected: 43. Measurements: G54, G55, G88.

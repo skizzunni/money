@@ -78,6 +78,8 @@ namespace NinjaTrader.NinjaScript.Strategies
         // the last 14 sessions' average body, its way) in the 09:35-09:55 slot, and the shorts the trend filter blocks
         public bool MoreDays = false;
         public double FillSmallK = 0.0, FillDriveK = 0.5, FillMinRoom = 3000;
+        // G97: the fill-ins at 2 MNQ while the account is FillQty2Room above the floor (0 = always 1)
+        public double FillQty2Room = 0;
         // G76: the bot's sizing counts this many points more slippage at the stop (0 = off)
         public double SizeSlipPts = 0;
         // G87: within ProtectRoom of the trailing floor, no new trade on a session after a shadow (1-contract, paper)
@@ -184,6 +186,14 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (s.ProtectRoom <= 0 || !ProtectClosed || s.TrailDD <= 0 || double.IsNaN(trailPeak)) return false;
             double floor = Math.Min(trailPeak - s.TrailDD, trailBase);
             return EqEff - floor < s.ProtectRoom;
+        }
+
+        // G97: the fill-ins' contracts
+        int FillQ()
+        {
+            if (s.FillQty2Room <= 0 || s.TrailDD <= 0 || double.IsNaN(trailPeak)) return 1;
+            double floor = Math.Min(trailPeak - s.TrailDD, trailBase);
+            return EqEff - floor >= s.FillQty2Room ? 2 : 1;
         }
 
         // G72: may a fill-in trade be taken now? The floor stopped at the start, and FillMinRoom above it
@@ -591,10 +601,11 @@ namespace NinjaTrader.NinjaScript.Strategies
                 ml = ml / q * qUp;
                 q = qUp;
             }
-            if (s.MoreDays && s.TrendN > 0 && d < 0 && trend == 1)  // G72: a fill-in short in the uptrend, 1 MNQ at its max loss
+            if (s.MoreDays && s.TrendN > 0 && d < 0 && trend == 1)  // G72: a fill-in short in the uptrend at its max loss a contract
             {
-                ml = ml / q;
-                q = 1;
+                int fq = FillQ();  // G97: 1 MNQ, or 2 well above the floor
+                ml = ml / q * fq;
+                q = fq;
             }
             if ((s.DailyLoss > 0 || s.TrailDD > 0) && ml > 0)  // the loss budget
             {
@@ -677,7 +688,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                     else if (s.GapGoMaxQty > 0)
                         q = Math.Min(q, s.GapGoMaxQty);
                     if (one)
-                        q = Math.Min(q, 1);
+                        q = Math.Min(q, FillQ());
                     if (q >= 1)
                     {
                         gapPending = true; gapPendingDir = d; gapPendingQty = q; gapPendingStop = dayOpen;
@@ -755,7 +766,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (State == State.SetDefaults)
             {
                 Name = "MnqNoiseV38";
-                Description = "MNQ Noise-Area Momentum v3.8, Funded growth: 1 MNQ to start, $187.50 max loss a contract ($250 after a loser), $900 a day, a $2,000 end-of-day trailing floor, a contract more per $1,500 of profit up to 15, the 60-minute time stop; gap and go at 1 MNQ, up to 10 once the trailing floor has stopped at the start; More trading days (1-MNQ fill-in trades once $3,000 above the stopped floor); sizing with 2 points more stop slippage.";
+                Description = "MNQ Noise-Area Momentum v3.8, Funded growth: 1 MNQ to start, $187.50 max loss a contract ($250 after a loser), $900 a day, a $2,000 end-of-day trailing floor, a contract more per $1,500 of profit up to 15, the 60-minute time stop; gap and go at 1 MNQ, up to 10 once the trailing floor has stopped at the start; More trading days (fill-in trades once $3,000 above the stopped floor: 1 MNQ, 2 from $6,000); sizing with 3 points more stop slippage.";
                 Calculate = Calculate.OnBarClose;
                 EntriesPerDirection = 1;
                 EntryHandling = EntryHandling.UniqueEntries;
@@ -799,7 +810,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 GapGoLocked = 10;  // G84 (G67b: 3, G80: 5, G82: 7; G83's 15 broke the daily limit once)
                 MoreDays = true;  // G79: on by default (with SizeSlip 2)
                 MoreDaysCushion = 3000;
-                SizeSlip = 2;  // G79
+                SizeSlip = 3;  // G97 (G79: 2)
+                MoreDaysQty2Room = 6000;  // G97
                 NearFloorGate = 0;  // G87b: off (it lost more accounts)
                 TestedWinRate = 61.2;
             }
@@ -855,6 +867,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 st.GapGoLockedQty = GapGoLocked;  // G67
                 st.MoreDays = MoreDays && st.GapGo;  // G72: the fill-in trades (5-minute chart, not in Evaluation)
                 st.FillMinRoom = MoreDaysCushion;
+                st.FillQty2Room = MoreDaysQty2Room;  // G97
                 st.SizeSlipPts = Mode != "Evaluation" ? SizeSlip : 0;  // G79: the Funded growth modes and Custom
                 st.ProtectRoom = Mode != "Evaluation" ? NearFloorGate : 0;  // G87
                 st.Tick = TickSize;
@@ -1557,6 +1570,11 @@ namespace NinjaTrader.NinjaScript.Strategies
         [Range(0, 100000)]
         [Display(Name = "More trading days: only while the account is at least this far above the trailing floor, $", Order = 17, GroupName = "1. Size and risk")]
         public double MoreDaysCushion { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, 100000)]
+        [Display(Name = "More trading days: fill-ins at 2 MNQ while the account is at least this far above the floor, $ (0 = always 1)", Order = 20, GroupName = "1. Size and risk")]
+        public double MoreDaysQty2Room { get; set; }
 
         [NinjaScriptProperty]
         [Range(0, 50)]
