@@ -4619,3 +4619,12 @@ freezes: the window's account made −$802 on 61 trades). Log: `verification/noi
 **The idea:** 15 of U34's 32 lost starts go before the floor stops, in a few −$900 days of a volatile stretch.
 `early_daily_loss` (a new research setting): the day's budget until the floor has stopped. **Variants:** U34 with $500
 and $650. **Adopt (the fewest lost) on G99b's survival-first rule** on the 263 monthly starts, as G152.
+
+**G153 result (run once, 2026-11-04): rejected.** 263 monthly starts: $500 36 lost or frozen, $650 33 (U34 32); the
+full sets within $200 of U34. Early on the floor's room, not the day's budget, sets the size; a smaller day budget only
+slows the recovery. Log: `verification/noise_v2/g153_early_budget.txt`.
+
+## G154: a tighter max loss a contract until the floor has stopped (registered 2026-11-04, before its run)
+
+**Variants:** U34 with `early_ml` 150 and 125 (the max loss per contract until the floor has stopped; $187.50 after).
+**Adopt (the fewest lost) on G99b's survival-first rule** on the 263 monthly starts, as G152.
