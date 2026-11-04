@@ -4781,3 +4781,10 @@ suggested it (G164); the full sets are the check it hadn't seen. Log: `verificat
 **U35 (2026-11-04): the trade after a loser risks $225, not $250, until the floor has stopped (G165).** In Funded growth
 on the 5-minute chart "After a losing trade: max loss per trade" is $225 (1.2x; $250 on other charts); after the floor
 stops U30's $187.50 applies. `test_v38_after_loss_225` checks NinjaTrader's code against the model at $225 and $250.
+
+## G166: 20 random combinations of the survival settings around U35 (registered 2026-11-04, before its run)
+
+**Variants (seed 166), around U35:** `after_loss_ml_mult` 1.0 / 1.1 / 1.2 / 1.25, `giveback_brake` 0.45-0.6,
+`fill_min_room` $2,500-3,500, `max_loss_per_trade` $175 / $187.50 / $200, the early no-entry checks (13:00 + 14:30,
+14:30, 13:00 + 14:00 + 14:30). As G164: the fewest lost or frozen on the 263 starts (ties: the higher median) goes on to
+the full sets in both executions; **adopt on G99b's survival-first rule** against U35 (fewer than 26).
