@@ -5128,3 +5128,11 @@ now waits for the bot's own trades to bring it back, without the gap trade's. Lo
 **U41 (2026-11-04): no gap trade while the giveback brake is on (G191).** The setting "Giveback brake: no gap trade
 while the brake is on" (`GapSkipBraked`) defaults to on (the Funded growth modes; it acts only on the 5-minute chart,
 as the brake does). The dashboard's today line adds ", no gap trade" while the brake is on.
+
+## G192: a $150 stop on every trade, on U41 (registered 2026-11-04, before its run)
+
+**The ask (the user):** "just set stop loss at like 150". The bot's max loss is $187.50 a contract (93.75 points);
+G154 tried $150 only until the floor stops (on U34: more accounts lost). **The variants:** U41 with (a)
+`max_loss_per_trade` 150 on every trade, and (b) the same plus `gap_go_cap` (the gap trade's stop no farther than $150 a
+contract, 75 points). **Run once:** the 526 starts and the full sets in both executions. **Adopt (the fewest lost) on
+G78's rule** (no more than 38 lost, higher nets) or G99b's (at least 4 fewer lost, every net at least 95%).
