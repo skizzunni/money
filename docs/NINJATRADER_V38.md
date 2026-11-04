@@ -5015,3 +5015,9 @@ nets within 1%. Log: `verification/noise_v2/g182_cushion.txt`.
 24, $2,500 → 17, $3,000 → 19), so a difference of 1-2 accounts is within the noise. Of today's survival-rule adoptions,
 U35 (32 → 26) and U37 (25 → 20) are well clear of it; U36 (−1), U38 (−1) and U40 (−2) are not, though none costs more
 than 1% of net. Expect about 1 fresh account in 10 to 15 to be lost or frozen within 21 months, not a precise figure.
+
+## G183: the survival gains on start dates they weren't chosen on (a check, registered 2026-11-04, before its run)
+
+**The check:** U35-U40 were adopted on starts on the 1st of each month. The same 263 months started on the **15th**
+(`START_FREQ=MID`) are a new sample: U34, U37 and U40 on it. **Read:** if U40 loses clearly fewer than U34 there too,
+the survival gains are real; if not, they were fitted to the 1st-of-month sample. No adoption rides on it.

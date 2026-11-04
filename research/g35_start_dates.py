@@ -457,9 +457,11 @@ def main() -> None:
     S.init({}, *sys.argv[1:4])
     S.D = {k: (with_1600(b, S.MIN[0]), first, skip) for k, (b, first, skip) in S.D.items() if k != "win"}
     if MONTHS == 21:
-        fq = os.environ.get("START_FREQ", "QS")  # G141: "MS", a start every month
-        jobs = [("nq", d.strftime("%Y-%m-%d")) for d in pd.date_range("2015-04-01", "2023-10-01", freq=fq)]
-        jobs += [("index", d.strftime("%Y-%m-%d")) for d in pd.date_range("2011-04-01", "2024-07-01", freq=fq)]
+        fq = os.environ.get("START_FREQ", "QS")  # G141: "MS", a start every month; G183: "MID", the 15th of each month
+        off = pd.Timedelta(days=14) if fq == "MID" else pd.Timedelta(0)
+        fq = "MS" if fq == "MID" else fq
+        jobs = [("nq", (d + off).strftime("%Y-%m-%d")) for d in pd.date_range("2015-04-01", "2023-10-01", freq=fq)]
+        jobs += [("index", (d + off).strftime("%Y-%m-%d")) for d in pd.date_range("2011-04-01", "2024-07-01", freq=fq)]
     else:  # G43: every six months, with the whole horizon in the data
         last_nq = pd.Timestamp("2025-07-01") - pd.DateOffset(months=MONTHS)
         last_ix = pd.Timestamp("2026-09-01") - pd.DateOffset(months=MONTHS)
