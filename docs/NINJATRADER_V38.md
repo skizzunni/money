@@ -3984,3 +3984,8 @@ the window's days traded, index $663,561 (chart, above) but **$600,246** in Ninj
 dates 10 lost or frozen, medians $47,442 / $35,758 (`verification/noise_v2/g108_drive03.txt`).
 
 **Scorecard, G44-G108:** 65 rounds. Adopted 10 (and the data fix); rejected 52; measurements 3.
+
+## G109: 2-MNQ fill-ins from $5,000 above the floor (registered 2026-11-04, before its run)
+
+**The idea:** G97's fill-ins go to 2 MNQ at $6,000 above the floor; at $5,000 the second contract comes sooner.
+**The variant:** U29 with `fill_qty2_room` 5000. **Adopt on G78's rule**, against U29.
