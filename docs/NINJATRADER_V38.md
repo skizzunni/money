@@ -5315,3 +5315,13 @@ rest 18-44. k18 (`giveback_brake` 0.6, `early_daily_loss` $750, `max_losers` 3, 
 about $34,000-49,000). G99b asks for every net at least 95%. It is the clearest survival-for-profit trade found: about
 1 account in 18 lost instead of 1 in 14, for about 7% less on the window and 14% less on the index in NinjaTrader's
 execution. Log: `verification/noise_v2/g203_k18.txt`.
+
+## G204: G203's k18 taken apart (registered 2026-11-04, before its run)
+
+**Why:** k18 saved 9 of 526 accounts but cost 7-14% of the nets; it moves six settings. **The variants:** k18 with each
+one of its six settings put back to U41's (six variants: without the brake at 0.6, without the $750 early budget,
+without three losers a day, without the 45-minute time stop, without the 0.7 range filter, without the 0.6 gap
+trigger), and the $750 early budget alone (it acts only before the floor stops). **Stage A:** each on the 263 starts on
+the 1st (U41 17, k18 12). **Stage B:** the one with the fewest lost (ties: the higher median), if 13 or fewer, goes on
+to the mid-month starts and the full sets in both executions. **Adopted on G99b's rule** (at least 4 fewer of the 526
+than U41's 38, every net at least 95%) or G78's.
