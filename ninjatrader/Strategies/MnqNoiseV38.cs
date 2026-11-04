@@ -800,7 +800,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 MoreDays = true;  // G79: on by default (with SizeSlip 2)
                 MoreDaysCushion = 3000;
                 SizeSlip = 2;  // G79
-                NearFloorGate = 1000;  // G87
+                NearFloorGate = 0;  // G87b: off (it lost more accounts)
                 TestedWinRate = 61.2;
             }
             else if (State == State.DataLoaded)

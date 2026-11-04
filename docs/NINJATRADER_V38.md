@@ -3561,3 +3561,16 @@ path lived), no −$1,000 day; B gave 16. Nothing is adopted from it.
 
 The same rule, variants and pass rule as G87, with the shadow fixed to 1 contract (`size_up_to` 1 in
 `research/shadow_gate.py`), as NinjaTrader's code has it.
+
+**G87b result (run once, 2026-11-04): rejected; the gate loses more accounts.**
+
+| | 89 start dates: lost or frozen (NQ / index) | window, chart / NinjaTrader | index |
+|---|---|---|---|
+| U25 (today) | **11** (5 / 6) | $43,463 / $43,740 | $607,307 / $600,553 |
+| A, $1,000, 1-contract shadow | 15 (9 / 6) | $43,574 / $42,875 | $596,406 / $593,321 |
+| B, $1,500 | (not needed) | $43,820 / **$7,164, lost** | $601,979 / $593,280 |
+
+Near the floor, the gate skips the first winners of a recovery (the shadow is still under its average when the market
+turns), and the account that would have climbed out sits until the room is too small to trade. The lost accounts move
+around under any rule here: G87 saved 10 of the 11 and lost 9 others. `protect_room` and the C# `NearFloorGate` stay
+in the code, **off** (`verification/noise_v2/g87b_shadow_gate.txt`).
