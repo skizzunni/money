@@ -5673,7 +5673,7 @@ Full suite 675 passed; NinjaTrader's growth run identical to the model (up to th
 | Weekly, the account $10,000-30,000 up (window) | $1,483 average, 11% of weeks at +$3,000 or more |
 | Weekly, past $75,000 (long histories) | $1,067-1,256 |
 
-**Today (G189-G230, 42 rounds):** U41 (no gap trade while braked), U42 (G204's five survival settings: 38 → 28 lost),
+**Today (G189-G231, 43 rounds):** U41 (no gap trade while braked), U42 (G204's five survival settings: 38 → 28 lost),
 U43 and U44 (faster grown-phase steps, 3-MNQ fill-ins, 75 MNQ: window $53,164 → $57,475, index +9%). Everything else was
 rejected or a measurement. **Not reached:** $3,000 a week on average, or zero lost accounts. Past U44, every extra
 contract or a bigger day budget broke the $1,000 day (G214, G219, G226), and the account's survival depends on fills
@@ -5696,3 +5696,7 @@ after-loss stop gets hit more on the long histories. Log: `verification/noise_v2
 **Why:** the grown gap trade (10 contracts) is where the worst days come from (G226); G157 tried a bigger trigger once
 grown on U34. **The variants:** U44 with `gap_go_k_locked` (a) 0.75 and (b) 1.0 (0.6 now, as before the floor stops).
 **Run once:** the 526 starts and the full sets in both executions. **Adopt (the better window) on G78's rule** against U44.
+
+**G231 result (run once, 2026-11-04): both rejected.** 0.75: 30 lost, NQ $569,653 / $562,087 (U44 $587,643 / $579,739);
+1.0: 32 lost, every net lower. Fewer grown gap trades cost more than they save. Log:
+`verification/noise_v2/g231_gap_k_locked.txt`.
