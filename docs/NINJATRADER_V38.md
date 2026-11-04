@@ -5785,3 +5785,8 @@ execution). **Screen:** all three nets at least U44's, no −$1,000 day, the flo
 passing (by the sum of the three nets against U44's) go to NinjaTrader's execution and the 526 starts; **the best window
 among those meeting G78's rule** against U44 (higher nets on all three in both executions, no more than 28 lost) is
 adopted. With 1,000 tries, some pass by chance; the 526 starts and NinjaTrader's execution are the check.
+
+**G239 result (run once, 2026-11-04): both rejected.** On the 263 starts on the 1st alone: (a) **31** lost, (b) **37** (U44
+12; the rule allows 28 of the 526), so the mid-month half can't save them. The window also splits between the
+executions: (a) chart **$11,785** against NinjaTrader $70,327; the 15-minute grid's results hang on single fills. The
+off-half-hour exits still act early (only the entries were held back). Log: `verification/noise_v2/g239_grid15_locked.txt`.
