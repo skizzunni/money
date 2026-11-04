@@ -4468,3 +4468,7 @@ cap the size. Faster steps only above $10,000 of profit (`profit_step_fast`, `pr
 settings) leave the thin early zone, where the accounts are lost, as it is. **Variants:** U33 (row 0, the check) and
 U33 with a contract per $750 above $10,000, per $500 above $10,000, per $750 above $20,000. G135's screen, then
 NinjaTrader's execution and the 89 starts for the best, on G78's rule or G99b's.
+
+**G142 screen (2026-11-04):** row 0 = U33 exactly. Per $750 above $10,000: **window $54,879, NQ $554,388, index
+$786,440** (passes); per $500: index $784,902 (out by $31); per $750 above $20,000: index $784,279 (out). The candidate
+is per $750 above $10,000 (package `U33fs`, variant `u33fs`). Log: `verification/noise_v2/g142_fast_steps_screen.txt`.
