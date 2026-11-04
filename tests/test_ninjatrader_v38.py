@@ -35,7 +35,9 @@ GROW = NoiseConfig(**{**V21, "qty": 1, "lookback": 14, "max_loss_per_trade": 187
                       "fill_min_room": 3000.0, "size_slip_pts": 4.0, "fill_qty2_room": 6000.0,
                       "giveback_brake": 0.5,
                       # G119: once the floor has stopped, the trade after a loser risks $187.50 like the others
-                      "after_loss_ml_locked": 1.0},
+                      "after_loss_ml_locked": 1.0,
+                      # G125: no entries at 13:00 and 14:30 until the floor has stopped
+                      "skip_checks": "780,870", "skip_checks_early": True},
                    nt_execution=True, round_prices=True, target_on_fill_bar=True)
 GROW_ARGS = ["Mode=Funded growth"]  # the default; its settings are the tested ones above
 # G72's fill-in trades off (NinjaTrader's More trading days needs gap and go on)
@@ -663,11 +665,11 @@ def test_v38_gap_go_locked(sim, sample_1m, tmp_path):  # noqa: F811
             f.write(f"{t:%Y-%m-%d %H:%M},{r.open!r},{r.high!r},{r.low!r},{r.close!r}\n")
     sizes = {}
     for lq in (3, 0):
-        r = subprocess.run([DOTNET, str(sim), str(path), "5", "Strategy=V38", "Mode=Custom", "TrailDD=600",
+        r = subprocess.run([DOTNET, str(sim), str(path), "5", "Strategy=V38", "Mode=Custom", "TrailDD=600", "EarlyNoEntryChecks=",
                             f"GapGoLocked={lq}"], capture_output=True, text=True, env=ENV)
         assert r.returncode == 0, r.stderr[-2000:]
         nt = [x.split(",")[1:] for x in r.stdout.splitlines() if x.startswith("T,")]
-        py = run(bars, dataclasses.replace(GROW, trail_dd=600.0, gap_go_locked_qty=lq), minutes=5).trades
+        py = run(bars, dataclasses.replace(GROW, trail_dd=600.0, skip_checks="", gap_go_locked_qty=lq), minutes=5).trades
         assert len(nt) == len(py) >= 20
         for a, t in zip(nt, py, strict=True):
             assert (int(a[0]), int(a[1]), int(a[3])) == (t.direction, t.entry_bar, t.exit_bar), (a, t)
@@ -692,11 +694,11 @@ def test_v38_more_days(sim, sample_1m, tmp_path):  # noqa: F811
             "fill_min_room": 100.0}
     days = {}
     for on in (True, False):
-        r = subprocess.run([DOTNET, str(sim), str(path), "5", "Strategy=V38", "Mode=Custom", "TrailDD=600",
+        r = subprocess.run([DOTNET, str(sim), str(path), "5", "Strategy=V38", "Mode=Custom", "TrailDD=600", "EarlyNoEntryChecks=",
                             f"MoreDays={on}", "MoreDaysCushion=100"], capture_output=True, text=True, env=ENV)
         assert r.returncode == 0, r.stderr[-2000:]
         nt = [x.split(",")[1:] for x in r.stdout.splitlines() if x.startswith("T,")]
-        py = run(bars, dataclasses.replace(GROW, trail_dd=600.0, **(fill if on else NO_FILL)), minutes=5).trades
+        py = run(bars, dataclasses.replace(GROW, trail_dd=600.0, skip_checks="", **(fill if on else NO_FILL)), minutes=5).trades
         assert len(nt) == len(py) >= 20
         for a, t in zip(nt, py, strict=True):
             assert (int(a[0]), int(a[1]), int(a[3])) == (t.direction, t.entry_bar, t.exit_bar), (a, t)
@@ -719,11 +721,11 @@ def test_v38_giveback_brake(sim, sample_1m, tmp_path):  # noqa: F811
             f.write(f"{t:%Y-%m-%d %H:%M},{r.open!r},{r.high!r},{r.low!r},{r.close!r}\n")
     qtys = {}
     for gb in (0.9, 0.0):
-        r = subprocess.run([DOTNET, str(sim), str(path), "5", "Strategy=V38", "Mode=Custom", "TrailDD=600",
+        r = subprocess.run([DOTNET, str(sim), str(path), "5", "Strategy=V38", "Mode=Custom", "TrailDD=600", "EarlyNoEntryChecks=",
                             f"GivebackBrake={gb}"], capture_output=True, text=True, env=ENV)
         assert r.returncode == 0, r.stderr[-2000:]
         nt = [x.split(",")[1:] for x in r.stdout.splitlines() if x.startswith("T,")]
-        py = run(bars, dataclasses.replace(GROW, trail_dd=600.0, giveback_brake=gb), minutes=5).trades
+        py = run(bars, dataclasses.replace(GROW, trail_dd=600.0, skip_checks="", giveback_brake=gb), minutes=5).trades
         assert len(nt) == len(py) >= 20
         for a, t in zip(nt, py, strict=True):
             assert (int(a[0]), int(a[1]), int(a[3])) == (t.direction, t.entry_bar, t.exit_bar), (a, t)
@@ -745,11 +747,11 @@ def test_v38_after_loss_locked(sim, sample_1m, tmp_path):  # noqa: F811
             f.write(f"{t:%Y-%m-%d %H:%M},{r.open!r},{r.high!r},{r.low!r},{r.close!r}\n")
     nets = {}
     for usd, k in ((187.5, 1.0), (0.0, 0.0)):
-        r = subprocess.run([DOTNET, str(sim), str(path), "5", "Strategy=V38", "Mode=Custom", "TrailDD=600",
+        r = subprocess.run([DOTNET, str(sim), str(path), "5", "Strategy=V38", "Mode=Custom", "TrailDD=600", "EarlyNoEntryChecks=",
                             f"AfterLossLocked={usd}"], capture_output=True, text=True, env=ENV)
         assert r.returncode == 0, r.stderr[-2000:]
         nt = [x.split(",")[1:] for x in r.stdout.splitlines() if x.startswith("T,")]
-        py = run(bars, dataclasses.replace(GROW, trail_dd=600.0, after_loss_ml_locked=k), minutes=5).trades
+        py = run(bars, dataclasses.replace(GROW, trail_dd=600.0, skip_checks="", after_loss_ml_locked=k), minutes=5).trades
         assert len(nt) == len(py) >= 20
         for a, t in zip(nt, py, strict=True):
             assert (int(a[0]), int(a[1]), int(a[3])) == (t.direction, t.entry_bar, t.exit_bar), (a, t)
@@ -757,6 +759,34 @@ def test_v38_after_loss_locked(sim, sample_1m, tmp_path):  # noqa: F811
             assert math.isclose(float(a[6]), t.pnl, abs_tol=1e-6), (a, t)
         nets[usd] = [(t.qty, round(t.pnl, 6)) for t in py]
     assert nets[187.5] != nets[0.0]
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+def test_v38_early_no_entry_checks(sim, sample_1m, tmp_path):  # noqa: F811
+    """G125: no entries at the 13:00 and 14:30 checks until the floor has stopped. NinjaTrader's code and the model agree
+    trade for trade with it on (the default) and off (blank), it changes the trades, and before the floor stops no
+    entry fills at 13:00 or 14:30."""
+    bars = resample(sample_1m, "5min")
+    path = tmp_path / "bars.csv"
+    with path.open("w") as f:
+        for t, r in zip(bars.index, bars.itertuples(), strict=True):
+            f.write(f"{t:%Y-%m-%d %H:%M},{r.open!r},{r.high!r},{r.low!r},{r.close!r}\n")
+    got = {}
+    for arg, sk in ((None, "780,870"), ("EarlyNoEntryChecks=", "")):
+        r = subprocess.run([DOTNET, str(sim), str(path), "5", "Strategy=V38", *GROW_ARGS, *([arg] if arg else [])],
+                           capture_output=True, text=True, env=ENV)
+        assert r.returncode == 0, r.stderr[-2000:]
+        nt = [x.split(",")[1:] for x in r.stdout.splitlines() if x.startswith("T,")]
+        py = run(bars, dataclasses.replace(GROW, skip_checks=sk), minutes=5).trades
+        assert len(nt) == len(py) >= 20
+        for a, t in zip(nt, py, strict=True):
+            assert (int(a[0]), int(a[1]), int(a[3])) == (t.direction, t.entry_bar, t.exit_bar), (a, t)
+            assert float(a[2]) == t.entry and float(a[4]) == t.exit, (a, t)
+            assert math.isclose(float(a[6]), t.pnl, abs_tol=1e-6), (a, t)
+        got[sk] = py
+    assert [(t.entry_bar, t.pnl) for t in got["780,870"]] != [(t.entry_bar, t.pnl) for t in got[""]]
+    ny = [t.entry_time.tz_convert("America/New_York") for t in got["780,870"] if not t.reason.startswith("Gap")]
+    assert not any((x.hour, x.minute) in ((13, 0), (14, 30)) for x in ny)  # the sample's floor never stops
 
 
 @pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")

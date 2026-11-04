@@ -4207,3 +4207,16 @@ on. Log: `verification/noise_v2/g124_skip_1300_1430.txt`.
 **The variant:** U32 with `skip_checks` "780,870" and `skip_checks_early` (a new research setting): no entries at
 13:00 and 14:30 until the floor has stopped, as U32 after. **Adopt on G78's rule** against U32, or on G99b's
 survival-first rule (fewer lost or frozen, the net at least 95% of U32's on every set in both executions).
+
+**G125 result (run once, 2026-11-04): passes G99b's survival-first rule; adopted (U33).** Chart / NinjaTrader: window
+$50,219 / $50,337 (U32 $50,252 / $50,328), NQ $546,409 / $549,379 (U32 $555,059 / $553,246: 98.4% / 99.3%), index
+$784,933 / $774,086 (U32 $784,932 / $773,197); the floor never touched, no −$1,000 day; 89 start dates **8 lost or
+frozen** (NQ 4, index 4) against 9. Not G78's rule (NQ's chart net is lower), but every set keeps at least 95%.
+Log: `verification/noise_v2/g125_skip_early.txt`.
+
+**U33 (2026-11-04): no entries at 13:00 and 14:30 until the floor has stopped (G125).** New setting "No entries at
+these checks until the floor has stopped" (`EarlyNoEntryChecks`, default "13:00,14:30"; blank = off), in the Funded
+growth modes and Custom on the 5-minute chart. `test_v38_early_no_entry_checks` checks NinjaTrader's code against the
+model with it on and off. **A fix found by its tests:** the milestone alert at a day's close counted the model's equity,
+which books the 16:00 close only after the check, so a level reached on the day's last trade was alerted a day late;
+it now counts the strategy's fills (`test_v38_milestones`).

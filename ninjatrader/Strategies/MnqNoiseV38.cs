@@ -85,6 +85,9 @@ namespace NinjaTrader.NinjaScript.Strategies
         public double GivebackBrake = 0;
         // G119: once the floor has stopped at the start, the trade after a loser risks this instead (0 = AfterLossMaxLoss)
         public double AfterLossLockedMaxLoss = 0;
+        // G125: no new entry at these checks (the check bar's end, minutes after midnight, e.g. ",780,870,") until the
+        // floor has stopped at the start (5-minute bars; "" = off)
+        public string EarlySkipChecks = "";
         // G103: a sprint: for the account's first SprintDays sessions, until its profit reaches SprintTarget, every bot and
         // gap trade takes SprintQty contracts (still cut to the day's and the floor's room); then the usual sizing (0 = off)
         public int SprintQty = 0, SprintDays = 5;
@@ -383,10 +386,19 @@ namespace NinjaTrader.NinjaScript.Strategies
             GapStop = double.NaN;
         }
 
+        // G125: is this check one without entries until the floor has stopped?
+        bool EarlySkip(int end)
+        {
+            if (string.IsNullOrEmpty(s.EarlySkipChecks) || minutes != 5) return false;  // tested on 5-minute bars
+            if (s.TrailDD > 0 && !double.IsNaN(trailPeak) && trailPeak - s.TrailDD >= trailBase) return false;
+            return s.EarlySkipChecks.Contains("," + end + ",");
+        }
+
         bool StudyOk(int d, int end, double c)
         {
             if (Protected()) { Note = "near the floor, shadow below its average"; return false; }
             if (s.LastEntryEnd > 0 && end > s.LastEntryEnd) { Note = "after the last entry check"; return false; }
+            if (EarlySkip(end)) { Note = "no entry at this check until the floor has stopped"; return false; }
             if (blockDir != 0 && d == blockDir) { Note = "after a big day, not its way"; return false; }
             if (s.TrendN > 0 && d < 0 && trend == 1 && !FillOk()) { Note = "no shorts in the uptrend"; return false; }
             if (calm) { Note = "calm stretch"; return false; }
@@ -867,6 +879,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 MoreDaysQty2Room = 6000;  // G97
                 GivebackBrake = 0.5;  // G99c
                 AfterLossLocked = 187.5;  // G119
+                EarlyNoEntryChecks = "13:00,14:30";  // G125
                 PropStartBalance = 50000;
                 PropHighBalance = 0;
                 SizeToAccountRoom = true;
@@ -930,6 +943,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 st.FillQty2Room = MoreDaysQty2Room;  // G97
                 st.GivebackBrake = Mode != "Evaluation" ? GivebackBrake : 0;  // G99
                 st.AfterLossLockedMaxLoss = Mode != "Evaluation" ? AfterLossLocked : 0;  // G119
+                st.EarlySkipChecks = Mode != "Evaluation" ? CheckEnds(EarlyNoEntryChecks) : "";  // G125
                 st.SprintQty = Mode != "Evaluation" ? SprintContracts : 0;  // G103
                 st.SizeSlipPts = Mode != "Evaluation" ? SizeSlip : 0;  // G79: the Funded growth modes and Custom
                 st.ProtectRoom = Mode != "Evaluation" ? NearFloorGate : 0;  // G87
@@ -1070,10 +1084,10 @@ namespace NinjaTrader.NinjaScript.Strategies
                 if (paceFrom == DateTime.MinValue && engine.Ready) paceFrom = start.Date;
                 lastSession = start.Date;
             }
+            engine.ExtEquity = cum;  // before the day's summary: its milestone counts the fills up to this bar
+            engine.ExtDayPnl = cum - realDayStart;
             if (tMin >= V38Engine.RthClose)
                 DaySummary(cum);
-            engine.ExtEquity = cum;
-            engine.ExtDayPnl = cum - realDayStart;
             int before = engine.Trades.Count;
             // live: never more risk than the prop account's own room (only once the account reports a balance; a connection
             // that reports 0 is not used, so it can't block the trades)
@@ -1223,7 +1237,8 @@ namespace NinjaTrader.NinjaScript.Strategies
         double SinceStart()
         {
             double cumReal = SystemPerformance.AllTrades.TradesPerformance.Currency.CumProfit;
-            return double.IsNaN(engine.TrailBase) ? cumReal : engine.Equity - engine.TrailBase;
+            // the fills, not the model's equity: at the 16:00 bar the model books its close only after this check
+            return double.IsNaN(engine.TrailBase) ? cumReal : cumReal - engine.TrailBase;
         }
 
         // U8: live, at a day's close, once for each new multiple of MilestoneStep of profit since the start (none for the
@@ -1723,6 +1738,30 @@ namespace NinjaTrader.NinjaScript.Strategies
         [Range(0, 5000)]
         [Display(Name = "After a losing trade, once the floor has stopped: max loss per trade, $ (0 = as before it stopped)", Order = 25, GroupName = "1. Size and risk")]
         public double AfterLossLocked { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "No entries at these checks until the floor has stopped (HH:mm, comma-separated; blank = off)", Order = 26, GroupName = "1. Size and risk")]
+        public string EarlyNoEntryChecks { get; set; }
+
+        // "13:00,14:30" -> ",780,870," (the check bars' ends, minutes after midnight); a bad entry raises a setup warning
+        string CheckEnds(string list)
+        {
+            string outS = ",";
+            foreach (string part in (list ?? "").Split(','))
+            {
+                string t = part.Trim();
+                if (t.Length == 0) continue;
+                string[] hm = t.Split(':');
+                int hh, mm;
+                if (hm.Length != 2 || !int.TryParse(hm[0], out hh) || !int.TryParse(hm[1], out mm) || hh < 0 || hh > 23 || mm < 0 || mm > 59)
+                {
+                    setupWarnings.Add("\"No entries at these checks\": \"" + t + "\" isn't HH:mm; ignored");
+                    continue;
+                }
+                outS += (hh * 60 + mm) + ",";
+            }
+            return outS == "," ? "" : outS;
+        }
 
         [NinjaScriptProperty]
         [Range(0, 15)]
