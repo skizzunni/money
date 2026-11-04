@@ -5673,7 +5673,7 @@ Full suite 675 passed; NinjaTrader's growth run identical to the model (up to th
 | Weekly, the account $10,000-30,000 up (window) | $1,483 average, 11% of weeks at +$3,000 or more |
 | Weekly, past $75,000 (long histories) | $1,067-1,256 |
 
-**Today (G189-G229, 41 rounds):** U41 (no gap trade while braked), U42 (G204's five survival settings: 38 → 28 lost),
+**Today (G189-G230, 42 rounds):** U41 (no gap trade while braked), U42 (G204's five survival settings: 38 → 28 lost),
 U43 and U44 (faster grown-phase steps, 3-MNQ fill-ins, 75 MNQ: window $53,164 → $57,475, index +9%). Everything else was
 rejected or a measurement. **Not reached:** $3,000 a week on average, or zero lost accounts. Past U44, every extra
 contract or a bigger day budget broke the $1,000 day (G214, G219, G226), and the account's survival depends on fills
@@ -5686,3 +5686,7 @@ near the tested 1 tick (G215, G222).
 and after the floor stops (`after_loss_ml_mult5`, `after_loss_ml_locked`). **Run once:** the 526 starts and the full sets
 in both executions. **Adopt (the fewer lost) on G78's rule** against U44, or G99b's (at least 4 fewer lost, every net at
 least 95%).
+
+**G230 result (run once, 2026-11-04): both rejected.** 0.9x: 526 starts **38** lost (U44 28), NQ $480,263 / $480,133
+(−18%); 0.8x: 37 lost, NQ $483,390, index $728,790 (−12%). The window gains ($59,383 / $62,131) but the tighter
+after-loss stop gets hit more on the long histories. Log: `verification/noise_v2/g230_after_loss.txt`.
