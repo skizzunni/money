@@ -5476,3 +5476,7 @@ $6,000-7,000, `fill_qty3_room` $6,000-7,000, `fill_qty2_room` $3,000-3,500, `gap
 0.5-0.75, `size_up_to` 100; row 0 is U44. **Screen and adoption as G209's**, against U44 (no more than 28 lost). A
 caution: G209, G212 and this search climb on the same data, so each step needs the long histories and the 526 starts,
 not the window alone.
+
+**G214 result (2026-11-04): none of 30 passes the screen.** Half (15) have a day at −$1,000 or worse; the rest are lower
+somewhere than U44. Bigger and earlier grown-phase sizing has reached the daily limit: past U44, more size breaks the
+$1,000 day. U44 stays. Log: `verification/noise_v2/g214_grown_search.txt`.
