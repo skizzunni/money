@@ -3963,3 +3963,8 @@ trades, $46,711.93, profit factor 1.656, closed drawdown $4,191.81, worst day âˆ
 
 **Scorecard, G44-G106:** 63 rounds. Adopted 10 (and the data fix): G60, G67b, G79, G80, G82, G84, G97, G99c, G106 and
 U28's safety change aside. Rejected: 50. Measurements: 3.
+
+## G107: fill-ins at 3 MNQ from $9,000 above the floor (registered 2026-11-04, before its run)
+
+**The idea:** G97's fill-ins at 2 MNQ from $6,000 passed; one more contract each $3,000 of cushion, to 3 from $9,000
+(`fill_qty3_room` 9000). **The variant:** U29 with `fill_qty3_room` 9000. **Adopt on G78's rule**, against U29.

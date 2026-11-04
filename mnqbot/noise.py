@@ -337,6 +337,7 @@ class NoiseConfig:
     protect_room: float = 0.0
     calm_small: bool = False  # G95: on a calm stretch, the bot's signals at 1 contract while fill_ok() (fill-ins)
     fill_qty2_room: float = 0.0  # G96: the fill-ins at 2 contracts while the account is this far above the floor
+    fill_qty3_room: float = 0.0  # G107: and at 3 from this far above it (0 = off)
     gap_go_room_per_c: float = 0.0  # G98: once the floor has stopped, a gap trade's contracts at most room / this
     # research (G99): once the floor has stopped, while the profit is under giveback_brake x the best end-of-day
     # profit, every trade at 1 contract (0 = off)
@@ -634,7 +635,10 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
         floor = trail_peak - cfg.trail_dd
         if cfg.trail_cap >= 0:
             floor = min(floor, trail_base + cfg.trail_cap)
-        return 2 if eq_curve[-1] - floor >= cfg.fill_qty2_room else 1
+        room = eq_curve[-1] - floor
+        if cfg.fill_qty3_room > 0 and room >= cfg.fill_qty3_room:  # G107
+            return 3
+        return 2 if room >= cfg.fill_qty2_room else 1
 
     def fill_ok() -> bool:
         """G70: may a fill-in trade be taken now?"""
