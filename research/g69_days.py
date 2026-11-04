@@ -8,8 +8,8 @@ import sys
 
 import numpy as np
 import pandas as pd
-import t1_eval as T
 import shadow_gate as SG
+import t1_eval as T
 import v24_scan as S
 
 from mnqbot.noise import NoiseConfig, run
