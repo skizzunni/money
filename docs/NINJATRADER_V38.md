@@ -5390,3 +5390,13 @@ executions. **Adopt (the better window) on G78's rule** against U42 (higher nets
 28); NQ $600,213 / **$580,796** (U42 $543,263 / $542,956: +7%), index $777,163 / $753,984, but the window **$45,507** /
 $46,148 (U42 $53,124 / $53,164: −13%). k39: **23** lost (10 + 13); window $49,380 / $49,505 (−7%), NQ $544,043 /
 $543,826, index $770,155 / $751,338. G78 asks for a higher net on all three. Log: `verification/noise_v2/g208_k32_k39.txt`.
+
+## G209: 30 random combinations of the grown-phase settings around U42 (registered 2026-11-04, before its run)
+
+**Why:** U42's gains are in survival; the weekly P/L once grown is what falls short. These settings act only once the
+floor has stopped, so they should leave the early accounts alone. **The search** (`research/g209_grown_search.py`, seed
+209): `profit_step_fast` 600-850, `profit_step_fast_from` $8,000-15,000, `gap_go_locked_qty` 8-15, `fill_qty2_room`
+$5,000-7,000, `fill_qty3_room` $9,000-12,000, `gap_go_k_locked` 0.5-1.0, `after_loss_ml_locked` 0.9-1.1; row 0 is U42.
+**Screen:** the chart's nets at least U42's on all three sets, no −$1,000 day, the floor never touched. **Then:** the
+best window among those passing goes to NinjaTrader's execution and the 526 starts, **adopted on G78's rule** (higher
+nets on all three in both executions, no more than 28 lost).
