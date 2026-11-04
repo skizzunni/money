@@ -232,6 +232,10 @@ class NoiseConfig:
     # research (G37): until the trailing floor has stopped at the starting equity plus trail_cap, a trade's max loss
     # is at most early_ml a contract (0 = off), so a bad start costs less of the cushion
     early_ml: float = 0.0
+    # research (G197): once the profit is above grown_from, a trade's max loss is at most grown_ml a contract (5-minute
+    # bars; 0 = off)
+    grown_ml: float = 0.0
+    grown_from: float = 10000.0
     # with the money budget: when not even 1 contract fits, still take 1 with its max loss cut to the room left (less
     # costs), if that leaves at least squeeze_min points of stop; 0 = off (no entry)
     squeeze_min: float = 0.0
@@ -1227,6 +1231,9 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                     if cfg.early_ml > 0 and not (not math.isnan(trail_peak) and cfg.trail_cap >= 0
                                                  and trail_peak - cfg.trail_dd >= trail_base + cfg.trail_cap):
                         ml_next = min(ml_next, cfg.early_ml * q_next)
+                    if (cfg.grown_ml > 0 and minutes == 5 and not math.isnan(trail_base)
+                            and eq_curve[-1] - trail_base > cfg.grown_from):  # G197
+                        ml_next = min(ml_next, cfg.grown_ml * q_next)
                     if cfg.profit_step > 0 and not math.isnan(trail_base) and step_ok:  # a contract more per step
                         q_up = q_next + n_steps()
                         if cfg.size_up_to > 0:

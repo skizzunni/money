@@ -5199,3 +5199,12 @@ $609,219 / $800,791; $50 **$1,776** / $774,367 / $787,199 (U41 $54,710 / $553,16
 but the window, where the account trades, loses 43% and 97%; at $50 only 40-48% of trades win (25 points is inside a
 5-minute bar's noise), and the chart's index has three days past −$1,000. 526 starts: $100 **88** lost or frozen, $50
 **66** (U41 38); medians $12,800-24,000 (U41 about $39,000). Log: `verification/noise_v2/g193_small_stops.txt`.
+
+## G197: a tighter stop only once the account is well up, on U41 (registered 2026-11-04, before its run)
+
+**Why, from G193:** a $100 stop made more on NQ and the index (+$56k / +$24k) but lost accounts and most of the window.
+Most losses come before the cushion is built, and a tight stop there is what kills accounts (G154, G193). **The
+variants:** U41 with the max loss at most (a) $100 and (b) $125 a contract once the profit is above $10,000
+(`grown_ml`, `grown_from` 10,000; 5-minute bars), the gap trade unchanged. **Run once:** the 526 starts and the full
+sets in both executions. **Adopt (the better window) on G78's rule** (higher nets on all three in both executions, no
+−$1,000 day, the floor never touched, no more than 38 lost).
