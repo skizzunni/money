@@ -5068,3 +5068,7 @@ on, G99b needs a survival gain of at least 4 of the 526 starts.** Log: `verifica
 makes the morning wide, so half the contracts (`news_mult` 0.5, at least 1). **The variant:** U40 with it. **Run once:**
 the 526 starts and the full sets in both executions. **Adopt on G78's rule** (no more lost than U40's 42), or G99b's
 with a gain of at least 4 of the 526.
+
+**G187 result (run once, 2026-11-04): rejected.** Chart / NinjaTrader: window **$53,412 / $52,599** (U40 $54,622 /
+$54,700), NQ $570,957 / $567,981, index $785,535 / $774,439; 526 starts **47** lost or frozen (U40 42). Log:
+`verification/noise_v2/g187_nfp_half.txt`.
