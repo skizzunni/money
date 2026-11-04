@@ -4866,3 +4866,10 @@ Log: `verification/noise_v2/g170_size_slip.txt`.
 **Variants (seed 171), around U38:** `lock_at` 0.30-0.38, `lock_plus` 2 / 2.5 / 3 points, `stop_buffer` 0.22-0.26,
 `time_stop` 50 / 60 / 70. As G164: the fewest lost or frozen on the 263 starts (ties: the higher median) to the full
 sets in both executions; **adopt on G99b's survival-first rule** against U38 (fewer than 19, every net at least 95%).
+
+**G171 result (run once, 2026-11-04): none passes.** The best of the 20 lost 21 of 263 (U38 19); U38's exits stay.
+Log: `verification/noise_v2/g171_survival_search.txt`.
+
+**Scorecard, G148-G171:** adopted G165 (U35), G167 (U36), G168 (U37), G170 (U38), all on the survival-first rule:
+fresh-account losses on 263 starts 32 → 26 → 25 → 20 → 19 with the nets within 1-2%. Rejected the rest; measurements
+G156, G158, G160, G162.
