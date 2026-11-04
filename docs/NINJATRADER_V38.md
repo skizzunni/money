@@ -4631,3 +4631,11 @@ slows the recovery. Log: `verification/noise_v2/g153_early_budget.txt`.
 
 **G154 result (run once, 2026-11-04): rejected.** 263 monthly starts: `early_ml` 150 43 lost or frozen, 125 55 (U34
 32): the tighter stops get hit more often. Log: `verification/noise_v2/g154_early_ml.txt`.
+
+## G155: U34 with one part off, judged on 263 starts (registered 2026-11-04, before its run)
+
+**The idea:** each part of U34 was adopted on the 89 quarterly starts; on the 263 monthly ones one may cost more
+accounts than it earns. **Variants:** U34 without the fill-ins ("More trading days" off), without the opening-drive
+fill-in, without the giveback brake, without U30's after-loss rule. **Adopt (the fewest lost) on G99b's survival-first
+rule** on the 263 monthly starts (fewer than U34's 32, the net at least 95% of U34's on every set in both executions,
+no −$1,000 day).
