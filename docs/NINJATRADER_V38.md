@@ -4394,3 +4394,11 @@ fill, so a reversal costs more than the day's budget. Log: `verification/noise_v
 grow`, rebuilt simulator) on the window: 701 trades, **$50,096.63**, profit factor 1.712, closed drawdown $4,779.88,
 worst day −$899.31, at most 32 contracts; identical to the model up to the 2026-03-09 data hole, as before
 (`verification/noise_v2/v38g_nt_u33.txt`). The Go live table is updated.
+
+## G138: settings never tried on the growth bot, one at a time on U33 (registered 2026-11-04, before its run)
+
+**Variants:** U33 with `storm_k` 1.6 / 2.0 (no entries on a session after a very wide stretch), `touch_entry` (enter on
+the touch of the line, not the check), `limit_entry_frac` 0.5 (a limit halfway back to the line), `side_cooldown` 1,
+`streak_k` 3 (skip a signal after three losers in a row), `eq_n` 20 (half size below the 20-trade equity average),
+`confirm` (the last check past the line too). G135's screen, then NinjaTrader's execution and the 89 starts for the
+best, on G78's rule or G99b's against U33.
