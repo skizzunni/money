@@ -5673,7 +5673,7 @@ Full suite 675 passed; NinjaTrader's growth run identical to the model (up to th
 | Weekly, the account $10,000-30,000 up (window) | $1,483 average, 11% of weeks at +$3,000 or more |
 | Weekly, past $75,000 (long histories) | $1,067-1,256 |
 
-**Today (G189-G232, 44 rounds):** U41 (no gap trade while braked), U42 (G204's five survival settings: 38 → 28 lost),
+**Today (G189-G233, 45 rounds):** U41 (no gap trade while braked), U42 (G204's five survival settings: 38 → 28 lost),
 U43 and U44 (faster grown-phase steps, 3-MNQ fill-ins, 75 MNQ: window $53,164 → $57,475, index +9%). Everything else was
 rejected or a measurement. **Not reached:** $3,000 a week on average, or zero lost accounts. Past U44, every extra
 contract or a bigger day budget broke the $1,000 day (G214, G219, G226), and the account's survival depends on fills
@@ -5713,3 +5713,7 @@ lost, the window $57,443 (U44 $57,475). The $2,500 cushion stays. Log: `verifica
 
 **The variants:** U44 with `giveback_brake` (a) 0.4 and (b) 0.6 (0.5 now; G174 tried 0.55 / 0.6 on U38). **Run once:** the
 526 starts and the full sets in both executions. **Adopt (the fewer lost) on G78's rule** against U44, or G99b's.
+
+**G233 result (run once, 2026-11-04): both rejected.** 0.4: 32 lost, window unchanged, index $826,176 (lower); 0.6: 30
+lost and the window **$14,368** (the brake at 60% catches the window's 2025 giveback and holds the account at 1 MNQ
+through the recovery). 0.5 stays. Log: `verification/noise_v2/g233_brake.txt`.
