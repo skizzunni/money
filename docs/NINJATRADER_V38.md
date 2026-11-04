@@ -4472,3 +4472,14 @@ NinjaTrader's execution and the 89 starts for the best, on G78's rule or G99b's.
 **G142 screen (2026-11-04):** row 0 = U33 exactly. Per $750 above $10,000: **window $54,879, NQ $554,388, index
 $786,440** (passes); per $500: index $784,902 (out by $31); per $750 above $20,000: index $784,279 (out). The candidate
 is per $750 above $10,000 (package `U33fs`, variant `u33fs`). Log: `verification/noise_v2/g142_fast_steps_screen.txt`.
+
+**G142 result (run once, 2026-11-04): passes G78's rule; adopted (U34).** Chart / NinjaTrader: window **$54,879 /
+$54,874** (U33 $50,219 / $50,337), NQ $554,388 / $557,093 (U33 $546,409 / $549,379), index $786,440 / $776,796 (U33
+$784,933 / $774,086); the floor never touched, no −$1,000 day (worst −$986); 89 starts 8 lost or frozen (as U33).
+Log: `verification/noise_v2/g142_fast_steps.txt`.
+
+**U34 (2026-11-04): faster contract steps above $10,000 of profit (G142).** In the Funded growth modes and Custom on
+the 5-minute chart, the contract steps are one per $1,500 up to $10,000 of profit and one per $750 above it (new
+settings "Faster contract steps" `FastSteps` 750, 0 = off, and `FastStepsFrom` 10,000); the 50 cap, the day's budget
+and the floor's room still cut each trade. `test_v38_fast_steps` checks NinjaTrader's code against the model with it
+on and off.

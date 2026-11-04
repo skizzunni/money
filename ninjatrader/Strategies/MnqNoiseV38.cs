@@ -88,6 +88,8 @@ namespace NinjaTrader.NinjaScript.Strategies
         // G125: no new entry at these checks (the check bar's end, minutes after midnight, e.g. ",780,870,") until the
         // floor has stopped at the start (5-minute bars; "" = off)
         public string EarlySkipChecks = "";
+        // G142: above ProfitStepFastFrom of profit, one more contract per ProfitStepFast (5-minute bars; 0 = off)
+        public double ProfitStepFast = 0, ProfitStepFastFrom = 10000;
         // G103: a sprint: for the account's first SprintDays sessions, until its profit reaches SprintTarget, every bot and
         // gap trade takes SprintQty contracts (still cut to the day's and the floor's room); then the usual sizing (0 = off)
         public int SprintQty = 0, SprintDays = 5;
@@ -167,7 +169,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 int q = s.Qty;
                 if (s.ProfitStep > 0 && !double.IsNaN(trailBase) && StepsOk)
                 {
-                    q += (int)Math.Floor(Math.Max(0.0, EqEff - trailBase) / s.ProfitStep);
+                    q += NSteps();
                     if (s.MaxContracts > 0) q = Math.Min(q, s.MaxContracts);
                 }
                 return q;
@@ -384,6 +386,15 @@ namespace NinjaTrader.NinjaScript.Strategies
             equity += pnl;
             GapPos = 0;
             GapStop = double.NaN;
+        }
+
+        // the contract steps for the profit since the start (G142: faster above ProfitStepFastFrom, on 5-minute bars)
+        int NSteps()
+        {
+            double p = Math.Max(0.0, EqEff - trailBase);
+            if (s.ProfitStepFast > 0 && minutes == 5 && p > s.ProfitStepFastFrom)
+                return (int)Math.Floor(s.ProfitStepFastFrom / s.ProfitStep) + (int)Math.Floor((p - s.ProfitStepFastFrom) / s.ProfitStepFast);
+            return (int)Math.Floor(p / s.ProfitStep);
         }
 
         // G125: is this check one without entries until the floor has stopped?
@@ -645,7 +656,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             double ml = afterLoss && alMl > 0 ? alMl : s.MaxLoss;
             if (s.ProfitStep > 0 && !double.IsNaN(trailBase) && StepsOk)  // a contract more per step of profit
             {
-                int qUp = q + (int)Math.Floor(Math.Max(0.0, EqEff - trailBase) / s.ProfitStep);
+                int qUp = q + NSteps();
                 if (s.MaxContracts > 0) qUp = Math.Min(qUp, s.MaxContracts);
                 ml = ml / q * qUp;
                 q = qUp;
@@ -734,7 +745,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                     int q = s.Qty;
                     if (s.ProfitStep > 0 && !double.IsNaN(trailBase))
                     {
-                        q += (int)Math.Floor(Math.Max(0.0, EqEff - trailBase) / s.ProfitStep);
+                        q += NSteps();
                         if (s.MaxContracts > 0) q = Math.Min(q, s.MaxContracts);
                     }
                     double perC = Math.Abs(c + d * slip - dayOpen) * s.PointValue + 2 * s.CommissionPerSide + 2 * slip * s.PointValue;
@@ -880,6 +891,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 GivebackBrake = 0.5;  // G99c
                 AfterLossLocked = 187.5;  // G119
                 EarlyNoEntryChecks = "13:00,14:30";  // G125
+                FastSteps = 750;  // G142
+                FastStepsFrom = 10000;
                 PropStartBalance = 50000;
                 PropHighBalance = 0;
                 SizeToAccountRoom = true;
@@ -944,6 +957,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 st.GivebackBrake = Mode != "Evaluation" ? GivebackBrake : 0;  // G99
                 st.AfterLossLockedMaxLoss = Mode != "Evaluation" ? AfterLossLocked : 0;  // G119
                 st.EarlySkipChecks = Mode != "Evaluation" ? CheckEnds(EarlyNoEntryChecks) : "";  // G125
+                st.ProfitStepFast = Mode != "Evaluation" ? FastSteps : 0;  // G142
+                st.ProfitStepFastFrom = FastStepsFrom;
                 st.SprintQty = Mode != "Evaluation" ? SprintContracts : 0;  // G103
                 st.SizeSlipPts = Mode != "Evaluation" ? SizeSlip : 0;  // G79: the Funded growth modes and Custom
                 st.ProtectRoom = Mode != "Evaluation" ? NearFloorGate : 0;  // G87
@@ -1742,6 +1757,16 @@ namespace NinjaTrader.NinjaScript.Strategies
         [NinjaScriptProperty]
         [Display(Name = "No entries at these checks until the floor has stopped (HH:mm, comma-separated; blank = off)", Order = 26, GroupName = "1. Size and risk")]
         public string EarlyNoEntryChecks { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, 100000)]
+        [Display(Name = "Faster contract steps: above the profit below, one more MNQ per this much, $ (0 = off)", Order = 27, GroupName = "1. Size and risk")]
+        public double FastSteps { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, 1000000)]
+        [Display(Name = "Faster contract steps from this much profit, $", Order = 28, GroupName = "1. Size and risk")]
+        public double FastStepsFrom { get; set; }
 
         // "13:00,14:30" -> ",780,870," (the check bars' ends, minutes after midnight); a bad entry raises a setup warning
         string CheckEnds(string list)

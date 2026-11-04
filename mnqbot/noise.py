@@ -639,7 +639,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
     def n_steps() -> int:
         """The contract steps for the profit so far (G142: faster above profit_step_fast_from)."""
         p = max(0.0, eq_curve[-1] - steps_off() - trail_base)
-        if cfg.profit_step_fast > 0 and p > cfg.profit_step_fast_from:
+        if cfg.profit_step_fast > 0 and minutes == 5 and p > cfg.profit_step_fast_from:  # tested on 5-minute bars
             return int(cfg.profit_step_fast_from // step_now()) + int((p - cfg.profit_step_fast_from) // cfg.profit_step_fast)
         return int(p // step_now())
 
