@@ -11,13 +11,13 @@ NTARGS = (["Mode=Funded growth", "TrailFrom=2025-01-02", f"GapGoLocked={LQ}", f"
           else ["Mode=Evaluation"])
 FILL = ({"gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
          "fill_min_room": 3000.0, "fill_qty2_room": 6000.0} if MORE else {})
-SLIP = float(os.environ.get("SIZE_SLIP", "3"))  # G76: the sizing's extra stop slippage, points
+SLIP = float(os.environ.get("SIZE_SLIP", "4"))  # G76: the sizing's extra stop slippage, points
 NTARGS += [f"SizeSlip={SLIP}"] if GROW else []
 PROTECT = float(os.environ.get("PROTECT", "0"))  # G87: the near-floor shadow gate, $ (0 = off)
 NTARGS += [f"NearFloorGate={PROTECT}"] if GROW else []
 GIVEBACK = float(os.environ.get("GIVEBACK", "0.5"))  # G99: the giveback brake (0 = off)
 NTARGS += [f"GivebackBrake={GIVEBACK}"] if GROW else []
-FILL = {**FILL, "size_slip_pts": SLIP, "giveback_brake": GIVEBACK}
+FILL = {**FILL, "size_slip_pts": SLIP, "giveback_brake": GIVEBACK, "size_up_to": 20}  # G106: 20 on 5-minute bars
 from mnqbot.noise import NoiseConfig, run
 S = "/tmp/claude-0/-home-user-money/b0ea31b5-d9fc-525a-a114-db6430eff3ed/scratchpad"
 SIM = "ninjatrader/tests/Sim/bin/Release/net8.0/Sim"

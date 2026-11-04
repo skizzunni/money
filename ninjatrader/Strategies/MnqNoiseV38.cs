@@ -814,7 +814,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (State == State.SetDefaults)
             {
                 Name = "MnqNoiseV38";
-                Description = "MNQ Noise-Area Momentum v3.8, Funded growth: 1 MNQ to start, $187.50 max loss a contract ($250 after a loser), $900 a day, a $2,000 end-of-day trailing floor, a contract more per $1,500 of profit up to 15, the 60-minute time stop; gap and go at 1 MNQ, up to 10 once the trailing floor has stopped at the start; More trading days (fill-in trades once $3,000 above the stopped floor: 1 MNQ, 2 from $6,000); sizing with 3 points more stop slippage.";
+                Description = "MNQ Noise-Area Momentum v3.8, Funded growth: 1 MNQ to start, $187.50 max loss a contract ($250 after a loser), $900 a day, a $2,000 end-of-day trailing floor, a contract more per $1,500 of profit up to 20, the 60-minute time stop; gap and go at 1 MNQ, up to 10 once the trailing floor has stopped at the start; More trading days (fill-in trades once $3,000 above the stopped floor: 1 MNQ, 2 from $6,000); sizing with 4 points more stop slippage.";
                 Calculate = Calculate.OnBarClose;
                 EntriesPerDirection = 1;
                 EntryHandling = EntryHandling.UniqueEntries;
@@ -846,7 +846,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 TrailDD = 2000;
                 TrailFrom = "";
                 ProfitStep = 1500;
-                MaxContracts = 15;
+                MaxContracts = 20;  // G106
                 SizeByOwnStop = true;
                 TimeStop = 60;
                 StepsAfterLock = false;
@@ -858,7 +858,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 GapGoLocked = 10;  // G84 (G67b: 3, G80: 5, G82: 7; G83's 15 broke the daily limit once)
                 MoreDays = true;  // G79: on by default (with SizeSlip 2)
                 MoreDaysCushion = 3000;
-                SizeSlip = 3;  // G97 (G79: 2)
+                SizeSlip = 4;  // G106 (G79: 2, G97: 3)
                 MoreDaysQty2Room = 6000;  // G97
                 GivebackBrake = 0.5;  // G99c
                 PropStartBalance = 50000;
@@ -892,7 +892,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 if (Mode.StartsWith("Funded growth"))  // the tested growth settings (docs/NINJATRADER_V38.md), whatever is set below
                 {
                     Contracts = 1; MaxLoss = 187.5; AfterLossMaxLoss = 250; DailyLoss = 900; TrailDD = 2000;
-                    ProfitStep = 1500; MaxContracts = 15; SizeByOwnStop = true; TimeStop = 60;
+                    ProfitStep = 1500; SizeByOwnStop = true; TimeStop = 60;
+                    MaxContracts = Mode == "Funded growth" && minutes == 5 ? 20 : 15;  // G106: 20 on the 50K's 5-minute chart
                     // G40: a bigger account trades the 50K's size; its larger limits are cushion (a $2,000 / $3,000
                     // daily loss and a $3,000 / $4,500 trailing drawdown; the bot's budget is 90% of the daily loss)
                     if (Mode == "Funded growth 100K") { DailyLoss = 1800; TrailDD = 3000; LossGuard = 1900; }

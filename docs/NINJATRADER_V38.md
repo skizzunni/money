@@ -74,16 +74,16 @@ real MNQ data will differ somewhat. The stand-in has flattered this strategy bef
 simulator, Funded growth, from 2025-01-02, 1 tick of slippage, $0.62 a side;
 `verification/noise_v2/v38g_nt_2026-11-03.csv` and the trade lists beside it):
 
-| Jan 2, 2025 – Oct 2026 (updated 2026-11-04, U26) | 5-minute bars | 30-minute bars |
+| Jan 2, 2025 – Oct 2026 (updated 2026-11-04, U29) | 5-minute bars | 30-minute bars |
 |---|---|---|
 | Trades | 704 | 252 |
-| Net | **$45,289.92** | $28,620.10 |
+| Net | **$46,711.93** | $28,620.10 |
 | Winners | 50.8% | 53.6% |
-| Profit factor | 1.634 | 1.881 |
-| Closed drawdown | $4,333.80 | $3,934.78 |
+| Profit factor | 1.656 | 1.881 |
+| Closed drawdown | $4,191.81 | $3,934.78 |
 | Largest loss | −$1,762.10 | −$1,634.41 |
-| Worst day | −$899.44 | −$899.20 |
-| Most contracts | 15 | 15 |
+| Worst day | −$899.31 | −$899.20 |
+| Most contracts | 20 | 15 |
 | Days with a trade (the model) | about 72% | about 29% |
 
 The 5-minute chart includes gap and go (U19, U20, U25: up to 10 MNQ once the floor has stopped), More trading days with the sizing allowance (U22, U26: 2-MNQ fill-ins from $6,000, 3 points) and the
@@ -3950,3 +3950,16 @@ day in the chart's execution (`verification/noise_v2/g105_max20.txt`).
 **The idea:** G105 failed on one day where a stop filled past its price at full size; the sizing allowance (G76/G97)
 is what removes such days. **The variant:** U28 with `size_up_to` 20 and `size_slip_pts` 4.
 **Adopt on G78's rule**, against U28.
+
+**G106 result (run once, 2026-11-04): passes; adopted.** 89 start dates: 10 lost or frozen (as U28), medians $46,477
+NQ / $36,500 index; window **$46,656 / $46,828**, index **$661,701 / $648,812**, NQ $495,184 / $492,844 (all above
+U28); no −$1,000 day; floor never touched (`verification/noise_v2/g106_max20_s4.txt`).
+
+**U29 (2026-11-04): up to 20 MNQ, with a 4-point sizing allowance (G106).** In Funded growth (the 50K) on a 5-minute
+chart the most contracts is now 20 (15 on other charts and in the 100K / 150K modes, as tested), and "Sizing: count this
+many points more slippage at each stop" is 4. **The file you trade, NinjaTrader simulator, 5-minute window: 704
+trades, $46,711.93, profit factor 1.656, closed drawdown $4,191.81, worst day −$899.31.** 30-minute unchanged
+($28,620.10) (`verification/noise_v2/v38g_nt_g106_2026-11-04.txt`).
+
+**Scorecard, G44-G106:** 63 rounds. Adopted 10 (and the data fix): G60, G67b, G79, G80, G82, G84, G97, G99c, G106 and
+U28's safety change aside. Rejected: 50. Measurements: 3.
