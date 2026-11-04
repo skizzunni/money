@@ -5007,3 +5007,11 @@ never touched. $3,500: 20 lost. Log: `verification/noise_v2/g181_cushion.txt`.
 **Variants:** U40 with `fill_min_room` 2,000 and 2,250 (U40: 2,500). **Run once:** the 263 starts and the full sets in
 both executions. **Adopt (the fewest lost) on G99b's survival-first rule** against U40 (fewer than 17, every net at
 least 95%), or G78's.
+
+**G182 result (run once, 2026-11-04): both rejected.** 263 starts: $2,000 20 lost, $2,250 **24** (U40's $2,500: 17);
+nets within 1%. Log: `verification/noise_v2/g182_cushion.txt`.
+
+**A caveat on the survival counts (2026-11-04).** Neighbouring settings move the 263-start count by up to 7 ($2,250 →
+24, $2,500 → 17, $3,000 → 19), so a difference of 1-2 accounts is within the noise. Of today's survival-rule adoptions,
+U35 (32 → 26) and U37 (25 → 20) are well clear of it; U36 (−1), U38 (−1) and U40 (−2) are not, though none costs more
+than 1% of net. Expect about 1 fresh account in 10 to 15 to be lost or frozen within 21 months, not a precise figure.
