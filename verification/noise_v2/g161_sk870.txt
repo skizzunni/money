@@ -1,0 +1,5 @@
+{'nt': True, 'pack': 'U34sk870', 'set': 'proxy', 'days traded %': 72.0, 'gap trades': 288, 'trades': 705, 'net $': 54880, 'pf': 1.768, 'win %': 52.1, 'closed dd $': 4780, 'worst day $': -899, 'days <= -1000': 0, 'floor touches': 0}
+{'nt': True, 'pack': 'U34sk870', 'set': 'nq', 'days traded %': 83.0, 'gap trades': 1992, 'trades': 5098, 'net $': 559733, 'pf': 1.533, 'win %': 52.3, 'closed dd $': 29469, 'worst day $': -925, 'days <= -1000': 0, 'floor touches': 0}
+{'nt': True, 'pack': 'U34sk870', 'set': 'index', 'days traded %': 80.6, 'gap trades': 2868, 'trades': 7181, 'net $': 776179, 'pf': 1.537, 'win %': 51.5, 'closed dd $': 32071, 'worst day $': -985, 'days <= -1000': 0, 'floor touches': 0}
+index u34sk870 starts 160 lost (at the floor) 15 dead (lost or frozen) 15 below start 11 median net 35842 worst net -1999 lowest point -1999 reached +2000 149
+nq u34sk870 starts 103 lost (at the floor) 16 dead (lost or frozen) 16 below start 9 median net 48068 worst net -1997 lowest point -1997 reached +2000 95

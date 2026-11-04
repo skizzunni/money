@@ -4723,3 +4723,8 @@ monthly starts and NinjaTrader's execution, on G78's rule (no more than U34's 32
 **G161 screen (2026-11-04):** 13:00 only: $54,883 / $561,774 / $786,495 (passes); **14:30 only: $54,885 / $561,826 /
 $786,498** (passes, the best window by $2); 12:30 + 13:00 + 14:30: index $782,753 (out). Candidate: 14:30 only
 (package `U34sk870`, variant `u34sk870`). Log: `verification/noise_v2/g161_early_checks_screen.txt`.
+
+**G161 result (run once, 2026-11-04): rejected on its registered rule.** NinjaTrader's execution: window $54,880
+(U34 $54,874), NQ $559,733 ($557,093), index **$776,179** ($776,796, −$617); 263 monthly starts **31** lost or frozen
+(U34 32). It fails G78's rule (registered) on the index by 0.08%; it would have passed G99b's survival-first rule,
+which wasn't the one registered, so it is not adopted. Log: `verification/noise_v2/g161_sk870.txt`.
