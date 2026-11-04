@@ -4753,3 +4753,8 @@ U34, then confirmation for the best on G78's rule.
 14:30, 13:00 + 14:00 + 14:30). **Screen:** lost or frozen on the 263 monthly starts. **Then:** the fewest (ties: the
 higher median) on the window, NQ and the index in both executions; **adopt on G99b's survival-first rule** against
 U34 (fewer than 32 lost, every net at least 95% of U34's, no −$1,000 day, the floor never touched).
+
+**G164 screen (2026-11-04), lost or frozen of 263 (U34 32):** k6 **25** (brake 0.5, cushion $3,500, 6 gap contracts,
+after-loss 1.2, 13:00 + 14:30; medians $32,325 / $43,390), k11 25 (medians $14,968 / $26,635), k18 26, k14 26, k7 26;
+the after-loss max loss at 1.2x (U34 1.33x) is in all five. By the registered rule k6 (fewest, then the higher median)
+goes on to the full sets (package `U34g164k6`). Log: `verification/noise_v2/g164_survival_search.txt`.
