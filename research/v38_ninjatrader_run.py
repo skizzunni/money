@@ -2,6 +2,7 @@ import os, subprocess, sys
 sys.path.insert(0, "research"); sys.path.insert(0, ".")
 import numpy as np, pandas as pd
 import e50_eval as E
+import shadow_gate as SG
 import t1_eval as T, v24_scan as VS
 GROW = len(sys.argv) > 1 and sys.argv[1] == "grow"
 LQ = int(os.environ.get("GAP_LOCKED", "10"))  # G67: gap and go's contracts once the floor has stopped
@@ -12,6 +13,8 @@ FILL = ({"gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fil
          "fill_min_room": 3000.0} if MORE else {})
 SLIP = float(os.environ.get("SIZE_SLIP", "2"))  # G76: the sizing's extra stop slippage, points
 NTARGS += [f"SizeSlip={SLIP}"] if GROW else []
+PROTECT = float(os.environ.get("PROTECT", "1000"))  # G87: the near-floor shadow gate, $ (0 = off)
+NTARGS += [f"NearFloorGate={PROTECT}"] if GROW else []
 FILL = {**FILL, "size_slip_pts": SLIP}
 from mnqbot.noise import NoiseConfig, run
 S = "/tmp/claude-0/-home-user-money/b0ea31b5-d9fc-525a-a114-db6430eff3ed/scratchpad"
@@ -42,6 +45,9 @@ for m in (30, 5):
              "time_stop": 60, "gap_go": True, "gap_go_max_qty": 1, "gap_go_locked_qty": LQ, **(FILL if m == 5 else {})} if GROW
             else {**E.config(1, 2.0, 260.0, 0), "daily_loss_limit": 900.0})
     cfg = NoiseConfig(**{**base, "tv_path": False, "nt_execution": True, "round_prices": True, "target_on_fill_bar": True})
+    if GROW and m == 5 and PROTECT > 0:  # G87: the shadow gate's closed days, on the bars the strategy sees
+        cfg.protect_room = PROTECT
+        cfg.protect_dates = SG.closed_days(bars, cfg, m)
     py = run(bars, cfg, minutes=m).trades_frame()
     same = (len(nt) == len(py) and (nt.d.values == py.direction.values).all() and (nt.eb.values == py.entry_bar.values).all()
             and (nt.xb.values == py.exit_bar.values).all() and np.allclose(nt.entry.values, py.entry.values)

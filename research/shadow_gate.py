@@ -16,7 +16,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))  # the repositor
 from mnqbot.noise import NoiseConfig, run  # noqa: E402
 
 NY = "America/New_York"
-SHADOW = {"profit_step": 0.0, "qty": 1, "trail_dd": 0.0, "gap_go_locked_qty": 0, "gap_go_max_qty": 1,
+SHADOW = {"profit_step": 0.0, "qty": 1, "size_up_to": 1, "trail_dd": 0.0, "gap_go_locked_qty": 0, "gap_go_max_qty": 1,
           "gap_go_small_k": -1.0, "trend_small": False, "gap_go_drive_k": 0.0, "fill_after_lock": False,
           "fill_min_room": 0.0, "protect_room": 0.0, "protect_dates": ""}
 

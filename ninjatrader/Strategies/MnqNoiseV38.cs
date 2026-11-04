@@ -80,6 +80,12 @@ namespace NinjaTrader.NinjaScript.Strategies
         public double FillSmallK = 0.0, FillDriveK = 0.5, FillMinRoom = 3000;
         // G76: the bot's sizing counts this many points more slippage at the stop (0 = off)
         public double SizeSlipPts = 0;
+        // G87: within ProtectRoom of the trailing floor, no new trade on a session after a shadow (1-contract, paper)
+        // record of the bot closed below its average of the last ProtectN sessions (0 = off; set by the wrapper)
+        public double ProtectRoom = 0;
+        public int ProtectN = 20;
+
+        public V38Settings Clone() { return (V38Settings)MemberwiseClone(); }
     }
 
     public sealed class V38Trade
@@ -169,6 +175,17 @@ namespace NinjaTrader.NinjaScript.Strategies
         readonly List<double> gapHist = new List<double>();
         readonly List<double> driveHist = new List<double>();  // G72: the 09:30 bars' |close - open|
 
+        // G87: is the shadow gate closed today (set by the wrapper at each session's first bar)?
+        public bool ProtectClosed = false;
+
+        // G87: within ProtectRoom of the floor on a day the shadow gate is closed: no new trade
+        public bool Protected()
+        {
+            if (s.ProtectRoom <= 0 || !ProtectClosed || s.TrailDD <= 0 || double.IsNaN(trailPeak)) return false;
+            double floor = Math.Min(trailPeak - s.TrailDD, trailBase);
+            return EqEff - floor < s.ProtectRoom;
+        }
+
         // G72: may a fill-in trade be taken now? The floor stopped at the start, and FillMinRoom above it
         bool FillOk()
         {
@@ -178,12 +195,15 @@ namespace NinjaTrader.NinjaScript.Strategies
             return EqEff - floor >= s.FillMinRoom;
         }
         public int LastEntryMinute { get { return s.LastEntryEnd; } }
+        public int ProtectNSessions { get { return s.ProtectN; } }
         // U15: what today's filters allow, for the dashboard (set at the 09:30 bar; the day's loss budget live)
         public string TodayRules
         {
             get
             {
                 if (SkipToday) return "no entries (holiday / half day)";
+                if (Protected()) return "no entries (within $" + s.ProtectRoom.ToString("0", CultureInfo.InvariantCulture) +
+                                        " of the floor, and the shadow record is below its " + s.ProtectN + "-session average)";
                 if (calm) return "no entries (calm stretch: the last 10 sessions' ranges are small)" +
                                  (s.GapGo ? "; the 09:35 gap trade still can" : "");
                 if (s.DailyLoss > 0 && DayRoom <= 0) return "no entries (today's loss budget is used up)";
@@ -324,6 +344,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         bool StudyOk(int d, int end, double c)
         {
+            if (Protected()) { Note = "near the floor, shadow below its average"; return false; }
             if (s.LastEntryEnd > 0 && end > s.LastEntryEnd) { Note = "after the last entry check"; return false; }
             if (blockDir != 0 && d == blockDir) { Note = "after a big day, not its way"; return false; }
             if (s.TrendN > 0 && d < 0 && trend == 1 && !FillOk()) { Note = "no shorts in the uptrend"; return false; }
@@ -617,7 +638,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         void GapSignal(double c)
         {
             double gap = dayOpen - prevClose;
-            if (gapHist.Count >= 10 && gap != 0 && !SkipToday && Position == 0 && GapPos == 0)
+            if (gapHist.Count >= 10 && gap != 0 && !SkipToday && Position == 0 && GapPos == 0 && !Protected())
             {
                 int n = Math.Min(14, gapHist.Count);
                 double avg = 0.0;
@@ -691,6 +712,9 @@ namespace NinjaTrader.NinjaScript.Strategies
             "2026-01-28,2026-03-18,2026-04-29,2026-06-17,2026-07-29,2026-09-16,2026-10-28,2026-12-09," +
             "2027-01-27,2027-03-17,2027-04-28,2027-06-09,2027-07-28,2027-09-15,2027-10-27,2027-12-08";
         V38Engine engine;
+        V38Engine shadow;  // G87: the 1-contract paper record behind the near-floor gate
+        readonly List<double> shadowEod = new List<double>();
+        int shadowSessions;
         TimeZoneInfo newYork;
         int minutes;
         bool badChart;
@@ -776,6 +800,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 MoreDays = true;  // G79: on by default (with SizeSlip 2)
                 MoreDaysCushion = 3000;
                 SizeSlip = 2;  // G79
+                NearFloorGate = 1000;  // G87
                 TestedWinRate = 61.2;
             }
             else if (State == State.DataLoaded)
@@ -831,10 +856,18 @@ namespace NinjaTrader.NinjaScript.Strategies
                 st.MoreDays = MoreDays && st.GapGo;  // G72: the fill-in trades (5-minute chart, not in Evaluation)
                 st.FillMinRoom = MoreDaysCushion;
                 st.SizeSlipPts = Mode != "Evaluation" ? SizeSlip : 0;  // G79: the Funded growth modes and Custom
+                st.ProtectRoom = Mode != "Evaluation" ? NearFloorGate : 0;  // G87
                 st.Tick = TickSize;
                 st.PointValue = Instrument.MasterInstrument.PointValue;
                 if (!badChart)
                     engine = new V38Engine(st, minutes);
+                if (!badChart && st.ProtectRoom > 0 && st.TrailDD > 0 && minutes == 5)  // G87, tested on 5-minute bars
+                {
+                    V38Settings sh = st.Clone();
+                    sh.ProfitStep = 0; sh.Qty = 1; sh.TrailDD = 0; sh.GapGoLockedQty = 0; sh.GapGoMaxQty = 1;
+                    sh.MoreDays = false; sh.ProtectRoom = 0;
+                    shadow = new V38Engine(sh, minutes);
+                }
                 // the journal: every closed trade from the account's own fills, and a line per day. A backtest's goes to
                 // MnqNoiseV38_backtest.csv (written anew each run); live trades are also added to
                 // MnqNoiseV38_live_<account>.csv, kept across restarts. Both in Documents\NinjaTrader 8.
@@ -959,6 +992,26 @@ namespace NinjaTrader.NinjaScript.Strategies
             engine.ExtEquity = cum;
             engine.ExtDayPnl = cum - realDayStart;
             int before = engine.Trades.Count;
+            if (shadow != null)  // G87: the shadow first; at a session's first bar, the gate from the last session's close
+            {
+                if (tMin == V38Engine.RthOpen)
+                {
+                    if (shadowSessions > 0)
+                        shadowEod.Add(shadow.Equity);
+                    shadowSessions++;
+                    int n = engine.ProtectNSessions;
+                    bool closed = false;
+                    if (shadowEod.Count >= n)
+                    {
+                        double avg = 0.0;
+                        for (int k = shadowEod.Count - n; k < shadowEod.Count; k++)
+                            avg += shadowEod[k];
+                        closed = shadowEod[shadowEod.Count - 1] < avg / n;
+                    }
+                    engine.ProtectClosed = closed;
+                }
+                shadow.OnBar(start, Open[0], High[0], Low[0], Close[0]);
+            }
             engine.OnBar(start, Open[0], High[0], Low[0], Close[0]);
             for (int k = before; k < engine.Trades.Count; k++)
                 Tally(start, engine.Trades[k].Pnl);
@@ -1509,6 +1562,11 @@ namespace NinjaTrader.NinjaScript.Strategies
         [Range(0, 50)]
         [Display(Name = "Sizing: count this many points more slippage at each stop (room kept for a jump past it)", Order = 18, GroupName = "1. Size and risk")]
         public double SizeSlip { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, 100000)]
+        [Display(Name = "Near-floor gate: within this many $ of the trailing floor, trade only when a 1-MNQ shadow record is at or above its 20-session average (0 = off)", Order = 19, GroupName = "1. Size and risk")]
+        public double NearFloorGate { get; set; }
 
         [NinjaScriptProperty]
         [Range(0, 200)]

@@ -3550,3 +3550,14 @@ sessions. The shadow never stops, so the account starts again when the strategy 
 changed it before was the cushion (G40: the 50K's size on a 150K's limits, 14 → 5 dead). This measures today's
 default (U25) on the 100K ($1,800 budget, $3,000 trailing) and 150K ($2,700, $4,500) limits, the existing Funded
 growth 100K / 150K modes. No adoption: the modes are there; this says what they now give.
+
+**G87 as run: not the rule as written.** Building the NinjaTrader side showed the model's shadow was not 1 contract:
+with contract steps off, an old sizing branch (`size_up_to` with `profit_step` 0) let it trade up to 15 contracts
+whenever the day's room allowed. NinjaTrader's shadow is 1 contract, as registered. As run, variant A gave 10 lost or
+frozen of 89 (index 3, NQ 7), window $42,726 / $42,854, index $602,186 / $593,329, NQ $457,838 / $457,374 (the 2015
+path lived), no −$1,000 day; B gave 16. Nothing is adopted from it.
+
+## G87b: G87 with the shadow at 1 contract (registered 2026-11-04, before its run)
+
+The same rule, variants and pass rule as G87, with the shadow fixed to 1 contract (`size_up_to` 1 in
+`research/shadow_gate.py`), as NinjaTrader's code has it.
