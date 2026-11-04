@@ -3628,3 +3628,12 @@ trades. **Variants:** U25 with `take_profit` 1.5 and 2.5. **Adopt (the better by
 **The idea:** the lock (stop to the entry plus 2.5 points once the trade is up 0.35 of its max loss) was set in v3.2 and
 re-checked in G21, before gap and go and the rest. **Variants:** U25 with `lock_at` 0.25 and 0.5.
 **Adopt (the better by window net) on G78's rule**, against U25.
+
+**G91 result (run once, 2026-11-04): rejected; 0.35 stays.** 0.5: window $43,975 / $44,408 (more), index $584,580 /
+$563,690 (less). 0.25: less on both (window $42,655 / $43,113, index $575,158 / $555,996)
+(`verification/noise_v2/g91_lock.txt`).
+
+## G92: the stop distance past the line re-checked on U25 (registered 2026-11-04, before its run)
+
+**The idea:** the stop sits 0.24 noise units past the line (G22, before gap and go and the rest).
+**Variants:** U25 with `stop_buffer` 0.18 and 0.30. **Adopt (the better by window net) on G78's rule**, against U25.
