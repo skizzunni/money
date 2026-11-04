@@ -61,6 +61,10 @@ namespace NinjaTrader.NinjaScript.Strategies
         // a time stop (G6): a trade not yet locked that is losing at a bar close TimeStop minutes or more after its
         // fill is closed at market, filled at the next bar's open (0 = off)
         public int TimeStop = 0;
+        // G204: no new entry after MaxLosers losing trades in a day (0 = no limit); until the trailing floor has stopped,
+        // the day's budget is EarlyDailyLoss instead of DailyLoss (0 = DailyLoss)
+        public int MaxLosers = 0;
+        public double EarlyDailyLoss = 0;
         // a gentle start (G30): no contract steps until the trailing floor has stopped at the starting balance
         public bool StepsAfterLock = false;
         // gap and go (G60): when the 09:30 open is at least GapGoK times the last 14 sessions' average gap from the
@@ -140,6 +144,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         double held = double.NaN, fav = double.NaN;
         string heldWhy = "";
         int consec;                       // losing trades in a row, across days
+        int losersToday;                  // G204: losing trades closed today
         double equity;                    // the closed P/L so far
         double trailBase = double.NaN, trailPeak = double.NaN;
 
@@ -177,7 +182,16 @@ namespace NinjaTrader.NinjaScript.Strategies
                 return q;
             }
         }
-        public double DayRoom { get { return s.DailyLoss > 0 ? s.DailyLoss + DayEff : double.NaN; } }
+        public double DayRoom { get { return s.DailyLoss > 0 ? DayLimit + DayEff : double.NaN; } }
+        // G204: the day's budget, EarlyDailyLoss until the trailing floor has stopped at the starting balance
+        double DayLimit
+        {
+            get
+            {
+                bool stopped = s.TrailDD > 0 && !double.IsNaN(trailPeak) && trailPeak - s.TrailDD >= trailBase;
+                return s.EarlyDailyLoss > 0 && !stopped ? s.EarlyDailyLoss : s.DailyLoss;
+            }
+        }
         public int NewEntry;          // this bar's signal: +1 / -1 to send now (0: none)
         public int NewQty;
         public double NewStopPts, NewTpPts;
@@ -255,6 +269,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 if (calm) return "no entries (calm stretch: the last 10 sessions' ranges are small)" +
                                  (s.GapGo ? "; the 09:35 gap trade still can" : "");
                 if (s.DailyLoss > 0 && DayRoom <= 0) return "no entries (today's loss budget is used up)";
+                if (s.MaxLosers > 0 && losersToday >= s.MaxLosers) return "no entries (" + s.MaxLosers + " losing trades today)";
                 string longs = blockDir == 1 ? "no (after a big up day)" : "yes";
                 string shorts = blockDir == -1 ? "no (after a big down day)"
                               : s.TrendN > 0 && trend == 1 ? (FillOk() ? "1 MNQ only (uptrend; More trading days)"
@@ -371,7 +386,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             Trades.Add(t);
             DayPnl += pnl;
             equity += pnl;
-            if (pnl < 0 && reason != "Session ended") consec++;
+            if (pnl < 0 && reason != "Session ended") { consec++; losersToday++; }
             else if (pnl >= 0) consec = 0;
             Position = 0;
             Locked = false;
@@ -425,6 +440,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         bool StudyOk(int d, int end, double c)
         {
+            if (s.MaxLosers > 0 && losersToday >= s.MaxLosers) { Note = "after " + s.MaxLosers + " losing trades today"; return false; }  // G204
             if (Protected()) { Note = "near the floor, shadow below its average"; return false; }
             if (s.LastEntryEnd > 0 && end > s.LastEntryEnd) { Note = "after the last entry check"; return false; }
             if (EarlySkip(end)) { Note = "no entry at this check until the floor has stopped"; return false; }
@@ -552,6 +568,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             {
                 blockDir = 0;
                 DayPnl = 0;
+                losersToday = 0;
                 if (s.TrailDD > 0 && string.CompareOrdinal(nyStart.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture), s.TrailFrom ?? "") >= 0)
                 {
                     if (double.IsNaN(trailBase)) trailBase = trailPeak = EqEff;  // yesterday's end-of-day equity
@@ -651,7 +668,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         {
             double room = double.PositiveInfinity;
             if (s.DailyLoss > 0)
-                room = s.DailyLoss + DayEff;
+                room = DayLimit + DayEff;
             if (s.TrailDD > 0 && !double.IsNaN(trailPeak))
             {
                 double floor = Math.Min(trailPeak - s.TrailDD, trailBase);  // it stops at the starting balance
@@ -882,7 +899,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 LastEntry = "15:00";
                 BigDayK = 1.5;
                 CalmK = 0.7;
-                RangePos = 0.65;
+                RangePos = 0.7;  // G204 (0.65 before; Evaluation keeps 0.65)
                 TrendSessions = 50;
                 FedNoShorts = true;
                 SkipDates = SkipDefault;
@@ -896,7 +913,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 ProfitStep = 1500;
                 MaxContracts = 20;  // G106
                 SizeByOwnStop = true;
-                TimeStop = 60;
+                TimeStop = 45;  // G204 (G6: 60)
                 StepsAfterLock = false;
                 LossGuard = 950;
                 AlertsOn = true;
@@ -910,6 +927,9 @@ namespace NinjaTrader.NinjaScript.Strategies
                 MoreDaysQty2Room = 6000;  // G97
                 GivebackBrake = 0.5;  // G99c
                 GapSkipBraked = true;  // G191
+                MaxLosersPerDay = 3;  // G204
+                EarlyDayBudget = 750;  // G204
+                GapTrigger = 0.6;  // G204 (G60: 0.5)
                 AfterLossLocked = 187.5;  // G119
                 EarlyNoEntryChecks = "13:00,14:30";  // G125
                 FastSteps = 750;  // G142
@@ -946,7 +966,9 @@ namespace NinjaTrader.NinjaScript.Strategies
                 {
                     Contracts = 1; MaxLoss = 187.5; DailyLoss = 900; TrailDD = 2000;
                     AfterLossMaxLoss = minutes == 5 ? 187.5 : 250;  // G168: as every trade on the 5-minute chart (G167 1.1x, G165 1.2x, 1.33x before)
-                    ProfitStep = 1500; SizeByOwnStop = true; TimeStop = 60;
+                    ProfitStep = 1500; SizeByOwnStop = true;
+                    TimeStop = Mode == "Funded growth" ? 45 : 60;  // G204 on the 50K (G6: 60)
+                    RangePos = Mode == "Funded growth" ? 0.7 : 0.65;  // G204 on the 50K
                     MaxContracts = Mode == "Funded growth" && minutes == 5 ? 50 : 15;  // G121: 50 on the 50K's 5-minute chart (G106: 20, G120: 30)
                     // G40: a bigger account trades the 50K's size; its larger limits are cushion (a $2,000 / $3,000
                     // daily loss and a $3,000 / $4,500 trailing drawdown; the bot's budget is 90% of the daily loss)
@@ -959,7 +981,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 else if (Mode == "Evaluation")  // v3.8: 1 MNQ, $260 a trade, $900 a day
                 {
                     Contracts = 1; MaxLoss = 260; AfterLossMaxLoss = 0; DailyLoss = 900; TrailDD = 0;
-                    ProfitStep = 0; SizeByOwnStop = false; TimeStop = 0;
+                    ProfitStep = 0; SizeByOwnStop = false; TimeStop = 0; RangePos = 0.65;
                 }
                 V38Settings st = new V38Settings();
                 st.Qty = Contracts; st.MaxLoss = MaxLoss; st.DailyLoss = DailyLoss; st.TakeProfit = TakeProfit;
@@ -978,6 +1000,10 @@ namespace NinjaTrader.NinjaScript.Strategies
                 st.FillQty2Room = MoreDaysQty2Room;  // G97
                 st.GivebackBrake = Mode != "Evaluation" ? GivebackBrake : 0;  // G99
                 st.GapSkipBraked = Mode != "Evaluation" && GapSkipBraked;  // G191
+                bool g204 = Mode == "Funded growth" || Mode == "Custom";  // G204: tested on the 50K
+                st.MaxLosers = g204 ? MaxLosersPerDay : 0;
+                st.EarlyDailyLoss = g204 ? EarlyDayBudget : 0;
+                st.GapGoK = g204 ? GapTrigger : 0.5;
                 st.AfterLossLockedMaxLoss = Mode != "Evaluation" ? AfterLossLocked : 0;  // G119
                 st.EarlySkipChecks = Mode != "Evaluation" ? CheckEnds(EarlyNoEntryChecks) : "";  // G125
                 st.ProfitStepFast = Mode != "Evaluation" ? FastSteps : 0;  // G142
@@ -1786,6 +1812,21 @@ namespace NinjaTrader.NinjaScript.Strategies
         [NinjaScriptProperty]
         [Display(Name = "Giveback brake: no gap trade while the brake is on", Order = 29, GroupName = "1. Size and risk")]
         public bool GapSkipBraked { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, 20)]
+        [Display(Name = "No new entry after this many losing trades in a day (0 = no limit; the 50K's Funded growth and Custom)", Order = 30, GroupName = "1. Size and risk")]
+        public int MaxLosersPerDay { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, 100000)]
+        [Display(Name = "Day budget until the floor has stopped, $ (0 = the daily loss; the 50K's Funded growth and Custom)", Order = 31, GroupName = "1. Size and risk")]
+        public double EarlyDayBudget { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, 10)]
+        [Display(Name = "Gap trade: the gap at least this many times the 14-session average (the 50K's Funded growth and Custom)", Order = 32, GroupName = "1. Size and risk")]
+        public double GapTrigger { get; set; }
 
         [NinjaScriptProperty]
         [Range(0, 5000)]

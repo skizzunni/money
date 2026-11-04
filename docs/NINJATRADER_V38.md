@@ -74,13 +74,13 @@ real MNQ data will differ somewhat. The stand-in has flattered this strategy bef
 simulator, Funded growth, from 2025-01-02, 1 tick of slippage, $0.62 a side;
 `verification/noise_v2/v38g_nt_2026-11-03.csv` and the trade lists beside it):
 
-| Jan 2, 2025 – Oct 2026 (updated 2026-11-04, U41) | 5-minute bars | 30-minute bars |
+| Jan 2, 2025 – Oct 2026 (updated 2026-11-04, U42) | 5-minute bars | 30-minute bars |
 |---|---|---|
-| Trades | 702 | 252 |
-| Net | **$54,700.08** | $28,620.10 |
-| Winners | 52.4% | 53.6% |
-| Profit factor | 1.773 | 1.881 |
-| Closed drawdown | $5,067.86 | $3,934.78 |
+| Trades | 760 | 244 |
+| Net | **$52,981.78** | $28,226.67 |
+| Winners | 49.5% | 54.1% |
+| Profit factor | 1.698 | 2.025 |
+| Closed drawdown | $5,511.92 | $3,268.44 |
 | Largest loss | −$1,703.05 | −$1,634.41 |
 | Worst day | −$899.31 | −$899.20 |
 | Most contracts | 50 | 15 |
@@ -88,13 +88,15 @@ simulator, Funded growth, from 2025-01-02, 1 tick of slippage, $0.62 a side;
 
 The 5-minute chart includes gap and go (U19, U20, U25: up to 10 MNQ once the floor has stopped), More trading days with the sizing allowance (U22, U26: 2-MNQ fill-ins from $6,000, 3 points), the
 data fix (G67), the after-loss max loss at $187.50 once the floor has stopped (U30), up to 50 MNQ (U32) and no entries
-at 13:00 and 14:30 until the floor has stopped (U33), faster contract steps above $10,000 of profit (U34) and the after-loss max loss as every trade's, $187.50 (U35-U37), a 5-point sizing allowance (U38) the drive fill-in at 0.6x (U39) More trading days from a $2,500 cushion (U40) and no gap trade while the giveback brake is on (U41). They need the 5-minute chart, so **trade the 5-minute chart**.
+at 13:00 and 14:30 until the floor has stopped (U33), faster contract steps above $10,000 of profit (U34) and the after-loss max loss as every trade's, $187.50 (U35-U37), a 5-point sizing allowance (U38) the drive fill-in at 0.6x (U39) More trading days from a $2,500 cushion (U40) no gap trade while the giveback brake is on (U41) and G204's five survival settings (U42: three losers a day, a $750 day budget until the floor stops, a 45-minute time stop, the top 70% of the range, the gap trade from 0.6x; on the 50K's Funded growth, both charts). They need the 5-minute chart, so **trade the 5-minute chart**.
 
 **What to expect (measured 2026-11-04, G141/G144/G165 and the 263 fresh starts):**
-- A fresh 50K account on U41: about **1 in 14 is lost or frozen** within 21 months (38 of 526 starts on the 1st and the
-  15th of each month; U40: 42; U34: 60, about 1 in 9); the median account makes **$39,260 in 21 months** (about $430 a week; U40 $42,114); +$3,000 takes a median
-  138 days (within 30 days in 4.0%); +$50,000 within 21 months in 47.1% (median 16.6 months).
-- Once the account is $10,000-30,000 up: the window averaged **$1,660 a week** (17% of weeks at +$3,000 or more);
+- A fresh 50K account on U42: about **1 in 19 is lost or frozen** within 21 months (28 of 526 starts on the 1st and the
+  15th of each month; U41: 38; U40: 42; U34: 60, about 1 in 9); the median account makes **$35,219 in 21 months** (about $390 a week; U41 $39,260); +$3,000 takes a
+  median 153 days (U41 138; within 30 days in 3.6%); +$50,000 within 21 months in 41.6% (U41 47.1%; median 16.0 months).
+  U42 trades some of the median's profit for 10 fewer lost accounts in 526.
+- Once the account is $10,000-30,000 up: the window averaged **$1,532 a week** on U42 (12% of weeks at +$3,000 or more;
+  U40 $1,637; G206, `verification/noise_v2/g206_weekly_u42.txt`);
   past $30,000 the day's $900 budget caps every trade and the long histories average $600-1,200 a week.
 - At 2 ticks of slippage instead of 1, the window still makes $52,137 (G156).
 
@@ -5353,3 +5355,9 @@ floor never touched. Medians: $33,067 / $41,928 on the mid-month starts (U41 $33
 trades in a day** (`MaxLosersPerDay`), a **$750 day budget until the floor has stopped** (`EarlyDayBudget`; $900 after),
 a **45-minute time stop** (60 before), entries only in the top **70%** of the day's range (0.65 before), and the gap
 trade from **0.6x** the average gap (`GapTrigger`; 0.5 before). The giveback brake stays at 0.5.
+
+## G206: U42's weekly P/L by the account's profit (a measurement, 2026-11-04)
+
+`research/g206_weekly_u42.py` (`verification/noise_v2/g206_weekly_u42.txt`). Window, $10,000-30,000 up: 26 weeks,
+**$1,532** average (U40 $1,637), 11.5% of weeks at +$3,000 or more; NQ $1,158 (U40 $1,627), the index $1,059 (U40
+$639); past $75,000 the long histories average $967-1,158 a week. U42's gain is survival, not the grown phase.
