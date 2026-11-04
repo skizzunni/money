@@ -962,7 +962,17 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                 if entry_bar != i and ((pos > 0 and held > line) or (pos < 0 and held < line)):
                     line, reason = held, held_why
                 held, held_why = line, reason
-            if cfg.nt_execution and entry_bar != i and pos * (c[i - 1] - line) <= 0:
+            if cfg.day_guard > 0:  # G128: the day guard, a tick-level exit: in force wherever it is tighter
+                allow = cfg.day_guard + day_pnl
+                if cfg.trail_dd > 0 and not math.isnan(trail_peak):
+                    fl = trail_peak - cfg.trail_dd
+                    if cfg.trail_cap >= 0:
+                        fl = min(fl, trail_base + cfg.trail_cap)
+                    allow = min(allow, eq_curve[-1] - fl - cfg.guard_floor_buffer)
+                gpx = entry_px - pos * (allow - 2 * cfg.commission_per_side * q_trade) / (rest * q_trade * cfg.point_value)
+                if pos * (gpx - line) > 0:
+                    line, reason = gpx, "Day guard"
+            if cfg.nt_execution and entry_bar != i and pos * (c[i - 1] - line) <= 0 and reason != "Day guard":
                 hit, price, reason = True, o[i] - pos * slip, "Stop passed"  # sent at the last close, filled now
             elif entry_bar == i:  # a stop attached to the entry can fill on the fill bar itself
                 hit = l[i] <= line if pos > 0 else h[i] >= line
@@ -995,21 +1005,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             if hit:
                 close_pos(i, price, reason)
                 events.append((i - 1 if reason == "Time stop" else i, "EXIT"))  # the time stop's alert: at the close
-            elif pos and cfg.day_guard > 0:  # G128: the day guard, at the bar's worst price (before any target)
-                allow = cfg.day_guard + day_pnl
-                if cfg.trail_dd > 0 and not math.isnan(trail_peak):
-                    fl = trail_peak - cfg.trail_dd
-                    if cfg.trail_cap >= 0:
-                        fl = min(fl, trail_base + cfg.trail_cap)
-                    allow = min(allow, eq_curve[-1] - fl - cfg.guard_floor_buffer)
-                qv = rest * q_trade * cfg.point_value
-                gpx = entry_px - pos * (allow - rest * 2 * cfg.commission_per_side * q_trade) / qv
-                worst = l[i] if pos > 0 else h[i]
-                if pos * (worst - gpx) <= 0:
-                    px = o[i] if pos * (o[i] - gpx) <= 0 else gpx
-                    close_pos(i, px - pos * slip, "Day guard")
-                    events.append((i, "EXIT"))
-                    guard_today, hit = True, True
+                if reason == "Day guard":
+                    guard_today = True
             initial = cfg.partial_r == "initial"
             r_now = r_trade if initial else r_pts
             if (pos and rest == 1.0 and cfg.partial_at > 0 and not math.isnan(r_now)  # research: part at +partial_at R

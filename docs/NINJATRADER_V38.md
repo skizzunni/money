@@ -4255,3 +4255,11 @@ contract steps and the 50 cap are unchanged, so it acts only once the steps exce
 **Variants:** U33 with `day_guard` 900 and `room_mult` 1.5 and 2.0 (new research settings).
 **Adopt (the better window net of those that pass) on G78's rule or G99b's** against U33; no day at −$1,000 or worse
 is part of both.
+
+**G128 result: invalid (an error in the test, not a verdict).** The guard was checked only on bars where the bot's
+own stop didn't fill; sized up, the stop sits past the guard, so it filled first: up to 247 days at −$1,000 or worse
+(worst −$4,338). A live tick-level guard fires first. Log kept: `verification/noise_v2/g128_invalid.txt`.
+
+**G128b (registered 2026-11-04, before its run):** G128 with the guard as a stop level: on every bar, wherever the
+guard's price is tighter than the bot's stop, it is the stop in force (filled at it, or at the open past it, less a
+tick; "Day guard"). Variants and pass rule as G128.
