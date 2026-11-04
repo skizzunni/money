@@ -4280,3 +4280,15 @@ The floor never touched. 2x passes everything but the lost accounts (NQ 4, index
 **The idea:** the extra lost start comes before the floor stops, where the larger room lets the steps' contracts fit
 sooner. **The variant:** U33 with `day_guard` 900, `room_mult` 2.0 and `room_mult_locked` (a new research setting:
 the 2x only once the floor has stopped). **Adopt on G78's rule or G99b's** against U33.
+
+**G129 result (run once, 2026-11-04): rejected; the same as G128b to the dollar** (the 2x never acts before the floor
+stops: the contract steps bind there). Three starts changed against U33: NQ 2015-04 now lost (the floor had just
+stopped, $2,000 of room, and 2x days took it back to the start), index 2015-07 now lost (before the floor stopped, the
+guard's $100 floor buffer closed trades early and ended the day), NQ 2022-07 now kept. Log:
+`verification/noise_v2/g129_room_guard_locked.txt`.
+
+## G130: the guard once the floor has stopped, 2x only with $6,000 of room (registered 2026-11-04, before its run)
+
+**The variant:** U33 with `day_guard` 900 and `day_guard_locked` (the guard only once the floor has stopped), and
+`room_mult` 2.0 with `room_mult_room` 6000 (2x only while the account is at least $6,000 above the floor, the bot's own
+2-contract fill-in threshold, not a new number). New research settings. **Adopt on G78's rule or G99b's** against U33.

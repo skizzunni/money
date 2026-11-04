@@ -147,6 +147,8 @@ class NoiseConfig:
     # it) less slippage; no more entries that day (0: off)
     room_mult: float = 1.0
     room_mult_locked: bool = False  # G129: room_mult only once the floor has stopped
+    room_mult_room: float = 0.0  # G130: room_mult only while the account is at least this far above the floor
+    day_guard_locked: bool = False  # G130: the day guard only once the floor has stopped
     day_guard: float = 0.0
     guard_floor_buffer: float = 100.0
     guard_slip_pts: float = 0.0  # research: the day guard's fill this many points worse (a fast market)
@@ -729,11 +731,20 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             return True
         return st == d if cfg.confirm_mode == "with" else st != -d
 
+    def floor_room() -> float:
+        """G130: the account's room above the trailing floor (inf without one)."""
+        if cfg.trail_dd <= 0 or math.isnan(trail_peak):
+            return math.inf
+        fl = trail_peak - cfg.trail_dd
+        if cfg.trail_cap >= 0:
+            fl = min(fl, trail_base + cfg.trail_cap)
+        return eq_curve[-1] - fl
+
     def money_room(bot: bool = False) -> float:
         """What a new trade may risk: the rest of today's loss limit and the room above the trailing floor."""
         room = math.inf
         if cfg.daily_loss_limit > 0:
-            big = bot and (not cfg.room_mult_locked or floor_stopped())
+            big = bot and (not cfg.room_mult_locked or floor_stopped()) and floor_room() >= cfg.room_mult_room
             room = (cfg.room_mult if big else 1.0) * cfg.budget_frac * (cfg.daily_loss_limit + day_pnl - cfg.day_keep * max(day_pnl, 0.0)
                                       - (max(gap_day_pnl, 0.0) if cfg.gap_no_budget else 0.0))
         if cfg.trail_dd > 0 and not math.isnan(trail_peak):
@@ -965,7 +976,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                 if entry_bar != i and ((pos > 0 and held > line) or (pos < 0 and held < line)):
                     line, reason = held, held_why
                 held, held_why = line, reason
-            if cfg.day_guard > 0:  # G128: the day guard, a tick-level exit: in force wherever it is tighter
+            if cfg.day_guard > 0 and (not cfg.day_guard_locked or floor_stopped()):  # G128: the day guard, a tick-level exit
                 allow = cfg.day_guard + day_pnl
                 if cfg.trail_dd > 0 and not math.isnan(trail_peak):
                     fl = trail_peak - cfg.trail_dd
