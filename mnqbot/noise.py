@@ -85,6 +85,7 @@ class NoiseConfig:
     lock_at: float = 1.0  # once the trade has been this many max losses in profit, the stop moves to entry + lock_plus
     lock_plus: float = 2.5  # points; with lock_at 0 or no max loss, no lock (round thirty-seven)
     max_losers: int = 4  # no new entries today after this many losing trades today; 0 = no limit (round thirty-eight)
+    max_losers_locked: int = -1  # research (G225): once the floor has stopped, this instead (-1 = max_losers; 0 = none)
     tighten_only: bool = False  # webhook mode: in a trade the stop never moves away from the price (round thirty-five)
     # the take-profit also works on the fill bar, from the expected fill, as a bracket sent with the entry does
     # (the NinjaTrader strategy); off: from the bar after the fill, as the Pine script places it
@@ -617,6 +618,11 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
         pos, held, locked, rest, part_pnl, best, tp_dist = 0, math.nan, False, 1.0, 0.0, math.nan, math.nan
         locked1, fav, lock_px = False, math.nan, math.nan
 
+    def losers_ok() -> bool:
+        """The day's loser limit (G225: max_losers_locked once the floor has stopped)."""
+        ml = cfg.max_losers_locked if cfg.max_losers_locked >= 0 and floor_stopped() else cfg.max_losers
+        return ml <= 0 or losers_today < ml
+
     def floor_stopped() -> bool:
         """Has the trailing floor stopped at the start (the account's first trail_dd made)?"""
         return (not math.isnan(trail_peak) and cfg.trail_cap >= 0
@@ -937,7 +943,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
 
         if (cfg.touch_entry and use_stop and pos == 0 and pending is None and in_rth and not skip_today
                 and not math.isnan(upper) and t_min >= FIRST_CHECK
-                and (cfg.max_losers <= 0 or losers_today < cfg.max_losers)):
+                and losers_ok()):
             up_hit = h[i] >= upper
             dn_hit = l[i] <= lower and not (fed_today and end <= FED_CUTOFF)
             d = 0
@@ -1188,7 +1194,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                 bands.append((i, upper, lower))
                 short_ok = (not (fed_today and end < FED_CUTOFF) and cfg.short_mult > 0
                             and not (tom_today and cfg.tom_no_shorts))
-                fresh_ok = cfg.max_losers <= 0 or losers_today < cfg.max_losers  # the daily limit: new entries
+                fresh_ok = losers_ok()  # the daily limit: new entries
                 up_e, lo_e = upper, lower  # the entry lines (entry_k: a wider area for entries only)
                 if cfg.entry_k != 1.0:
                     up_e = max(day_open, prev_close) * (1 + cfg.entry_k * sigma)
@@ -1346,7 +1352,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
         nxt = end + 5
         if (in_rth and 5 % minutes == 0 and not math.isnan(day_open) and FIRST_CHECK <= nxt <= LAST_CHECK
                 and (nxt - FIRST_CHECK) % STEP == 0 and filled >= lb_n and not math.isnan(prev_close) and pos == 0
-                and not skip_today and (cfg.max_losers <= 0 or losers_today < cfg.max_losers)
+                and not skip_today and losers_ok()
                 and not (cfg.last_entry_end and nxt > cfg.last_entry_end) and not (calm and not cfg.calm_div)
                 and budget_fits()):
             k = (nxt - FIRST_CHECK) // STEP

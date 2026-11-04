@@ -5602,3 +5602,11 @@ tests; if that can't be done and tested today, a pass is recorded as pending, no
 $905,429 (all above U44), no −$1,000 day. But 526 starts: **100** lost or frozen (U44 28); at 2 ticks **136** (U44 51).
 The 15-minute grid trades more often at the start, and a fresh account can't carry the extra losers. Log:
 `verification/noise_v2/g224_grid15.txt`.
+
+## G225: the three-losers rule only until the floor has stopped (registered 2026-11-04, before its run)
+
+**Why:** U42's three-losers limit is a survival rule; once grown, the day's $900 budget already bounds the day. **The
+variants:** U44 with `max_losers_locked` (a new research setting: the loser limit once the floor has stopped) (a) 0 (no
+limit) and (b) 4. **Run once:** the 526 starts and the full sets in both executions. **Adopt (the better window) on
+G78's rule** against U44 (higher nets on all three in both executions, no −$1,000 day, the floor never touched, no more
+than 28 lost).
