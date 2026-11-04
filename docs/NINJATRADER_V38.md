@@ -5517,3 +5517,9 @@ the 526 than 28, every net at least 95% of U44's, no −$1,000 day, the floor ne
 **G217 result (2026-11-04): none goes on.** 263 starts on the 1st, lost or frozen (U44 12): the best k20 **10**
 (`size_slip_pts` 6, `skip_checks` 780 only, `lock_at` 0.3, `trend_n` 40, `big_day_k` 1.7; medians $30,853 / $59,163),
 k2 / k26 12, the rest 13 or more. None reaches 8; U44 stays. Log: `verification/noise_v2/g217_survival_search.txt`.
+
+## G218: G217's k20 on the full checks, against U44 (registered 2026-11-04, before its run)
+
+**Why:** k20 lost 10 of 263 (U44 12) with the highest NQ median yet ($59,163). **Run once:** the mid-month starts and
+the full sets in both executions. **Adopt on G78's rule** against U44 (higher nets on all three in both executions, no
+−$1,000 day, the floor never touched, no more than 28 of 526 lost).
