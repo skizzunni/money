@@ -4628,3 +4628,6 @@ slows the recovery. Log: `verification/noise_v2/g153_early_budget.txt`.
 
 **Variants:** U34 with `early_ml` 150 and 125 (the max loss per contract until the floor has stopped; $187.50 after).
 **Adopt (the fewest lost) on G99b's survival-first rule** on the 263 monthly starts, as G152.
+
+**G154 result (run once, 2026-11-04): rejected.** 263 monthly starts: `early_ml` 150 43 lost or frozen, 125 55 (U34
+32): the tighter stops get hit more often. Log: `verification/noise_v2/g154_early_ml.txt`.
