@@ -4613,3 +4613,9 @@ on the window, NQ and the index in both executions, no −$1,000 day, the floor 
 **G152 result (run once, 2026-11-04): all rejected.** On the 263 monthly starts (U34 32 lost or frozen):
 `steps_after_lock` 36, `trail_frac` 0.5 34 (its full-set nets are U34's to the dollar), `trail_buffer` 500 88 (it
 freezes: the window's account made −$802 on 61 trades). Log: `verification/noise_v2/g152_early_protection.txt`.
+
+## G153: a smaller day budget until the floor has stopped (registered 2026-11-04, before its run)
+
+**The idea:** 15 of U34's 32 lost starts go before the floor stops, in a few −$900 days of a volatile stretch.
+`early_daily_loss` (a new research setting): the day's budget until the floor has stopped. **Variants:** U34 with $500
+and $650. **Adopt (the fewest lost) on G99b's survival-first rule** on the 263 monthly starts, as G152.
