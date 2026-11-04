@@ -5523,3 +5523,7 @@ k2 / k26 12, the rest 13 or more. None reaches 8; U44 stays. Log: `verification/
 **Why:** k20 lost 10 of 263 (U44 12) with the highest NQ median yet ($59,163). **Run once:** the mid-month starts and
 the full sets in both executions. **Adopt on G78's rule** against U44 (higher nets on all three in both executions, no
 −$1,000 day, the floor never touched, no more than 28 of 526 lost).
+
+**G218 result (run once, 2026-11-04): rejected.** k20: the window **$15,044 / $7,545** (U44 $57,446 / $57,475) though NQ
+$601,417 / $602,205 and the index $850,045 / $828,426 are higher; 526 starts 26 lost (10 + 16). A setting set that fits
+the long histories and fails the window the account trades. Log: `verification/noise_v2/g218_k20.txt`.
