@@ -5041,3 +5041,10 @@ rule** against U40 (fewer than 42 of 526 lost, every net at least 95%).
 
 **G184 result (run once, 2026-11-04): rejected.** 526 starts: **46** lost or frozen (22 + 24; U40 42); nets within
 1-2%. Log: `verification/noise_v2/g184_step1750.txt`.
+
+## G185: U40's weekly P/L by the account's profit (a measurement, 2026-11-04)
+
+`research/g185_weekly_u40.py` (`verification/noise_v2/g185_weekly_u40.txt`), as G144 for U34: under $10,000 of profit
+$175-430 a week; $10,000-30,000 **$1,637** a week on the window (17% of weeks at +$3,000), $1,627 on NQ, $639 on the
+index; past $30,000 $714-1,177 a week, 12-15% of weeks at +$3,000. About the same as U34: today's later rounds bought
+survival, not weekly profit.
