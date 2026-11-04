@@ -5087,3 +5087,7 @@ in both executions. **Adopt on G78's rule** (no more lost than 42), or G99b's wi
 as a group, but never tried the gap-slot ones alone. **The variant:** U40 with `gap_fill_early` (the small-gap and
 drive fill-ins of the gap slot also allowed before the floor has stopped). **Run once:** the 526 starts and the full
 sets in both executions. **Adopt on G78's rule** (no more lost than 42), or G99b's with a gain of at least 4 of the 526.
+
+**G189 result (run once, 2026-11-04): rejected.** 526 starts: **70** lost or frozen (36 + 34; U40 42). The window
+gained (NinjaTrader $57,807 against $54,710) but the index fell (NinjaTrader $768,257 against $774,954). Like G102,
+fill-ins before the floor stops cost accounts. Log: `verification/noise_v2/g189_gap_fill_early.txt`.
