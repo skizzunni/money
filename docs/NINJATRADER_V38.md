@@ -3646,3 +3646,11 @@ execution. 0.30: less everywhere (window $40,279 / $40,365) (`verification/noise
 
 **The idea:** between G92's 0.18 (more on the window and the chart's index, a −$1,012 day) and today's 0.24.
 **The variant:** U25 with `stop_buffer` 0.21. **Adopt on G78's rule**, against U25.
+
+**G93 result (run once, 2026-11-04): rejected by one day.** Window $44,412 / $44,479, index $622,500 / $605,574 (both
+above U25), NQ's 2015 account lived ($431,394 / $427,989), but a −$1,030 NQ day in the chart's execution (none at
+−$1,000 in NinjaTrader's). The rule allows no more days at −$1,000 on any set, so 0.24 stays
+(`verification/noise_v2/g93_stop_buffer21.txt`).
+
+**Scorecard, G44-G93:** 50 rounds. Adopted: G60 (U19), G67b (U20), G67's data fix, G79 (U22), G80 (U23), G82 (U24),
+G84 (U25). Rejected: 40. Measurements: G54, G55, G88.
