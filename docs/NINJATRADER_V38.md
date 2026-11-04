@@ -5303,3 +5303,8 @@ the gap trigger, the after-loss max loss). **Stage A:** each on the 263 starts o
 with the fewest lost (ties: the higher median), if 13 or fewer, goes on to the 263 mid-month starts and the full sets
 in both executions. **Adopted on G99b's rule** (at least 4 fewer of the 526 than U41's 38, every net at least 95%, no
 −$1,000 day, the floor never touched) or G78's.
+
+**G203 stage A (2026-11-04):** 263 starts on the 1st, lost or frozen: **k18 12** (U41 17), k27 16, k2 / k9 17, the
+rest 18-44. k18 (`giveback_brake` 0.6, `early_daily_loss` $750, `max_losers` 3, `time_stop` 45, `range_pos_min` 0.7,
+`gap_go_k` 0.6) goes on to stage B; its medians are lower ($27,237 / $28,971 against U41's $34,175 / $49,488). Log:
+`verification/noise_v2/g203_survival_search.txt`.
