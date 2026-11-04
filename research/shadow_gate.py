@@ -7,10 +7,13 @@ is closed on a session whose previous session's shadow equity closed below its a
 from __future__ import annotations
 
 import dataclasses
+import sys
+from pathlib import Path
 
 import pandas as pd
 
-from mnqbot.noise import NoiseConfig, run  # noqa: F401
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))  # the repository root, for mnqbot
+from mnqbot.noise import NoiseConfig, run  # noqa: E402
 
 NY = "America/New_York"
 SHADOW = {"profit_step": 0.0, "qty": 1, "trail_dd": 0.0, "gap_go_locked_qty": 0, "gap_go_max_qty": 1,
