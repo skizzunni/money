@@ -3425,3 +3425,9 @@ floor stops when the account is $2,000 up), so the account's second stretch trad
 **G81 result (run once, 2026-11-04): rejected; the window makes less in the chart's execution.** 73.3% / 80.7% of days
 (window / index); window $37,569 / $38,250 (U23: $37,861 / $38,189); index $557,462 / $551,577 (U23: $557,421 /
 $551,532). The $3,000 cushion stays (`verification/noise_v2/g81_cushion2000.txt`).
+
+## G82: up to 7 gap contracts once the floor has stopped (registered 2026-11-04, before its run)
+
+**The idea:** 3 (G67b) and then 5 (G80) passed. 7 tests whether the gap trade still has room.
+
+**The variant:** U23 with `gap_go_locked_qty` 7. **Adopt on G78's rule**, against U23.
