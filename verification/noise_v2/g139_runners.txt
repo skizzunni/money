@@ -1,0 +1,5 @@
+{"k": 0, "take_profit": 0.0, "proxy net": 42649, "proxy d1000": 0, "nq net": 498347, "nq d1000": 0, "index net": 609459, "index d1000": 0}
+{"k": 1, "take_profit": 2.5, "proxy net": 45846, "proxy d1000": 0, "nq net": 557434, "nq d1000": 0, "index net": 695929, "index d1000": 0}
+{"k": 2, "take_profit": 3.0, "proxy net": 45832, "proxy d1000": 0, "nq net": 497615, "nq d1000": 0, "index net": 641517, "index d1000": 0}
+{"k": 3, "tp_keep": 0.5, "proxy net": 43046, "proxy d1000": 0, "nq net": 466774, "nq d1000": 0, "index net": 597495, "index d1000": 0}
+{"k": 4, "tp_keep": 0.5, "runner_lock": 0.5, "proxy net": 43308, "proxy d1000": 0, "nq net": 478133, "nq d1000": 0, "index net": 588086, "index d1000": 0}

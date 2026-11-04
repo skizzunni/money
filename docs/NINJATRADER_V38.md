@@ -4415,3 +4415,17 @@ gain, not adopted); `streak_k` 3: $50,556 / $547,695 / **$768,674**; `eq_n` 20: 
 **Variants:** U33 with `take_profit` 0 (none: the line, the lock and 16:00 close every trade), 2.5, 3.0; `tp_keep` 0.5
 (half the contracts run on past the target); `tp_keep` 0.5 with `runner_lock` 0.5 (the runner's stop at half the
 target's distance). G135's screen, then NinjaTrader's execution and the 89 starts for the best, on G78's rule or G99b's.
+
+**G139 result (run once, 2026-11-04): none passes the screen.** `take_profit` 0 / 2.5 / 3.0: window $42,649 / $45,846 /
+$45,832 (U33 $50,219); `tp_keep` 0.5: $43,046; with `runner_lock` 0.5: $43,308; all lower on the index. The 2.0
+target stays. Log: `verification/noise_v2/g139_runners.txt`.
+
+**What loses the accounts (U33's 8 of 89, `verification/noise_v2/g35_start_dates_u32ske.csv`):** 6 of them made the
+floor stop (+$2,000), most reached +$3,000, then gave it all back over months (55-328 trades) to the starting balance;
+2 lost $1,100-1,650 before the floor stopped.
+
+## G140: the trend rules on both sides, on U33 (registered 2026-11-04, before its run)
+
+**Variants:** U33 with `trend_side` 0 (longs below the 50-session trend at 1 contract too, as shorts above it),
+`trend_n` 100, both, and `giveback_brake` 0.6 (G99's brake at 60%, for the slow giveback that loses the accounts).
+G135's screen, then NinjaTrader's execution and the 89 starts for the best, on G78's rule or G99b's.
