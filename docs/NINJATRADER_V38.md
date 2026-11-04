@@ -5361,3 +5361,11 @@ trade from **0.6x** the average gap (`GapTrigger`; 0.5 before). The giveback bra
 `research/g206_weekly_u42.py` (`verification/noise_v2/g206_weekly_u42.txt`). Window, $10,000-30,000 up: 26 weeks,
 **$1,532** average (U40 $1,637), 11.5% of weeks at +$3,000 or more; NQ $1,158 (U40 $1,627), the index $1,059 (U40
 $639); past $75,000 the long histories average $967-1,158 a week. U42's gain is survival, not the grown phase.
+
+## G207: 40 random combinations of the survival settings around U42 (registered 2026-11-04, before its run)
+
+**The search** (`research/g207_survival_search.py`, seed 207): as G203, around U42, the same 18 settings with values
+other than U42's. **Stage A:** each on the 263 starts on the 1st (U42: 12). **Stage B:** the one with the fewest lost
+(ties: the higher median), if 8 or fewer, goes on to the mid-month starts and the full sets in both executions.
+**Adopted on G99b's rule** against U42 (at least 4 fewer of the 526 than U42's 28, every net at least 95% of U42's, no
+−$1,000 day, the floor never touched) or G78's.
