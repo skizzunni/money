@@ -1662,8 +1662,8 @@ namespace NinjaTrader.NinjaScript.Strategies
             double inAvg = entrySlipSum / entrySlipN, outAvg = exitSlipN > 0 ? exitSlipSum / exitSlipN : 0.0;
             string s = "Fills vs plan: entries " + inAvg.ToString("+0.0;-0.0;0.0", CultureInfo.InvariantCulture) + " ticks (" + entrySlipN +
                        "), stops and market exits " + outAvg.ToString("+0.0;-0.0;0.0", CultureInfo.InvariantCulture) + " ticks (" + exitSlipN + ")";
-            if (entrySlipN >= 20 && (inAvg + outAvg) / 2 > 2.0 && !StepsAfterLock)
-                s += " -- worse than 2 ticks: consider Gentle start";
+            if (entrySlipN >= 20 && (inAvg + outAvg) / 2 > 2.0)  // G215: survival needs fills near the tested 1 tick
+                s += " -- worse than 2 ticks: check the connection and order route (Gentle start doesn't make up for it, G222)";
             return s + "\n";
         }
 
@@ -1746,7 +1746,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         public int TimeStop { get; set; }
 
         [NinjaScriptProperty]
-        [Display(Name = "Gentle start: no contract steps until the trailing floor has stopped (turn on if live fills are 3+ ticks worse)", Order = 12, GroupName = "1. Size and risk")]
+        [Display(Name = "Gentle start: no contract steps until the trailing floor has stopped (G222: no help on U44 at worse fills)", Order = 12, GroupName = "1. Size and risk")]
         public bool StepsAfterLock { get; set; }
 
         [NinjaScriptProperty]

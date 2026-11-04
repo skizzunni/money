@@ -1,0 +1,4 @@
+index g222gentles2 starts 160 lost (at the floor) 4 dead (lost or frozen) 4 below start 0 median net 29331 worst net 1 lowest point -1855 reached +2000 160
+nq g222gentles2 starts 103 lost (at the floor) 20 dead (lost or frozen) 20 below start 12 median net 13839 worst net -1999 lowest point -1999 reached +2000 92
+index g222gentles2 starts 160 lost (at the floor) 7 dead (lost or frozen) 8 below start 1 median net 28972 worst net -115 lowest point -1846 reached +2000 159
+nq g222gentles2 starts 103 lost (at the floor) 20 dead (lost or frozen) 20 below start 12 median net 15466 worst net -1999 lowest point -1999 reached +2000 91

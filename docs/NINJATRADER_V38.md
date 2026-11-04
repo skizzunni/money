@@ -1645,8 +1645,9 @@ planned:
 - the dashboard's "Fills vs plan: entries +x ticks (n), stops and market exits +y ticks (m)";
 - a "Fills vs plan" line in `research/journal_report.py`.
 
-Once 20 trades average more than 2 ticks, the dashboard adds "consider Gentle start". G29-G30 found that 3 ticks is
-where a new account's first months are at risk.
+Once 20 trades average more than 2 ticks, the dashboard warns to check the connection and order route (until G222 it
+said "consider Gentle start", which G222 found doesn't help on U44). G29-G30 and G215 found that worse fills put a new
+account's first months at risk.
 
 A live journal from before this version, with the old columns, is moved aside as `..._until_<time>.csv`, so no file
 mixes the two layouts.
@@ -5491,7 +5492,7 @@ Reported, not judged; a −$1,000 day or a floor touch at 2 ticks would be flagg
 $54,035 (1 tick $57,446 / $57,475), NQ $539,072 / $538,954, index $801,371 / $709,120; no −$1,000 day, the floor never
 touched. But 526 starts: **51** lost or frozen (14 + 37; 28 at 1 tick), most on NQ (37 of 206). A fresh account's
 survival depends on fills near the tested 1 tick: the strategy's fill-quality alert (20 trades averaging more than 2
-ticks worse) is the signal to check the connection or turn on "Gentle start". Log:
+ticks worse) is the signal to check the connection and order route (G222: "Gentle start" doesn't help). Log:
 `verification/noise_v2/g215_u44_slip2.txt`.
 
 ## G216: protecting a fresh account against worse fills, on U44 (registered 2026-11-04, before its run)
@@ -5567,3 +5568,7 @@ window $60,182, index $848,323 (99.8%), NQ $571,363 (97.2%). U44's filters stay.
 steps until the floor has stopped) if live fills run 3+ ticks worse. It was never measured on U44. **The measurement:**
 U44 with `steps_after_lock` on, at 2 ticks, on the 526 starts (U44 at 2 ticks: 51 lost). **What would follow:** the
 advice stays if it loses clearly fewer (45 or fewer); otherwise the setting text and the docs say it doesn't help.
+
+**G222 result (2026-11-04): "Gentle start" doesn't help.** U44 with it, at 2 ticks: 526 starts **52** lost or frozen (U44
+51). The advice is withdrawn: the dashboard's fill warning now says to check the connection and order route, and the
+setting's text says it doesn't help on U44. Log: `verification/noise_v2/g222_gentle_slip2.txt`.

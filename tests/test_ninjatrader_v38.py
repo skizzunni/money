@@ -474,7 +474,7 @@ def test_v38_progress_matches_the_journal(sim, sample_1m, tmp_path):  # noqa: F8
 def test_v38_fill_quality(sim, sample_1m, tmp_path):  # noqa: F811
     """Fill quality: each trade's entry slip (ticks paid past the close the order was sent at) and stop slip (past the
     resting stop) in the journal match the simulator's fills exactly; the dashboard averages them; at 3 ticks of
-    slippage it warns to consider Gentle start. The trades themselves are unchanged."""
+    slippage it warns to check the connection. The trades themselves are unchanged."""
     import re
 
     bars = resample(sample_1m, "5min")
@@ -506,10 +506,10 @@ def test_v38_fill_quality(sim, sample_1m, tmp_path):  # noqa: F811
     m = re.search(r"Fills vs plan: entries ([+-]?[\d.]+) ticks \((\d+)\)", dash)
     assert m and int(m.group(2)) == len(tr)
     assert math.isclose(float(m.group(1)), tr["entry slip ticks"].mean(), abs_tol=0.05)
-    assert "consider Gentle start" not in dash
+    assert "worse than 2 ticks" not in dash
     _, j3, dash3 = go(3)
     stops3 = j3[(j3.kind == "TRADE") & (j3["exit kind"] == "Stop loss")]["exit slip ticks"].dropna()
-    assert (stops3 >= 3 - 1e-9).all() and "consider Gentle start" in dash3
+    assert (stops3 >= 3 - 1e-9).all() and "worse than 2 ticks" in dash3
     # G158: live, one alert once 20 trades average more than 2 ticks worse than planned (none at 1 tick)
     for slip, want in ((3, 1), (1, 0)):
         rr = subprocess.run([DOTNET, str(sim), str(path), "5", "Strategy=V38", *GROW_ARGS, "SimRealtimeFrom=1",
