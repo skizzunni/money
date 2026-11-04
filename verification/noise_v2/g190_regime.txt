@@ -1,0 +1,12 @@
+
+nq: 2583 sessions, forward 20-session per-contract P/L ($), mean by quintile (1 = lowest)
+  eff20    mean     526     648     624     678     728   % below -$300  17.4  14.1  13.0  15.9  19.9
+  rng_rel  mean     533     582     669     578     841   % below -$300  13.9  16.9  14.9  15.9  18.8
+  ac20     mean     439     624     625     638     876   % below -$300  16.4  18.0  15.9  15.3  14.7
+  bot40    mean     717     715     656     449     666   % below -$300  14.1  11.2  14.9  20.9  19.1
+
+index: 3912 sessions, forward 20-session per-contract P/L ($), mean by quintile (1 = lowest)
+  eff20    mean     466     588     526     564     620   % below -$300  16.7  14.2  17.6  16.8  18.5
+  rng_rel  mean     410     562     643     470     680   % below -$300  13.9  17.4  16.0  19.8  16.7
+  ac20     mean     515     525     524     532     668   % below -$300  13.9  18.4  18.4  18.5  14.6
+  bot40    mean     571     674     436     491     594   % below -$300  14.7   9.8  15.7  21.0  22.5

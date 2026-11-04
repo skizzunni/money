@@ -5101,3 +5101,8 @@ four things known the evening before: the open-to-close efficiency (last 20 sess
 100-session mean, the 5-minute returns' lag-1 autocorrelation (last 20 sessions), and the bot's own last 40 sessions.
 **What would follow:** a filter is registered (G191) only if one quintile is the lowest on both NQ and the index and
 well below the others; otherwise none.
+
+**G190 result (2026-11-04): no filter follows.** Every quintile of every measure has a positive forward 20-session P/L
+on both sets ($410-876 a contract). The lowest efficiency quintile is the lowest on both (NQ $526, index $466 against
+$588-728), but only about 20% below the rest, and its share of stretches below −$300 (17%) is no higher than the others'
+(13-20%). The losing stretches don't show in these beforehand. Log: `verification/noise_v2/g190_regime.txt`.
