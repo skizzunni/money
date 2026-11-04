@@ -5539,3 +5539,10 @@ nets on all three in both executions, **no day at −$1,000 or worse**, the floo
 NQ $598,409, index $859,078) and 526 starts 29 lost, but the index has **3 days at −$1,034** in both executions: the
 $100 left under the firm's limit is what absorbs a stop that fills past its price. The $900 budget stays. Log:
 `verification/noise_v2/g219_day950.txt`.
+
+## G220: 30 random combinations of the exit settings around U44 (registered 2026-11-04, before its run)
+
+**The search** (`research/g220_exit_search.py`, seed 220): `take_profit` 1.75-2.5, `lock_at` 0.25-0.45, `lock_plus`
+1-5, `time_stop` 30-60, `late_lock_from` 14:00 / 15:00, `time_lock` 30 / 60; row 0 is U44. **Screen and adoption as
+G209's**, against U44 (the chart's nets at least U44's on all three sets, no −$1,000 day, the floor never touched; then
+the best window to NinjaTrader's execution and the 526 starts, G78's rule, no more than 28 lost).
