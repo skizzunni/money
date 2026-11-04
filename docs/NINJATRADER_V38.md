@@ -4549,3 +4549,9 @@ Log: `verification/noise_v2/g147_search.txt`.
 Adopted: G119 (U30), G120 + G121 (U31/U32, up to 50 MNQ), G125 (U33), G142 (U34). Measurements: G122, G123, G134,
 G144, the lost-account anatomy, G141's monthly starts. The rest rejected, most on one part of the rule (one account,
 or the window by under $100).
+
+## G148: G131's 2x with the day guard on U34, under the guard's slippage (registered 2026-11-04, before its run)
+
+**The variant:** U34 with `day_guard` 900 (once the floor has stopped), `room_mult` 2.0 from $3,000 of room, run with
+`guard_slip_pts` 2 (every guard fill 2 points worse). U34's faster steps let the 2x bind more often than on U33.
+**Adopt on G78's rule** against U34 (unstressed), all of it under the stress.
