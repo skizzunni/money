@@ -282,7 +282,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 return p;
             }
         }
-        public double SimNetLiq { get; set; }  // tests: the account's net liquidation, whatever the strategy did
+        public double SimNetLiq { get; set; }  // tests: the account's net liquidation, whatever the strategy did (< 0: 0)
         public bool SimSplitFills { get; set; }  // tests: each entry fills in two executions (two trade records)
         public string SimLiqFile { get; set; }  // tests: the account's net liquidation at each bar, one per line
         public string SimWithdraw { get; set; }  // tests: "bar:amount": a payout leaves the account at that bar
@@ -676,6 +676,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 double out_ = CurrentBar >= withdrawBar ? withdrawAmount : 0;
                 if (SimLiqFile != null) return liqs[CurrentBar] - out_;
                 if (SimNetLiq > 0) return SimNetLiq;
+                if (SimNetLiq < 0) return 0;  // tests: a connection that reports no balance
                 return 50000 + SystemPerformance.AllTrades.TradesPerformance.Currency.CumProfit + open() - out_;
             };
             Account.Realized = delegate

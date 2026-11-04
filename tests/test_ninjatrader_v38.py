@@ -729,3 +729,58 @@ def test_v38_giveback_brake(sim, sample_1m, tmp_path):  # noqa: F811
             assert math.isclose(float(a[6]), t.pnl, abs_tol=1e-6), (a, t)
         qtys[gb] = sum(t.qty for t in py)
     assert qtys[0.9] < qtys[0.0]
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+def test_v38_live_account_dashboard(sim, sample_1m, tmp_path):  # noqa: F811
+    """Live, the dashboard tracks the account itself: its name, balance and net liquidation, today's realized and open
+    P/L, the trades closed live, and the prop floor from the account's own balance (the higher of its starting balance
+    and its balance at go-live, less the trailing drawdown, never above the start) with the room above it. With an
+    account $1,700 below its start (net liquidation $48,300 on a 50K: $300 of room), the dashboard flags the
+    difference from the strategy's own count, and no trade risks more than the account's room: the trades shrink.
+    With the room check off, live trades are the backtest's."""
+    bars = resample(sample_1m, "5min")
+    path = tmp_path / "bars.csv"
+    with path.open("w") as f:
+        for t, r in zip(bars.index, bars.itertuples(), strict=True):
+            f.write(f"{t:%Y-%m-%d %H:%M},{r.open!r},{r.high!r},{r.low!r},{r.close!r}\n")
+    base = [DOTNET, str(sim), str(path), "5", "Strategy=V38", *GROW_ARGS]
+
+    def go(*extra):
+        r = subprocess.run([*base, *extra], capture_output=True, text=True, env=ENV)
+        assert r.returncode == 0, r.stderr[-2000:]
+        out = r.stdout.splitlines()
+        return [x.split(",")[1:] for x in out if x.startswith("T,")], [x.split(",")[1:] for x in out
+                                                                        if x.startswith("TN,")], r.stdout
+
+    hist, hist_q, _ = go()
+    live, live_q, out = go("SimRealtimeFrom=1000", "SimNetLiq=48300")
+    dash = [x for x in out.splitlines() if x.startswith("D,")][0]
+    assert "LIVE account Sim101: balance $" in dash and "net liq $48300.00" in dash
+    assert "Today on the account: realized $" in dash and "Live trades since enabled: " in dash
+    assert "Prop floor (from the account): $48000.00, room $300.00, profit $-1700.00" in dash
+    assert "CHECK: the strategy counts $" in dash and "(trades are sized to the account's)" in dash
+    late = [int(q[1]) for t, q in zip(live, live_q, strict=True) if int(t[1]) >= 1000]
+    late_hist = [int(q[1]) for t, q in zip(hist, hist_q, strict=True) if int(t[1]) >= 1000]
+    assert sum(late) < sum(late_hist), "live with $300 of room: fewer or smaller trades than the backtest's"
+    off, _, _ = go("SimRealtimeFrom=1000", "SimNetLiq=48300", "SizeToAccountRoom=False")
+    assert off == hist, "the room check off: live trades are the backtest's"
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+def test_v38_live_without_account_values(sim, sample_1m, tmp_path):  # noqa: F811
+    """A connection that reports no account balance (net liquidation 0) must not stop the trading: the account-room
+    check is not used, the trades are the backtest's, and the dashboard says it is waiting for the balance."""
+    bars = resample(sample_1m, "5min")
+    path = tmp_path / "bars.csv"
+    with path.open("w") as f:
+        for t, r in zip(bars.index, bars.itertuples(), strict=True):
+            f.write(f"{t:%Y-%m-%d %H:%M},{r.open!r},{r.high!r},{r.low!r},{r.close!r}\n")
+    base = [DOTNET, str(sim), str(path), "5", "Strategy=V38", *GROW_ARGS]
+    hist = [x for x in subprocess.run(base, capture_output=True, text=True, env=ENV).stdout.splitlines()
+            if x.startswith("T,")]
+    r = subprocess.run([*base, "SimRealtimeFrom=1000", "SimNetLiq=-1"], capture_output=True, text=True, env=ENV)
+    assert r.returncode == 0, r.stderr[-2000:]
+    live = [x for x in r.stdout.splitlines() if x.startswith("T,")]
+    assert live == hist
+    assert "Prop floor: waiting for the account's balance" in [x for x in r.stdout.splitlines() if x.startswith("D,")][0]

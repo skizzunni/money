@@ -3804,3 +3804,37 @@ not allowed (`verification/noise_v2/g100_gap_squeeze.txt`).
 
 **Scorecard, G44-G100:** 57 rounds. Adopted: G60 (U19), G67b (U20), G67's data fix, G79 (U22), G80 (U23), G82 (U24),
 G84 (U25), G97 (U26), G99c (U27). Rejected: 45. Measurements: G54, G55, G88.
+
+**U28 (2026-11-04): the dashboard tracks the live account, and trades never risk more than the account's own room.**
+At the user's ask (the dashboard must follow the live account, and the strategy must trade once an account is
+connected). Before this, the dashboard's "Account P/L" was the strategy's own fills, which in NinjaTrader include the
+backtest it replays on the chart's history before going live.
+- **New group "6. Prop account":** its starting balance (**$50,000**), its highest end-of-day balance so far (0 = the
+  start), and "never risk more than the account's own room above its floor (live)" (**on**).
+- **Live, the dashboard now shows** the account's name, balance and net liquidation, today's realized and open P/L
+  (from the account), the trades closed live since enabling (`SystemPerformance.RealTimeTrades`), and the prop floor
+  from the account's own balance (its highest end-of-day balance, at least the start and the balance at go-live, less
+  the trailing drawdown, never above the start) with the room above it and the profit. If the strategy counts more room
+  than the account has, a CHECK line says so. Before going live it says it will show the account once enabled. The
+  old line is now "Strategy P/L (its fills, history and live)".
+- **The room cap:** live, a new trade (the bot's, gap and go, the fill-ins) never risks more than the account's room
+  above its floor; the floor's high follows the account's balance at each day's close. It only ever makes a trade
+  smaller. It is not used while the connection reports no balance (net liquidation 0), so it can't block trading, and
+  not in Evaluation (no trailing floor). Backtests are unchanged.
+- **Tests:** `test_v38_live_account_dashboard` (live on an account $1,700 under its start: the dashboard shows the
+  account, the floor at $48,000 and $300 of room, the CHECK line, and the trades shrink; with the check off, the live
+  trades are the backtest's) and `test_v38_live_without_account_values` (a connection with no balance: the trades are
+  the backtest's and the dashboard says it is waiting). All 35 v3.8 tests and the other NinjaTrader tests pass (168).
+
+**Will it trade once an account is connected? The conditions, all checked in the code (`OnBarUpdate`):**
+1. **The chart:** MNQ (front month), a **5-minute** chart (any minute length that divides 30 runs; the 5-minute one is
+   the tested one), Trading hours CME US Index Futures ETH, **Days to load 120 or more**. Any other bar type stops it
+   with a setup warning on the dashboard.
+2. **The strategy's settings:** Mode Funded growth, **"Trailing drawdown and contract steps from date" = your account's
+   first trading day** (blank counts the chart's history as your account; a bad stretch there can leave it thinking
+   it is at the floor and not trading), Account = your prop account, Calculate On bar close, Place orders on (default).
+   Prop account starting balance: the account's start ($50,000), and its highest end-of-day balance if it has one.
+3. **Enabling:** with the default "Wait until flat", if the replayed history ends in a position the strategy waits for
+   that to close (the same day at most), then trades. The dashboard says LIVE with the account's name once it is.
+4. **When it trades:** a gap-and-go trade at 09:35 New York on gap days, the bot's checks every half hour 10:00-15:00,
+   and once the floor has stopped, the fill-ins. About 7 days in 10 have a trade (the model); some days none.

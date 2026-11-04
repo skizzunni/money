@@ -140,6 +140,9 @@ namespace NinjaTrader.NinjaScript.Strategies
         // the account's own numbers (the strategy's real fills), set by the wrapper before each bar; every risk limit
         // uses the worse of these and the model's, so a live fill worse than the model's never adds risk (NaN: unset)
         public double ExtDayPnl = double.NaN, ExtEquity = double.NaN;
+        // live: the prop account's own room above its trailing floor, from the account's balance (NaN = not used); a new
+        // trade never risks more than it
+        public double ExtRoom = double.NaN;
         double DayEff { get { return double.IsNaN(ExtDayPnl) ? DayPnl : Math.Min(DayPnl, ExtDayPnl); } }
         double EqEff { get { return double.IsNaN(ExtEquity) ? equity : Math.Min(equity, ExtEquity); } }
         public double Equity { get { return EqEff; } }
@@ -595,6 +598,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 double floor = Math.Min(trailPeak - s.TrailDD, trailBase);  // it stops at the starting balance
                 room = Math.Min(room, EqEff - floor);
             }
+            if (!double.IsNaN(ExtRoom))
+                room = Math.Min(room, ExtRoom);
             return room;
         }
 
@@ -743,6 +748,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             "2027-01-27,2027-03-17,2027-04-28,2027-06-09,2027-07-28,2027-09-15,2027-10-27,2027-12-08";
         V38Engine engine;
         V38Engine shadow;  // G87: the 1-contract paper record behind the near-floor gate
+        double propHigh = double.NaN;  // live: the prop account's highest end-of-day balance, for its trailing floor
         readonly List<double> shadowEod = new List<double>();
         int shadowSessions;
         TimeZoneInfo newYork;
@@ -832,6 +838,9 @@ namespace NinjaTrader.NinjaScript.Strategies
                 SizeSlip = 3;  // G97 (G79: 2)
                 MoreDaysQty2Room = 6000;  // G97
                 GivebackBrake = 0.5;  // G99c
+                PropStartBalance = 50000;
+                PropHighBalance = 0;
+                SizeToAccountRoom = true;
                 NearFloorGate = 0;  // G87b: off (it lost more accounts)
                 TestedWinRate = 61.2;
             }
@@ -955,6 +964,13 @@ namespace NinjaTrader.NinjaScript.Strategies
                     setupWarnings.Add(dqw);
                     Print("MnqNoiseV38 WARNING: " + dqw);
                 }
+                if (PropStartBalance > 0 && TrailDD > 0 && Account != null)  // the prop account's floor from its own balance
+                {
+                    double bal = Math.Max(0, Account.Get(AccountItem.CashValue, Currency.UsDollar));
+                    propHigh = Math.Max(Math.Max(PropStartBalance, PropHighBalance), bal);
+                    Print("MnqNoiseV38: live on " + Account.Name + ", balance $" + bal.ToString("0.00", CultureInfo.InvariantCulture) +
+                          ", prop floor $" + PropFloor().ToString("0.00", CultureInfo.InvariantCulture));
+                }
                 foreach (string w in setupWarnings)  // once, as the strategy goes live
                     Say("setup", "SETUP WARNING: " + w);
                 milestoneDone = MilestoneStep > 0 ? (int)Math.Floor(Math.Max(0, SinceStart()) / MilestoneStep) : 0;
@@ -1026,6 +1042,10 @@ namespace NinjaTrader.NinjaScript.Strategies
             engine.ExtEquity = cum;
             engine.ExtDayPnl = cum - realDayStart;
             int before = engine.Trades.Count;
+            // live: never more risk than the prop account's own room (only once the account reports a balance; a connection
+            // that reports 0 is not used, so it can't block the trades)
+            engine.ExtRoom = State == State.Realtime && SizeToAccountRoom && !double.IsNaN(propHigh) && AccountValuesOk()
+                             ? PropRoom() : double.NaN;
             if (shadow != null)  // G87: the shadow first; at a session's first bar, the gate from the last session's close
             {
                 if (tMin == V38Engine.RthOpen)
@@ -1147,6 +1167,8 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (State != State.Realtime || summaryDay == realDay || realDay.Length == 0)
                 return;
             summaryDay = realDay;
+            if (!double.IsNaN(propHigh) && Account != null)  // the prop floor trails the end-of-day balance
+                propHigh = Math.Max(propHigh, Account.Get(AccountItem.CashValue, Currency.UsDollar));
             double day = cum - realDayStart;
             Say("day", "Day done " + realDay + ": " + (day >= 0 ? "+$" : "-$") + Math.Abs(day).ToString("0.00", CultureInfo.InvariantCulture) +
                 " in " + realDayTrades + " trades (" + realDayWins + " winners), total $" + cum.ToString("0.00", CultureInfo.InvariantCulture) +
@@ -1309,6 +1331,54 @@ namespace NinjaTrader.NinjaScript.Strategies
             maxDd = Math.Max(maxDd, peak - net);
         }
 
+        // live: the prop account's trailing floor (its highest end-of-day balance less the trailing drawdown, stopping at
+        // the starting balance) and the room above it from the account's net liquidation
+        double PropFloor()
+        {
+            return Math.Min(propHigh - TrailDD, PropStartBalance);
+        }
+
+        bool AccountValuesOk()
+        {
+            return Account != null && Account.Get(AccountItem.NetLiquidation, Currency.UsDollar) > 0;
+        }
+
+        double PropRoom()
+        {
+            return Account.Get(AccountItem.NetLiquidation, Currency.UsDollar) - PropFloor();
+        }
+
+        // the dashboard's live-account lines: the real account, the live trades, and the prop floor from the balance
+        string LiveAccountLines()
+        {
+            if (State != State.Realtime || Account == null)
+                return "Account: shows the live account once enabled on it (now: the chart's history)\n";
+            double bal = Account.Get(AccountItem.CashValue, Currency.UsDollar);
+            double nl = Account.Get(AccountItem.NetLiquidation, Currency.UsDollar);
+            double rz = Account.Get(AccountItem.RealizedProfitLoss, Currency.UsDollar);
+            double ur = Account.Get(AccountItem.UnrealizedProfitLoss, Currency.UsDollar);
+            string txt = "LIVE account " + Account.Name + ": balance $" + bal.ToString("0.00", CultureInfo.InvariantCulture) +
+                         ", net liq $" + nl.ToString("0.00", CultureInfo.InvariantCulture) + "\n" +
+                         "Today on the account: realized $" + rz.ToString("0.00", CultureInfo.InvariantCulture) +
+                         ", open $" + ur.ToString("0.00", CultureInfo.InvariantCulture) + "\n" +
+                         "Live trades since enabled: " + SystemPerformance.RealTimeTrades.Count + ", $" +
+                         SystemPerformance.RealTimeTrades.TradesPerformance.Currency.CumProfit.ToString("0.00", CultureInfo.InvariantCulture) + "\n";
+            if (!double.IsNaN(propHigh) && !AccountValuesOk())
+                txt += "Prop floor: waiting for the account's balance (the connection reports none yet)\n";
+            else if (!double.IsNaN(propHigh))
+            {
+                double room = PropRoom();
+                txt += "Prop floor (from the account): $" + PropFloor().ToString("0.00", CultureInfo.InvariantCulture) +
+                       ", room $" + room.ToString("0.00", CultureInfo.InvariantCulture) +
+                       ", profit $" + (nl - PropStartBalance).ToString("0.00", CultureInfo.InvariantCulture) + "\n";
+                if (!double.IsNaN(engine.TrailFloorRoom) && engine.TrailFloorRoom > room + 100)
+                    txt += "CHECK: the strategy counts $" + engine.TrailFloorRoom.ToString("0", CultureInfo.InvariantCulture) +
+                           " of room, the account has $" + room.ToString("0", CultureInfo.InvariantCulture) +
+                           (SizeToAccountRoom ? " (trades are sized to the account's)" : "") + "\n";
+            }
+            return txt;
+        }
+
         void Dashboard(DateTime endNy)
         {
             double cumReal = SystemPerformance.AllTrades.TradesPerformance.Currency.CumProfit;
@@ -1316,7 +1386,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             string goal = Goal > 0 ? "Goal $" + Goal.ToString("0", CultureInfo.InvariantCulture) + ": $" +
                           sinceStart.ToString("0", CultureInfo.InvariantCulture) + " so far (" +
                           (100 * sinceStart / Goal).ToString("0.0", CultureInfo.InvariantCulture) + "%)\n" : "";
-            string txt = goal + "Account P/L (real fills): $" + cumReal.ToString("0.00", CultureInfo.InvariantCulture) +
+            string txt = goal + LiveAccountLines() + "Strategy P/L (its fills, history and live): $" + cumReal.ToString("0.00", CultureInfo.InvariantCulture) +
                          ", today $" + (cumReal - realDayStart).ToString("0.00", CultureInfo.InvariantCulture) + "\n" +
                          "Next trade: " + engine.NextQty + " MNQ, room today $" + (double.IsNaN(engine.DayRoom) ? "-" : Math.Max(0, engine.DayRoom).ToString("0", CultureInfo.InvariantCulture)) + "\n" +
                          (setupWarnings.Count > 0 ? "SETUP WARNING (" + setupWarnings.Count + "): " + setupWarnings[0] + "\n" : "Setup: OK\n") +
@@ -1555,6 +1625,20 @@ namespace NinjaTrader.NinjaScript.Strategies
         [Range(0, 10000)]
         [Display(Name = "Loss guard, live: flat and done for the day at this loss today, closed + open, $ (0 = off)", Order = 13, GroupName = "1. Size and risk")]
         public double LossGuard { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, 10000000)]
+        [Display(Name = "Prop account: its starting balance, $ (live: the dashboard's floor and room from the account; 0 = off)", Order = 0, GroupName = "6. Prop account")]
+        public double PropStartBalance { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, 10000000)]
+        [Display(Name = "Prop account: its highest end-of-day balance so far, $ (0 = the starting balance; the higher of this and today's is used)", Order = 1, GroupName = "6. Prop account")]
+        public double PropHighBalance { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Prop account: never risk more than the account's own room above its floor (live)", Order = 2, GroupName = "6. Prop account")]
+        public bool SizeToAccountRoom { get; set; }
 
         [NinjaScriptProperty]
         [Display(Name = "Alerts (live): entries, exits, time stop, loss guard, setup warnings", Order = 0, GroupName = "5. Alerts")]
