@@ -3654,3 +3654,11 @@ above U25), NQ's 2015 account lived ($431,394 / $427,989), but a −$1,030 NQ da
 
 **Scorecard, G44-G93:** 50 rounds. Adopted: G60 (U19), G67b (U20), G67's data fix, G79 (U22), G80 (U23), G82 (U24),
 G84 (U25). Rejected: 40. Measurements: G54, G55, G88.
+
+## G94: G93's 0.21 stop with a 3-point sizing allowance (registered 2026-11-04, before its run)
+
+**The idea:** G93 failed only on one −$1,030 day (a stop filled past its price on a full-size day). G76/G79's sizing
+allowance is what removed such days before; 3 points (from 2) keeps $6 a contract more of the room for it.
+**The variant:** U25 with `stop_buffer` 0.21 and `size_slip_pts` 3. **Adopt on G78's rule**, against U25.
+**Caution, written before the run:** this is the third stop-buffer variant in a row (G92, G93), so a pass carries
+more chance of luck than a first try; the 89 start dates are the check on that.

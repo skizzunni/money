@@ -94,7 +94,10 @@ EXTRA = {"base": {}, "gentle": {"steps_after_lock": True}, "cap10": {"size_up_to
          "u25_150p": {"gap_go": True, "gap_go_skip_month_first": True, "gap_go_max_qty": 1, "gap_go_locked_qty": 10,
                       "gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
                       "fill_min_room": 3000.0, "size_slip_pts": 2.0, "daily_loss_limit": 2700.0,
-                      "trail_dd": 4500.0, "protect_room": 1000.0}}[VARIANT]
+                      "trail_dd": 4500.0, "protect_room": 1000.0},
+         "u25sb21s3": {"gap_go": True, "gap_go_skip_month_first": True, "gap_go_max_qty": 1, "gap_go_locked_qty": 10,
+                       "gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
+                       "fill_min_room": 3000.0, "size_slip_pts": 3.0, "stop_buffer": 0.21}}[VARIANT]
 
 
 def with_1600(bars: pd.DataFrame, m: int) -> pd.DataFrame:
