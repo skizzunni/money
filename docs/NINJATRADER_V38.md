@@ -4145,3 +4145,19 @@ G78's rule). 30 MNQ is 3 minis' worth, inside a 50K account's usual position lim
 limit (5 minis). **Variants:** U31 (30) with `size_up_to` 40 and 50. **Adopt (the better window net of those that
 pass) on G78's rule** against U31 (chart / NinjaTrader window $50,246 / $50,322, NQ $544,740 / $543,365, index
 $731,161 / $721,212; 9 lost or frozen of 89).
+
+**G121 result (run once, 2026-11-04): 50 passes and is adopted (U32); 40 fails on NQ.**
+
+| | window, chart / NinjaTrader | NQ, chart / NinjaTrader | index, chart / NinjaTrader | 89 starts lost or frozen |
+|---|---|---|---|---|
+| U31 (30) | $50,246 / $50,322 | $544,740 / $543,365 | $731,161 / $721,212 | 9 |
+| 40 | $50,252 / $50,328 | $544,597 / **$542,802** | $759,117 / $748,724 | 9 |
+| **50** | **$50,252 / $50,328** | $555,059 / $553,246 | $784,932 / $773,197 | 9 |
+
+The floor never touched, no −$1,000 day (worst −$986). The window hardly reaches 30 contracts (+$6); the gain is on
+the long histories, once an account has grown. Closed drawdown on the index $26,289 → $32,071.
+Log: `verification/noise_v2/g121_max40_50.txt`.
+
+**U31/U32 (2026-11-04): up to 50 MNQ (G120, G121).** In Funded growth (the 50K) on a 5-minute chart "Most contracts"
+is 50 (U29: 20); 15 elsewhere. 50 MNQ is 5 minis' worth, the usual 50K position limit. The bot steps one contract
+per $1,500 of profit, so it passes 20 only after about $28,500 and reaches 50 after about $73,500.

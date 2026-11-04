@@ -899,7 +899,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 {
                     Contracts = 1; MaxLoss = 187.5; AfterLossMaxLoss = 250; DailyLoss = 900; TrailDD = 2000;
                     ProfitStep = 1500; SizeByOwnStop = true; TimeStop = 60;
-                    MaxContracts = Mode == "Funded growth" && minutes == 5 ? 20 : 15;  // G106: 20 on the 50K's 5-minute chart
+                    MaxContracts = Mode == "Funded growth" && minutes == 5 ? 50 : 15;  // G121: 50 on the 50K's 5-minute chart (G106: 20, G120: 30)
                     // G40: a bigger account trades the 50K's size; its larger limits are cushion (a $2,000 / $3,000
                     // daily loss and a $3,000 / $4,500 trailing drawdown; the bot's budget is 90% of the daily loss)
                     if (Mode == "Funded growth 100K") { DailyLoss = 1800; TrailDD = 3000; LossGuard = 1900; }

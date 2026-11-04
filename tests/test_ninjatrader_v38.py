@@ -27,7 +27,7 @@ CFG = NoiseConfig(**{**V21, "qty": 1, "lookback": 14, "trail_from": "", "tv_path
 # funded growth (docs/NINJATRADER_V38.md): v3.6's sizing at $900 a day and a $2,000 end-of-day trailing drawdown, and
 # G6's 60-minute time stop
 GROW = NoiseConfig(**{**V21, "qty": 1, "lookback": 14, "max_loss_per_trade": 187.5, "after_loss_ml_mult": 250 / 187.5,
-                      "trail_dd": 2000.0, "trail_from": "", "profit_step": 1500.0, "size_up_to": 20,
+                      "trail_dd": 2000.0, "trail_from": "", "profit_step": 1500.0, "size_up_to": 50,
                       "budget_actual": True, "time_stop": 60, "tv_path": False, "gap_go": True, "gap_go_max_qty": 1,
                       "gap_go_locked_qty": 10, "trail_cap": 0.0,
                       # G79: More trading days and the 2-point sizing allowance
