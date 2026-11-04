@@ -3670,3 +3670,10 @@ accounts. 0.24 and 2 points stay (`verification/noise_v2/g94_sb21_s3.txt`, `g35_
 
 **Scorecard, G44-G94:** 51 rounds. Adopted: G60 (U19), G67b (U20), G67's data fix, G79 (U22), G80 (U23), G82 (U24),
 G84 (U25). Rejected: 41. Measurements: G54, G55, G88.
+
+## G95: calm-stretch fill-ins at 1 MNQ (registered 2026-11-04, before its run)
+
+**The idea:** on a calm stretch (the last 10 sessions' ranges under 0.7 of the last 40's) the bot takes no entries.
+U22's fill-in rule extended: once the floor has stopped and the account is $3,000 above it, the bot's signals on calm
+days trade at 1 MNQ at its usual max loss a contract (`calm_small`), counted as fill-ins.
+**The variant:** U25 with `calm_small`. **Adopt on G78's rule**, against U25.

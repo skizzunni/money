@@ -335,6 +335,7 @@ class NoiseConfig:
     # research (G87): within protect_room of the trailing floor, no new trade on protect_dates (YYYY-MM-DD, comma
     # separated: the days after a shadow record of the bot closed below its recent average; research/shadow_gate.py)
     protect_room: float = 0.0
+    calm_small: bool = False  # G95: on a calm stretch, the bot's signals at 1 contract while fill_ok() (fill-ins)
     protect_dates: str = ""
     # research (G67): once the trailing floor has stopped at the start (trail_cap), a gap trade may take up to this
     # many contracts in place of gap_go_max_qty (0 = off)
@@ -627,7 +628,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             return False
         if against_trend(d) and not cfg.trend_qty_div and not (cfg.trend_small and fill_ok()):
             return False
-        if calm and not cfg.calm_div:
+        if calm and not cfg.calm_div and not (cfg.calm_small and fill_ok()):
             return False
         if cfg.week_stop and eq_curve[-1] - week_start_eq <= -cfg.week_stop:
             return False
@@ -1102,6 +1103,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                         ml_next *= cfg.trend_with_mult * cfg.trend_with_ml
                     if calm and cfg.calm_div:
                         q_next = max(1, round(q_next / cfg.calm_div))
+                    if calm and cfg.calm_small:  # G95: a calm-day fill-in, 1 contract at its max loss a contract
+                        ml_next, q_next, fill_next = ml_next / q_next, 1, True
                     if cfg.confirm_map is not None and cfg.confirm_div and not confirmed(d):
                         q_next = max(1, round(q_next / cfg.confirm_div))
                     if cfg.eq_n and len(eq_curve) > cfg.eq_n:
