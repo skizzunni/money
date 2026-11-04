@@ -4703,3 +4703,13 @@ and 2.5 from the 13:30 check. G135's screen against U34, then confirmation for t
 **G159 result (run once, 2026-11-04): none passes the screen.** From 15:00 at 1.0: $54,687 / $504,280 / $734,852;
 at 1.5: $54,904 / **$519,757** / $780,321; from 13:30 at 2.5: $54,883 / $564,979 / **$766,103** (U34 $54,879 /
 $554,388 / $786,440). Log: `verification/noise_v2/g159_late_tp.txt`.
+
+## G160: U29 against U34 year by year (a measurement, 2026-11-04)
+
+`research/g160_by_year.py` (`verification/noise_v2/g160_by_year.txt`), the chart's execution, net by exit year from one
+continuous account. U34 is ahead on the index in 11 of 16 years, on NQ in 5 of 11; the gain is concentrated in the
+trend years (2020: +$15,360 NQ / +$38,954 index; 2023: +$21,497 / +$11,190; 2025: +$39,391 / +$40,861) and gives some
+back elsewhere (NQ 2018 −$18,377, index 2014 −$16,889). The faster steps and 50 contracts pay most when a big year
+comes after the account has grown.
+
+**The full suite after the live fill alert and the dashboard line: 668 passed.**
