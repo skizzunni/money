@@ -149,6 +149,7 @@ class NoiseConfig:
     room_mult_locked: bool = False  # G129: room_mult only once the floor has stopped
     day_guard: float = 0.0
     guard_floor_buffer: float = 100.0
+    guard_slip_pts: float = 0.0  # research: the day guard's fill this many points worse (a fast market)
     day_stop_profit: float = 0.0  # research (G127): no new entries today once today's closed P/L is at least this, $
     skip_checks_early: bool = False  # research (G125): skip_checks only until the floor has stopped
     after_target_done: bool = False  # research: no new entries today after a take-profit fills
@@ -1004,6 +1005,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             if (cfg.time_stop and not locked and entry_bar != i  # at the open, before any stop in the bar
                     and (i - entry_bar) * minutes >= cfg.time_stop and pos * (c[i - 1] - entry_px) < 0):
                 hit, price, reason, deferred = True, o[i] - pos * slip, "Time stop", None
+            if hit and reason == "Day guard":
+                price -= pos * cfg.guard_slip_pts
             if hit:
                 close_pos(i, price, reason)
                 events.append((i - 1 if reason == "Time stop" else i, "EXIT"))  # the time stop's alert: at the close
