@@ -4292,3 +4292,13 @@ guard's $100 floor buffer closed trades early and ended the day), NQ 2022-07 now
 **The variant:** U33 with `day_guard` 900 and `day_guard_locked` (the guard only once the floor has stopped), and
 `room_mult` 2.0 with `room_mult_room` 6000 (2x only while the account is at least $6,000 above the floor, the bot's own
 2-contract fill-in threshold, not a new number). New research settings. **Adopt on G78's rule or G99b's** against U33.
+
+**G130 result (run once, 2026-11-04): rejected on the window by $66.** Chart / NinjaTrader: window $50,152 / $50,271
+(U33 $50,219 / $50,337), NQ $672,830 / $677,861 (U33 $546,409 / $549,379), index $1,104,428 / $1,028,705 (U33
+$784,933 / $774,086); the floor never touched, no −$1,000 day; 89 starts 8 lost or frozen (as U33). Log:
+`verification/noise_v2/g130_guard_room6000.txt`.
+
+## G131: G130 with 2x from $3,000 of room (registered 2026-11-04, before its run)
+
+**The variant:** G130 with `room_mult_room` 3000 (the "More trading days" cushion, the bot's other existing threshold).
+**Adopt on G78's rule or G99b's** against U33.
