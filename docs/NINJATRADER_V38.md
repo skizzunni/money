@@ -3903,3 +3903,22 @@ account to the floor about twice as often. The fill-ins stay behind the $3,000 c
 **Variants:** 5, 8 and 10 MNQ. **Measured on G35's 89 fresh-account starts:** the share at +$3,000 within 7 calendar
 days, lost or frozen within 21 months, and the median net. No adoption as the default; the best (the most at +$3,000
 in a week with lost or frozen at most 2x U28's 10) becomes an opt-in setting, with its odds stated.
+
+**G103 result (run once, 2026-11-04): none qualifies.** G35's 89 fresh-account starts:
+
+| | +$3,000 within 7 days | within 30 days | lost or frozen in 21 months | median 21-month net |
+|---|---|---|---|---|
+| U28 (today) | 0.0% | 4.5% | 10 of 89 | $39,445 |
+| sprint 5 MNQ | 7.9% | 19.1% | 21 of 89 | $37,495 |
+| sprint 8 MNQ | 13.5% | 21.3% | 22 of 89 | $37,335 |
+| sprint 10 MNQ | 15.7% | 21.3% | 24 of 89 | $37,478 |
+
+Every sprint more than doubles the lost accounts (the bar was at most 2x U28's 10), so none is recommended. The setting
+("Sprint", `SprintContracts`) stays in the file at 0 (off), with these odds, for an account the user can afford to
+lose (`verification/noise_v2/g103_sprint.txt`).
+
+**Weekly profit, measured on the window's account (U28, NinjaTrader's execution, from 2025-01-02):** average $482 a
+week, median $7; weeks at $3,000 or more: 5% overall, 0% in the first 15 months, 15-23% once the account had grown
+(2026 Q2-Q3, at 10-15 contracts, average $800-1,640 a week). About 4 weeks in 10 lose money in every phase.
+
+**Scorecard, G44-G103:** 60 rounds. Adopted 9 (and the data fix); rejected 48; measurements 3.

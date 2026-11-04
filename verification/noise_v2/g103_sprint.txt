@@ -1,0 +1,6 @@
+index sprint10 starts 54 lost (at the floor) 16 dead (lost or frozen) 16 below start 12 median net 31051 worst net -1999 lowest point -1999 reached +2000 43
+nq sprint10 starts 35 lost (at the floor) 8 dead (lost or frozen) 8 below start 6 median net 43275 worst net -1999 lowest point -1999 reached +2000 29
+index sprint5 starts 54 lost (at the floor) 13 dead (lost or frozen) 13 below start 11 median net 34101 worst net -2005 lowest point -2005 reached +2000 44
+nq sprint5 starts 35 lost (at the floor) 8 dead (lost or frozen) 8 below start 7 median net 43304 worst net -1999 lowest point -1999 reached +2000 30
+index sprint8 starts 54 lost (at the floor) 14 dead (lost or frozen) 14 below start 11 median net 31024 worst net -1999 lowest point -1999 reached +2000 45
+nq sprint8 starts 35 lost (at the floor) 8 dead (lost or frozen) 8 below start 7 median net 43305 worst net -1999 lowest point -1999 reached +2000 29
