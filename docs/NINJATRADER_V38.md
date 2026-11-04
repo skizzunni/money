@@ -3978,3 +3978,9 @@ U29); but the window $46,145 / $46,283 against U29's $46,656 / $46,828. The rule
 
 **The idea:** the drive fill-in needs a 09:30 body of half the 14-session average; at 0.3 more cushioned days trade.
 **The variant:** U29 with `gap_go_drive_k` 0.3. **Adopt on G78's rule**, against U29.
+
+**G108 result (run once, 2026-11-04): rejected on NinjaTrader's index.** Window $48,327 / $48,390 (above U29), 75% of
+the window's days traded, index $663,561 (chart, above) but **$600,246** in NinjaTrader's (U29: $648,812); 89 start
+dates 10 lost or frozen, medians $47,442 / $35,758 (`verification/noise_v2/g108_drive03.txt`).
+
+**Scorecard, G44-G108:** 65 rounds. Adopted 10 (and the data fix); rejected 52; measurements 3.
