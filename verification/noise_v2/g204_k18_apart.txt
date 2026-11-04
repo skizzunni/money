@@ -1,0 +1,14 @@
+index g204no_giveback_brake starts 160 lost (at the floor) 4 dead (lost or frozen) 4 below start 2 median net 32059 worst net -84 lowest point -1833 reached +2000 160
+nq g204no_giveback_brake starts 103 lost (at the floor) 8 dead (lost or frozen) 8 below start 5 median net 44475 worst net -1995 lowest point -1995 reached +2000 98
+index g204no_early_daily_loss starts 160 lost (at the floor) 7 dead (lost or frozen) 7 below start 4 median net 26753 worst net -1999 lowest point -1999 reached +2000 158
+nq g204no_early_daily_loss starts 103 lost (at the floor) 7 dead (lost or frozen) 7 below start 5 median net 28971 worst net -1995 lowest point -1995 reached +2000 98
+index g204no_max_losers starts 160 lost (at the floor) 5 dead (lost or frozen) 5 below start 3 median net 23248 worst net -1999 lowest point -1999 reached +2000 157
+nq g204no_max_losers starts 103 lost (at the floor) 9 dead (lost or frozen) 9 below start 7 median net 23437 worst net -1995 lowest point -1995 reached +2000 98
+index g204no_time_stop starts 160 lost (at the floor) 4 dead (lost or frozen) 4 below start 3 median net 21550 worst net -1996 lowest point -1996 reached +2000 157
+nq g204no_time_stop starts 103 lost (at the floor) 9 dead (lost or frozen) 9 below start 8 median net 41241 worst net -1998 lowest point -1998 reached +2000 96
+index g204no_range_pos_min starts 160 lost (at the floor) 19 dead (lost or frozen) 19 below start 14 median net 25713 worst net -1999 lowest point -1999 reached +2000 148
+nq g204no_range_pos_min starts 103 lost (at the floor) 10 dead (lost or frozen) 10 below start 8 median net 44308 worst net -1999 lowest point -1999 reached +2000 96
+index g204no_gap_go_k starts 160 lost (at the floor) 6 dead (lost or frozen) 6 below start 3 median net 25496 worst net -113 lowest point -1833 reached +2000 159
+nq g204no_gap_go_k starts 103 lost (at the floor) 7 dead (lost or frozen) 7 below start 5 median net 25460 worst net -1995 lowest point -1995 reached +2000 98
+index g204edl750 starts 160 lost (at the floor) 8 dead (lost or frozen) 8 below start 4 median net 33267 worst net -1999 lowest point -1999 reached +2000 156
+nq g204edl750 starts 103 lost (at the floor) 8 dead (lost or frozen) 8 below start 8 median net 49488 worst net -1832 lowest point -1944 reached +2000 97

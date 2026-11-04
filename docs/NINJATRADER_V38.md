@@ -5325,3 +5325,9 @@ trigger), and the $750 early budget alone (it acts only before the floor stops).
 the 1st (U41 17, k18 12). **Stage B:** the one with the fewest lost (ties: the higher median), if 13 or fewer, goes on
 to the mid-month starts and the full sets in both executions. **Adopted on G99b's rule** (at least 4 fewer of the 526
 than U41's 38, every net at least 95%) or G78's.
+
+**G204 stage A (2026-11-04):** 263 starts on the 1st, lost or frozen (U41 17, k18 12): without the 0.6 brake **12**
+(medians $32,059 / $44,475, against k18's $27,237 / $28,971), without the time stop 13, without the gap trigger 13,
+without the early budget 14, without three losers 14, the early budget alone 16, **without the 0.7 range filter 29**:
+the range filter carries the survival gain. "Without the brake" goes on to stage B. Log:
+`verification/noise_v2/g204_k18_apart.txt`.
