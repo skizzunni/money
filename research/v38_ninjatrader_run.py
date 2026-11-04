@@ -4,7 +4,7 @@ import numpy as np, pandas as pd
 import e50_eval as E
 import t1_eval as T, v24_scan as VS
 GROW = len(sys.argv) > 1 and sys.argv[1] == "grow"
-LQ = int(os.environ.get("GAP_LOCKED", "7"))  # G67: gap and go's contracts once the floor has stopped
+LQ = int(os.environ.get("GAP_LOCKED", "10"))  # G67: gap and go's contracts once the floor has stopped
 MORE = os.environ.get("MORE_DAYS", "1") == "1"  # G72/G79: the "More trading days" switch (on by default)
 NTARGS = (["Mode=Funded growth", "TrailFrom=2025-01-02", f"GapGoLocked={LQ}", f"MoreDays={MORE}"] if GROW
           else ["Mode=Evaluation"])
