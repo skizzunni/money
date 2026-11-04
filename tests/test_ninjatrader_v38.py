@@ -32,7 +32,7 @@ GROW = NoiseConfig(**{**V21, "qty": 1, "lookback": 14, "max_loss_per_trade": 187
                       "gap_go_locked_qty": 10, "trail_cap": 0.0,
                       # G79: More trading days and the 2-point sizing allowance
                       "gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.6, "fill_after_lock": True,
-                      "fill_min_room": 3000.0, "size_slip_pts": 5.0, "fill_qty2_room": 6000.0,
+                      "fill_min_room": 2500.0, "size_slip_pts": 5.0, "fill_qty2_room": 6000.0,
                       "giveback_brake": 0.5,
                       # G119: once the floor has stopped, the trade after a loser risks $187.50 like the others
                       "after_loss_ml_locked": 1.0,

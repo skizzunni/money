@@ -4993,3 +4993,11 @@ $54,700), NQ $558,199 / $555,637 (lower), 19 lost. Small gap 0.1: window $54,638
 **Variants:** U39 with `fill_min_room` 2,500 and 3,500 (the fill-ins once the account is that far above the stopped
 floor; U39: 3,000). **Run once:** the 263 starts and the full sets in both executions. **Adopt (the better window) on
 G78's rule** against U39 (no more than 19 lost), or G99b's if it loses fewer.
+
+**G181 result (run once, 2026-11-04): $2,500 passes G99b's survival-first rule; adopted (U40).** $2,500: 263 starts
+**17 lost or frozen** (NQ 8, index 9) against U39's 19; chart / NinjaTrader window $54,622 / $54,710, NQ $563,490 /
+$560,957, index $787,085 / $774,954 (all 99.3-100% of U39's); medians $51,488 / $38,803; no −$1,000 day, the floor
+never touched. $3,500: 20 lost. Log: `verification/noise_v2/g181_cushion.txt`.
+
+**U40 (2026-11-04): More trading days from $2,500 above the stopped floor (G181; U22-U39: $3,000).** The setting
+"More trading days: cushion" defaults to 2,500.

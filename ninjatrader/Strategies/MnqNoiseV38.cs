@@ -902,7 +902,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 GapGo = true;
                 GapGoLocked = 10;  // G84 (G67b: 3, G80: 5, G82: 7; G83's 15 broke the daily limit once)
                 MoreDays = true;  // G79: on by default (with SizeSlip 2)
-                MoreDaysCushion = 3000;
+                MoreDaysCushion = 2500;  // G181 (G71: 3000)
                 SizeSlip = 5;  // G170 (G79: 2, G97: 3, G106: 4)
                 MoreDaysQty2Room = 6000;  // G97
                 GivebackBrake = 0.5;  // G99c
