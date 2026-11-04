@@ -4900,3 +4900,7 @@ One early gap contract stays. Log: `verification/noise_v2/g173_gap_qty2.txt`.
 **The idea:** G155: the brake saves accounts (35 lost without it, 32 with, on U34); G169's best combinations had 0.55.
 **Variants:** U38 with `giveback_brake` 0.55 and 0.6. **Run once:** the 263 monthly starts and the full sets in both
 executions. **Adopt (the fewest lost) on G99b's survival-first rule** against U38 (fewer than 19, every net ≥ 95%).
+
+**G174 result (run once, 2026-11-04): both rejected on NinjaTrader's index.** 0.55: 18 lost or frozen of 263, nets
+99-100% except the index in NinjaTrader's execution, **$704,967** (91% of U38's $774,859); 0.6: 17 lost, the index
+**$637,763** (82%). Log: `verification/noise_v2/g174_brake.txt`.
