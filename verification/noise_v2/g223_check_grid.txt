@@ -1,0 +1,6 @@
+{"k": 0, "proxy net": 57446, "proxy d1000": 0, "proxy floor": 0, "nq net": 587643, "nq d1000": 0, "nq floor": 0, "index net": 849992, "index d1000": 0, "index floor": 0}
+{"k": 1, "check_step": 15, "proxy net": 11789, "proxy d1000": 0, "proxy floor": 0, "nq net": 608562, "nq d1000": 0, "nq floor": 0, "index net": 1035510, "index d1000": 0, "index floor": 0}
+{"k": 2, "check_step": 15, "first_check": 585, "proxy net": 64793, "proxy d1000": 0, "proxy floor": 0, "nq net": 585198, "nq d1000": 0, "nq floor": 0, "index net": 1065541, "index d1000": 0, "index floor": 0}
+{"k": 3, "first_check": 585, "proxy net": 13980, "proxy d1000": 0, "proxy floor": 0, "nq net": 369993, "nq d1000": 0, "nq floor": 0, "index net": 352711, "index d1000": 0, "index floor": 0}
+{"k": 4, "check_step": 20, "proxy net": 95896, "proxy d1000": 0, "proxy floor": 0, "nq net": 368694, "nq d1000": 0, "nq floor": 0, "index net": 640253, "index d1000": 0, "index floor": 0}
+{"k": 5, "check_step": 15, "last_entry_end": 870, "proxy net": 66707, "proxy d1000": 0, "proxy floor": 0, "nq net": 606068, "nq d1000": 0, "nq floor": 0, "index net": 929754, "index d1000": 0, "index floor": 0}

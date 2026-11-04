@@ -5583,3 +5583,17 @@ U44 with checks every 15 minutes (`check_step` 15), the same from 09:45 (`first_
 hours, every 20 minutes, and every 15 minutes with the last entry at 14:30. **Screen as G209's** against U44 (the chart's
 nets at least U44's on all three sets, no −$1,000 day, the floor never touched). A pass is reported; the NinjaTrader
 strategy has only the half-hour grid, so adoption needs the grid built there first.
+
+**G223 result (2026-11-04): one passes the screen, and it looks fragile.** Chart's execution, window / NQ / index (U44
+$57,446 / $587,643 / $849,992): every 15 minutes $11,789 / $608,562 / $1,035,510; from 09:45 $64,793 / $585,198 /
+$1,065,541; 09:45 alone $13,980 / $369,993 / $352,711; every 20 minutes $95,896 / $368,694 / $640,253; **every 15
+minutes with the last entry at 14:30 $66,707 / $606,068 / $929,754** (passes). Neighbouring grids swing the window from
+$12k to $96k: the result depends on which checks exist, not on a steady edge. Log: `verification/noise_v2/g223_check_grid.txt`.
+
+## G224: G223's 15-minute grid (last entry 14:30) on the full checks (registered 2026-11-04, before its run)
+
+**The variant:** U44 with `check_step` 15 and `last_entry_end` 870. **Run once:** NinjaTrader's execution on the full
+sets and the 526 starts. **Adopt on G78's rule** against U44 (higher nets on all three in both executions, no −$1,000 day,
+the floor never touched, no more than 28 lost), **and** a robustness condition given G223's swings: the same at 2 ticks
+must lose no more of the 526 than U44 at 2 ticks (51). Adoption also needs the grid built in NinjaTrader with parity
+tests; if that can't be done and tested today, a pass is recorded as pending, not adopted.
