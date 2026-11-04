@@ -218,6 +218,8 @@ def test_v38_today_line(sim, sample_1m, tmp_path):  # noqa: F811
             assert "shorts yes" in rule or ("shorts after 14:00" in rule and hhmm.hour >= 14), (t, rule)
     rules = {v[0] for v in today.values()}
     assert any("shorts no (uptrend" in x for x in rules) and any("longs yes; shorts yes" in x for x in rules), rules
+    # U33: until the floor stops (it doesn't in this sample) the line names the checks without entries
+    assert all("no entries at 13:00, 14:30 until the floor stops" in x for x in rules if x.startswith("longs")), rules
     for b, (_, nxt) in today.items():
         end = bars.index[b] + pd.Timedelta(minutes=5)
         m = end.hour * 60 + end.minute

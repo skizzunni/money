@@ -258,7 +258,10 @@ namespace NinjaTrader.NinjaScript.Strategies
                               : s.TrendN > 0 && trend == 1 ? (FillOk() ? "1 MNQ only (uptrend; More trading days)"
                                                                         : "no (uptrend: above the 50-session average)")
                               : FedToday && s.FedNoShorts ? "after 14:00 (Fed day)" : "yes";
-                return "longs " + longs + "; shorts " + shorts + (Braked() ? "; giveback brake on: 1 MNQ a trade" : "");
+                bool early = !string.IsNullOrEmpty(s.EarlySkipChecks) && minutes == 5
+                             && !(s.TrailDD > 0 && !double.IsNaN(trailPeak) && trailPeak - s.TrailDD >= trailBase);
+                return "longs " + longs + "; shorts " + shorts + (Braked() ? "; giveback brake on: 1 MNQ a trade" : "")
+                       + (early ? "; no entries at " + EarlySkipText() + " until the floor stops" : "");
             }
         }
 
@@ -395,6 +398,19 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (s.ProfitStepFast > 0 && minutes == 5 && p > s.ProfitStepFastFrom)
                 return (int)Math.Floor(s.ProfitStepFastFrom / s.ProfitStep) + (int)Math.Floor((p - s.ProfitStepFastFrom) / s.ProfitStepFast);
             return (int)Math.Floor(p / s.ProfitStep);
+        }
+
+        // the early no-entry checks as clock times ("13:00, 14:30"), for the dashboard
+        string EarlySkipText()
+        {
+            List<string> parts = new List<string>();
+            foreach (string m in s.EarlySkipChecks.Split(','))
+            {
+                int end;
+                if (m.Length == 0 || !int.TryParse(m, out end)) continue;
+                parts.Add((end / 60).ToString("00", CultureInfo.InvariantCulture) + ":" + (end % 60).ToString("00", CultureInfo.InvariantCulture));
+            }
+            return string.Join(", ", parts.ToArray());
         }
 
         // G125: is this check one without entries until the floor has stopped?
