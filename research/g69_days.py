@@ -141,7 +141,11 @@ PACK = {"P0": {}, "P1": {"gap_go_small_k": 0.0}, "P2": {"gap_go_small_k": 0.0, "
         # G100: U27 with the gap trade squeezed near the floor
         "U27sq": {"gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
                   "fill_min_room": 3000.0, "size_slip_pts": 3.0, "gap_go_locked_qty": 10, "fill_qty2_room": 6000.0,
-                  "giveback_brake": 0.5, "gap_squeeze": True}}
+                  "giveback_brake": 0.5, "gap_squeeze": True},
+        # G101: U27 with the brake at 0.7
+        "U27gb7": {"gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
+                   "fill_min_room": 3000.0, "size_slip_pts": 3.0, "gap_go_locked_qty": 10, "fill_qty2_room": 6000.0,
+                   "giveback_brake": 0.7}}
 for pk in (sys.argv[4].split(",") if len(sys.argv) > 4 else list(PACK)):
     for name, (bars, first, skip) in S.D.items():
         if name == "win":

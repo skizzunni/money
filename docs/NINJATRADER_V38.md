@@ -3838,3 +3838,10 @@ backtest it replays on the chart's history before going live.
    that to close (the same day at most), then trades. The dashboard says LIVE with the account's name once it is.
 4. **When it trades:** a gap-and-go trade at 09:35 New York on gap days, the bot's checks every half hour 10:00-15:00,
    and once the floor has stopped, the fill-ins. About 7 days in 10 have a trade (the model); some days none.
+
+## G101: the giveback brake earlier, at 70% of the best profit (registered 2026-11-04, before its run)
+
+**The idea:** U27's brake acts once the profit is under half of its best. At 0.7 it acts sooner in a drawdown.
+**The variant:** U27 with `giveback_brake` 0.7. **Adopt on G99b's rule**, against U27 (fewer lost or frozen than 10 on
+the 89 start dates; the window's and the index's net at least 95% of U27's in both executions; no −$1,000 day; floor
+never touched on the window and the index).
