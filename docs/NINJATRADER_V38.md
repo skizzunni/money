@@ -4851,3 +4851,12 @@ cushion $2,500; medians $29,536 / $46,371), then four at 19. k3 goes on to the f
 stop that fills that much worse gives fewer contracts when the stop is near. **Variants:** U37 with `size_slip_pts` 5
 and 6. **Run once:** the 263 monthly starts and the full sets in both executions. **Adopt (the fewest lost) on G99b's
 survival-first rule** against U37 (fewer than 20, every net at least 95%).
+
+**G170 result (run once, 2026-11-04): 5 points passes G99b's survival-first rule; adopted (U38).** 263 monthly starts:
+5 points **19 lost or frozen** (NQ 10, index 9), 6 points 19, U37 20. Chart / NinjaTrader at 5: window $54,339 /
+$54,417 (U37 $54,710 / $54,865: 99%), NQ $560,911 / $558,360, index $783,163 / $774,859 (99.6% / 99.8%); medians
+$50,739 / $40,040 (U37 $49,924 / $37,124); no −$1,000 day, the floor never touched. 6 points: the same 19, lower nets.
+Log: `verification/noise_v2/g170_size_slip.txt`.
+
+**U38 (2026-11-04): the sizing counts a stop 5 points worse (G170; U29-U37: 4).** The "sizing allowance" setting
+(`SizeSlip`) defaults to 5, on the 5-minute chart.

@@ -11,7 +11,7 @@ NTARGS = (["Mode=Funded growth", "TrailFrom=2025-01-02", f"GapGoLocked={LQ}", f"
           else ["Mode=Evaluation"])
 FILL = ({"gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
          "fill_min_room": 3000.0, "fill_qty2_room": 6000.0} if MORE else {})
-SLIP = float(os.environ.get("SIZE_SLIP", "4"))  # G76: the sizing's extra stop slippage, points
+SLIP = float(os.environ.get("SIZE_SLIP", "5"))  # G170 (G76 2, G106 4): the sizing's extra stop slippage, points
 NTARGS += [f"SizeSlip={SLIP}"] if GROW else []
 PROTECT = float(os.environ.get("PROTECT", "0"))  # G87: the near-floor shadow gate, $ (0 = off)
 NTARGS += [f"NearFloorGate={PROTECT}"] if GROW else []
