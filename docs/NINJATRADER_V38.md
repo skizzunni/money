@@ -5080,3 +5080,10 @@ in both executions. **Adopt on G78's rule** (no more lost than 42), or G99b's wi
 
 **G188 result (run once, 2026-11-04): rejected.** 526 starts: **50** lost or frozen (U40 42); nets within 0.1%. Log:
 `verification/noise_v2/g188_max_losers3.txt`.
+
+## G189: the gap-slot fill-ins from day one, on U40 (registered 2026-11-04, before its run)
+
+**Why:** G172 showed the early 1-contract gap trade saves accounts; G102 found *all* fill-ins from day one lost accounts
+as a group, but never tried the gap-slot ones alone. **The variant:** U40 with `gap_fill_early` (the small-gap and
+drive fill-ins of the gap slot also allowed before the floor has stopped). **Run once:** the 526 starts and the full
+sets in both executions. **Adopt on G78's rule** (no more lost than 42), or G99b's with a gain of at least 4 of the 526.

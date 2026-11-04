@@ -341,6 +341,7 @@ class NoiseConfig:
     gap_go_small_k: float = -1.0
     # research (G70): the fill-in trades (small gaps, drives, trend_small's shorts) only once the trailing floor has
     # stopped at the start (trail_cap)
+    gap_fill_early: bool = False  # research (G189): the gap-slot fill-ins (small gap, drive) also before the floor stops
     fill_after_lock: bool = False
     fill_min_room: float = 0.0  # G71: and only while the account is at least this far above the trailing floor
     fill_no_steps: bool = False  # G73: the fill-in trades' P/L doesn't count toward the contract steps
@@ -676,6 +677,10 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             return 3
         return 2 if room >= cfg.fill_qty2_room else 1
 
+    def gap_fill_ok() -> bool:
+        """G189: the gap-slot fill-ins: as fill_ok(), or (gap_fill_early) any time before the floor has stopped."""
+        return fill_ok() or (cfg.gap_fill_early and not floor_stopped())
+
     def fill_ok() -> bool:
         """G70: may a fill-in trade be taken now?"""
         if cfg.fill_after_lock and not floor_stopped():
@@ -836,9 +841,9 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                     fire = abs(gap) >= gk * avg and d * body > 0
                     one = False  # G69: a small-gap or drive trade, 1 contract always
                     if not fire and cfg.gap_go_small_k >= 0 and abs(gap) >= cfg.gap_go_small_k * avg and d * body > 0 \
-                            and fill_ok():
+                            and gap_fill_ok():
                         fire = one = True
-                    if not fire and cfg.gap_go_drive_k > 0 and len(drive_hist) >= 10 and body != 0 and fill_ok():
+                    if not fire and cfg.gap_go_drive_k > 0 and len(drive_hist) >= 10 and body != 0 and gap_fill_ok():
                         bavg = sum(drive_hist[-14:]) / len(drive_hist[-14:])
                         if abs(body) >= cfg.gap_go_drive_k * bavg:
                             d, fire, one = (1 if body > 0 else -1), True, True
