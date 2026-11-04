@@ -336,6 +336,7 @@ class NoiseConfig:
     # separated: the days after a shadow record of the bot closed below its recent average; research/shadow_gate.py)
     protect_room: float = 0.0
     calm_small: bool = False  # G95: on a calm stretch, the bot's signals at 1 contract while fill_ok() (fill-ins)
+    fill_qty2_room: float = 0.0  # G96: the fill-ins at 2 contracts while the account is this far above the floor
     protect_dates: str = ""
     # research (G67): once the trailing floor has stopped at the start (trail_cap), a gap trade may take up to this
     # many contracts in place of gap_go_max_qty (0 = off)
@@ -591,6 +592,15 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
         """G73: the equity the contract steps leave out (the fill-in trades' P/L)."""
         return fill_pnl if cfg.fill_no_steps else 0.0
 
+    def fill_q() -> int:
+        """G96: the fill-ins' contracts: 2 with fill_qty2_room above the floor, else 1."""
+        if cfg.fill_qty2_room <= 0 or math.isnan(trail_peak):
+            return 1
+        floor = trail_peak - cfg.trail_dd
+        if cfg.trail_cap >= 0:
+            floor = min(floor, trail_base + cfg.trail_cap)
+        return 2 if eq_curve[-1] - floor >= cfg.fill_qty2_room else 1
+
     def fill_ok() -> bool:
         """G70: may a fill-in trade be taken now?"""
         if cfg.fill_after_lock and not floor_stopped():
@@ -761,7 +771,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                         elif cfg.gap_go_max_qty > 0:
                             q = min(q, cfg.gap_go_max_qty)
                         if one:
-                            q = min(q, 1)
+                            q = min(q, fill_q())
                         if q >= 1:
                             gg = {"d": d, "q": q, "bar": i, "px": o[i] + d * slip, "stop": stop_px, "fill": one}
                             events.append((i - 1, "GAP BUY" if d > 0 else "GAP SELL"))
@@ -1094,7 +1104,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                         q_n = max(1, round(q_next * cfg.news_mult))
                         ml_next, q_next = ml_next / q_next * q_n, q_n
                     if cfg.trend_small and against_trend(d):  # G65: 1 contract, its max loss a contract
-                        ml_next, q_next, fill_next = ml_next / q_next, 1, True
+                        fq = fill_q()
+                        ml_next, q_next, fill_next = ml_next / q_next * fq, fq, True
                     elif cfg.trend_qty_div and against_trend(d):
                         q_next = max(1, round(q_next / cfg.trend_qty_div))
                         ml_next *= cfg.trend_ml_mult

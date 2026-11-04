@@ -3677,3 +3677,13 @@ G84 (U25). Rejected: 41. Measurements: G54, G55, G88.
 U22's fill-in rule extended: once the floor has stopped and the account is $3,000 above it, the bot's signals on calm
 days trade at 1 MNQ at its usual max loss a contract (`calm_small`), counted as fill-ins.
 **The variant:** U25 with `calm_small`. **Adopt on G78's rule**, against U25.
+
+**G95 result (run once, 2026-11-04): rejected; calm-day trades lose.** Window $43,197 / $42,728, index $603,157 /
+$596,234, both below U25 (`verification/noise_v2/g95_calm_small.txt`). The calm filter's blocked trades are losers
+even at 1 MNQ.
+
+## G96: fill-ins at 2 MNQ with a $6,000 cushion (registered 2026-11-04, before its run)
+
+**The idea:** the fill-ins (small gaps, drives, uptrend shorts) made money at 1 MNQ (G72). Once the account is $6,000
+above the stopped floor (twice their cushion), they take 2 MNQ (`fill_qty2_room` 6000); below it, 1 as now.
+**The variant:** U25 with `fill_qty2_room` 6000. **Adopt on G78's rule**, against U25.
