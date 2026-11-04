@@ -4966,3 +4966,9 @@ $783,163 / $774,859); no −$1,000 day, the floor never touched; 263 starts **19
 $50,083 / $39,579. Log: `verification/noise_v2/g178_drive06.txt`.
 
 **U39 (2026-11-04): the opening-drive fill-in needs a 09:30 bar of 0.6x the average body (G178; U26-U38: 0.5).**
+
+## G179: G177's other two settings, each alone on U39 (registered 2026-11-04, before its run)
+
+**Variants:** U39 with `profit_step_fast` 600 from $15,000 (instead of 750 from $10,000), and U39 with `fill_qty2_room`
+5,000. **Run once:** the 263 starts and the full sets in both executions. **Adopt (the better window) on G78's rule**
+against U39 (no more than 19 lost).
