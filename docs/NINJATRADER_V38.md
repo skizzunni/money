@@ -4943,3 +4943,8 @@ $54,417), NQ **$554,231 / $551,907** (U38 $560,911 / $558,360), index $798,034 /
 $5,000-7,000, `gap_go_locked_qty` 9-11, `gap_go_drive_k` 0.4-0.6; row 0 is U38. **Screen:** G135's against U38 (the
 chart's nets at least U38's on all three sets, no −$1,000 day); the best window among those passing then goes on to
 NinjaTrader's execution and the 263 monthly starts, **adopted on G78's rule** (no more than 19 lost).
+
+**G177 screen (2026-11-04):** 2 of 23 pass. k11 (`profit_step_fast` 600 from $15,000, `fill_qty2_room` 5,000,
+`gap_go_drive_k` 0.6): window **$57,714**, NQ $564,991, index $786,675 (U38 $54,339 / $560,911 / $783,163); k8: $54,860
+/ $563,204 / $788,266. k11 goes on to NinjaTrader's execution and the 263 starts. Log:
+`verification/noise_v2/g177_search.txt`.
