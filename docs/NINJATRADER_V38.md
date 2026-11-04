@@ -4591,3 +4591,7 @@ points: lower on every set. Log: `verification/noise_v2/g150_singles.txt`.
 `late_lock_from` 15:00 (a trade in profit at 15:00 locks), `time_lock` 30 (in profit after 30 minutes, locks),
 `after_loss_same_side` (the after-loss rules only on the losing side), `big_day_against_tp` 1.0. G135's screen against
 U34, then confirmation for the best, on G78's rule.
+
+**G151 result (run once, 2026-11-04): none passes the screen.** Window (U34 $54,879): `tom_no_shorts` $53,736,
+`tom_mult` 1.5 $54,850, `late_lock_from` 15:00 $54,566, `time_lock` 30 $54,832, `after_loss_same_side` $54,710,
+`big_day_against_tp` 1.0 $11,781. Log: `verification/noise_v2/g151_rare.txt`.

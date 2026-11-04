@@ -1,0 +1,7 @@
+{"k": 0, "proxy net": 54879, "proxy d1000": 0, "nq net": 554388, "nq d1000": 0, "index net": 786440, "index d1000": 0}
+{"k": 1, "tom_no_shorts": true, "proxy net": 53736, "proxy d1000": 0, "nq net": 526544, "nq d1000": 0, "index net": 711196, "index d1000": 0}
+{"k": 2, "tom_mult": 1.5, "proxy net": 54850, "proxy d1000": 0, "nq net": 559358, "nq d1000": 0, "index net": 790326, "index d1000": 0}
+{"k": 3, "late_lock_from": 900, "proxy net": 54566, "proxy d1000": 0, "nq net": 553218, "nq d1000": 0, "index net": 787853, "index d1000": 0}
+{"k": 4, "time_lock": 30, "proxy net": 54832, "proxy d1000": 0, "nq net": 527086, "nq d1000": 0, "index net": 761999, "index d1000": 0}
+{"k": 5, "after_loss_same_side": true, "proxy net": 54710, "proxy d1000": 0, "nq net": 561729, "nq d1000": 0, "index net": 786440, "index d1000": 0}
+{"k": 6, "big_day_against_tp": 1.0, "proxy net": 11781, "proxy d1000": 0, "nq net": 492955, "nq d1000": 0, "index net": 741044, "index d1000": 0}
