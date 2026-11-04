@@ -331,6 +331,7 @@ class NoiseConfig:
     # research (G77): once a bar closes with the gap trade up gap_go_be x its initial risk, its stop goes to the entry
     # plus a tick, from the next bar (0 = off)
     gap_go_be: float = 0.0
+    gap_slip_pts: float = 0.0  # G86: the gap trade's sizing counts this many points more slippage at its stop
     # research (G67): once the trailing floor has stopped at the start (trail_cap), a gap trade may take up to this
     # many contracts in place of gap_go_max_qty (0 = off)
     gap_go_locked_qty: int = 0
@@ -732,7 +733,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                             if cfg.size_up_to > 0:
                                 q = min(q, cfg.size_up_to)
                         per_c = (abs(c[i - 1] + d * slip - stop_px) * cfg.point_value
-                                 + 2 * cfg.commission_per_side + 2 * slip * cfg.point_value)
+                                 + 2 * cfg.commission_per_side + 2 * slip * cfg.point_value
+                                 + cfg.gap_slip_pts * cfg.point_value)
                         room = money_room()
                         if math.isfinite(room):
                             q = min(q, math.floor(room / per_c + 1e-9))
