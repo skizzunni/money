@@ -5673,7 +5673,7 @@ Full suite 675 passed; NinjaTrader's growth run identical to the model (up to th
 | Weekly, the account $10,000-30,000 up (window) | $1,483 average, 11% of weeks at +$3,000 or more |
 | Weekly, past $75,000 (long histories) | $1,067-1,256 |
 
-**Today (G189-G237, 49 rounds):** U41 (no gap trade while braked), U42 (G204's five survival settings: 38 → 28 lost),
+**Today (G189-G238, 50 rounds):** U41 (no gap trade while braked), U42 (G204's five survival settings: 38 → 28 lost),
 U43 and U44 (faster grown-phase steps, 3-MNQ fill-ins, 75 MNQ: window $53,164 → $57,475, index +9%). Everything else was
 rejected or a measurement. **Not reached:** $3,000 a week on average, or zero lost accounts. Past U44, every extra
 contract or a bigger day budget broke the $1,000 day (G214, G219, G226), and the account's survival depends on fills
@@ -5761,3 +5761,6 @@ $757,430 in NinjaTrader's execution). The trend shorts stay. Log: `verification/
 **The variants:** U44 with `lock_at` (a) 0.3 and (b) 0.4 (0.35 now): the stop moves to the entry once the trade is that
 many max losses in profit. **Run once:** the 526 starts and the full sets in both executions. **Adopt (the better window)
 on G78's rule** against U44, or G99b's.
+
+**G238 result (run once, 2026-11-04): both rejected.** 0.3: 35 lost (U44 28), window $55,146; 0.4: 44 lost, the index
+$774,147. The 0.35 lock stays. Log: `verification/noise_v2/g238_lock_at.txt`.
