@@ -4574,3 +4574,9 @@ family (G128-G133, G148-G149) depends on fills too much to trust. Log: `verifica
 **U34 checks (2026-11-04):** the full suite, 668 passed; the NinjaTrader growth run on the window, $54,772.31, profit
 factor 1.768, worst day −$899.31, up to 50 contracts, identical to the model up to the 2026-03-09 data hole
 (`verification/noise_v2/v38g_nt_u34.txt`).
+
+## G150: six single settings on U34 (registered 2026-11-04, before its run)
+
+**Variants:** U34 (row 0) with `gap_go_exit` 09:50 / 10:00, `lookback` 12 / 16 sessions, `size_slip_pts` 3 / 5. G135's
+screen against U34, then the best window among those passing on to NinjaTrader's execution and the 89 starts, on
+G78's rule.
