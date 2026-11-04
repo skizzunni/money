@@ -3770,3 +3770,29 @@ against U26's 11; medians $43,402 NQ / $37,330 index (U26: $47,789 / $39,130); w
 **A bug, found while building the NinjaTrader side:** with the brake on, the model set a gap trade to exactly 1
 contract, even on a day whose room fitted none (it should be at most 1). The fix (`min(q, 1)`) is re-run in full
 before adoption (G99c): the three sets in both executions and the 89 start dates, on G99b's rule.
+
+**G99c result (run once, 2026-11-04): passes G99b's rule; adopted.** With the bug fixed: 89 start dates **10 lost or
+frozen** (NQ 5, index 5) against U26's 11; window $45,340 / $45,396 and index $639,432 / $629,489 (100% of U26's);
+NQ's 2015 path lived ($472,623 / $470,273); no −$1,000 day; floor never touched. The medians fell: $43,053 NQ /
+$36,981 index (U26: $47,789 / $39,130). Honest reading: one account saved, at about $2,000-4,700 of the typical
+account's 21 months (`verification/noise_v2/g99c_giveback.txt`, `g35_start_dates_u26gb.csv`).
+
+**What the bug showed (G99b, 5 of 89):** the extra survivors were accounts near the floor that kept taking 1-MNQ gap
+trades when the room no longer fitted one, and climbed back. Risking more than the room is not allowed, but the idea
+that a nearly frozen account should keep trading small is G100.
+
+**U27 (2026-11-04): the giveback brake (G99c).** New setting, group 1: "Giveback brake: once the floor has stopped,
+1 MNQ per trade while the profit is under this share of its best", **0.5**. 5-minute charts only; not in Evaluation.
+The dashboard's "today" line says when it is on. The file you trade, 5-minute window: unchanged, **704 trades,
+$45,289.92** (the window's account never gives back half its best). `test_v38_giveback_brake`: with a 0.9 brake and a
+$600 trailing drawdown (Custom mode), NinjaTrader's code and the model agree trade for trade on and off, and the brake
+cuts the contracts.
+
+## G100: a nearly frozen account keeps trading (registered 2026-11-04, before its run)
+
+**The idea, from G99b:** when the room above the floor can't fit 1 contract of the gap trade's stop, the gap trade is
+skipped today, and an account near the floor stops trading and freezes. Here it takes the gap trade at 1 MNQ with its
+stop cut to the room, as the bot's own squeeze does (`gap_squeeze`), if the room is at least 10 points ($20) plus
+costs: never more risk than the room.
+**The variant:** U27 with `gap_squeeze`. **Adopt on G99b's rule** (fewer lost or frozen than U27's 10; the window's
+and the index's net at least 95% of U27's; no −$1,000 day; floor never touched on the window and the index).

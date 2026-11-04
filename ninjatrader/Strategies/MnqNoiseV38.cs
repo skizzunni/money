@@ -194,7 +194,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         // G99: has the account given back more than (1 - GivebackBrake) of its best profit since the floor stopped?
         public bool Braked()
         {
-            if (s.GivebackBrake <= 0 || s.TrailDD <= 0 || double.IsNaN(trailPeak)) return false;
+            if (s.GivebackBrake <= 0 || minutes != 5 || s.TrailDD <= 0 || double.IsNaN(trailPeak)) return false;  // tested on 5-minute bars
             if (trailPeak - s.TrailDD < trailBase) return false;
             return EqEff - trailBase < s.GivebackBrake * (trailPeak - trailBase);
         }
@@ -831,7 +831,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 MoreDaysCushion = 3000;
                 SizeSlip = 3;  // G97 (G79: 2)
                 MoreDaysQty2Room = 6000;  // G97
-                GivebackBrake = 0;  // G99: set from G99c's result
+                GivebackBrake = 0.5;  // G99c
                 NearFloorGate = 0;  // G87b: off (it lost more accounts)
                 TestedWinRate = 61.2;
             }

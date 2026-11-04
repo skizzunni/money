@@ -598,7 +598,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
 
     def braked() -> bool:
         """G99: has the account given back more than (1 - giveback_brake) of its best profit since the floor stopped?"""
-        if cfg.giveback_brake <= 0 or not floor_stopped():
+        if cfg.giveback_brake <= 0 or minutes != 5 or not floor_stopped():  # tested on 5-minute bars
             return False
         return eq_curve[-1] - trail_base < cfg.giveback_brake * (trail_peak - trail_base)
 

@@ -32,7 +32,8 @@ GROW = NoiseConfig(**{**V21, "qty": 1, "lookback": 14, "max_loss_per_trade": 187
                       "gap_go_locked_qty": 10, "trail_cap": 0.0,
                       # G79: More trading days and the 2-point sizing allowance
                       "gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
-                      "fill_min_room": 3000.0, "size_slip_pts": 3.0, "fill_qty2_room": 6000.0},
+                      "fill_min_room": 3000.0, "size_slip_pts": 3.0, "fill_qty2_room": 6000.0,
+                      "giveback_brake": 0.5},
                    nt_execution=True, round_prices=True, target_on_fill_bar=True)
 GROW_ARGS = ["Mode=Funded growth"]  # the default; its settings are the tested ones above
 # G72's fill-in trades off (NinjaTrader's More trading days needs gap and go on)
