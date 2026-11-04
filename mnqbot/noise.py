@@ -141,6 +141,13 @@ class NoiseConfig:
     trend_with_tp: float = 0.0  # research (G20): a trade with the trend takes this take-profit, noise units (0 = off)
     # research (v2.4 study): no new entries at these checks (minutes of the day the check's bar closes, e.g. "840")
     skip_checks: str = ""
+    # research (G128): the bot's trades are sized to room_mult x the day's budget left (not the gap trade), and a guard
+    # closes the bot's trade inside the bar once today's closed P/L plus its open P/L at the bar's worst price reaches
+    # -day_guard (or the room above the trailing floor less guard_floor_buffer), at that price (or the bar's open past
+    # it) less slippage; no more entries that day (0: off)
+    room_mult: float = 1.0
+    day_guard: float = 0.0
+    guard_floor_buffer: float = 100.0
     day_stop_profit: float = 0.0  # research (G127): no new entries today once today's closed P/L is at least this, $
     skip_checks_early: bool = False  # research (G125): skip_checks only until the floor has stopped
     after_target_done: bool = False  # research: no new entries today after a take-profit fills
@@ -466,6 +473,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
     prev_side = 0  # confirm: the last check today closed above its upper line (1), below its lower (-1), or inside
     target_today = False  # after_target_done: a take-profit filled today
     day_pnl = 0.0  # daily_loss_limit: today's realized P/L
+    guard_today = False  # G128: the day guard closed a trade today
     gap_day_pnl = 0.0  # gap_no_budget: today's gap-slot P/L
     week_key, week_start_eq = None, 0.0  # week_stop: this week, and the closed equity at its first session
     trail_base = trail_peak = math.nan  # trail_dd: the closed equity at its start, the highest end-of-day equity
@@ -674,6 +682,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
         if (cfg.skip_checks and str(end) in cfg.skip_checks.split(",")
                 and not (cfg.skip_checks_early and (minutes != 5 or floor_stopped()))):  # G125: 5-minute bars
             return False
+        if guard_today:
+            return False
         if cfg.day_stop_profit > 0 and day_pnl >= cfg.day_stop_profit:
             return False
         if cfg.after_target_done and target_today:
@@ -717,11 +727,11 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             return True
         return st == d if cfg.confirm_mode == "with" else st != -d
 
-    def money_room() -> float:
+    def money_room(bot: bool = False) -> float:
         """What a new trade may risk: the rest of today's loss limit and the room above the trailing floor."""
         room = math.inf
         if cfg.daily_loss_limit > 0:
-            room = cfg.budget_frac * (cfg.daily_loss_limit + day_pnl - cfg.day_keep * max(day_pnl, 0.0)
+            room = (cfg.room_mult if bot else 1.0) * cfg.budget_frac * (cfg.daily_loss_limit + day_pnl - cfg.day_keep * max(day_pnl, 0.0)
                                       - (max(gap_day_pnl, 0.0) if cfg.gap_no_budget else 0.0))
         if cfg.trail_dd > 0 and not math.isnan(trail_peak):
             floor = trail_peak - cfg.trail_dd
@@ -985,6 +995,21 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             if hit:
                 close_pos(i, price, reason)
                 events.append((i - 1 if reason == "Time stop" else i, "EXIT"))  # the time stop's alert: at the close
+            elif pos and cfg.day_guard > 0:  # G128: the day guard, at the bar's worst price (before any target)
+                allow = cfg.day_guard + day_pnl
+                if cfg.trail_dd > 0 and not math.isnan(trail_peak):
+                    fl = trail_peak - cfg.trail_dd
+                    if cfg.trail_cap >= 0:
+                        fl = min(fl, trail_base + cfg.trail_cap)
+                    allow = min(allow, eq_curve[-1] - fl - cfg.guard_floor_buffer)
+                qv = rest * q_trade * cfg.point_value
+                gpx = entry_px - pos * (allow - rest * 2 * cfg.commission_per_side * q_trade) / qv
+                worst = l[i] if pos > 0 else h[i]
+                if pos * (worst - gpx) <= 0:
+                    px = o[i] if pos * (o[i] - gpx) <= 0 else gpx
+                    close_pos(i, px - pos * slip, "Day guard")
+                    events.append((i, "EXIT"))
+                    guard_today, hit = True, True
             initial = cfg.partial_r == "initial"
             r_now = r_trade if initial else r_pts
             if (pos and rest == 1.0 and cfg.partial_at > 0 and not math.isnan(r_now)  # research: part at +partial_at R
@@ -1047,7 +1072,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
 
         if t_min == RTH_OPEN:
             block_dir = 0
-            target_today = False
+            target_today = guard_today = False
             day_pnl = gap_day_pnl = 0.0
             if t.isocalendar()[:2] != week_key:
                 week_key, week_start_eq = t.isocalendar()[:2], eq_curve[-1]
@@ -1224,7 +1249,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                             pts = min(abs(c[i] + d * slip - ln_stop), ml_next / q_next / cfg.point_value)
                             per_c = (pts * cfg.point_value + 2 * cfg.commission_per_side + 2 * slip * cfg.point_value
                                      + size_slip_c)
-                        room = money_room()
+                        room = money_room(bot=True)
                         fit = math.floor(room / per_c + 1e-9) if math.isfinite(room) else q_next
                         costs = 2 * cfg.commission_per_side + 2 * slip * cfg.point_value
                         if fit < 1 and cfg.squeeze_min > 0 and math.isfinite(room) \

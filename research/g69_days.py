@@ -254,7 +254,16 @@ PACK = {"P0": {}, "P1": {"gap_go_small_k": 0.0}, "P2": {"gap_go_small_k": 0.0, "
         "U33ds25": {"gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
                     "fill_min_room": 3000.0, "size_slip_pts": 4.0, "gap_go_locked_qty": 10, "fill_qty2_room": 6000.0,
                     "giveback_brake": 0.5, "after_loss_ml_locked": 1.0, "size_up_to": 50, "skip_checks": "780,870",
-                    "skip_checks_early": True, "day_stop_profit": 2500.0}}
+                    "skip_checks_early": True, "day_stop_profit": 2500.0},
+        # G128: U33 with the bot sized to 1.5 / 2x the day's budget left and a $900 day guard
+        "U33rm15": {"gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
+                    "fill_min_room": 3000.0, "size_slip_pts": 4.0, "gap_go_locked_qty": 10, "fill_qty2_room": 6000.0,
+                    "giveback_brake": 0.5, "after_loss_ml_locked": 1.0, "size_up_to": 50, "skip_checks": "780,870",
+                    "skip_checks_early": True, "day_guard": 900.0, "room_mult": 1.5},
+        "U33rm20": {"gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
+                    "fill_min_room": 3000.0, "size_slip_pts": 4.0, "gap_go_locked_qty": 10, "fill_qty2_room": 6000.0,
+                    "giveback_brake": 0.5, "after_loss_ml_locked": 1.0, "size_up_to": 50, "skip_checks": "780,870",
+                    "skip_checks_early": True, "day_guard": 900.0, "room_mult": 2.0}}
 for pk in (sys.argv[4].split(",") if len(sys.argv) > 4 else list(PACK)):
     for name, (bars, first, skip) in S.D.items():
         if name == "win":

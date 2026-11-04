@@ -4238,3 +4238,20 @@ Fewer lost accounts, but 76-87% of the net at 0.8 (below G99b's 95%). Log: `veri
 **The idea:** keep a big day instead of giving part of it back. `day_stop_profit` (a new research setting): no new
 entries once today's closed P/L is at least this (open trades run as usual). **Variants:** U33 with $1,500 and $2,500.
 **Adopt (the better window net of those that pass) on G78's rule or G99b's** against U33.
+
+**G127 result (run once, 2026-11-04): rejected.** NinjaTrader's execution, $1,500 / $2,500: window $34,993 / $32,747
+(U33 $50,337), NQ $414,216 / $415,775 (U33 $549,379), index $467,520 / $535,006 (U33 $774,086); 89 starts 8 / 8 lost
+or frozen. The big days are where the profit is: stopping them costs 25-40%. Log:
+`verification/noise_v2/g127_day_stop.txt`.
+
+## G128: bigger bot trades, held by a day guard (registered 2026-11-04, before its run)
+
+**The idea:** G123: once grown, the bot's trades are sized to the day's $900 at their full stop, but its average loser
+is about half of that, so the day's budget is mostly unused. Size the bot's trades to `room_mult` x the budget left
+(the gap trade as now), and hold the day with a guard like the live `LossGuard`: inside a bar, once today's closed P/L
+plus the trade's open P/L at the bar's worst price reaches −$900 (or the room above the trailing floor less $100), the
+trade closes at that price (at the bar's open if it opened past it), less a tick, and no more entries today. The
+contract steps and the 50 cap are unchanged, so it acts only once the steps exceed what the budget fits.
+**Variants:** U33 with `day_guard` 900 and `room_mult` 1.5 and 2.0 (new research settings).
+**Adopt (the better window net of those that pass) on G78's rule or G99b's** against U33; no day at −$1,000 or worse
+is part of both.
