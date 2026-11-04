@@ -5746,3 +5746,9 @@ starts and the full sets in both executions. **Adopt (the better window) on G78'
 
 **G236 result (run once, 2026-11-04): both rejected.** 0.75x: 28 lost, every net lower (window $56,735, index $812,879);
 1.25x: 29 lost, the window $52,044. Full-size shorts stay. Log: `verification/noise_v2/g236_short_mult.txt`.
+
+## G237: no shorts against the uptrend, on U44 (registered 2026-11-04, before its run)
+
+**Why:** U44's fill-ins include shorts against the 50-session uptrend (`trend_small`, from G65), now at up to 3 MNQ
+(U43-U44's fill-in sizes); G186 removed them on U40 and lost more accounts. **The variant:** U44 with `trend_small` off.
+**Run once:** the 526 starts and the full sets in both executions. **Adopt on G78's rule** against U44, or G99b's.
