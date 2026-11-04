@@ -1,0 +1,2 @@
+{"k": 0, "proxy net": 54879, "proxy d1000": 0, "nq net": 554388, "nq d1000": 0, "index net": 786440, "index d1000": 0}
+{"k": 1, "commission_per_side": 0.3, "proxy net": 58310, "proxy d1000": 0, "nq net": 581502, "nq d1000": 0, "index net": 815160, "index d1000": 1}

@@ -4728,3 +4728,9 @@ $786,498** (passes, the best window by $2); 12:30 + 13:00 + 14:30: index $782,75
 (U34 $54,874), NQ $559,733 ($557,093), index **$776,179** ($776,796, −$617); 263 monthly starts **31** lost or frozen
 (U34 32). It fails G78's rule (registered) on the index by 0.08%; it would have passed G99b's survival-first rule,
 which wasn't the one registered, so it is not adopted. Log: `verification/noise_v2/g161_sk870.txt`.
+
+## G162: the commission saving of NQ minis, an upper bound (a measurement, 2026-11-04)
+
+Every contract at $0.30 a side instead of $0.62 (as if every 10 MNQ went as 1 NQ at about $2 a side; in fact only
+10-lots convert): window $58,310 (+$3,431), NQ $581,502, index $815,160 (`verification/noise_v2/g162_comm.txt`). The
+real saving would be about half of that; routing two instruments in the live strategy isn't worth the risk for it.
