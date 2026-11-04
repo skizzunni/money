@@ -4810,3 +4810,10 @@ against U35's 26, medians $49,426 / $37,626. A small gain, at the edge of the ru
 
 **U36 (2026-11-04): the after-loss max loss at $206.25 (1.1x) on the 5-minute chart (G167; U35: $225).**
 `test_v38_after_loss_206` checks NinjaTrader's code against the model at $206.25 and $250.
+
+## G168: the after-loss max loss at 1.0x on U36 (registered 2026-11-04, before its run)
+
+**The idea:** G165 (1.2x) and G167 (1.1x) each saved accounts; 1.0x ($187.50, as every other trade) ends the line.
+(On U29, G116's 1.0x lost one more of the 89.) **The variant:** U36 with `after_loss_ml_mult5` 1.0. **Run once:** the
+263 monthly starts and the full sets in both executions. **Adopt on G99b's survival-first rule** against U36 (fewer
+than 25 lost, every net at least 95%).
