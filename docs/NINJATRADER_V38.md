@@ -3421,3 +3421,7 @@ floor stops when the account is $2,000 up), so the account's second stretch trad
 **The variant:** today's default (U23) with "More trading days" cushion $2,000 (`fill_min_room` 2000).
 
 **Adopt on G78's rule**, against U23 (and its 89 start dates' 11).
+
+**G81 result (run once, 2026-11-04): rejected; the window makes less in the chart's execution.** 73.3% / 80.7% of days
+(window / index); window $37,569 / $38,250 (U23: $37,861 / $38,189); index $557,462 / $551,577 (U23: $557,421 /
+$551,532). The $3,000 cushion stays (`verification/noise_v2/g81_cushion2000.txt`).

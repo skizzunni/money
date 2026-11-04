@@ -1,0 +1,6 @@
+{'nt': False, 'pack': 'U23c2', 'set': 'proxy', 'days traded %': 73.3, 'gap trades': 296, 'trades': 713, 'net $': 37569, 'pf': 1.632, 'win %': 50.8, 'closed dd $': 3436, 'worst day $': -900, 'days <= -1000': 0, 'floor touches': 0}
+{'nt': False, 'pack': 'U23c2', 'set': 'nq', 'days traded %': 4.6, 'gap trades': 84, 'trades': 238, 'net $': 0, 'pf': 1.0, 'win %': 52.1, 'closed dd $': 6635, 'worst day $': -859, 'days <= -1000': 0, 'floor touches': 0}
+{'nt': False, 'pack': 'U23c2', 'set': 'index', 'days traded %': 80.7, 'gap trades': 2874, 'trades': 7090, 'net $': 557462, 'pf': 1.51, 'win %': 50.7, 'closed dd $': 19519, 'worst day $': -955, 'days <= -1000': 0, 'floor touches': 0}
+{'nt': True, 'pack': 'U23c2', 'set': 'proxy', 'days traded %': 73.5, 'gap trades': 297, 'trades': 721, 'net $': 38250, 'pf': 1.635, 'win %': 50.9, 'closed dd $': 3364, 'worst day $': -899, 'days <= -1000': 0, 'floor touches': 0}
+{'nt': True, 'pack': 'U23c2', 'set': 'nq', 'days traded %': 4.6, 'gap trades': 86, 'trades': 239, 'net $': 1, 'pf': 1.0, 'win %': 52.3, 'closed dd $': 6684, 'worst day $': -859, 'days <= -1000': 0, 'floor touches': 0}
+{'nt': True, 'pack': 'U23c2', 'set': 'index', 'days traded %': 80.7, 'gap trades': 2874, 'trades': 7120, 'net $': 551577, 'pf': 1.505, 'win %': 50.6, 'closed dd $': 19238, 'worst day $': -921, 'days <= -1000': 0, 'floor touches': 0}
