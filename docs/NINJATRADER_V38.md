@@ -4061,3 +4061,8 @@ combinations drawn at random (seed 115) around U29: `lock_at` 0.28-0.45, `lock_p
 highest window net is the candidate. **Then, run once:** NinjaTrader's execution and the 89 start dates, on G78's
 rule against U29. Selection bias is the risk (32 tries); the two later checks are on the sets and starts the screen
 didn't rank on (NinjaTrader's execution, the 89 starts).
+
+**Result (G115, run once): rejected at the screen.** None of the 32 combinations kept NQ and the index at least U29's
+with no −$1,000 day: 11 of 32 lost the account on at least one set (net near $0), 1 of 32 beat U29's window, and the
+best index net ($663,057, k=12) came with a $27,644 window and a −$1,000 day. U29's settings sit at a ridge: moving
+several together loses more than it gains. Log: `verification/noise_v2/g115_search.txt`.
