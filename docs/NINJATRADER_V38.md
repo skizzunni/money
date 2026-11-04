@@ -5219,3 +5219,10 @@ change acts only past $10,000). NinjaTrader's execution, window / NQ / index: $1
 **$57,915** / $470,599 / $571,427 (U41 $54,710 / $553,165 / $776,319). $125 gains on the window, but loses 15% on NQ
 and 26% on the index; medians fall too. G193's long-history gain came with the early phase's sizing, not from the
 tight stop on a grown account. Log: `verification/noise_v2/g197_grown_ml.txt`.
+
+**G196 result (run once, 2026-11-04): none passes stage 1; nothing goes on.** Of 299 combinations, 249 had no −$1,000
+day and never touched the floor on NQ and the index; of those **2 beat U41 on NQ and 8 on the index, none on both** (U41
+$563,437 / $787,157). The closest: k184 (range position 0.6, no time stop, last entry 15:30) NQ $558,865 (99.2%), index
+**$815,563**; k242 (a lock from 14:00) $557,079 / $806,500; k17 ($1,250 steps, brake 0.6, cushion $2,000) $561,161 /
+$799,057. With G195, about 600 random combinations of 30 settings: U41 sits at or near the top of this strategy's
+settings on the long histories. Log: `verification/noise_v2/g196_wide_long.txt`.
