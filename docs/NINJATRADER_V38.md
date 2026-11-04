@@ -4873,3 +4873,10 @@ Log: `verification/noise_v2/g171_survival_search.txt`.
 **Scorecard, G148-G171:** adopted G165 (U35), G167 (U36), G168 (U37), G170 (U38), all on the survival-first rule:
 fresh-account losses on 263 starts 32 → 26 → 25 → 20 → 19 with the nets within 1-2%. Rejected the rest; measurements
 G156, G158, G160, G162.
+
+## G172: no gap trades until the floor has stopped (registered 2026-11-04, before its run)
+
+**The idea:** before the floor stops, a fresh account trades the bot's own signals and a 1-contract gap trade; 9-12
+of U38's 19 lost starts go in that phase. `gap_go_after_lock` (an existing research setting): the gap trade only once
+the floor has stopped. **The variant:** U38 with it. **Run once:** the 263 monthly starts and the full sets in both
+executions. **Adopt on G99b's survival-first rule** against U38 (fewer than 19, every net at least 95%).
