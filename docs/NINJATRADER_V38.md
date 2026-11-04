@@ -5659,3 +5659,22 @@ executions. **Adopt (the better window) on G78's rule** against U44, or G99b's (
 NinjaTrader window $58,485, NQ $589,951, index $829,784 (all above U44), chart window $57,584 and index $850,071 above,
 but the chart's NQ **$587,584** against U44's $587,643. G78 asks for higher on all; G99b for 4 fewer lost. A near miss,
 not adopted. $1,600: 28 lost, NinjaTrader window $57,316 (lower). Log: `verification/noise_v2/g229_step.txt`.
+
+## Where it stands at the end of 2026-11-04 (U44)
+
+**The file:** `ninjatrader/Strategies/MnqNoiseV38.cs`, Mode "Funded growth", the 5-minute MNQ chart, one 50K account.
+Full suite 675 passed; NinjaTrader's growth run identical to the model (up to the stand-in data's 2026-03-09 hole).
+
+| U44, measured | |
+|---|---|
+| Window Jan 2025 – Oct 2026, NinjaTrader's execution | **$57,549** net, 760 trades, worst day −$899, floor never touched |
+| Fresh 50K accounts started on the 1st and the 15th of 263 months (NQ 2015-25, index 2011-26), 21 months each | **28 of 526 lost or frozen (about 1 in 19)**; median net $33,917 |
+| The same at 2 ticks of slippage | 51 of 526 |
+| Weekly, the account $10,000-30,000 up (window) | $1,483 average, 11% of weeks at +$3,000 or more |
+| Weekly, past $75,000 (long histories) | $1,067-1,256 |
+
+**Today (G189-G229, 41 rounds):** U41 (no gap trade while braked), U42 (G204's five survival settings: 38 → 28 lost),
+U43 and U44 (faster grown-phase steps, 3-MNQ fill-ins, 75 MNQ: window $53,164 → $57,475, index +9%). Everything else was
+rejected or a measurement. **Not reached:** $3,000 a week on average, or zero lost accounts. Past U44, every extra
+contract or a bigger day budget broke the $1,000 day (G214, G219, G226), and the account's survival depends on fills
+near the tested 1 tick (G215, G222).
