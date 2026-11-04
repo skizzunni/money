@@ -3687,3 +3687,14 @@ even at 1 MNQ.
 **The idea:** the fill-ins (small gaps, drives, uptrend shorts) made money at 1 MNQ (G72). Once the account is $6,000
 above the stopped floor (twice their cushion), they take 2 MNQ (`fill_qty2_room` 6000); below it, 1 as now.
 **The variant:** U25 with `fill_qty2_room` 6000. **Adopt on G78's rule**, against U25.
+
+**G96 result (run once, 2026-11-04): rejected by one day.** Window **$46,254 / $46,441**, index **$649,705 /
+$638,929** (U25: $43,463 / $43,740, $607,307 / $600,553), but a −$1,023 index day in the chart's execution: 2016-05-16,
+a +$230 gap trade (2 MNQ) widened the day's room, and the bot's 10:00 trade at 13 contracts exited 7.5 points past its
+stop (−$1,253) (`verification/noise_v2/g96_fill2.txt`).
+
+## G97: G96 with a 3-point sizing allowance (registered 2026-11-04, before its run)
+
+**The idea:** at 3 points (from 2), that 10:00 trade sizes to 12 contracts and the day ends near −$926. Everything else
+is G96. **The variant:** U25 with `fill_qty2_room` 6000 and `size_slip_pts` 3. **Adopt on G78's rule**, against U25.
+**Caution:** a fix aimed at one known day; the 89 start dates are the check.
