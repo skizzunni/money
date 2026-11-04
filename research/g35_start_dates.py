@@ -68,6 +68,9 @@ EXTRA = {"base": {}, "gentle": {"steps_after_lock": True}, "cap10": {"size_up_to
                     "fill_min_room": 3000.0, "size_slip_pts": 2.0},
          "u24q10": {"gap_go": True, "gap_go_skip_month_first": True, "gap_go_max_qty": 1, "gap_go_locked_qty": 10,
                     "gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
+                    "fill_min_room": 3000.0, "size_slip_pts": 2.0},
+         "u25q12": {"gap_go": True, "gap_go_skip_month_first": True, "gap_go_max_qty": 1, "gap_go_locked_qty": 12,
+                    "gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
                     "fill_min_room": 3000.0, "size_slip_pts": 2.0}}[VARIANT]
 
 

@@ -3492,3 +3492,8 @@ past. That is a broken daily loss limit; 7 stays (`verification/noise_v2/g83_u24
 
 **Scorecard, G44-G84:** 41 rounds. Adopted: G60 (U19), G67b (U20), G67's data fix, G79 (U22), G80 (U23), G82 (U24),
 G84 (U25). Rejected: 32 (G54 and G55 were measurements).
+
+## G85: up to 12 gap contracts once the floor has stopped (registered 2026-11-04, before its run)
+
+**The idea:** 10 passed, 15 broke the daily limit once (G83). 12 is between. U25 with `gap_go_locked_qty` 12.
+**Adopt on G78's rule**, against U25.
