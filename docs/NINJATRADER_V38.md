@@ -4758,3 +4758,15 @@ U34 (fewer than 32 lost, every net at least 95% of U34's, no −$1,000 day, the 
 after-loss 1.2, 13:00 + 14:30; medians $32,325 / $43,390), k11 25 (medians $14,968 / $26,635), k18 26, k14 26, k7 26;
 the after-loss max loss at 1.2x (U34 1.33x) is in all five. By the registered rule k6 (fewest, then the higher median)
 goes on to the full sets (package `U34g164k6`). Log: `verification/noise_v2/g164_survival_search.txt`.
+
+**G164 result (run once, 2026-11-04): k6 rejected.** Chart / NinjaTrader: window $47,642 / $47,646 (87% of U34's),
+NQ $515,398 / $513,935, index $714,263 / $701,413: below G99b's 95%. Log: `verification/noise_v2/g164_k6.txt`.
+
+## G165: the after-loss max loss at 1.2x on U34 (registered 2026-11-04, before its run)
+
+**The idea, from G164 (stated as a search result, not a fresh test of survival):** the after-loss max loss at 1.2x
+(U34: 250/187.5 = 1.33x, i.e. $225 instead of $250 before the floor stops) is in all five of G164's best; G164's k14 is
+U34 with only that change: 26 lost or frozen of 263 (U34 32), medians $37,057 / $50,259 (U34 $36,963 / $41,914).
+**The check not yet seen:** the window, NQ and the index in both executions, and the 89 quarterly starts. **Adopt on
+G99b's survival-first rule** (fewer lost on the 263, the net at least 95% of U34's on every set in both executions, no
+−$1,000 day, the floor never touched).
