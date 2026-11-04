@@ -4595,3 +4595,10 @@ U34, then confirmation for the best, on G78's rule.
 **G151 result (run once, 2026-11-04): none passes the screen.** Window (U34 $54,879): `tom_no_shorts` $53,736,
 `tom_mult` 1.5 $54,850, `late_lock_from` 15:00 $54,566, `time_lock` 30 $54,832, `after_loss_same_side` $54,710,
 `big_day_against_tp` 1.0 $11,781. Log: `verification/noise_v2/g151_rare.txt`.
+
+## U34 from a fresh account (a measurement on 263 monthly starts, 2026-11-04)
+
+`START_FREQ=MS research/g35_start_dates.py ... u33fs` (`verification/noise_v2/g35_start_dates_u33fs_MS.csv`): 21 months
+from each month's first day, NinjaTrader's execution. **32 of 263 lost or frozen (12.2%, as U33)**; median 21-month
+net **$39,454** (about $430 a week); +$3,000 within 7 days in none, within 30 days in 3.8%, median 138 days; +$50,000
+within 21 months in 45.6% (median 16.8 months).
