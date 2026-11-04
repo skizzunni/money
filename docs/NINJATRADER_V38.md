@@ -3973,3 +3973,8 @@ U28's safety change aside. Rejected: 50. Measurements: 3.
 **$56,526 NQ / $42,470 index** (U29: $46,477 / $36,500); index $695,858 / $659,294 and NQ $516,796 / $516,484 (above
 U29); but the window $46,145 / $46,283 against U29's $46,656 / $46,828. The rule asks for more on the window too
 (`verification/noise_v2/g107_fill3.txt`).
+
+## G108: more opening-drive fill-ins (registered 2026-11-04, before its run)
+
+**The idea:** the drive fill-in needs a 09:30 body of half the 14-session average; at 0.3 more cushioned days trade.
+**The variant:** U29 with `gap_go_drive_k` 0.3. **Adopt on G78's rule**, against U29.
