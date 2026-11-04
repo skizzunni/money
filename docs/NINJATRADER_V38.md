@@ -3796,3 +3796,11 @@ stop cut to the room, as the bot's own squeeze does (`gap_squeeze`), if the room
 costs: never more risk than the room.
 **The variant:** U27 with `gap_squeeze`. **Adopt on G99b's rule** (fewer lost or frozen than U27's 10; the window's
 and the index's net at least 95% of U27's; no −$1,000 day; floor never touched on the window and the index).
+
+**G100 result (run once, 2026-11-04): rejected.** 89 start dates: 11 lost or frozen (NQ 5, index 6) against U27's
+10; window and index unchanged. A gap trade squeezed to the room (often 10-30 points) is stopped out by the opening
+noise and doesn't bring the account back; what kept G99b's accounts alive was risking more than the room, which is
+not allowed (`verification/noise_v2/g100_gap_squeeze.txt`).
+
+**Scorecard, G44-G100:** 57 rounds. Adopted: G60 (U19), G67b (U20), G67's data fix, G79 (U22), G80 (U23), G82 (U24),
+G84 (U25), G97 (U26), G99c (U27). Rejected: 45. Measurements: G54, G55, G88.
