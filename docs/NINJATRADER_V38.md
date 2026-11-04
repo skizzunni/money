@@ -5534,3 +5534,8 @@ the long histories and fails the window the account trades. Log: `verification/n
 variant:** U44 with `daily_loss_limit` 950 (the $750 early budget unchanged, so it acts only once the floor has
 stopped). **Run once:** the 526 starts and the full sets in both executions. **Adopt on G78's rule** against U44 (higher
 nets on all three in both executions, **no day at −$1,000 or worse**, the floor never touched, no more than 28 lost).
+
+**G219 result (run once, 2026-11-04): rejected: three index days past −$1,000.** Nets rise (NinjaTrader window $58,593,
+NQ $598,409, index $859,078) and 526 starts 29 lost, but the index has **3 days at −$1,034** in both executions: the
+$100 left under the firm's limit is what absorbs a stop that fills past its price. The $900 budget stays. Log:
+`verification/noise_v2/g219_day950.txt`.
