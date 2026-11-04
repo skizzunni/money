@@ -4384,3 +4384,7 @@ which a 2-4 point allowance can't size for. 10 gap contracts stays. Log: `verifi
 the next bar's open once a trade's lock arms, sharing its locked stop. Tried on v2.9's 30-minute chart (rejected), not
 on the 5-minute growth bot. **Variants:** U33 with `add_at_lock` 2, 4, 8. G135's screen, then NinjaTrader's execution
 and the 89 starts for the best, on G78's rule or G99b's against U33.
+
+**G137 result (run once, 2026-11-04): rejected.** `add_at_lock` 2 / 4 / 8: the window's account lost (−$1,161 /
+−$1,082 / −$1,594), 19-378 days at −$1,000 on the long sets: the added contracts' stop at the lock is far from their
+fill, so a reversal costs more than the day's budget. Log: `verification/noise_v2/g137_add.txt`.

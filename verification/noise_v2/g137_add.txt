@@ -1,0 +1,3 @@
+{"k": 0, "add_at_lock": 2, "proxy net": -1161, "proxy d1000": 0, "nq net": 486024, "nq d1000": 19, "index net": 747688, "index d1000": 23}
+{"k": 1, "add_at_lock": 4, "proxy net": -1082, "proxy d1000": 0, "nq net": 543658, "nq d1000": 97, "index net": 703459, "index d1000": 139}
+{"k": 2, "add_at_lock": 8, "proxy net": -1594, "proxy d1000": 2, "nq net": -1579, "nq d1000": 2, "index net": 806277, "index d1000": 378}
