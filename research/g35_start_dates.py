@@ -277,7 +277,17 @@ EXTRA = {"base": {}, "gentle": {"steps_after_lock": True}, "cap10": {"size_up_to
                     "fill_min_room": 3000.0, "size_slip_pts": 4.0, "fill_qty2_room": 6000.0,
                     "giveback_brake": 0.5, "after_loss_ml_locked": 1.0, "size_up_to": 50, "skip_checks": "780,870",
                     "skip_checks_early": True, "day_guard": 900.0, "room_mult": 2.0,
-                    "room_mult_room": 3000.0, "day_guard_locked": True}}[VARIANT]
+                    "room_mult_room": 3000.0, "day_guard_locked": True},
+         "u33rm3": {"gap_go": True, "gap_go_skip_month_first": True, "gap_go_max_qty": 1, "gap_go_locked_qty": 10,
+                    "gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
+                    "fill_min_room": 3000.0, "size_slip_pts": 4.0, "fill_qty2_room": 6000.0,
+                    "giveback_brake": 0.5, "after_loss_ml_locked": 1.0, "size_up_to": 50, "skip_checks": "780,870",
+                    "skip_checks_early": True, "day_guard": 900.0, "room_mult_room": 3000.0, "day_guard_locked": True, "room_mult": 3.0},
+         "u33rm4": {"gap_go": True, "gap_go_skip_month_first": True, "gap_go_max_qty": 1, "gap_go_locked_qty": 10,
+                    "gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
+                    "fill_min_room": 3000.0, "size_slip_pts": 4.0, "fill_qty2_room": 6000.0,
+                    "giveback_brake": 0.5, "after_loss_ml_locked": 1.0, "size_up_to": 50, "skip_checks": "780,870",
+                    "skip_checks_early": True, "day_guard": 900.0, "room_mult_room": 3000.0, "day_guard_locked": True, "room_mult": 4.0}}[VARIANT]
 
 
 def with_1600(bars: pd.DataFrame, m: int) -> pd.DataFrame:

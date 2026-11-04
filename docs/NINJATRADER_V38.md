@@ -4302,3 +4302,14 @@ $784,933 / $774,086); the floor never touched, no −$1,000 day; 89 starts 8 los
 
 **The variant:** G130 with `room_mult_room` 3000 (the "More trading days" cushion, the bot's other existing threshold).
 **Adopt on G78's rule or G99b's** against U33.
+
+**G131 result (run once, 2026-11-04): rejected on NinjaTrader's window by $75.** Chart / NinjaTrader: window **$50,692
+/ $50,262** (U33 $50,219 / $50,337), NQ $689,320 / $690,819, index $1,104,428 / $1,028,705; the floor never touched,
+no −$1,000 day; 89 starts 8 lost or frozen (as U33). On the window the 2x is neutral (+$473 / −$75); on the long sets
++26% / +33%. Log: `verification/noise_v2/g131_guard_room3000.txt`.
+
+## G132: G131 at 3x and 4x (registered 2026-11-04, before its run)
+
+**The idea:** with the guard holding each day at −$900 whatever the size, a bigger room only makes the winners bigger
+and the guard days more frequent. **Variants:** G131 with `room_mult` 3.0 and 4.0. **Adopt (the better window net of
+those that pass) on G78's rule or G99b's** against U33.
