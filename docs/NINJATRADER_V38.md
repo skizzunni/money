@@ -5486,3 +5486,10 @@ $1,000 day. U44 stays. Log: `verification/noise_v2/g214_grown_search.txt`.
 **Why:** U44 sizes bigger once grown (up to 75 MNQ); G156 measured U34 at 2 ticks. **The measurement:** U44 with
 `slippage_ticks` 2 (every fill a tick worse than the tested 1) on the full sets in both executions and the 526 starts.
 Reported, not judged; a −$1,000 day or a floor touch at 2 ticks would be flagged as a risk to fix.
+
+**G215 result (2026-11-04): the nets hold at 2 ticks, survival does not.** Chart / NinjaTrader at 2 ticks: window $54,012 /
+$54,035 (1 tick $57,446 / $57,475), NQ $539,072 / $538,954, index $801,371 / $709,120; no −$1,000 day, the floor never
+touched. But 526 starts: **51** lost or frozen (14 + 37; 28 at 1 tick), most on NQ (37 of 206). A fresh account's
+survival depends on fills near the tested 1 tick: the strategy's fill-quality alert (20 trades averaging more than 2
+ticks worse) is the signal to check the connection or turn on "Gentle start". Log:
+`verification/noise_v2/g215_u44_slip2.txt`.
