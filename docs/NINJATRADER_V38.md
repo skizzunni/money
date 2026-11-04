@@ -5038,3 +5038,6 @@ $37,937, U34 $48,237 / $35,674. Log: `verification/noise_v2/g183_mid_month.txt`.
 **The variant:** U40 with `profit_step` 1,750 (the faster $750 steps above $10,000 unchanged). **Run once:** the 526
 starts (the 1st and the 15th of each month) and the full sets in both executions. **Adopt on G99b's survival-first
 rule** against U40 (fewer than 42 of 526 lost, every net at least 95%).
+
+**G184 result (run once, 2026-11-04): rejected.** 526 starts: **46** lost or frozen (22 + 24; U40 42); nets within
+1-2%. Log: `verification/noise_v2/g184_step1750.txt`.
