@@ -3574,3 +3574,27 @@ Near the floor, the gate skips the first winners of a recovery (the shadow is st
 turns), and the account that would have climbed out sits until the room is too small to trade. The lost accounts move
 around under any rule here: G87 saved 10 of the 11 and lost 9 others. `protect_room` and the C# `NearFloorGate` stay
 in the code, **off** (`verification/noise_v2/g87b_shadow_gate.txt`).
+
+**G88 result (measured 2026-11-04): the cushion is what saves accounts.** Today's default (U25) on each account's
+limits (the existing Funded growth / 100K / 150K modes), 5-minute bars:
+
+| | 50K ($900 / $2,000) | 100K ($1,800 / $3,000) | 150K ($2,700 / $4,500) | 150K + G87's gate |
+|---|---|---|---|---|
+| 89 start dates: lost or frozen (NQ / index) | 11 (5 / 6) | **5** (3 / 2) | **4** (3 / 1) | **3** (0 / 3) |
+| median 21-month net, NQ / index | $44,185 / $36,305 | $62,974 / $48,045 | $63,007 / $50,096 | $66,724 / $49,296 |
+| window, chart / NinjaTrader | $43,463 / $43,740 | $46,142 / $45,796 | $33,902 / $33,115 | |
+| index 2011-26, chart / NinjaTrader | $607,307 / $600,553 | $899,260 / $873,890 | $1,073,921 / $1,054,035 | |
+| worst day (the account's daily rule) | −$899 ($1,000) | −$1,873 ($2,000) | −$2,719 ($3,000) | |
+| days with a trade, window | 72% | 69% | 60% | |
+
+The floor was never touched on the window or the index; NQ's January 2015 path is lost on all three (reported, as
+G78's rule says). The 150K makes less on the window because its floor stops later (at +$4,500), so the fill-ins and
+the bigger gap trades start later; it makes the most on the long histories.
+
+**What the 50K can do (G35-G37, G87, G87b):** every rule tried moves which accounts die, not how many: about 11 of
+89. With a $2,000 trailing drawdown, a long losing stretch for this strategy ends some new accounts whatever the rule.
+A bigger account, or the same 50K's risk spread over more than one account, is what lowers it
+(`verification/noise_v2/g88_account_sizes.txt`).
+
+**Scorecard, G44-G88:** 45 rounds. Adopted: G60 (U19), G67b (U20), G67's data fix, G79 (U22), G80 (U23), G82 (U24),
+G84 (U25). Rejected: 35. Measurements: G54, G55, G88.
