@@ -4372,3 +4372,15 @@ starts, on G78's rule or G99b's against U33.
 `gap_slip_pts` sizes the gap trade as if its stop fills that many points worse. **Variants:** U33 with
 `gap_go_locked_qty` 15 + `gap_slip_pts` 2, 15 + 4, 12 + 2. G135's screen, then NinjaTrader's execution and the 89 starts
 for the best, on G78's rule or G99b's against U33.
+
+**G136 result (run once, 2026-11-04): none passes the screen.** 15 + 2 points: window $51,544, NQ $573,949, index
+$818,474; 15 + 4: $47,507 / $568,953 / $809,374; 12 + 2: $51,564 / $557,561 / $797,989; each keeps the index's
+−$1,251 day (2015-08-26: 13 gap contracts stopped 47 points past the entry on the fill bar, the August 2015 crash),
+which a 2-4 point allowance can't size for. 10 gap contracts stays. Log: `verification/noise_v2/g136_gap15.txt`.
+
+## G137: contracts added once the lock arms, on U33 (registered 2026-11-04, before its run)
+
+**The idea:** the profit is in a few big trend trades (G123: targets and 16:00 closes); `add_at_lock` adds contracts at
+the next bar's open once a trade's lock arms, sharing its locked stop. Tried on v2.9's 30-minute chart (rejected), not
+on the 5-minute growth bot. **Variants:** U33 with `add_at_lock` 2, 4, 8. G135's screen, then NinjaTrader's execution
+and the 89 starts for the best, on G78's rule or G99b's against U33.

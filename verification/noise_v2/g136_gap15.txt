@@ -1,0 +1,3 @@
+{"k": 0, "gap_go_locked_qty": 15, "gap_slip_pts": 2.0, "proxy net": 51544, "proxy d1000": 0, "nq net": 573949, "nq d1000": 0, "index net": 818474, "index d1000": 1}
+{"k": 1, "gap_go_locked_qty": 15, "gap_slip_pts": 4.0, "proxy net": 47507, "proxy d1000": 0, "nq net": 568953, "nq d1000": 0, "index net": 809374, "index d1000": 1}
+{"k": 2, "gap_go_locked_qty": 12, "gap_slip_pts": 2.0, "proxy net": 51564, "proxy d1000": 0, "nq net": 557561, "nq d1000": 0, "index net": 797989, "index d1000": 1}
