@@ -1,0 +1,10 @@
+{'nt': False, 'pack': 'U44ps1250', 'set': 'proxy', 'days traded %': 80.2, 'gap trades': 329, 'trades': 758, 'net $': 58736, 'pf': 1.619, 'win %': 49.7, 'closed dd $': 6009, 'worst day $': -900, 'days <= -1000': 0, 'floor touches': 0}
+{'nt': False, 'pack': 'U44ps1250', 'set': 'nq', 'days traded %': 81.1, 'gap trades': 1890, 'trades': 4904, 'net $': 574035, 'pf': 1.534, 'win %': 51.8, 'closed dd $': 22330, 'worst day $': -925, 'days <= -1000': 0, 'floor touches': 0}
+{'nt': False, 'pack': 'U44ps1250', 'set': 'index', 'days traded %': 79.1, 'gap trades': 2759, 'trades': 6954, 'net $': 858424, 'pf': 1.576, 'win %': 51.1, 'closed dd $': 22524, 'worst day $': -985, 'days <= -1000': 0, 'floor touches': 0}
+{'nt': True, 'pack': 'U44ps1250', 'set': 'proxy', 'days traded %': 80.2, 'gap trades': 329, 'trades': 760, 'net $': 58790, 'pf': 1.622, 'win %': 49.7, 'closed dd $': 6014, 'worst day $': -899, 'days <= -1000': 0, 'floor touches': 0}
+{'nt': True, 'pack': 'U44ps1250', 'set': 'nq', 'days traded %': 81.0, 'gap trades': 1887, 'trades': 4912, 'net $': 577333, 'pf': 1.537, 'win %': 51.7, 'closed dd $': 22015, 'worst day $': -925, 'days <= -1000': 0, 'floor touches': 0}
+{'nt': True, 'pack': 'U44ps1250', 'set': 'index', 'days traded %': 79.0, 'gap trades': 2749, 'trades': 6964, 'net $': 838761, 'pf': 1.562, 'win %': 51.0, 'closed dd $': 23937, 'worst day $': -985, 'days <= -1000': 0, 'floor touches': 0}
+index u44ps1250 starts 160 lost (at the floor) 12 dead (lost or frozen) 12 below start 6 median net 36668 worst net -842 lowest point -1833 reached +2000 157
+nq u44ps1250 starts 103 lost (at the floor) 9 dead (lost or frozen) 9 below start 7 median net 37228 worst net -1995 lowest point -1995 reached +2000 97
+index u44ps1250 starts 160 lost (at the floor) 10 dead (lost or frozen) 11 below start 4 median net 36553 worst net -705 lowest point -1816 reached +2000 158
+nq u44ps1250 starts 103 lost (at the floor) 8 dead (lost or frozen) 8 below start 5 median net 45075 worst net -1999 lowest point -1999 reached +2000 98

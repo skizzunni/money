@@ -5644,3 +5644,7 @@ extra contracts earn. Log: `verification/noise_v2/g227_gap_slip.txt`.
 **The variant:** U44 with `profit_step` 1,250 (1,500 now; G184's 1,750 lost more on U40). **Run once:** the 526 starts
 and the full sets in both executions. **Adopt on G78's rule** against U44 (higher nets on all three in both executions, no
 −$1,000 day, the floor never touched, no more than 28 lost).
+
+**G228 result (run once, 2026-11-04): rejected.** 526 starts **40** lost or frozen (21 + 19; U44 28); NQ $574,035 /
+$577,333 (U44 $587,643 / $579,739); the window ($58,790) and the index ($838,761) gain. Faster early sizing costs fresh
+accounts, as G184's slower sizing did the other way. Log: `verification/noise_v2/g228_step1250.txt`.
