@@ -4514,3 +4514,8 @@ Over $75,000 the weeks are U32's to the dollar: by then the day's $900 budget, n
 NQ $554,388, index $786,440, no −$1,000 day); the best window net among those passing goes on to NinjaTrader's
 execution and the 89 starts, on G78's rule against U34. Selection over 23 tries is the risk; the confirmation sets
 are the check.
+
+**G145 screen (2026-11-04):** 1 of 23 passes: k9 (`profit_step` 1,250, `profit_step_fast` 600 from $10,000,
+`giveback_brake` 0.4; the rest as U34): window $56,299, NQ $562,184, index $797,376. The four best windows ($58,611-
+59,417, all with 12 gap contracts) each have one index day at −$1,000. Candidate: k9 (package `U34k9`, variant `u34k9`).
+Log: `verification/noise_v2/g145_search.txt`.
