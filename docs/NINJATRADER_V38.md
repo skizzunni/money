@@ -5654,3 +5654,8 @@ accounts, as G184's slower sizing did the other way. Log: `verification/noise_v2
 **The variants:** U44 with `profit_step` (a) 1,400 and (b) 1,600. **Run once:** the 526 starts and the full sets in both
 executions. **Adopt (the better window) on G78's rule** against U44, or G99b's (at least 4 fewer lost, every net at least
 95%).
+
+**G229 result (run once, 2026-11-04): both rejected; $1,400 by $59.** $1,400: 526 starts **26** lost (U44 28);
+NinjaTrader window $58,485, NQ $589,951, index $829,784 (all above U44), chart window $57,584 and index $850,071 above,
+but the chart's NQ **$587,584** against U44's $587,643. G78 asks for higher on all; G99b for 4 fewer lost. A near miss,
+not adopted. $1,600: 28 lost, NinjaTrader window $57,316 (lower). Log: `verification/noise_v2/g229_step.txt`.
