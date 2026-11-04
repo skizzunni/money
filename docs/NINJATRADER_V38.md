@@ -3520,3 +3520,26 @@ widens the day, and the bot's next trade, sized to it, takes the loss). U25 stay
 
 **Scorecard, G44-G86:** 43 rounds. Adopted: G60 (U19), G67b (U20), G67's data fix, G79 (U22), G80 (U23), G82 (U24),
 G84 (U25). Rejected: 34 (G54 and G55 were measurements).
+
+## G87: a shadow gate near the floor, to save the lost accounts (registered 2026-11-04, before its run)
+
+**The ask:** the user wants the 11 lost or frozen accounts of 89 down to about 1, with the results kept.
+
+**What the 11 are (U25, `g35_start_dates_u24q10.csv`):** 7 made the first $2,000 (the floor stopped at the start)
+and then gave it all back; 4 never got there. All 11 died in long losing stretches for this strategy (2011, 2014, 2015,
+2019-20, 2021-22). G36-G37 showed that no size or stop change saves them: the bot loses for months even at 1 contract.
+The one thing that does is not trading through the stretch. The old equity-curve filter (v3.2's study) did that all
+the time and cut the profit by a quarter to most of it.
+
+**The rule (`protect_room`, `protect_n` 20):** a shadow (paper) record of the bot's own signals at 1 contract (no
+contract steps, no fill-ins, gap and go at 1, no floor) runs beside the account. While the account is more than
+`protect_room` above its trailing floor, nothing changes. Within `protect_room` of it, the account takes a trade (bot,
+gap and go, fill-ins) only on a day after the shadow's end-of-day equity closed at or above its average of the last 20
+sessions. The shadow never stops, so the account starts again when the strategy does.
+
+**Variants:** A: `protect_room` $1,000; B: $1,500.
+
+**Adopt (the one with fewer lost or frozen; A if tied) only if, against U25, both executions:**
+- on G35's 89 start dates, fewer lost or frozen accounts than 11;
+- the window's and the index's net at least 95% of U25's (the ask is survival, with the results kept);
+- no day at −$1,000 on any set, and the floor never touched on the window and the index.
