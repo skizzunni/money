@@ -5513,3 +5513,7 @@ the accounts that worse fills cost. U44 stays. Log:
 each on the 263 starts on the 1st (U44: 12). **Stage B:** the fewest lost (ties: the higher median), if 8 or fewer, on
 the mid-month starts and the full sets in both executions. **Adopted on G99b's rule** against U44 (at least 4 fewer of
 the 526 than 28, every net at least 95% of U44's, no −$1,000 day, the floor never touched) or G78's.
+
+**G217 result (2026-11-04): none goes on.** 263 starts on the 1st, lost or frozen (U44 12): the best k20 **10**
+(`size_slip_pts` 6, `skip_checks` 780 only, `lock_at` 0.3, `trend_n` 40, `big_day_k` 1.7; medians $30,853 / $59,163),
+k2 / k26 12, the rest 13 or more. None reaches 8; U44 stays. Log: `verification/noise_v2/g217_survival_search.txt`.
