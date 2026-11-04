@@ -5493,3 +5493,11 @@ touched. But 526 starts: **51** lost or frozen (14 + 37; 28 at 1 tick), most on 
 survival depends on fills near the tested 1 tick: the strategy's fill-quality alert (20 trades averaging more than 2
 ticks worse) is the signal to check the connection or turn on "Gentle start". Log:
 `verification/noise_v2/g215_u44_slip2.txt`.
+
+## G216: protecting a fresh account against worse fills, on U44 (registered 2026-11-04, before its run)
+
+**Why, from G215:** at 2 ticks U44 loses 51 of 526 (28 at 1 tick). **The variants:** U44 with (a) `size_slip_pts` 8 (the
+sizing counts a stop 8 points worse; 5 now), (b) `early_daily_loss` 600 (a $600 day until the floor stops; $750 now),
+(c) both. **Stage A:** each on the 526 starts at 2 ticks. **Stage B:** the one with the fewest lost at 2 ticks, if 45 or
+fewer, on the 526 starts and the full sets in both executions at 1 tick. **Adopted** if at 1 tick it loses no more than
+U44's 28 and every net is at least 95% of U44's, with no −$1,000 day and the floor never touched.
