@@ -4050,3 +4050,14 @@ net) on G78's rule**, against U29.
 $41,600, index $650,677 / $642,004. Both below U29 (`verification/noise_v2/g114_big_day.txt`).
 
 **Scorecard, G44-G114:** 71 rounds. Adopted 10 (and the data fix); rejected 58; measurements 3.
+
+## G115: a random search of nine settings together (registered 2026-11-04, before its run)
+
+**The idea:** one setting at a time has found each at its own best; settings that work together may not be. 32
+combinations drawn at random (seed 115) around U29: `lock_at` 0.28-0.45, `lock_plus` 1.5-4, `take_profit` 1.8-2.4,
+`stop_buffer` 0.20-0.28, `time_stop` 50/55/60/65/70/75, `fill_min_room` 2,500-4,000, `fill_qty2_room` 5,000-8,000,
+`gap_go_locked_qty` 8-12, `giveback_brake` 0.4-0.6.
+**Screen (chart's execution, 5-minute):** NQ and the index at least U29's, no day at −$1,000 on any set; of those, the
+highest window net is the candidate. **Then, run once:** NinjaTrader's execution and the 89 start dates, on G78's
+rule against U29. Selection bias is the risk (32 tries); the two later checks are on the sets and starts the screen
+didn't rank on (NinjaTrader's execution, the 89 starts).
