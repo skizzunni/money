@@ -3543,3 +3543,10 @@ sessions. The shadow never stops, so the account starts again when the strategy 
 - on G35's 89 start dates, fewer lost or frozen accounts than 11;
 - the window's and the index's net at least 95% of U25's (the ask is survival, with the results kept);
 - no day at −$1,000 on any set, and the floor never touched on the window and the index.
+
+## G88: today's default on the 100K and 150K accounts (a measurement, 2026-11-04)
+
+**Why:** G87 shows the lost accounts move around under any rule but the count stays near 10-11 of 89 on a 50K. What
+changed it before was the cushion (G40: the 50K's size on a 150K's limits, 14 → 5 dead). This measures today's
+default (U25) on the 100K ($1,800 budget, $3,000 trailing) and 150K ($2,700, $4,500) limits, the existing Funded
+growth 100K / 150K modes. No adoption: the modes are there; this says what they now give.
