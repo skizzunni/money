@@ -5725,3 +5725,10 @@ sets in both executions. **Adopt (the fewer lost) on G78's rule** against U44, o
 **G234 result (run once, 2026-11-04): both rejected.** 4 points: 28 lost, window $58,175 (higher), but the chart's NQ
 $584,903 and NinjaTrader's index $824,368 below U44; 6 points: 28 lost, the window $56,141 (lower). 5 stays. Log:
 `verification/noise_v2/g234_size_slip.txt`.
+
+## G235: G229's $1,400 step with G234's 4-point allowance, on U44 (registered 2026-11-04, before its run)
+
+**Why:** each was a near miss (G229 by $59 on the chart's NQ, 26 lost; G234 lower on two nets). **The variant:** U44 with
+`profit_step` 1,400 and `size_slip_pts` 4. **Run once:** the 526 starts and the full sets in both executions. **Adopt on
+G78's rule** against U44, or G99b's. Two near misses combined after the fact is a weaker test; a pass here is reported
+with that caveat.
