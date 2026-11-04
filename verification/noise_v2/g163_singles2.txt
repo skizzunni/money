@@ -1,0 +1,5 @@
+{"k": 0, "proxy net": 54879, "proxy d1000": 0, "nq net": 554388, "nq d1000": 0, "index net": 786440, "index d1000": 0}
+{"k": 1, "max_losers": 2, "proxy net": 51450, "proxy d1000": 0, "nq net": 539789, "nq d1000": 0, "index net": 795882, "index d1000": 0}
+{"k": 2, "after_loss_qty_div": 2.0, "proxy net": 54879, "proxy d1000": 0, "nq net": 554388, "nq d1000": 0, "index net": 786440, "index d1000": 0}
+{"k": 3, "fed_no_shorts": false, "proxy net": 53837, "proxy d1000": 0, "nq net": 554388, "nq d1000": 0, "index net": 786440, "index d1000": 0}
+{"k": 4, "lock_intrabar": true, "proxy net": 53200, "proxy d1000": 0, "nq net": 543061, "nq d1000": 0, "index net": 831279, "index d1000": 0}

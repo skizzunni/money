@@ -4740,3 +4740,8 @@ real saving would be about half of that; routing two instruments in the live str
 **Variants:** U34 with `max_losers` 2 (no entries after two losers in a day), `after_loss_qty_div` 2 (half the
 contracts after a loser), `fed_no_shorts` off, `lock_intrabar` (the lock armed inside the bar). G135's screen against
 U34, then confirmation for the best on G78's rule.
+
+**G163 result (run once, 2026-11-04): none passes the screen.** `max_losers` 2: $51,450 / $539,789 / $795,882;
+`after_loss_qty_div` 2: U34 to the dollar (the after-loss sizing already sets it); `fed_no_shorts` off: $53,837;
+`lock_intrabar`: $53,200 / $543,061 / $831,279 (U34 $54,879 / $554,388 / $786,440). Log:
+`verification/noise_v2/g163_singles2.txt`.
