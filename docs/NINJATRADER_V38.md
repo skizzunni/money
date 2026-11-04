@@ -3637,3 +3637,12 @@ $563,690 (less). 0.25: less on both (window $42,655 / $43,113, index $575,158 / 
 
 **The idea:** the stop sits 0.24 noise units past the line (G22, before gap and go and the rest).
 **Variants:** U25 with `stop_buffer` 0.18 and 0.30. **Adopt (the better by window net) on G78's rule**, against U25.
+
+**G92 result (run once, 2026-11-04): rejected; a near miss at 0.18.** 0.18: window **$46,291 / $46,293** (U25: $43,463
+/ $43,740), index $616,890 / **$595,276** (U25: $607,307 / $600,553), and a −$1,012 index day in the chart's
+execution. 0.30: less everywhere (window $40,279 / $40,365) (`verification/noise_v2/g92_stop_buffer.txt`).
+
+## G93: the stop 0.21 noise units past the line (registered 2026-11-04, before its run)
+
+**The idea:** between G92's 0.18 (more on the window and the chart's index, a −$1,012 day) and today's 0.24.
+**The variant:** U25 with `stop_buffer` 0.21. **Adopt on G78's rule**, against U25.
