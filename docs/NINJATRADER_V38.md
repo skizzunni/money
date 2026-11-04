@@ -5621,3 +5621,7 @@ higher. Within $20 of U44 on the window: once grown the day's budget, not the lo
 **Why:** G209's 15 gap contracts raised the nets but broke the $1,000 day; 11-12 were only tried inside combinations.
 **The variants:** U44 with `gap_go_locked_qty` (a) 11 and (b) 12 (10 now). **Run once:** the 526 starts and the full
 sets in both executions. **Adopt (the better window) on G78's rule** against U44.
+
+**G226 result (run once, 2026-11-04): both rejected: an index day past −$1,000.** 11 contracts: window $59,537, NQ
+$588,863, 28 lost, but an index day at **−$1,059**; 12: window $61,344, NQ $596,353, 28 lost, an index day at
+**−$1,155** (a gap trade stopped past its price at the open). 10 stays. Log: `verification/noise_v2/g226_gap_qty.txt`.
