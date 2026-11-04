@@ -83,6 +83,8 @@ namespace NinjaTrader.NinjaScript.Strategies
         // G99: once the floor has stopped at the start, while the profit is under GivebackBrake x the best end-of-day
         // profit, every trade at 1 MNQ (0 = off)
         public double GivebackBrake = 0;
+        // G191: no gap-slot trade (the gap trade, its small-gap and drive fill-ins) while the giveback brake is on
+        public bool GapSkipBraked = false;
         // G119: once the floor has stopped at the start, the trade after a loser risks this instead (0 = AfterLossMaxLoss)
         public double AfterLossLockedMaxLoss = 0;
         // G125: no new entry at these checks (the check bar's end, minutes after midnight, e.g. ",780,870,") until the
@@ -260,7 +262,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                               : FedToday && s.FedNoShorts ? "after 14:00 (Fed day)" : "yes";
                 bool early = !string.IsNullOrEmpty(s.EarlySkipChecks) && minutes == 5
                              && !(s.TrailDD > 0 && !double.IsNaN(trailPeak) && trailPeak - s.TrailDD >= trailBase);
-                return "longs " + longs + "; shorts " + shorts + (Braked() ? "; giveback brake on: 1 MNQ a trade" : "")
+                return "longs " + longs + "; shorts " + shorts + (Braked() ? "; giveback brake on: 1 MNQ a trade" + (s.GapSkipBraked ? ", no gap trade" : "") : "")
                        + (early ? "; no entries at " + EarlySkipText() + " until the floor stops" : "");
             }
         }
@@ -756,6 +758,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                     bavg /= nb;
                     if (Math.Abs(body) >= s.FillDriveK * bavg) { d = body > 0 ? 1 : -1; fire = one = true; }  // a drive
                 }
+                if (fire && s.GapSkipBraked && Braked()) fire = false;  // G191
                 if (fire)
                 {
                     int q = s.Qty;
@@ -906,6 +909,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 SizeSlip = 5;  // G170 (G79: 2, G97: 3, G106: 4)
                 MoreDaysQty2Room = 6000;  // G97
                 GivebackBrake = 0.5;  // G99c
+                GapSkipBraked = true;  // G191
                 AfterLossLocked = 187.5;  // G119
                 EarlyNoEntryChecks = "13:00,14:30";  // G125
                 FastSteps = 750;  // G142
@@ -973,6 +977,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 st.FillMinRoom = MoreDaysCushion;
                 st.FillQty2Room = MoreDaysQty2Room;  // G97
                 st.GivebackBrake = Mode != "Evaluation" ? GivebackBrake : 0;  // G99
+                st.GapSkipBraked = Mode != "Evaluation" && GapSkipBraked;  // G191
                 st.AfterLossLockedMaxLoss = Mode != "Evaluation" ? AfterLossLocked : 0;  // G119
                 st.EarlySkipChecks = Mode != "Evaluation" ? CheckEnds(EarlyNoEntryChecks) : "";  // G125
                 st.ProfitStepFast = Mode != "Evaluation" ? FastSteps : 0;  // G142
@@ -1777,6 +1782,10 @@ namespace NinjaTrader.NinjaScript.Strategies
         [Range(0, 1)]
         [Display(Name = "Giveback brake: once the floor has stopped, 1 MNQ per trade while the profit is under this share of its best (0 = off)", Order = 21, GroupName = "1. Size and risk")]
         public double GivebackBrake { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Giveback brake: no gap trade while the brake is on", Order = 29, GroupName = "1. Size and risk")]
+        public bool GapSkipBraked { get; set; }
 
         [NinjaScriptProperty]
         [Range(0, 5000)]

@@ -19,7 +19,7 @@ GIVEBACK = float(os.environ.get("GIVEBACK", "0.5"))  # G99: the giveback brake (
 NTARGS += [f"GivebackBrake={GIVEBACK}"] if GROW else []
 FILL = {**FILL, "size_slip_pts": SLIP, "giveback_brake": GIVEBACK, "size_up_to": 50,
         "after_loss_ml_locked": 1.0, "skip_checks": "780,870", "skip_checks_early": True,
-        "profit_step_fast": 750.0, "after_loss_ml_mult5": 1.0}  # G121: 50 on 5-minute bars (G106: 20); G119; G125
+        "profit_step_fast": 750.0, "after_loss_ml_mult5": 1.0, "gap_skip_braked": True}  # G121: 50 on 5-minute bars (G106: 20); G119; G125
 from mnqbot.noise import NoiseConfig, run
 S = "/tmp/claude-0/-home-user-money/b0ea31b5-d9fc-525a-a114-db6430eff3ed/scratchpad"
 SIM = "ninjatrader/tests/Sim/bin/Release/net8.0/Sim"

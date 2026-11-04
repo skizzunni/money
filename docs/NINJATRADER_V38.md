@@ -74,7 +74,7 @@ real MNQ data will differ somewhat. The stand-in has flattered this strategy bef
 simulator, Funded growth, from 2025-01-02, 1 tick of slippage, $0.62 a side;
 `verification/noise_v2/v38g_nt_2026-11-03.csv` and the trade lists beside it):
 
-| Jan 2, 2025 – Oct 2026 (updated 2026-11-04, U40) | 5-minute bars | 30-minute bars |
+| Jan 2, 2025 – Oct 2026 (updated 2026-11-04, U41) | 5-minute bars | 30-minute bars |
 |---|---|---|
 | Trades | 702 | 252 |
 | Net | **$54,700.08** | $28,620.10 |
@@ -88,13 +88,12 @@ simulator, Funded growth, from 2025-01-02, 1 tick of slippage, $0.62 a side;
 
 The 5-minute chart includes gap and go (U19, U20, U25: up to 10 MNQ once the floor has stopped), More trading days with the sizing allowance (U22, U26: 2-MNQ fill-ins from $6,000, 3 points), the
 data fix (G67), the after-loss max loss at $187.50 once the floor has stopped (U30), up to 50 MNQ (U32) and no entries
-at 13:00 and 14:30 until the floor has stopped (U33), faster contract steps above $10,000 of profit (U34) and the after-loss max loss as every trade's, $187.50 (U35-U37), a 5-point sizing allowance (U38) the drive fill-in at 0.6x (U39) and More trading days from a $2,500 cushion (U40). They need the 5-minute chart, so **trade the 5-minute chart**.
+at 13:00 and 14:30 until the floor has stopped (U33), faster contract steps above $10,000 of profit (U34) and the after-loss max loss as every trade's, $187.50 (U35-U37), a 5-point sizing allowance (U38) the drive fill-in at 0.6x (U39) More trading days from a $2,500 cushion (U40) and no gap trade while the giveback brake is on (U41). They need the 5-minute chart, so **trade the 5-minute chart**.
 
 **What to expect (measured 2026-11-04, G141/G144/G165 and the 263 fresh starts):**
-- A fresh 50K account on U40: about **1 in 12 is lost or frozen** within 21 months (42 of 526 starts on the 1st and the
-  15th of each month; U34: 60, about 1 in 9);
-  the median account makes **$43,318 in 21 months** (about $476 a week; U34 $39,454); +$3,000 takes a median
-  141 days (within 30 days in 3.8%); +$50,000 within 21 months in 51.0% (median 16.8 months).
+- A fresh 50K account on U41: about **1 in 14 is lost or frozen** within 21 months (38 of 526 starts on the 1st and the
+  15th of each month; U40: 42; U34: 60, about 1 in 9); the median account makes **$39,260 in 21 months** (about $430 a week; U40 $42,114); +$3,000 takes a median
+  138 days (within 30 days in 4.0%); +$50,000 within 21 months in 47.1% (median 16.6 months).
 - Once the account is $10,000-30,000 up: the window averaged **$1,660 a week** (17% of weeks at +$3,000 or more);
   past $30,000 the day's $900 budget caps every trade and the long histories average $600-1,200 a week.
 - At 2 ticks of slippage instead of 1, the window still makes $52,137 (G156).
@@ -5116,3 +5115,16 @@ variants:** U40 with (a) `gap_go_cap` (the gap trade's stop no farther than the 
 `gap_skip_braked` (no gap-slot trade while the giveback brake is on). **Run once:** the 526 starts and the full sets in
 both executions. **Adopt (the fewest lost) on G78's rule** (no more than 42 lost, higher nets) or G99b's (at least 4
 fewer lost, every net at least 95%).
+
+**G191 result (run once, 2026-11-04): (b) passes G99b's survival-first rule; adopted (U41).** 526 starts: (a) the
+capped stop **45** lost or frozen, with NinjaTrader's index $749,885 (96.8%); (b) no gap trade while braked **38**
+(17 + 21; U40 42). (b)'s nets, chart / NinjaTrader: window $54,622 / $54,710 (identical to U40: the brake never acts
+there), NQ $563,437 / $553,165 (U40 $563,490 / $560,957: 98.6%), index $787,157 / $776,319 (U40 $787,085 / $774,954);
+no −$1,000 day, the floor never touched. **The cost:** on the 526 starts the median 21-month net is $39,260 (U40
+$42,114 on the same count) and +$50,000 is reached in 47.1% (U40 49.4%): an account that gives back half its profit
+now waits for the bot's own trades to bring it back, without the gap trade's. Log:
+`verification/noise_v2/g191_gap_braked.txt`.
+
+**U41 (2026-11-04): no gap trade while the giveback brake is on (G191).** The setting "Giveback brake: no gap trade
+while the brake is on" (`GapSkipBraked`) defaults to on (the Funded growth modes; it acts only on the 5-minute chart,
+as the brake does). The dashboard's today line adds ", no gap trade" while the brake is on.

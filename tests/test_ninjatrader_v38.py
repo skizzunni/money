@@ -34,6 +34,8 @@ GROW = NoiseConfig(**{**V21, "qty": 1, "lookback": 14, "max_loss_per_trade": 187
                       "gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.6, "fill_after_lock": True,
                       "fill_min_room": 2500.0, "size_slip_pts": 5.0, "fill_qty2_room": 6000.0,
                       "giveback_brake": 0.5,
+                      # G191: no gap-slot trade while the giveback brake is on
+                      "gap_skip_braked": True,
                       # G119: once the floor has stopped, the trade after a loser risks $187.50 like the others
                       "after_loss_ml_locked": 1.0,
                       # G125: no entries at 13:00 and 14:30 until the floor has stopped
@@ -746,6 +748,33 @@ def test_v38_giveback_brake(sim, sample_1m, tmp_path):  # noqa: F811
             assert math.isclose(float(a[6]), t.pnl, abs_tol=1e-6), (a, t)
         qtys[gb] = sum(t.qty for t in py)
     assert qtys[0.9] < qtys[0.0]
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+def test_v38_gap_skip_braked(sim, sample_1m, tmp_path):  # noqa: F811
+    """G191: no gap-slot trade while the giveback brake is on. A $600 trailing drawdown (Custom mode) and a 0.9 brake
+    make it act within the sample; NinjaTrader's code and the model agree trade for trade with it on and off, and on,
+    there are fewer gap trades."""
+    bars = resample(sample_1m, "5min")
+    path = tmp_path / "bars.csv"
+    with path.open("w") as f:
+        for t, r in zip(bars.index, bars.itertuples(), strict=True):
+            f.write(f"{t:%Y-%m-%d %H:%M},{r.open!r},{r.high!r},{r.low!r},{r.close!r}\n")
+    gaps = {}
+    for on in (True, False):
+        r = subprocess.run([DOTNET, str(sim), str(path), "5", "Strategy=V38", "Mode=Custom", "TrailDD=600", "EarlyNoEntryChecks=",
+                            "GivebackBrake=0.9", f"GapSkipBraked={on}"], capture_output=True, text=True, env=ENV)
+        assert r.returncode == 0, r.stderr[-2000:]
+        nt = [x.split(",")[1:] for x in r.stdout.splitlines() if x.startswith("T,")]
+        py = run(bars, dataclasses.replace(GROW, trail_dd=600.0, skip_checks="", giveback_brake=0.9,
+                                           gap_skip_braked=on), minutes=5).trades
+        assert len(nt) == len(py) >= 20
+        for a, t in zip(nt, py, strict=True):
+            assert (int(a[0]), int(a[1]), int(a[3])) == (t.direction, t.entry_bar, t.exit_bar), (a, t)
+            assert float(a[2]) == t.entry and float(a[4]) == t.exit, (a, t)
+            assert math.isclose(float(a[6]), t.pnl, abs_tol=1e-6), (a, t)
+        gaps[on] = sum(t.reason.startswith("Gap") for t in py)
+    assert gaps[True] < gaps[False]
 
 
 @pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
