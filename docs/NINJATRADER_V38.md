@@ -91,7 +91,8 @@ data fix (G67), the after-loss max loss at $187.50 once the floor has stopped (U
 at 13:00 and 14:30 until the floor has stopped (U33), faster contract steps above $10,000 of profit (U34) and the after-loss max loss as every trade's, $187.50 (U35-U37), a 5-point sizing allowance (U38) the drive fill-in at 0.6x (U39) and More trading days from a $2,500 cushion (U40). They need the 5-minute chart, so **trade the 5-minute chart**.
 
 **What to expect (measured 2026-11-04, G141/G144/G165 and the 263 fresh starts):**
-- A fresh 50K account on U40: about **1 in 15 is lost or frozen** within 21 months (17 of 263 monthly starts; U34 32);
+- A fresh 50K account on U40: about **1 in 12 is lost or frozen** within 21 months (42 of 526 starts on the 1st and the
+  15th of each month; U34: 60, about 1 in 9);
   the median account makes **$43,318 in 21 months** (about $476 a week; U34 $39,454); +$3,000 takes a median
   141 days (within 30 days in 3.8%); +$50,000 within 21 months in 51.0% (median 16.8 months).
 - Once the account is $10,000-30,000 up: the window averaged **$1,660 a week** (17% of weeks at +$3,000 or more);
@@ -5021,3 +5022,10 @@ than 1% of net. Expect about 1 fresh account in 10 to 15 to be lost or frozen wi
 **The check:** U35-U40 were adopted on starts on the 1st of each month. The same 263 months started on the **15th**
 (`START_FREQ=MID`) are a new sample: U34, U37 and U40 on it. **Read:** if U40 loses clearly fewer than U34 there too,
 the survival gains are real; if not, they were fitted to the 1st-of-month sample. No adoption rides on it.
+
+**G183 result (2026-11-04): the after-loss gains hold; the last three don't add.** Lost or frozen on the 263
+mid-month starts: U34 **28**, U37 **22**, U40 **25** (on the 1st-of-month starts: 32 / 20 / 17). Over both samples
+(526): U34 60 (11.4%), U37 42 (8.0%), U40 42 (8.0%). So U35-U37 (the after-loss max loss as every trade's) are a real
+gain of about 3 accounts in 100; U38-U40 are neutral on survival (and within 1% on net). U40 stays the file: as safe as
+U37 on the larger sample, with the same net. Medians on the mid-month starts: U40 $47,800 / $37,760, U37 $51,397 /
+$37,937, U34 $48,237 / $35,674. Log: `verification/noise_v2/g183_mid_month.txt`.

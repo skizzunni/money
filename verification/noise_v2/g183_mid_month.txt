@@ -1,0 +1,6 @@
+index u33fs starts 160 lost (at the floor) 12 dead (lost or frozen) 13 below start 7 median net 35674 worst net -1982 lowest point -1982 reached +2000 153
+nq u33fs starts 103 lost (at the floor) 15 dead (lost or frozen) 15 below start 8 median net 48237 worst net -1999 lowest point -1999 reached +2000 96
+index u37mid starts 160 lost (at the floor) 11 dead (lost or frozen) 12 below start 4 median net 37937 worst net -1857 lowest point -1857 reached +2000 156
+nq u37mid starts 103 lost (at the floor) 10 dead (lost or frozen) 10 below start 9 median net 51397 worst net -1999 lowest point -1999 reached +2000 96
+index u40mid starts 160 lost (at the floor) 12 dead (lost or frozen) 13 below start 4 median net 37760 worst net -1857 lowest point -1857 reached +2000 156
+nq u40mid starts 103 lost (at the floor) 12 dead (lost or frozen) 12 below start 9 median net 47800 worst net -1999 lowest point -1999 reached +2000 96
