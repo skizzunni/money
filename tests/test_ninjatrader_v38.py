@@ -498,6 +498,13 @@ def test_v38_fill_quality(sim, sample_1m, tmp_path):  # noqa: F811
     _, j3, dash3 = go(3)
     stops3 = j3[(j3.kind == "TRADE") & (j3["exit kind"] == "Stop loss")]["exit slip ticks"].dropna()
     assert (stops3 >= 3 - 1e-9).all() and "consider Gentle start" in dash3
+    # G158: live, one alert once 20 trades average more than 2 ticks worse than planned (none at 1 tick)
+    for slip, want in ((3, 1), (1, 0)):
+        rr = subprocess.run([DOTNET, str(sim), str(path), "5", "Strategy=V38", *GROW_ARGS, "SimRealtimeFrom=1",
+                             f"SimSlippageTicks={slip}"], capture_output=True, text=True, env=ENV)
+        assert rr.returncode == 0, rr.stderr[-2000:]
+        alerts = [x for x in rr.stdout.splitlines() if x.startswith("A,") and "Fills are" in x]
+        assert len(alerts) == want, (slip, alerts[:3])
     plain = subprocess.run([DOTNET, str(sim), str(path), "5", "Strategy=V38", *GROW_ARGS], capture_output=True,
                            text=True, env=ENV)
     assert [x.split(",")[1:] for x in plain.stdout.splitlines() if x.startswith("T,")] == trades

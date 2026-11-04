@@ -847,6 +847,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         string summaryDay = "";   // the session the day's summary was sent for
         bool winWarned;           // U13: the win-rate warning alerted
         bool goalDone;            // U8: the goal alerted or already reached when the strategy went live
+        bool slipWarned;          // G158: the fill-quality alert, once
         int milestoneDone;        // U8: the last milestone (multiples of MilestoneStep since the start) alerted or passed
         string realDay = "";
         string journalPath = "", liveJournalPath = "";
@@ -1343,6 +1344,17 @@ namespace NinjaTrader.NinjaScript.Strategies
                 double outSlip = double.IsNaN(outRef) ? double.NaN : dir * (outRef - t.Exit.Price) / TickSize;
                 if (!double.IsNaN(inSlip)) { entrySlipSum += inSlip; entrySlipN++; }
                 if (!double.IsNaN(outSlip)) { exitSlipSum += outSlip; exitSlipN++; }
+                if (!slipWarned && entrySlipN >= 20)  // G158: at 3 ticks a fill the tested bot can lose a fresh account
+                {
+                    double avgSlip = (entrySlipSum / entrySlipN + (exitSlipN > 0 ? exitSlipSum / exitSlipN : 0.0)) / 2;
+                    if (avgSlip > 2.0)
+                    {
+                        slipWarned = true;
+                        Say("fills", "Fills are " + avgSlip.ToString("0.0", CultureInfo.InvariantCulture) + " ticks worse than plan on average (" +
+                            entrySlipN + " trades); the backtests assume 1, and at 3 a fresh account can be lost. Check the connection, " +
+                            "the data feed and the order type before trading on");
+                    }
+                }
                 entryRef = exitRef = stopRef = double.NaN;
                 Journal("TRADE," + en.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture) + "," +
                         ex.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture) + "," + side + "," + t.Quantity + "," +
