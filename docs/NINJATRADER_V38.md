@@ -4699,3 +4699,7 @@ more, stop and check the connection, the data feed and the order type.
 **The idea:** G123: the 13:30 and 15:00 entries make the most per trade; a 15:00 entry has an hour to reach a target
 set for a whole afternoon. **Variants:** U34 with `late_tp` 1.0 and 1.5 noise units for entries from the 15:00 check,
 and 2.5 from the 13:30 check. G135's screen against U34, then confirmation for the best on G78's rule.
+
+**G159 result (run once, 2026-11-04): none passes the screen.** From 15:00 at 1.0: $54,687 / $504,280 / $734,852;
+at 1.5: $54,904 / **$519,757** / $780,321; from 13:30 at 2.5: $54,883 / $564,979 / **$766,103** (U34 $54,879 /
+$554,388 / $786,440). Log: `verification/noise_v2/g159_late_tp.txt`.
