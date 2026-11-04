@@ -5673,7 +5673,7 @@ Full suite 675 passed; NinjaTrader's growth run identical to the model (up to th
 | Weekly, the account $10,000-30,000 up (window) | $1,483 average, 11% of weeks at +$3,000 or more |
 | Weekly, past $75,000 (long histories) | $1,067-1,256 |
 
-**Today (G189-G235, 47 rounds):** U41 (no gap trade while braked), U42 (G204's five survival settings: 38 → 28 lost),
+**Today (G189-G236, 48 rounds):** U41 (no gap trade while braked), U42 (G204's five survival settings: 38 → 28 lost),
 U43 and U44 (faster grown-phase steps, 3-MNQ fill-ins, 75 MNQ: window $53,164 → $57,475, index +9%). Everything else was
 rejected or a measurement. **Not reached:** $3,000 a week on average, or zero lost accounts. Past U44, every extra
 contract or a bigger day budget broke the $1,000 day (G214, G219, G226), and the account's survival depends on fills
@@ -5743,3 +5743,6 @@ $58,301, NQ $596,531, index $856,839 and NinjaTrader window $59,263, NQ $597,954
 **Why:** the index has an upward drift; the bot's shorts and longs take the same size (`short_mult` 1). G195 drew
 0.5 / 1.5 only inside combinations. **The variants:** U44 with `short_mult` (a) 0.75 and (b) 1.25. **Run once:** the 526
 starts and the full sets in both executions. **Adopt (the better window) on G78's rule** against U44, or G99b's.
+
+**G236 result (run once, 2026-11-04): both rejected.** 0.75x: 28 lost, every net lower (window $56,735, index $812,879);
+1.25x: 29 lost, the window $52,044. Full-size shorts stay. Log: `verification/noise_v2/g236_short_mult.txt`.
