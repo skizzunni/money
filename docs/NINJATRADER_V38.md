@@ -5061,3 +5061,10 @@ But 2 of 526 is well inside the noise G182 showed, and the median fresh account 
 $37,339 against U40's $51,488 / $47,800). Trading 4% less net and a fifth less median for no measurable safety is the
 wrong trade for this account, so U40 stays; this departs from the registered rule and is stated as such. **From G187
 on, G99b needs a survival gain of at least 4 of the 526 starts.** Log: `verification/noise_v2/g186_no_uptrend_shorts.txt`.
+
+## G187: half size on jobs-report days, on U40, on 526 starts (registered 2026-11-04, before its run)
+
+**The idea:** G62 doubled the size on the first-Friday jobs reports (rejected); the other way: those days' 08:30 news
+makes the morning wide, so half the contracts (`news_mult` 0.5, at least 1). **The variant:** U40 with it. **Run once:**
+the 526 starts and the full sets in both executions. **Adopt on G78's rule** (no more lost than U40's 42), or G99b's
+with a gain of at least 4 of the 526.
