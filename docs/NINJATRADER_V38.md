@@ -74,19 +74,19 @@ real MNQ data will differ somewhat. The stand-in has flattered this strategy bef
 simulator, Funded growth, from 2025-01-02, 1 tick of slippage, $0.62 a side;
 `verification/noise_v2/v38g_nt_2026-11-03.csv` and the trade lists beside it):
 
-| Jan 2, 2025 – Oct 2026 (updated 2026-11-03, U22) | 5-minute bars | 30-minute bars |
+| Jan 2, 2025 – Oct 2026 (updated 2026-11-04, U23) | 5-minute bars | 30-minute bars |
 |---|---|---|
 | Trades | 710 | 252 |
-| Net | **$33,011.82** | $28,620.10 |
+| Net | **$38,090.29** | $28,620.10 |
 | Winners | 51.2% | 53.6% |
-| Profit factor | 1.585 | 1.881 |
-| Closed drawdown | $2,859.94 | $3,934.78 |
-| Largest loss | −$1,006.91 | −$1,634.41 |
-| Worst day | −$899.06 | −$899.20 |
+| Profit factor | 1.625 | 1.881 |
+| Closed drawdown | $3,363.85 | $3,934.78 |
+| Largest loss | −$1,258.64 | −$1,634.41 |
+| Worst day | −$899.16 | −$899.20 |
 | Most contracts | 15 | 15 |
 | Days with a trade (the model) | about 72% | about 29% |
 
-The 5-minute chart includes gap and go (U19, U20), More trading days with the 2-point sizing allowance (U22) and the
+The 5-minute chart includes gap and go (U19, U20, U23: up to 5 MNQ once the floor has stopped), More trading days with the 2-point sizing allowance (U22) and the
 data fix (G67). They need the 5-minute chart, so **trade the 5-minute chart**.
 
 **It matches the Python model, trade for trade.**
@@ -3387,3 +3387,28 @@ path (no longer a gate, G78's rule) and one −$1,054 index day, which U22's 2-p
 **Adopt on G78's rule**, against U22: a higher net on the window and the index in both executions (NQ too where its
 account lives), the floor never touched on the window and the index, no more days at −$1,000 on any set, and on the 89
 start dates no more lost or frozen accounts than U22's 11.
+
+**G80 result (run once, 2026-11-03/04): passes; adopted.**
+
+| 5-minute, chart / NinjaTrader | U22 (3 gap contracts once stopped) | **U22 + 5** |
+|---|---|---|
+| days with a trade (window / NQ / index) | 72% / lost / 81% | 72% / lost / 81% |
+| window | $33,962 / $33,773 | **$37,861 / $38,189** |
+| NQ 2015-25 | lost / lost (reported) | lost / lost (reported) |
+| index | $521,452 / $515,363 | **$557,421 / $551,532** |
+| days at −$1,000 | 0 | 0 |
+| floor touched (window, index) | never | never |
+| 89 start dates: lost or frozen | 11 | **11** |
+| medians NQ / index | $40,443 / $34,289 | $40,251 / $35,065 |
+
+(`verification/noise_v2/g80_u22_q5.txt`, `g35_start_dates_u22q5.csv`.)
+
+**U23 (2026-11-04): gap and go up to 5 MNQ once the floor has stopped (G80).** "Gap and go once the trailing floor
+has stopped at the start: up to this many MNQ" now defaults to **5** (was 3).
+- **The file you trade, on the NinjaTrader simulator, 5-minute, from 2025-01-02: 710 trades, $38,090.29, 51.2%
+  winners, profit factor 1.625, closed drawdown $3,363.85, worst day −$899.16, largest loss −$1,258.64** (a 5-contract
+  gap stop on a day already green). Trade for trade with the model to 2026-03-09 (the stand-in data's hole). 30-minute
+  unchanged: $28,620.10, all 303 identical (`verification/noise_v2/v38g_nt_g80_2026-11-04.txt`).
+
+**Scorecard, G44-G80:** 37 rounds. Adopted: G60 (U19), G67b (U20), G67's data fix, G79 (U22), G80 (U23). Rejected: 30
+(G54 and G55 were measurements).
