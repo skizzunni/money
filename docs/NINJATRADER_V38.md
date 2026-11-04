@@ -4082,3 +4082,17 @@ max loss at 1.0 (window $48,001, NQ $530,631, index $703,794), `profit_step` 1,2
 (window $45,066). The highest window net is `after_loss_ml_mult` 1.0, the candidate (package `U29al1`, variant
 `u29al1`). A shorter lookback, a wider entry line and an earlier last entry each lose an account on some set. Log:
 `verification/noise_v2/g116_sweep.txt`.
+
+**G116 result (run once, 2026-11-04): rejected by one account.** NinjaTrader's execution: window $48,100 (U29 $46,828),
+NQ $528,725, index $684,979 (U29 $648,812), floor never touched, no −$1,000 day. 89 start dates: 11 lost or frozen
+(NQ 5, index 6) against U29's 10. U29 stays. Log: `verification/noise_v2/g116_after_loss_1.txt`.
+
+## G117: the trend over 40 sessions (registered 2026-11-04, before its run)
+
+**The variant:** U29 with `trend_n` 40, G116's second screen pass (chart's execution: window $45,066, NQ $507,848,
+index $696,307). **Adopt on G78's rule** against U29 (NinjaTrader window $46,828, index $648,812; 10 lost or frozen).
+
+## G118: a contract per $1,250 (registered 2026-11-04, before its run)
+
+**The variant:** U29 with `profit_step` 1,250, G116's third screen pass (window $45,983, NQ $504,922, index $669,421).
+**Adopt on G78's rule** against U29.
