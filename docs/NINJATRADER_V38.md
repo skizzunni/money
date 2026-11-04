@@ -5574,3 +5574,12 @@ advice stays if it loses clearly fewer (45 or fewer); otherwise the setting text
 setting's text says it doesn't help on U44. Log: `verification/noise_v2/g222_gentle_slip2.txt`.
 
 **After G222 (2026-11-04):** the full suite, **675 passed**, on the final U44 file (the fill warning's new text).
+
+## G223: a finer check grid on U44 (registered 2026-11-04, before its run)
+
+**Why:** once grown, U44's day is capped by its budget, not by signals; more checks mean more chances at a trade that
+fits it. A 15-minute grid was tried only on the v2.8 bot (docs/RESULTS.md). **The variants** (`research/g223_check_grid.py`):
+U44 with checks every 15 minutes (`check_step` 15), the same from 09:45 (`first_check` 585), 09:45 with the half
+hours, every 20 minutes, and every 15 minutes with the last entry at 14:30. **Screen as G209's** against U44 (the chart's
+nets at least U44's on all three sets, no −$1,000 day, the floor never touched). A pass is reported; the NinjaTrader
+strategy has only the half-hour grid, so adoption needs the grid built there first.
