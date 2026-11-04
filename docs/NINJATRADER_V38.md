@@ -4505,3 +4505,12 @@ $750 above $10,000 stays. Log: `verification/noise_v2/g143_steps2.txt`.
 | over $75,000 | - | 401 / $1,195 / 15.7% | 711 / $986 / 14.1% |
 
 Over $75,000 the weeks are U32's to the dollar: by then the day's $900 budget, not the steps, sets every trade's size.
+
+## G145: 23 random combinations of the growth settings around U34 (registered 2026-11-04, before its run)
+
+**Variants (seed 145):** `profit_step` 1,250 / 1,500 / 1,750, `profit_step_fast` 600 / 750 / 900,
+`profit_step_fast_from` 8,000 / 10,000 / 12,000, `gap_go_locked_qty` 8 / 10 / 12, `fill_qty2_room` 5,000-7,000,
+`giveback_brake` 0.4-0.6, `fill_min_room` 2,500-3,500; row 0 is U34. **Screen:** G135's against U34 (window $54,879,
+NQ $554,388, index $786,440, no −$1,000 day); the best window net among those passing goes on to NinjaTrader's
+execution and the 89 starts, on G78's rule against U34. Selection over 23 tries is the risk; the confirmation sets
+are the check.
