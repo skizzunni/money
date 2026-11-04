@@ -5246,3 +5246,13 @@ k242 30, k17 22, k262 50, k237 34, k166 24. Each of G196's closest loses more ac
 raises the window and the index and costs NQ about 1%. It was never judged on the 526 starts. **The variant:** U41 with
 `trend_n` 100. **Run once:** the 526 starts and the full sets in both executions. **Adopt on G78's rule** (higher nets
 on all three in both executions, no more than 38 lost) or G99b's (at least 4 fewer lost, every net at least 95%).
+
+## G200: what simple setups earn on the days U41 sits out (a measurement, registered 2026-11-04, before its run)
+
+**Why:** U41 trades on about 72% of sessions; a second setup on the other 28% would add trades without crowding the
+first. **The measurement** (`research/g200_idle_days.py`, 1 MNQ, commission and a tick each way): on the sessions with
+no U41 trade, (A) last-half-hour momentum in the direction of the day so far, (B) the same in the direction of the
+first half hour, (C) the opening-range breakout (first close beyond 09:30-10:00, a stop at the other side, out at
+16:00), (D) a fade of the first half hour from 10:00 to 16:00; per year on NQ, the index and the window. **What would
+follow:** a setup is registered as a fill-in (G201) only if it is positive on all three sets and in at least two thirds
+of the years.
