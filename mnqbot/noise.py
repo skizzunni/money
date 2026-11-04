@@ -341,6 +341,9 @@ class NoiseConfig:
     # research (G99): once the floor has stopped, while the profit is under giveback_brake x the best end-of-day
     # profit, every trade at 1 contract (0 = off)
     giveback_brake: float = 0.0
+    # research (G100): when the room can't fit 1 contract of the gap trade's stop, 1 contract with the stop cut to the
+    # room (whole ticks), if that is at least 10 points
+    gap_squeeze: bool = False
     protect_dates: str = ""
     # research (G67): once the trailing floor has stopped at the start (trail_cap), a gap trade may take up to this
     # many contracts in place of gap_go_max_qty (0 = off)
@@ -787,6 +790,12 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                             q = min(q, cfg.gap_go_max_qty)
                         if one:
                             q = min(q, fill_q())
+                        if q < 1 and cfg.gap_squeeze and math.isfinite(room):  # G100: the gap trade squeezed
+                            costs = (2 * cfg.commission_per_side + 2 * slip * cfg.point_value
+                                     + cfg.gap_slip_pts * cfg.point_value)
+                            pts = math.floor((room - costs) / cfg.point_value / cfg.tick + 1e-9) * cfg.tick
+                            if pts >= 10:
+                                q, stop_px = 1, c[i - 1] + d * slip - d * pts
                         if q >= 1:
                             gg = {"d": d, "q": q, "bar": i, "px": o[i] + d * slip, "stop": stop_px, "fill": one}
                             events.append((i - 1, "GAP BUY" if d > 0 else "GAP SELL"))
