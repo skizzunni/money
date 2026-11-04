@@ -5054,3 +5054,10 @@ survival, not weekly profit.
 **The variant:** U40 with `trend_small` off (above the 50-session trend, no shorts at all; U40: 1-contract shorts there
 once the floor stops). **Run once:** the 526 starts and the full sets in both executions. **Adopt on G78's rule**
 against U40 (no more than 42 of 526 lost), or G99b's if it loses fewer.
+
+**G186 result (run once, 2026-11-04): passes the letter of G99b, not adopted.** 526 starts: **40** lost or frozen
+(17 + 23; U40 42); NinjaTrader window $52,315 (95.6%), NQ $539,350 (96.1%), index $745,291 (96.2%); no −$1,000 day.
+But 2 of 526 is well inside the noise G182 showed, and the median fresh account falls by about a fifth (NQ $37,684 /
+$37,339 against U40's $51,488 / $47,800). Trading 4% less net and a fifth less median for no measurable safety is the
+wrong trade for this account, so U40 stays; this departs from the registered rule and is stated as such. **From G187
+on, G99b needs a survival gain of at least 4 of the 526 starts.** Log: `verification/noise_v2/g186_no_uptrend_shorts.txt`.
