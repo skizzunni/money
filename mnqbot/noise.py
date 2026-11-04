@@ -141,6 +141,7 @@ class NoiseConfig:
     trend_with_tp: float = 0.0  # research (G20): a trade with the trend takes this take-profit, noise units (0 = off)
     # research (v2.4 study): no new entries at these checks (minutes of the day the check's bar closes, e.g. "840")
     skip_checks: str = ""
+    day_stop_profit: float = 0.0  # research (G127): no new entries today once today's closed P/L is at least this, $
     skip_checks_early: bool = False  # research (G125): skip_checks only until the floor has stopped
     after_target_done: bool = False  # research: no new entries today after a take-profit fills
     # research (v2.4 study): the equity curve. While the closed-trade P&L is below its average over the last eq_n
@@ -672,6 +673,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             return False
         if (cfg.skip_checks and str(end) in cfg.skip_checks.split(",")
                 and not (cfg.skip_checks_early and (minutes != 5 or floor_stopped()))):  # G125: 5-minute bars
+            return False
+        if cfg.day_stop_profit > 0 and day_pnl >= cfg.day_stop_profit:
             return False
         if cfg.after_target_done and target_today:
             return False

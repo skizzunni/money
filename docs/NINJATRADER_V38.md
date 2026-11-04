@@ -4228,3 +4228,13 @@ strongest checks (10:00, 13:30, 15:00). With `budget_frac` below 1 a trade may r
 today (the steps and the cap unchanged). Last tested on v2.8 (`docs/RESULTS.md`), never with the growth sizing.
 **Variants:** U33 with `budget_frac` 0.6 and 0.8. **Adopt (the better window net of those that pass) on G78's rule or
 G99b's** against U33.
+
+**G126 result (run once, 2026-11-04): rejected.** NinjaTrader's execution, U33 / 0.8 / 0.6: window $50,337 / $43,691 /
+$32,294, NQ $549,379 / $417,950 / $320,051, index $774,086 / $604,657 / $432,290; 89 starts lost or frozen 8 / 7 / 6.
+Fewer lost accounts, but 76-87% of the net at 0.8 (below G99b's 95%). Log: `verification/noise_v2/g126_budget_frac.txt`.
+
+## G127: no new entries once the day is well up (registered 2026-11-04, before its run)
+
+**The idea:** keep a big day instead of giving part of it back. `day_stop_profit` (a new research setting): no new
+entries once today's closed P/L is at least this (open trades run as usual). **Variants:** U33 with $1,500 and $2,500.
+**Adopt (the better window net of those that pass) on G78's rule or G99b's** against U33.
