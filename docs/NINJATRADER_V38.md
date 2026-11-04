@@ -5673,7 +5673,7 @@ Full suite 675 passed; NinjaTrader's growth run identical to the model (up to th
 | Weekly, the account $10,000-30,000 up (window) | $1,483 average, 11% of weeks at +$3,000 or more |
 | Weekly, past $75,000 (long histories) | $1,067-1,256 |
 
-**Today (G189-G234, 46 rounds):** U41 (no gap trade while braked), U42 (G204's five survival settings: 38 → 28 lost),
+**Today (G189-G235, 47 rounds):** U41 (no gap trade while braked), U42 (G204's five survival settings: 38 → 28 lost),
 U43 and U44 (faster grown-phase steps, 3-MNQ fill-ins, 75 MNQ: window $53,164 → $57,475, index +9%). Everything else was
 rejected or a measurement. **Not reached:** $3,000 a week on average, or zero lost accounts. Past U44, every extra
 contract or a bigger day budget broke the $1,000 day (G214, G219, G226), and the account's survival depends on fills
@@ -5732,3 +5732,8 @@ $584,903 and NinjaTrader's index $824,368 below U44; 6 points: 28 lost, the wind
 `profit_step` 1,400 and `size_slip_pts` 4. **Run once:** the 526 starts and the full sets in both executions. **Adopt on
 G78's rule** against U44, or G99b's. Two near misses combined after the fact is a weaker test; a pass here is reported
 with that caveat.
+
+**G235 result (run once, 2026-11-04): rejected by NinjaTrader's index.** 526 starts **26** lost (U44 28); chart window
+$58,301, NQ $596,531, index $856,839 and NinjaTrader window $59,263, NQ $597,954, all above U44, but NinjaTrader's index
+**$824,406** against $828,138 (−0.45%). G78 asks for higher on all six; G99b for 4 fewer lost. Not adopted. Log:
+`verification/noise_v2/g235_combined.txt`.
