@@ -5171,3 +5171,12 @@ stop capped **80** (U41 38). The window gains (NinjaTrader $56,044 / $58,274 aga
 / $461,585 (U41 $553,165: 84%), the index to $730,889 / $725,923, and both have an index day at **−$1,117** (past the
 $1,000 limit): the smaller stop takes more contracts, and a stop that fills far past its price then costs more. Log:
 `verification/noise_v2/g192_stop150.txt`.
+
+**G195 result (run once, 2026-11-04): none passes stage 2; nothing goes on.** Stage 1: 22 of 299 beat U41 on the window
+($54,622) with no −$1,000 day and the floor never touched, the best at **$73,777**; 12 touched the floor. Stage 2: all
+15 best are lower on NQ or the index (U41 $563,437 / $787,157). The window's best mostly had a one-check cooldown after
+a trade on a side (`side_cooldown`), which pays on the window and costs $140-200k on NQ and the index: a window fit.
+The closest, k87 (`trend_n` 100, no time stop, the gap trade to break-even at 1x its risk, a lock from 15:00, a
+4-point sizing allowance): window $58,043, index **$806,551**, NQ $555,239 (98.5%), so it fails by NQ; k133 (lookback
+20, entry 0.9x, range position 0.55, last entry 15:30, at most four losers, $1,250 steps): NQ $550,705, index $608,681.
+Log: `verification/noise_v2/g195_wide.txt`.
