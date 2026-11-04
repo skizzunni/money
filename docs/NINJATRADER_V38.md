@@ -5165,3 +5165,9 @@ after-loss target, day keep...); row 0 is U41. **Stage 1:** each on the window (
 execution and the 526 starts, best window first, at most three; **adopted on G78's rule** (no more than 38 lost) or
 G99b's (at least 4 fewer lost, every net at least 95%). With 299 tries some will beat U41 on the window by chance; NQ,
 the index and the 526 starts are the check against that.
+
+**G192 result (run once, 2026-11-04): both rejected.** 526 starts: (a) $150 **95** lost or frozen, (b) with the gap
+stop capped **80** (U41 38). The window gains (NinjaTrader $56,044 / $58,274 against $54,710), but NQ falls to $465,623
+/ $461,585 (U41 $553,165: 84%), the index to $730,889 / $725,923, and both have an index day at **−$1,117** (past the
+$1,000 limit): the smaller stop takes more contracts, and a stop that fills far past its price then costs more. Log:
+`verification/noise_v2/g192_stop150.txt`.
