@@ -3940,3 +3940,13 @@ window $44,141 / $44,199 (U28: $45,340 / $45,396). Faster steps still cost accou
 **The idea:** the lost accounts die early, at small size; the most contracts (15) binds only on grown accounts, where
 the weekly profit is made. Every trade still fits the day's $900 budget and the room above the floor.
 **The variant:** U28 with `size_up_to` 20. **Adopt on G78's rule**, against U28 (no more lost or frozen than 10).
+
+**G105 result (run once, 2026-11-04): rejected by one day.** 89 start dates: 10 lost or frozen (as U28); window
+**$47,172 / $47,230**, index **$666,770 / $655,294**, NQ **$500,348 / $498,513** (all above U28); but a −$1,033 index
+day in the chart's execution (`verification/noise_v2/g105_max20.txt`).
+
+## G106: 20 contracts with a 4-point sizing allowance (registered 2026-11-04, before its run)
+
+**The idea:** G105 failed on one day where a stop filled past its price at full size; the sizing allowance (G76/G97)
+is what removes such days. **The variant:** U28 with `size_up_to` 20 and `size_slip_pts` 4.
+**Adopt on G78's rule**, against U28.
