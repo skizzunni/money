@@ -5899,3 +5899,6 @@ meeting G78's rule against U46 (chart $61,152 / $609,486 / $892,868; no more tha
 
 **U46 checks (2026-11-05):** the full suite, **677 passed**. G243's row 0 reproduces U46 in NinjaTrader's execution
 ($61,255 / $611,194 / $861,886).
+
+**Progress (2026-11-05 18:45 UTC):** 7,668 of 10,001 rows screened, 50 pass stage 1 so far (partial log
+`verification/noise_v2/g243_nt_search_partial.jsonl`). No stage 2 yet; nothing adopted from G243 so far.
