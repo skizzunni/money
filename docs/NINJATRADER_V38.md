@@ -5946,3 +5946,6 @@ remains sensitive to real slippage (G222). Logs: `verification/noise_v2/g243k*_c
 in 51.9% (U46 47.0%).
 
 **U47 checks, full suite (2026-11-05):** **677 passed**. G244 runs around U47 (base `u47_J`: U46 plus k6546).
+
+**G244 progress (2026-11-05 21:45 UTC):** running around U47; row 0 reproduces U47 in NinjaTrader's execution
+($61,661 / $618,986 / $873,759). Partial log `verification/noise_v2/g244_nt_search_partial.jsonl`.
