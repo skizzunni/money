@@ -1,0 +1,12 @@
+sprint  0 index: weeks 805, passed 0.0%, failed 0.0%, still open 100.0%, median week $0
+sprint  0    nq: weeks 534, passed 0.0%, failed 0.0%, still open 100.0%, median week $28
+sprint  5 index: weeks 805, passed 0.7%, failed 6.5%, still open 92.8%, median week $0
+sprint  5    nq: weeks 534, passed 1.1%, failed 8.1%, still open 90.8%, median week $16
+sprint 10 index: weeks 805, passed 0.7%, failed 19.9%, still open 79.4%, median week $0
+sprint 10    nq: weeks 534, passed 1.1%, failed 21.7%, still open 77.2%, median week $0
+sprint 15 index: weeks 805, passed 0.5%, failed 26.5%, still open 73.0%, median week $0
+sprint 15    nq: weeks 534, passed 0.7%, failed 27.2%, still open 72.1%, median week $0
+sprint 20 index: weeks 805, passed 0.5%, failed 30.1%, still open 69.4%, median week $0
+sprint 20    nq: weeks 534, passed 0.7%, failed 29.4%, still open 69.9%, median week $0
+sprint 30 index: weeks 805, passed 0.4%, failed 32.5%, still open 67.1%, median week $0
+sprint 30    nq: weeks 534, passed 0.6%, failed 32.0%, still open 67.4%, median week $0

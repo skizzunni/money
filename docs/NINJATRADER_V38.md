@@ -6065,3 +6065,20 @@ center states them (+$3,000 with the best day under half the profit and 3+ tradi
 floor, stopping at the start, failing the Test when the marked balance touches it; no daily loss limit; 60 MNQ at most).
 U48 with every trade at `sprint_qty` contracts (0 = U48's own sizing; 5, 10, 15, 20), cut to the room above the floor,
 and no day budget short of the floor. Reported: passed, failed and still open after the week, per sprint size.
+
+**G250 result (2026-11-05): the Test can't be passed in a week.** 1,339 weekly starts (`verification/noise_v2/g250_test_week.{txt,csv}`;
+a 30-MNQ row was added to the registered list as an extra measurement):
+
+| every trade at | passed in the week | failed in the week | still open |
+|---|---|---|---|
+| U48's own size | 0.0% | 0.0% | 100% |
+| 5 MNQ | 0.9% | 7.1% | 92% |
+| 10 MNQ | 0.9% | 20.6% | 78% |
+| 15 MNQ | 0.6% | 26.7% | 73% |
+| 20 MNQ | 0.6% | 29.8% | 70% |
+| 30 MNQ | 0.4% | 32.3% | 67% |
+
+(2019 onward: at most 1.1% passed.) The bot trades about one day in three early on, and the consistency rule needs
++$3,000 spread over at least three winning days with none above half the profit; a bigger size only fails more Tests.
+TPT's Test has no time limit (Rule 5: "You may take as long as you want"); the bot's median time to +$3,000 is about
+144 days (G247's 526 starts).
