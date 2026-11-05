@@ -5949,3 +5949,20 @@ in 51.9% (U46 47.0%).
 
 **G244 progress (2026-11-05 21:45 UTC):** running around U47; row 0 reproduces U47 in NinjaTrader's execution
 ($61,661 / $618,986 / $873,759). Partial log `verification/noise_v2/g244_nt_search_partial.jsonl`.
+
+## G245: support and resistance, breakout and retest (the user's video; registered 2026-11-05, before its run)
+
+**From the video** (TikTok, MNQ 1-minute chart, 6 MNQ): a support (resistance) is where the market turned up (down)
+more than once; wait for a close through it, then for the retest back to the level, and enter on the retest; their
+trade risked $132 for $150 (11 points for 12.5).
+
+**The rules** (`research/g245_sr_retest.py`, 5-minute RTH bars, the chart we trade): a pivot high (low) is a bar's high
+(low) at least (at most) the 3 bars on each side, known 3 bars later; a level is a confirmed pivot with an earlier pivot
+of the same kind that session within 0.05% of its price. A close beyond the level from 09:45 is the breakout; within 12
+bars, a bar that comes back to the level and closes beyond it again is the retest: enter at its close (09:45-15:30, one
+trade at a time, each level once). Stop 11 points and target 12.5 points at 24,500, scaled with the price; stop first
+when both are in one bar; out at 16:00. 1 MNQ, $1.24 commission and a tick each way. U47's trades as the day split.
+
+**Pass rule (to build it into the bot as an idle-day add-on, a separate pre-registered test):** on U47's idle days, a
+positive net per MNQ on the window, NQ and the index, with NQ and the index up in at least two thirds of their years.
+Otherwise rejected. Run once.
