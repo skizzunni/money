@@ -6024,3 +6024,12 @@ three sets in both executions and the 526 starts (`run247.sh`), to report its co
 $900,190 and $61,661 / $618,986 / $873,759); no −$1,000 day, the floor never touched. 526 starts: 21 lost at the floor,
 22 lost or frozen (as U47), median net **$47,023** (U47 $46,561), +$50,000 within 21 months in 52.1%. Logs
 `verification/noise_v2/g247_{c,n,s,m}.txt`. G244 keeps U47 (75) as its base; anything it adopts is re-checked at 60.
+
+## G248: the 526 starts under the PRO account's intraday drawdown (registered 2026-11-05, before its run)
+
+Take Profit Trader's PRO drawdown trails **intraday from the highest balance including open profit** and stops at the
+starting balance. `research/g248_pro_intraday.py` reruns U48 on the 526 starts (the bot unchanged: it sizes from the
+end-of-day floor) and marks every open trade at each bar's high and low; an account is lost when its marked balance
+reaches the floor. Two bounds for the order inside a bar: "worst order" (the bar's best mark raises the floor before
+its worst mark) and "best order" (the worst mark first). A measurement, no pass rule: if PRO loses clearly more than
+the end-of-day count (22), the bot needs a PRO mode that sizes from the intraday floor before it goes on a PRO account.
