@@ -1,0 +1,3 @@
+{'nt': False, 'pack': 'g243k6546', 'set': 'proxy', 'days traded %': 80.2, 'gap trades': 329, 'trades': 758, 'net $': 61661, 'pf': 1.666, 'win %': 49.3, 'closed dd $': 5898, 'worst day $': -900, 'days <= -1000': 0, 'floor touches': 0}
+{'nt': False, 'pack': 'g243k6546', 'set': 'nq', 'days traded %': 81.5, 'gap trades': 1908, 'trades': 4938, 'net $': 617427, 'pf': 1.587, 'win %': 51.3, 'closed dd $': 21521, 'worst day $': -925, 'days <= -1000': 0, 'floor touches': 0}
+{'nt': False, 'pack': 'g243k6546', 'set': 'index', 'days traded %': 78.9, 'gap trades': 2745, 'trades': 6941, 'net $': 900190, 'pf': 1.614, 'win %': 50.6, 'closed dd $': 22448, 'worst day $': -988, 'days <= -1000': 0, 'floor touches': 0}

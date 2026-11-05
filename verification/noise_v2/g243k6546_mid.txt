@@ -1,0 +1,2 @@
+index g243k6546 starts 160 lost (at the floor) 2 dead (lost or frozen) 3 below start 0 median net 42222 worst net 1 lowest point -1683 reached +2000 160
+nq g243k6546 starts 103 lost (at the floor) 9 dead (lost or frozen) 9 below start 4 median net 58393 worst net -1999 lowest point -1999 reached +2000 99

@@ -5919,3 +5919,18 @@ stage 1, the 40 best go to stage 2. Stage 2 in progress (`verification/noise_v2/
 
 **G243 stage 2 done:** all 40 on the 263 starts on the 1st (`verification/noise_v2/g243_stage2.txt`; U46 loses 11).
 Three lose at most 11: k6546 (10), k7849 (11), k3044 (11); they go to stage 3.
+
+**G243 stage 3 (2026-11-05):** lost of 263 on the 1st + of 263 mid-month; nets NinjaTrader's execution / the chart's
+(window / NQ / index); every row no −$1,000 day, the floor never touched.
+
+| | lost (1st + mid) | NinjaTrader nets | chart nets |
+|---|---|---|---|
+| U46 | 11 + 12 = **23** | $61,255 / $611,194 / $861,886 | $61,152 / $609,486 / $892,868 |
+| k6546: fast steps from $9,000, sizing slippage 4 pts, giveback brake 0.45 | 10 + 11 = **21** | $61,661 / $618,986 / $873,759 | $61,661 / $617,427 / $900,190 |
+| k3044: range pos 0.72, 4 losers, early budget $650 | 11 + 11 = **22** | $61,375 / $614,476 / $886,483 | $61,506 / $617,195 / $905,391 |
+| k7849: take profit 1.9, 3-MNQ fill-ins from $7,000 | 11 + 15 = 26 | $61,427 / $660,447 / $879,269 | $60,396 / $659,431 / $880,589 |
+
+**Decision:** k6546 and k3044 meet G78's rule against U46 (all six nets higher, no more lost); k7849 fails (26 lost,
+chart window lower). **Adopted: k6546 (U47)**, the better NinjaTrader window (and fewer lost). Note: its sizing counts 4
+points of stop slippage instead of 5, so it trades slightly bigger; the tests' slippage is unchanged, and survival
+remains sensitive to real slippage (G222). Logs: `verification/noise_v2/g243k*_chart.txt`, `g243k*_mid.txt`.
