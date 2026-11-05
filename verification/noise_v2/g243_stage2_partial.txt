@@ -28,3 +28,11 @@ index g243k1165 starts 160 lost (at the floor) 5 dead (lost or frozen) 5 below s
 nq g243k1165 starts 103 lost (at the floor) 11 dead (lost or frozen) 11 below start 8 median net 37700 worst net -1999 lowest point -1999 reached +2000 95
 index g243k3120 starts 160 lost (at the floor) 6 dead (lost or frozen) 6 below start 3 median net 37639 worst net -1999 lowest point -1999 reached +2000 158
 nq g243k3120 starts 103 lost (at the floor) 10 dead (lost or frozen) 10 below start 7 median net 32407 worst net -1999 lowest point -1999 reached +2000 97
+index g243k6837 starts 160 lost (at the floor) 7 dead (lost or frozen) 7 below start 4 median net 42279 worst net -2001 lowest point -2001 reached +2000 157
+nq g243k6837 starts 103 lost (at the floor) 8 dead (lost or frozen) 8 below start 5 median net 43516 worst net -1999 lowest point -1999 reached +2000 98
+index g243k5743 starts 160 lost (at the floor) 8 dead (lost or frozen) 8 below start 4 median net 41804 worst net -1999 lowest point -1999 reached +2000 157
+nq g243k5743 starts 103 lost (at the floor) 7 dead (lost or frozen) 7 below start 5 median net 45439 worst net -1999 lowest point -1999 reached +2000 98
+index g243k5903 starts 160 lost (at the floor) 7 dead (lost or frozen) 7 below start 4 median net 42219 worst net -2001 lowest point -2001 reached +2000 157
+nq g243k5903 starts 103 lost (at the floor) 8 dead (lost or frozen) 8 below start 5 median net 42978 worst net -1999 lowest point -1999 reached +2000 98
+index g243k7188 starts 160 lost (at the floor) 8 dead (lost or frozen) 8 below start 4 median net 40707 worst net -1999 lowest point -1999 reached +2000 157
+nq g243k7188 starts 103 lost (at the floor) 7 dead (lost or frozen) 7 below start 5 median net 45276 worst net -1999 lowest point -1999 reached +2000 98
