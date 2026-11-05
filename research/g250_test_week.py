@@ -22,7 +22,8 @@ import v24_scan as S
 from mnqbot.noise import NoiseConfig, run
 
 NY = "America/New_York"
-DD, TARGET, PV, SESS = 2000.0, 3000.0, 2.0, 5
+DD, TARGET, PV = 2000.0, 3000.0, 2.0
+SESS = int(os.environ.get("SESS", "5"))  # G251: 10 (two weeks)
 BASE: dict = {}
 
 
@@ -38,14 +39,15 @@ def with_1600(bars: pd.DataFrame, m: int) -> pd.DataFrame:
 
 
 def one(job):
-    name, start, sq = job
+    name, start, sq, ds = job
     bars, _, skip = S.D[name]
     s0 = pd.Timestamp(start, tz=NY)
-    b = bars[(bars.index >= s0 - pd.Timedelta(days=150)) & (bars.index < s0 + pd.Timedelta(days=12))]
+    b = bars[(bars.index >= s0 - pd.Timedelta(days=150)) & (bars.index < s0 + pd.Timedelta(days=7 + 7 * ((SESS + 4) // 5)))]
     cfg = NoiseConfig(**{**S.V23, **T.REFERENCE, "daily_loss_limit": 900.0, "trail_dd": DD, "time_stop": 60,
                          **BASE, "daily_loss_limit": 2000.0, "early_daily_loss": 0.0})
     if sq:
         cfg.sprint_qty, cfg.sprint_days, cfg.sprint_target = sq, SESS, TARGET
+    cfg.day_stop_profit = ds  # G251: no new entries once the day is up this much (0 = off)
     cfg.tv_path, cfg.nt_execution, cfg.round_prices, cfg.target_on_fill_bar = False, True, True, True
     if isinstance(skip, str):
         cfg.skip_dates, cfg.fed_dates = skip, ""
@@ -90,7 +92,7 @@ def one(job):
         if cum >= TARGET and best < 0.5 * cum and traded >= 3:
             passed, pass_day = True, days.index(d) + 1
             break
-    return {"set": name, "start": start, "sprint": sq, "passed": passed, "failed": failed, "pass day": pass_day,
+    return {"set": name, "start": start, "sprint": sq, "day stop": ds, "passed": passed, "failed": failed, "pass day": pass_day,
             "fail day": fail_day, "net": round(cum)}
 
 
@@ -101,13 +103,14 @@ def main() -> None:
     sprints = [int(x) for x in os.environ.get("SPRINTS", "0,5,10,15,20").split(",")]
     starts = [("nq", d.strftime("%Y-%m-%d")) for d in pd.date_range("2015-04-06", "2025-06-30", freq="W-MON")]
     starts += [("index", d.strftime("%Y-%m-%d")) for d in pd.date_range("2011-04-04", "2026-08-31", freq="W-MON")]
-    jobs = [(n, s, q) for q in sprints for n, s in starts]
+    stops = [float(x) for x in os.environ.get("DAYSTOPS", "0").split(",")]
+    jobs = [(n, s, q, ds) for q in sprints for ds in stops for n, s in starts]
     with ProcessPoolExecutor(int(os.environ.get("PROCS", "4"))) as ex:
         rows = [r for r in ex.map(one, jobs, chunksize=8) if r]
     d = pd.DataFrame(rows)
-    d.to_csv("verification/noise_v2/g250_test_week.csv", index=False)
-    for (q, n), g in d.groupby(["sprint", "set"]):
-        print(f"sprint {q:>2} {n:>5}: weeks {len(g)}, passed {100 * g.passed.mean():.1f}%, failed "
+    d.to_csv(f"verification/noise_v2/g25{0 if SESS == 5 else 1}_test_{SESS}sessions.csv", index=False)
+    for (q, ds, n), g in d.groupby(["sprint", "day stop", "set"]):
+        print(f"sprint {q:>2} day stop {ds:>6.0f} {n:>5}: weeks {len(g)}, passed {100 * g.passed.mean():.1f}%, failed "
               f"{100 * g.failed.mean():.1f}%, still open {100 * (~g.passed & ~g.failed).mean():.1f}%, "
               f"median week ${int(g.net.median())}", flush=True)
 
