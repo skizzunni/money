@@ -5902,3 +5902,14 @@ meeting G78's rule against U46 (chart $61,152 / $609,486 / $892,868; no more tha
 
 **Progress (2026-11-05 18:45 UTC):** 7,668 of 10,001 rows screened, 50 pass stage 1 so far (partial log
 `verification/noise_v2/g243_nt_search_partial.jsonl`). No stage 2 yet; nothing adopted from G243 so far.
+
+**Progress (2026-11-05 19:45 UTC):** 9,500 of 10,001 rows screened; stage 2 starts by itself when the screen ends.
+
+## G244: 10,000 more combinations, around the version current after G243 (registered 2026-11-05, before its run)
+
+**The search:** G241's (`research/g241_nt_search.py`, the same 34 settings) with `SEED=244`, around the version in the
+file when G243 is decided (U46, or G243's adoption if one is made); row 0 must reproduce that version's NinjaTrader
+nets exactly or the run is stopped. **Stages and adoption as G241's**, against that version: stage 1 all three
+NinjaTrader nets above its own, no −$1,000 day, the floor never touched; stage 2 the 40 best on the 263 starts on the 1st;
+stage 3 the 5 with the fewest lost (at most the current version's count there) on the mid-month starts and the chart's
+execution; adopted the best window meeting G78's rule against the current version (no more of 526 lost). Run once.
