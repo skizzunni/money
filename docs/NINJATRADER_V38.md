@@ -6033,3 +6033,9 @@ end-of-day floor) and marks every open trade at each bar's high and low; an acco
 reaches the floor. Two bounds for the order inside a bar: "worst order" (the bar's best mark raises the floor before
 its worst mark) and "best order" (the worst mark first). A measurement, no pass rule: if PRO loses clearly more than
 the end-of-day count (22), the bot needs a PRO mode that sizes from the intraday floor before it goes on a PRO account.
+
+**G248 result (2026-11-05):** under the PRO account's intraday trailing drawdown, U48 as it is loses **55 of 526**
+(18 + 13 on NQ / the index on the 1st, 11 + 13 mid-month; the same in both bar orders) against **21** at the floor
+under the Test account's end-of-day rule; 41 starts lost only under the PRO rule. The nets are identical (the bot is
+unchanged). **On a PRO account the bot must size from the intraday floor** (G249). Logs
+`verification/noise_v2/g248_pro_u48*.{txt,csv}`.
