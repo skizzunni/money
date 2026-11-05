@@ -5987,3 +5987,8 @@ instead of G245's intraday pivots: the prior RTH session's high and low (`resear
 breakout, retest and entry as G245; stop 11 points and target **22 points** at 24,500 (2:1), scaled with the price.
 **Pass rule as G245's** (U47's idle days: positive per MNQ on all three sets, NQ and the index up in two thirds of
 their years). Run once.
+
+**G246 result (2026-11-05): rejected.** Per MNQ after costs (`verification/noise_v2/g246_prior_day_retest.txt`): window
+200 trades −$1,391 (26.0% winners; idle days −$1,117), NQ 1,114 trades −$7,511 (27.8%; idle days up 1 of 11 years),
+index 1,666 trades −$10,063 (28.7%; idle days up 0 of 16). A 2:1 target needs about 33% winners before costs; the
+retests of the prior day's levels win 26-29%. The file is unchanged (U47).
