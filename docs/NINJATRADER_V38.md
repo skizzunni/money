@@ -5913,3 +5913,6 @@ nets exactly or the run is stopped. **Stages and adoption as G241's**, against t
 NinjaTrader nets above its own, no −$1,000 day, the floor never touched; stage 2 the 40 best on the 263 starts on the 1st;
 stage 3 the 5 with the fewest lost (at most the current version's count there) on the mid-month starts and the chart's
 execution; adopted the best window meeting G78's rule against the current version (no more of 526 lost). Run once.
+
+**G243 stage 1 done (2026-11-05 20:00 UTC):** all 10,001 rows (`verification/noise_v2/g243_nt_search.jsonl`); 62 pass
+stage 1, the 40 best go to stage 2. Stage 2 in progress (`verification/noise_v2/g243_stage2_partial.txt`).
