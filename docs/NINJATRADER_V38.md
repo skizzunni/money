@@ -5818,3 +5818,6 @@ mid-month starts and the chart's execution. **Adopted:** the best window among t
 
 **G241 progress (2026-11-04, 23:41 UTC):** 112 of 10,000 done in NinjaTrader's execution; 2 pass the screen so far (k74,
 k13). Partial log: `verification/noise_v2/g241_nt_search_partial.jsonl`.
+
+**G241 progress (2026-11-05, 00:43 UTC):** the container restarted and stopped the search at 232; restarted, it resumes
+from the rows saved.
