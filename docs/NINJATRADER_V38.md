@@ -6056,3 +6056,12 @@ closes the early trades sooner and the higher floor shrinks the sizes. The nets 
 stops early there): chart $61,612 / $632,164 / $893,356, NinjaTrader $61,612 / $622,740 / $854,239. Logs
 `verification/noise_v2/g249_*`, `g248_pro_g249_*.csv`. The PRO account's extra losses all come before its floor
 stops (the first $2,000 of profit); after that the floor is fixed at $50,000 and the two rules are the same.
+
+## G250: Take Profit Trader's 50K Test in one week (registered 2026-11-05, before its run)
+
+The user is on TPT's 50K Test and has about a week to pass it into PRO. **Measured** (`research/g250_test_week.py`,
+no adoption rule): a fresh Test every Monday (NQ 2015-25, the index 2011-26), 5 sessions, under TPT's rules as its help
+center states them (+$3,000 with the best day under half the profit and 3+ trading days; the $2,000 end-of-day trailing
+floor, stopping at the start, failing the Test when the marked balance touches it; no daily loss limit; 60 MNQ at most).
+U48 with every trade at `sprint_qty` contracts (0 = U48's own sizing; 5, 10, 15, 20), cut to the room above the floor,
+and no day budget short of the floor. Reported: passed, failed and still open after the week, per sprint size.
