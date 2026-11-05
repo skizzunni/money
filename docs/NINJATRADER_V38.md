@@ -5997,3 +5997,24 @@ retests of the prior day's levels win 26-29%. The file is unchanged (U47).
 combination that can't beat U47 on the window (or has a −$1,000 day or touches the floor there) skips NQ and the index.
 Stage 1 needs all three, so the outcome is identical; only 13-16% pass the window, so the screen runs about 5x faster.
 Rows that stop early carry only the window's columns.
+
+## The user's firm: Take Profit Trader 50K (2026-11-05)
+
+The user named the firm: **Take Profit Trader, 50K**. Its help center (takeprofittraderhelp.zendesk.com, read
+2026-11-05; articles updated Aug-Nov 2026) says:
+- **No trading bots or algos** on any account (Universal Trading Policies #1, "Automated trading systems, bots, or
+  algorithmic execution tools are not permitted"; PRO rule 1, "All trades must be manually executed by the trader").
+  Violations "may result in profit forfeiture, account reset, account closure, or removal from the platform".
+- **Maximum position size 60 micros** on the 50K (Rule 2). U47 goes to 75 MNQ on the 5-minute chart.
+- **No daily loss limit** in the Test rules (Rules 1-6) or the PRO rules.
+- **Drawdown $2,000.** Test: end-of-day trailing (Rule 3). **PRO: intraday trailing, including unrealized gains**, until
+  the minimum balance reaches the starting balance ($50,000); the buffer for withdrawals is $52,000. The bot's model is
+  end-of-day trailing, so on PRO the first $2,000 of growth is riskier than modelled.
+- **PRO / PRO+: flat from one minute before to one minute after FOMC (Wednesdays 14:00), NFP and CPI (08:30).** The bot
+  trades from 09:30, so only FOMC applies; on Fed days it may hold a long through 14:00.
+- Test only: best day under 50% of the profit (Rule 5), at least 3 trading days. Positions closed by 16:55.
+
+## G247: 60 MNQ at most, the firm's limit (registered 2026-11-05, before its run)
+
+A compliance change, adopted whatever its numbers: `size_up_to` 60 instead of 75 (U47 otherwise). Measured once on the
+three sets in both executions and the 526 starts (`run247.sh`), to report its cost.
