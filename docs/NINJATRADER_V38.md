@@ -5868,3 +5868,7 @@ meeting G78's rule against U45 (no more than 25 of 526 lost).
 **G242 stage 1 (2026-11-05): 105 of 10,000 pass the NinjaTrader screen against U45.** The best by the three nets: k5922
 (range 0.68, target 1.75, early budget $700, lookback 12) $63,966 / $657,515 / $862,072; k3975 $60,505 / $653,597 /
 $884,771 (U45 $59,167 / $603,956 / $853,557). The 40 best go to stage 2. Log: `verification/noise_v2/g242_nt_search.jsonl`.
+
+**G242 stage 2 (2026-11-05):** of the 40, three lose **11** of the 263 starts on the 1st (U45 12), all with the gap
+trigger at 0.65 and the gap trade to break-even at 1.5x its risk (`gap_go_k` 0.65, `gap_go_be` 1.5): k2079, k8946,
+k8599; k4039 / k5623 (the same rule set) lose 12. The five go to stage 3. Log: `verification/noise_v2/g242_stage2_starts.txt`.
