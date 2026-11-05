@@ -5833,3 +5833,7 @@ tracked task.
 floor never touched). The best by the three nets: k4403 (lock plus 2, trend 75, gap trigger 0.65) $62,838 / $634,566 /
 $834,077; k356 (gap break-even 1.5, range 0.72, trend 55) $64,049 / $597,872 / $849,153. The 40 best go to stage 2 (263
 starts on the 1st). Log: `verification/noise_v2/g241_nt_search.jsonl`.
+
+**G241 stage 2 (2026-11-05):** of the 40, six lose **12** of the 263 starts on the 1st (U44 12), all with the trend over
+45 sessions (`trend_n` 45): k1015, k1474, k1063, k1712, k2525, k6649. The 5 with the best NinjaTrader window go to stage 3:
+k1015, k1474, k1063, k1712, k2525. Log: `verification/noise_v2/g241_stage2_starts.txt`.
