@@ -5966,3 +5966,14 @@ when both are in one bar; out at 16:00. 1 MNQ, $1.24 commission and a tick each 
 **Pass rule (to build it into the bot as an idle-day add-on, a separate pre-registered test):** on U47's idle days, a
 positive net per MNQ on the window, NQ and the index, with NQ and the index up in at least two thirds of their years.
 Otherwise rejected. Run once.
+
+**G245 result (2026-11-05): rejected.** Per MNQ after costs (`verification/noise_v2/g245_sr_retest.txt`):
+
+| | trades | net | winners | years up | idle days net (years up) |
+|---|---|---|---|---|---|
+| window | 455 | −$2,309 | 40.7% | 0 of 2 | −$1,754 (0 of 2) |
+| NQ 2015-25 | 3,218 | −$17,698 | 41.2% | 0 of 11 | −$10,590 (0 of 11) |
+| index 2011-26 | 4,891 | −$22,593 | 42.6% | 0 of 16 | −$13,949 (0 of 16) |
+
+It loses in every year of every set, on U47's days and on its idle days: with a target only 1.14x the stop it needs
+about 47% winners to break even before costs, and the retests win about 41%. The file is unchanged (U47).
