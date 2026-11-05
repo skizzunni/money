@@ -5977,3 +5977,13 @@ Otherwise rejected. Run once.
 
 It loses in every year of every set, on U47's days and on its idle days: with a target only 1.14x the stop it needs
 about 47% winners to break even before costs, and the retests win about 41%. The file is unchanged (U47).
+
+## G246: the prior day's high and low, breakout and retest, 2:1 (registered 2026-11-05, before its run)
+
+The user's two YouTube videos (Micah Thomas, "I Taught a Complete Beginner My $10k/Month Trading Strategy" and "How To
+Start Day-Trading in 2026") are the same creator's support and resistance strategy; YouTube refuses this server the
+audio and captions, so only the titles, descriptions and chapters were read. **G246** tests the levels most traders draw
+instead of G245's intraday pivots: the prior RTH session's high and low (`research/g246_prior_day_retest.py`); the
+breakout, retest and entry as G245; stop 11 points and target **22 points** at 24,500 (2:1), scaled with the price.
+**Pass rule as G245's** (U47's idle days: positive per MNQ on all three sets, NQ and the index up in two thirds of
+their years). Run once.
