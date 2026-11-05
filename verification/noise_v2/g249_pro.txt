@@ -1,0 +1,4 @@
+index g249 MS starts 160 PRO lost (worst order) 12 (best order) 12 median net 25743
+nq g249 MS starts 103 PRO lost (worst order) 9 (best order) 9 median net 35557
+index g249 MID starts 160 PRO lost (worst order) 11 (best order) 11 median net 32686
+nq g249 MID starts 103 PRO lost (worst order) 6 (best order) 6 median net 34516

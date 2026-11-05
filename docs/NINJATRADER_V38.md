@@ -6049,3 +6049,10 @@ balance would be **$100 above the floor** (after commission), as a resting stop.
 **Measured once:** the 526 starts under the PRO rule (G248's check, worst order) and the nets on the three sets in both
 executions. **Adopt as the PRO mode** (a separate mode; the Test account keeps U48) if the PRO losses fall to at most
 27 of 526 (half of U48's 55), whatever the nets; then built into the C# file with parity tests.
+
+**G249 result (2026-11-05): rejected as registered.** Under the PRO rule the 526 starts lose **38** (12 + 9 on the 1st,
+11 + 6 mid-month; U48 55), above the pass line of 27, and the median net falls to **$32,772** (U48 $47,023): the guard
+closes the early trades sooner and the higher floor shrinks the sizes. The nets on the long sets hardly move (the floor
+stops early there): chart $61,612 / $632,164 / $893,356, NinjaTrader $61,612 / $622,740 / $854,239. Logs
+`verification/noise_v2/g249_*`, `g248_pro_g249_*.csv`. The PRO account's extra losses all come before its floor
+stops (the first $2,000 of profit); after that the floor is fixed at $50,000 and the two rules are the same.
