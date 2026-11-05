@@ -213,6 +213,11 @@ class NoiseConfig:
     # one fits). 0 = off
     trail_dd: float = 0.0
     trail_cap: float = -1.0
+    # research (G249): Take Profit Trader's PRO drawdown: the trailing peak follows the marked balance intraday (each
+    # bar's favourable extreme of the open trades, from the next bar), and the open trades' stops are tightened to
+    # pro_guard above the floor (a tick-level guard, as the day guard)
+    trail_intraday: bool = False
+    pro_guard: float = 100.0
     trail_buffer: float = 0.0
     trail_from: str = ""
     # with the money budget: trail_frac of the room above the trailing floor per trade; budget_actual: a contract's
@@ -833,6 +838,13 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
     for i in range(len(bars)):
         t = idx[i]
         t_min = t.hour * 60 + t.minute
+        if cfg.trail_intraday and i > 0 and not math.isnan(trail_peak):  # G249: the last bar's best marked balance
+            mark = eq_curve[-1]
+            if pos:
+                mark += pos * ((h[i - 1] if pos > 0 else l[i - 1]) - entry_px) * q_trade * rest * cfg.point_value
+            if gg is not None and gg["bar"] < i:
+                mark += gg["d"] * ((h[i - 1] if gg["d"] > 0 else l[i - 1]) - gg["px"]) * gg["q"] * cfg.point_value
+            trail_peak = max(trail_peak, mark)
         end = t_min + minutes
         in_rth = t_min >= RTH_OPEN and end <= RTH_CLOSE
 
@@ -907,6 +919,15 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                 if usable:
                     gap_hist.append(abs(gap))
                 drive_hist.append(abs(c[i - 1] - day_open))
+            if gg is not None and cfg.trail_intraday and gg["bar"] < i and not math.isnan(trail_peak):  # G249
+                fl = trail_peak - cfg.trail_dd
+                if cfg.trail_cap >= 0:
+                    fl = min(fl, trail_base + cfg.trail_cap)
+                allow = eq_curve[-1] - fl - cfg.pro_guard - 2 * cfg.commission_per_side * gg["q"]
+                gpx = gg["px"] - gg["d"] * allow / (gg["q"] * cfg.point_value)
+                gpx = math.ceil(gpx / cfg.tick) * cfg.tick if gg["d"] > 0 else math.floor(gpx / cfg.tick) * cfg.tick
+                if gg["d"] * (gpx - gg["stop"]) > 0:
+                    gg["stop"] = gpx
             if gg is not None:  # its stop, from the fill bar on
                 gd = gg["d"]
                 if (l[i] <= gg["stop"]) if gd > 0 else (h[i] >= gg["stop"]):
@@ -1025,7 +1046,15 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                 gpx = entry_px - pos * (allow - 2 * cfg.commission_per_side * q_trade) / (rest * q_trade * cfg.point_value)
                 if pos * (gpx - line) > 0:
                     line, reason = gpx, "Day guard"
-            if cfg.nt_execution and entry_bar != i and pos * (c[i - 1] - line) <= 0 and reason != "Day guard":
+            if cfg.trail_intraday and entry_bar != i and not math.isnan(trail_peak):  # G249: the PRO floor guard
+                fl = trail_peak - cfg.trail_dd
+                if cfg.trail_cap >= 0:
+                    fl = min(fl, trail_base + cfg.trail_cap)
+                allow = eq_curve[-1] - fl - cfg.pro_guard - 2 * cfg.commission_per_side * q_trade * rest
+                gpx = on_grid(pos, entry_px - pos * allow / (rest * q_trade * cfg.point_value))
+                if pos * (gpx - line) > 0:
+                    line, reason = gpx, "Floor guard"
+            if cfg.nt_execution and entry_bar != i and pos * (c[i - 1] - line) <= 0 and reason not in ("Day guard", "Floor guard"):
                 hit, price, reason = True, o[i] - pos * slip, "Stop passed"  # sent at the last close, filled now
             elif entry_bar == i:  # a stop attached to the entry can fill on the fill bar itself
                 hit = l[i] <= line if pos > 0 else h[i] >= line

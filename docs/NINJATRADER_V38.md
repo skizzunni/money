@@ -6039,3 +6039,13 @@ the end-of-day count (22), the bot needs a PRO mode that sizes from the intraday
 under the Test account's end-of-day rule; 41 starts lost only under the PRO rule. The nets are identical (the bot is
 unchanged). **On a PRO account the bot must size from the intraday floor** (G249). Logs
 `verification/noise_v2/g248_pro_u48*.{txt,csv}`.
+
+## G249: a PRO mode, the floor from the intraday peak and a guard above it (registered 2026-11-05, before its run)
+
+**The rule** (new research settings `trail_intraday`, `pro_guard` in `mnqbot/noise.py`): the trailing peak follows the
+marked balance intraday (each bar's favourable extreme of the open trades, from the next bar), so the floor, the
+sizing and the floor's stop all use TPT's PRO floor; and every open trade's stop is tightened to the price where the
+balance would be **$100 above the floor** (after commission), as a resting stop. U48 otherwise.
+**Measured once:** the 526 starts under the PRO rule (G248's check, worst order) and the nets on the three sets in both
+executions. **Adopt as the PRO mode** (a separate mode; the Test account keeps U48) if the PRO losses fall to at most
+27 of 526 (half of U48's 55), whatever the nets; then built into the C# file with parity tests.
