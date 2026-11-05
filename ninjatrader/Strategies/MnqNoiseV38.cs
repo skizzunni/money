@@ -107,6 +107,8 @@ namespace NinjaTrader.NinjaScript.Strategies
         public double SprintTarget = 3000;
         // G76: the bot's sizing counts this many points more slippage at the stop (0 = off)
         public double SizeSlipPts = 0;
+        // LucidDirect: the trailing floor stops at the starting balance plus this (Lucid: $50,100 on the 50K; most firms 0)
+        public double TrailLock = 0;
         // G87: within ProtectRoom of the trailing floor, no new trade on a session after a shadow (1-contract, paper)
         // record of the bot closed below its average of the last ProtectN sessions (0 = off; set by the wrapper)
         public double ProtectRoom = 0;
@@ -173,7 +175,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         public int TimeStopMinutes { get { return s.TimeStop; } }
         public int MinutesInTrade { get { return Position != 0 ? (Bar + 1 - EntryBar) * minutes : 0; } }  // at this close
         // the contract steps may apply: always, or with StepsAfterLock once the floor has stopped at the start
-        bool StepsOk { get { return !s.StepsAfterLock || (!double.IsNaN(trailPeak) && trailPeak - s.TrailDD >= trailBase); } }
+        bool StepsOk { get { return !s.StepsAfterLock || (!double.IsNaN(trailPeak) && trailPeak - s.TrailDD >= trailBase + s.TrailLock); } }
         public int NextQty
         {
             get
@@ -193,7 +195,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         {
             get
             {
-                bool stopped = s.TrailDD > 0 && !double.IsNaN(trailPeak) && trailPeak - s.TrailDD >= trailBase;
+                bool stopped = s.TrailDD > 0 && !double.IsNaN(trailPeak) && trailPeak - s.TrailDD >= trailBase + s.TrailLock;
                 return s.EarlyDailyLoss > 0 && !stopped ? s.EarlyDailyLoss : s.DailyLoss;
             }
         }
@@ -224,7 +226,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         public bool Protected()
         {
             if (s.ProtectRoom <= 0 || !ProtectClosed || s.TrailDD <= 0 || double.IsNaN(trailPeak)) return false;
-            double floor = Math.Min(trailPeak - s.TrailDD, trailBase);
+            double floor = Math.Min(trailPeak - s.TrailDD, trailBase + s.TrailLock);
             return EqEff - floor < s.ProtectRoom;
         }
 
@@ -243,7 +245,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         public bool Braked()
         {
             if (s.GivebackBrake <= 0 || minutes != 5 || s.TrailDD <= 0 || double.IsNaN(trailPeak)) return false;  // tested on 5-minute bars
-            if (trailPeak - s.TrailDD < trailBase) return false;
+            if (trailPeak - s.TrailDD < trailBase + s.TrailLock) return false;
             return EqEff - trailBase < s.GivebackBrake * (trailPeak - trailBase);
         }
 
@@ -251,7 +253,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         int FillQ()
         {
             if (s.FillQty2Room <= 0 || s.TrailDD <= 0 || double.IsNaN(trailPeak) || Braked()) return 1;
-            double floor = Math.Min(trailPeak - s.TrailDD, trailBase);
+            double floor = Math.Min(trailPeak - s.TrailDD, trailBase + s.TrailLock);
             if (s.FillQty3Room > 0 && EqEff - floor >= s.FillQty3Room) return 3;  // G210
             return EqEff - floor >= s.FillQty2Room ? 2 : 1;
         }
@@ -260,8 +262,8 @@ namespace NinjaTrader.NinjaScript.Strategies
         bool FillOk()
         {
             if (!s.MoreDays || minutes != 5 || s.TrailDD <= 0 || double.IsNaN(trailPeak)) return false;  // tested on 5-minute bars only
-            if (trailPeak - s.TrailDD < trailBase) return false;
-            double floor = Math.Min(trailPeak - s.TrailDD, trailBase);
+            if (trailPeak - s.TrailDD < trailBase + s.TrailLock) return false;
+            double floor = Math.Min(trailPeak - s.TrailDD, trailBase + s.TrailLock);
             return EqEff - floor >= s.FillMinRoom;
         }
         public int LastEntryMinute { get { return s.LastEntryEnd; } }
@@ -284,7 +286,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                                                                         : "no (uptrend: above the 50-session average)")
                               : FedToday && s.FedNoShorts ? "after 14:00 (Fed day)" : "yes";
                 bool early = !string.IsNullOrEmpty(s.EarlySkipChecks) && minutes == 5
-                             && !(s.TrailDD > 0 && !double.IsNaN(trailPeak) && trailPeak - s.TrailDD >= trailBase);
+                             && !(s.TrailDD > 0 && !double.IsNaN(trailPeak) && trailPeak - s.TrailDD >= trailBase + s.TrailLock);
                 return "longs " + longs + "; shorts " + shorts + (Braked() ? "; giveback brake on: 1 MNQ a trade" + (s.GapSkipBraked ? ", no gap trade" : "") : "")
                        + (early ? "; no entries at " + EarlySkipText() + " until the floor stops" : "");
             }
@@ -443,7 +445,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         bool EarlySkip(int end)
         {
             if (string.IsNullOrEmpty(s.EarlySkipChecks) || minutes != 5) return false;  // tested on 5-minute bars
-            if (s.TrailDD > 0 && !double.IsNaN(trailPeak) && trailPeak - s.TrailDD >= trailBase) return false;
+            if (s.TrailDD > 0 && !double.IsNaN(trailPeak) && trailPeak - s.TrailDD >= trailBase + s.TrailLock) return false;
             return s.EarlySkipChecks.Contains("," + end + ",");
         }
 
@@ -691,7 +693,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 room = DayLimit + DayEff;
             if (s.TrailDD > 0 && !double.IsNaN(trailPeak))
             {
-                double floor = Math.Min(trailPeak - s.TrailDD, trailBase);  // it stops at the starting balance
+                double floor = Math.Min(trailPeak - s.TrailDD, trailBase + s.TrailLock);  // it stops at the starting balance
                 room = Math.Min(room, EqEff - floor);
             }
             if (!double.IsNaN(ExtRoom))
@@ -699,7 +701,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             return room;
         }
 
-        public double TrailFloorRoom { get { return s.TrailDD > 0 && !double.IsNaN(trailPeak) ? EqEff - Math.Min(trailPeak - s.TrailDD, trailBase) : double.NaN; } }
+        public double TrailFloorRoom { get { return s.TrailDD > 0 && !double.IsNaN(trailPeak) ? EqEff - Math.Min(trailPeak - s.TrailDD, trailBase + s.TrailLock) : double.NaN; } }
 
         void Entry(int d, double c)
         {
@@ -707,7 +709,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             bool afterLoss = consec > 0;
             double alMl = s.AfterLossMaxLoss;
             if (s.AfterLossLockedMaxLoss > 0 && minutes == 5 && s.TrailDD > 0 && !double.IsNaN(trailPeak)
-                && trailPeak - s.TrailDD >= trailBase) alMl = s.AfterLossLockedMaxLoss;  // G119 (tested on 5-minute bars)
+                && trailPeak - s.TrailDD >= trailBase + s.TrailLock) alMl = s.AfterLossLockedMaxLoss;  // G119 (tested on 5-minute bars)
             double ml = afterLoss && alMl > 0 ? alMl : s.MaxLoss;
             if (s.ProfitStep > 0 && !double.IsNaN(trailBase) && StepsOk)  // a contract more per step of profit
             {
@@ -808,7 +810,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                     double room = MoneyRoom();
                     int fitQ = double.IsInfinity(room) ? int.MaxValue : (int)Math.Floor(room / perC + 1e-9);
                     q = Math.Min(q, fitQ);
-                    bool floorStopped = !double.IsNaN(trailPeak) && trailPeak - s.TrailDD >= trailBase;
+                    bool floorStopped = !double.IsNaN(trailPeak) && trailPeak - s.TrailDD >= trailBase + s.TrailLock;
                     if (s.GapGoLockedQty > 0 && floorStopped)
                     {
                         q = Math.Min(q, s.GapGoLockedQty);
@@ -973,6 +975,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 string m = (Mode ?? "").Trim();
                 string mc = System.Text.RegularExpressions.Regex.Replace(m, @"\s+", " ");
                 if (string.Equals(mc, "Funded growth", StringComparison.OrdinalIgnoreCase)) Mode = "Funded growth";
+                else if (string.Equals(mc, "Funded growth LucidDirect", StringComparison.OrdinalIgnoreCase)) Mode = "Funded growth LucidDirect";
                 else if (string.Equals(mc, "Funded growth 100K", StringComparison.OrdinalIgnoreCase)) Mode = "Funded growth 100K";
                 else if (string.Equals(mc, "Funded growth 150K", StringComparison.OrdinalIgnoreCase)) Mode = "Funded growth 150K";
                 else if (string.Equals(mc, "Funded growth Apex 100K", StringComparison.OrdinalIgnoreCase)) Mode = "Funded growth Apex 100K";
@@ -984,6 +987,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                     setupWarnings.Add("Mode \"" + Mode + "\" isn't Funded growth (50K, 100K, 150K, Apex 100K or Apex 150K), Evaluation or Custom: running the settings below as Custom");
                     Mode = "Custom";
                 }
+                bool lucid = Mode == "Funded growth LucidDirect";  // G252: Lucid's LucidDirect 50K (bots allowed, no evaluation)
+                if (lucid) Mode = "Funded growth";  // the 50K's growth settings, then Lucid's limits below
                 if (Mode.StartsWith("Funded growth"))  // the tested growth settings (docs/NINJATRADER_V38.md), whatever is set below
                 {
                     Contracts = 1; MaxLoss = 187.5; DailyLoss = 900; TrailDD = 2000;
@@ -992,7 +997,9 @@ namespace NinjaTrader.NinjaScript.Strategies
                     TimeStop = Mode == "Funded growth" ? 45 : 60;  // G204 on the 50K (G6: 60)
                     RangePos = Mode == "Funded growth" ? 0.7 : 0.65;  // G204 on the 50K
                     TrendSessions = Mode == "Funded growth" ? 45 : 50;  // G241 on the 50K
-                    MaxContracts = Mode == "Funded growth" && minutes == 5 ? 60 : 15;  // G247: 60, Take Profit Trader's 50K limit (G212: 75; G106: 20, G120: 30, G121: 50)
+                    MaxContracts = Mode == "Funded growth" && minutes == 5 ? (lucid ? 40 : 60) : 15;  // G252: Lucid's 40
+                    trailLock = lucid ? 100 : 0;  // G252: Lucid's floor stops at $50,100
+                    //  // G247: 60, Take Profit Trader's 50K limit (G212: 75; G106: 20, G120: 30, G121: 50)
                     // G40: a bigger account trades the 50K's size; its larger limits are cushion (a $2,000 / $3,000
                     // daily loss and a $3,000 / $4,500 trailing drawdown; the bot's budget is 90% of the daily loss)
                     if (Mode == "Funded growth 100K") { DailyLoss = 1800; TrailDD = 3000; LossGuard = 1900; }
@@ -1034,6 +1041,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 st.ProfitStepFast = Mode != "Evaluation" ? FastSteps : 0;  // G142
                 st.ProfitStepFastFrom = FastStepsFrom;
                 st.SprintQty = Mode != "Evaluation" ? SprintContracts : 0;  // G103
+                st.TrailLock = trailLock;  // G252
                 st.SizeSlipPts = Mode != "Evaluation" ? SizeSlip : 0;  // G79: the Funded growth modes and Custom
                 st.ProtectRoom = Mode != "Evaluation" ? NearFloorGate : 0;  // G87
                 st.Tick = TickSize;
@@ -1489,9 +1497,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         // live: the prop account's trailing floor (its highest end-of-day balance less the trailing drawdown, stopping at
         // the starting balance) and the room above it from the account's net liquidation
+        double trailLock = 0;  // G252: LucidDirect's floor stops $100 above the start
         double PropFloor()
         {
-            return Math.Min(propHigh - TrailDD, PropStartBalance);
+            return Math.Min(propHigh - TrailDD, PropStartBalance + trailLock);
         }
 
         bool AccountValuesOk()
