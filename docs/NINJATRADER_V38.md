@@ -6018,3 +6018,9 @@ The user named the firm: **Take Profit Trader, 50K**. Its help center (takeprofi
 
 A compliance change, adopted whatever its numbers: `size_up_to` 60 instead of 75 (U47 otherwise). Measured once on the
 three sets in both executions and the 526 starts (`run247.sh`), to report its cost.
+
+**G247 result (2026-11-05): adopted as U48 (compliance).** 60 MNQ at most instead of 75; chart / NinjaTrader nets
+(window / NQ / index) $61,612 / $630,505 / $893,328 and $61,612 / $632,038 / $875,038 (U47 $61,661 / $617,427 /
+$900,190 and $61,661 / $618,986 / $873,759); no −$1,000 day, the floor never touched. 526 starts: 21 lost at the floor,
+22 lost or frozen (as U47), median net **$47,023** (U47 $46,561), +$50,000 within 21 months in 52.1%. Logs
+`verification/noise_v2/g247_{c,n,s,m}.txt`. G244 keeps U47 (75) as its base; anything it adopts is re-checked at 60.

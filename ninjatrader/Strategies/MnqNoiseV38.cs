@@ -961,7 +961,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 SizeToAccountRoom = true;
                 SprintContracts = 0;  // G103: off
                 NearFloorGate = 0;  // G87b: off (it lost more accounts)
-                TestedWinRate = 49.3;  // U47: the window's 5-minute win rate in NinjaTrader's execution (61.2 was v3.8's)
+                TestedWinRate = 49.3;  // U48: the window's 5-minute win rate in NinjaTrader's execution (61.2 was v3.8's)
             }
             else if (State == State.DataLoaded)
             {
@@ -992,7 +992,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                     TimeStop = Mode == "Funded growth" ? 45 : 60;  // G204 on the 50K (G6: 60)
                     RangePos = Mode == "Funded growth" ? 0.7 : 0.65;  // G204 on the 50K
                     TrendSessions = Mode == "Funded growth" ? 45 : 50;  // G241 on the 50K
-                    MaxContracts = Mode == "Funded growth" && minutes == 5 ? 75 : 15;  // G212: 75 on the 50K's 5-minute chart (G106: 20, G120: 30, G121: 50)
+                    MaxContracts = Mode == "Funded growth" && minutes == 5 ? 60 : 15;  // G247: 60, Take Profit Trader's 50K limit (G212: 75; G106: 20, G120: 30, G121: 50)
                     // G40: a bigger account trades the 50K's size; its larger limits are cushion (a $2,000 / $3,000
                     // daily loss and a $3,000 / $4,500 trailing drawdown; the bot's budget is 90% of the daily loss)
                     if (Mode == "Funded growth 100K") { DailyLoss = 1800; TrailDD = 3000; LossGuard = 1900; }

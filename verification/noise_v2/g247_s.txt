@@ -1,0 +1,2 @@
+index g247cap60 starts 160 lost (at the floor) 4 dead (lost or frozen) 4 below start 1 median net 43865 worst net -79 lowest point -1833 reached +2000 160
+nq g247cap60 starts 103 lost (at the floor) 6 dead (lost or frozen) 6 below start 4 median net 51072 worst net -1995 lowest point -1995 reached +2000 99
