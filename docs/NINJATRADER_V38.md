@@ -5864,3 +5864,7 @@ meeting G78's rule against U45 (no more than 25 of 526 lost).
 
 **U45 checks (2026-11-05):** the full suite, **675 passed**. G242's row 0 reproduces U45 in NinjaTrader's execution
 ($59,167 / $603,956 / $853,557).
+
+**G242 stage 1 (2026-11-05): 105 of 10,000 pass the NinjaTrader screen against U45.** The best by the three nets: k5922
+(range 0.68, target 1.75, early budget $700, lookback 12) $63,966 / $657,515 / $862,072; k3975 $60,505 / $653,597 /
+$884,771 (U45 $59,167 / $603,956 / $853,557). The 40 best go to stage 2. Log: `verification/noise_v2/g242_nt_search.jsonl`.
