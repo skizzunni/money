@@ -5853,3 +5853,11 @@ was v3.8's).
 **U45 checks (2026-11-05):** the NinjaTrader growth run on the window **$58,609.81**, 756 trades, 49.7% winners, worst
 day −$899.24 (`verification/noise_v2/v38g_nt_u45.txt`): identical to the model on 30-minute bars, and on 5-minute bars up
 to the 2026-03-09 data hole. 526 starts: 25 lost (about 1 in 21), median net $36,403 (U44 $33,917).
+
+## G242: 10,000 more combinations, around U45 (registered 2026-11-05, before its run)
+
+**The search:** G241's (`research/g241_nt_search.py`, the same 34 settings) with `SEED=242`, around U45 (row 0 is U45:
+NinjaTrader $59,167 / $603,956 / $853,557). **Stages and adoption as G241's**, against U45: stage 1 all three NinjaTrader
+nets above U45's, no −$1,000 day, the floor never touched; stage 2 the 40 best on the 263 starts on the 1st; stage 3 the
+5 with the fewest lost (at most U45's 12 there) on the mid-month starts and the chart's execution; adopted the best window
+meeting G78's rule against U45 (no more than 25 of 526 lost).

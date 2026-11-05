@@ -1,4 +1,4 @@
-"""G241 (docs/NINJATRADER_V38.md): 10,000 random combinations around U44, screened in NinjaTrader's execution (as
+"""G241 / G242 (docs/NINJATRADER_V38.md): 10,000 random combinations around U44, screened in NinjaTrader's execution (as
 g69_days.py with NT_EXEC=1) on the window, NQ and the index. Resumable: rows already in the output file are skipped.
 
     python research/g241_nt_search.py <data dir> <MNQ 09-26 file> <MNQ 12-26 file> <U44 J json> <output file>
@@ -44,7 +44,7 @@ SPACE = {
     "gap_go_drive_k": [0.5, 0.55, 0.65, 0.7], "fill_qty2_room": [3500.0, 4500.0, 5000.0],
     "fill_qty3_room": [7000.0, 7500.0, 8500.0, 9000.0], "gap_go_be": [0.75, 1.0, 1.5],
 }
-rng = random.Random(241)
+rng = random.Random(int(os.environ.get("SEED", "241")))  # G242: SEED=242 around U45
 VARIANTS = [{}]
 seen = {"{}"}
 while len(VARIANTS) < 10001:
