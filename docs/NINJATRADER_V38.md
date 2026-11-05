@@ -5828,3 +5828,8 @@ time.
 
 **G241 progress (2026-11-05, 01:42 UTC):** 1,400 of 10,000 done, 45 pass the NinjaTrader screen; running steadily as a
 tracked task.
+
+**G241 stage 1 (2026-11-05): 264 of 10,000 pass the NinjaTrader screen** (all three nets above U44's, no −$1,000 day, the
+floor never touched). The best by the three nets: k4403 (lock plus 2, trend 75, gap trigger 0.65) $62,838 / $634,566 /
+$834,077; k356 (gap break-even 1.5, range 0.72, trend 55) $64,049 / $597,872 / $849,153. The 40 best go to stage 2 (263
+starts on the 1st). Log: `verification/noise_v2/g241_nt_search.jsonl`.
