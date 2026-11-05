@@ -6091,3 +6091,20 @@ trades, 49.3% winners, most contracts 60 (`verification/noise_v2/v38g_nt_u48.txt
 The user asked for two weeks. G250's measurement with **10 sessions**, `sprint_qty` 0 / 5 / 10 / 15 / 20, each with and
 without a **day stop** (`day_stop_profit` $1,400: no new entries once the day is up $1,400, so no day reaches half of
 the $3,000; the consistency rule). Reported as G250. No adoption rule: the user picks with the odds in hand.
+
+## A firm that allows the bot: Lucid Trading's LucidDirect 50K (read 2026-11-05)
+
+From Lucid's help center (support.lucidtrading.com): **"Automated trading systems and trade copiers are permitted"**
+(Other Trading Activities); **LucidDirect is straight-to-funded, no evaluation**; the 50K: **$2,000 end-of-day trailing
+drawdown, locking at $50,100 once the account closes above $52,100**; a $1,200 daily loss limit that is a **soft breach**
+(trading stops until the next session, the account is kept), then 60% of the highest end-of-day profit; **40 micros at
+most**; positions closed by 16:45; news trading allowed; HFT, microscalping and hedging prohibited. Payouts: 90%, the
+first after $3,000 of profit with the largest day at most 20% of the cycle's profit, $2,000 at most each for the first
+three.
+
+## G252: U48 on LucidDirect's 50K rules (registered 2026-11-05, before its run)
+
+U48 with `size_up_to` 40 and the floor stopping at the start plus $100 (`trail_cap` 100). Measured once (`run252.sh`):
+the three sets in both executions and the 526 starts (their "lost" check counts the floor at the start, $100 lower than
+Lucid's). Adopted as a **LucidDirect preset** (a mode, the 50K Funded growth otherwise) if no −$1,000 day, the floor
+never touched, and no more than 26 of 526 lost or frozen (U48's 22 plus a margin for the smaller cap).
