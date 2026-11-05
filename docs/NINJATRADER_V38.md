@@ -6083,7 +6083,7 @@ a 30-MNQ row was added to the registered list as an extra measurement):
 TPT's Test has no time limit (Rule 5: "You may take as long as you want"); the bot's median time to +$3,000 is about
 144 days (G247's 526 starts).
 
-**U48 checks (2026-11-05):** the NinjaTrader tests passed; the NinjaTrader growth run on the window **$61,047.16**, 760
+**U48 checks (2026-11-05):** the full suite, 677 passed; the NinjaTrader tests passed; the NinjaTrader growth run on the window **$61,047.16**, 760
 trades, 49.3% winners, most contracts 60 (`verification/noise_v2/v38g_nt_u48.txt`), parity as U47.
 
 ## G251: the Test in two weeks (registered 2026-11-05, before its run)
