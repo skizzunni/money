@@ -19,9 +19,10 @@ GIVEBACK = float(os.environ.get("GIVEBACK", "0.5"))  # G99: the giveback brake (
 NTARGS += [f"GivebackBrake={GIVEBACK}"] if GROW else []
 FILL = {**FILL, "size_slip_pts": SLIP, "giveback_brake": GIVEBACK, "size_up_to": 75,
         "after_loss_ml_locked": 1.0, "skip_checks": "780,870", "skip_checks_early": True,
-        "profit_step_fast": 650.0, "profit_step_fast_from": 8000.0, "fill_qty3_room": 8000.0, "fill_qty2_room": 4000.0, "after_loss_ml_mult5": 1.0, "gap_skip_braked": True}  # G121: 50 on 5-minute bars (G106: 20); G119; G125
+        "profit_step_fast": 650.0, "profit_step_fast_from": 8000.0, "fill_qty3_room": 8000.0, "fill_qty2_room": 5000.0, "fill_min_room": 2750.0, "after_loss_ml_mult5": 1.0, "gap_skip_braked": True}  # G121: 50 on 5-minute bars (G106: 20); G119; G125
 # G204: the 50K's Funded growth on either chart (NinjaTrader applies them on both)
-G204 = {"max_losers": 3, "early_daily_loss": 750.0, "time_stop": 45, "range_pos_min": 0.7, "gap_go_k": 0.6}
+G204 = {"max_losers": 3, "early_daily_loss": 750.0, "time_stop": 45, "range_pos_min": 0.7, "gap_go_k": 0.6,
+        "trend_n": 45}  # and G241's trend
 from mnqbot.noise import NoiseConfig, run
 S = "/tmp/claude-0/-home-user-money/b0ea31b5-d9fc-525a-a114-db6430eff3ed/scratchpad"
 SIM = "ninjatrader/tests/Sim/bin/Release/net8.0/Sim"

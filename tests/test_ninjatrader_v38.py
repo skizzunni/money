@@ -32,13 +32,15 @@ GROW = NoiseConfig(**{**V21, "qty": 1, "lookback": 14, "max_loss_per_trade": 187
                       "gap_go_locked_qty": 10, "trail_cap": 0.0,
                       # G79: More trading days and the 2-point sizing allowance
                       "gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.6, "fill_after_lock": True,
-                      "fill_min_room": 2500.0, "size_slip_pts": 5.0, "fill_qty2_room": 4000.0,
+                      "fill_min_room": 2750.0, "size_slip_pts": 5.0, "fill_qty2_room": 5000.0,
                       "giveback_brake": 0.5,
                       # G191: no gap-slot trade while the giveback brake is on
                       "gap_skip_braked": True,
                       # G204: at most three losers a day, a $750 day budget until the floor has stopped, a 45-minute
                       # time stop, the top 70% of the day's range, the gap trade from 0.6x
                       "max_losers": 3, "early_daily_loss": 750.0, "range_pos_min": 0.7, "gap_go_k": 0.6,
+                      # G241: the trend over 45 sessions, the fill-ins from $2,750, 2 MNQ from $5,000
+                      "trend_n": 45,
                       # G119: once the floor has stopped, the trade after a loser risks $187.50 like the others
                       "after_loss_ml_locked": 1.0,
                       # G125: no entries at 13:00 and 14:30 until the floor has stopped
@@ -51,8 +53,8 @@ GROW = NoiseConfig(**{**V21, "qty": 1, "lookback": 14, "max_loss_per_trade": 187
                       "after_loss_ml_mult5": 1.0},
                    nt_execution=True, round_prices=True, target_on_fill_bar=True)
 # the bigger accounts' modes keep the settings from before G204
-PRE_G204 = {"max_losers": 0, "early_daily_loss": 0.0, "range_pos_min": 0.65, "gap_go_k": 0.5, "time_stop": 60}
-PRE_G204_ARGS = ["MaxLosersPerDay=0", "EarlyDayBudget=0", "RangePos=0.65", "GapTrigger=0.5", "TimeStop=60"]
+PRE_G204 = {"max_losers": 0, "early_daily_loss": 0.0, "range_pos_min": 0.65, "gap_go_k": 0.5, "time_stop": 60, "trend_n": 50}
+PRE_G204_ARGS = ["MaxLosersPerDay=0", "EarlyDayBudget=0", "RangePos=0.65", "GapTrigger=0.5", "TimeStop=60", "TrendSessions=50"]
 GROW_ARGS = ["Mode=Funded growth"]  # the default; its settings are the tested ones above
 # G72's fill-in trades off (NinjaTrader's More trading days needs gap and go on)
 NO_FILL = {"gap_go_small_k": -1.0, "trend_small": False, "gap_go_drive_k": 0.0, "fill_after_lock": False,
@@ -609,7 +611,7 @@ def test_v38_milestones(sim, sample_1m, tmp_path):  # noqa: F811
 @pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
 def test_v38_win_rate_check(sim, sample_1m, tmp_path):  # noqa: F811
     """U13: the dashboard's win-rate check equals research/journal_report.py's binomial tail for the journal's trades;
-    in line at the tested 61.2%, a warning (and one live alert) when the tested rate is set far above the real one."""
+    in line at the tested 49.7% (U45), a warning (and one live alert) when the tested rate is set far above the real one."""
     import re
     import sys
 
@@ -636,7 +638,7 @@ def test_v38_win_rate_check(sim, sample_1m, tmp_path):  # noqa: F811
     dash, alerts, tr, t1 = go()
     n, wins = len(tr), int((tr["P/L"] > 0).sum())
     assert n >= 30 and not alerts
-    assert f"Win rate in line with the tests: {100 * wins / n:.1f}% in {n} trades (tested 61.2%)" in dash, dash
+    assert f"Win rate in line with the tests: {100 * wins / n:.1f}% in {n} trades (tested 49.7%)" in dash, dash
     dash, alerts, _, t2 = go("TestedWinRate=90")
     m = re.search(r"WIN RATE WARNING: ([\d.]+)% in (\d+) trades, below the tested 90.0% \(([\d.]+)% chance\)", dash)
     assert m and int(m.group(2)) == n, dash

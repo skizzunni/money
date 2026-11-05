@@ -903,7 +903,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 BigDayK = 1.5;
                 CalmK = 0.7;
                 RangePos = 0.7;  // G204 (0.65 before; Evaluation keeps 0.65)
-                TrendSessions = 50;
+                TrendSessions = 45;  // G241 (50 before; Evaluation and the bigger accounts keep 50)
                 FedNoShorts = true;
                 SkipDates = SkipDefault;
                 FedDates = FedDefault;
@@ -925,9 +925,9 @@ namespace NinjaTrader.NinjaScript.Strategies
                 GapGo = true;
                 GapGoLocked = 10;  // G84 (G67b: 3, G80: 5, G82: 7; G83's 15 broke the daily limit once)
                 MoreDays = true;  // G79: on by default (with SizeSlip 2)
-                MoreDaysCushion = 2500;  // G181 (G71: 3000)
+                MoreDaysCushion = 2750;  // G241 (G71: 3000, G181: 2500)
                 SizeSlip = 5;  // G170 (G79: 2, G97: 3, G106: 4)
-                MoreDaysQty2Room = 4000;  // G212 (G97: 6000)
+                MoreDaysQty2Room = 5000;  // G241 (G97: 6000, G212: 4000)
                 MoreDaysQty3Room = 8000;  // G212 (G210: 9000)
                 GivebackBrake = 0.5;  // G99c
                 GapSkipBraked = true;  // G191
@@ -943,7 +943,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 SizeToAccountRoom = true;
                 SprintContracts = 0;  // G103: off
                 NearFloorGate = 0;  // G87b: off (it lost more accounts)
-                TestedWinRate = 61.2;
+                TestedWinRate = 49.7;  // U45: the window's 5-minute win rate in NinjaTrader's execution (61.2 was v3.8's)
             }
             else if (State == State.DataLoaded)
             {
@@ -973,6 +973,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                     ProfitStep = 1500; SizeByOwnStop = true;
                     TimeStop = Mode == "Funded growth" ? 45 : 60;  // G204 on the 50K (G6: 60)
                     RangePos = Mode == "Funded growth" ? 0.7 : 0.65;  // G204 on the 50K
+                    TrendSessions = Mode == "Funded growth" ? 45 : 50;  // G241 on the 50K
                     MaxContracts = Mode == "Funded growth" && minutes == 5 ? 75 : 15;  // G212: 75 on the 50K's 5-minute chart (G106: 20, G120: 30, G121: 50)
                     // G40: a bigger account trades the 50K's size; its larger limits are cushion (a $2,000 / $3,000
                     // daily loss and a $3,000 / $4,500 trailing drawdown; the bot's budget is 90% of the daily loss)
@@ -985,7 +986,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 else if (Mode == "Evaluation")  // v3.8: 1 MNQ, $260 a trade, $900 a day
                 {
                     Contracts = 1; MaxLoss = 260; AfterLossMaxLoss = 0; DailyLoss = 900; TrailDD = 0;
-                    ProfitStep = 0; SizeByOwnStop = false; TimeStop = 0; RangePos = 0.65;
+                    ProfitStep = 0; SizeByOwnStop = false; TimeStop = 0; RangePos = 0.65; TrendSessions = 50;
                 }
                 V38Settings st = new V38Settings();
                 st.Qty = Contracts; st.MaxLoss = MaxLoss; st.DailyLoss = DailyLoss; st.TakeProfit = TakeProfit;
