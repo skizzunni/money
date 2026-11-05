@@ -5825,3 +5825,6 @@ from the rows saved.
 **G241 progress (2026-11-05, 01:10 UTC):** 392 of 10,000 done, 8 pass the screen. The container is reclaimed while the
 session is idle, which stopped the detached run twice; it now runs as a tracked task in two-hour legs, resuming each
 time.
+
+**G241 progress (2026-11-05, 01:42 UTC):** 1,400 of 10,000 done, 45 pass the NinjaTrader screen; running steadily as a
+tracked task.
