@@ -11,15 +11,15 @@ NTARGS = (["Mode=Funded growth", "TrailFrom=2025-01-02", f"GapGoLocked={LQ}", f"
           else ["Mode=Evaluation"])
 FILL = ({"gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.6, "fill_after_lock": True,
          "fill_min_room": 2500.0, "fill_qty2_room": 6000.0} if MORE else {})
-SLIP = float(os.environ.get("SIZE_SLIP", "5"))  # G170 (G76 2, G106 4): the sizing's extra stop slippage, points
+SLIP = float(os.environ.get("SIZE_SLIP", "4"))  # G243 (G170 5) (G76 2, G106 4): the sizing's extra stop slippage, points
 NTARGS += [f"SizeSlip={SLIP}"] if GROW else []
 PROTECT = float(os.environ.get("PROTECT", "0"))  # G87: the near-floor shadow gate, $ (0 = off)
 NTARGS += [f"NearFloorGate={PROTECT}"] if GROW else []
-GIVEBACK = float(os.environ.get("GIVEBACK", "0.5"))  # G99: the giveback brake (0 = off)
+GIVEBACK = float(os.environ.get("GIVEBACK", "0.45"))  # G243  # G99: the giveback brake (0 = off)
 NTARGS += [f"GivebackBrake={GIVEBACK}"] if GROW else []
 FILL = {**FILL, "size_slip_pts": SLIP, "giveback_brake": GIVEBACK, "size_up_to": 75,
         "after_loss_ml_locked": 1.0, "skip_checks": "780,870", "skip_checks_early": True,
-        "profit_step_fast": 650.0, "profit_step_fast_from": 8000.0, "fill_qty3_room": 8000.0, "fill_qty2_room": 5000.0, "fill_min_room": 2750.0, "after_loss_ml_mult5": 1.0, "gap_skip_braked": True}  # G121: 50 on 5-minute bars (G106: 20); G119; G125
+        "profit_step_fast": 650.0, "profit_step_fast_from": 9000.0, "fill_qty3_room": 8000.0, "fill_qty2_room": 5000.0, "fill_min_room": 2750.0, "after_loss_ml_mult5": 1.0, "gap_skip_braked": True}  # G121: 50 on 5-minute bars (G106: 20); G119; G125
 # G204: the 50K's Funded growth on either chart (NinjaTrader applies them on both)
 G204 = {"max_losers": 3, "early_daily_loss": 750.0, "time_stop": 45, "range_pos_min": 0.7, "gap_go_k": 0.65,
         "trend_n": 45, "gap_go_be": 1.5}  # and G241's trend, G242's gap trigger and break-even

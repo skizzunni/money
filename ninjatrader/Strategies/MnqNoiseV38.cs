@@ -943,10 +943,10 @@ namespace NinjaTrader.NinjaScript.Strategies
                 GapGoLocked = 10;  // G84 (G67b: 3, G80: 5, G82: 7; G83's 15 broke the daily limit once)
                 MoreDays = true;  // G79: on by default (with SizeSlip 2)
                 MoreDaysCushion = 2750;  // G241 (G71: 3000, G181: 2500)
-                SizeSlip = 5;  // G170 (G79: 2, G97: 3, G106: 4)
+                SizeSlip = 4;  // G243 (G79: 2, G97: 3, G106: 4, G170: 5)
                 MoreDaysQty2Room = 5000;  // G241 (G97: 6000, G212: 4000)
                 MoreDaysQty3Room = 8000;  // G212 (G210: 9000)
-                GivebackBrake = 0.5;  // G99c
+                GivebackBrake = 0.45;  // G243 (G99c: 0.5)
                 GapSkipBraked = true;  // G191
                 MaxLosersPerDay = 3;  // G204
                 EarlyDayBudget = 750;  // G204
@@ -955,13 +955,13 @@ namespace NinjaTrader.NinjaScript.Strategies
                 AfterLossLocked = 187.5;  // G119
                 EarlyNoEntryChecks = "13:00,14:30";  // G125
                 FastSteps = 650;  // G212 (G142: 750, G210: 700)
-                FastStepsFrom = 8000;  // G210 (G142: 10000)
+                FastStepsFrom = 9000;  // G243 (G142: 10000, G210: 8000)
                 PropStartBalance = 50000;
                 PropHighBalance = 0;
                 SizeToAccountRoom = true;
                 SprintContracts = 0;  // G103: off
                 NearFloorGate = 0;  // G87b: off (it lost more accounts)
-                TestedWinRate = 49.3;  // U46: the window's 5-minute win rate in NinjaTrader's execution (61.2 was v3.8's)
+                TestedWinRate = 49.3;  // U47: the window's 5-minute win rate in NinjaTrader's execution (61.2 was v3.8's)
             }
             else if (State == State.DataLoaded)
             {
