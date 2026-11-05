@@ -5916,3 +5916,6 @@ execution; adopted the best window meeting G78's rule against the current versio
 
 **G243 stage 1 done (2026-11-05 20:00 UTC):** all 10,001 rows (`verification/noise_v2/g243_nt_search.jsonl`); 62 pass
 stage 1, the 40 best go to stage 2. Stage 2 in progress (`verification/noise_v2/g243_stage2_partial.txt`).
+
+**G243 stage 2 done:** all 40 on the 263 starts on the 1st (`verification/noise_v2/g243_stage2.txt`; U46 loses 11).
+Three lose at most 11: k6546 (10), k7849 (11), k3044 (11); they go to stage 3.
