@@ -55,6 +55,7 @@ while len(VARIANTS) < 10001:
         seen.add(key)
         VARIANTS.append(v)
 BASE: dict = {}
+WINDOW_FIRST = float(os.environ.get("WINDOW_FIRST", "0"))  # the base's window net: screen the window first (G244 on)
 
 
 def one(k: int) -> dict:
@@ -77,6 +78,9 @@ def one(k: int) -> dict:
         out[f"{name} net"] = round(float(tf.pnl.sum()))
         out[f"{name} d1000"] = int((dayp <= -1000).sum())
         out[f"{name} floor"] = int(S.trail_stats(name, tf)[f"{name} tb0"])
+        if WINDOW_FIRST and k and name == "proxy" and not (out["proxy net"] > WINDOW_FIRST and out["proxy d1000"] == 0
+                                                           and out["proxy floor"] == 0):
+            break  # it can't pass stage 1: NQ and the index are skipped (the outcome is the same, about 5x faster)
     return out
 
 

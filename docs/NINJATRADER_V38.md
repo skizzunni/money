@@ -5992,3 +5992,8 @@ their years). Run once.
 200 trades −$1,391 (26.0% winners; idle days −$1,117), NQ 1,114 trades −$7,511 (27.8%; idle days up 1 of 11 years),
 index 1,666 trades −$10,063 (28.7%; idle days up 0 of 16). A 2:1 target needs about 33% winners before costs; the
 retests of the prior day's levels win 26-29%. The file is unchanged (U47).
+
+**G244 speed-up (2026-11-05, at row 2,698):** `WINDOW_FIRST=<U47's window net>` in `research/g241_nt_search.py`: a
+combination that can't beat U47 on the window (or has a −$1,000 day or touches the floor there) skips NQ and the index.
+Stage 1 needs all three, so the outcome is identical; only 13-16% pass the window, so the screen runs about 5x faster.
+Rows that stop early carry only the window's columns.
