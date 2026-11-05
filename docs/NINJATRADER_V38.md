@@ -5888,3 +5888,11 @@ trade's stop order moves to the real fill plus a tick. The win-rate check's test
 the 2026-03-09 data hole. 526 starts: **23 lost (about 1 in 23)**, median net **$39,513** (U45 $36,403); +$3,000 in a
 median 145 days; +$50,000 within 21 months in 47.0%. The NinjaTrader tests, 48 passed (a new one for the gap
 break-even; three sample-size checks narrowed because the short sample now stays at 1 MNQ on 5-minute bars).
+
+## G243: 10,000 more combinations, around U46 (registered 2026-11-05, before its run)
+
+**The search:** G241's (`research/g241_nt_search.py`, the same 34 settings) with `SEED=243`, around U46 (row 0 is U46:
+NinjaTrader $61,255 / $611,194 / $861,886). **Stages and adoption as G241's**, against U46: stage 1 all three NinjaTrader
+nets above U46's, no −$1,000 day, the floor never touched; stage 2 the 40 best on the 263 starts on the 1st; stage 3 the
+5 with the fewest lost (at most U46's 11 there) on the mid-month starts and the chart's execution; adopted the best window
+meeting G78's rule against U46 (chart $61,152 / $609,486 / $892,868; no more than 23 of 526 lost).
