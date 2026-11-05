@@ -18,3 +18,13 @@ index g243k4710 starts 160 lost (at the floor) 7 dead (lost or frozen) 7 below s
 nq g243k4710 starts 103 lost (at the floor) 8 dead (lost or frozen) 8 below start 5 median net 43961 worst net -1999 lowest point -1999 reached +2000 98
 index g243k4600 starts 160 lost (at the floor) 5 dead (lost or frozen) 5 below start 2 median net 42755 worst net -1999 lowest point -1999 reached +2000 159
 nq g243k4600 starts 103 lost (at the floor) 10 dead (lost or frozen) 10 below start 5 median net 36543 worst net -1999 lowest point -1999 reached +2000 97
+index g243k7958 starts 160 lost (at the floor) 8 dead (lost or frozen) 8 below start 4 median net 40947 worst net -2001 lowest point -2001 reached +2000 156
+nq g243k7958 starts 103 lost (at the floor) 7 dead (lost or frozen) 7 below start 4 median net 39603 worst net -1999 lowest point -1999 reached +2000 99
+index g243k9224 starts 160 lost (at the floor) 7 dead (lost or frozen) 7 below start 4 median net 42112 worst net -1999 lowest point -1999 reached +2000 157
+nq g243k9224 starts 103 lost (at the floor) 8 dead (lost or frozen) 8 below start 5 median net 43557 worst net -1999 lowest point -1999 reached +2000 98
+index g243k9352 starts 160 lost (at the floor) 5 dead (lost or frozen) 5 below start 2 median net 38313 worst net -2004 lowest point -2004 reached +2000 159
+nq g243k9352 starts 103 lost (at the floor) 11 dead (lost or frozen) 11 below start 8 median net 37763 worst net -1999 lowest point -1999 reached +2000 95
+index g243k1165 starts 160 lost (at the floor) 5 dead (lost or frozen) 5 below start 2 median net 41955 worst net -2004 lowest point -2004 reached +2000 159
+nq g243k1165 starts 103 lost (at the floor) 11 dead (lost or frozen) 11 below start 8 median net 37700 worst net -1999 lowest point -1999 reached +2000 95
+index g243k3120 starts 160 lost (at the floor) 6 dead (lost or frozen) 6 below start 3 median net 37639 worst net -1999 lowest point -1999 reached +2000 158
+nq g243k3120 starts 103 lost (at the floor) 10 dead (lost or frozen) 10 below start 7 median net 32407 worst net -1999 lowest point -1999 reached +2000 97
