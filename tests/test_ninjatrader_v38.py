@@ -38,9 +38,11 @@ GROW = NoiseConfig(**{**V21, "qty": 1, "lookback": 14, "max_loss_per_trade": 187
                       "gap_skip_braked": True,
                       # G204: at most three losers a day, a $750 day budget until the floor has stopped, a 45-minute
                       # time stop, the top 70% of the day's range, the gap trade from 0.6x
-                      "max_losers": 3, "early_daily_loss": 750.0, "range_pos_min": 0.7, "gap_go_k": 0.6,
+                      "max_losers": 3, "early_daily_loss": 750.0, "range_pos_min": 0.7, "gap_go_k": 0.65,  # G242: 0.65
                       # G241: the trend over 45 sessions, the fill-ins from $2,750, 2 MNQ from $5,000
                       "trend_n": 45,
+                      # G242: the gap trade's stop to break-even once a bar closes 1.5x its risk in profit
+                      "gap_go_be": 1.5,
                       # G119: once the floor has stopped, the trade after a loser risks $187.50 like the others
                       "after_loss_ml_locked": 1.0,
                       # G125: no entries at 13:00 and 14:30 until the floor has stopped
@@ -53,8 +55,9 @@ GROW = NoiseConfig(**{**V21, "qty": 1, "lookback": 14, "max_loss_per_trade": 187
                       "after_loss_ml_mult5": 1.0},
                    nt_execution=True, round_prices=True, target_on_fill_bar=True)
 # the bigger accounts' modes keep the settings from before G204
-PRE_G204 = {"max_losers": 0, "early_daily_loss": 0.0, "range_pos_min": 0.65, "gap_go_k": 0.5, "time_stop": 60, "trend_n": 50}
-PRE_G204_ARGS = ["MaxLosersPerDay=0", "EarlyDayBudget=0", "RangePos=0.65", "GapTrigger=0.5", "TimeStop=60", "TrendSessions=50"]
+PRE_G204 = {"max_losers": 0, "early_daily_loss": 0.0, "range_pos_min": 0.65, "gap_go_k": 0.5, "time_stop": 60, "trend_n": 50,
+            "gap_go_be": 0.0}
+PRE_G204_ARGS = ["MaxLosersPerDay=0", "EarlyDayBudget=0", "RangePos=0.65", "GapTrigger=0.5", "TimeStop=60", "TrendSessions=50", "GapBreakEven=0"]
 GROW_ARGS = ["Mode=Funded growth"]  # the default; its settings are the tested ones above
 # G72's fill-in trades off (NinjaTrader's More trading days needs gap and go on)
 NO_FILL = {"gap_go_small_k": -1.0, "trend_small": False, "gap_go_drive_k": 0.0, "fill_after_lock": False,
@@ -115,8 +118,9 @@ def test_v38_ninjatrader_code_and_python_agree(sim, sample_1m, minutes, grow, tm
         assert float(a[2]) == t.entry and float(a[4]) == t.exit, (a, t)
         assert math.isclose(float(a[6]), t.pnl, abs_tol=1e-6), (a, t)
         assert grow or t.pnl > -300.0  # the $260 cap holds, with fees and a tick of slippage
-    if grow:
+    if grow and minutes == 30:
         assert max(t.qty for t in py) >= 2  # the contract steps were reached
+    # (on 5-minute bars U46's sample stays at 1 MNQ; the steps are tested with ProfitStep=300 and by test_v38_fill_qty3)
 
 
 @pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
@@ -169,7 +173,10 @@ def test_v38_gentle_start_agrees(sim, sample_1m, minutes, tmp_path):  # noqa: F8
         assert float(a[2]) == t.entry and float(a[4]) == t.exit, (a, t)
         assert math.isclose(float(a[6]), t.pnl, abs_tol=1e-6), (a, t)
     plain = run(bars, GROW, minutes=minutes).trades
-    assert [t.qty for t in py] != [t.qty for t in plain], "the gentle start changes the sizes"
+    if max(t.qty for t in plain) >= 2:  # (U46's 5-minute sample stays at 1 MNQ, so there is nothing to hold back)
+        assert [t.qty for t in py] != [t.qty for t in plain], "the gentle start changes the sizes"
+    else:
+        assert minutes == 5
 
 
 @pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
@@ -507,7 +514,7 @@ def test_v38_fill_quality(sim, sample_1m, tmp_path):  # noqa: F811
     assert tr[tr["exit kind"] == "Profit target"]["exit slip ticks"].isna().all(), "a limit has no slippage"
     m = re.search(r"Fills vs plan: entries ([+-]?[\d.]+) ticks \((\d+)\)", dash)
     assert m and int(m.group(2)) == len(tr)
-    assert math.isclose(float(m.group(1)), tr["entry slip ticks"].mean(), abs_tol=0.05)
+    assert math.isclose(float(m.group(1)), tr["entry slip ticks"].mean(), abs_tol=0.0501)  # shown to 0.1
     assert "worse than 2 ticks" not in dash
     _, j3, dash3 = go(3)
     stops3 = j3[(j3.kind == "TRADE") & (j3["exit kind"] == "Stop loss")]["exit slip ticks"].dropna()
@@ -611,7 +618,7 @@ def test_v38_milestones(sim, sample_1m, tmp_path):  # noqa: F811
 @pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
 def test_v38_win_rate_check(sim, sample_1m, tmp_path):  # noqa: F811
     """U13: the dashboard's win-rate check equals research/journal_report.py's binomial tail for the journal's trades;
-    in line at the tested 49.7% (U45), a warning (and one live alert) when the tested rate is set far above the real one."""
+    in line at the tested 49.3% (U46), a warning (and one live alert) when the tested rate is set far above the real one."""
     import re
     import sys
 
@@ -638,7 +645,7 @@ def test_v38_win_rate_check(sim, sample_1m, tmp_path):  # noqa: F811
     dash, alerts, tr, t1 = go()
     n, wins = len(tr), int((tr["P/L"] > 0).sum())
     assert n >= 30 and not alerts
-    assert f"Win rate in line with the tests: {100 * wins / n:.1f}% in {n} trades (tested 49.7%)" in dash, dash
+    assert f"Win rate in line with the tests: {100 * wins / n:.1f}% in {n} trades (tested 49.3%)" in dash, dash
     dash, alerts, _, t2 = go("TestedWinRate=90")
     m = re.search(r"WIN RATE WARNING: ([\d.]+)% in (\d+) trades, below the tested 90.0% \(([\d.]+)% chance\)", dash)
     assert m and int(m.group(2)) == n, dash
@@ -848,6 +855,31 @@ def test_v38_fill_qty3(sim, sample_1m, tmp_path):  # noqa: F811
 
 
 @pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+@pytest.mark.parametrize("be", [0.5, 0.0])
+def test_v38_gap_break_even(sim, sample_1m, be, tmp_path):  # noqa: F811
+    """G242: once a bar closes with the gap trade up GapBreakEven x its risk, its stop goes to the entry plus a tick.
+    NinjaTrader's code and the model agree trade for trade at 0.5 and off, and at 0.5 some gap trade ends at
+    break-even (its exit a tick from its entry)."""
+    bars = resample(sample_1m, "5min")
+    path = tmp_path / "bars.csv"
+    with path.open("w") as f:
+        for t, r in zip(bars.index, bars.itertuples(), strict=True):
+            f.write(f"{t:%Y-%m-%d %H:%M},{r.open!r},{r.high!r},{r.low!r},{r.close!r}\n")
+    r = subprocess.run([DOTNET, str(sim), str(path), "5", "Strategy=V38", "Mode=Custom", f"GapBreakEven={be}"],
+                       capture_output=True, text=True, env=ENV)
+    assert r.returncode == 0, r.stderr[-2000:]
+    nt = [x.split(",")[1:] for x in r.stdout.splitlines() if x.startswith("T,")]
+    py = run(bars, dataclasses.replace(GROW, gap_go_be=be), minutes=5).trades
+    assert len(nt) == len(py) >= 20
+    for a, t in zip(nt, py, strict=True):
+        assert (int(a[0]), int(a[1]), int(a[3])) == (t.direction, t.entry_bar, t.exit_bar), (a, t)
+        assert float(a[2]) == t.entry and float(a[4]) == t.exit, (a, t)
+        assert math.isclose(float(a[6]), t.pnl, abs_tol=1e-6), (a, t)
+    be_exits = [t for t in py if t.reason == "Gap stop" and abs(t.exit - t.entry) < 0.75]
+    assert bool(be_exits) == (be > 0)
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
 def test_v38_after_loss_locked(sim, sample_1m, tmp_path):  # noqa: F811
     """G119: once the floor has stopped, the trade after a loser risks AfterLossLocked ($187.50) instead of $250. A $600
     trailing drawdown (Custom mode) stops the floor within the sample; NinjaTrader's code and the model agree trade for
@@ -960,7 +992,7 @@ def test_v38_live_account_dashboard(sim, sample_1m, tmp_path):  # noqa: F811
     """Live, the dashboard tracks the account itself: its name, balance and net liquidation, today's realized and open
     P/L, the trades closed live, and the prop floor from the account's own balance (the higher of its starting balance
     and its balance at go-live, less the trailing drawdown, never above the start) with the room above it. With an
-    account $1,700 below its start (net liquidation $48,300 on a 50K: $300 of room), the dashboard flags the
+    account $1,850 below its start (net liquidation $48,150 on a 50K: $150 of room, less than one contract's risk), the dashboard flags the
     difference from the strategy's own count, and no trade risks more than the account's room: the trades shrink.
     With the room check off, live trades are the backtest's."""
     bars = resample(sample_1m, "5min")
@@ -978,16 +1010,16 @@ def test_v38_live_account_dashboard(sim, sample_1m, tmp_path):  # noqa: F811
                                                                         if x.startswith("TN,")], r.stdout
 
     hist, hist_q, _ = go()
-    live, live_q, out = go("SimRealtimeFrom=1000", "SimNetLiq=48300")
+    live, live_q, out = go("SimRealtimeFrom=1000", "SimNetLiq=48150")
     dash = [x for x in out.splitlines() if x.startswith("D,")][0]
-    assert "LIVE account Sim101: balance $" in dash and "net liq $48300.00" in dash
+    assert "LIVE account Sim101: balance $" in dash and "net liq $48150.00" in dash
     assert "Today on the account: realized $" in dash and "Live trades since enabled: " in dash
-    assert "Prop floor (from the account): $48000.00, room $300.00, profit $-1700.00" in dash
+    assert "Prop floor (from the account): $48000.00, room $150.00, profit $-1850.00" in dash
     assert "CHECK: the strategy counts $" in dash and "(trades are sized to the account's)" in dash
     late = [int(q[1]) for t, q in zip(live, live_q, strict=True) if int(t[1]) >= 1000]
     late_hist = [int(q[1]) for t, q in zip(hist, hist_q, strict=True) if int(t[1]) >= 1000]
-    assert sum(late) < sum(late_hist), "live with $300 of room: fewer or smaller trades than the backtest's"
-    off, _, _ = go("SimRealtimeFrom=1000", "SimNetLiq=48300", "SizeToAccountRoom=False")
+    assert sum(late) < sum(late_hist), "live with $150 of room: fewer or smaller trades than the backtest's"
+    off, _, _ = go("SimRealtimeFrom=1000", "SimNetLiq=48150", "SizeToAccountRoom=False")
     assert off == hist, "the room check off: live trades are the backtest's"
 
 

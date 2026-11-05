@@ -64,6 +64,9 @@ namespace NinjaTrader.NinjaScript.Strategies
         // G204: no new entry after MaxLosers losing trades in a day (0 = no limit); until the trailing floor has stopped,
         // the day's budget is EarlyDailyLoss instead of DailyLoss (0 = DailyLoss)
         public int MaxLosers = 0;
+        // G242: once a bar closes with the gap trade up GapGoBe x its initial risk, its stop goes to the entry plus a
+        // tick (0 = off)
+        public double GapGoBe = 0;
         public double EarlyDailyLoss = 0;
         // a gentle start (G30): no contract steps until the trailing floor has stopped at the starting balance
         public bool StepsAfterLock = false;
@@ -206,6 +209,8 @@ namespace NinjaTrader.NinjaScript.Strategies
         public int GapNewEntry, GapNewQty;  // this bar's gap signal: send now at market (0: none)
         public double GapNewStop = double.NaN;  // its stop price
         public bool GapExitNow;               // close the gap trade at market now (it fills at the next open)
+        public bool GapStopMoved;             // G242: the gap trade's stop moved to break-even at this bar's close
+        bool gapBe;                           // G242: its stop is already at break-even
         bool gapPending, gapExitPending;
         int gapPendingDir, gapPendingQty;
         double gapPendingStop;
@@ -409,6 +414,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             equity += pnl;
             GapPos = 0;
             GapStop = double.NaN;
+            gapBe = false;
         }
 
         // the contract steps for the profit since the start (G142: faster above ProfitStepFastFrom, on 5-minute bars)
@@ -470,6 +476,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             Note = "";
             GapNewEntry = 0;
             GapExitNow = false;
+            GapStopMoved = false;
 
             if (s.GapGo)  // G60: the gap trade's market orders fill at this open, then its stop
             {
@@ -482,11 +489,21 @@ namespace NinjaTrader.NinjaScript.Strategies
                     if (tMin == RthOpen + 5 && Position == 0 && GapPos == 0)
                     {
                         GapPos = gapPendingDir; GapQty = gapPendingQty; GapBar = i;
-                        GapEntry = o + GapPos * slip; GapStop = gapPendingStop;
+                        GapEntry = o + GapPos * slip; GapStop = gapPendingStop; gapBe = false;
                     }
                 }
                 if (GapPos != 0 && (GapPos > 0 ? l <= GapStop : h >= GapStop))
                     GapClose(i, (GapPos > 0 ? Math.Min(o, GapStop) : Math.Max(o, GapStop)) - GapPos * slip, "Gap stop");
+                else if (GapPos != 0 && s.GapGoBe > 0 && !gapBe)  // G242: to break-even once up GapGoBe x its risk
+                {
+                    double risk = Math.Abs(GapEntry - GapStop);
+                    if (risk > 0 && GapPos * (c - GapEntry) >= s.GapGoBe * risk)
+                    {
+                        GapStop = GapEntry + GapPos * s.Tick;
+                        gapBe = true;
+                        GapStopMoved = true;
+                    }
+                }
             }
 
             if (pendingKind != 0)  // market orders from the last bar fill at this bar's open
@@ -933,7 +950,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 GapSkipBraked = true;  // G191
                 MaxLosersPerDay = 3;  // G204
                 EarlyDayBudget = 750;  // G204
-                GapTrigger = 0.6;  // G204 (G60: 0.5)
+                GapTrigger = 0.65;  // G242 (G60: 0.5, G204: 0.6)
+                GapBreakEven = 1.5;  // G242
                 AfterLossLocked = 187.5;  // G119
                 EarlyNoEntryChecks = "13:00,14:30";  // G125
                 FastSteps = 650;  // G212 (G142: 750, G210: 700)
@@ -943,7 +961,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 SizeToAccountRoom = true;
                 SprintContracts = 0;  // G103: off
                 NearFloorGate = 0;  // G87b: off (it lost more accounts)
-                TestedWinRate = 49.7;  // U45: the window's 5-minute win rate in NinjaTrader's execution (61.2 was v3.8's)
+                TestedWinRate = 49.3;  // U46: the window's 5-minute win rate in NinjaTrader's execution (61.2 was v3.8's)
             }
             else if (State == State.DataLoaded)
             {
@@ -1010,6 +1028,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 st.MaxLosers = g204 ? MaxLosersPerDay : 0;
                 st.EarlyDailyLoss = g204 ? EarlyDayBudget : 0;
                 st.GapGoK = g204 ? GapTrigger : 0.5;
+                st.GapGoBe = g204 ? GapBreakEven : 0;  // G242
                 st.AfterLossLockedMaxLoss = Mode != "Evaluation" ? AfterLossLocked : 0;  // G119
                 st.EarlySkipChecks = Mode != "Evaluation" ? CheckEnds(EarlyNoEntryChecks) : "";  // G125
                 st.ProfitStepFast = Mode != "Evaluation" ? FastSteps : 0;  // G142
@@ -1261,6 +1280,14 @@ namespace NinjaTrader.NinjaScript.Strategies
                             SetProfitTarget(name, CalculationMode.Price, tp);
                     }
                 }
+            }
+            else if (real != 0 && engine.GapPos == real && engine.Position == 0 && engine.GapStopMoved)
+            {
+                // G242: the gap trade's stop to break-even (the real fill plus a tick)
+                double be = Position.AveragePrice + real * TickSize;
+                SetStopLoss(real > 0 ? GapLongName : GapShortName, CalculationMode.Price, be, false);
+                stopRef = be;
+                Say("gapbe", "Gap trade: stop moved to break-even, " + be.ToString("0.00", CultureInfo.InvariantCulture));
             }
             else if (real != 0 && engine.Position == 0 && engine.GapPos != real)
                 Flatten(real, "Model flat");  // the model closed (a fill elsewhere): don't hold an unmanaged position
@@ -1838,6 +1865,11 @@ namespace NinjaTrader.NinjaScript.Strategies
         [Range(0, 10)]
         [Display(Name = "Gap trade: the gap at least this many times the 14-session average (the 50K's Funded growth and Custom)", Order = 32, GroupName = "1. Size and risk")]
         public double GapTrigger { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, 20)]
+        [Display(Name = "Gap trade: its stop to break-even once a bar closes this many times its risk in profit (0 = off; the 50K's Funded growth and Custom)", Order = 34, GroupName = "1. Size and risk")]
+        public double GapBreakEven { get; set; }
 
         [NinjaScriptProperty]
         [Range(0, 5000)]

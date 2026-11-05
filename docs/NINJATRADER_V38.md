@@ -74,13 +74,13 @@ real MNQ data will differ somewhat. The stand-in has flattered this strategy bef
 simulator, Funded growth, from 2025-01-02, 1 tick of slippage, $0.62 a side;
 `verification/noise_v2/v38g_nt_2026-11-03.csv` and the trade lists beside it):
 
-| Jan 2, 2025 – Oct 2026 (updated 2026-11-05, U45) | 5-minute bars | 30-minute bars |
+| Jan 2, 2025 – Oct 2026 (updated 2026-11-05, U46) | 5-minute bars | 30-minute bars |
 |---|---|---|
-| Trades | 756 | 254 |
-| Net | **$58,609.81** | $28,191.46 |
-| Winners | 49.7% | 53.5% |
-| Profit factor | 1.617 | 1.933 |
-| Closed drawdown | $6,088.76 | $3,633.60 |
+| Trades | 760 | 254 |
+| Net | **$60,557.54** | $28,191.46 |
+| Winners | 49.3% | 53.5% |
+| Profit factor | 1.659 | 1.933 |
+| Closed drawdown | $6,136.03 | $3,633.60 |
 | Largest loss | −$1,927.41 | −$1,634.41 |
 | Worst day | −$899.24 | −$899.20 |
 | Most contracts | 75 | 15 |
@@ -91,10 +91,10 @@ data fix (G67), the after-loss max loss at $187.50 once the floor has stopped (U
 at 13:00 and 14:30 until the floor has stopped (U33), faster contract steps above $10,000 of profit (U34) and the after-loss max loss as every trade's, $187.50 (U35-U37), a 5-point sizing allowance (U38) the drive fill-in at 0.6x (U39) More trading days from a $2,500 cushion (U40) no gap trade while the giveback brake is on (U41) and G204's five survival settings (U42: three losers a day, a $750 day budget until the floor stops, a 45-minute time stop, the top 70% of the range, the gap trade from 0.6x; on the 50K's Funded growth, both charts) $700 steps above $8,000 with 3-MNQ fill-ins from $9,000 (U43), and $650 steps, fill-ins at 2 MNQ from $4,000 and 3 from $8,000, up to 75 MNQ (U44). They need the 5-minute chart, so **trade the 5-minute chart**.
 
 **What to expect (measured 2026-11-04, G141/G144/G165 and the 263 fresh starts):**
-- A fresh 50K account on U45: about **1 in 21 is lost or frozen** within 21 months (25 of 526 starts on the 1st and the
-  15th of each month; U42-U44: 28; U41: 38; U40: 42; U34: 60, about 1 in 9); the median account makes **$36,403 in 21
-  months** (about $400 a week; U44 $33,917); +$3,000 takes a median 148 days (within 30 days in 4.0%); +$50,000 within
-  21 months in 44.1% (median 15.9 months). U42-U43 trade some of the median's profit for 10 fewer lost accounts in 526;
+- A fresh 50K account on U46: about **1 in 23 is lost or frozen** within 21 months (23 of 526 starts on the 1st and the
+  15th of each month; U45: 25; U42-U44: 28; U41: 38; U40: 42; U34: 60, about 1 in 9); the median account makes **$39,513
+  in 21 months** (about $435 a week; U45 $36,403); +$3,000 takes a median 145 days (within 30 days in 4.2%); +$50,000
+  within 21 months in 47.0% (median 15.9 months). U42-U43 trade some of the median's profit for 10 fewer lost accounts in 526;
   U43's own gain is in the grown phase and on the long histories.
 - Once the account is $10,000-30,000 up: the window averaged **$1,483 a week** on U44 (11% of weeks at +$3,000 or more;
   U43 $1,668, U42 $1,532; G213, `verification/noise_v2/g213_weekly_u44.txt`);
@@ -1754,7 +1754,7 @@ for days like those in the user's Winter Trades clips (10/29, 11/2): export MNQ 
 replay them.
 
 **U13 (2026-11-03): the win-rate check on NinjaTrader's dashboard.** U11's check, live, without running a script.
-From 30 trades, the dashboard compares the real win rate with the tested one ("Win rate check", group 5, default 61.2% until U45, now 49.7%,
+From 30 trades, the dashboard compares the real win rate with the tested one ("Win rate check", group 5, default 61.2% until U45, 49.7% in U45, now 49.3%,
 0 = off), using the same binomial tail as `research/journal_report.py`:
 - "Win rate in line with the tests: 63.3% in 49 trades (tested 61.2%)"; or
 - under a 5% chance, "WIN RATE WARNING: 48.0% in 50 trades, below the tested 61.2% (0.4% chance): check the fills, the
@@ -5872,3 +5872,19 @@ $884,771 (U45 $59,167 / $603,956 / $853,557). The 40 best go to stage 2. Log: `v
 **G242 stage 2 (2026-11-05):** of the 40, three lose **11** of the 263 starts on the 1st (U45 12), all with the gap
 trigger at 0.65 and the gap trade to break-even at 1.5x its risk (`gap_go_k` 0.65, `gap_go_be` 1.5): k2079, k8946,
 k8599; k4039 / k5623 (the same rule set) lose 12. The five go to stage 3. Log: `verification/noise_v2/g242_stage2_starts.txt`.
+
+**G242 result (2026-11-05): k8946 passes G78's rule; adopted (U46).** 526 starts lost or frozen: k2079 / k8946 / k8599
+**23**, k4039 / k5623 26 (U45 25). k2079 and k8599 fail on the chart's NQ ($589,260 / $590,128 against U45's $602,285).
+k8946 (`gap_go_k` 0.65, `gap_go_be` 1.5), chart / NinjaTrader: window $61,152 / **$61,255** (U45 $59,108 / $59,167), NQ
+$609,486 / $611,194 (U45 $602,285 / $603,956), index $892,868 / $861,886 (U45 $873,722 / $853,557); no −$1,000 day, the
+floor never touched. Log: `verification/noise_v2/g242_stage3.txt`.
+
+**U46 (2026-11-05): the gap trade from 0.65x the average gap, its stop to break-even once a bar closes 1.5x its risk in
+profit (G242).** `GapTrigger` 0.65 and the new `GapBreakEven` 1.5 (the 50K's Funded growth and Custom). Live, the gap
+trade's stop order moves to the real fill plus a tick. The win-rate check's tested rate is 49.3%.
+
+**U46 checks (2026-11-05):** the NinjaTrader growth run on the window **$60,557.54**, 760 trades, 49.3% winners, worst day
+−$899.24 (`verification/noise_v2/v38g_nt_u46.txt`): identical to the model on 30-minute bars, and on 5-minute bars up to
+the 2026-03-09 data hole. 526 starts: **23 lost (about 1 in 23)**, median net **$39,513** (U45 $36,403); +$3,000 in a
+median 145 days; +$50,000 within 21 months in 47.0%. The NinjaTrader tests, 48 passed (a new one for the gap
+break-even; three sample-size checks narrowed because the short sample now stays at 1 MNQ on 5-minute bars).
