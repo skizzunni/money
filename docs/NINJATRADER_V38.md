@@ -5945,3 +5945,4 @@ remains sensitive to real slippage (G222). Logs: `verification/noise_v2/g243k*_c
 **$46,561** in 21 months (U46 $39,513); +$3,000 in a median 144 days (within 30 days in 4.2%); +$50,000 within 21 months
 in 51.9% (U46 47.0%).
 
+**U47 checks, full suite (2026-11-05):** **677 passed**. G244 runs around U47 (base `u47_J`: U46 plus k6546).
