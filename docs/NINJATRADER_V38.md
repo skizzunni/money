@@ -5896,3 +5896,6 @@ NinjaTrader $61,255 / $611,194 / $861,886). **Stages and adoption as G241's**, a
 nets above U46's, no −$1,000 day, the floor never touched; stage 2 the 40 best on the 263 starts on the 1st; stage 3 the
 5 with the fewest lost (at most U46's 11 there) on the mid-month starts and the chart's execution; adopted the best window
 meeting G78's rule against U46 (chart $61,152 / $609,486 / $892,868; no more than 23 of 526 lost).
+
+**U46 checks (2026-11-05):** the full suite, **677 passed**. G243's row 0 reproduces U46 in NinjaTrader's execution
+($61,255 / $611,194 / $861,886).
