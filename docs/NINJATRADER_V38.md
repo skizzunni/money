@@ -6111,3 +6111,18 @@ never touched, and no more than 26 of 526 lost or frozen (U48's 22 plus a margin
 
 **G252: cancelled before its result (2026-11-05), at the user's request** ("remove that lucid stuff"); the LucidDirect
 mode was taken out of the file again (revert of 525c230). The bot trades on any account added in NinjaTrader.
+
+**G251 result (2026-11-06): no setting passes the Test in two weeks with any regularity.** 1,338 two-week starts
+(`verification/noise_v2/g251_test_2weeks.txt`, `g251_test_10sessions.csv`), NQ / the index:
+
+| every trade at | day stop | passed in 2 weeks | failed in 2 weeks |
+|---|---|---|---|
+| U48's own size | none / $1,400 | 0.2-0.4% | 0.0-0.1% |
+| 5 MNQ | none | 3.9% / 3.5% | 15.2% / 13.9% |
+| 5 MNQ | $1,400 | **4.9% / 3.9%** | 14.8% / 14.0% |
+| 10 MNQ | $1,400 | 4.3% / 3.9% | 33.6% / 32.7% |
+| 15 MNQ | $1,400 | 3.6% / 2.9% | 40.5% / 39.8% |
+| 20 MNQ | $1,400 | 3.4% / 2.4% | 42.0% / 40.6% |
+
+The best is 5 MNQ with the day stop: about 1 pass in 20-25 two-week tries, against about 1 failed Test in 7. Bigger
+sizes fail far more often and pass no more often.
