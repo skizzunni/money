@@ -6196,7 +6196,7 @@ $1,100 day profit stop, the noise area over 18 sessions with entries at 0.7x it,
 day, a 30-minute time stop, take profit 0.75, lock at 0.2 (+2.5 points), calm 0.7, no trend / big-day / squeeze filter,
 entries to 15:30, the gap trade from 0.5x, stop buffer 0.24.
 
-**U50 (2026-11-06): the Test sprint mode is k317.** NinjaTrader tests 49 passed (`test_v38_test_sprint` now k317, trade
+**U50 (2026-11-06): the Test sprint mode is k317.** Full suite: **678 passed**. NinjaTrader tests 49 passed (`test_v38_test_sprint` now k317, trade
 for trade against the model).
 
 ## G257: the two-week Test search close to k317 (registered 2026-11-06, before its run)
