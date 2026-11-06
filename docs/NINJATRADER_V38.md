@@ -6276,3 +6276,11 @@ k250 10.6% / 6.9%, k88 10.1% / 7.2%, k178 10.6% / 7.7%, k103 10.1% / 8.6%, k290 
 10.8% / 9.4%, k88 6.6% / 10.2%, k103 9.8% / 10.8%, k290 9.1% / 14.4% (`verification/noise_v2/g261b_*`). k178 passes
 more than k317 but fails 9.4% against 9.1%; k250 fails less but passes less. Across G253-G261 (1,900 combinations)
 k317 remains the best two-week balance.
+
+## G262: 10,000 more combinations around U48's Funded growth (registered 2026-11-06, before its run)
+
+G241's search and stages (`research/g241_nt_search.py`, the window first) with `SEED=262` around U48 (the 60-MNQ cap;
+row 0 must reproduce U48 in NinjaTrader's execution: $61,612 / $632,038 / $875,038). Stage 2 the 40 best on the 263
+starts on the 1st; stage 3 the 5 with the fewest lost (at most U48's 10 there) on the mid-month starts and the chart's
+execution. **Adopted into Funded growth** if G78's rule holds against U48 (chart $61,612 / $630,505 / $893,328; at most
+22 of 526 lost or frozen; no −$1,000 day; the floor never touched). The Test sprint mode is not affected. Run once.
