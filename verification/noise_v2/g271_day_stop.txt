@@ -1,0 +1,14 @@
+development (index 2011-18):
+                 weeks  passed  failed
+tag                                   
+U51 ($1,100)       405   0.119   0.067
+day stop $1,300    405   0.109   0.067
+day stop $1,500    405   0.086   0.067
+day stop $2,000    405   0.072   0.067
+unseen (NQ 2015-25 + index 2019-26):
+                 weeks  passed  failed
+tag                                   
+U51 ($1,100)       933   0.115   0.091
+day stop $1,300    933   0.096   0.090
+day stop $1,500    933   0.087   0.091
+day stop $2,000    933   0.068   0.092

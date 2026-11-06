@@ -6394,3 +6394,7 @@ U51 stops new entries once the day is up $1,100 (k317's, chosen for a $3,000 tar
 +$5,000, a day up to $1,300 / $1,500 / $2,000 may still keep the best day under half the profit. `research/g271_day_stop.py`,
 G253's measure. **Replaces U51's day stop** if on the unseen weeks it passes more than 11.5% and fails at most 9.1%.
 Run once.
+
+**G271 result (2026-11-07): rejected.** Unseen weeks (passed / failed): U51 ($1,100) 11.5% / 9.1%; $1,300 9.6% / 9.0%;
+$1,500 8.7% / 9.1%; $2,000 6.8% / 9.2% (`verification/noise_v2/g271_day_stop.txt`). A bigger day makes the
+consistency rule harder (the best day must stay under half the profit), so passes fall. U51 stays.
