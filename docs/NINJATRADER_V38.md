@@ -6287,3 +6287,9 @@ execution. **Adopted into Funded growth** if G78's rule holds against U48 (chart
 
 **G262 progress (2026-11-06 12:45 UTC):** row 0 reproduces U48 in NinjaTrader's execution ($61,612 / $632,038 /
 $875,038); partial log `verification/noise_v2/g262_nt_search_partial.jsonl`.
+
+**G262 result (2026-11-06): rejected.** Stage 1: 130 of 10,000 beat U48 in NinjaTrader's execution on all three sets;
+stage 2: three at U48's 10 lost on the 1st (k5856, k3547, k3652). Stage 3 (mid-month lost; chart window / NQ / index):
+k5856 13, $61,433 / $667,326 / $892,677; k3547 13, $60,792 / $667,152 / $892,244; k3652 13, $63,023 / $650,724 /
+$892,522. Each loses more than U48 (10 + 13 = 23 at the floor against 21) and each misses one chart net (U48 $61,612 /
+$630,505 / $893,328). Funded growth stays U48. Logs `verification/noise_v2/g262_*`.
