@@ -6264,3 +6264,5 @@ k317** only if on stage 2 it passes more than 10.0% and fails at most 9.1%; as G
 combinations (at least 10% passed, at most 10% failed) also go to stage 2 under the same rule. Run once.
 
 **G261 progress (2026-11-06 09:45 UTC):** stage 1 running (results saved row by row).
+
+**G261 progress (2026-11-06 10:50 UTC):** 168,032 of 243,000 stage-1 rows; resumed after its task's time limit.
