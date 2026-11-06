@@ -9,3 +9,4 @@ data/*.csv
 tests/.pine_cache/
 ninjatrader/tests/*/obj/
 ninjatrader/tests/*/bin/
+verification/noise_v2/g253_rows.jsonl
