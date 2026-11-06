@@ -6322,3 +6322,9 @@ Funded growth stays U48. Logs `verification/noise_v2/g264_*`.
 ## G265: G262 again with SEED=265 (registered 2026-11-06, before its run)
 
 G262's search, stages and adoption rule against U48, with `SEED=265`. Run once.
+
+**G265 result (2026-11-06): rejected; the seed series stops here.** Stage 1: 130 of 10,000 beat U48 in NinjaTrader's
+execution; stage 2's two picks (k3345, k8649) are the same trading as G262's k3652 and G264's k372 (lock +2 points, the
+drive fill-in at 0.7x): 10 + 13 = 23 of 526 lost (U48 21) and the chart's index $892,522 (U48 $893,328). Four seeds
+(G262-G265, 40,000 combinations) around U48 found only that candidate and G263's near miss k7885; the random search
+around U48 has run dry. Funded growth stays U48. Logs `verification/noise_v2/g265_*`.

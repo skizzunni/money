@@ -1,2 +1,0 @@
-index g265k2087 starts 160 lost (at the floor) 16 dead (lost or frozen) 16 below start 10 median net 27121 worst net -1101 lowest point -1878 reached +2000 150
-nq g265k2087 starts 103 lost (at the floor) 20 dead (lost or frozen) 20 below start 14 median net 35502 worst net -1835 lowest point -1879 reached +2000 91
