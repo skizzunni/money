@@ -6350,3 +6350,9 @@ and fails at most 9.1%. Run once.
 **G267 result (2026-11-06): rejected.** Unseen weeks (passed / failed): k317 10.0% / 9.1%; day budget $1,000 9.0% /
 9.5%; $800 8.7% / 7.4%; $600 6.9% / 4.6% (`verification/noise_v2/g267_day_budget.txt`). A tighter day budget fails less
 but passes less in the same proportion; none passes more than 10.0%. k317 stays.
+
+## G268: the Test sprint without the gap trade, or longs only (registered 2026-11-06, before its run)
+
+k317 without the 09:35 gap trade (`gap_go` off), with longs only (`short_mult` 0), or both.
+`research/g268_sides.py`, G253's measure on its development and unseen weeks. **Replaces k317** if on the unseen weeks
+it passes more than 10.0% and fails at most 9.1%. Run once.
