@@ -36,6 +36,25 @@ def job(args):
     return None if r is None else {"k": k, **r}
 
 
+ROWS = "verification/noise_v2/g253_rows.jsonl"  # every result as it finishes (resumable after a restart)
+
+
+def run_saved(ex, jobs, stage):
+    done = {}
+    if os.path.exists(ROWS):
+        for line in open(ROWS):
+            r = json.loads(line)
+            done[(r["stage"], r["k"], r["set"], r["start"])] = r
+    todo = [j for j in jobs if (stage, j[0], j[1], j[2]) not in done]
+    with open(ROWS, "a") as f:
+        for j, r in zip(todo, ex.map(job, todo, chunksize=16)):
+            row = {"stage": stage, "k": j[0], "set": j[1], "start": j[2], **(r or {"skip": True})}
+            done[(stage, j[0], j[1], j[2])] = row
+            f.write(json.dumps(row, default=str) + "\n")
+            f.flush()
+    return [done[(stage, *j)] for j in jobs if not done[(stage, *j)].get("skip")]
+
+
 def score(rows):
     d = pd.DataFrame([r for r in rows if r])
     return d.groupby("k").agg(weeks=("passed", "size"), passed=("passed", "mean"), failed=("failed", "mean"))
@@ -49,11 +68,11 @@ def main() -> None:
     conf = [("nq", d.strftime("%Y-%m-%d")) for d in pd.date_range("2015-04-06", "2025-06-30", freq="W-MON")]
     conf += [("index", d.strftime("%Y-%m-%d")) for d in pd.date_range("2019-01-07", "2026-08-31", freq="W-MON")]
     with ProcessPoolExecutor(int(os.environ.get("PROCS", "4"))) as ex:
-        s1 = score(ex.map(job, [(k, n, s) for k in range(len(VARIANTS)) for n, s in dev], chunksize=16))
+        s1 = score(run_saved(ex, [(k, n, s) for k in range(len(VARIANTS)) for n, s in dev], 1))
         s1.to_csv("verification/noise_v2/g253_stage1.csv")
         top = s1[s1.failed <= 0.15].sort_values("passed", ascending=False).head(10)
         print("stage 1 best (index 2011-18):\n" + top.round(3).to_string(), flush=True)
-        s2 = score(ex.map(job, [(k, n, s) for k in top.index for n, s in conf], chunksize=16))
+        s2 = score(run_saved(ex, [(k, n, s) for k in top.index for n, s in conf], 2))
     s2 = s2.join(pd.Series({k: json.dumps(VARIANTS[k]) for k in s2.index}, name="settings"))
     s2.to_csv("verification/noise_v2/g253_stage2.csv")
     print("stage 2 (NQ 2015-25 + index 2019-26):\n" + s2.sort_values("passed", ascending=False).round(3).to_string(),
