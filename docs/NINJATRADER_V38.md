@@ -6210,3 +6210,13 @@ and fails at most 9.1%. Run once.
 **G257 progress (2026-11-06 06:45 UTC):** stage 1 running (results saved row by row).
 
 **G257 progress (2026-11-06 07:45 UTC):** stage 1 past halfway; stage 2 decides.
+
+**G257 result (2026-11-06): no replacement as registered.** Stage 2 (933 unseen starts), the ten by stage-1 passes:
+k239 13.1% / 17.8%, k285 13.0% / 15.2%, k115 12.5% / 14.9%, k46 12.0% / 17.7%, k188 11.9% / 14.7%, k140 11.7% / 12.8%,
+k49 11.1% / 13.9%; none failed at most 9.1% while passing more than 10.0% (`verification/noise_v2/g257_*`).
+
+## G258: G257's lowest-failure combinations on unseen weeks (registered 2026-11-06, before its run)
+
+As G256 for G255: G257's stage-1 combinations with at least 10% passed and at most 10% failed (four: k55 10.1% / 7.4%,
+k5 10.9% / 7.7%, k183 10.1% / 7.9%, k192 10.4% / 8.4%) on the stage-2 weeks (`research/g258_low_fail.py`). **Replaces
+k317** only if one passes more than 10.0% and fails at most 9.1% there. Run once.
