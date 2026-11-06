@@ -6255,3 +6255,10 @@ position off at 1R (`partial_at` 1.0, from the bar after the fill), or the runne
 20 points 9.1% / 8.7%, 40 points 8.9% / 9.0%; half off at 1R 8.5% / 9.5%; runner lock 0.5 identical to k317 (it never
 binds with take profit 0.75) (`verification/noise_v2/g260_exits.txt`). The trailing stops fail a little less but pass
 less; none passes more than 10.0%. k317 stays.
+
+## G261: the two-week Test search, 600 combinations with exit timing (registered 2026-11-06, before its run)
+
+`research/g261_test_search.py`: G255's stages and measure, 600 combinations (seed 261), G255's space plus a trailing
+stop (off / 20 / 40 points), a time lock (off / 30 / 60 minutes) and a late-day lock (off / 14:30 / 15:00). **Replaces
+k317** only if on stage 2 it passes more than 10.0% and fails at most 9.1%; as G256, the five lowest-failure stage-1
+combinations (at least 10% passed, at most 10% failed) also go to stage 2 under the same rule. Run once.
