@@ -6360,3 +6360,10 @@ it passes more than 10.0% and fails at most 9.1%. Run once.
 **G268 result (2026-11-06): rejected.** Unseen weeks (passed / failed): k317 10.0% / 9.1%; no gap trade 8.7% / 7.3%;
 longs only 4.1% / 5.9%; both 1.3% / 3.5% (`verification/noise_v2/g268_sides.txt`). The shorts and the gap trade carry a
 large share of the passes. k317 stays.
+
+## G269: the Test sprint keeps its size past +$3,000 (registered 2026-11-06, before its run)
+
+k317 drops to U48's sizing at +$3,000, but the Test also needs the best day under half the profit, which can take more
+than $3,000; here the 4 MNQ stay until +$3,500, +$4,000 or +$5,000 (`sprint_target`). `research/g269_sprint_target.py`,
+G253's measure on its development and unseen weeks. **Replaces k317** if on the unseen weeks it passes more than 10.0%
+and fails at most 9.1%. Run once.
