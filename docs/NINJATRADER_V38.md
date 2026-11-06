@@ -6346,3 +6346,7 @@ k317 sizes each trade to $2,000 of room (the floor binds first); here the day's 
 instead (`daily_loss_limit`: trades sized to what is left of it, no new trade once used). `research/g267_day_budget.py`,
 G253's measure on its development and unseen weeks. **Replaces k317** if on the unseen weeks it passes more than 10.0%
 and fails at most 9.1%. Run once.
+
+**G267 result (2026-11-06): rejected.** Unseen weeks (passed / failed): k317 10.0% / 9.1%; day budget $1,000 9.0% /
+9.5%; $800 8.7% / 7.4%; $600 6.9% / 4.6% (`verification/noise_v2/g267_day_budget.txt`). A tighter day budget fails less
+but passes less in the same proportion; none passes more than 10.0%. k317 stays.
