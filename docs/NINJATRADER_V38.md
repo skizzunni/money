@@ -6284,3 +6284,6 @@ row 0 must reproduce U48 in NinjaTrader's execution: $61,612 / $632,038 / $875,0
 starts on the 1st; stage 3 the 5 with the fewest lost (at most U48's 10 there) on the mid-month starts and the chart's
 execution. **Adopted into Funded growth** if G78's rule holds against U48 (chart $61,612 / $630,505 / $893,328; at most
 22 of 526 lost or frozen; no −$1,000 day; the floor never touched). The Test sprint mode is not affected. Run once.
+
+**G262 progress (2026-11-06 12:45 UTC):** row 0 reproduces U48 in NinjaTrader's execution ($61,612 / $632,038 /
+$875,038); partial log `verification/noise_v2/g262_nt_search_partial.jsonl`.
