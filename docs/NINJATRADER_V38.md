@@ -6367,3 +6367,11 @@ k317 drops to U48's sizing at +$3,000, but the Test also needs the best day unde
 than $3,000; here the 4 MNQ stay until +$3,500, +$4,000 or +$5,000 (`sprint_target`). `research/g269_sprint_target.py`,
 G253's measure on its development and unseen weeks. **Replaces k317** if on the unseen weeks it passes more than 10.0%
 and fails at most 9.1%. Run once.
+
+**G269 result (2026-11-06): adopted (U51).** Unseen weeks (passed / failed): k317 10.0% / 9.1%; to +$3,500 10.7% /
+9.1%; to +$4,000 11.4% / 9.1%; **to +$5,000 11.5% / 9.1%** (development 11.6-11.9% / 6.4-6.7%;
+`verification/noise_v2/g269_sprint_target.txt`). The 4 MNQ kept past $3,000 add passes (the consistency rule's extra
+profit comes sooner) and no failures: the floor has stopped by then.
+
+**U51 (2026-11-06): the Test sprint keeps its 4 MNQ to +$5,000.** The engine's `SprintTarget` 5000 in "Test sprint"
+mode (3000 elsewhere). NinjaTrader tests 49 passed (`test_v38_test_sprint` with the +$5,000 target, trade for trade).

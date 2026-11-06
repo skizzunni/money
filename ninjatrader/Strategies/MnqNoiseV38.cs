@@ -1015,7 +1015,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                     if (Mode == "Funded growth Apex 100K") { DailyLoss = 1350; TrailDD = 3000; LossGuard = 1425; }
                     if (Mode == "Funded growth Apex 150K") { DailyLoss = 1800; TrailDD = 4000; LossGuard = 1900; }
                 }
-                if (sprintMode)  // G256 k317: the Test in two weeks (10.0% passed, 9.1% failed on unseen weeks; docs)
+                if (sprintMode)  // G256 k317 + G269: the Test in two weeks (11.5% passed, 9.1% failed on unseen weeks; docs)
                 {
                     DailyLoss = 2000; LossGuard = 1900; EarlyDayBudget = 0; MaxLosersPerDay = 3; TimeStop = 30;
                     RangePos = 0.7; TrendSessions = 0; BigDayK = 0; CalmK = 0.7; TakeProfit = 0.75; LockAt = 0.2;
@@ -1057,6 +1057,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 st.ProfitStepFastFrom = FastStepsFrom;
                 st.SprintQty = Mode != "Evaluation" ? SprintContracts : 0;  // G103
                 st.SprintDays = sprintDays;  // G253: 10 in the Test sprint
+                st.SprintTarget = sprintMode ? 5000 : 3000;  // G269: the Test sprint keeps its size to +$5,000
                 st.Lookback = NoiseSessions; st.EntryK = EntryWidth; st.DayStopProfit = DayProfitStop;  // G253
                 st.SizeSlipPts = Mode != "Evaluation" ? SizeSlip : 0;  // G79: the Funded growth modes and Custom
                 st.ProtectRoom = Mode != "Evaluation" ? NearFloorGate : 0;  // G87

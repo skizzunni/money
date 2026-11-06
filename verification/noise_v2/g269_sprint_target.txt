@@ -1,0 +1,14 @@
+development (index 2011-18):
+                   weeks  passed  failed
+tag                                     
+k317                 405   0.116   0.064
+sprint to +$3,500    405   0.116   0.067
+sprint to +$4,000    405   0.116   0.067
+sprint to +$5,000    405   0.119   0.067
+unseen (NQ 2015-25 + index 2019-26):
+                   weeks  passed  failed
+tag                                     
+k317                 933   0.100   0.091
+sprint to +$3,500    933   0.107   0.091
+sprint to +$4,000    933   0.114   0.091
+sprint to +$5,000    933   0.115   0.091
