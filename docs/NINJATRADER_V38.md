@@ -6108,3 +6108,6 @@ U48 with `size_up_to` 40 and the floor stopping at the start plus $100 (`trail_c
 the three sets in both executions and the 526 starts (their "lost" check counts the floor at the start, $100 lower than
 Lucid's). Adopted as a **LucidDirect preset** (a mode, the 50K Funded growth otherwise) if no −$1,000 day, the floor
 never touched, and no more than 26 of 526 lost or frozen (U48's 22 plus a margin for the smaller cap).
+
+**G252: cancelled before its result (2026-11-05), at the user's request** ("remove that lucid stuff"); the LucidDirect
+mode was taken out of the file again (revert of 525c230). The bot trades on any account added in NinjaTrader.
