@@ -6335,3 +6335,7 @@ k317 with no new trades on Mondays, on Fridays, or on both (the ten sessions sti
 `research/g266_weekdays.py`, G253's measure on its development and unseen weeks. **Replaces k317** (with a weekday
 setting in the NinjaTrader file and a parity test) if on the unseen weeks it passes more than 10.0% and fails at most
 9.1%. Run once.
+
+**G266 result (2026-11-06): rejected.** Unseen weeks (passed / failed): k317 10.0% / 9.1%; no Mondays 8.4% / 6.9%; no
+Fridays 6.6% / 7.9%; neither 4.4% / 5.1% (development: 11.6% / 6.4%, 5.9% / 6.4%, 6.2% / 5.9%, 2.7% / 3.5%;
+`verification/noise_v2/g266_weekdays.txt`). Fewer trading days cut the passes more than the failures. k317 stays.

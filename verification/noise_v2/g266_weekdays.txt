@@ -1,0 +1,14 @@
+development (index 2011-18):
+                       weeks  passed  failed
+tag                                         
+k317                     405   0.116   0.064
+no Fridays               405   0.062   0.059
+no Mondays               405   0.059   0.064
+no Mondays or Fridays    405   0.027   0.035
+unseen (NQ 2015-25 + index 2019-26):
+                       weeks  passed  failed
+tag                                         
+k317                     933   0.100   0.091
+no Fridays               933   0.066   0.079
+no Mondays               933   0.084   0.069
+no Mondays or Fridays    933   0.044   0.051
