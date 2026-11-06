@@ -935,7 +935,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 SkipDates = SkipDefault;
                 FedDates = FedDefault;
                 PlaceOrders = true;
-                Mode = "Test sprint";  // G253: the default, the Test in two weeks (Funded growth once passed)
+                Mode = "Test sprint";  // G253 / G256: the default, the Test in two weeks (Funded growth once passed)
                 Goal = 50000;
                 AfterLossMaxLoss = 187.5;  // G168 (Funded growth sets it by the chart: 187.5 on 5-minute, 250 otherwise)
                 TrailDD = 2000;
@@ -1015,12 +1015,13 @@ namespace NinjaTrader.NinjaScript.Strategies
                     if (Mode == "Funded growth Apex 100K") { DailyLoss = 1350; TrailDD = 3000; LossGuard = 1425; }
                     if (Mode == "Funded growth Apex 150K") { DailyLoss = 1800; TrailDD = 4000; LossGuard = 1900; }
                 }
-                if (sprintMode)  // G253 k61: the Test in two weeks (9.3% passed, 9.5% failed on unseen weeks; docs)
+                if (sprintMode)  // G256 k317: the Test in two weeks (10.0% passed, 9.1% failed on unseen weeks; docs)
                 {
-                    DailyLoss = 2000; LossGuard = 1900; EarlyDayBudget = 0; MaxLosersPerDay = 2; TimeStop = 60;
-                    RangePos = 0.7; TrendSessions = 0; BigDayK = 0; CalmK = 0.8; TakeProfit = 1.0; LockAt = 0.25;
-                    EarlyNoEntryChecks = ""; SprintContracts = 4; sprintDays = 10; DayProfitStop = 1200;
-                    NoiseSessions = 16; EntryWidth = 0.8;
+                    DailyLoss = 2000; LossGuard = 1900; EarlyDayBudget = 0; MaxLosersPerDay = 3; TimeStop = 30;
+                    RangePos = 0.7; TrendSessions = 0; BigDayK = 0; CalmK = 0.7; TakeProfit = 0.75; LockAt = 0.2;
+                    EarlyNoEntryChecks = ""; SprintContracts = 4; sprintDays = 10; DayProfitStop = 1100;
+                    NoiseSessions = 18; EntryWidth = 0.7; SqueezeMin = 0; LastEntry = "15:30"; GapTrigger = 0.5;
+                    StopBuffer = 0.24; LockPlus = 2.5;
                 }
                 else if (Mode == "Evaluation")  // v3.8: 1 MNQ, $260 a trade, $900 a day
                 {

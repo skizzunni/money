@@ -1070,17 +1070,18 @@ def test_v38_sprint(sim, sample_1m, tmp_path):  # noqa: F811
     assert sum(qty[5]) > sum(qty[0]), qty
 
 
-# G253 k61: the two-week Test sprint
-SPRINT = {"daily_loss_limit": 2000.0, "early_daily_loss": 0.0, "max_losers": 2, "time_stop": 60, "range_pos_min": 0.7,
-          "trend_n": 0, "big_day_k": 0.0, "calm_k": 0.8, "take_profit": 1.0, "lock_at": 0.25, "skip_checks": "",
-          "sprint_qty": 4, "sprint_days": 10, "sprint_target": 3000.0, "day_stop_profit": 1200.0, "lookback": 16,
-          "entry_k": 0.8}
+# G256 k317: the two-week Test sprint (G253's k61 before)
+SPRINT = {"daily_loss_limit": 2000.0, "early_daily_loss": 0.0, "max_losers": 3, "time_stop": 30, "range_pos_min": 0.7,
+          "trend_n": 0, "big_day_k": 0.0, "calm_k": 0.7, "take_profit": 0.75, "lock_at": 0.2, "skip_checks": "",
+          "sprint_qty": 4, "sprint_days": 10, "sprint_target": 3000.0, "day_stop_profit": 1100.0, "lookback": 18,
+          "entry_k": 0.7, "squeeze_min": 0.0, "last_entry_end": 930, "gap_go_k": 0.5, "stop_buffer": 0.24,
+          "lock_plus": 2.5}
 
 
 @pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
 def test_v38_test_sprint(sim, sample_1m, tmp_path):  # noqa: F811
-    """G253: Mode "Test sprint" (k61: 4 MNQ for the first 10 sessions until +$3,000, a $1,200 day profit stop, the
-    noise area over 16 sessions, entries at 0.8x it, and the rest of k61's settings). NinjaTrader's code and the model
+    """G256: Mode "Test sprint" (k317: 4 MNQ for the first 10 sessions until +$3,000, a $1,100 day profit stop, the
+    noise area over 18 sessions, entries at 0.7x it, and the rest of k317's settings). NinjaTrader's code and the model
     agree trade for trade, and the sprint's 4 MNQ trades are there."""
     bars = resample(sample_1m, "5min")
     path = tmp_path / "bars.csv"

@@ -6188,3 +6188,13 @@ G255's stage 2 took the ten with the most stage-1 passes; five others had far fe
 6.4%, k484 10.6% / 6.9%, k20 10.1% / 7.2%, k225 10.4% / 7.4%, k153 10.6% / 7.9% (passed at least 10%, failed at most
 10%, the five lowest failures). `research/g256_low_fail.py` runs these five on G255's stage-2 weeks. **Replaces k61**
 only if one passes more than 9.3% and fails at most 9.5% there (the best by passes among those that do). Run once.
+
+**G256 result (2026-11-06): k317 replaces k61 (U50).** On G255's stage-2 weeks (933 unseen starts): **k317 10.0% passed
+/ 9.1% failed** (k61 9.3% / 9.5%), k484 12.0% / 10.6%, k153 9.9% / 11.3%, k20 10.6% / 11.9%, k225 10.9% / 12.0%
+(`verification/noise_v2/g256_low_fail.txt`, `g256_stage2.csv`). k317: 4 MNQ for the first 10 sessions until +$3,000, a
+$1,100 day profit stop, the noise area over 18 sessions with entries at 0.7x it, the top 70% of the range, 3 losers a
+day, a 30-minute time stop, take profit 0.75, lock at 0.2 (+2.5 points), calm 0.7, no trend / big-day / squeeze filter,
+entries to 15:30, the gap trade from 0.5x, stop buffer 0.24.
+
+**U50 (2026-11-06): the Test sprint mode is k317.** NinjaTrader tests 49 passed (`test_v38_test_sprint` now k317, trade
+for trade against the model).
