@@ -6375,3 +6375,10 @@ profit comes sooner) and no failures: the floor has stopped by then.
 
 **U51 (2026-11-06): the Test sprint keeps its 4 MNQ to +$5,000.** The engine's `SprintTarget` 5000 in "Test sprint"
 mode (3000 elsewhere). NinjaTrader tests 49 passed (`test_v38_test_sprint` with the +$5,000 target, trade for trade).
+
+## G270: U51's Test sprint, bigger once the floor has stopped (registered 2026-11-06, before its run)
+
+New research setting `sprint_qty_locked`: once the trailing floor has stopped at the start (+$2,000 at an end of day),
+the sprint's trades take this many MNQ instead of 4 (still cut to the day's and the floor's room). Variants: 5, 6, 8
+MNQ, on U51 (sprint to +$5,000). `research/g270_sprint_locked.py`, G253's measure. **Replaces U51's Test sprint** if on
+the unseen weeks it passes more than 11.5% and fails at most 9.1%. Run once.

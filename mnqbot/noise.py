@@ -381,6 +381,7 @@ class NoiseConfig:
     # sprint_target, every trade (the bot's, gap and go) takes sprint_qty contracts, still sized down to the day's room
     # and the floor's; then the usual sizing (0 = off)
     sprint_qty: int = 0
+    sprint_qty_locked: int = 0  # research (G270): the sprint's size once the floor has stopped (0 = sprint_qty)
     profit_step_fast: float = 0.0  # research (G142): above profit_step_fast_from of profit, a contract per this much
     profit_step_fast_from: float = 10000.0
     profit_step_locked: float = 0.0  # G104: once the floor has stopped, a contract per this much profit (0: off)
@@ -666,6 +667,10 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             return int(cfg.profit_step_fast_from // step_now()) + int((p - cfg.profit_step_fast_from) // cfg.profit_step_fast)
         return int(p // step_now())
 
+    def sprint_q() -> int:
+        """G270: the sprint's size (sprint_qty_locked once the floor has stopped)."""
+        return cfg.sprint_qty_locked if cfg.sprint_qty_locked > 0 and floor_stopped() else cfg.sprint_qty
+
     def sprint_on() -> bool:
         """G103: is the sprint on (the first sprint_days sessions, until the profit reaches sprint_target)?"""
         nonlocal sprint_done
@@ -906,7 +911,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                         if one:
                             q = min(q, fill_q())
                         if sprint_on() and not one:  # G103: the sprint's size, as the room allows
-                            q = min(cfg.sprint_qty, fit_q)
+                            q = min(sprint_q(), fit_q)
                         if q < 1 and cfg.gap_squeeze and math.isfinite(room):  # G100: the gap trade squeezed
                             costs = (2 * cfg.commission_per_side + 2 * slip * cfg.point_value
                                      + cfg.gap_slip_pts * cfg.point_value)
@@ -1278,7 +1283,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                             q_up = min(q_up, cfg.size_up_to)
                         ml_next, q_next = ml_next / q_next * q_up, q_up
                     if sprint_on():  # G103: the sprint's size (the day's and the floor's room still cut it below)
-                        ml_next, q_next = ml_next / q_next * cfg.sprint_qty, cfg.sprint_qty
+                        ml_next, q_next = ml_next / q_next * sprint_q(), sprint_q()
                     if cfg.news_mult != 1.0 and t.strftime("%Y-%m-%d") in news_set:  # G62: the jobs-report days
                         q_n = max(1, round(q_next * cfg.news_mult))
                         ml_next, q_next = ml_next / q_next * q_n, q_n
