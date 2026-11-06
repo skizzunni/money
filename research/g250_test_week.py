@@ -40,7 +40,8 @@ def with_1600(bars: pd.DataFrame, m: int) -> pd.DataFrame:
 
 def one(job):
     name, start, sq, ds, *more = job
-    extra = more[0] if more else {}  # G253: a variant's settings
+    extra = dict(more[0]) if more else {}  # G253: a variant's settings
+    skip_more = extra.pop("skip_more", "")  # G266: extra no-trade dates
     bars, _, skip = S.D[name]
     s0 = pd.Timestamp(start, tz=NY)
     b = bars[(bars.index >= s0 - pd.Timedelta(days=150)) & (bars.index < s0 + pd.Timedelta(days=7 + 7 * ((SESS + 4) // 5)))]
@@ -52,6 +53,8 @@ def one(job):
     cfg.tv_path, cfg.nt_execution, cfg.round_prices, cfg.target_on_fill_bar = False, True, True, True
     if isinstance(skip, str):
         cfg.skip_dates, cfg.fed_dates = skip, ""
+    if skip_more:
+        cfg.skip_dates = cfg.skip_dates + "," + skip_more
     cfg.trail_from = start
     res = run(b, cfg, minutes=S.MIN[0])
     bt = b.index.tz_convert(NY)

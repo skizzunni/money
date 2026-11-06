@@ -6328,3 +6328,10 @@ execution; stage 2's two picks (k3345, k8649) are the same trading as G262's k36
 drive fill-in at 0.7x): 10 + 13 = 23 of 526 lost (U48 21) and the chart's index $892,522 (U48 $893,328). Four seeds
 (G262-G265, 40,000 combinations) around U48 found only that candidate and G263's near miss k7885; the random search
 around U48 has run dry. Funded growth stays U48. Logs `verification/noise_v2/g265_*`.
+
+## G266: the Test sprint without Mondays and/or Fridays (registered 2026-11-06, before its run)
+
+k317 with no new trades on Mondays, on Fridays, or on both (the ten sessions still count those days).
+`research/g266_weekdays.py`, G253's measure on its development and unseen weeks. **Replaces k317** (with a weekday
+setting in the NinjaTrader file and a parity test) if on the unseen weeks it passes more than 10.0% and fails at most
+9.1%. Run once.
