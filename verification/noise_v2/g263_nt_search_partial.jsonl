@@ -1,0 +1,390 @@
+{"k": 0, "proxy net": 61612, "proxy d1000": 0, "proxy floor": 0, "nq net": 632038, "nq d1000": 0, "nq floor": 0, "index net": 875038, "index d1000": 0, "index floor": 0}
+{"k": 1, "size_slip_pts": 4.5, "max_losers": 4, "profit_step_fast": 700.0, "last_entry_end": 870, "proxy net": -1293, "proxy d1000": 0, "proxy floor": 0}
+{"k": 2, "trend_n": 55, "proxy net": 62022, "proxy d1000": 0, "proxy floor": 0, "nq net": 606978, "nq d1000": 0, "nq floor": 0, "index net": 849141, "index d1000": 0, "index floor": 0}
+{"k": 3, "lookback": 15, "fill_qty3_room": 7500.0, "range_pos_min": 0.65, "proxy net": 65400, "proxy d1000": 0, "proxy floor": 0, "nq net": 537762, "nq d1000": 0, "nq floor": 0, "index net": 825306, "index d1000": 0, "index floor": 0}
+{"k": 4, "lock_plus": 3.5, "giveback_brake": 0.45, "fill_qty2_room": 3500.0, "gap_go_k": 0.55, "proxy net": 59733, "proxy d1000": 0, "proxy floor": 0}
+{"k": 5, "lock_at": 0.4, "big_day_k": 1.4, "squeeze_min": 15.0, "gap_go_k_locked": 0.55, "proxy net": 56928, "proxy d1000": 0, "proxy floor": 0}
+{"k": 6, "squeeze_min": 15.0, "profit_step_fast": 625.0, "budget_frac": 0.95, "proxy net": 55789, "proxy d1000": 0, "proxy floor": 0}
+{"k": 7, "gap_go_k_locked": 0.65, "size_slip_pts": 4.5, "proxy net": 60916, "proxy d1000": 0, "proxy floor": 0}
+{"k": 8, "budget_frac": 0.98, "big_day_k": 1.6, "gap_go_k_locked": 0.65, "profit_step_fast_from": 7500.0, "proxy net": 50597, "proxy d1000": 0, "proxy floor": 0}
+{"k": 9, "range_pos_min": 0.68, "big_day_k": 1.6, "proxy net": 53953, "proxy d1000": 0, "proxy floor": 0}
+{"k": 10, "profit_step": 1600.0, "lookback": 16, "gap_go_locked_qty": 8, "gap_go_be": 1.0, "proxy net": 55643, "proxy d1000": 0, "proxy floor": 0}
+{"k": 11, "fill_min_room": 2750.0, "giveback_brake": 0.55, "size_slip_pts": 6.0, "fill_qty2_room": 4500.0, "lookback": 13, "proxy net": 48638, "proxy d1000": 0, "proxy floor": 0}
+{"k": 12, "last_entry_end": 930, "lock_at": 0.33, "gap_go_be": 0.75, "gap_go_drive_k": 0.7, "proxy net": 58317, "proxy d1000": 0, "proxy floor": 0}
+{"k": 13, "skip_checks": "750,780,870", "time_stop": 40, "trend_n": 45, "last_entry_end": 930, "proxy net": 57303, "proxy d1000": 0, "proxy floor": 0}
+{"k": 14, "entry_k": 0.95, "fill_qty3_room": 7500.0, "after_loss_ml_mult5": 1.05, "proxy net": 61638, "proxy d1000": 0, "proxy floor": 0, "nq net": 628361, "nq d1000": 0, "nq floor": 0, "index net": 828083, "index d1000": 0, "index floor": 0}
+{"k": 15, "fill_min_room": 2750.0, "gap_go_be": 0.75, "gap_go_locked_qty": 8, "proxy net": 57196, "proxy d1000": 0, "proxy floor": 0}
+{"k": 16, "size_slip_pts": 6.0, "proxy net": 59532, "proxy d1000": 0, "proxy floor": 0}
+{"k": 17, "big_day_k": 1.6, "early_daily_loss": 800.0, "proxy net": 55358, "proxy d1000": 0, "proxy floor": 0}
+{"k": 18, "last_entry_end": 930, "entry_k": 0.95, "fill_qty3_room": 7500.0, "max_loss_per_trade": 195.0, "skip_checks": "780", "proxy net": 55642, "proxy d1000": 0, "proxy floor": 0}
+{"k": 19, "budget_frac": 0.98, "fill_min_room": 2750.0, "range_pos_min": 0.68, "squeeze_min": 22.0, "proxy net": 56803, "proxy d1000": 0, "proxy floor": 0}
+{"k": 20, "gap_go_be": 1.0, "entry_k": 0.95, "lock_plus": 1.0, "proxy net": 60518, "proxy d1000": 0, "proxy floor": 0}
+{"k": 21, "after_loss_ml_locked": 1.05, "time_stop": 40, "gap_go_k_locked": 0.55, "proxy net": 60047, "proxy d1000": 0, "proxy floor": 0}
+{"k": 22, "gap_go_be": 0.75, "proxy net": 61154, "proxy d1000": 0, "proxy floor": 0}
+{"k": 23, "time_stop": 50, "profit_step_fast_from": 7500.0, "proxy net": 60504, "proxy d1000": 0, "proxy floor": 0}
+{"k": 24, "giveback_brake": 0.55, "gap_go_k": 0.7, "after_loss_ml_mult5": 0.95, "proxy net": 62562, "proxy d1000": 0, "proxy floor": 0, "nq net": 604131, "nq d1000": 0, "nq floor": 0, "index net": 787434, "index d1000": 0, "index floor": 0}
+{"k": 25, "big_day_k": 1.6, "proxy net": 55358, "proxy d1000": 0, "proxy floor": 0}
+{"k": 26, "entry_k": 0.95, "gap_go_k": 0.55, "proxy net": 62446, "proxy d1000": 0, "proxy floor": 0, "nq net": 620126, "nq d1000": 0, "nq floor": 0, "index net": 828984, "index d1000": 0, "index floor": 0}
+{"k": 27, "fill_qty2_room": 3500.0, "big_day_k": 1.4, "fill_qty3_room": 7000.0, "calm_k": 0.65, "lookback": 16, "proxy net": 57211, "proxy d1000": 0, "proxy floor": 0}
+{"k": 28, "early_daily_loss": 700.0, "range_pos_min": 0.72, "squeeze_min": 18.0, "last_entry_end": 870, "proxy net": -1293, "proxy d1000": 0, "proxy floor": 0}
+{"k": 29, "big_day_k": 1.3, "max_losers": 4, "gap_go_k": 0.7, "proxy net": 58884, "proxy d1000": 0, "proxy floor": 0}
+{"k": 30, "trend_n": 40, "proxy net": 56511, "proxy d1000": 0, "proxy floor": 0}
+{"k": 31, "profit_step": 1450.0, "profit_step_fast": 675.0, "proxy net": 60996, "proxy d1000": 0, "proxy floor": 0}
+{"k": 32, "size_slip_pts": 5.5, "time_lock": 30, "after_loss_ml_locked": 0.95, "proxy net": 58209, "proxy d1000": 0, "proxy floor": 0}
+{"k": 33, "range_pos_min": 0.68, "proxy net": 60863, "proxy d1000": 0, "proxy floor": 0}
+{"k": 34, "early_daily_loss": 650.0, "lock_plus": 3.5, "max_losers": 2, "gap_go_k_locked": 0.55, "proxy net": 56910, "proxy d1000": 0, "proxy floor": 0}
+{"k": 35, "time_lock": 30, "profit_step_fast": 625.0, "max_loss_per_trade": 175.0, "proxy net": 50863, "proxy d1000": 0, "proxy floor": 0}
+{"k": 36, "time_lock": 60, "fill_qty3_room": 9000.0, "proxy net": 61721, "proxy d1000": 0, "proxy floor": 0, "nq net": 632400, "nq d1000": 0, "nq floor": 0, "index net": 877829, "index d1000": 0, "index floor": 0}
+{"k": 37, "profit_step": 1600.0, "take_profit": 2.1, "lock_plus": 3.5, "gap_go_be": 1.5, "max_loss_per_trade": 175.0, "proxy net": 53286, "proxy d1000": 0, "proxy floor": 0}
+{"k": 38, "max_loss_per_trade": 180.0, "profit_step_fast_from": 9000.0, "late_lock_from": 900, "time_lock": 30, "gap_go_be": 1.0, "proxy net": 54677, "proxy d1000": 0, "proxy floor": 0}
+{"k": 39, "calm_k": 0.75, "lock_plus": 2.0, "last_entry_end": 870, "proxy net": -1291, "proxy d1000": 0, "proxy floor": 0}
+{"k": 40, "time_stop": 35, "last_entry_end": 930, "proxy net": 56598, "proxy d1000": 0, "proxy floor": 0}
+{"k": 41, "lookback": 15, "time_stop": 40, "early_daily_loss": 800.0, "lock_at": 0.4, "proxy net": 62912, "proxy d1000": 0, "proxy floor": 0, "nq net": 593128, "nq d1000": 0, "nq floor": 0, "index net": 808254, "index d1000": 0, "index floor": 0}
+{"k": 42, "gap_go_locked_qty": 8, "skip_checks": "780", "after_loss_ml_mult5": 1.05, "profit_step": 1450.0, "proxy net": 55936, "proxy d1000": 0, "proxy floor": 0}
+{"k": 43, "profit_step": 1400.0, "time_stop": 40, "max_losers": 2, "gap_go_k": 0.65, "fill_qty2_room": 4500.0, "proxy net": 58698, "proxy d1000": 0, "proxy floor": 0}
+{"k": 44, "gap_go_locked_qty": 9, "size_slip_pts": 4.5, "proxy net": 59790, "proxy d1000": 0, "proxy floor": 0}
+{"k": 45, "time_stop": 55, "gap_go_k": 0.55, "proxy net": 59784, "proxy d1000": 0, "proxy floor": 0}
+{"k": 46, "lookback": 12, "fill_qty3_room": 7500.0, "proxy net": 55446, "proxy d1000": 0, "proxy floor": 0}
+{"k": 47, "after_loss_ml_locked": 1.05, "profit_step_fast_from": 7000.0, "proxy net": 60841, "proxy d1000": 0, "proxy floor": 0}
+{"k": 48, "early_daily_loss": 800.0, "late_lock_from": 900, "trend_n": 75, "time_stop": 40, "proxy net": 62852, "proxy d1000": 0, "proxy floor": 0, "nq net": 608300, "nq d1000": 0, "nq floor": 0, "index net": 853022, "index d1000": 0, "index floor": 0}
+{"k": 49, "max_losers": 4, "gap_go_k": 0.65, "max_loss_per_trade": 195.0, "squeeze_min": 15.0, "proxy net": 59169, "proxy d1000": 0, "proxy floor": 0}
+{"k": 50, "late_lock_from": 870, "big_day_k": 1.3, "gap_go_be": 1.5, "proxy net": 58947, "proxy d1000": 0, "proxy floor": 0}
+{"k": 51, "gap_go_be": 1.5, "proxy net": 61612, "proxy d1000": 0, "proxy floor": 0}
+{"k": 52, "early_daily_loss": 800.0, "after_loss_ml_mult5": 1.05, "max_losers": 2, "lookback": 12, "gap_go_be": 1.0, "proxy net": 52583, "proxy d1000": 0, "proxy floor": 0}
+{"k": 53, "fill_qty2_room": 5000.0, "lock_plus": 3.5, "profit_step_fast_from": 7000.0, "gap_go_locked_qty": 9, "proxy net": 58939, "proxy d1000": 0, "proxy floor": 0}
+{"k": 54, "big_day_k": 1.4, "after_loss_ml_locked": 1.05, "giveback_brake": 0.55, "lock_at": 0.3, "late_lock_from": 870, "proxy net": 56452, "proxy d1000": 0, "proxy floor": 0}
+{"k": 55, "max_loss_per_trade": 200.0, "last_entry_end": 870, "fill_qty2_room": 4500.0, "lock_at": 0.4, "trend_n": 55, "proxy net": -1294, "proxy d1000": 0, "proxy floor": 1}
+{"k": 56, "calm_k": 0.65, "proxy net": 59571, "proxy d1000": 0, "proxy floor": 0}
+{"k": 57, "after_loss_ml_locked": 0.95, "gap_go_locked_qty": 9, "proxy net": 59321, "proxy d1000": 0, "proxy floor": 0}
+{"k": 58, "lookback": 13, "range_pos_min": 0.72, "after_loss_ml_mult5": 1.05, "profit_step_fast": 600.0, "gap_go_k": 0.65, "proxy net": 52024, "proxy d1000": 0, "proxy floor": 0}
+{"k": 59, "gap_go_drive_k": 0.55, "gap_go_be": 0.75, "late_lock_from": 870, "last_entry_end": 930, "max_loss_per_trade": 175.0, "proxy net": 50171, "proxy d1000": 0, "proxy floor": 0}
+{"k": 60, "lookback": 16, "gap_go_drive_k": 0.7, "big_day_k": 1.4, "proxy net": 59122, "proxy d1000": 0, "proxy floor": 0}
+{"k": 61, "gap_go_locked_qty": 8, "profit_step": 1550.0, "proxy net": 56555, "proxy d1000": 0, "proxy floor": 0}
+{"k": 62, "take_profit": 2.1, "budget_frac": 0.98, "proxy net": 59616, "proxy d1000": 0, "proxy floor": 0}
+{"k": 63, "early_daily_loss": 700.0, "lock_plus": 5.0, "proxy net": 59050, "proxy d1000": 0, "proxy floor": 0}
+{"k": 64, "max_losers": 4, "gap_go_be": 0.75, "gap_go_locked_qty": 8, "time_lock": 30, "trend_n": 55, "proxy net": 57019, "proxy d1000": 0, "proxy floor": 0}
+{"k": 65, "fill_qty2_room": 3500.0, "lock_plus": 2.0, "proxy net": 59917, "proxy d1000": 0, "proxy floor": 0}
+{"k": 66, "gap_go_k_locked": 0.65, "profit_step": 1450.0, "profit_step_fast": 700.0, "proxy net": 60870, "proxy d1000": 0, "proxy floor": 0}
+{"k": 67, "take_profit": 1.9, "calm_k": 0.65, "proxy net": 58614, "proxy d1000": 0, "proxy floor": 0}
+{"k": 68, "skip_checks": "750,780,870", "calm_k": 0.65, "after_loss_ml_mult5": 1.05, "proxy net": 60861, "proxy d1000": 0, "proxy floor": 0}
+{"k": 69, "late_lock_from": 870, "after_loss_ml_mult5": 0.95, "last_entry_end": 870, "proxy net": 58969, "proxy d1000": 0, "proxy floor": 0}
+{"k": 70, "gap_go_k_locked": 0.65, "gap_go_k": 0.7, "entry_k": 1.1, "gap_go_drive_k": 0.5, "proxy net": 58285, "proxy d1000": 0, "proxy floor": 0}
+{"k": 71, "gap_go_drive_k": 0.65, "last_entry_end": 930, "trend_n": 75, "time_lock": 60, "proxy net": 58453, "proxy d1000": 0, "proxy floor": 0}
+{"k": 72, "size_slip_pts": 4.5, "range_pos_min": 0.65, "after_loss_ml_locked": 1.05, "proxy net": 62482, "proxy d1000": 0, "proxy floor": 0, "nq net": 626395, "nq d1000": 0, "nq floor": 0, "index net": 843294, "index d1000": 0, "index floor": 0}
+{"k": 73, "after_loss_ml_mult5": 0.95, "take_profit": 1.9, "proxy net": 59945, "proxy d1000": 0, "proxy floor": 0}
+{"k": 74, "fill_min_room": 2250.0, "calm_k": 0.8, "proxy net": 29987, "proxy d1000": 0, "proxy floor": 0}
+{"k": 75, "budget_frac": 0.98, "calm_k": 0.65, "proxy net": 55437, "proxy d1000": 0, "proxy floor": 0}
+{"k": 76, "profit_step_fast_from": 7000.0, "proxy net": 61333, "proxy d1000": 0, "proxy floor": 0}
+{"k": 77, "fill_min_room": 2750.0, "proxy net": 61612, "proxy d1000": 0, "proxy floor": 0}
+{"k": 78, "calm_k": 0.8, "fill_qty2_room": 4500.0, "skip_checks": "870", "proxy net": 28699, "proxy d1000": 0, "proxy floor": 0}
+{"k": 79, "gap_go_drive_k": 0.65, "fill_qty3_room": 8500.0, "after_loss_ml_mult5": 1.05, "fill_min_room": 2250.0, "big_day_k": 1.7, "proxy net": 54782, "proxy d1000": 0, "proxy floor": 0}
+{"k": 80, "squeeze_min": 15.0, "late_lock_from": 870, "gap_go_locked_qty": 8, "proxy net": 56600, "proxy d1000": 0, "proxy floor": 0}
+{"k": 81, "after_loss_ml_locked": 1.05, "profit_step_fast": 625.0, "fill_qty3_room": 8500.0, "after_loss_ml_mult5": 1.05, "proxy net": 61484, "proxy d1000": 0, "proxy floor": 0}
+{"k": 82, "lock_plus": 3.5, "profit_step_fast": 600.0, "lookback": 13, "time_lock": 45, "after_loss_ml_mult5": 1.05, "proxy net": 53262, "proxy d1000": 0, "proxy floor": 0}
+{"k": 83, "fill_min_room": 2750.0, "last_entry_end": 870, "calm_k": 0.65, "profit_step_fast": 675.0, "proxy net": -1293, "proxy d1000": 0, "proxy floor": 0}
+{"k": 84, "squeeze_min": 15.0, "lookback": 13, "trend_n": 55, "proxy net": 52952, "proxy d1000": 0, "proxy floor": 0}
+{"k": 85, "size_slip_pts": 6.0, "gap_go_be": 1.5, "proxy net": 59532, "proxy d1000": 0, "proxy floor": 0}
+{"k": 86, "entry_k": 0.95, "proxy net": 62470, "proxy d1000": 0, "proxy floor": 0, "nq net": 627963, "nq d1000": 0, "nq floor": 0, "index net": 828053, "index d1000": 0, "index floor": 0}
+{"k": 87, "lock_plus": 5.0, "time_stop": 55, "calm_k": 0.8, "proxy net": 29224, "proxy d1000": 0, "proxy floor": 0}
+{"k": 88, "max_losers": 4, "late_lock_from": 840, "proxy net": 63525, "proxy d1000": 0, "proxy floor": 0, "nq net": 606725, "nq d1000": 0, "nq floor": 0, "index net": 899002, "index d1000": 0, "index floor": 0}
+{"k": 89, "entry_k": 1.1, "gap_go_k": 0.65, "gap_go_drive_k": 0.5, "proxy net": 58264, "proxy d1000": 0, "proxy floor": 0}
+{"k": 90, "gap_go_k": 0.7, "skip_checks": "750,780,870", "proxy net": 62571, "proxy d1000": 0, "proxy floor": 0, "nq net": 617384, "nq d1000": 0, "nq floor": 0, "index net": 864797, "index d1000": 0, "index floor": 0}
+{"k": 91, "profit_step": 1400.0, "after_loss_ml_locked": 0.95, "gap_go_be": 1.5, "max_losers": 4, "lock_plus": 3.5, "proxy net": 59017, "proxy d1000": 0, "proxy floor": 0}
+{"k": 92, "early_daily_loss": 650.0, "range_pos_min": 0.65, "proxy net": 63386, "proxy d1000": 0, "proxy floor": 0, "nq net": 604170, "nq d1000": 0, "nq floor": 0, "index net": 867984, "index d1000": 0, "index floor": 0}
+{"k": 93, "after_loss_ml_mult5": 0.95, "late_lock_from": 840, "proxy net": 63688, "proxy d1000": 0, "proxy floor": 0, "nq net": 607111, "nq d1000": 0, "nq floor": 0, "index net": 898060, "index d1000": 0, "index floor": 0}
+{"k": 94, "profit_step_fast_from": 9000.0, "calm_k": 0.65, "take_profit": 2.25, "proxy net": 51564, "proxy d1000": 0, "proxy floor": 0}
+{"k": 95, "after_loss_ml_locked": 1.05, "early_daily_loss": 650.0, "skip_checks": "870", "max_loss_per_trade": 175.0, "fill_qty2_room": 5000.0, "proxy net": 55511, "proxy d1000": 0, "proxy floor": 0}
+{"k": 96, "gap_go_locked_qty": 9, "time_stop": 35, "proxy net": 60073, "proxy d1000": 0, "proxy floor": 0}
+{"k": 97, "giveback_brake": 0.55, "max_loss_per_trade": 180.0, "big_day_k": 1.4, "time_stop": 50, "lock_at": 0.38, "proxy net": 58540, "proxy d1000": 0, "proxy floor": 0}
+{"k": 98, "take_profit": 2.1, "proxy net": 63820, "proxy d1000": 0, "proxy floor": 0, "nq net": 613111, "nq d1000": 0, "nq floor": 0, "index net": 841943, "index d1000": 0, "index floor": 0}
+{"k": 99, "lookback": 13, "gap_go_drive_k": 0.7, "proxy net": 53559, "proxy d1000": 0, "proxy floor": 0}
+{"k": 100, "giveback_brake": 0.55, "proxy net": 61612, "proxy d1000": 0, "proxy floor": 0}
+{"k": 101, "lookback": 12, "after_loss_ml_locked": 1.05, "late_lock_from": 870, "proxy net": 55348, "proxy d1000": 0, "proxy floor": 0}
+{"k": 102, "gap_go_k_locked": 0.65, "proxy net": 61612, "proxy d1000": 0, "proxy floor": 0}
+{"k": 103, "lock_at": 0.33, "budget_frac": 0.98, "proxy net": 54766, "proxy d1000": 0, "proxy floor": 0}
+{"k": 104, "entry_k": 0.95, "max_losers": 4, "lock_at": 0.38, "calm_k": 0.8, "proxy net": 28437, "proxy d1000": 0, "proxy floor": 0}
+{"k": 105, "gap_go_k": 0.7, "proxy net": 62551, "proxy d1000": 0, "proxy floor": 0, "nq net": 618344, "nq d1000": 0, "nq floor": 0, "index net": 864824, "index d1000": 0, "index floor": 0}
+{"k": 106, "lock_plus": 2.0, "entry_k": 1.1, "size_slip_pts": 4.0, "range_pos_min": 0.72, "proxy net": 59167, "proxy d1000": 0, "proxy floor": 0}
+{"k": 107, "trend_n": 45, "time_lock": 45, "after_loss_ml_mult5": 0.95, "proxy net": 61799, "proxy d1000": 0, "proxy floor": 0, "nq net": 632744, "nq d1000": 0, "nq floor": 0, "index net": 874880, "index d1000": 0, "index floor": 0}
+{"k": 108, "profit_step": 1550.0, "size_slip_pts": 5.5, "early_daily_loss": 650.0, "range_pos_min": 0.65, "proxy net": 63048, "proxy d1000": 0, "proxy floor": 0, "nq net": 621825, "nq d1000": 0, "nq floor": 0, "index net": 859199, "index d1000": 0, "index floor": 0}
+{"k": 109, "gap_go_be": 0.75, "after_loss_ml_locked": 1.05, "proxy net": 60315, "proxy d1000": 0, "proxy floor": 0}
+{"k": 110, "size_slip_pts": 4.5, "squeeze_min": 18.0, "skip_checks": "870", "gap_go_be": 0.75, "lookback": 12, "proxy net": 54878, "proxy d1000": 0, "proxy floor": 0}
+{"k": 111, "entry_k": 0.95, "time_lock": 30, "gap_go_k_locked": 0.65, "proxy net": 60781, "proxy d1000": 0, "proxy floor": 0}
+{"k": 112, "fill_qty3_room": 8500.0, "calm_k": 0.8, "lookback": 13, "gap_go_k": 0.65, "profit_step_fast_from": 7500.0, "proxy net": 30901, "proxy d1000": 0, "proxy floor": 0}
+{"k": 113, "entry_k": 1.05, "profit_step": 1400.0, "proxy net": 65741, "proxy d1000": 0, "proxy floor": 0, "nq net": 596306, "nq d1000": 0, "nq floor": 0, "index net": 852793, "index d1000": 0, "index floor": 0}
+{"k": 114, "gap_go_k": 0.7, "profit_step_fast": 675.0, "fill_qty2_room": 3500.0, "proxy net": 60757, "proxy d1000": 0, "proxy floor": 0}
+{"k": 115, "early_daily_loss": 700.0, "gap_go_drive_k": 0.65, "proxy net": 61764, "proxy d1000": 0, "proxy floor": 0, "nq net": 631530, "nq d1000": 0, "nq floor": 0, "index net": 874846, "index d1000": 0, "index floor": 0}
+{"k": 116, "lock_plus": 2.0, "profit_step_fast_from": 7500.0, "squeeze_min": 18.0, "proxy net": 60991, "proxy d1000": 0, "proxy floor": 0}
+{"k": 117, "gap_go_be": 1.0, "entry_k": 1.05, "trend_n": 60, "fill_qty3_room": 9000.0, "gap_go_k": 0.65, "proxy net": 65816, "proxy d1000": 0, "proxy floor": 0, "nq net": 581150, "nq d1000": 0, "nq floor": 0, "index net": 779025, "index d1000": 0, "index floor": 0}
+{"k": 118, "max_losers": 2, "range_pos_min": 0.68, "time_stop": 35, "giveback_brake": 0.55, "proxy net": 58944, "proxy d1000": 0, "proxy floor": 0}
+{"k": 119, "giveback_brake": 0.45, "late_lock_from": 840, "proxy net": 63525, "proxy d1000": 0, "proxy floor": 0, "nq net": 607111, "nq d1000": 0, "nq floor": 0, "index net": 898060, "index d1000": 0, "index floor": 0}
+{"k": 120, "range_pos_min": 0.65, "late_lock_from": 900, "proxy net": 63704, "proxy d1000": 0, "proxy floor": 0, "nq net": 616631, "nq d1000": 0, "nq floor": 0, "index net": 870186, "index d1000": 0, "index floor": 0}
+{"k": 121, "max_losers": 4, "profit_step_fast": 625.0, "trend_n": 40, "squeeze_min": 18.0, "proxy net": 56741, "proxy d1000": 0, "proxy floor": 0}
+{"k": 122, "time_stop": 35, "big_day_k": 1.3, "gap_go_drive_k": 0.7, "proxy net": 57816, "proxy d1000": 0, "proxy floor": 0}
+{"k": 123, "big_day_k": 1.6, "time_lock": 30, "skip_checks": "750,780,870", "proxy net": 53711, "proxy d1000": 0, "proxy floor": 0}
+{"k": 124, "profit_step": 1600.0, "max_loss_per_trade": 175.0, "proxy net": 52123, "proxy d1000": 0, "proxy floor": 0}
+{"k": 125, "squeeze_min": 25.0, "late_lock_from": 900, "size_slip_pts": 6.0, "proxy net": 57910, "proxy d1000": 0, "proxy floor": 0}
+{"k": 126, "profit_step_fast_from": 8500.0, "max_loss_per_trade": 180.0, "size_slip_pts": 4.0, "profit_step_fast": 625.0, "proxy net": 56515, "proxy d1000": 0, "proxy floor": 0}
+{"k": 127, "gap_go_k_locked": 0.65, "lock_plus": 3.5, "max_losers": 4, "last_entry_end": 870, "budget_frac": 0.95, "proxy net": -1289, "proxy d1000": 0, "proxy floor": 0}
+{"k": 128, "lock_at": 0.38, "profit_step_fast_from": 7500.0, "proxy net": 60508, "proxy d1000": 0, "proxy floor": 0}
+{"k": 129, "early_daily_loss": 650.0, "lookback": 12, "proxy net": 55446, "proxy d1000": 0, "proxy floor": 0}
+{"k": 130, "gap_go_be": 0.75, "after_loss_ml_locked": 0.95, "proxy net": 60780, "proxy d1000": 0, "proxy floor": 0}
+{"k": 131, "big_day_k": 1.4, "early_daily_loss": 800.0, "proxy net": 57760, "proxy d1000": 0, "proxy floor": 0}
+{"k": 132, "gap_go_drive_k": 0.55, "proxy net": 60952, "proxy d1000": 0, "proxy floor": 0}
+{"k": 133, "lookback": 13, "budget_frac": 0.98, "proxy net": 47586, "proxy d1000": 0, "proxy floor": 0}
+{"k": 134, "range_pos_min": 0.75, "late_lock_from": 900, "proxy net": 60854, "proxy d1000": 0, "proxy floor": 0}
+{"k": 135, "entry_k": 1.05, "giveback_brake": 0.45, "profit_step_fast_from": 9000.0, "proxy net": 64451, "proxy d1000": 0, "proxy floor": 0, "nq net": 607350, "nq d1000": 0, "nq floor": 0, "index net": 842532, "index d1000": 0, "index floor": 0}
+{"k": 136, "time_stop": 40, "gap_go_k": 0.55, "size_slip_pts": 4.5, "trend_n": 55, "entry_k": 1.05, "proxy net": 65051, "proxy d1000": 0, "proxy floor": 0, "nq net": 580204, "nq d1000": 0, "nq floor": 0, "index net": 810236, "index d1000": 0, "index floor": 0}
+{"k": 137, "range_pos_min": 0.75, "time_stop": 55, "proxy net": 58203, "proxy d1000": 0, "proxy floor": 0}
+{"k": 138, "profit_step": 1450.0, "after_loss_ml_locked": 0.95, "gap_go_k_locked": 0.55, "proxy net": 61583, "proxy d1000": 0, "proxy floor": 0}
+{"k": 139, "take_profit": 1.75, "gap_go_locked_qty": 9, "profit_step": 1450.0, "proxy net": 55315, "proxy d1000": 0, "proxy floor": 0}
+{"k": 140, "early_daily_loss": 700.0, "squeeze_min": 15.0, "size_slip_pts": 4.5, "lock_at": 0.33, "proxy net": 58478, "proxy d1000": 0, "proxy floor": 0}
+{"k": 141, "after_loss_ml_mult5": 1.05, "lock_at": 0.33, "budget_frac": 0.95, "proxy net": 53458, "proxy d1000": 0, "proxy floor": 0}
+{"k": 142, "time_stop": 35, "big_day_k": 1.7, "proxy net": 54491, "proxy d1000": 0, "proxy floor": 0}
+{"k": 143, "early_daily_loss": 800.0, "budget_frac": 0.95, "proxy net": 55853, "proxy d1000": 0, "proxy floor": 0}
+{"k": 144, "calm_k": 0.8, "profit_step_fast": 700.0, "lookback": 15, "late_lock_from": 870, "trend_n": 60, "proxy net": 32322, "proxy d1000": 0, "proxy floor": 0}
+{"k": 145, "gap_go_k_locked": 0.65, "fill_min_room": 2250.0, "after_loss_ml_locked": 1.05, "proxy net": 60769, "proxy d1000": 0, "proxy floor": 0}
+{"k": 146, "gap_go_k": 0.55, "proxy net": 61602, "proxy d1000": 0, "proxy floor": 0}
+{"k": 147, "time_lock": 30, "lookback": 15, "calm_k": 0.8, "proxy net": 28210, "proxy d1000": 0, "proxy floor": 0}
+{"k": 148, "entry_k": 0.95, "range_pos_min": 0.75, "proxy net": 61880, "proxy d1000": 0, "proxy floor": 0, "nq net": 587551, "nq d1000": 0, "nq floor": 0, "index net": 750070, "index d1000": 0, "index floor": 0}
+{"k": 149, "giveback_brake": 0.55, "lock_at": 0.33, "size_slip_pts": 4.0, "proxy net": 58893, "proxy d1000": 0, "proxy floor": 0}
+{"k": 150, "gap_go_drive_k": 0.55, "late_lock_from": 900, "size_slip_pts": 5.5, "proxy net": 57823, "proxy d1000": 0, "proxy floor": 0}
+{"k": 151, "fill_qty3_room": 9000.0, "squeeze_min": 25.0, "profit_step_fast_from": 9000.0, "proxy net": 61704, "proxy d1000": 0, "proxy floor": 0, "nq net": 631442, "nq d1000": 0, "nq floor": 0, "index net": 876643, "index d1000": 0, "index floor": 0}
+{"k": 152, "lookback": 15, "lock_at": 0.3, "proxy net": 62193, "proxy d1000": 0, "proxy floor": 0, "nq net": 634252, "nq d1000": 0, "nq floor": 0, "index net": 834172, "index d1000": 0, "index floor": 0}
+{"k": 153, "size_slip_pts": 4.0, "fill_min_room": 2250.0, "proxy net": 61612, "proxy d1000": 0, "proxy floor": 0}
+{"k": 154, "gap_go_locked_qty": 9, "gap_go_k_locked": 0.55, "lock_at": 0.4, "proxy net": 58297, "proxy d1000": 0, "proxy floor": 0}
+{"k": 155, "calm_k": 0.6, "squeeze_min": 18.0, "fill_min_room": 2750.0, "big_day_k": 1.6, "budget_frac": 0.98, "proxy net": 46792, "proxy d1000": 0, "proxy floor": 0}
+{"k": 156, "late_lock_from": 900, "after_loss_ml_locked": 0.95, "proxy net": 60760, "proxy d1000": 0, "proxy floor": 0}
+{"k": 157, "budget_frac": 0.95, "proxy net": 55853, "proxy d1000": 0, "proxy floor": 0}
+{"k": 158, "gap_go_locked_qty": 8, "giveback_brake": 0.45, "proxy net": 57791, "proxy d1000": 0, "proxy floor": 0}
+{"k": 159, "fill_qty2_room": 3500.0, "time_stop": 50, "trend_n": 55, "proxy net": 61393, "proxy d1000": 0, "proxy floor": 0}
+{"k": 160, "budget_frac": 0.95, "time_stop": 35, "gap_go_be": 0.75, "range_pos_min": 0.65, "proxy net": 57115, "proxy d1000": 0, "proxy floor": 0}
+{"k": 161, "after_loss_ml_mult5": 1.05, "early_daily_loss": 800.0, "gap_go_locked_qty": 8, "skip_checks": "", "entry_k": 0.95, "proxy net": 57458, "proxy d1000": 0, "proxy floor": 0}
+{"k": 162, "time_stop": 40, "profit_step_fast": 700.0, "proxy net": 59700, "proxy d1000": 0, "proxy floor": 0}
+{"k": 163, "late_lock_from": 870, "profit_step": 1450.0, "proxy net": 61766, "proxy d1000": 0, "proxy floor": 0, "nq net": 622783, "nq d1000": 0, "nq floor": 0, "index net": 896178, "index d1000": 0, "index floor": 0}
+{"k": 164, "after_loss_ml_mult5": 1.05, "gap_go_be": 1.5, "proxy net": 61603, "proxy d1000": 0, "proxy floor": 0}
+{"k": 165, "big_day_k": 1.4, "late_lock_from": 840, "proxy net": 59724, "proxy d1000": 0, "proxy floor": 0}
+{"k": 166, "big_day_k": 1.4, "max_loss_per_trade": 200.0, "proxy net": 53607, "proxy d1000": 0, "proxy floor": 0}
+{"k": 167, "gap_go_be": 1.0, "budget_frac": 0.95, "gap_go_locked_qty": 8, "proxy net": 52398, "proxy d1000": 0, "proxy floor": 0}
+{"k": 168, "range_pos_min": 0.75, "take_profit": 1.75, "trend_n": 40, "late_lock_from": 900, "proxy net": 51786, "proxy d1000": 0, "proxy floor": 0}
+{"k": 169, "gap_go_drive_k": 0.65, "early_daily_loss": 650.0, "fill_min_room": 2250.0, "after_loss_ml_locked": 1.05, "proxy net": 60922, "proxy d1000": 0, "proxy floor": 0}
+{"k": 170, "take_profit": 2.25, "size_slip_pts": 6.0, "gap_go_drive_k": 0.55, "lock_at": 0.33, "proxy net": 48811, "proxy d1000": 0, "proxy floor": 0}
+{"k": 171, "profit_step": 1450.0, "lookback": 15, "proxy net": 64005, "proxy d1000": 0, "proxy floor": 0, "nq net": 612092, "nq d1000": 0, "nq floor": 0, "index net": 837525, "index d1000": 0, "index floor": 0}
+{"k": 172, "fill_qty2_room": 3500.0, "gap_go_drive_k": 0.5, "max_loss_per_trade": 195.0, "proxy net": 57078, "proxy d1000": 0, "proxy floor": 0}
+{"k": 173, "take_profit": 1.75, "after_loss_ml_locked": 0.95, "entry_k": 1.1, "lock_plus": 2.0, "proxy net": 54760, "proxy d1000": 0, "proxy floor": 0}
+{"k": 174, "lookback": 16, "big_day_k": 1.3, "squeeze_min": 25.0, "proxy net": 58201, "proxy d1000": 0, "proxy floor": 0}
+{"k": 175, "budget_frac": 0.95, "after_loss_ml_locked": 1.05, "last_entry_end": 930, "after_loss_ml_mult5": 1.05, "proxy net": 51804, "proxy d1000": 0, "proxy floor": 0}
+{"k": 176, "lookback": 12, "max_loss_per_trade": 195.0, "lock_at": 0.38, "trend_n": 45, "fill_qty2_room": 3500.0, "proxy net": 52520, "proxy d1000": 0, "proxy floor": 0}
+{"k": 177, "gap_go_drive_k": 0.55, "gap_go_be": 0.75, "proxy net": 60412, "proxy d1000": 0, "proxy floor": 0}
+{"k": 178, "gap_go_k": 0.65, "time_stop": 50, "fill_qty2_room": 5000.0, "proxy net": 60628, "proxy d1000": 0, "proxy floor": 0}
+{"k": 179, "max_losers": 2, "profit_step_fast_from": 7500.0, "profit_step": 1550.0, "gap_go_be": 0.75, "proxy net": 56129, "proxy d1000": 0, "proxy floor": 0}
+{"k": 180, "last_entry_end": 870, "gap_go_k_locked": 0.65, "lock_plus": 3.5, "giveback_brake": 0.45, "proxy net": -1289, "proxy d1000": 0, "proxy floor": 0}
+{"k": 181, "gap_go_k": 0.7, "big_day_k": 1.4, "entry_k": 0.95, "late_lock_from": 840, "proxy net": 60700, "proxy d1000": 0, "proxy floor": 0}
+{"k": 182, "gap_go_drive_k": 0.7, "proxy net": 63707, "proxy d1000": 0, "proxy floor": 0, "nq net": 618119, "nq d1000": 0, "nq floor": 0, "index net": 875929, "index d1000": 0, "index floor": 0}
+{"k": 183, "after_loss_ml_locked": 1.05, "lock_plus": 1.0, "late_lock_from": 900, "gap_go_k": 0.7, "gap_go_locked_qty": 8, "proxy net": 57347, "proxy d1000": 0, "proxy floor": 0}
+{"k": 184, "take_profit": 1.75, "after_loss_ml_mult5": 0.95, "proxy net": 57668, "proxy d1000": 0, "proxy floor": 0}
+{"k": 185, "lock_plus": 2.0, "entry_k": 1.05, "gap_go_k": 0.55, "max_loss_per_trade": 200.0, "proxy net": 61225, "proxy d1000": 0, "proxy floor": 0}
+{"k": 186, "size_slip_pts": 5.5, "trend_n": 60, "proxy net": 59962, "proxy d1000": 0, "proxy floor": 0}
+{"k": 187, "gap_go_drive_k": 0.55, "time_stop": 35, "proxy net": 60551, "proxy d1000": 0, "proxy floor": 0}
+{"k": 188, "after_loss_ml_locked": 0.95, "proxy net": 61231, "proxy d1000": 0, "proxy floor": 0}
+{"k": 189, "max_losers": 4, "squeeze_min": 18.0, "profit_step_fast": 700.0, "budget_frac": 0.98, "proxy net": 56547, "proxy d1000": 0, "proxy floor": 0}
+{"k": 190, "fill_min_room": 2250.0, "time_lock": 30, "proxy net": 60643, "proxy d1000": 0, "proxy floor": 0}
+{"k": 191, "profit_step_fast_from": 7000.0, "take_profit": 2.1, "big_day_k": 1.7, "gap_go_k_locked": 0.55, "trend_n": 40, "proxy net": 51144, "proxy d1000": 0, "proxy floor": 0}
+{"k": 192, "gap_go_locked_qty": 9, "size_slip_pts": 4.5, "fill_qty2_room": 3500.0, "after_loss_ml_locked": 0.95, "big_day_k": 1.7, "proxy net": 51151, "proxy d1000": 0, "proxy floor": 0}
+{"k": 193, "gap_go_drive_k": 0.5, "early_daily_loss": 800.0, "proxy net": 60445, "proxy d1000": 0, "proxy floor": 0}
+{"k": 194, "gap_go_be": 1.0, "max_loss_per_trade": 200.0, "profit_step": 1400.0, "calm_k": 0.75, "fill_qty3_room": 8500.0, "proxy net": 60817, "proxy d1000": 0, "proxy floor": 0}
+{"k": 195, "lock_plus": 2.0, "gap_go_k": 0.7, "proxy net": 62402, "proxy d1000": 0, "proxy floor": 0, "nq net": 652348, "nq d1000": 0, "nq floor": 0, "index net": 863432, "index d1000": 0, "index floor": 0}
+{"k": 196, "giveback_brake": 0.45, "budget_frac": 0.98, "lock_plus": 3.5, "proxy net": 56660, "proxy d1000": 0, "proxy floor": 0}
+{"k": 197, "big_day_k": 1.6, "profit_step_fast_from": 8500.0, "proxy net": 55088, "proxy d1000": 0, "proxy floor": 0}
+{"k": 198, "gap_go_be": 1.5, "profit_step_fast_from": 9000.0, "late_lock_from": 840, "big_day_k": 1.7, "fill_min_room": 2750.0, "proxy net": 56725, "proxy d1000": 0, "proxy floor": 0}
+{"k": 199, "take_profit": 1.75, "gap_go_k": 0.7, "fill_qty3_room": 9000.0, "skip_checks": "780", "trend_n": 40, "proxy net": 52716, "proxy d1000": 0, "proxy floor": 0}
+{"k": 200, "gap_go_locked_qty": 9, "skip_checks": "750,780,870", "lock_plus": 1.0, "proxy net": 58450, "proxy d1000": 0, "proxy floor": 0}
+{"k": 201, "early_daily_loss": 700.0, "size_slip_pts": 5.5, "proxy net": 59958, "proxy d1000": 0, "proxy floor": 0}
+{"k": 202, "max_losers": 4, "size_slip_pts": 4.0, "budget_frac": 0.98, "take_profit": 1.75, "after_loss_ml_mult5": 0.95, "proxy net": 53178, "proxy d1000": 0, "proxy floor": 0}
+{"k": 203, "range_pos_min": 0.72, "proxy net": 62486, "proxy d1000": 0, "proxy floor": 0, "nq net": 636174, "nq d1000": 0, "nq floor": 0, "index net": 893247, "index d1000": 0, "index floor": 0}
+{"k": 204, "profit_step_fast": 625.0, "squeeze_min": 15.0, "proxy net": 61884, "proxy d1000": 0, "proxy floor": 0, "nq net": 631823, "nq d1000": 0, "nq floor": 0, "index net": 874998, "index d1000": 0, "index floor": 0}
+{"k": 205, "budget_frac": 0.98, "time_stop": 40, "proxy net": 56648, "proxy d1000": 0, "proxy floor": 0}
+{"k": 206, "profit_step_fast": 700.0, "after_loss_ml_mult5": 1.05, "last_entry_end": 870, "lock_at": 0.38, "fill_min_room": 2750.0, "proxy net": -1292, "proxy d1000": 0, "proxy floor": 0}
+{"k": 207, "skip_checks": "", "profit_step_fast_from": 9000.0, "take_profit": 2.25, "proxy net": 52038, "proxy d1000": 0, "proxy floor": 0}
+{"k": 208, "squeeze_min": 15.0, "gap_go_locked_qty": 8, "proxy net": 57751, "proxy d1000": 0, "proxy floor": 0}
+{"k": 209, "big_day_k": 1.4, "profit_step_fast": 625.0, "gap_go_be": 1.5, "lookback": 16, "proxy net": 57264, "proxy d1000": 0, "proxy floor": 0}
+{"k": 210, "squeeze_min": 25.0, "last_entry_end": 870, "profit_step_fast_from": 7500.0, "proxy net": -1293, "proxy d1000": 0, "proxy floor": 0}
+{"k": 211, "gap_go_locked_qty": 8, "budget_frac": 0.98, "entry_k": 1.05, "proxy net": 56395, "proxy d1000": 0, "proxy floor": 0}
+{"k": 212, "squeeze_min": 22.0, "proxy net": 61656, "proxy d1000": 0, "proxy floor": 0, "nq net": 631499, "nq d1000": 0, "nq floor": 0, "index net": 874915, "index d1000": 0, "index floor": 0}
+{"k": 213, "fill_min_room": 2250.0, "gap_go_locked_qty": 9, "proxy net": 59701, "proxy d1000": 0, "proxy floor": 0}
+{"k": 214, "after_loss_ml_mult5": 0.95, "skip_checks": "870", "fill_qty2_room": 5000.0, "proxy net": 61627, "proxy d1000": 0, "proxy floor": 0, "nq net": 630898, "nq d1000": 0, "nq floor": 0, "index net": 875044, "index d1000": 0, "index floor": 0}
+{"k": 215, "giveback_brake": 0.45, "gap_go_k_locked": 0.55, "lock_at": 0.38, "lookback": 12, "proxy net": 54807, "proxy d1000": 0, "proxy floor": 0}
+{"k": 216, "gap_go_k_locked": 0.65, "range_pos_min": 0.72, "early_daily_loss": 700.0, "proxy net": 62486, "proxy d1000": 0, "proxy floor": 0, "nq net": 636174, "nq d1000": 0, "nq floor": 0, "index net": 893247, "index d1000": 0, "index floor": 0}
+{"k": 217, "squeeze_min": 15.0, "time_lock": 45, "proxy net": 60587, "proxy d1000": 0, "proxy floor": 0}
+{"k": 218, "gap_go_drive_k": 0.65, "fill_qty3_room": 9000.0, "gap_go_locked_qty": 8, "proxy net": 58044, "proxy d1000": 0, "proxy floor": 0}
+{"k": 219, "time_lock": 30, "squeeze_min": 18.0, "budget_frac": 0.95, "proxy net": 54881, "proxy d1000": 0, "proxy floor": 0}
+{"k": 220, "trend_n": 40, "skip_checks": "780", "fill_qty3_room": 8500.0, "late_lock_from": 840, "proxy net": 56622, "proxy d1000": 0, "proxy floor": 0}
+{"k": 221, "profit_step_fast_from": 9000.0, "lock_at": 0.33, "proxy net": 58893, "proxy d1000": 0, "proxy floor": 0}
+{"k": 222, "profit_step": 1400.0, "budget_frac": 0.98, "early_daily_loss": 800.0, "after_loss_ml_locked": 1.05, "squeeze_min": 18.0, "proxy net": 56421, "proxy d1000": 0, "proxy floor": 0}
+{"k": 223, "fill_qty2_room": 4500.0, "late_lock_from": 840, "proxy net": 63544, "proxy d1000": 0, "proxy floor": 0, "nq net": 539270, "nq d1000": 0, "nq floor": 0, "index net": 898025, "index d1000": 0, "index floor": 0}
+{"k": 224, "max_losers": 4, "gap_go_k_locked": 0.55, "after_loss_ml_locked": 1.05, "proxy net": 60702, "proxy d1000": 0, "proxy floor": 0}
+{"k": 225, "lookback": 13, "proxy net": 51669, "proxy d1000": 0, "proxy floor": 0}
+{"k": 226, "calm_k": 0.8, "fill_qty3_room": 8500.0, "profit_step": 1550.0, "gap_go_k_locked": 0.65, "proxy net": 29002, "proxy d1000": 0, "proxy floor": 0}
+{"k": 227, "squeeze_min": 25.0, "profit_step_fast_from": 7500.0, "proxy net": 61657, "proxy d1000": 0, "proxy floor": 0, "nq net": 630608, "nq d1000": 0, "nq floor": 0, "index net": 877667, "index d1000": 0, "index floor": 0}
+{"k": 228, "max_loss_per_trade": 200.0, "skip_checks": "870", "proxy net": 56835, "proxy d1000": 0, "proxy floor": 0}
+{"k": 229, "size_slip_pts": 4.0, "gap_go_k": 0.55, "proxy net": 61602, "proxy d1000": 0, "proxy floor": 0}
+{"k": 230, "fill_qty3_room": 8500.0, "budget_frac": 0.98, "lock_plus": 3.5, "calm_k": 0.65, "proxy net": 56114, "proxy d1000": 0, "proxy floor": 0}
+{"k": 231, "gap_go_k": 0.55, "lock_at": 0.38, "proxy net": 60417, "proxy d1000": 0, "proxy floor": 0}
+{"k": 232, "fill_qty3_room": 7500.0, "profit_step_fast": 625.0, "proxy net": 61839, "proxy d1000": 0, "proxy floor": 0, "nq net": 632310, "nq d1000": 0, "nq floor": 0, "index net": 875106, "index d1000": 0, "index floor": 0}
+{"k": 233, "after_loss_ml_mult5": 1.05, "fill_qty3_room": 7000.0, "profit_step_fast_from": 9000.0, "last_entry_end": 870, "max_losers": 2, "proxy net": 53385, "proxy d1000": 0, "proxy floor": 0}
+{"k": 234, "gap_go_drive_k": 0.55, "fill_qty3_room": 7000.0, "budget_frac": 0.95, "range_pos_min": 0.75, "trend_n": 75, "proxy net": 57567, "proxy d1000": 0, "proxy floor": 0}
+{"k": 235, "lock_at": 0.33, "late_lock_from": 900, "squeeze_min": 15.0, "giveback_brake": 0.55, "take_profit": 1.75, "proxy net": 55906, "proxy d1000": 0, "proxy floor": 0}
+{"k": 236, "take_profit": 2.1, "size_slip_pts": 4.5, "proxy net": 63019, "proxy d1000": 0, "proxy floor": 0, "nq net": 615492, "nq d1000": 0, "nq floor": 0, "index net": 837546, "index d1000": 0, "index floor": 0}
+{"k": 237, "skip_checks": "870", "proxy net": 59959, "proxy d1000": 0, "proxy floor": 0}
+{"k": 238, "time_lock": 45, "take_profit": 2.1, "gap_go_k": 0.65, "skip_checks": "870", "last_entry_end": 870, "proxy net": -1293, "proxy d1000": 0, "proxy floor": 0}
+{"k": 239, "time_stop": 35, "proxy net": 61563, "proxy d1000": 0, "proxy floor": 0}
+{"k": 240, "early_daily_loss": 800.0, "lock_at": 0.3, "size_slip_pts": 4.5, "proxy net": 57404, "proxy d1000": 0, "proxy floor": 0}
+{"k": 241, "time_lock": 30, "late_lock_from": 840, "max_losers": 2, "proxy net": 57421, "proxy d1000": 0, "proxy floor": 0}
+{"k": 242, "late_lock_from": 900, "fill_min_room": 2750.0, "proxy net": 60714, "proxy d1000": 0, "proxy floor": 0}
+{"k": 243, "time_lock": 30, "big_day_k": 1.6, "profit_step": 1450.0, "proxy net": 53825, "proxy d1000": 0, "proxy floor": 0}
+{"k": 244, "fill_qty2_room": 4500.0, "lock_plus": 3.5, "late_lock_from": 870, "lookback": 13, "fill_qty3_room": 8500.0, "proxy net": 51034, "proxy d1000": 0, "proxy floor": 0}
+{"k": 245, "trend_n": 45, "gap_go_k_locked": 0.55, "gap_go_be": 1.5, "proxy net": 61602, "proxy d1000": 0, "proxy floor": 0}
+{"k": 246, "max_loss_per_trade": 200.0, "entry_k": 1.1, "gap_go_k_locked": 0.55, "max_losers": 2, "proxy net": 49565, "proxy d1000": 0, "proxy floor": 0}
+{"k": 247, "take_profit": 1.9, "big_day_k": 1.3, "proxy net": 56510, "proxy d1000": 0, "proxy floor": 0}
+{"k": 248, "early_daily_loss": 700.0, "max_losers": 4, "lock_plus": 3.5, "proxy net": 60990, "proxy d1000": 0, "proxy floor": 0}
+{"k": 249, "skip_checks": "780", "calm_k": 0.8, "take_profit": 2.25, "proxy net": 29150, "proxy d1000": 0, "proxy floor": 0}
+{"k": 250, "budget_frac": 0.98, "profit_step_fast": 600.0, "early_daily_loss": 650.0, "proxy net": 58308, "proxy d1000": 0, "proxy floor": 0}
+{"k": 251, "max_loss_per_trade": 175.0, "early_daily_loss": 650.0, "proxy net": 51974, "proxy d1000": 0, "proxy floor": 0}
+{"k": 252, "time_lock": 30, "lock_at": 0.4, "proxy net": 58014, "proxy d1000": 0, "proxy floor": 0}
+{"k": 253, "gap_go_locked_qty": 9, "max_loss_per_trade": 180.0, "proxy net": 54487, "proxy d1000": 0, "proxy floor": 0}
+{"k": 254, "gap_go_k_locked": 0.55, "time_stop": 50, "squeeze_min": 25.0, "size_slip_pts": 4.5, "lookback": 16, "proxy net": 59954, "proxy d1000": 0, "proxy floor": 0}
+{"k": 255, "last_entry_end": 930, "early_daily_loss": 700.0, "take_profit": 2.25, "proxy net": 50970, "proxy d1000": 0, "proxy floor": 0}
+{"k": 256, "take_profit": 1.9, "gap_go_k": 0.55, "max_loss_per_trade": 200.0, "proxy net": 55636, "proxy d1000": 0, "proxy floor": 0}
+{"k": 257, "size_slip_pts": 6.0, "late_lock_from": 900, "proxy net": 57866, "proxy d1000": 0, "proxy floor": 0}
+{"k": 258, "profit_step": 1600.0, "entry_k": 1.05, "proxy net": 65039, "proxy d1000": 0, "proxy floor": 0, "nq net": 591677, "nq d1000": 0, "nq floor": 0, "index net": 848927, "index d1000": 0, "index floor": 0}
+{"k": 259, "max_losers": 4, "big_day_k": 1.7, "time_stop": 55, "take_profit": 1.9, "proxy net": 51698, "proxy d1000": 0, "proxy floor": 0}
+{"k": 260, "fill_qty2_room": 4500.0, "time_stop": 50, "gap_go_locked_qty": 9, "gap_go_be": 0.75, "late_lock_from": 900, "proxy net": 57405, "proxy d1000": 0, "proxy floor": 0}
+{"k": 261, "fill_qty3_room": 7500.0, "max_losers": 4, "proxy net": 61606, "proxy d1000": 0, "proxy floor": 0}
+{"k": 262, "last_entry_end": 930, "giveback_brake": 0.45, "time_stop": 35, "profit_step_fast_from": 7000.0, "proxy net": 56448, "proxy d1000": 0, "proxy floor": 0}
+{"k": 263, "max_losers": 4, "take_profit": 1.9, "gap_go_k_locked": 0.55, "lock_plus": 1.0, "giveback_brake": 0.55, "proxy net": 59762, "proxy d1000": 0, "proxy floor": 0}
+{"k": 264, "late_lock_from": 900, "trend_n": 55, "giveback_brake": 0.45, "profit_step_fast_from": 7000.0, "time_lock": 60, "proxy net": 61306, "proxy d1000": 0, "proxy floor": 0}
+{"k": 265, "budget_frac": 0.95, "lock_plus": 1.0, "profit_step": 1400.0, "proxy net": 55405, "proxy d1000": 0, "proxy floor": 0}
+{"k": 266, "trend_n": 75, "size_slip_pts": 5.5, "late_lock_from": 870, "proxy net": 62149, "proxy d1000": 0, "proxy floor": 0, "nq net": 611654, "nq d1000": 0, "nq floor": 0, "index net": 859814, "index d1000": 0, "index floor": 0}
+{"k": 267, "time_stop": 40, "time_lock": 45, "lock_at": 0.38, "proxy net": 60123, "proxy d1000": 0, "proxy floor": 0}
+{"k": 268, "fill_min_room": 2250.0, "lookback": 12, "max_losers": 4, "proxy net": 54803, "proxy d1000": 0, "proxy floor": 0}
+{"k": 269, "size_slip_pts": 4.5, "lock_at": 0.3, "fill_qty2_room": 4500.0, "proxy net": 57359, "proxy d1000": 0, "proxy floor": 0}
+{"k": 270, "last_entry_end": 930, "profit_step": 1450.0, "gap_go_locked_qty": 9, "fill_min_room": 2750.0, "gap_go_k": 0.55, "proxy net": 56304, "proxy d1000": 0, "proxy floor": 0}
+{"k": 271, "lock_at": 0.33, "gap_go_k": 0.7, "proxy net": 60026, "proxy d1000": 0, "proxy floor": 0}
+{"k": 272, "fill_min_room": 2750.0, "time_lock": 45, "proxy net": 60627, "proxy d1000": 0, "proxy floor": 0}
+{"k": 273, "range_pos_min": 0.75, "size_slip_pts": 4.5, "after_loss_ml_mult5": 1.05, "proxy net": 60551, "proxy d1000": 0, "proxy floor": 0}
+{"k": 274, "after_loss_ml_locked": 0.95, "early_daily_loss": 800.0, "proxy net": 61231, "proxy d1000": 0, "proxy floor": 0}
+{"k": 275, "calm_k": 0.6, "proxy net": 58427, "proxy d1000": 0, "proxy floor": 0}
+{"k": 276, "skip_checks": "", "profit_step_fast_from": 7500.0, "proxy net": 59860, "proxy d1000": 0, "proxy floor": 0}
+{"k": 277, "profit_step_fast": 600.0, "proxy net": 62449, "proxy d1000": 0, "proxy floor": 0, "nq net": 632351, "nq d1000": 0, "nq floor": 0, "index net": 874981, "index d1000": 0, "index floor": 0}
+{"k": 278, "profit_step_fast": 675.0, "gap_go_be": 1.5, "proxy net": 61009, "proxy d1000": 0, "proxy floor": 0}
+{"k": 279, "profit_step": 1550.0, "entry_k": 0.95, "after_loss_ml_mult5": 0.95, "gap_go_k": 0.7, "budget_frac": 0.95, "proxy net": 58319, "proxy d1000": 0, "proxy floor": 0}
+{"k": 280, "last_entry_end": 930, "squeeze_min": 18.0, "take_profit": 2.25, "early_daily_loss": 700.0, "calm_k": 0.8, "proxy net": 27274, "proxy d1000": 0, "proxy floor": 0}
+{"k": 281, "range_pos_min": 0.68, "gap_go_locked_qty": 8, "proxy net": 56868, "proxy d1000": 0, "proxy floor": 0}
+{"k": 282, "lock_at": 0.3, "fill_qty3_room": 9000.0, "max_losers": 2, "gap_go_k": 0.7, "proxy net": 55179, "proxy d1000": 0, "proxy floor": 0}
+{"k": 283, "profit_step_fast_from": 9000.0, "max_loss_per_trade": 200.0, "proxy net": 56846, "proxy d1000": 0, "proxy floor": 0}
+{"k": 284, "big_day_k": 1.6, "lookback": 12, "gap_go_be": 1.5, "proxy net": 50998, "proxy d1000": 0, "proxy floor": 0}
+{"k": 285, "max_loss_per_trade": 175.0, "last_entry_end": 930, "gap_go_k": 0.55, "fill_qty3_room": 7000.0, "gap_go_be": 1.5, "proxy net": 49534, "proxy d1000": 0, "proxy floor": 0}
+{"k": 286, "early_daily_loss": 700.0, "proxy net": 61612, "proxy d1000": 0, "proxy floor": 0}
+{"k": 287, "squeeze_min": 15.0, "profit_step_fast_from": 8500.0, "max_losers": 4, "last_entry_end": 930, "range_pos_min": 0.68, "proxy net": 57523, "proxy d1000": 0, "proxy floor": 0}
+{"k": 288, "giveback_brake": 0.45, "fill_qty3_room": 7000.0, "gap_go_k": 0.55, "early_daily_loss": 800.0, "proxy net": 61541, "proxy d1000": 0, "proxy floor": 0}
+{"k": 289, "early_daily_loss": 800.0, "calm_k": 0.8, "max_loss_per_trade": 180.0, "proxy net": 28799, "proxy d1000": 0, "proxy floor": 0}
+{"k": 290, "gap_go_locked_qty": 9, "entry_k": 1.1, "trend_n": 40, "fill_qty2_room": 5000.0, "lock_at": 0.3, "proxy net": 49170, "proxy d1000": 0, "proxy floor": 0}
+{"k": 291, "calm_k": 0.65, "max_losers": 4, "proxy net": 59546, "proxy d1000": 0, "proxy floor": 0}
+{"k": 292, "after_loss_ml_locked": 0.95, "lock_plus": 5.0, "gap_go_k_locked": 0.65, "early_daily_loss": 700.0, "proxy net": 56590, "proxy d1000": 0, "proxy floor": 0}
+{"k": 293, "gap_go_locked_qty": 9, "trend_n": 45, "lock_at": 0.3, "budget_frac": 0.98, "proxy net": 51883, "proxy d1000": 0, "proxy floor": 0}
+{"k": 294, "size_slip_pts": 4.0, "big_day_k": 1.6, "proxy net": 55358, "proxy d1000": 0, "proxy floor": 0}
+{"k": 295, "budget_frac": 0.95, "lock_plus": 1.0, "after_loss_ml_mult5": 0.95, "proxy net": 57524, "proxy d1000": 0, "proxy floor": 0}
+{"k": 296, "squeeze_min": 18.0, "big_day_k": 1.3, "proxy net": 57881, "proxy d1000": 0, "proxy floor": 0}
+{"k": 297, "entry_k": 1.05, "proxy net": 64451, "proxy d1000": 0, "proxy floor": 0, "nq net": 607350, "nq d1000": 0, "nq floor": 0, "index net": 842532, "index d1000": 0, "index floor": 0}
+{"k": 298, "fill_qty3_room": 9000.0, "gap_go_drive_k": 0.55, "max_losers": 2, "lock_plus": 2.0, "proxy net": 56311, "proxy d1000": 0, "proxy floor": 0}
+{"k": 299, "fill_qty2_room": 5000.0, "profit_step_fast": 625.0, "lookback": 13, "proxy net": 51577, "proxy d1000": 0, "proxy floor": 0}
+{"k": 300, "gap_go_locked_qty": 9, "early_daily_loss": 650.0, "proxy net": 59701, "proxy d1000": 0, "proxy floor": 0}
+{"k": 301, "lookback": 16, "proxy net": 59270, "proxy d1000": 0, "proxy floor": 0}
+{"k": 302, "gap_go_k": 0.65, "trend_n": 60, "big_day_k": 1.6, "entry_k": 1.1, "late_lock_from": 870, "proxy net": 49000, "proxy d1000": 0, "proxy floor": 0}
+{"k": 303, "max_loss_per_trade": 175.0, "after_loss_ml_locked": 0.95, "proxy net": 56253, "proxy d1000": 0, "proxy floor": 0}
+{"k": 304, "lock_plus": 5.0, "early_daily_loss": 800.0, "gap_go_locked_qty": 8, "big_day_k": 1.3, "proxy net": 51884, "proxy d1000": 0, "proxy floor": 0}
+{"k": 305, "lock_plus": 5.0, "proxy net": 59050, "proxy d1000": 0, "proxy floor": 0}
+{"k": 306, "skip_checks": "870", "after_loss_ml_locked": 0.95, "big_day_k": 1.6, "proxy net": 53809, "proxy d1000": 0, "proxy floor": 0}
+{"k": 307, "after_loss_ml_mult5": 1.05, "proxy net": 61603, "proxy d1000": 0, "proxy floor": 0}
+{"k": 308, "entry_k": 0.95, "fill_min_room": 2250.0, "time_lock": 30, "proxy net": 60497, "proxy d1000": 0, "proxy floor": 0}
+{"k": 309, "budget_frac": 0.98, "lookback": 13, "after_loss_ml_mult5": 1.05, "proxy net": 47577, "proxy d1000": 0, "proxy floor": 0}
+{"k": 310, "lookback": 12, "lock_plus": 2.0, "late_lock_from": 840, "proxy net": 56086, "proxy d1000": 0, "proxy floor": 0}
+{"k": 311, "max_loss_per_trade": 195.0, "proxy net": 59267, "proxy d1000": 0, "proxy floor": 0}
+{"k": 312, "lookback": 12, "max_losers": 2, "proxy net": 52345, "proxy d1000": 0, "proxy floor": 0}
+{"k": 313, "take_profit": 2.25, "squeeze_min": 15.0, "late_lock_from": 870, "proxy net": 53091, "proxy d1000": 0, "proxy floor": 0}
+{"k": 314, "early_daily_loss": 650.0, "size_slip_pts": 6.0, "max_losers": 4, "gap_go_k": 0.7, "proxy net": 60522, "proxy d1000": 0, "proxy floor": 0}
+{"k": 315, "take_profit": 1.9, "lock_plus": 5.0, "proxy net": 58035, "proxy d1000": 0, "proxy floor": 0}
+{"k": 316, "take_profit": 1.75, "gap_go_k": 0.55, "fill_min_room": 2250.0, "proxy net": 56808, "proxy d1000": 0, "proxy floor": 0}
+{"k": 317, "giveback_brake": 0.45, "size_slip_pts": 5.5, "take_profit": 1.9, "lock_at": 0.4, "proxy net": 57588, "proxy d1000": 0, "proxy floor": 0}
+{"k": 318, "max_losers": 4, "proxy net": 61591, "proxy d1000": 0, "proxy floor": 0}
+{"k": 319, "lookback": 12, "proxy net": 55446, "proxy d1000": 0, "proxy floor": 0}
+{"k": 320, "lock_plus": 3.5, "lookback": 13, "time_lock": 60, "trend_n": 45, "proxy net": 51131, "proxy d1000": 0, "proxy floor": 0}
+{"k": 321, "size_slip_pts": 5.5, "lock_plus": 1.0, "last_entry_end": 930, "max_loss_per_trade": 175.0, "proxy net": 51770, "proxy d1000": 0, "proxy floor": 0}
+{"k": 322, "fill_qty2_room": 5000.0, "proxy net": 61612, "proxy d1000": 0, "proxy floor": 0}
+{"k": 323, "gap_go_be": 1.0, "skip_checks": "870", "gap_go_drive_k": 0.5, "proxy net": 58756, "proxy d1000": 0, "proxy floor": 0}
+{"k": 324, "gap_go_k_locked": 0.65, "fill_min_room": 2750.0, "trend_n": 40, "proxy net": 56511, "proxy d1000": 0, "proxy floor": 0}
+{"k": 325, "skip_checks": "", "early_daily_loss": 700.0, "fill_qty2_room": 5000.0, "proxy net": 60025, "proxy d1000": 0, "proxy floor": 0}
+{"k": 326, "after_loss_ml_mult5": 1.05, "fill_qty2_room": 5000.0, "take_profit": 2.1, "early_daily_loss": 650.0, "fill_min_room": 2250.0, "proxy net": 63887, "proxy d1000": 0, "proxy floor": 0, "nq net": 613094, "nq d1000": 0, "nq floor": 0, "index net": 839982, "index d1000": 0, "index floor": 0}
+{"k": 327, "skip_checks": "870", "lookback": 16, "fill_min_room": 2750.0, "proxy net": 59757, "proxy d1000": 0, "proxy floor": 0}
+{"k": 328, "giveback_brake": 0.45, "time_stop": 50, "time_lock": 30, "proxy net": 57424, "proxy d1000": 0, "proxy floor": 0}
+{"k": 329, "gap_go_locked_qty": 9, "profit_step_fast_from": 9000.0, "proxy net": 59701, "proxy d1000": 0, "proxy floor": 0}
+{"k": 330, "profit_step_fast_from": 9000.0, "gap_go_k": 0.7, "budget_frac": 0.95, "big_day_k": 1.6, "proxy net": 50639, "proxy d1000": 0, "proxy floor": 0}
+{"k": 331, "gap_go_be": 1.0, "time_stop": 35, "proxy net": 61420, "proxy d1000": 0, "proxy floor": 0}
+{"k": 332, "profit_step_fast": 625.0, "entry_k": 0.95, "last_entry_end": 870, "early_daily_loss": 800.0, "squeeze_min": 22.0, "proxy net": -1293, "proxy d1000": 0, "proxy floor": 0}
+{"k": 333, "after_loss_ml_locked": 1.05, "lock_at": 0.3, "giveback_brake": 0.45, "proxy net": 58156, "proxy d1000": 0, "proxy floor": 0}
+{"k": 334, "entry_k": 1.05, "gap_go_locked_qty": 9, "max_loss_per_trade": 175.0, "last_entry_end": 870, "big_day_k": 1.3, "proxy net": -1463, "proxy d1000": 0, "proxy floor": 0}
+{"k": 335, "profit_step_fast": 675.0, "after_loss_ml_locked": 0.95, "skip_checks": "780", "proxy net": 59973, "proxy d1000": 0, "proxy floor": 0}
+{"k": 336, "time_lock": 60, "gap_go_drive_k": 0.5, "early_daily_loss": 800.0, "profit_step_fast_from": 7500.0, "squeeze_min": 18.0, "proxy net": 60033, "proxy d1000": 0, "proxy floor": 0}
+{"k": 337, "calm_k": 0.6, "budget_frac": 0.95, "lookback": 16, "proxy net": 54075, "proxy d1000": 0, "proxy floor": 0}
+{"k": 338, "fill_qty2_room": 3500.0, "max_loss_per_trade": 200.0, "proxy net": 54974, "proxy d1000": 0, "proxy floor": 0}
+{"k": 339, "after_loss_ml_mult5": 0.95, "take_profit": 1.9, "trend_n": 45, "proxy net": 59945, "proxy d1000": 0, "proxy floor": 0}
+{"k": 340, "gap_go_k_locked": 0.65, "fill_min_room": 2250.0, "late_lock_from": 900, "proxy net": 60594, "proxy d1000": 0, "proxy floor": 0}
+{"k": 341, "profit_step_fast": 600.0, "fill_qty3_room": 9000.0, "late_lock_from": 900, "trend_n": 75, "fill_min_room": 2250.0, "proxy net": 65077, "proxy d1000": 0, "proxy floor": 0, "nq net": 598172, "nq d1000": 0, "nq floor": 0, "index net": 851984, "index d1000": 0, "index floor": 0}
+{"k": 342, "squeeze_min": 25.0, "late_lock_from": 900, "last_entry_end": 870, "proxy net": -1293, "proxy d1000": 0, "proxy floor": 0}
+{"k": 343, "gap_go_k_locked": 0.65, "budget_frac": 0.98, "proxy net": 57403, "proxy d1000": 0, "proxy floor": 0}
+{"k": 344, "size_slip_pts": 6.0, "giveback_brake": 0.45, "lock_at": 0.33, "last_entry_end": 870, "after_loss_ml_locked": 1.05, "proxy net": 53746, "proxy d1000": 0, "proxy floor": 0}
+{"k": 345, "gap_go_k_locked": 0.55, "proxy net": 61602, "proxy d1000": 0, "proxy floor": 0}
+{"k": 346, "gap_go_drive_k": 0.65, "proxy net": 61764, "proxy d1000": 0, "proxy floor": 0, "nq net": 631530, "nq d1000": 0, "nq floor": 0, "index net": 874846, "index d1000": 0, "index floor": 0}
+{"k": 347, "gap_go_locked_qty": 9, "gap_go_be": 0.75, "proxy net": 59126, "proxy d1000": 0, "proxy floor": 0}
+{"k": 348, "skip_checks": "", "gap_go_k": 0.7, "trend_n": 40, "profit_step_fast_from": 7500.0, "late_lock_from": 870, "proxy net": 55637, "proxy d1000": 0, "proxy floor": 0}
+{"k": 349, "max_loss_per_trade": 195.0, "size_slip_pts": 4.5, "gap_go_locked_qty": 9, "proxy net": 57381, "proxy d1000": 0, "proxy floor": 0}
+{"k": 350, "big_day_k": 1.6, "lock_at": 0.3, "late_lock_from": 870, "last_entry_end": 870, "proxy net": 48539, "proxy d1000": 0, "proxy floor": 0}
+{"k": 351, "fill_qty2_room": 5000.0, "lookback": 13, "proxy net": 51669, "proxy d1000": 0, "proxy floor": 0}
+{"k": 352, "gap_go_be": 0.75, "gap_go_k": 0.65, "proxy net": 61154, "proxy d1000": 0, "proxy floor": 0}
+{"k": 353, "gap_go_k": 0.55, "skip_checks": "", "budget_frac": 0.95, "proxy net": 54611, "proxy d1000": 0, "proxy floor": 0}
+{"k": 354, "gap_go_k": 0.55, "profit_step_fast": 675.0, "big_day_k": 1.3, "gap_go_locked_qty": 9, "proxy net": 55384, "proxy d1000": 0, "proxy floor": 0}
+{"k": 355, "gap_go_drive_k": 0.5, "proxy net": 60445, "proxy d1000": 0, "proxy floor": 0}
+{"k": 356, "profit_step": 1450.0, "gap_go_be": 1.0, "proxy net": 61539, "proxy d1000": 0, "proxy floor": 0}
+{"k": 357, "last_entry_end": 870, "profit_step": 1600.0, "gap_go_k": 0.7, "proxy net": -1290, "proxy d1000": 0, "proxy floor": 0}
+{"k": 358, "fill_qty2_room": 3500.0, "giveback_brake": 0.45, "budget_frac": 0.98, "proxy net": 56441, "proxy d1000": 0, "proxy floor": 0}
+{"k": 359, "time_lock": 60, "time_stop": 50, "late_lock_from": 840, "max_loss_per_trade": 180.0, "early_daily_loss": 650.0, "proxy net": 57130, "proxy d1000": 0, "proxy floor": 0}
+{"k": 360, "calm_k": 0.8, "squeeze_min": 22.0, "big_day_k": 1.3, "proxy net": 27013, "proxy d1000": 0, "proxy floor": 0}
+{"k": 361, "last_entry_end": 870, "gap_go_drive_k": 0.55, "skip_checks": "", "proxy net": 57987, "proxy d1000": 0, "proxy floor": 0}
+{"k": 362, "gap_go_k_locked": 0.65, "lookback": 15, "proxy net": 64111, "proxy d1000": 0, "proxy floor": 0, "nq net": 612209, "nq d1000": 0, "nq floor": 0, "index net": 837498, "index d1000": 0, "index floor": 0}
+{"k": 363, "after_loss_ml_locked": 0.95, "entry_k": 1.05, "gap_go_k": 0.7, "proxy net": 65645, "proxy d1000": 0, "proxy floor": 0, "nq net": 465394, "nq d1000": 0, "nq floor": 0, "index net": 847296, "index d1000": 0, "index floor": 0}
+{"k": 364, "max_loss_per_trade": 180.0, "proxy net": 55884, "proxy d1000": 0, "proxy floor": 0}
+{"k": 365, "max_losers": 2, "giveback_brake": 0.45, "proxy net": 56702, "proxy d1000": 0, "proxy floor": 0}
+{"k": 366, "lock_at": 0.33, "budget_frac": 0.98, "max_losers": 2, "after_loss_ml_mult5": 0.95, "late_lock_from": 840, "proxy net": 51563, "proxy d1000": 0, "proxy floor": 0}
+{"k": 367, "profit_step": 1550.0, "lock_at": 0.38, "lookback": 13, "proxy net": 50673, "proxy d1000": 0, "proxy floor": 0}
+{"k": 368, "entry_k": 1.1, "big_day_k": 1.6, "lock_plus": 3.5, "profit_step_fast": 675.0, "proxy net": 50351, "proxy d1000": 0, "proxy floor": 0}
+{"k": 369, "gap_go_k_locked": 0.65, "entry_k": 1.1, "gap_go_be": 0.75, "proxy net": 58081, "proxy d1000": 0, "proxy floor": 0}
+{"k": 370, "entry_k": 1.05, "skip_checks": "750,780,870", "proxy net": 64439, "proxy d1000": 0, "proxy floor": 0, "nq net": 607359, "nq d1000": 0, "nq floor": 0, "index net": 842604, "index d1000": 0, "index floor": 0}
+{"k": 371, "profit_step_fast_from": 7500.0, "proxy net": 61613, "proxy d1000": 0, "proxy floor": 0, "nq net": 631049, "nq d1000": 0, "nq floor": 0, "index net": 877582, "index d1000": 0, "index floor": 0}
+{"k": 372, "fill_min_room": 2250.0, "budget_frac": 0.95, "time_stop": 50, "lock_at": 0.38, "late_lock_from": 870, "proxy net": 53713, "proxy d1000": 0, "proxy floor": 0}
+{"k": 373, "lock_plus": 5.0, "late_lock_from": 840, "budget_frac": 0.95, "proxy net": 56100, "proxy d1000": 0, "proxy floor": 0}
+{"k": 374, "fill_qty3_room": 7500.0, "trend_n": 55, "gap_go_k_locked": 0.65, "early_daily_loss": 650.0, "proxy net": 61502, "proxy d1000": 0, "proxy floor": 0}
+{"k": 375, "size_slip_pts": 5.5, "gap_go_locked_qty": 9, "profit_step_fast_from": 7500.0, "gap_go_k": 0.55, "proxy net": 58054, "proxy d1000": 0, "proxy floor": 0}
+{"k": 376, "range_pos_min": 0.75, "time_lock": 60, "squeeze_min": 18.0, "size_slip_pts": 4.5, "giveback_brake": 0.55, "proxy net": 59980, "proxy d1000": 0, "proxy floor": 0}
+{"k": 377, "last_entry_end": 930, "trend_n": 40, "proxy net": 53782, "proxy d1000": 0, "proxy floor": 0}
+{"k": 378, "gap_go_drive_k": 0.5, "range_pos_min": 0.75, "lock_at": 0.3, "gap_go_be": 1.0, "proxy net": 57971, "proxy d1000": 0, "proxy floor": 0}
+{"k": 379, "max_losers": 4, "max_loss_per_trade": 195.0, "proxy net": 59248, "proxy d1000": 0, "proxy floor": 0}
+{"k": 380, "lock_at": 0.3, "budget_frac": 0.98, "gap_go_k": 0.55, "skip_checks": "870", "proxy net": 54371, "proxy d1000": 0, "proxy floor": 0}
+{"k": 381, "fill_min_room": 2250.0, "proxy net": 61612, "proxy d1000": 0, "proxy floor": 0}
+{"k": 382, "lock_at": 0.4, "proxy net": 60457, "proxy d1000": 0, "proxy floor": 0}
+{"k": 383, "time_lock": 60, "profit_step_fast_from": 8500.0, "proxy net": 61705, "proxy d1000": 0, "proxy floor": 0, "nq net": 632413, "nq d1000": 0, "nq floor": 0, "index net": 876290, "index d1000": 0, "index floor": 0}
+{"k": 384, "late_lock_from": 900, "proxy net": 60714, "proxy d1000": 0, "proxy floor": 0}
+{"k": 385, "fill_min_room": 2250.0, "take_profit": 2.25, "proxy net": 52968, "proxy d1000": 0, "proxy floor": 0}
+{"k": 386, "early_daily_loss": 650.0, "time_lock": 30, "max_loss_per_trade": 175.0, "max_losers": 2, "late_lock_from": 840, "proxy net": 52128, "proxy d1000": 0, "proxy floor": 0}
+{"k": 387, "profit_step_fast": 700.0, "fill_qty2_room": 3500.0, "proxy net": 59722, "proxy d1000": 0, "proxy floor": 0}
+{"k": 388, "time_stop": 55, "entry_k": 1.05, "max_losers": 4, "after_loss_ml_locked": 0.95, "proxy net": 64297, "proxy d1000": 0, "proxy floor": 0, "nq net": 466009, "nq d1000": 0, "nq floor": 0, "index net": 839379, "index d1000": 0, "index floor": 0}
+{"k": 389, "after_loss_ml_mult5": 0.95, "skip_checks": "", "proxy net": 59938, "proxy d1000": 0, "proxy floor": 0}

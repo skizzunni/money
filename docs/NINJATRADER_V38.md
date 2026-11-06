@@ -6297,3 +6297,5 @@ $630,505 / $893,328). Funded growth stays U48. Logs `verification/noise_v2/g262_
 ## G263: G262 again with SEED=263 (registered 2026-11-06, before its run)
 
 G262's search, stages and adoption rule against U48, with `SEED=263` (10,000 new combinations). Run once.
+
+**G263 progress (2026-11-06 13:45 UTC):** partial logs `verification/noise_v2/g263_*_partial.*`.
