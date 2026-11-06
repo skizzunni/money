@@ -6208,3 +6208,5 @@ profit 0.6-0.9, lock 0.15-0.25 / +1.5-3.5 points, 2-4 losers, time stop 20-45, s
 and fails at most 9.1%. Run once.
 
 **G257 progress (2026-11-06 06:45 UTC):** stage 1 running (results saved row by row).
+
+**G257 progress (2026-11-06 07:45 UTC):** stage 1 past halfway; stage 2 decides.
