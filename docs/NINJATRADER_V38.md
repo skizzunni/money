@@ -6146,7 +6146,7 @@ the day is up $1,200, the noise area over 16 sessions with entries at 0.8x it, t
 no skipped checks, and a $2,000 day budget (the floor's room binds first). In two weeks about 81% of Tests are still
 open (neither passed nor failed). Logs `verification/noise_v2/g253_*`.
 
-**U49 (2026-11-06): Mode "Test sprint" (k61), the default.** New settings `NoiseSessions` (14), `EntryWidth` (1.0),
+**U49 (2026-11-06): Mode "Test sprint" (k61), the default.** Full suite: **678 passed**. New settings `NoiseSessions` (14), `EntryWidth` (1.0),
 `DayProfitStop` (0) in `MnqNoiseV38.cs` (the engine's `EntryK`, `DayStopProfit`, `Lookback`), a 10-session sprint in
 this mode. "Funded growth" is U48 unchanged. NinjaTrader tests: **49 passed** (a new parity test, `test_v38_test_sprint`:
 the mode trade for trade against the model, with its 4-MNQ sprint trades).
