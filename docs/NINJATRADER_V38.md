@@ -6356,3 +6356,7 @@ but passes less in the same proportion; none passes more than 10.0%. k317 stays.
 k317 without the 09:35 gap trade (`gap_go` off), with longs only (`short_mult` 0), or both.
 `research/g268_sides.py`, G253's measure on its development and unseen weeks. **Replaces k317** if on the unseen weeks
 it passes more than 10.0% and fails at most 9.1%. Run once.
+
+**G268 result (2026-11-06): rejected.** Unseen weeks (passed / failed): k317 10.0% / 9.1%; no gap trade 8.7% / 7.3%;
+longs only 4.1% / 5.9%; both 1.3% / 3.5% (`verification/noise_v2/g268_sides.txt`). The shorts and the gap trade carry a
+large share of the passes. k317 stays.

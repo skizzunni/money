@@ -1,0 +1,14 @@
+development (index 2011-18):
+                          weeks  passed  failed
+tag                                            
+k317                        405   0.116   0.064
+longs only                  405   0.030   0.042
+longs only, no gap trade    405   0.007   0.032
+no gap trade                405   0.089   0.057
+unseen (NQ 2015-25 + index 2019-26):
+                          weeks  passed  failed
+tag                                            
+k317                        933   0.100   0.091
+longs only                  933   0.041   0.059
+longs only, no gap trade    933   0.013   0.035
+no gap trade                933   0.087   0.073
