@@ -6225,3 +6225,10 @@ k317** only if one passes more than 10.0% and fails at most 9.1% there. Run once
 k192 9.2% / 12.6%, k183 7.8% / 13.0% (`verification/noise_v2/g258_*`). Across G253-G258 (1,300 combinations, the best
 of each confirmed on 933 unseen two-week starts), nothing beats k317's 10.0% passed with at most 9.1% failed; passes
 above about 11% come only with failures of 13-19%.
+
+## G259: the Test sprint with entry checks every 15 or 10 minutes (registered 2026-11-06, before its run)
+
+k317 as it is, with the entry checks every 15 or 10 minutes (`check_step`) instead of every 30 (more chances in ten
+sessions). `research/g259_checks.py`, G253's measure on its development and unseen weeks. **Replaces k317** (and is
+built into the NinjaTrader file, which has the 30-minute grid only today) if on the unseen weeks it passes more than
+10.0% and fails at most 9.1%. Run once.
