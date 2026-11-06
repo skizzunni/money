@@ -39,12 +39,13 @@ def with_1600(bars: pd.DataFrame, m: int) -> pd.DataFrame:
 
 
 def one(job):
-    name, start, sq, ds = job
+    name, start, sq, ds, *more = job
+    extra = more[0] if more else {}  # G253: a variant's settings
     bars, _, skip = S.D[name]
     s0 = pd.Timestamp(start, tz=NY)
     b = bars[(bars.index >= s0 - pd.Timedelta(days=150)) & (bars.index < s0 + pd.Timedelta(days=7 + 7 * ((SESS + 4) // 5)))]
     cfg = NoiseConfig(**{**S.V23, **T.REFERENCE, "daily_loss_limit": 900.0, "trail_dd": DD, "time_stop": 60,
-                         **BASE, "daily_loss_limit": 2000.0, "early_daily_loss": 0.0})
+                         **BASE, "daily_loss_limit": 2000.0, "early_daily_loss": 0.0, **extra})
     if sq:
         cfg.sprint_qty, cfg.sprint_days, cfg.sprint_target = sq, SESS, TARGET
     cfg.day_stop_profit = ds  # G251: no new entries once the day is up this much (0 = off)

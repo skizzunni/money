@@ -6126,3 +6126,12 @@ mode was taken out of the file again (revert of 525c230). The bot trades on any 
 
 The best is 5 MNQ with the day stop: about 1 pass in 20-25 two-week tries, against about 1 failed Test in 7. Bigger
 sizes fail far more often and pass no more often.
+
+## G253: a search for passing the Test within two weeks (registered 2026-11-06, before its run)
+
+The user asked for searches aimed at their target. `research/g253_test_search.py`, G251's measure (10 sessions, TPT's
+Test rules): **stage 1**, 200 random combinations of the sprint size (3-8 MNQ), the day stop ($800-1,400) and 11
+entry/exit settings, on the index's Monday starts 2011-2018 (development); **stage 2**, the 10 with the most passes
+(failures at most 15%) on NQ 2015-25 and the index 2019-26 (unseen). **A setting is offered to the user** if on stage 2
+it passes more than G251's best (4.9% NQ / 3.9% index; overall about 4.5%) with failures at most 15%, stated with its
+odds. Run once. (G244's stage 2 is paused to give it the processors; it resumes from its saved rows.)
