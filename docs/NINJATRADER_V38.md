@@ -6339,3 +6339,10 @@ setting in the NinjaTrader file and a parity test) if on the unseen weeks it pas
 **G266 result (2026-11-06): rejected.** Unseen weeks (passed / failed): k317 10.0% / 9.1%; no Mondays 8.4% / 6.9%; no
 Fridays 6.6% / 7.9%; neither 4.4% / 5.1% (development: 11.6% / 6.4%, 5.9% / 6.4%, 6.2% / 5.9%, 2.7% / 3.5%;
 `verification/noise_v2/g266_weekdays.txt`). Fewer trading days cut the passes more than the failures. k317 stays.
+
+## G267: the Test sprint with a day loss budget (registered 2026-11-06, before its run)
+
+k317 sizes each trade to $2,000 of room (the floor binds first); here the day's loss budget is $600, $800 or $1,000
+instead (`daily_loss_limit`: trades sized to what is left of it, no new trade once used). `research/g267_day_budget.py`,
+G253's measure on its development and unseen weeks. **Replaces k317** if on the unseen weeks it passes more than 10.0%
+and fails at most 9.1%. Run once.
