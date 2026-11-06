@@ -6174,3 +6174,5 @@ only if on stage 2 (unseen weeks) it passes more than 9.3% and fails at most 9.5
 
 **G255 progress (2026-11-06 03:45 UTC):** 71 of 600 combinations done on stage 1; the best so far with failures at most
 10%: 10.1% passed / 7.2% failed (k20), 8.4% / 5.2% (k36). Stage 2 decides.
+
+**G255 progress (2026-11-06 04:45 UTC):** stage 1 continuing (results saved row by row); stage 2 decides.
