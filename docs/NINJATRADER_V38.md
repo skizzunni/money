@@ -6299,3 +6299,11 @@ $630,505 / $893,328). Funded growth stays U48. Logs `verification/noise_v2/g262_
 G262's search, stages and adoption rule against U48, with `SEED=263` (10,000 new combinations). Run once.
 
 **G263 progress (2026-11-06 13:45 UTC):** partial logs `verification/noise_v2/g263_*_partial.*`.
+
+**G263 result (2026-11-06): rejected, a near miss.** Stage 1: 119 of 10,000 beat U48 in NinjaTrader's execution;
+stage 2: one at or under U48's 10 lost on the 1st, **k7885** (time lock 45 minutes, range position 0.68, fast steps
+$600, fill-ins from $2,250, lock +2 points): 9 on the 1st, 11 mid-month, **20 of 526 lost at the floor, 21 lost or
+frozen** (U48 21 / 22). NinjaTrader nets $61,736 / $659,997 / $877,877 (U48 $61,612 / $632,038 / $875,038), all
+higher; the chart's $61,455 / $680,661 / $902,204 (U48 $61,612 / $630,505 / $893,328): **the window $157 lower**, so
+G78's rule fails, and G99b's needs 4 fewer lost. Not adopted. (The first stage-2 run wrote nothing; it was rerun with
+its input on a separate file descriptor.) Logs `verification/noise_v2/g263_*`.
