@@ -6150,3 +6150,12 @@ open (neither passed nor failed). Logs `verification/noise_v2/g253_*`.
 `DayProfitStop` (0) in `MnqNoiseV38.cs` (the engine's `EntryK`, `DayStopProfit`, `Lookback`), a 10-session sprint in
 this mode. "Funded growth" is U48 unchanged. NinjaTrader tests: **49 passed** (a new parity test, `test_v38_test_sprint`:
 the mode trade for trade against the model, with its 4-MNQ sprint trades).
+
+## G254: G253 again, narrower, around its best (registered 2026-11-06, before its run)
+
+The user wants the Test passed within two weeks. `research/g254_test_search.py`: G253's two stages and measure, 200 new
+combinations (seed 254) from a narrower space around k61 / k111 / k175 (sprint 3-6 MNQ, day stop $1,000-1,450, the
+noise area 12-20 sessions, entries at 0.7-1.0x, range position 0.6-0.75, calm 0-0.9, take profit 0.75-1.5, lock
+0.2-0.33, 0-3 losers, time stop 30-60 or none, big-day filter off or 1.5; no trend filter, no skipped checks).
+**Replaces U49's k61 as the Test sprint** only if on stage 2 (unseen weeks) it fails at most k61's 9.5% and passes more
+than k61's 9.3%. Run once.
