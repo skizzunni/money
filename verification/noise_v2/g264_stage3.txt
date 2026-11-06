@@ -1,0 +1,19 @@
+rows 10001
+row 0 {'proxy': 61612, 'nq': 632038, 'index': 875038}
+108 40
+stage2 lines 80
+40 done; g264k2834 g264k372
+== g264k2834
+index g264k2834 starts 160 lost (at the floor) 3 dead (lost or frozen) 4 below start 1 median net 38272 worst net -400 lowest point -1683 reached +2000 159
+nq g264k2834 starts 103 lost (at the floor) 10 dead (lost or frozen) 10 below start 4 median net 50074 worst net -1999 lowest point -1999 reached +2000 100
+{'nt': False, 'pack': 'g264k2834', 'set': 'proxy', 'days traded %': 78.5, 'gap trades': 314, 'trades': 748, 'net $': 61187, 'pf': 1.672, 'win %': 50.0, 'closed dd $': 5898, 'worst day $': -900, 'days <= -1000': 0, 'floor touches': 0}
+{'nt': False, 'pack': 'g264k2834', 'set': 'nq', 'days traded %': 80.1, 'gap trades': 1846, 'trades': 4927, 'net $': 656451, 'pf': 1.627, 'win %': 51.7, 'closed dd $': 22415, 'worst day $': -925, 'days <= -1000': 0, 'floor touches': 0}
+{'nt': False, 'pack': 'g264k2834', 'set': 'index', 'days traded %': 77.7, 'gap trades': 2658, 'trades': 6895, 'net $': 888034, 'pf': 1.603, 'win %': 51.0, 'closed dd $': 22651, 'worst day $': -988, 'days <= -1000': 0, 'floor touches': 0}
+== g264k372
+index g264k372 starts 160 lost (at the floor) 3 dead (lost or frozen) 4 below start 0 median net 41829 worst net 1 lowest point -1697 reached +2000 160
+nq g264k372 starts 103 lost (at the floor) 10 dead (lost or frozen) 10 below start 4 median net 50148 worst net -1999 lowest point -1999 reached +2000 99
+{'nt': False, 'pack': 'g264k372', 'set': 'proxy', 'days traded %': 78.5, 'gap trades': 314, 'trades': 738, 'net $': 63023, 'pf': 1.689, 'win %': 50.1, 'closed dd $': 5919, 'worst day $': -900, 'days <= -1000': 0, 'floor touches': 0}
+{'nt': False, 'pack': 'g264k372', 'set': 'nq', 'days traded %': 80.1, 'gap trades': 1846, 'trades': 4858, 'net $': 650724, 'pf': 1.628, 'win %': 51.5, 'closed dd $': 22501, 'worst day $': -925, 'days <= -1000': 0, 'floor touches': 0}
+{'nt': False, 'pack': 'g264k372', 'set': 'index', 'days traded %': 77.5, 'gap trades': 2651, 'trades': 6817, 'net $': 892522, 'pf': 1.618, 'win %': 51.0, 'closed dd $': 22765, 'worst day $': -988, 'days <= -1000': 0, 'floor touches': 0}
+
+[exited with code 0]

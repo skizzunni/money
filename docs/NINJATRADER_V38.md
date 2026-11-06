@@ -6313,3 +6313,8 @@ called G262's finished stage-2 script by name; stage 2 was rerun for G263's own 
 G262's search, stages and adoption rule against U48, with `SEED=264`. Run once.
 
 **G264 progress (2026-11-06 15:45 UTC):** screening (partial log `verification/noise_v2/g264_nt_search_partial.jsonl`).
+
+**G264 result (2026-11-06): rejected.** Stage 1: 108 of 10,000 beat U48 in NinjaTrader's execution; stage 2: two at or
+under U48's 10 lost on the 1st (k2834, k372). Stage 3: each loses 13 mid-month (more than U48's 21 in all) and misses a
+chart net: k2834's window $61,187, k372's index $892,522 (U48 $61,612 / $893,328; k372 repeats G262's k3652 exactly).
+Funded growth stays U48. Logs `verification/noise_v2/g264_*`.
