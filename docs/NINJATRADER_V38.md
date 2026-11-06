@@ -6293,3 +6293,7 @@ stage 2: three at U48's 10 lost on the 1st (k5856, k3547, k3652). Stage 3 (mid-m
 k5856 13, $61,433 / $667,326 / $892,677; k3547 13, $60,792 / $667,152 / $892,244; k3652 13, $63,023 / $650,724 /
 $892,522. Each loses more than U48 at the floor (k5856 9 + 13 = 22, the others 10 + 13 = 23, against U48's 21) and each misses one chart net (U48 $61,612 /
 $630,505 / $893,328). Funded growth stays U48. Logs `verification/noise_v2/g262_*`.
+
+## G263: G262 again with SEED=263 (registered 2026-11-06, before its run)
+
+G262's search, stages and adoption rule against U48, with `SEED=263` (10,000 new combinations). Run once.
