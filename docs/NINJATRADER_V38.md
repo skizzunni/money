@@ -6171,3 +6171,6 @@ two-week pass rate tops out near 10-12%, and every step above k61's 9.3% costs f
 plus five settings the NinjaTrader file already has: the stop buffer (0.12-0.3 sigma), the lock's points (1-5), the
 squeeze filter (0-20), the last entry (15:00 / 15:30) and the gap trigger (0.5-0.8). **Replaces k61 as the Test sprint**
 only if on stage 2 (unseen weeks) it passes more than 9.3% and fails at most 9.5%. Run once. (G244 paused again.)
+
+**G255 progress (2026-11-06 03:45 UTC):** 71 of 600 combinations done on stage 1; the best so far with failures at most
+10%: 10.1% passed / 7.2% failed (k20), 8.4% / 5.2% (k36). Stage 2 decides.
