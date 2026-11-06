@@ -6262,3 +6262,5 @@ less; none passes more than 10.0%. k317 stays.
 stop (off / 20 / 40 points), a time lock (off / 30 / 60 minutes) and a late-day lock (off / 14:30 / 15:00). **Replaces
 k317** only if on stage 2 it passes more than 10.0% and fails at most 9.1%; as G256, the five lowest-failure stage-1
 combinations (at least 10% passed, at most 10% failed) also go to stage 2 under the same rule. Run once.
+
+**G261 progress (2026-11-06 09:45 UTC):** stage 1 running (results saved row by row).
