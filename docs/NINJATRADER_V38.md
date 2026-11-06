@@ -6206,3 +6206,5 @@ k317 (sprint 3-5, day stop $1,000-1,200, noise 16-22 sessions, entries 0.6-0.75x
 profit 0.6-0.9, lock 0.15-0.25 / +1.5-3.5 points, 2-4 losers, time stop 20-45, stop buffer 0.18-0.3, squeeze 0 / 10, gap
 0.4-0.6; entries to 15:30, no trend / big-day filter). **Replaces k317** only if on stage 2 it passes more than 10.0%
 and fails at most 9.1%. Run once.
+
+**G257 progress (2026-11-06 06:45 UTC):** stage 1 running (results saved row by row).
