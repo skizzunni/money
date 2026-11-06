@@ -6307,3 +6307,7 @@ frozen** (U48 21 / 22). NinjaTrader nets $61,736 / $659,997 / $877,877 (U48 $61,
 higher; the chart's $61,455 / $680,661 / $902,204 (U48 $61,612 / $630,505 / $893,328): **the window $157 lower**, so
 G78's rule fails, and G99b's needs 4 fewer lost. Not adopted. (The first stage-2 run wrote nothing; it was rerun with
 its input on a separate file descriptor.) Logs `verification/noise_v2/g263_*`.
+
+## G264: G262 again with SEED=264 (registered 2026-11-06, before its run)
+
+G262's search, stages and adoption rule against U48, with `SEED=264`. Run once.
