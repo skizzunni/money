@@ -1,0 +1,18 @@
+development (index 2011-18):
+                 weeks  passed  failed
+tag                                   
+half off at 1R     405   0.091   0.067
+k317               405   0.116   0.064
+runner lock 0.5    405   0.116   0.064
+trail 10 pts       405   0.057   0.069
+trail 20 pts       405   0.079   0.079
+trail 40 pts       405   0.104   0.067
+unseen (NQ 2015-25 + index 2019-26):
+                 weeks  passed  failed
+tag                                   
+half off at 1R     933   0.085   0.095
+k317               933   0.100   0.091
+runner lock 0.5    933   0.100   0.091
+trail 10 pts       933   0.096   0.090
+trail 20 pts       933   0.091   0.087
+trail 40 pts       933   0.089   0.090

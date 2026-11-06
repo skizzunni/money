@@ -6250,3 +6250,8 @@ position off at 1R (`partial_at` 1.0, from the bar after the fill), or the runne
 (`runner_lock` 0.5). `research/g260_exits.py`, G253's measure on its development and unseen weeks. **Replaces k317**
 (built into the NinjaTrader file with parity tests) if on the unseen weeks it passes more than 10.0% and fails at most
 9.1%. Run once.
+
+**G260 result (2026-11-06): rejected.** Unseen weeks (passed / failed): k317 10.0% / 9.1%; trail 10 points 9.6% / 9.0%,
+20 points 9.1% / 8.7%, 40 points 8.9% / 9.0%; half off at 1R 8.5% / 9.5%; runner lock 0.5 identical to k317 (it never
+binds with take profit 0.75) (`verification/noise_v2/g260_exits.txt`). The trailing stops fail a little less but pass
+less; none passes more than 10.0%. k317 stays.
