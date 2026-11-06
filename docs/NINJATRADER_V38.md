@@ -6237,3 +6237,8 @@ built into the NinjaTrader file, which has the 30-minute grid only today) if on 
 8.6% / 15.1%, k317 (30 minutes) 10.0% / 9.1% (development: 9.4% / 7.9%, 10.4% / 11.9%, 11.6% / 6.4%;
 `verification/noise_v2/g259_checks.txt`). The extra checks add weaker breakouts: about as many passes, far more
 failures. k317 stays.
+
+**G244 result (2026-11-06): rejected.** Stage 1: 113 of 10,000 beat U47 in NinjaTrader's execution; stage 2 (the 40 best
+on the 1st's 263 starts): three at U47's 10 lost (k150, k2589, k8673). Stage 3: each loses 15 mid-month (10 + 15 = 25
+of 526 against U47's 21), and k150 / k2589's chart window is lower ($60,544 against $61,661). Funded growth stays U48.
+Logs `verification/noise_v2/g244_*`.

@@ -1,0 +1,23 @@
+rows 10001
+stage2 lines 80
+40 done; g244k150 g244k2589 g244k8673
+== g244k150
+index g244k150 starts 160 lost (at the floor) 5 dead (lost or frozen) 6 below start 1 median net 36848 worst net -400 lowest point -1683 reached +2000 159
+nq g244k150 starts 103 lost (at the floor) 10 dead (lost or frozen) 10 below start 4 median net 49510 worst net -1999 lowest point -1999 reached +2000 100
+{'nt': False, 'pack': 'g244k150', 'set': 'proxy', 'days traded %': 80.2, 'gap trades': 329, 'trades': 760, 'net $': 60544, 'pf': 1.654, 'win %': 49.6, 'closed dd $': 5898, 'worst day $': -900, 'days <= -1000': 0, 'floor touches': 0}
+{'nt': False, 'pack': 'g244k150', 'set': 'nq', 'days traded %': 81.4, 'gap trades': 1907, 'trades': 4987, 'net $': 667471, 'pf': 1.628, 'win %': 51.5, 'closed dd $': 21952, 'worst day $': -925, 'days <= -1000': 0, 'floor touches': 0}
+{'nt': False, 'pack': 'g244k150', 'set': 'index', 'days traded %': 78.9, 'gap trades': 2745, 'trades': 6980, 'net $': 884932, 'pf': 1.593, 'win %': 50.6, 'closed dd $': 22650, 'worst day $': -988, 'days <= -1000': 0, 'floor touches': 0}
+== g244k2589
+index g244k2589 starts 160 lost (at the floor) 5 dead (lost or frozen) 6 below start 1 median net 36848 worst net -400 lowest point -1683 reached +2000 159
+nq g244k2589 starts 103 lost (at the floor) 10 dead (lost or frozen) 10 below start 4 median net 49510 worst net -1999 lowest point -1999 reached +2000 100
+{'nt': False, 'pack': 'g244k2589', 'set': 'proxy', 'days traded %': 80.2, 'gap trades': 329, 'trades': 760, 'net $': 60544, 'pf': 1.654, 'win %': 49.6, 'closed dd $': 5898, 'worst day $': -900, 'days <= -1000': 0, 'floor touches': 0}
+{'nt': False, 'pack': 'g244k2589', 'set': 'nq', 'days traded %': 81.4, 'gap trades': 1907, 'trades': 4987, 'net $': 667471, 'pf': 1.628, 'win %': 51.5, 'closed dd $': 21952, 'worst day $': -925, 'days <= -1000': 0, 'floor touches': 0}
+{'nt': False, 'pack': 'g244k2589', 'set': 'index', 'days traded %': 78.9, 'gap trades': 2745, 'trades': 6980, 'net $': 884932, 'pf': 1.593, 'win %': 50.6, 'closed dd $': 22650, 'worst day $': -988, 'days <= -1000': 0, 'floor touches': 0}
+== g244k8673
+index g244k8673 starts 160 lost (at the floor) 5 dead (lost or frozen) 6 below start 1 median net 34896 worst net -400 lowest point -1683 reached +2000 159
+nq g244k8673 starts 103 lost (at the floor) 10 dead (lost or frozen) 10 below start 4 median net 50774 worst net -1999 lowest point -1999 reached +2000 100
+{'nt': False, 'pack': 'g244k8673', 'set': 'proxy', 'days traded %': 78.5, 'gap trades': 314, 'trades': 748, 'net $': 62378, 'pf': 1.684, 'win %': 50.0, 'closed dd $': 5898, 'worst day $': -900, 'days <= -1000': 0, 'floor touches': 0}
+{'nt': False, 'pack': 'g244k8673', 'set': 'nq', 'days traded %': 80.0, 'gap trades': 1845, 'trades': 4925, 'net $': 649734, 'pf': 1.618, 'win %': 51.7, 'closed dd $': 22415, 'worst day $': -925, 'days <= -1000': 0, 'floor touches': 0}
+{'nt': False, 'pack': 'g244k8673', 'set': 'index', 'days traded %': 77.5, 'gap trades': 2651, 'trades': 6888, 'net $': 886425, 'pf': 1.598, 'win %': 51.0, 'closed dd $': 22651, 'worst day $': -988, 'days <= -1000': 0, 'floor touches': 0}
+
+[exited with code 0]
