@@ -6266,3 +6266,8 @@ combinations (at least 10% passed, at most 10% failed) also go to stage 2 under 
 **G261 progress (2026-11-06 09:45 UTC):** stage 1 running (results saved row by row).
 
 **G261 progress (2026-11-06 10:50 UTC):** 168,032 of 243,000 stage-1 rows; resumed after its task's time limit.
+
+**G261 result, main stage 2 (2026-11-06): no replacement.** The ten by stage-1 passes on 933 unseen starts: k315 13.4% /
+17.4%, k339 13.4% / 16.2%, k154 13.3% / 17.8%, k405 13.2% / 17.7%, k140 13.1% / 14.8%, k564 11.6% / 13.9%; none at most
+9.1% failed (`verification/noise_v2/g261_*`). Its registered low-failure check runs next (`research/g261b_low_fail.py`):
+k250 10.6% / 6.9%, k88 10.1% / 7.2%, k178 10.6% / 7.7%, k103 10.1% / 8.6%, k290 10.9% / 8.9% on stage 1.
