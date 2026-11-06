@@ -6232,3 +6232,8 @@ k317 as it is, with the entry checks every 15 or 10 minutes (`check_step`) inste
 sessions). `research/g259_checks.py`, G253's measure on its development and unseen weeks. **Replaces k317** (and is
 built into the NinjaTrader file, which has the 30-minute grid only today) if on the unseen weeks it passes more than
 10.0% and fails at most 9.1%. Run once.
+
+**G259 result (2026-11-06): rejected.** Unseen weeks: every 15 minutes 10.4% passed / 14.9% failed, every 10 minutes
+8.6% / 15.1%, k317 (30 minutes) 10.0% / 9.1% (development: 9.4% / 7.9%, 10.4% / 11.9%, 11.6% / 6.4%;
+`verification/noise_v2/g259_checks.txt`). The extra checks add weaker breakouts: about as many passes, far more
+failures. k317 stays.

@@ -1,0 +1,12 @@
+development (index 2011-18):
+               weeks  passed  failed
+tag                                 
+every 10 min     405   0.104   0.119
+every 15 min     405   0.094   0.079
+k317 (30 min)    405   0.116   0.064
+unseen (NQ 2015-25 + index 2019-26):
+               weeks  passed  failed
+tag                                 
+every 10 min     933   0.086   0.151
+every 15 min     933   0.104   0.149
+k317 (30 min)    933   0.100   0.091
