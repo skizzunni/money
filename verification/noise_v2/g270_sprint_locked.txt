@@ -1,0 +1,14 @@
+development (index 2011-18):
+                   weeks  passed  failed
+tag                                     
+5 MNQ once locked    405   0.119   0.067
+6 MNQ once locked    405   0.116   0.067
+8 MNQ once locked    405   0.119   0.081
+U51                  405   0.119   0.067
+unseen (NQ 2015-25 + index 2019-26):
+                   weeks  passed  failed
+tag                                     
+5 MNQ once locked    933   0.115   0.099
+6 MNQ once locked    933   0.109   0.101
+8 MNQ once locked    933   0.106   0.105
+U51                  933   0.115   0.091
