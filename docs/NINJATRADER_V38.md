@@ -6242,3 +6242,11 @@ failures. k317 stays.
 on the 1st's 263 starts): three at U47's 10 lost (k150, k2589, k8673). Stage 3: each loses 15 mid-month (10 + 15 = 25
 of 526 against U47's 21), and k150 / k2589's chart window is lower ($60,544 against $61,661). Funded growth stays U48.
 Logs `verification/noise_v2/g244_*`.
+
+## G260: the Test sprint with a trailing stop or half off at 1R (registered 2026-11-06, before its run)
+
+k317 with one exit change each: a trailing stop 10 / 20 / 40 points behind the best price (`trail_points`), half the
+position off at 1R (`partial_at` 1.0, from the bar after the fill), or the runner keeping half the target once locked
+(`runner_lock` 0.5). `research/g260_exits.py`, G253's measure on its development and unseen weeks. **Replaces k317**
+(built into the NinjaTrader file with parity tests) if on the unseen weeks it passes more than 10.0% and fails at most
+9.1%. Run once.
