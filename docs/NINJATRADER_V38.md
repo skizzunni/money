@@ -6159,3 +6159,8 @@ noise area 12-20 sessions, entries at 0.7-1.0x, range position 0.6-0.75, calm 0-
 0.2-0.33, 0-3 losers, time stop 30-60 or none, big-day filter off or 1.5; no trend filter, no skipped checks).
 **Replaces U49's k61 as the Test sprint** only if on stage 2 (unseen weeks) it fails at most k61's 9.5% and passes more
 than k61's 9.3%. Run once.
+
+**G254 result (2026-11-06): no replacement; U49's k61 stays.** Stage 2 (933 unseen two-week starts): k85 12.0% passed
+/ 19.8% failed, k7 11.7% / 17.6%, k116 10.9% / 16.7%, k153 10.8% / 16.0%, k122 9.8% / 13.7%; none passed more than
+9.3% while failing at most 9.5% (`verification/noise_v2/g254_test_search.txt`, `g254_stage*.csv`). Across G251-G254 the
+two-week pass rate tops out near 10-12%, and every step above k61's 9.3% costs failures (17-20% at 11.7-12.0%).
