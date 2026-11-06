@@ -6220,3 +6220,8 @@ k49 11.1% / 13.9%; none failed at most 9.1% while passing more than 10.0% (`veri
 As G256 for G255: G257's stage-1 combinations with at least 10% passed and at most 10% failed (four: k55 10.1% / 7.4%,
 k5 10.9% / 7.7%, k183 10.1% / 7.9%, k192 10.4% / 8.4%) on the stage-2 weeks (`research/g258_low_fail.py`). **Replaces
 k317** only if one passes more than 10.0% and fails at most 9.1% there. Run once.
+
+**G258 result (2026-11-06): no replacement; k317 stays.** On the stage-2 weeks: k5 9.8% / 10.1%, k55 10.7% / 11.1%,
+k192 9.2% / 12.6%, k183 7.8% / 13.0% (`verification/noise_v2/g258_*`). Across G253-G258 (1,300 combinations, the best
+of each confirmed on 933 unseen two-week starts), nothing beats k317's 10.0% passed with at most 9.1% failed; passes
+above about 11% come only with failures of 13-19%.
