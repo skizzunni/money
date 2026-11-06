@@ -104,6 +104,8 @@ namespace NinjaTrader.NinjaScript.Strategies
         // G103: a sprint: for the account's first SprintDays sessions, until its profit reaches SprintTarget, every bot and
         // gap trade takes SprintQty contracts (still cut to the day's and the floor's room); then the usual sizing (0 = off)
         public int SprintQty = 0, SprintDays = 5;
+        // G253: a wider area for new entries only (entry_k), and no new entries once the day is up DayStopProfit
+        public double EntryK = 1.0, DayStopProfit = 0;
         public double SprintTarget = 3000;
         // G76: the bot's sizing counts this many points more slippage at the stop (0 = off)
         public double SizeSlipPts = 0;
@@ -450,6 +452,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         bool StudyOk(int d, int end, double c)
         {
             if (s.MaxLosers > 0 && losersToday >= s.MaxLosers) { Note = "after " + s.MaxLosers + " losing trades today"; return false; }  // G204
+            if (s.DayStopProfit > 0 && DayPnl >= s.DayStopProfit) { Note = "today's profit stop"; return false; }  // G253
             if (Protected()) { Note = "near the floor, shadow below its average"; return false; }
             if (s.LastEntryEnd > 0 && end > s.LastEntryEnd) { Note = "after the last entry check"; return false; }
             if (EarlySkip(end)) { Note = "no entry at this check until the floor has stopped"; return false; }
@@ -646,9 +649,16 @@ namespace NinjaTrader.NinjaScript.Strategies
                     Note = c > Upper || c < Lower ? "" : "inside the noise area";
                     if (SkipToday) Note = "holiday / half day";
                     else if (Position != 0) Note = "in a trade";
-                    else if (c > Upper && StudyOk(1, end, c)) dir = 1;
-                    else if (c < Lower && !shortOk) Note = "Fed day: no shorts before 14:00";
-                    else if (c < Lower && StudyOk(-1, end, c)) dir = -1;
+                    double upE = Upper, loE = Lower;  // G253: the entry lines (EntryK: a wider area for entries only)
+                    if (s.EntryK != 1.0)
+                    {
+                        upE = Math.Max(dayOpen, prevClose) * (1 + s.EntryK * Sigma);
+                        loE = Math.Min(dayOpen, prevClose) * (1 - s.EntryK * Sigma);
+                    }
+                    if (SkipToday || Position != 0) { }
+                    else if (c > upE && StudyOk(1, end, c)) dir = 1;
+                    else if (c < loE && !shortOk) Note = "Fed day: no shorts before 14:00";
+                    else if (c < loE && StudyOk(-1, end, c)) dir = -1;
                     if (dir != 0)
                         Entry(dir, c);
                 }
@@ -925,7 +935,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 SkipDates = SkipDefault;
                 FedDates = FedDefault;
                 PlaceOrders = true;
-                Mode = "Funded growth";
+                Mode = "Test sprint";  // G253: the default, the Test in two weeks (Funded growth once passed)
                 Goal = 50000;
                 AfterLossMaxLoss = 187.5;  // G168 (Funded growth sets it by the chart: 187.5 on 5-minute, 250 otherwise)
                 TrailDD = 2000;
@@ -960,6 +970,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 PropHighBalance = 0;
                 SizeToAccountRoom = true;
                 SprintContracts = 0;  // G103: off
+                NoiseSessions = 14; EntryWidth = 1.0; DayProfitStop = 0;  // G253
                 NearFloorGate = 0;  // G87b: off (it lost more accounts)
                 TestedWinRate = 49.3;  // U48: the window's 5-minute win rate in NinjaTrader's execution (61.2 was v3.8's)
             }
@@ -973,6 +984,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 string m = (Mode ?? "").Trim();
                 string mc = System.Text.RegularExpressions.Regex.Replace(m, @"\s+", " ");
                 if (string.Equals(mc, "Funded growth", StringComparison.OrdinalIgnoreCase)) Mode = "Funded growth";
+                else if (string.Equals(mc, "Test sprint", StringComparison.OrdinalIgnoreCase)) Mode = "Test sprint";
                 else if (string.Equals(mc, "Funded growth 100K", StringComparison.OrdinalIgnoreCase)) Mode = "Funded growth 100K";
                 else if (string.Equals(mc, "Funded growth 150K", StringComparison.OrdinalIgnoreCase)) Mode = "Funded growth 150K";
                 else if (string.Equals(mc, "Funded growth Apex 100K", StringComparison.OrdinalIgnoreCase)) Mode = "Funded growth Apex 100K";
@@ -984,6 +996,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                     setupWarnings.Add("Mode \"" + Mode + "\" isn't Funded growth (50K, 100K, 150K, Apex 100K or Apex 150K), Evaluation or Custom: running the settings below as Custom");
                     Mode = "Custom";
                 }
+                bool sprintMode = Mode == "Test sprint";  // G253: the 50K's growth settings, then the two-week Test sprint's
+                if (sprintMode) Mode = "Funded growth";
                 if (Mode.StartsWith("Funded growth"))  // the tested growth settings (docs/NINJATRADER_V38.md), whatever is set below
                 {
                     Contracts = 1; MaxLoss = 187.5; DailyLoss = 900; TrailDD = 2000;
@@ -1000,6 +1014,13 @@ namespace NinjaTrader.NinjaScript.Strategies
                     // G42: Apex's end-of-day accounts, a tighter day: a $1,500 / $2,000 daily loss, a $3,000 / $4,000 trail
                     if (Mode == "Funded growth Apex 100K") { DailyLoss = 1350; TrailDD = 3000; LossGuard = 1425; }
                     if (Mode == "Funded growth Apex 150K") { DailyLoss = 1800; TrailDD = 4000; LossGuard = 1900; }
+                }
+                if (sprintMode)  // G253 k61: the Test in two weeks (9.3% passed, 9.5% failed on unseen weeks; docs)
+                {
+                    DailyLoss = 2000; LossGuard = 1900; EarlyDayBudget = 0; MaxLosersPerDay = 2; TimeStop = 60;
+                    RangePos = 0.7; TrendSessions = 0; BigDayK = 0; CalmK = 0.8; TakeProfit = 1.0; LockAt = 0.25;
+                    EarlyNoEntryChecks = ""; SprintContracts = 4; sprintDays = 10; DayProfitStop = 1200;
+                    NoiseSessions = 16; EntryWidth = 0.8;
                 }
                 else if (Mode == "Evaluation")  // v3.8: 1 MNQ, $260 a trade, $900 a day
                 {
@@ -1034,6 +1055,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 st.ProfitStepFast = Mode != "Evaluation" ? FastSteps : 0;  // G142
                 st.ProfitStepFastFrom = FastStepsFrom;
                 st.SprintQty = Mode != "Evaluation" ? SprintContracts : 0;  // G103
+                st.SprintDays = sprintDays;  // G253: 10 in the Test sprint
+                st.Lookback = NoiseSessions; st.EntryK = EntryWidth; st.DayStopProfit = DayProfitStop;  // G253
                 st.SizeSlipPts = Mode != "Evaluation" ? SizeSlip : 0;  // G79: the Funded growth modes and Custom
                 st.ProtectRoom = Mode != "Evaluation" ? NearFloorGate : 0;  // G87
                 st.Tick = TickSize;
@@ -1722,7 +1745,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         #region Properties
         [NinjaScriptProperty]
-        [Display(Name = "Mode: Funded growth (50K), Funded growth 100K / 150K (Topstep), Funded growth Apex 100K / Apex 150K, Evaluation, or Custom", Order = 0, GroupName = "1. Size and risk")]
+        [Display(Name = "Mode: Test sprint (the default: the 50K Test in two weeks), Funded growth (50K, once passed), Funded growth 100K / 150K (Topstep), Funded growth Apex 100K / Apex 150K, Evaluation, or Custom", Order = 0, GroupName = "1. Size and risk")]
         public string Mode { get; set; }
 
         [NinjaScriptProperty]
@@ -1914,6 +1937,23 @@ namespace NinjaTrader.NinjaScript.Strategies
         [Range(0, 15)]
         [Display(Name = "Sprint: the first 5 sessions from the start date, until +$3,000, every trade this many MNQ (0 = off; see the odds in the docs)", Order = 22, GroupName = "1. Size and risk")]
         public int SprintContracts { get; set; }
+
+        int sprintDays = 5;  // G103: 5 sessions; the Test sprint 10
+
+        [NinjaScriptProperty]
+        [Range(2, 60)]
+        [Display(Name = "Noise area: sessions averaged (14; the Test sprint 16)", Order = 30, GroupName = "3. Filters")]
+        public int NoiseSessions { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0.5, 2.0)]
+        [Display(Name = "Entry width: new entries need this x the noise area (1.0; the Test sprint 0.8)", Order = 31, GroupName = "3. Filters")]
+        public double EntryWidth { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, double.MaxValue)]
+        [Display(Name = "Day profit stop: no new entries once the day is up this much, $ (0 = off; the Test sprint 1,200)", Order = 32, GroupName = "3. Filters")]
+        public double DayProfitStop { get; set; }
 
         [NinjaScriptProperty]
         [Range(0, 50)]

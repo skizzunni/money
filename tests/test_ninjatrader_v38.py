@@ -1068,3 +1068,35 @@ def test_v38_sprint(sim, sample_1m, tmp_path):  # noqa: F811
             assert math.isclose(float(a[6]), t.pnl, abs_tol=1e-6), (a, t)
         qty[sq] = [t.qty for t in py if str(t.entry_time.date()) >= start][:6]
     assert sum(qty[5]) > sum(qty[0]), qty
+
+
+# G253 k61: the two-week Test sprint
+SPRINT = {"daily_loss_limit": 2000.0, "early_daily_loss": 0.0, "max_losers": 2, "time_stop": 60, "range_pos_min": 0.7,
+          "trend_n": 0, "big_day_k": 0.0, "calm_k": 0.8, "take_profit": 1.0, "lock_at": 0.25, "skip_checks": "",
+          "sprint_qty": 4, "sprint_days": 10, "sprint_target": 3000.0, "day_stop_profit": 1200.0, "lookback": 16,
+          "entry_k": 0.8}
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+def test_v38_test_sprint(sim, sample_1m, tmp_path):  # noqa: F811
+    """G253: Mode "Test sprint" (k61: 4 MNQ for the first 10 sessions until +$3,000, a $1,200 day profit stop, the
+    noise area over 16 sessions, entries at 0.8x it, and the rest of k61's settings). NinjaTrader's code and the model
+    agree trade for trade, and the sprint's 4 MNQ trades are there."""
+    bars = resample(sample_1m, "5min")
+    path = tmp_path / "bars.csv"
+    with path.open("w") as f:
+        for t, r in zip(bars.index, bars.itertuples(), strict=True):
+            f.write(f"{t:%Y-%m-%d %H:%M},{r.open!r},{r.high!r},{r.low!r},{r.close!r}\n")
+    ny = bars.index.tz_convert("America/New_York") if bars.index.tz is not None else bars.index
+    start = sorted(set(ny.date))[20].strftime("%Y-%m-%d")  # past the 16 sessions the noise area needs
+    r = subprocess.run([DOTNET, str(sim), str(path), "5", "Strategy=V38", "Mode=Test sprint", f"TrailFrom={start}"],
+                       capture_output=True, text=True, env=ENV)
+    assert r.returncode == 0, r.stderr[-2000:]
+    nt = [x.split(",")[1:] for x in r.stdout.splitlines() if x.startswith("T,")]
+    py = run(bars, dataclasses.replace(GROW, **SPRINT, trail_from=start), minutes=5).trades
+    assert len(nt) == len(py) >= 10
+    for a, t in zip(nt, py, strict=True):
+        assert (int(a[0]), int(a[1]), int(a[3])) == (t.direction, t.entry_bar, t.exit_bar), (a, t)
+        assert float(a[2]) == t.entry and float(a[4]) == t.exit, (a, t)
+        assert math.isclose(float(a[6]), t.pnl, abs_tol=1e-6), (a, t)
+    assert any(t.qty == 4 for t in py)

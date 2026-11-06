@@ -6135,3 +6135,18 @@ entry/exit settings, on the index's Monday starts 2011-2018 (development); **sta
 (failures at most 15%) on NQ 2015-25 and the index 2019-26 (unseen). **A setting is offered to the user** if on stage 2
 it passes more than G251's best (4.9% NQ / 3.9% index; overall about 4.5%) with failures at most 15%, stated with its
 odds. Run once. (G244's stage 2 is paused to give it the processors; it resumes from its saved rows.)
+
+**G253 result (2026-11-06): k61 offered and built in (U49).** Stage 1 (index 2011-18, 405 two-week starts each): the
+best ten passed 8.4-10.6% with 9.6-14.6% failed. Stage 2, on unseen weeks (NQ 2015-25 and the index 2019-26, 933
+starts): k111 10.3% passed / 13.6% failed, k175 10.1% / 13.2%, k20 10.0% / 15.3%, **k61 9.3% / 9.5%**, k119 9.1% /
+14.5% (G251's best: about 4.5% / 14.5%). With the user's rule (don't lose the account) the pick is **k61**, the fewest
+failures for nearly the most passes: 4 MNQ on every trade for the first 10 sessions until +$3,000, no new entries once
+the day is up $1,200, the noise area over 16 sessions with entries at 0.8x it, the top 70% of the day's range, at most
+2 losers a day, a 60-minute time stop, take profit 1.0, lock at 0.25, no trend or big-day filter, a calm filter of 0.8,
+no skipped checks, and a $2,000 day budget (the floor's room binds first). In two weeks about 81% of Tests are still
+open (neither passed nor failed). Logs `verification/noise_v2/g253_*`.
+
+**U49 (2026-11-06): Mode "Test sprint" (k61), the default.** New settings `NoiseSessions` (14), `EntryWidth` (1.0),
+`DayProfitStop` (0) in `MnqNoiseV38.cs` (the engine's `EntryK`, `DayStopProfit`, `Lookback`), a 10-session sprint in
+this mode. "Funded growth" is U48 unchanged. NinjaTrader tests: **49 passed** (a new parity test, `test_v38_test_sprint`:
+the mode trade for trade against the model, with its 4-MNQ sprint trades).

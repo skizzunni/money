@@ -1,0 +1,26 @@
+stage 1 best (index 2011-18):
+     weeks  passed  failed
+k                         
+20     405   0.106   0.138
+175    405   0.104   0.116
+142    405   0.096   0.128
+111    405   0.094   0.121
+119    405   0.089   0.114
+61     405   0.089   0.096
+54     405   0.086   0.119
+150    405   0.086   0.114
+174    405   0.086   0.146
+85     405   0.084   0.126
+stage 2 (NQ 2015-25 + index 2019-26):
+     weeks  passed  failed                                                                                                                                                                                                                                 settings
+k                                                                                                                                                                                                                                                                  
+111    933   0.103   0.136         {"sprint": 4, "day stop": 1200.0, "lookback": 12, "entry_k": 0.8, "range_pos_min": 0.7, "calm_k": 0.6, "take_profit": 1.5, "lock_at": 0.25, "skip_checks": "", "max_losers": 3, "time_stop": 30, "trend_n": 0, "big_day_k": 0.0}
+175    933   0.101   0.132          {"sprint": 4, "day stop": 1000.0, "lookback": 14, "entry_k": 1.0, "range_pos_min": 0.7, "calm_k": 0.8, "take_profit": 1.0, "lock_at": 0.33, "skip_checks": "", "max_losers": 0, "time_stop": 0, "trend_n": 0, "big_day_k": 0.0}
+20     933   0.100   0.153          {"sprint": 4, "day stop": 1000.0, "lookback": 16, "entry_k": 1.0, "range_pos_min": 0.7, "calm_k": 0.6, "take_profit": 1.5, "lock_at": 0.5, "skip_checks": "", "max_losers": 3, "time_stop": 45, "trend_n": 0, "big_day_k": 1.5}
+85     933   0.096   0.156         {"sprint": 5, "day stop": 1200.0, "lookback": 16, "entry_k": 1.1, "range_pos_min": 0.0, "calm_k": 0.8, "take_profit": 1.0, "lock_at": 0.25, "skip_checks": "", "max_losers": 2, "time_stop": 45, "trend_n": 0, "big_day_k": 0.0}
+61     933   0.093   0.095         {"sprint": 4, "day stop": 1200.0, "lookback": 16, "entry_k": 0.8, "range_pos_min": 0.7, "calm_k": 0.8, "take_profit": 1.0, "lock_at": 0.25, "skip_checks": "", "max_losers": 2, "time_stop": 60, "trend_n": 0, "big_day_k": 0.0}
+150    933   0.092   0.122   {"sprint": 4, "day stop": 1000.0, "lookback": 14, "entry_k": 1.1, "range_pos_min": 0.0, "calm_k": 0.8, "take_profit": 1.5, "lock_at": 0.33, "skip_checks": "780,870", "max_losers": 0, "time_stop": 0, "trend_n": 0, "big_day_k": 0.0}
+119    933   0.091   0.145   {"sprint": 4, "day stop": 1000.0, "lookback": 16, "entry_k": 0.8, "range_pos_min": 0.0, "calm_k": 0.6, "take_profit": 1.0, "lock_at": 0.5, "skip_checks": "780,870", "max_losers": 2, "time_stop": 45, "trend_n": 0, "big_day_k": 1.5}
+142    933   0.086   0.128  {"sprint": 4, "day stop": 1200.0, "lookback": 10, "entry_k": 1.1, "range_pos_min": 0.65, "calm_k": 0.6, "take_profit": 1.5, "lock_at": 0.33, "skip_checks": "780,870", "max_losers": 0, "time_stop": 0, "trend_n": 0, "big_day_k": 0.0}
+174    933   0.081   0.169  {"sprint": 5, "day stop": 1000.0, "lookback": 14, "entry_k": 0.9, "range_pos_min": 0.0, "calm_k": 0.8, "take_profit": 1.5, "lock_at": 0.25, "skip_checks": "780,870", "max_losers": 0, "time_stop": 60, "trend_n": 0, "big_day_k": 1.5}
+54     933   0.069   0.119          {"sprint": 4, "day stop": 1000.0, "lookback": 12, "entry_k": 1.1, "range_pos_min": 0.0, "calm_k": 0.8, "take_profit": 1.5, "lock_at": 0.5, "skip_checks": "", "max_losers": 3, "time_stop": 45, "trend_n": 0, "big_day_k": 1.5}
