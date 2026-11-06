@@ -6198,3 +6198,11 @@ entries to 15:30, the gap trade from 0.5x, stop buffer 0.24.
 
 **U50 (2026-11-06): the Test sprint mode is k317.** NinjaTrader tests 49 passed (`test_v38_test_sprint` now k317, trade
 for trade against the model).
+
+## G257: the two-week Test search close to k317 (registered 2026-11-06, before its run)
+
+`research/g257_test_search.py`: G255's two stages and measure, 300 combinations (seed 257) in a narrow space around
+k317 (sprint 3-5, day stop $1,000-1,200, noise 16-22 sessions, entries 0.6-0.75x, range 0.65-0.75, calm 0.6-0.8, take
+profit 0.6-0.9, lock 0.15-0.25 / +1.5-3.5 points, 2-4 losers, time stop 20-45, stop buffer 0.18-0.3, squeeze 0 / 10, gap
+0.4-0.6; entries to 15:30, no trend / big-day filter). **Replaces k317** only if on stage 2 it passes more than 10.0%
+and fails at most 9.1%. Run once.
