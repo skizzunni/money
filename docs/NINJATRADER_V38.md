@@ -6176,3 +6176,15 @@ only if on stage 2 (unseen weeks) it passes more than 9.3% and fails at most 9.5
 10%: 10.1% passed / 7.2% failed (k20), 8.4% / 5.2% (k36). Stage 2 decides.
 
 **G255 progress (2026-11-06 04:45 UTC):** stage 1 continuing (results saved row by row); stage 2 decides.
+
+**G255 result (2026-11-06): no replacement as registered.** Stage 2 (933 unseen starts), the ten by stage-1 passes:
+k78 13.6% passed / 18.5% failed, k342 13.2% / 19.0%, k334 12.8% / 19.4%, k91 11.6% / 18.0%, k242 11.1% / 14.6%, k514
+10.7% / 12.9%, k299 10.7% / 14.1%; none failed at most 9.5% while passing more than 9.3%
+(`verification/noise_v2/g255_test_search.txt`, `g255_stage*.csv`).
+
+## G256: G255's lowest-failure combinations on unseen weeks (registered 2026-11-06, before its run)
+
+G255's stage 2 took the ten with the most stage-1 passes; five others had far fewer stage-1 failures: k317 11.6% /
+6.4%, k484 10.6% / 6.9%, k20 10.1% / 7.2%, k225 10.4% / 7.4%, k153 10.6% / 7.9% (passed at least 10%, failed at most
+10%, the five lowest failures). `research/g256_low_fail.py` runs these five on G255's stage-2 weeks. **Replaces k61**
+only if one passes more than 9.3% and fails at most 9.5% there (the best by passes among those that do). Run once.
