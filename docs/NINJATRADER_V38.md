@@ -6164,3 +6164,10 @@ than k61's 9.3%. Run once.
 / 19.8% failed, k7 11.7% / 17.6%, k116 10.9% / 16.7%, k153 10.8% / 16.0%, k122 9.8% / 13.7%; none passed more than
 9.3% while failing at most 9.5% (`verification/noise_v2/g254_test_search.txt`, `g254_stage*.csv`). Across G251-G254 the
 two-week pass rate tops out near 10-12%, and every step above k61's 9.3% costs failures (17-20% at 11.7-12.0%).
+
+## G255: the two-week Test search, 600 combinations, five more settings (registered 2026-11-06, before its run)
+
+`research/g255_test_search.py`: G253's two stages and measure, 600 combinations (seed 255), G254's space (sprint 3-5)
+plus five settings the NinjaTrader file already has: the stop buffer (0.12-0.3 sigma), the lock's points (1-5), the
+squeeze filter (0-20), the last entry (15:00 / 15:30) and the gap trigger (0.5-0.8). **Replaces k61 as the Test sprint**
+only if on stage 2 (unseen weeks) it passes more than 9.3% and fails at most 9.5%. Run once. (G244 paused again.)
