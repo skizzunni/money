@@ -6387,3 +6387,10 @@ the unseen weeks it passes more than 11.5% and fails at most 9.1%. Run once.
 9.9%; 6 MNQ 10.9% / 10.1%; 8 MNQ 10.6% / 10.5% (`verification/noise_v2/g270_sprint_locked.txt`). Bigger trades after
 the floor stops add failures (losses back to the stopped floor) and no passes. U51 stays; the research setting
 `sprint_qty_locked` stays in the model at 0 (off).
+
+## G271: U51's Test sprint with a higher day profit stop (registered 2026-11-07, before its run)
+
+U51 stops new entries once the day is up $1,100 (k317's, chosen for a $3,000 target); with the sprint now running to
++$5,000, a day up to $1,300 / $1,500 / $2,000 may still keep the best day under half the profit. `research/g271_day_stop.py`,
+G253's measure. **Replaces U51's day stop** if on the unseen weeks it passes more than 11.5% and fails at most 9.1%.
+Run once.
