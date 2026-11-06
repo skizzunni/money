@@ -6311,3 +6311,5 @@ called G262's finished stage-2 script by name; stage 2 was rerun for G263's own 
 ## G264: G262 again with SEED=264 (registered 2026-11-06, before its run)
 
 G262's search, stages and adoption rule against U48, with `SEED=264`. Run once.
+
+**G264 progress (2026-11-06 15:45 UTC):** screening (partial log `verification/noise_v2/g264_nt_search_partial.jsonl`).
