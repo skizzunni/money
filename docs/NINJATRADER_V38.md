@@ -6414,3 +6414,12 @@ day stops pass a little more but fail more (9.5-9.6% against 9.1%); 5 MNQ nearly
 New research setting `sprint_gap_qty`: during the sprint the 09:35 gap trade takes this many MNQ instead of the
 sprint's 4 (still cut to the room). Variants 2, 6, 8. `research/g273_sprint_gap.py`, G253's measure. **Replaces U51's
 gap size** if on the unseen weeks it passes more than 11.5% and fails at most 9.1%. Run once.
+
+**G273 result (2026-11-07): adopted (U52).** Unseen weeks (passed / failed): U51 (gap at 4) 11.5% / 9.1%; **gap at 2
+12.1% / 8.5%**; gap at 6 10.6% / 14.1%; gap at 8 10.9% / 17.7% (development: 11.9% / 6.7%, 10.9% / 6.2%, 11.1% /
+12.3%, 11.1% / 15.8%; `verification/noise_v2/g273_sprint_gap.txt`). On the development weeks gap-at-2 passed a little
+less (10.9% against 11.9%) and failed less; on the unseen weeks, the pre-registered test, it passes more and fails less.
+
+**U52 (2026-11-07): the Test sprint's gap trade at 2 MNQ.** The engine's new `SprintGapQty` (2 in "Test sprint" mode, 0
+= the sprint's size elsewhere); the model's `sprint_gap_qty`. NinjaTrader tests 49 passed (`test_v38_test_sprint` with
+it, trade for trade).
