@@ -1,0 +1,26 @@
+stage 1 best (index 2011-18):
+    weeks  passed  failed  failed_or_stuck                                                                    settings
+k                                                                                                                     
+36    405   0.178   0.052            0.274                                           {"sprint": 5, "rules": ["guard"]}
+38    405   0.170   0.057            0.279                               {"sprint": 5, "rules": ["guard", "day lock"]}
+46    405   0.168   0.054            0.269                    {"sprint": 5, "rules": ["big day", "guard", "day lock"]}
+52    405   0.168   0.052            0.230                                 {"sprint": 5, "rules": ["streak", "guard"]}
+53    405   0.165   0.052            0.240                         {"sprint": 5, "rules": ["streak", "guard", "jobs"]}
+62    405   0.165   0.042            0.217          {"sprint": 5, "rules": ["streak", "big day", "guard", "day lock"]}
+61    405   0.165   0.052            0.227              {"sprint": 5, "rules": ["streak", "big day", "guard", "jobs"]}
+60    405   0.165   0.049            0.220                      {"sprint": 5, "rules": ["streak", "big day", "guard"]}
+54    405   0.165   0.052            0.232                     {"sprint": 5, "rules": ["streak", "guard", "day lock"]}
+63    405   0.163   0.042            0.222  {"sprint": 5, "rules": ["streak", "big day", "guard", "day lock", "jobs"]}
+stage 2 (NQ 2015-25 + index 2019-26):
+    weeks  passed  failed  failed_or_stuck                                                                    settings
+k                                                                                                                     
+52    933   0.177   0.098            0.272                                 {"sprint": 5, "rules": ["streak", "guard"]}
+36    933   0.170   0.098            0.284                                           {"sprint": 5, "rules": ["guard"]}
+60    933   0.170   0.094            0.267                      {"sprint": 5, "rules": ["streak", "big day", "guard"]}
+53    933   0.170   0.101            0.280                         {"sprint": 5, "rules": ["streak", "guard", "jobs"]}
+38    933   0.169   0.096            0.287                               {"sprint": 5, "rules": ["guard", "day lock"]}
+61    933   0.169   0.098            0.271              {"sprint": 5, "rules": ["streak", "big day", "guard", "jobs"]}
+54    933   0.168   0.087            0.268                     {"sprint": 5, "rules": ["streak", "guard", "day lock"]}
+46    933   0.165   0.096            0.267                    {"sprint": 5, "rules": ["big day", "guard", "day lock"]}
+62    933   0.164   0.077            0.258          {"sprint": 5, "rules": ["streak", "big day", "guard", "day lock"]}
+63    933   0.164   0.079            0.263  {"sprint": 5, "rules": ["streak", "big day", "guard", "day lock", "jobs"]}

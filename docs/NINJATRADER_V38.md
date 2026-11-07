@@ -7027,3 +7027,11 @@ rows): up and alive 56.0%, passed 15.1%, failed 7.4%.
 only if (a) on all starts it fails at most U55's 7.4%, ends up and alive at least as often (56.0%) and passes more, and
 (b) on the unseen starts alone (NQ 2015-25 and the index 2019-26) it passes more than 15.6%, fails at most 7.9%, and
 failed + near-frozen is at most 22.2% (G290's rule). The most passes among those that qualify; none qualifying: U55 stays.
+
+**G311 result (2026-11-07): rejected.** Stage 1 (64 variants, 405 development weeks; U55 13.6% / 5.9% / 20.0%): the top
+10 with failures at most 5.9% are all the 5 MNQ sprint with the day guard, passing 16.3-17.8% (failed 4.2-5.7%, failed
+or near-frozen 21.7-27.9%). Stage 2 (933 unseen weeks; U55 15.6% / 7.9% / 22.2%): 16.4-17.7% passed, 7.7-10.1% failed,
+**25.8-28.7% failed or near-frozen**. The closest, 5 MNQ with the streak pause, the big-day rule, the guard and the day
+lock (k62), passes 16.4% and fails 7.7%, but 25.8% of its Tests end failed or near-frozen against U55's 22.2%: the guard
+turns failures into accounts left at the floor. None qualifies; U55 stays.
+`verification/noise_v2/g311_combo_search.txt`, `g311_stage1.csv`, `g311_stage2.csv`.
