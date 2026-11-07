@@ -6848,3 +6848,9 @@ and changing it after seeing the unseen results would make them no longer unseen
 or 2 MNQ after two (3 variants; `sprint_after_loss_qty` / `sprint_after_loss_n`; the gap trade stays at 2). G253's
 measure and G290's rule (development: more passes than U55, failures no higher; unseen: more than 15.6% passed, at most
 7.9% failed, failed + near-frozen at most 22.2%). Run once.
+
+**G298 result (2026-11-07): rejected.** Development (405 weeks; U55 13.6% / 5.9% / 20.0%): 2 MNQ after one loser today
+5.7% / 3.5% / 12.3%; 3 MNQ after one 9.1% / 5.9% / 15.6%; 2 MNQ after two 10.6% / 5.4% / 18.3%: fewer passes, none
+qualifies. Unseen (933; U55 15.6% / 7.9% / 22.2%): 9.2% / 4.2% / 13.5%, 12.5% / 5.8% / 18.2%, 14.0% / 6.3% / 19.0%.
+Smaller trades after a loser cut failures and near-frozen Tests a lot (2 MNQ after one: failed or near-frozen 13.5%
+against 22.2%) but cut the passes more. U55 stays. `verification/noise_v2/g298_after_loss.txt`.
