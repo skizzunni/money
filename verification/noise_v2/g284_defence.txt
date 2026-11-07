@@ -1,0 +1,26 @@
+development (index 2011-18):
+                          weeks  passed  failed
+tag                                            
+U53                         405   0.109   0.064
+U53, 1 MNQ under $1,000     405   0.106   0.015
+U53, 1 MNQ under $1,500     405   0.081   0.002
+U53, 2 MNQ under $1,000     405   0.104   0.044
+U53, 2 MNQ under $1,500     405   0.084   0.015
+k296                        405   0.119   0.116
+k296, 1 MNQ under $1,000    405   0.109   0.030
+k296, 1 MNQ under $1,500    405   0.096   0.012
+k296, 2 MNQ under $1,000    405   0.114   0.059
+k296, 2 MNQ under $1,500    405   0.104   0.042
+unseen (NQ 2015-25 + index 2019-26):
+                          weeks  passed  failed
+tag                                            
+U53                         933   0.122   0.084
+U53, 1 MNQ under $1,000     933   0.116   0.034
+U53, 1 MNQ under $1,500     933   0.088   0.015
+U53, 2 MNQ under $1,000     933   0.118   0.061
+U53, 2 MNQ under $1,500     933   0.096   0.040
+k296                        933   0.138   0.106
+k296, 1 MNQ under $1,000    933   0.130   0.044
+k296, 1 MNQ under $1,500    933   0.115   0.015
+k296, 2 MNQ under $1,000    933   0.136   0.068
+k296, 2 MNQ under $1,500    933   0.123   0.038

@@ -105,6 +105,9 @@ namespace NinjaTrader.NinjaScript.Strategies
         // gap trade takes SprintQty contracts (still cut to the day's and the floor's room); then the usual sizing (0 = off)
         public int SprintQty = 0, SprintDays = 5;
         public int SprintGapQty = 0;  // G273: the gap trade's size during the sprint (0 = SprintQty)
+        // G284: the sprint's defence: with less than SprintLowRoom above the trailing floor, SprintLowQty contracts (0 = off)
+        public double SprintLowRoom = 0;
+        public int SprintLowQty = 1;
         // G253: a wider area for new entries only (entry_k), and no new entries once the day is up DayStopProfit
         public double EntryK = 1.0, DayStopProfit = 0;
         public double SprintTarget = 3000;
@@ -240,6 +243,14 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (s.SprintQty <= 0 || sprintDone || double.IsNaN(trailBase)) return false;
             if (EqEff - trailBase >= s.SprintTarget) { sprintDone = true; return false; }
             return sprintSessions <= s.SprintDays;
+        }
+
+        // G284: the sprint's size (SprintLowQty with less than SprintLowRoom above the trailing floor)
+        int SprintQ()
+        {
+            if (s.SprintLowRoom > 0 && s.TrailDD > 0 && !double.IsNaN(trailPeak)
+                && EqEff - Math.Min(trailPeak - s.TrailDD, trailBase) < s.SprintLowRoom) return s.SprintLowQty;
+            return s.SprintQty;
         }
 
         // G99: has the account given back more than (1 - GivebackBrake) of its best profit since the floor stopped?
@@ -729,8 +740,9 @@ namespace NinjaTrader.NinjaScript.Strategies
             }
             if (SprintOn())  // G103: the sprint's size (the day's and the floor's room still cut it below)
             {
-                ml = ml / q * s.SprintQty;
-                q = s.SprintQty;
+                int sq = SprintQ();  // G284
+                ml = ml / q * sq;
+                q = sq;
             }
             if (s.MoreDays && s.TrendN > 0 && d < 0 && trend == 1)  // G72: a fill-in short in the uptrend at its max loss a contract
             {
@@ -830,7 +842,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                     if (one)
                         q = Math.Min(q, FillQ());
                     if (SprintOn() && !one)  // G103: the sprint's size, as the room allows
-                        q = Math.Min(s.SprintGapQty > 0 ? s.SprintGapQty : s.SprintQty, fitQ);  // G273
+                        q = Math.Min(s.SprintGapQty > 0 ? s.SprintGapQty : SprintQ(), fitQ);  // G273, G284
                     if (q >= 1)
                     {
                         gapPending = true; gapPendingDir = d; gapPendingQty = q; gapPendingStop = dayOpen;
@@ -1016,13 +1028,13 @@ namespace NinjaTrader.NinjaScript.Strategies
                     if (Mode == "Funded growth Apex 100K") { DailyLoss = 1350; TrailDD = 3000; LossGuard = 1425; }
                     if (Mode == "Funded growth Apex 150K") { DailyLoss = 1800; TrailDD = 4000; LossGuard = 1900; }
                 }
-                if (sprintMode)  // G256 k317 + G269 + G273 + G275: the Test in two weeks (12.2% passed, 8.4% failed on unseen weeks; docs)
+                if (sprintMode)  // G277 k296 + G284: the Test in two weeks (13.6% passed, 6.8% failed on unseen weeks; docs)
                 {
-                    DailyLoss = 2000; LossGuard = 1900; EarlyDayBudget = 0; MaxLosersPerDay = 3; TimeStop = 30;
-                    RangePos = 0.7; TrendSessions = 0; BigDayK = 0; CalmK = 0.7; TakeProfit = 0.75; LockAt = 0.2;
-                    EarlyNoEntryChecks = ""; SprintContracts = 4; sprintDays = 10; DayProfitStop = 1100;
+                    DailyLoss = 2000; LossGuard = 1900; EarlyDayBudget = 0; MaxLosersPerDay = 4; TimeStop = 45;
+                    RangePos = 0.7; TrendSessions = 0; BigDayK = 0; CalmK = 0.7; TakeProfit = 0.6; LockAt = 0.25;
+                    EarlyNoEntryChecks = ""; SprintContracts = 4; sprintDays = 10; DayProfitStop = 1000;
                     NoiseSessions = 18; EntryWidth = 0.7; SqueezeMin = 0; LastEntry = "15:30"; GapTrigger = 0.5;
-                    StopBuffer = 0.24; LockPlus = 2.5; GapBreakEven = 0;  // G275: no gap break-even in the sprint
+                    StopBuffer = 0.3; LockPlus = 2.5; GapBreakEven = 0;  // G275: no gap break-even in the sprint
                 }
                 else if (Mode == "Evaluation")  // v3.8: 1 MNQ, $260 a trade, $900 a day
                 {
@@ -1060,6 +1072,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 st.SprintDays = sprintDays;  // G253: 10 in the Test sprint
                 st.SprintTarget = sprintMode ? 5000 : 3000;  // G269: the Test sprint keeps its size to +$5,000
                 st.SprintGapQty = sprintMode ? 2 : 0;  // G273: the Test sprint's gap trade at 2 MNQ
+                st.SprintLowRoom = sprintMode ? 1000 : 0;  // G284: 2 MNQ with less than $1,000 above the floor
+                st.SprintLowQty = 2;
                 st.Lookback = NoiseSessions; st.EntryK = EntryWidth; st.DayStopProfit = DayProfitStop;  // G253
                 st.SizeSlipPts = Mode != "Evaluation" ? SizeSlip : 0;  // G79: the Funded growth modes and Custom
                 st.ProtectRoom = Mode != "Evaluation" ? NearFloorGate : 0;  // G87
