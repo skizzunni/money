@@ -7022,3 +7022,8 @@ measurement, no adoption rule by itself: U55's Test sprint at 4, 5, 6 and 8 MNQ,
 (8 variants), on all two-week Monday starts (NQ 2015-25, the index 2011-26): passed, failed, **up and alive** (profit
 above zero after the two weeks, not failed), and the median two weeks (`research/g312_size_scan.py`). U55 now (G295's
 rows): up and alive 56.0%, passed 15.1%, failed 7.4%.
+
+**G312 adoption rule (added 2026-11-07, before its results; the user: "just get it done").** A variant replaces U55
+only if (a) on all starts it fails at most U55's 7.4%, ends up and alive at least as often (56.0%) and passes more, and
+(b) on the unseen starts alone (NQ 2015-25 and the index 2019-26) it passes more than 15.6%, fails at most 7.9%, and
+failed + near-frozen is at most 22.2% (G290's rule). The most passes among those that qualify; none qualifying: U55 stays.
