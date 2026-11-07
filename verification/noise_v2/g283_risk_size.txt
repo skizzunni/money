@@ -1,0 +1,10 @@
+development (index 2011-18):
+                   weeks  passed  failed
+tag                                     
+U53                  405   0.109   0.064
+risk $300 up to 6    405   0.012   0.010
+risk $300 up to 8    405   0.017   0.012
+risk $450 up to 6    405   0.022   0.032
+risk $450 up to 8    405   0.030   0.030
+risk $600 up to 6    405   0.057   0.044
+risk $600 up to 8    405   0.062   0.072

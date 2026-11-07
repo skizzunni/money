@@ -6574,3 +6574,9 @@ instead its risk ($300, $450 or $600) over its own initial stop's distance plus 
 E50R sizing; 6 variants; the gap trade stays at 2 MNQ; the day's and the floor's room still cut the size). G253's
 measure; the same rule as G282 (the best development variant that passes more than U53 there and fails no more replaces
 U53 only if on the unseen weeks it passes more than 12.2% and fails at most 8.4%). Run once.
+
+**G283 result (2026-11-07): rejected at the development step.** Development (index 2011-18, 405 weeks): U53 10.9%
+passed / 6.4% failed; fixed-risk sizing $300 up to 6 / 8 MNQ 1.2% / 1.0%, 1.7% / 1.2%; $450 2.2% / 3.2%, 3.0% / 3.0%;
+$600 5.7% / 4.4%, 6.2% / 7.2%. No variant passes more than U53, so none goes to the unseen weeks (that part of the run
+was stopped; it could not change the verdict). The bot's own stops are wide (the noise line), so a fixed dollar risk
+buys 1-3 MNQ and the Test runs out of time. U53 stays. `verification/noise_v2/g283_risk_size.txt`.
