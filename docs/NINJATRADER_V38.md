@@ -7136,3 +7136,8 @@ G261 searched G13's time lock before the cap. `research/g319_time_lock.py`, on U
 minutes after its fill gets the lock (its stop to the entry plus lock_plus; 3 variants; `time_lock`). G253's measure and
 G290's rule (development: more passes than U55, failures no higher; unseen: more than 15.6% passed, at most 7.9%
 failed, failed + near-frozen at most 22.2%). Run once.
+
+**G319 result (2026-11-07): rejected.** Development (405 weeks; U55 13.6% / 5.9%): time lock 30 / 60 / 90 minutes 13.3% /
+5.7%, 13.6% / 5.9%, 13.6% / 5.9%. Unseen (933; U55 15.6% / 7.9% / 22.2%): 15.4% / 8.0%, 15.6% / 7.9%, 15.6% / 7.9%. The
+30-minute time stop and the lock already settle almost every trade before 60 minutes; no change. U55 stays.
+`verification/noise_v2/g319_time_lock.txt`.
