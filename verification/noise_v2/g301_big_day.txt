@@ -1,0 +1,14 @@
+development (index 2011-18):
+              weeks  passed  failed  stuck  failed_or_stuck
+tag                                                        
+U55             405   0.136   0.059  0.141            0.200
+big day 1.5x    405   0.136   0.054  0.138            0.193
+big day 2.0x    405   0.138   0.064  0.133            0.198
+big day 2.5x    405   0.136   0.059  0.141            0.200
+unseen (NQ 2015-25 + index 2019-26):
+              weeks  passed  failed  stuck  failed_or_stuck
+tag                                                        
+U55             933   0.156   0.079  0.143            0.222
+big day 1.5x    933   0.152   0.078  0.131            0.209
+big day 2.0x    933   0.160   0.078  0.137            0.215
+big day 2.5x    933   0.156   0.079  0.143            0.222

@@ -6886,3 +6886,8 @@ The sprint turned v2.3's big-day rule off (the searches after G253 held `big_day
 U55: after a day whose range is above 1.5x, 2x or 2.5x the average, no entries in that day's direction the next day (3
 variants). G253's measure and G290's rule (development: more passes than U55, failures no higher; unseen: more than
 15.6% passed, at most 7.9% failed, failed + near-frozen at most 22.2%). Run once.
+
+**G301 result (2026-11-07): rejected.** Development (405 weeks; U55 13.6% / 5.9% / 20.0%): big day 1.5x 13.6% / 5.4% /
+19.3% (a tie in passes), 2x 13.8% / 6.4% (more failures), 2.5x the same as U55 (it never applies). None qualifies.
+Unseen (933; U55 15.6% / 7.9% / 22.2%): 15.2% / 7.8% / 20.9%, 16.0% / 7.8% / 21.5%, 15.6% / 7.9% / 22.2%: within noise.
+U55 stays. `verification/noise_v2/g301_big_day.txt`.
