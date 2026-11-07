@@ -6728,3 +6728,10 @@ target goes to the price where today's P/L reaches $1,500 when that is nearer th
 from the fill, and each bar after). Engine: `DayCapExit` (C#), `day_cap_exit` (mnqbot/noise.py). NinjaTrader's code
 matches the model trade for trade on the test sample, which reaches the day cap (`test_v38_test_sprint`). Still far from
 25% in two weeks.
+
+## G290: more of the day cap (registered 2026-11-07, before its run)
+
+G289b's passes rose with the cap ($1,100 → $1,500). `research/g290_cap_more.py`, on U55: the cap at $1,700 or $2,000,
+and G277's k296 settings with the $1,500 cap (3 variants). G253's measure and the rule raised to U55's numbers: the best
+development variant (more passes than U55 there, failures no higher) replaces U55 only if on the unseen weeks it passes
+more than 15.6%, fails at most 7.9%, and failed + near-frozen is at most 22.2%. Run once.
