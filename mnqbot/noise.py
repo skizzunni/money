@@ -162,6 +162,7 @@ class NoiseConfig:
     day_stop_consistent: float = 0.0
     # research (G289): the day profit stop also closes the open trade, at the price where the day's P/L reaches it
     day_cap_exit: bool = False
+    day_cap_at: float = 0.0  # research (G296): the cap's amount when it differs from day_stop_profit (0 = the same)
     # research (G294): the day lock. Once today's P/L with the open trade at its best price since entry (bar extremes,
     # through the last bar) reaches day_lock_at, the stop goes no lower than the price where today's P/L is day_lock_keep
     day_lock_at: float = 0.0
@@ -1175,7 +1176,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                         locked = True
             cp, tp_checked = math.nan, False  # G289: the day's cap, a limit where today's P/L reaches day_stop_profit
             if pos and cfg.day_cap_exit and cfg.day_stop_profit > 0:
-                need = cfg.day_stop_profit - day_pnl + 2 * cfg.commission_per_side * q_trade * rest
+                need = (cfg.day_cap_at or cfg.day_stop_profit) - day_pnl + 2 * cfg.commission_per_side * q_trade * rest
                 cp = entry_px + pos * math.ceil(need / (rest * q_trade * cfg.point_value) / cfg.tick - 1e-9) * cfg.tick
             if not pos or hit:
                 pass

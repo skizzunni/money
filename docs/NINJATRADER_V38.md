@@ -6814,3 +6814,11 @@ within 10, 15, 20, 30 and 40 sessions, NQ 2015-25 and the index 2011-26 Monday s
 
 U55 passes 2-3 points more than U53 at every horizon and fails less. About a quarter of Tests pass within 6-8 weeks;
 within two weeks, 15%.
+
+## G296: new entries stop before the day cap (registered 2026-11-07, before its run)
+
+U55's $1,500 is both the day profit stop (no new entries) and the cap (the open trade closed there).
+`research/g296_entry_stop.py`, on U55: new entries stop at $1,000, $1,200 or $1,300 of today's P/L, while the open
+trade is still closed at $1,500 (3 variants; `day_cap_at` in mnqbot/noise.py). G253's measure and G290's rule
+(development: more passes than U55, failures no higher; unseen: more than 15.6% passed, at most 7.9% failed, failed +
+near-frozen at most 22.2%). Run once.
