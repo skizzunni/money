@@ -6879,3 +6879,10 @@ sessions, shorts against it at 1 MNQ or skipped: 9.1% / 4.0% (both); at 20 sessi
 7.9% / 22.2%): 12.0% / 7.4%, 12.4% / 7.4%, 11.4% / 7.0%. The shorts against the uptrend carry passes in a two-week Test;
 filtering them cuts passes more than failures, as G253 found before the cap. U55 stays.
 `verification/noise_v2/g300_trend.txt`.
+
+## G301: the big-day rule under the day cap (registered 2026-11-07, before its run)
+
+The sprint turned v2.3's big-day rule off (the searches after G253 held `big_day_k` 0). `research/g301_big_day.py`, on
+U55: after a day whose range is above 1.5x, 2x or 2.5x the average, no entries in that day's direction the next day (3
+variants). G253's measure and G290's rule (development: more passes than U55, failures no higher; unseen: more than
+15.6% passed, at most 7.9% failed, failed + near-frozen at most 22.2%). Run once.
