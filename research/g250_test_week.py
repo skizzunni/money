@@ -48,7 +48,7 @@ def one(job):
     cfg = NoiseConfig(**{**S.V23, **T.REFERENCE, "daily_loss_limit": 900.0, "trail_dd": DD, "time_stop": 60,
                          **BASE, "daily_loss_limit": 2000.0, "early_daily_loss": 0.0, **extra})
     if sq:
-        cfg.sprint_qty, cfg.sprint_days, cfg.sprint_target = sq, SESS, extra.get("sprint_target", TARGET)  # G269
+        cfg.sprint_qty, cfg.sprint_days, cfg.sprint_target = sq, extra.get("sprint_days", SESS), extra.get("sprint_target", TARGET)  # G269 / G278
     cfg.day_stop_profit = ds  # G251: no new entries once the day is up this much (0 = off)
     cfg.tv_path, cfg.nt_execution, cfg.round_prices, cfg.target_on_fill_bar = False, True, True, True
     if isinstance(skip, str):

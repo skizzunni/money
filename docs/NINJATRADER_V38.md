@@ -6468,3 +6468,10 @@ profit (0.6-1.0), lock (0.15-0.25 / +1.5-3.5 points), losers (2-4), time stop (2
 **Replaces U53's Test sprint** if on stage 2 it passes more than 12.2% and fails at most 8.4%; as G256, the five
 lowest-failure stage-1 combinations (at least 11% passed, at most 8% failed) also go to stage 2 under the same rule.
 Run once.
+
+## G278: U53 over 2, 3, 4 and 6 weeks (registered 2026-11-07, before its run)
+
+The user asked for 25% passes. A measurement, no adoption rule: U53's Test sprint (4 MNQ for the first 10 sessions,
+then the 50K's growth sizing) under G250's Test rules, the share passed and failed within 10, 15, 20 and 30 sessions,
+NQ 2015-25 and the index 2011-26 Monday starts (`research/g278_horizon.py`). Earlier rounds found no edge on the S&P
+(G56) or overnight (G57), so more sessions are the remaining source of passes.
