@@ -6992,3 +6992,11 @@ not, and U53 passes 9 that U55 does not; U55 fails 3 that U53 does not, U53 fail
 of calendar quarters (4,000 draws), the passes gained: **+3.2 points (95%: +1.9 to +4.5; never at or below zero)**; the
 failures: −0.45 points (95%: −0.9 to 0.0). The day cap's extra passes are not noise; its saving in failures is small.
 `verification/noise_v2/g309_paired.txt`.
+
+## G310: a green afternoon kept green (registered 2026-11-07, before its run)
+
+The Test needs three trading days and the best day under half the profit; a day that is up by the afternoon can still
+turn red. `research/g310_late_stop.py`, on U55: from 13:00 (or 14:00), no new entries once today's P/L is at least $500
+(or $750 from 13:00) (3 variants; `day_stop_late_from` / `day_stop_late`). G253's measure and G290's rule (development:
+more passes than U55, failures no higher; unseen: more than 15.6% passed, at most 7.9% failed, failed + near-frozen at
+most 22.2%). Run once.
