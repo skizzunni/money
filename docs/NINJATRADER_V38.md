@@ -6710,3 +6710,21 @@ $1,300 / $1,500: 10.9% / 12.8% / 13.3% passed, 5.7% / 5.9% / 5.9% failed (U53 10
 so on a bar that reached both it filled at the farther price; a real account's nearer limit fills first. **G289b**
 (registered now, before its run; same variants and rule): the nearer of the take-profit and the day's cap is the one
 that fills (`research/g289_day_cap.py`, mnqbot/noise.py).
+
+**G289b result (2026-11-07): adopted as U55.** The nearer of the take-profit and the day's cap fills
+(`verification/noise_v2/g289b_day_cap.txt`):
+
+| | development passed | failed | failed or near-frozen | unseen passed | failed | failed or near-frozen |
+|---|---|---|---|---|---|---|
+| U53 | 10.9% | 6.4% | 20.5% | 12.2% | 8.4% | 22.3% |
+| day cap $1,100 | 10.1% | 5.4% | 19.8% | 12.8% | 7.3% | 21.1% |
+| day cap $1,300 | 12.3% | 5.7% | 20.5% | 13.8% | 7.4% | 22.0% |
+| **day cap $1,500** | **13.6%** | **5.9%** | **20.0%** | **15.6%** | **7.9%** | **22.2%** |
+
+The best development variant with more passes than U53 and failures no higher is the $1,500 cap (13.6% / 5.9%). On the
+933 unseen weeks it passes 15.6%, fails 7.9%, and fails or ends near-frozen 22.2%: all three inside the rule (the last
+by 0.1 point). **U55** = Mode "Test sprint" with a $1,500 day profit stop that also closes the open trade: the bracket's
+target goes to the price where today's P/L reaches $1,500 when that is nearer than the take-profit (at entry, in ticks
+from the fill, and each bar after). Engine: `DayCapExit` (C#), `day_cap_exit` (mnqbot/noise.py). NinjaTrader's code
+matches the model trade for trade on the test sample, which reaches the day cap (`test_v38_test_sprint`). Still far from
+25% in two weeks.

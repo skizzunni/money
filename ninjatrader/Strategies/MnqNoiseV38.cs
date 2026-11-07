@@ -107,6 +107,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         public int SprintGapQty = 0;  // G273: the gap trade's size during the sprint (0 = SprintQty)
         // G253: a wider area for new entries only (entry_k), and no new entries once the day is up DayStopProfit
         public double EntryK = 1.0, DayStopProfit = 0;
+        public bool DayCapExit = false;  // G289: DayStopProfit also closes the open trade (a limit where today's P/L reaches it)
         public double SprintTarget = 3000;
         // G76: the bot's sizing counts this many points more slippage at the stop (0 = off)
         public double SizeSlipPts = 0;
@@ -369,9 +370,26 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         public double PeekTarget(double entry)
         {
-            if (Position == 0 || s.TakeProfit <= 0 || double.IsNaN(Sigma))
+            if (Position == 0)
                 return double.NaN;
-            return OnGrid(Position, entry * (1 + Position * s.TakeProfit * Sigma));
+            double tp = s.TakeProfit <= 0 || double.IsNaN(Sigma) ? double.NaN
+                      : OnGrid(Position, entry * (1 + Position * s.TakeProfit * Sigma));
+            double cp = DayCapPx(entry, Position, qTrade);  // G289: the nearer of the two
+            if (!double.IsNaN(cp) && (double.IsNaN(tp) || Position * (cp - tp) < 0)) tp = cp;
+            return tp;
+        }
+
+        // G289: the day's cap, the price where today's P/L reaches DayStopProfit (whole ticks; NaN = off)
+        double DayCapPx(double entry, int p, int q)
+        {
+            if (!s.DayCapExit || s.DayStopProfit <= 0 || p == 0 || q <= 0) return double.NaN;
+            return entry + p * DayCapPts(q);
+        }
+
+        double DayCapPts(int q)
+        {
+            double need = s.DayStopProfit - DayPnl + 2 * s.CommissionPerSide * q;
+            return Math.Ceiling(need / (q * s.PointValue) / s.Tick - 1e-9) * s.Tick;
         }
 
         public int TradeQty { get { return qTrade; } }
@@ -572,8 +590,17 @@ namespace NinjaTrader.NinjaScript.Strategies
                 {
                     double tp = EntryBar == i ? EntryPrice + p * brTpTrade
                                               : OnGrid(p, EntryPrice * (1 + p * s.TakeProfit * Sigma));
+                    string why = "Target";
+                    double cp = DayCapPx(EntryPrice, p, qTrade);  // G289: the day's cap, when nearer
+                    if (!double.IsNaN(cp) && p * (cp - tp) < 0) { tp = cp; why = "Day cap"; }
                     if ((p > 0 && h >= tp + s.Tick) || (p < 0 && l <= tp - s.Tick))
-                        Close(i, tp, "Target");
+                        Close(i, tp, why);
+                }
+                else
+                {
+                    double cp = DayCapPx(EntryPrice, p, qTrade);  // G289: the day's cap, no take-profit
+                    if (!double.IsNaN(cp) && ((p > 0 && h >= cp + s.Tick) || (p < 0 && l <= cp - s.Tick)))
+                        Close(i, cp, "Day cap");
                 }
             }
 
@@ -779,6 +806,11 @@ namespace NinjaTrader.NinjaScript.Strategies
             NewQty = q;
             NewStopPts = brStopNext;
             NewTpPts = brTpNext;
+            if (s.DayCapExit && s.DayStopProfit > 0)  // G289: the bracket's target at the day's cap when nearer
+            {
+                double capPts = DayCapPts(q);
+                if (double.IsNaN(NewTpPts) || capPts < NewTpPts) NewTpPts = capPts;
+            }
         }
 
         // G60: at the 09:30 bar's close, gap and go's signal for the 09:35 open (5-minute bars only)
@@ -1016,11 +1048,11 @@ namespace NinjaTrader.NinjaScript.Strategies
                     if (Mode == "Funded growth Apex 100K") { DailyLoss = 1350; TrailDD = 3000; LossGuard = 1425; }
                     if (Mode == "Funded growth Apex 150K") { DailyLoss = 1800; TrailDD = 4000; LossGuard = 1900; }
                 }
-                if (sprintMode)  // G256 k317 + G269 + G273 + G275: the Test in two weeks (12.2% passed, 8.4% failed on unseen weeks; docs)
+                if (sprintMode)  // G256 k317 + G269 + G273 + G275 + G289: the Test in two weeks (15.6% passed, 7.9% failed on unseen weeks; docs)
                 {
                     DailyLoss = 2000; LossGuard = 1900; EarlyDayBudget = 0; MaxLosersPerDay = 3; TimeStop = 30;
                     RangePos = 0.7; TrendSessions = 0; BigDayK = 0; CalmK = 0.7; TakeProfit = 0.75; LockAt = 0.2;
-                    EarlyNoEntryChecks = ""; SprintContracts = 4; sprintDays = 10; DayProfitStop = 1100;
+                    EarlyNoEntryChecks = ""; SprintContracts = 4; sprintDays = 10; DayProfitStop = 1500;  // G289
                     NoiseSessions = 18; EntryWidth = 0.7; SqueezeMin = 0; LastEntry = "15:30"; GapTrigger = 0.5;
                     StopBuffer = 0.24; LockPlus = 2.5; GapBreakEven = 0;  // G275: no gap break-even in the sprint
                 }
@@ -1060,6 +1092,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 st.SprintDays = sprintDays;  // G253: 10 in the Test sprint
                 st.SprintTarget = sprintMode ? 5000 : 3000;  // G269: the Test sprint keeps its size to +$5,000
                 st.SprintGapQty = sprintMode ? 2 : 0;  // G273: the Test sprint's gap trade at 2 MNQ
+                st.DayCapExit = sprintMode;  // G289: the Test sprint's day profit stop also closes the open trade
                 st.Lookback = NoiseSessions; st.EntryK = EntryWidth; st.DayStopProfit = DayProfitStop;  // G253
                 st.SizeSlipPts = Mode != "Evaluation" ? SizeSlip : 0;  // G79: the Funded growth modes and Custom
                 st.ProtectRoom = Mode != "Evaluation" ? NearFloorGate : 0;  // G87

@@ -1073,14 +1073,15 @@ def test_v38_sprint(sim, sample_1m, tmp_path):  # noqa: F811
 # G256 k317 with G269's +$5,000 sprint target: the two-week Test sprint (G253's k61 before)
 SPRINT = {"daily_loss_limit": 2000.0, "early_daily_loss": 0.0, "max_losers": 3, "time_stop": 30, "range_pos_min": 0.7,
           "trend_n": 0, "big_day_k": 0.0, "calm_k": 0.7, "take_profit": 0.75, "lock_at": 0.2, "skip_checks": "",
-          "sprint_qty": 4, "sprint_days": 10, "sprint_target": 5000.0, "sprint_gap_qty": 2, "gap_go_be": 0.0, "day_stop_profit": 1100.0, "lookback": 18,
+          "sprint_qty": 4, "sprint_days": 10, "sprint_target": 5000.0, "sprint_gap_qty": 2, "gap_go_be": 0.0, "day_stop_profit": 1500.0, "lookback": 18,
           "entry_k": 0.7, "squeeze_min": 0.0, "last_entry_end": 930, "gap_go_k": 0.5, "stop_buffer": 0.24,
-          "lock_plus": 2.5}
+          "lock_plus": 2.5, "day_cap_exit": True}  # U55: G289's day cap
 
 
 @pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
 def test_v38_test_sprint(sim, sample_1m, tmp_path):  # noqa: F811
-    """G256: Mode "Test sprint" (k317: 4 MNQ for the first 10 sessions until +$3,000, a $1,100 day profit stop, the
+    """G256 / U55: Mode "Test sprint" (k317: 4 MNQ for the first 10 sessions until +$5,000, a $1,500 day profit stop
+    that also closes the open trade (G289), the
     noise area over 18 sessions, entries at 0.7x it, and the rest of k317's settings). NinjaTrader's code and the model
     agree trade for trade, and the sprint's 4 MNQ trades are there."""
     bars = resample(sample_1m, "5min")
@@ -1101,3 +1102,4 @@ def test_v38_test_sprint(sim, sample_1m, tmp_path):  # noqa: F811
         assert float(a[2]) == t.entry and float(a[4]) == t.exit, (a, t)
         assert math.isclose(float(a[6]), t.pnl, abs_tol=1e-6), (a, t)
     assert any(t.qty == 4 for t in py)
+    assert any(t.reason == "Day cap" for t in py)  # U55: the sample reaches G289's day cap, so the parity covers it
