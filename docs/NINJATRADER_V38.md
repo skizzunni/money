@@ -6891,3 +6891,10 @@ variants). G253's measure and G290's rule (development: more passes than U55, fa
 19.3% (a tie in passes), 2x 13.8% / 6.4% (more failures), 2.5x the same as U55 (it never applies). None qualifies.
 Unseen (933; U55 15.6% / 7.9% / 22.2%): 15.2% / 7.8% / 20.9%, 16.0% / 7.8% / 21.5%, 15.6% / 7.9% / 22.2%: within noise.
 U55 stays. `verification/noise_v2/g301_big_day.txt`.
+
+## G302: the sprint's max loss a contract (registered 2026-11-07, before its run)
+
+The sprint has kept the 50K's $187.50 a contract (about 94 points; `max_loss_per_trade`), never searched. It caps the
+initial stop and sets the lock's trigger (lock_at x the max loss). `research/g302_max_loss.py`, on U55: $125, $150 or
+$250 a contract (3 variants). G253's measure and G290's rule (development: more passes than U55, failures no higher;
+unseen: more than 15.6% passed, at most 7.9% failed, failed + near-frozen at most 22.2%). Run once.
