@@ -6398,3 +6398,9 @@ Run once.
 **G271 result (2026-11-07): rejected.** Unseen weeks (passed / failed): U51 ($1,100) 11.5% / 9.1%; $1,300 9.6% / 9.0%;
 $1,500 8.7% / 9.1%; $2,000 6.8% / 9.2% (`verification/noise_v2/g271_day_stop.txt`). A bigger day makes the
 consistency rule harder (the best day must stay under half the profit), so passes fall. U51 stays.
+
+## G272: U51's Test sprint with a lower day stop or another size (registered 2026-11-07, before its run)
+
+U51 (4 MNQ to +$5,000, day stop $1,100) against a day stop of $900 or $1,000, and a sprint of 3 or 5 MNQ.
+`research/g272_sprint_grid.py`, G253's measure. **Replaces U51's setting** if on the unseen weeks it passes more than
+11.5% and fails at most 9.1%. Run once.
