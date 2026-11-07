@@ -6542,3 +6542,12 @@ loss could never pass the sizing's $100 above the floor and no Test ever failed 
 17.9% development / 25.0% unseen; `verification/noise_v2/g281_daily_bracket_exact_fills.*`). Real stops slip, more so
 when a minute opens past them. **G281b** (registered now, before its run, same grid and rule): a stop fills at the stop
 or at the opening price of the minute that opened past it, whichever is worse, and a further tick.
+
+**G281b result (2026-11-07): rejected.** With gap-through stop fills the pass and fail counts are unchanged (no Test
+touches the floor: the sizing keeps a full stop above it; `verification/noise_v2/g281b_daily_bracket.{txt,csv}`). The
+best development setting (stop 25 points, target $1,200 a day; R 1.0 and 1.25 tie at 17.9%) passes 22.9% / 25.0% on the
+unseen 2020-25 weeks, against U53's 16.5% passed / 11.9% failed on the same NQ weeks. **But** a check of how the open
+Tests end (G281c, `verification/noise_v2/g281c_frozen.txt`): **55-61% end with less than one contract's stop above the
+floor** (frozen: the account cannot take another trade), development and unseen alike. The "no failures" is the floor
+reached by inches, not avoided. Counting frozen as lost, it loses the account far more often than U53. Rejected; U53
+stays.
