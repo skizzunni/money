@@ -7059,3 +7059,8 @@ G53's gap block (growth bot only, mixed). `research/g313_gap_block.py`, on U55: 
 or 1.5% from the prior close, no bot entries against the gap (3 variants; `gap_block`). G253's measure and G290's rule
 (development: more passes than U55, failures no higher; unseen: more than 15.6% passed, at most 7.9% failed, failed +
 near-frozen at most 22.2%). Run once.
+
+**G313 result (2026-11-07): rejected.** Development (405 weeks; U55 13.6% / 5.9% / 20.0%): no entries against a 0.5% /
+1% / 1.5% gap: 11.6% / 7.9%, 13.3% / 6.4%, 13.3% / 5.9%. Unseen (933; U55 15.6% / 7.9% / 22.2%): 14.5% / 8.1%, 14.9% /
+8.3%, 15.2% / 8.1%. Fewer passes and more failures; the trades against a gap are not the bad ones. U55 stays.
+`verification/noise_v2/g313_gap_block.txt`.
