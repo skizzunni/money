@@ -6827,3 +6827,10 @@ near-frozen at most 22.2%). Run once.
 $1,000 / $1,200 / $1,300 with the cap at $1,500: 11.9% / 6.2%, 13.1% / 6.2%, 12.6% / 6.2%: fewer passes, more failures;
 none qualifies. Unseen (933; U55 15.6% / 7.9% / 22.2%): 14.8% / 8.1%, 15.6% / 7.9%, 15.9% / 7.9% (failed or near-frozen
 22.0-22.1%): within noise of U55. U55 stays. `verification/noise_v2/g296_entry_stop.txt`.
+
+## G297: a losing-streak pause in the Test sprint (registered 2026-11-07, before its run)
+
+The engine's streak rule (v2.1 study; tested for funded growth only) on the two-week Test: `research/g297_streak.py`, on
+U55: after 3 or 4 losing trades in a row (across days; a winner resets the count) the next 1 or 2 entry signals are
+skipped (3 variants: 3 / 1, 3 / 2, 4 / 2). G253's measure and G290's rule (development: more passes than U55, failures no
+higher; unseen: more than 15.6% passed, at most 7.9% failed, failed + near-frozen at most 22.2%). Run once.
