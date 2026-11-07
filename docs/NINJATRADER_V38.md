@@ -7052,3 +7052,10 @@ turns failures into accounts left at the floor. None qualifies; U55 stays.
 Sizing up passes more Tests but leaves fewer accounts up and alive: from 55.8% at 4 MNQ to 43.8% at 8, and the median
 two weeks falls. The user's rule ("up and not dead") is best met at 4 MNQ. None qualifies under the rule written
 before the results; U55 stays.
+
+## G313: no entries against a big opening gap, in the Test sprint (registered 2026-11-07, before its run)
+
+G53's gap block (growth bot only, mixed). `research/g313_gap_block.py`, on U55: on a day that opens more than 0.5%, 1%
+or 1.5% from the prior close, no bot entries against the gap (3 variants; `gap_block`). G253's measure and G290's rule
+(development: more passes than U55, failures no higher; unseen: more than 15.6% passed, at most 7.9% failed, failed +
+near-frozen at most 22.2%). Run once.
