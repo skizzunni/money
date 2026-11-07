@@ -7148,3 +7148,7 @@ G269 kept the sprint's 4 MNQ to +$5,000 before the cap existed. `research/g320_s
 +$4,000 or +$6,000 instead (3 variants; `sprint_target`). G253's measure and G290's rule (development: more passes than
 U55, failures no higher; unseen: more than 15.6% passed, at most 7.9% failed, failed + near-frozen at most 22.2%). Run
 once.
+
+**G320 result (2026-11-07): rejected (no effect).** Development: all three the same as U55 (13.6% / 5.9%). Unseen: +$3,500
+15.6% / 7.9%, +$4,000 15.4% / 7.9%, +$6,000 15.6% / 7.9%. Under the $1,500 cap a Test past +$3,500 has nearly always
+passed already, so the handover point hardly matters. U55 stays. `verification/noise_v2/g320_sprint_target.txt`.
