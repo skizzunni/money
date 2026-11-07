@@ -6551,3 +6551,12 @@ Tests end (G281c, `verification/noise_v2/g281c_frozen.txt`): **55-61% end with l
 floor** (frozen: the account cannot take another trade), development and unseen alike. The "no failures" is the floor
 reached by inches, not avoided. Counting frozen as lost, it loses the account far more often than U53. Rejected; U53
 stays.
+
+## G282: the sprint's push in the last sessions (registered 2026-11-07, before its run)
+
+At two weeks, 274 of U53's 1,322 open Tests end between +$1,000 and +$3,000 (G278's rows): close, but out of time.
+`research/g282_push.py`: U53's Test sprint, but from session 8 or 9 of the 10, while the Test is up at least $1,000 or
+$2,000, the sprint takes 6 or 8 MNQ (8 variants; the gap trade stays at 2 MNQ; the day's and the floor's room still cut
+the size). G253's measure. The best development variant (passes more than U53 there and fails no more; most passes)
+replaces U53 only if on the unseen weeks it passes more than 12.2% and fails at most 8.4%. None qualifying: rejected.
+Run once.

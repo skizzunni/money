@@ -383,6 +383,11 @@ class NoiseConfig:
     sprint_qty: int = 0
     sprint_gap_qty: int = 0  # research (G273): the gap trade's size during the sprint (0 = the sprint's)
     sprint_qty_locked: int = 0  # research (G270): the sprint's size once the floor has stopped (0 = sprint_qty)
+    # research (G282): the sprint's push: from the sprint_push_from-th session, while the profit since the start is at
+    # least sprint_push_min, the sprint takes sprint_push_qty contracts (the gap trade keeps sprint_gap_qty; 0 = off)
+    sprint_push_from: int = 0
+    sprint_push_qty: int = 0
+    sprint_push_min: float = 0.0
     profit_step_fast: float = 0.0  # research (G142): above profit_step_fast_from of profit, a contract per this much
     profit_step_fast_from: float = 10000.0
     profit_step_locked: float = 0.0  # G104: once the floor has stopped, a contract per this much profit (0: off)
@@ -669,7 +674,10 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
         return int(p // step_now())
 
     def sprint_q() -> int:
-        """G270: the sprint's size (sprint_qty_locked once the floor has stopped)."""
+        """G270: the sprint's size (sprint_qty_locked once the floor has stopped; G282: the push)."""
+        if (cfg.sprint_push_qty > 0 and cfg.sprint_push_from > 0 and sprint_sessions >= cfg.sprint_push_from
+                and eq_curve[-1] - trail_base >= cfg.sprint_push_min):
+            return cfg.sprint_push_qty
         return cfg.sprint_qty_locked if cfg.sprint_qty_locked > 0 and floor_stopped() else cfg.sprint_qty
 
     def sprint_on() -> bool:
