@@ -6748,3 +6748,9 @@ G272 chose 4 MNQ before the day cap existed; the cap now limits a day's gain. `r
 sprint at 5 or 6 MNQ under the $1,500 cap, and the cap at $1,400 with 4 MNQ (3 variants). G253's measure and G290's rule
 (development: more passes than U55, failures no higher; unseen: more than 15.6% passed, at most 7.9% failed, failed +
 near-frozen at most 22.2%). Run once.
+
+**G291 result (2026-11-07): rejected.** Development (405 weeks; U55 13.6% passed / 5.9% failed / 20.0% failed or
+near-frozen): the cap at $1,400 11.9% / 5.9% / 20.0%; the sprint at 5 MNQ 17.5% / 9.9% / 30.9%; at 6 MNQ 18.3% / 15.6%
+/ 36.3%. Unseen (933; U55 15.6% / 7.9% / 22.2%): $1,400 15.0% / 7.5% / 21.2%; 5 MNQ 17.7% / 12.0% / 29.8%; 6 MNQ 19.6% /
+18.3% / 37.8%. More contracts add passes but more failures (6 MNQ: about one extra failure for each extra pass); none
+qualifies. U55 stays. `verification/noise_v2/g291_cap_size.txt`.
