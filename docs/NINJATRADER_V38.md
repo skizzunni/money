@@ -7129,3 +7129,10 @@ more than 15.6% passed, at most 7.9% failed, failed + near-frozen at most 22.2%)
 0.25x / 0.35x opening drive: 12.1% / 5.4%, 12.3% / 5.2%, 13.1% / 5.9%. Unseen (933; U55 15.6% / 7.9% / 22.2%): 14.5% /
 7.8%, 14.8% / 7.9%, 15.0% / 7.8%. Fewer passes, hardly fewer failures: the reversals against the morning's move pay
 their share. U55 stays. `verification/noise_v2/g318_drive.txt`.
+
+## G319: the time lock under the day cap (registered 2026-11-07, before its run)
+
+G261 searched G13's time lock before the cap. `research/g319_time_lock.py`, on U55: a trade still in profit 30, 60 or 90
+minutes after its fill gets the lock (its stop to the entry plus lock_plus; 3 variants; `time_lock`). G253's measure and
+G290's rule (development: more passes than U55, failures no higher; unseen: more than 15.6% passed, at most 7.9%
+failed, failed + near-frozen at most 22.2%). Run once.
