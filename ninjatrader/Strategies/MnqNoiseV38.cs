@@ -108,6 +108,14 @@ namespace NinjaTrader.NinjaScript.Strategies
         // G253: a wider area for new entries only (entry_k), and no new entries once the day is up DayStopProfit
         public double EntryK = 1.0, DayStopProfit = 0;
         public bool DayCapExit = false;  // G289: DayStopProfit also closes the open trade (a limit where today's P/L reaches it)
+        // G128 / G321: the day guard, a stop where today's P/L (or the room above the floor less GuardFloorBuffer) reaches
+        // -DayGuard; no new entries after it fires (0 = off)
+        public double DayGuard = 0, GuardFloorBuffer = 100;
+        // G297 / G321: after StreakK losing trades in a row (across days), skip the next StreakSkip entry signals (0 = off)
+        public int StreakK = 0, StreakSkip = 1;
+        // G62 / G321: on these dates (the jobs-report days), NewsMult x the contracts, after the sprint's size
+        public string NewsDates = "";
+        public double NewsMult = 1.0;
         public double SprintTarget = 3000;
         // G76: the bot's sizing counts this many points more slippage at the stop (0 = off)
         public double SizeSlipPts = 0;
@@ -153,6 +161,8 @@ namespace NinjaTrader.NinjaScript.Strategies
         double held = double.NaN, fav = double.NaN;
         string heldWhy = "";
         int consec;                       // losing trades in a row, across days
+        int skipLeft;                     // G321: entry signals still to skip after a losing streak
+        bool guardToday;                  // G321: the day guard closed a trade today
         int losersToday;                  // G204: losing trades closed today
         double equity;                    // the closed P/L so far
         double trailBase = double.NaN, trailPeak = double.NaN;
@@ -163,6 +173,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         public double EntryPrice;
         public double Upper = double.NaN, Lower = double.NaN, Sigma = double.NaN;
         public bool Locked, SkipToday, FedToday;
+        bool newsToday;  // G321: a jobs-report day (NewsDates)
         public double DayPnl;
         // the account's own numbers (the strategy's real fills), set by the wrapper before each bar; every risk limit
         // uses the worse of these and the model's, so a live fill worse than the model's never adds risk (NaN: unset)
@@ -365,6 +376,12 @@ namespace NinjaTrader.NinjaScript.Strategies
             line = OnGrid(p, line);
             if (s.TightenOnly && !double.IsNaN(held) && ((p > 0 && held > line) || (p < 0 && held < line)))
                 line = held;
+            double gpx = DayGuardPx(entry, p, qTrade);  // G321: the day guard (on the grid, never past it)
+            if (!double.IsNaN(gpx))
+            {
+                gpx = OnGrid(p, gpx);
+                if (p * (gpx - line) > 0) line = gpx;
+            }
             return line;
         }
 
@@ -415,8 +432,13 @@ namespace NinjaTrader.NinjaScript.Strategies
             Trades.Add(t);
             DayPnl += pnl;
             equity += pnl;
-            if (pnl < 0 && reason != "Session ended") { consec++; losersToday++; }
+            if (pnl < 0 && reason != "Session ended")
+            {
+                consec++; losersToday++;
+                if (s.StreakK > 0 && consec >= s.StreakK) skipLeft = s.StreakSkip;  // G321
+            }
             else if (pnl >= 0) consec = 0;
+            if (reason == "Day guard") guardToday = true;  // G321
             Position = 0;
             Locked = false;
             held = double.NaN;
@@ -471,6 +493,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         bool StudyOk(int d, int end, double c)
         {
             if (s.MaxLosers > 0 && losersToday >= s.MaxLosers) { Note = "after " + s.MaxLosers + " losing trades today"; return false; }  // G204
+            if (guardToday) { Note = "the day guard closed a trade today"; return false; }  // G321
             if (s.DayStopProfit > 0 && DayPnl >= s.DayStopProfit) { Note = "today's profit stop"; return false; }  // G253
             if (Protected()) { Note = "near the floor, shadow below its average"; return false; }
             if (s.LastEntryEnd > 0 && end > s.LastEntryEnd) { Note = "after the last entry check"; return false; }
@@ -483,7 +506,18 @@ namespace NinjaTrader.NinjaScript.Strategies
                 double rp = d > 0 ? (c - dayLo) / (dayHi - dayLo) : (dayHi - c) / (dayHi - dayLo);
                 if (rp < s.RangePosMin) { Note = "not near the day's extreme"; return false; }
             }
+            if (skipLeft > 0) { skipLeft--; Note = "a signal skipped after a losing streak"; return false; }  // G321
             return true;
+        }
+
+        // G321: the day guard's price for a position of q contracts from entry (NaN = off)
+        double DayGuardPx(double entry, int p, int q)
+        {
+            if (s.DayGuard <= 0 || p == 0 || q <= 0) return double.NaN;
+            double allow = s.DayGuard + DayPnl;
+            if (s.TrailDD > 0 && !double.IsNaN(trailPeak))
+                allow = Math.Min(allow, equity - Math.Min(trailPeak - s.TrailDD, trailBase) - s.GuardFloorBuffer);  // closed equity, as the model
+            return entry - p * (allow - 2 * s.CommissionPerSide * q) / (q * s.PointValue);
         }
 
         public void OnBar(DateTime nyStart, double o, double h, double l, double c)
@@ -559,9 +593,11 @@ namespace NinjaTrader.NinjaScript.Strategies
                     held = line;
                     heldWhy = reason;
                 }
+                double gpx = OnGrid(p, DayGuardPx(EntryPrice, p, qTrade));  // G321: the day guard, on the tick grid
+                if (!double.IsNaN(gpx) && p * (gpx - line) > 0) { line = gpx; reason = "Day guard"; }
                 bool hit;
                 double price;
-                if (EntryBar != i && p * (lastBarClose - line) <= 0)
+                if (EntryBar != i && p * (lastBarClose - line) <= 0 && reason != "Day guard")
                 {
                     hit = true; price = o - p * slip; reason = "Stop passed";  // sent at the last close, filled now
                 }
@@ -620,6 +656,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 blockDir = 0;
                 DayPnl = 0;
                 losersToday = 0;
+                guardToday = false;  // G321
                 if (s.TrailDD > 0 && string.CompareOrdinal(nyStart.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture), s.TrailFrom ?? "") >= 0)
                 {
                     if (double.IsNaN(trailBase)) trailBase = trailPeak = EqEff;  // yesterday's end-of-day equity
@@ -643,6 +680,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 today = NewToday();
                 SkipToday = InList(s.SkipDates, nyStart);
                 FedToday = s.FedNoShorts && InList(s.FedDates, nyStart);
+                newsToday = s.NewsMult != 1.0 && InList(s.NewsDates, nyStart);  // G321
             }
             if (inRth)
             {
@@ -759,6 +797,12 @@ namespace NinjaTrader.NinjaScript.Strategies
                 ml = ml / q * s.SprintQty;
                 q = s.SprintQty;
             }
+            if (newsToday)  // G62 / G321: the jobs-report days, NewsMult x the contracts
+            {
+                int qn = Math.Max(1, (int)Math.Round(q * s.NewsMult, MidpointRounding.ToEven));
+                ml = ml / q * qn;
+                q = qn;
+            }
             if (s.MoreDays && s.TrendN > 0 && d < 0 && trend == 1)  // G72: a fill-in short in the uptrend at its max loss a contract
             {
                 int fq = FillQ();  // G97: 1 MNQ, or 2 well above the floor
@@ -806,6 +850,12 @@ namespace NinjaTrader.NinjaScript.Strategies
             NewQty = q;
             NewStopPts = brStopNext;
             NewTpPts = brTpNext;
+            double gpx = DayGuardPx(estPx, d, q);  // G321: the live bracket's stop no wider than the day guard
+            if (!double.IsNaN(gpx))
+            {
+                double gPts = TicksDown(d * (estPx - gpx));
+                if (gPts > 0 && gPts < NewStopPts) NewStopPts = gPts;
+            }
             if (s.DayCapExit && s.DayStopProfit > 0)  // G289: the bracket's target at the day's cap when nearer
             {
                 double capPts = DayCapPts(q);
@@ -1004,6 +1054,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 SizeToAccountRoom = true;
                 SprintContracts = 0;  // G103: off
                 NoiseSessions = 14; EntryWidth = 1.0; DayProfitStop = 0;  // G253
+                SprintDayGuard = 1200;  // G321
                 NearFloorGate = 0;  // G87b: off (it lost more accounts)
                 TestedWinRate = 49.3;  // U48: the window's 5-minute win rate in NinjaTrader's execution (61.2 was v3.8's)
             }
@@ -1048,10 +1099,10 @@ namespace NinjaTrader.NinjaScript.Strategies
                     if (Mode == "Funded growth Apex 100K") { DailyLoss = 1350; TrailDD = 3000; LossGuard = 1425; }
                     if (Mode == "Funded growth Apex 150K") { DailyLoss = 1800; TrailDD = 4000; LossGuard = 1900; }
                 }
-                if (sprintMode)  // G256 k317 + G269 + G273 + G275 + G289: the Test in two weeks (15.6% passed, 7.9% failed on unseen weeks; docs)
+                if (sprintMode)  // G256 k317 + G269 + G273 + G275 + G289 + G321: the Test in two weeks (16.0% passed, 6.9% failed on unseen weeks; docs)
                 {
                     DailyLoss = 2000; LossGuard = 1900; EarlyDayBudget = 0; MaxLosersPerDay = 3; TimeStop = 30;
-                    RangePos = 0.7; TrendSessions = 0; BigDayK = 0; CalmK = 0.7; TakeProfit = 0.75; LockAt = 0.2;
+                    RangePos = 0.7; TrendSessions = 0; BigDayK = 1.5; CalmK = 0.7; TakeProfit = 0.75; LockAt = 0.2;  // G321: big-day 1.5x
                     EarlyNoEntryChecks = ""; SprintContracts = 4; sprintDays = 10; DayProfitStop = 1500;  // G289
                     NoiseSessions = 18; EntryWidth = 0.7; SqueezeMin = 0; LastEntry = "15:30"; GapTrigger = 0.5;
                     StopBuffer = 0.24; LockPlus = 2.5; GapBreakEven = 0;  // G275: no gap break-even in the sprint
@@ -1093,6 +1144,11 @@ namespace NinjaTrader.NinjaScript.Strategies
                 st.SprintTarget = sprintMode ? 5000 : 3000;  // G269: the Test sprint keeps its size to +$5,000
                 st.SprintGapQty = sprintMode ? 2 : 0;  // G273: the Test sprint's gap trade at 2 MNQ
                 st.DayCapExit = sprintMode;  // G289: the Test sprint's day profit stop also closes the open trade
+                st.DayGuard = sprintMode ? SprintDayGuard : 0;  // G321: the Test sprint's day guard
+                st.StreakK = sprintMode ? 4 : 0;  // G321: skip 2 signals after 4 losers in a row
+                st.StreakSkip = 2;
+                st.NewsDates = sprintMode ? JobsReportDays : "";  // G321: 1.5x on the jobs-report days
+                st.NewsMult = sprintMode ? 1.5 : 1.0;
                 st.Lookback = NoiseSessions; st.EntryK = EntryWidth; st.DayStopProfit = DayProfitStop;  // G253
                 st.SizeSlipPts = Mode != "Evaluation" ? SizeSlip : 0;  // G79: the Funded growth modes and Custom
                 st.ProtectRoom = Mode != "Evaluation" ? NearFloorGate : 0;  // G87
@@ -1976,6 +2032,8 @@ namespace NinjaTrader.NinjaScript.Strategies
         public int SprintContracts { get; set; }
 
         int sprintDays = 5;  // G103: 5 sessions; the Test sprint 10
+        // G321: the monthly jobs-report days, 2010-2028 (BLS's rule; research/macro_days.py)
+        const string JobsReportDays = "2010-01-01,2010-02-05,2010-03-05,2010-04-02,2010-05-07,2010-06-04,2010-07-02,2010-08-06,2010-09-03,2010-10-08,2010-11-05,2010-12-03,2011-01-07,2011-02-04,2011-03-04,2011-04-01,2011-05-06,2011-06-03,2011-07-08,2011-08-05,2011-09-02,2011-10-07,2011-11-04,2011-12-02,2012-01-06,2012-02-03,2012-03-09,2012-04-06,2012-05-04,2012-06-01,2012-07-06,2012-08-03,2012-09-07,2012-10-05,2012-11-02,2012-12-07,2013-01-04,2013-02-01,2013-03-08,2013-04-05,2013-05-03,2013-06-07,2013-07-05,2013-08-02,2013-09-06,2013-10-04,2013-11-01,2013-12-06,2014-01-03,2014-02-07,2014-03-07,2014-04-04,2014-05-02,2014-06-06,2014-07-03,2014-08-01,2014-09-05,2014-10-03,2014-11-07,2014-12-05,2015-01-02,2015-02-06,2015-03-06,2015-04-03,2015-05-08,2015-06-05,2015-07-02,2015-08-07,2015-09-04,2015-10-02,2015-11-06,2015-12-04,2016-01-01,2016-02-05,2016-03-04,2016-04-01,2016-05-06,2016-06-03,2016-07-08,2016-08-05,2016-09-02,2016-10-07,2016-11-04,2016-12-02,2017-01-06,2017-02-03,2017-03-10,2017-04-07,2017-05-05,2017-06-02,2017-07-07,2017-08-04,2017-09-01,2017-10-06,2017-11-03,2017-12-08,2018-01-05,2018-02-02,2018-03-09,2018-04-06,2018-05-04,2018-06-01,2018-07-06,2018-08-03,2018-09-07,2018-10-05,2018-11-02,2018-12-07,2019-01-04,2019-02-01,2019-03-08,2019-04-05,2019-05-03,2019-06-07,2019-07-05,2019-08-02,2019-09-06,2019-10-04,2019-11-01,2019-12-06,2020-01-03,2020-02-07,2020-03-06,2020-04-03,2020-05-08,2020-06-05,2020-07-02,2020-08-07,2020-09-04,2020-10-02,2020-11-06,2020-12-04,2021-01-01,2021-02-05,2021-03-05,2021-04-02,2021-05-07,2021-06-04,2021-07-02,2021-08-06,2021-09-03,2021-10-08,2021-11-05,2021-12-03,2022-01-07,2022-02-04,2022-03-04,2022-04-01,2022-05-06,2022-06-03,2022-07-08,2022-08-05,2022-09-02,2022-10-07,2022-11-04,2022-12-02,2023-01-06,2023-02-03,2023-03-10,2023-04-07,2023-05-05,2023-06-02,2023-07-07,2023-08-04,2023-09-01,2023-10-06,2023-11-03,2023-12-08,2024-01-05,2024-02-02,2024-03-08,2024-04-05,2024-05-03,2024-06-07,2024-07-05,2024-08-02,2024-09-06,2024-10-04,2024-11-01,2024-12-06,2025-01-03,2025-02-07,2025-03-07,2025-04-04,2025-05-02,2025-06-06,2025-07-03,2025-08-01,2025-09-05,2025-10-03,2025-11-07,2025-12-05,2026-01-02,2026-02-06,2026-03-06,2026-04-03,2026-05-08,2026-06-05,2026-07-02,2026-08-07,2026-09-04,2026-10-02,2026-11-06,2026-12-04,2027-01-01,2027-02-05,2027-03-05,2027-04-02,2027-05-07,2027-06-04,2027-07-02,2027-08-06,2027-09-03,2027-10-08,2027-11-05,2027-12-03,2028-01-07,2028-02-04,2028-03-03,2028-04-07,2028-05-05,2028-06-02,2028-07-07,2028-08-04,2028-09-01,2028-10-06,2028-11-03,2028-12-08";
 
         [NinjaScriptProperty]
         [Range(2, 60)]
@@ -1991,6 +2049,11 @@ namespace NinjaTrader.NinjaScript.Strategies
         [Range(0, double.MaxValue)]
         [Display(Name = "Day profit stop: no new entries once the day is up this much, $ (0 = off; the Test sprint 1,500, and it also closes the open trade there)", Order = 32, GroupName = "3. Filters")]
         public double DayProfitStop { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, double.MaxValue)]
+        [Display(Name = "Test sprint day guard: a stop where today's P/L reaches minus this, $; no new entries after it (1,200; 0 = off)", Order = 33, GroupName = "3. Filters")]
+        public double SprintDayGuard { get; set; }
 
         [NinjaScriptProperty]
         [Range(0, 50)]

@@ -12,6 +12,7 @@ import dataclasses
 import gzip
 import math
 import subprocess
+from pathlib import Path
 
 import pandas as pd
 import pytest
@@ -1075,7 +1076,11 @@ SPRINT = {"daily_loss_limit": 2000.0, "early_daily_loss": 0.0, "max_losers": 3, 
           "trend_n": 0, "big_day_k": 0.0, "calm_k": 0.7, "take_profit": 0.75, "lock_at": 0.2, "skip_checks": "",
           "sprint_qty": 4, "sprint_days": 10, "sprint_target": 5000.0, "sprint_gap_qty": 2, "gap_go_be": 0.0, "day_stop_profit": 1500.0, "lookback": 18,
           "entry_k": 0.7, "squeeze_min": 0.0, "last_entry_end": 930, "gap_go_k": 0.5, "stop_buffer": 0.24,
-          "lock_plus": 2.5, "day_cap_exit": True}  # U55: G289's day cap
+          "lock_plus": 2.5, "day_cap_exit": True,  # U55: G289's day cap
+          # U56: G321's k30, the streak pause, the big-day rule, the day guard, 1.5x on the jobs-report days
+          "streak_k": 4, "streak_skip": 2, "big_day_k": 1.5, "big_day_n": 10, "day_guard": 1200.0, "day_guard_grid": True,
+          "news_dates": ",".join(pd.read_csv(Path(__file__).parent.parent / "research" / "nfp_dates.csv").date),
+          "news_mult": 1.5}
 
 
 @pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
@@ -1103,3 +1108,27 @@ def test_v38_test_sprint(sim, sample_1m, tmp_path):  # noqa: F811
         assert math.isclose(float(a[6]), t.pnl, abs_tol=1e-6), (a, t)
     assert any(t.qty == 4 for t in py)
     assert any(t.reason == "Day cap" for t in py)  # U55: the sample reaches G289's day cap, so the parity covers it
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+def test_v38_test_sprint_day_guard(sim, sample_1m, tmp_path):  # noqa: F811
+    """U56: G321's day guard. With a $300 guard (so it fires on the sample), NinjaTrader's code and the model agree trade
+    for trade, and the guard's exits are there."""
+    bars = resample(sample_1m, "5min")
+    path = tmp_path / "bars.csv"
+    with path.open("w") as f:
+        for t, r in zip(bars.index, bars.itertuples(), strict=True):
+            f.write(f"{t:%Y-%m-%d %H:%M},{r.open!r},{r.high!r},{r.low!r},{r.close!r}\n")
+    ny = bars.index.tz_convert("America/New_York") if bars.index.tz is not None else bars.index
+    start = sorted(set(ny.date))[20].strftime("%Y-%m-%d")
+    r = subprocess.run([DOTNET, str(sim), str(path), "5", "Strategy=V38", "Mode=Test sprint", f"TrailFrom={start}",
+                        "SprintDayGuard=300"], capture_output=True, text=True, env=ENV)
+    assert r.returncode == 0, r.stderr[-2000:]
+    nt = [x.split(",")[1:] for x in r.stdout.splitlines() if x.startswith("T,")]
+    py = run(bars, dataclasses.replace(GROW, **{**SPRINT, "day_guard": 300.0}, trail_from=start), minutes=5).trades
+    assert len(nt) == len(py) >= 10
+    for a, t in zip(nt, py, strict=True):
+        assert (int(a[0]), int(a[1]), int(a[3])) == (t.direction, t.entry_bar, t.exit_bar), (a, t)
+        assert float(a[2]) == t.entry and float(a[4]) == t.exit, (a, t)
+        assert math.isclose(float(a[6]), t.pnl, abs_tol=1e-6), (a, t)
+    assert any(t.reason == "Day guard" for t in py)

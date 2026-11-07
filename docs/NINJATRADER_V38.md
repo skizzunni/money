@@ -7176,3 +7176,16 @@ the tick grid; G321's model filled the day guard at its exact price (off the gri
 up, so it never loses more). **U56 replaces U55** only if on the development weeks it passes more than U55 with failures
 no higher, and on the unseen weeks passes more than 15.6%, fails at most 7.9%, and failed + near-frozen is at most 22.2%.
 Run once.
+
+**G321b result (2026-11-07): confirmed; adopted as U56.** Development (405 weeks): U55 13.6% / 5.9% / 20.0%; **U56 14.1%
+passed / 3.7% failed / 16.8% failed or near-frozen**. Unseen (933): U55 15.6% / 7.9% / 22.2%; **U56 16.0% / 6.6% /
+21.7%**. `verification/noise_v2/g321b_confirm.txt`.
+
+**U56 (2026-11-07): the Test sprint with G321's four rules.** On top of U55: after 4 losing trades in a row (across days)
+the next 2 entry signals are skipped (`StreakK` / `StreakSkip`); after a session whose range is above 1.5x the last 10
+sessions' average, no entries its way the next day (`BigDayK` 1.5); a day guard: the stop goes no lower than where
+today's P/L (or the room above the floor less $100) reaches −$1,200, on the tick grid, and no new entries that day once
+it fires (`SprintDayGuard`, the live bracket's stop never wider than it); on the monthly jobs-report days the sprint's
+size is 1.5x (6 MNQ; `NewsDates` 2010-2028 by BLS's rule, `NewsMult`). NinjaTrader's code matches the model trade for
+trade on the test sample (which reaches the streak, big-day and jobs-day rules) and with a $300 guard (which fires;
+`test_v38_test_sprint_day_guard`). The gain over U55 is mostly in failures; still far from 25% in two weeks.
