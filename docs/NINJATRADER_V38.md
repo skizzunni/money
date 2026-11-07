@@ -7104,3 +7104,11 @@ passes than U55, failures no higher; unseen: more than 15.6% passed, at most 7.9
 8.1%, no 15:00 / 15:30 11.1% / 6.4%, neither 9.6% / 5.7%. Unseen (933; U55 15.6% / 7.9% / 22.2%): 11.9% / 9.0%, 13.8% /
 7.6%, 9.6% / 6.6%. An hour's average P/L over eight years does not say which entries a two-week Test needs: fewer entries,
 fewer passes. U55 stays. `verification/noise_v2/g316_skip_checks.txt`.
+
+## G317: the sprint sized by volatility (registered 2026-11-07, before its run)
+
+G285 sized up in stormy stretches and added failures. The reverse: `research/g317_vol_size.py`, on U55: the sprint takes
+4 MNQ x (the last 40 sessions' average range / the last 10's), rounded, within 3-5, 2-6 or 2-8 MNQ (bigger in calm
+stretches, smaller in stormy ones; 3 variants; `sprint_vol_lo` / `sprint_vol_hi`; the gap trade stays at 2). G253's
+measure and G290's rule (development: more passes than U55, failures no higher; unseen: more than 15.6% passed, at most
+7.9% failed, failed + near-frozen at most 22.2%). Run once.
