@@ -6596,3 +6596,32 @@ $1,500 above the trailing floor, the sprint takes 1 or 2 MNQ instead of 4 (the g
 the size), on U53 and on k296 (8 variants, and the two bases). G253's measure; the same rule as G282: the best
 development variant that passes more than U53 there and fails no more replaces U53 only if on the unseen weeks it
 passes more than 12.2% and fails at most 8.4%. Run once.
+
+**G284 result (2026-11-07): adopted as U54.** `verification/noise_v2/g284_defence.txt`:
+
+| variant | development passed | failed | unseen passed | failed |
+|---|---|---|---|---|
+| U53 | 10.9% | 6.4% | 12.2% | 8.4% |
+| U53, 1 MNQ under $1,000 | 10.6% | 1.5% | 11.6% | 3.4% |
+| U53, 2 MNQ under $1,000 | 10.4% | 4.4% | 11.8% | 6.1% |
+| U53, 1 / 2 MNQ under $1,500 | 8.1% / 8.4% | 0.2% / 1.5% | 8.8% / 9.6% | 1.5% / 4.0% |
+| k296 | 11.9% | 11.6% | 13.8% | 10.6% |
+| k296, 1 MNQ under $1,000 | 10.9% | 3.0% | 13.0% | 4.4% |
+| **k296, 2 MNQ under $1,000** | **11.4%** | **5.9%** | **13.6%** | **6.8%** |
+| k296, 1 / 2 MNQ under $1,500 | 9.6% / 10.4% | 1.2% / 4.2% | 11.5% / 12.3% | 1.5% / 3.8% |
+
+The only development variant that passes more than U53 there (10.9%) and fails no more (6.4%) is k296 with 2 MNQ under
+$1,000 (11.4% / 5.9%). On the 933 unseen weeks it passes 13.6% and fails 6.8%, against U53's 12.2% / 8.4%: more passes
+and fewer failures. **U54** = Mode "Test sprint" with G277's k296 settings (losers 4, time stop 45, take profit 0.6,
+lock 0.25 / +2.5 points, stop buffer 0.3, a $1,000 day profit stop; the rest as U53) and the sprint at 2 MNQ whenever
+less than $1,000 is left above the trailing floor (`SprintLowRoom` / `SprintLowQty` in the engine; the gap trade stays
+at 2 MNQ). NinjaTrader's code matches the model trade for trade on the test sample, which reaches the defence
+(`test_v38_test_sprint`). Still far from 25% in two weeks; G282-G283 and G277 showed the passes come with failures, and
+this is the first change since U53 that lowers failures while adding passes.
+
+## G284b: how U54's Tests end (registered 2026-11-07, before its run)
+
+G281c's lesson: fewer failures can mean accounts left stuck just above the floor. `research/g284b_frozen.py`: on the
+933 unseen weeks, the share of U53's and U54's two-week Tests that end passed, failed, open with less than $500 above
+the trailing floor (near-frozen), or open with more. **U54 is reverted to U53** if its failed plus near-frozen share is
+higher than U53's. Run once.

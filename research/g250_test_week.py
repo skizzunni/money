@@ -97,7 +97,7 @@ def one(job):
             passed, pass_day = True, days.index(d) + 1
             break
     return {"set": name, "start": start, "sprint": sq, "day stop": ds, "passed": passed, "failed": failed, "pass day": pass_day,
-            "fail day": fail_day, "net": round(cum)}
+            "fail day": fail_day, "net": round(cum), "room": round(eod - min(peak - DD, 0.0))}  # G284b: left above the floor
 
 
 def main() -> None:
