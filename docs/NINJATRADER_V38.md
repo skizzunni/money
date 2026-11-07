@@ -7212,3 +7212,9 @@ buffer 0.18-0.3), 200 combinations (seed 323), with U56's sprint, cap and four r
 weeks; the 10 best by passes with failures at most U56's 3.7% and failed or near-frozen at most its 16.8% go to stage 2.
 **Replaces U56's settings** if on stage 2 it passes more than 16.0%, fails at most 6.6%, and failed + near-frozen is at
 most 21.7%. Run once (resumable).
+
+**G323 result (2026-11-07): rejected.** Stage 1 (200 combinations on U56, 405 development weeks; U56 14.1% / 3.7% /
+16.8%): with failures at most 3.7% and failed or near-frozen at most 16.8%, the best pass only 8.9-10.9%. Stage 2 (933
+unseen weeks; U56 16.0% / 6.6% / 21.7%): 9.9-13.0% passed. U56's own settings (k317 with U55's cap) sit above every
+combination that keeps its failures this low. U56 stays. `verification/noise_v2/g323_u56_search.txt`, `g323_stage1.csv`,
+`g323_stage2.csv`.
