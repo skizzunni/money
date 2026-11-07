@@ -6498,3 +6498,6 @@ U53 with the sprint over 15 sessions instead of 10, at 4 or 5 MNQ, with a day st
 unseen weeks as G253, measured over 15 sessions. **Offered to the user** with its odds if on the unseen weeks it passes
 more than U53 does over 15 sessions there with failures at most 10%; a variant failing more is reported, not adopted.
 Run once.
+
+**G279: cancelled before its result (2026-11-07)** — the user's "3 weeks" was a typo for 2 weeks; the two-week target
+(G253's measure) stands. G277's two-week search continues.
