@@ -7189,3 +7189,11 @@ it fires (`SprintDayGuard`, the live bracket's stop never wider than it); on the
 size is 1.5x (6 MNQ; `NewsDates` 2010-2028 by BLS's rule, `NewsMult`). NinjaTrader's code matches the model trade for
 trade on the test sample (which reaches the streak, big-day and jobs-day rules) and with a $300 guard (which fires;
 `test_v38_test_sprint_day_guard`). The gain over U55 is mostly in failures; still far from 25% in two weeks.
+
+## G322: more on top of U56 (registered 2026-11-07, before its run)
+
+U56 fails less than U55, so it may carry more size. `research/g322_u56_more.py`: U56 with the sprint at 5 MNQ, U56 with
+the opening-drive filter at 0.35x (G321's runner-up k107 had it), and both (3 variants). G253's measure; the rule at
+U56's numbers: the best development variant (more passes than U56's 14.1%, failures no higher than 3.7%) replaces U56
+only if on the unseen weeks it passes more than 16.0%, fails at most 6.6%, and failed + near-frozen is at most 21.7%.
+Run once.
