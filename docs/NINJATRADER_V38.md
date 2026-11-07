@@ -6487,3 +6487,6 @@ NQ 2015-25 and the index 2011-26 Monday starts (`research/g278_horizon.py`). Ear
 
 (The 2-week row here, all starts together, is 12.0% / 7.9%; G275's unseen-weeks split is 12.2% / 8.4%.) Passes keep
 coming after the sprint ends; 25% is beyond 6 weeks. A follow-up measures 8 and 12 weeks (40 and 60 sessions).
+
+**G278 follow-up (2026-11-07):** within 8 weeks (40 sessions) 24.8% passed / 10.9% failed; within 12 weeks (60) 31.2% /
+12.9% (`verification/noise_v2/g278_horizon_long.{txt,csv}`). U53 reaches about 25% passes at 8 weeks.
