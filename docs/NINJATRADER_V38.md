@@ -6527,3 +6527,12 @@ The bot's direction wins 6-12 points more often than the reverse: a real edge on
 the drawdown, about every second attempt passes (2 fees per pass); every failed attempt is a failed evaluation. This
 does not fit TPT's 50K Test (one day can't be more than half the profit; 3 days minimum). Not built into the file
 without the user's go-ahead: it fails about half of all evaluations by design.
+
+## G281: one bracket a day on the bot's first entry, for the Test in two weeks (registered 2026-11-07, before its run)
+
+From G280's edge (the bot's first entry wins 6-12 points more often than its reverse). `research/g281_daily_bracket.py`:
+each session only the bot's first entry, one MNQ bracket (stop 25 / 50 points, target 1.0 / 1.25 / 1.5 x), sized for
+about $800 / $1,000 / $1,200 at the target and never a full stop past the floor less $100; costs as elsewhere; TPT's
+Test rules over 10 sessions from every Monday; NQ (1-minute paths). Development: Mondays 2015-2019; unseen: 2020-2025.
+**Built into the file as the Test sprint** only if the best development setting, on the unseen weeks, passes more than
+U53 does there (to be measured on the same NQ 2020-25 weeks with G253's measure) and fails at most as often. Run once.
