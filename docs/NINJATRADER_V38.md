@@ -7035,3 +7035,20 @@ or near-frozen 21.7-27.9%). Stage 2 (933 unseen weeks; U55 15.6% / 7.9% / 22.2%)
 lock (k62), passes 16.4% and fails 7.7%, but 25.8% of its Tests end failed or near-frozen against U55's 22.2%: the guard
 turns failures into accounts left at the floor. None qualifies; U55 stays.
 `verification/noise_v2/g311_combo_search.txt`, `g311_stage1.csv`, `g311_stage2.csv`.
+
+**G312 result (2026-11-07): U55 stays.** All 1,338 two-week starts (`verification/noise_v2/g312_size_scan.{txt,csv}`):
+
+| sprint | passed | failed | up and alive | median two weeks | unseen passed | failed | failed or near-frozen |
+|---|---|---|---|---|---|---|---|
+| **4 MNQ (U55)** | 15.0% | 7.3% | **55.8%** | $328 | 15.6% | 7.9% | 22.2% |
+| 4, guard $1,000 | 14.6% | 5.9% | 55.7% | $315 | 15.0% | 6.5% | 22.3% |
+| 5 | 17.6% | 11.4% | 52.5% | $255 | 17.7% | 12.0% | 29.8% |
+| 5, guard | 17.3% | 8.4% | 53.0% | $253 | 17.0% | 9.8% | 28.4% |
+| 6 | 19.2% | 17.5% | 48.7% | $269 | 19.6% | 18.3% | 37.8% |
+| 6, guard | 18.8% | 10.8% | 51.0% | $223 | 18.8% | 11.5% | 34.8% |
+| 8 | 20.7% | 21.6% | 43.8% | $84 | 20.8% | 22.6% | 47.1% |
+| 8, guard | 19.7% | 14.4% | 45.3% | $0 | 19.9% | 14.8% | 42.0% |
+
+Sizing up passes more Tests but leaves fewer accounts up and alive: from 55.8% at 4 MNQ to 43.8% at 8, and the median
+two weeks falls. The user's rule ("up and not dead") is best met at 4 MNQ. None qualifies under the rule written
+before the results; U55 stays.
