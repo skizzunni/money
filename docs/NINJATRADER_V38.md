@@ -6433,3 +6433,9 @@ U52 (k317's gap trade from 0.5x the average gap, at 2 MNQ) with the trigger at 0
 **G274 result (2026-11-07): rejected.** Unseen weeks (passed / failed): U52 (0.5) 12.1% / 8.5%; 0.35 12.3% / 8.6%; 0.65
 12.1% / 8.8%; 0.8 11.7% / 8.8% (`verification/noise_v2/g274_gap_trigger.txt`). Within a few tenths of a point; none
 passes more while failing at most 8.5%. U52 stays.
+
+## G275: U52's Test sprint with another gap break-even (registered 2026-11-07, before its run)
+
+U52 moves the gap trade's stop to break-even once a bar closes 1.5x its risk in profit (G242); here at 0.75x, 1.0x, or
+never (`gap_go_be`). `research/g275_gap_be.py`, G253's measure. **Replaces U52's setting** if on the unseen weeks it
+passes more than 12.1% and fails at most 8.5%. Run once.
