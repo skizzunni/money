@@ -7218,3 +7218,12 @@ most 21.7%. Run once (resumable).
 unseen weeks; U56 16.0% / 6.6% / 21.7%): 9.9-13.0% passed. U56's own settings (k317 with U55's cap) sit above every
 combination that keeps its failures this low. U56 stays. `verification/noise_v2/g323_u56_search.txt`, `g323_stage1.csv`,
 `g323_stage2.csv`.
+
+## G324: U56's neighbours (registered 2026-11-07, before its run)
+
+`research/g324_u56_tune.py`: 60 random neighbours (seed 324; variant 0 is U56) of U56's rules: the streak pause (4 / 2,
+3 / 2, 5 / 2, 4 / 1, 4 / 3), the big-day rule (1.5x, 1.25x, 1.75x), the day guard ($1,200, $1,000, $1,400; on the grid),
+jobs days (1.5x, 1.25x, 2x) and the day cap ($1,500, $1,400, $1,600). Stage 1 on the development weeks; the 10 best by
+passes with failures at most U56's 3.7% and failed or near-frozen at most its 16.8% go to stage 2. **Replaces U56's
+settings** if on stage 2 it passes more than 16.0%, fails at most 6.6%, and failed + near-frozen is at most 21.7%. Run
+once (resumable).
