@@ -153,6 +153,7 @@ class NoiseConfig:
     room_mult_room: float = 0.0  # G130: room_mult only while the account is at least this far above the floor
     day_guard_locked: bool = False  # G130: the day guard only once the floor has stopped
     day_guard: float = 0.0
+    day_guard_grid: bool = False  # G321b: the day guard's stop on the tick grid with nt_execution (a long's rounds up)
     guard_floor_buffer: float = 100.0
     guard_reserve_pts: float = 0.0  # G133: the guard fires this many points per contract early (room for its own slippage)
     guard_slip_pts: float = 0.0  # research: the day guard's fill this many points worse (a fast market)
@@ -1155,6 +1156,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                     allow = min(allow, eq_curve[-1] - fl - cfg.guard_floor_buffer)
                 allow -= rest * q_trade * cfg.guard_reserve_pts * cfg.point_value
                 gpx = entry_px - pos * (allow - 2 * cfg.commission_per_side * q_trade) / (rest * q_trade * cfg.point_value)
+                if cfg.nt_execution and cfg.day_guard_grid:  # G321b: a real stop sits on the tick grid
+                    gpx = on_grid(pos, gpx)
                 if pos * (gpx - line) > 0:
                     line, reason = gpx, "Day guard"
             if cfg.trail_intraday and entry_bar != i and not math.isnan(trail_peak):  # G249: the PRO floor guard

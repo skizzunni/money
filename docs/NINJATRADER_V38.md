@@ -7169,3 +7169,10 @@ U55 13.6% / 5.9% / 20.0%): the best, k30, **14.1% / 3.7% / 16.8%**. Stage 2 (933
 row), the big-day rule at 1.5x (10 sessions), a $1,200 day guard (G128's tick-level exit, no new entries after it
 fires), and 1.5x the sprint's size on jobs-report days (6 MNQ). The gain is mostly in failures (−1.0 point, near-frozen
 −0.7); passes +0.4. `verification/noise_v2/g321_rule_search.txt`, `g321_stage1.csv`, `g321_stage2.csv`.
+
+**G321b (registered 2026-11-07, before its run): the confirmation as the bot trades.** NinjaTrader's stop must sit on
+the tick grid; G321's model filled the day guard at its exact price (off the grid; found by the new parity test).
+`research/g321b_confirm.py`: U55 against U56 = k30 with the guard's stop on the grid (`day_guard_grid`; a long's rounds
+up, so it never loses more). **U56 replaces U55** only if on the development weeks it passes more than U55 with failures
+no higher, and on the unseen weeks passes more than 15.6%, fails at most 7.9%, and failed + near-frozen is at most 22.2%.
+Run once.
