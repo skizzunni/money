@@ -6445,5 +6445,5 @@ passes more than 12.1% and fails at most 8.5%. Run once.
 for 1.5x, 0.75x and 1.0x; 10.9% / 6.4% for none; `verification/noise_v2/g275_gap_be.txt`). The difference is one week of
 933 either way: within noise, adopted because the pre-registered rule says so (and it removes a rule from the sprint).
 
-**U53 (2026-11-07): no gap break-even in the Test sprint.** `GapBreakEven` 0 in "Test sprint" mode (Funded growth keeps
+**U53 (2026-11-07): no gap break-even in the Test sprint.** Full suite: **678 passed**. `GapBreakEven` 0 in "Test sprint" mode (Funded growth keeps
 1.5). NinjaTrader tests 49 passed (`test_v38_test_sprint` with it).
