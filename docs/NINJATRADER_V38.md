@@ -6860,3 +6860,8 @@ against 22.2%) but cut the passes more. U55 stays. `verification/noise_v2/g298_a
 The sprint searches kept the last entry at 15:00-15:30. `research/g299_last_entry.py`, on U55: no new entries after
 12:00, 13:00 or 14:00 (3 variants; `last_entry_end`). G253's measure and G290's rule (development: more passes than U55,
 failures no higher; unseen: more than 15.6% passed, at most 7.9% failed, failed + near-frozen at most 22.2%). Run once.
+
+**G299 result (2026-11-07): rejected.** Development (405 weeks; U55 13.6% / 5.9% / 20.0%): the last entry at 12:00 4.2% /
+3.5%, 13:00 8.9% / 4.7%, 14:00 10.6% / 5.4%. Unseen (933; U55 15.6% / 7.9% / 22.2%): 6.5% / 4.4%, 10.4% / 6.4%, 12.3% /
+7.6%. The afternoon trades carry a large share of the passes; stopping earlier cuts them more than the failures. U55
+stays. `verification/noise_v2/g299_last_entry.txt`.
