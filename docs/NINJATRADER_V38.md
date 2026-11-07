@@ -6680,3 +6680,11 @@ failures no higher; unseen: more than 12.2% passed, at most 8.4% failed, failed 
 passed: 10.4%, 10.6%, 10.6% (6.2% failed). Unseen (933): 11.8%, 11.5%, 11.3% against U53's 12.2% (failures and
 near-frozen unchanged). Bigger trades from +$3,000 make bigger single days, and the best day must stay under half the
 profit, so the Test takes longer. U53 stays. `verification/noise_v2/g287_pass_push.txt`.
+
+## G288: a day profit stop that keeps the consistency rule (registered 2026-11-07, before its run)
+
+G271 raised the day profit stop for every day (rejected: big days break the rule that the best day is under half the
+profit); G287 found bigger days slow the Test. `research/g288_day_stop_consistent.py`: U53's $1,100 day profit stop
+rises, on a day when it is more, to 0.8x, 0.9x or 0.95x the Test's profit before today (so a bigger day comes only when
+it stays under the rest of the profit; 3 variants). G253's measure and G285's rule (development: more passes than U53,
+failures no higher; unseen: more than 12.2% passed, at most 8.4% failed, failed + near-frozen at most 22.3%). Run once.

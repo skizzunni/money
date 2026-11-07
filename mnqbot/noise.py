@@ -157,6 +157,9 @@ class NoiseConfig:
     guard_reserve_pts: float = 0.0  # G133: the guard fires this many points per contract early (room for its own slippage)
     guard_slip_pts: float = 0.0  # research: the day guard's fill this many points worse (a fast market)
     day_stop_profit: float = 0.0  # research (G127): no new entries today once today's closed P/L is at least this, $
+    # research (G288): the day profit stop rises to day_stop_consistent x the profit since the start before today, when
+    # that is more (a big day only when it keeps the best day under half the profit; 0 = off)
+    day_stop_consistent: float = 0.0
     skip_checks_early: bool = False  # research (G125): skip_checks only until the floor has stopped
     after_target_done: bool = False  # research: no new entries today after a take-profit fills
     # research (v2.4 study): the equity curve. While the closed-trade P&L is below its average over the last eq_n
@@ -781,7 +784,10 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
         if guard_today:
             return False
         if cfg.day_stop_profit > 0 and day_pnl >= cfg.day_stop_profit:
-            return False
+            before = eq_curve[-1] - day_pnl - trail_base  # G288: the profit since the start before today
+            if not (cfg.day_stop_consistent > 0 and not math.isnan(trail_base)
+                    and day_pnl < cfg.day_stop_consistent * before):
+                return False
         if cfg.after_target_done and target_today:
             return False
         if ts_done[d]:
