@@ -7203,3 +7203,12 @@ Run once.
 (more failures), 5 MNQ 16.8% / 5.9%, 5 MNQ + drive 17.0% / 6.2%: the variants that pass more all fail more. Unseen (933;
 U56 16.0% / 6.6% / 21.7%): 15.5% / 6.4%, 17.3% / 11.4% / 27.4%, 17.3% / 10.8% / 27.3%. A fifth contract still costs far
 more in failures than it adds in passes. U56 stays. `verification/noise_v2/g322_u56_more.txt`.
+
+## G323: the entry and exit settings re-searched on U56 (registered 2026-11-07, before its run)
+
+`research/g323_u56_search.py`: G292's search space (noise sessions 16-20, entry width 0.65-0.75, range position
+0.65-0.75, calm 0.6-0.8, take profit 0.6-1.0, lock 0.15-0.25 / +1.5-3.5 points, losers 2-4, time stop 20-45, stop
+buffer 0.18-0.3), 200 combinations (seed 323), with U56's sprint, cap and four rules held. Stage 1 on the development
+weeks; the 10 best by passes with failures at most U56's 3.7% and failed or near-frozen at most its 16.8% go to stage 2.
+**Replaces U56's settings** if on stage 2 it passes more than 16.0%, fails at most 6.6%, and failed + near-frozen is at
+most 21.7%. Run once (resumable).
