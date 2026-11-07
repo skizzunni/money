@@ -6903,3 +6903,10 @@ unseen: more than 15.6% passed, at most 7.9% failed, failed + near-frozen at mos
 8.9% / 7.4%, $150 11.6% / 7.2%, $250 11.9% / 7.7%: fewer passes and more failures either way. Unseen (933; U55 15.6% /
 7.9% / 22.2%): 12.2% / 7.7%, 13.5% / 8.6%, 14.9% / 9.0%. $187.50 sits at the best point. U55 stays.
 `verification/noise_v2/g302_max_loss.txt`.
+
+## G303: G138's untried rules on the Test sprint (registered 2026-11-07, before its run)
+
+G138 tried these on the growth bot only. `research/g303_cooldown.py`, on U55: after a losing trade, skip the next 1 or
+2 entry signals on that side (`side_cooldown`); or half size while the equity is below its 20-trade average (`eq_n`
+20) (3 variants). G253's measure and G290's rule (development: more passes than U55, failures no higher; unseen: more
+than 15.6% passed, at most 7.9% failed, failed + near-frozen at most 22.2%). Run once.
