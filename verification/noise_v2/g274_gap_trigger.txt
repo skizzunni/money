@@ -1,0 +1,14 @@
+development (index 2011-18):
+                  weeks  passed  failed
+tag                                    
+U52 (0.5)           405   0.109   0.062
+gap trigger 0.35    405   0.104   0.057
+gap trigger 0.65    405   0.111   0.054
+gap trigger 0.8     405   0.111   0.054
+unseen (NQ 2015-25 + index 2019-26):
+                  weeks  passed  failed
+tag                                    
+U52 (0.5)           933   0.121   0.085
+gap trigger 0.35    933   0.123   0.086
+gap trigger 0.65    933   0.121   0.088
+gap trigger 0.8     933   0.117   0.088
