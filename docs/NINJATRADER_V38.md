@@ -7091,3 +7091,11 @@ most 7.9% failed, failed + near-frozen at most 22.2%). Run once.
 gap trade 1 MNQ 12.6% / 6.4%, last entry 15:00 12.6% / 6.7%. Unseen (933; U55 15.6% / 7.9% / 22.2%): 13.2% / 7.0%, 14.1%
 / 7.8%, 14.8% / 7.7%. Though the gap trade nets little over eight years, inside a two-week Test its early wins carry
 passes; and the 15:00 entries add passes despite their small average. U55 stays. `verification/noise_v2/g315_gap_off.txt`.
+
+## G316: no entries at the weak checks (registered 2026-11-07, before its run)
+
+G315's profile of the development weeks: entries filled in the 11:00 hour average $10.60 and in the 15:00 hour $4.70,
+the hours 10:00 and 12:00-14:00 $24-33. `research/g316_skip_checks.py`, on U55: no entries at the 11:00 and 11:30 checks,
+or at 15:00 and 15:30, or at all four (3 variants; `skip_checks`). G253's measure and G290's rule (development: more
+passes than U55, failures no higher; unseen: more than 15.6% passed, at most 7.9% failed, failed + near-frozen at most
+22.2%). Run once.
