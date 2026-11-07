@@ -6971,3 +6971,11 @@ failed + near-frozen at most 22.2%). Run once.
 1.5x 13.8% / 6.2%, 2x 14.1% / 6.7%: the passes it adds come with more failures, so none qualifies. Unseen (933; U55
 15.6% / 7.9% / 22.2%): 14.5% / 7.8% / 21.2%, 16.2% / 7.8% / 22.7%, 16.3% / 8.5% / 23.4%. About one jobs day falls in a
 two-week Test, too few to move it much either way. U55 stays. `verification/noise_v2/g307_jobs_days.txt`.
+
+## G308: the day's first trade bigger (registered 2026-11-07, before its run)
+
+G280: the bot's first entry of a day wins 54.5% at a 1:1 bracket (42.4% reversed). `research/g308_first_trade.py`, on
+U55: the sprint's first bot trade of the day at 5 or 6 MNQ and the later ones at 3 or 4 (5 / 3, 6 / 3, 6 / 4; the gap
+trade stays at 2; the room still cuts the size; `sprint_first_qty` / `sprint_later_qty`). G253's measure and G290's
+rule (development: more passes than U55, failures no higher; unseen: more than 15.6% passed, at most 7.9% failed, failed
++ near-frozen at most 22.2%). Run once.

@@ -408,6 +408,9 @@ class NoiseConfig:
     # research (G298): after sprint_after_loss_n losing trades today, the sprint takes sprint_after_loss_qty (0 = off)
     sprint_after_loss_qty: int = 0
     sprint_after_loss_n: int = 1
+    # research (G308): the sprint's first bot trade of the day takes sprint_first_qty, later ones sprint_later_qty (0 = off)
+    sprint_first_qty: int = 0
+    sprint_later_qty: int = 0
     sprint_hot_qty: int = 0
     # research (G286): the sprint stays on until the Test's pass rule is met (profit at least sprint_pass_target, the best
     # day under half of it, at least 3 days with a trade), whatever sprint_target; from sprint_pass_target on it takes
@@ -514,6 +517,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
     entry_px, entry_bar = 0.0, 0
     est_px = math.nan  # expected fill of the pending entry
     losers_today = 0  # losing trades closed today
+    bot_trades_today = 0  # G308: the bot's trades closed today (before an entry, all of today's entries so far)
     consec = skip_left = 0  # the v2.1 study's streak rule: losers in a row, signals still to skip
     loss_side = 0  # the side of the last losing trade
     day_hi = day_lo = math.nan  # today's 09:30-16:00 high and low (big_day_k)
@@ -618,6 +622,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
 
     def close_pos(i: int, price: float, reason: str) -> None:
         nonlocal pos, held, locked, losers_today, rest, part_pnl, best, consec, skip_left, loss_side, tp_dist
+        nonlocal bot_trades_today
+        bot_trades_today += 1
         nonlocal add_px, add_due, target_today, locked1, fav, lock_px, day_pnl, fill_pnl
         pnl = rest * (pos * (price - entry_px) * q_trade * cfg.point_value - 2 * cfg.commission_per_side * q_trade)
         trades.append(NoiseTrade(pos, q_trade, entry_bar, idx[entry_bar], entry_px, i, idx[i], price, reason, pnl,
@@ -703,6 +709,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
 
     def sprint_q() -> int:
         """G270: the sprint's size (sprint_qty_locked once the floor has stopped; G282: the push; G284: the defence)."""
+        if cfg.sprint_first_qty > 0:  # G308
+            return cfg.sprint_first_qty if bot_trades_today == 0 else (cfg.sprint_later_qty or cfg.sprint_qty)
         if cfg.sprint_after_loss_qty > 0 and losers_today >= cfg.sprint_after_loss_n:
             return cfg.sprint_after_loss_qty  # G298
         if cfg.sprint_until_pass and cfg.sprint_pass_qty > 0 and eq_curve[-1] - trail_base >= cfg.sprint_pass_target:
@@ -1278,6 +1286,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             if cfg.gap_block > 0 and not math.isnan(prev_close) and abs(day_open / prev_close - 1) > cfg.gap_block:
                 gap_dir = 1 if day_open > prev_close else -1
             losers_today = 0
+            bot_trades_today = 0
             side_cd[1] = side_cd[-1] = 0
             ts_done[1] = ts_done[-1] = False
             side_lost[1] = side_lost[-1] = False
