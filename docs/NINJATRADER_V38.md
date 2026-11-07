@@ -6423,3 +6423,9 @@ less (10.9% against 11.9%) and failed less; on the unseen weeks, the pre-registe
 **U52 (2026-11-07): the Test sprint's gap trade at 2 MNQ.** Full suite: **678 passed**. The engine's new `SprintGapQty` (2 in "Test sprint" mode, 0
 = the sprint's size elsewhere); the model's `sprint_gap_qty`. NinjaTrader tests 49 passed (`test_v38_test_sprint` with
 it, trade for trade).
+
+## G274: U52's Test sprint with another gap trigger (registered 2026-11-07, before its run)
+
+U52 (k317's gap trade from 0.5x the average gap, at 2 MNQ) with the trigger at 0.35x, 0.65x or 0.8x (`gap_go_k`).
+`research/g274_gap_trigger.py`, G253's measure. **Replaces U52's trigger** if on the unseen weeks it passes more than
+12.1% and fails at most 8.5%. Run once.
