@@ -405,6 +405,9 @@ class NoiseConfig:
     # research (G285): the sprint in a stormy stretch: when the last calm_short sessions' average range is above
     # sprint_hot_k x the last calm_long's, the sprint takes sprint_hot_qty contracts (0 = off)
     sprint_hot_k: float = 0.0
+    # research (G298): after sprint_after_loss_n losing trades today, the sprint takes sprint_after_loss_qty (0 = off)
+    sprint_after_loss_qty: int = 0
+    sprint_after_loss_n: int = 1
     sprint_hot_qty: int = 0
     # research (G286): the sprint stays on until the Test's pass rule is met (profit at least sprint_pass_target, the best
     # day under half of it, at least 3 days with a trade), whatever sprint_target; from sprint_pass_target on it takes
@@ -700,6 +703,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
 
     def sprint_q() -> int:
         """G270: the sprint's size (sprint_qty_locked once the floor has stopped; G282: the push; G284: the defence)."""
+        if cfg.sprint_after_loss_qty > 0 and losers_today >= cfg.sprint_after_loss_n:
+            return cfg.sprint_after_loss_qty  # G298
         if cfg.sprint_until_pass and cfg.sprint_pass_qty > 0 and eq_curve[-1] - trail_base >= cfg.sprint_pass_target:
             return cfg.sprint_pass_qty  # G286
         if cfg.sprint_low_room > 0 and not math.isnan(trail_peak):

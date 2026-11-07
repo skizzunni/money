@@ -6841,3 +6841,10 @@ after 3 losers 11.6% / 8.6% / 22.0%; skip 2 after 3 losers 11.4% / 7.4% / 22.2%;
 15.8% / 6.5% / 19.9%. The unseen weeks look better for two variants, but the rule picks on the development weeks first,
 and changing it after seeing the unseen results would make them no longer unseen. Not adopted; U55 stays.
 `verification/noise_v2/g297_streak.txt`.
+
+## G298: a smaller sprint after a losing trade today (registered 2026-11-07, before its run)
+
+`research/g298_after_loss.py`, on U55: after one losing trade today the sprint takes 2 or 3 MNQ for the rest of the day,
+or 2 MNQ after two (3 variants; `sprint_after_loss_qty` / `sprint_after_loss_n`; the gap trade stays at 2). G253's
+measure and G290's rule (development: more passes than U55, failures no higher; unseen: more than 15.6% passed, at most
+7.9% failed, failed + near-frozen at most 22.2%). Run once.
