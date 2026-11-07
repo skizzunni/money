@@ -6958,3 +6958,11 @@ $1,000 guard and the big-day rule 16.3% / 5.7% / 26.9%. The best development var
 weeks (933; U55 15.6% / 7.9% / 22.2%): 17.0% passed but 9.8% failed and 28.4% failed or near-frozen; the others 16.2-16.8%
 / 9.8-10.0%. The guard holds the failures down on development but not on the unseen weeks, and in both the near-frozen
 Tests grow. U55 stays. `verification/noise_v2/g306_guard_size.txt`.
+
+## G307: the sprint on jobs-report days (registered 2026-11-07, before its run)
+
+G62 found the bot makes 2.5-3.4x its usual dollars on the monthly jobs-report days (tried on the growth bot only).
+`research/g307_jobs_days.py`, on U55: on those days (`research/nfp_dates.csv`) the sprint's bot trades take 0.5x, 1.5x
+or 2x its 4 MNQ (2, 6 or 8; `news_mult`; the day's and the floor's room still cut it; 3 variants). G253's measure and
+G290's rule (development: more passes than U55, failures no higher; unseen: more than 15.6% passed, at most 7.9% failed,
+failed + near-frozen at most 22.2%). Run once.
