@@ -6726,8 +6726,8 @@ The best development variant with more passes than U53 and failures no higher is
 by 0.1 point). **U55** = Mode "Test sprint" with a $1,500 day profit stop that also closes the open trade: the bracket's
 target goes to the price where today's P/L reaches $1,500 when that is nearer than the take-profit (at entry, in ticks
 from the fill, and each bar after). Engine: `DayCapExit` (C#), `day_cap_exit` (mnqbot/noise.py). NinjaTrader's code
-matches the model trade for trade on the test sample, which reaches the day cap (`test_v38_test_sprint`). Still far from
-25% in two weeks.
+matches the model trade for trade on the test sample, which reaches the day cap (`test_v38_test_sprint`). Full
+suite: **678 passed**. Still far from 25% in two weeks.
 
 ## G290: more of the day cap (registered 2026-11-07, before its run)
 
