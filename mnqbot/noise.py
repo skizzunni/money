@@ -359,6 +359,9 @@ class NoiseConfig:
     # research (G66): an opening drive. When the gap rule doesn't fire, a 09:30 bar whose body |close - open| is at
     # least gap_go_drive_k x the average of the last 14 sessions' 09:30 bodies takes the same trade its way (0 = off)
     gap_go_drive_k: float = 0.0
+    # research (G318): the opening drive as a filter. When 09:30-10:00 moves more than drive_filter_k x the average of the
+    # last calm_short sessions' ranges (a share of the open), no bot entries against that move today (0 = off)
+    drive_filter_k: float = 0.0
     # research (G69): small gaps. A gap at least gap_go_small_k x the average (but under gap_go_k), the 09:30 bar
     # closing its way, takes the same trade at 1 contract (-1 = off). Drive and small-gap trades are always 1 contract
     gap_go_small_k: float = -1.0
@@ -563,6 +566,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
     gg: dict | None = None  # gap_go: the open gap trade (side, contracts, entry bar and price, stop)
     gap_hist: list[float] = []  # gap_go: the last sessions' |gap|
     drive_hist: list[float] = []  # gap_go_drive_k: the last sessions' 09:30 bar |body|
+    drive_dir = 0  # G318: today's 09:30-10:00 direction when past drive_filter_k
     news_set = set(cfg.news_dates.split(",")) if cfg.news_dates else set()  # G62
     sess_month = sess_month_prev = None  # gap_go_skip_month_first: this session's and the last one's month
     side_lost = {1: False, -1: False}  # a loser on that side today (side_margin)
@@ -827,6 +831,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             return False
         if gap_dir and d == -gap_dir:
             return False
+        if drive_dir and d == -drive_dir:  # G318
+            return False
         if block_dir and (d == block_dir or cfg.big_day_both):
             return False
         if side_skip[d] > 0:
@@ -939,6 +945,11 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             trail_peak = max(trail_peak, mark)
         end = t_min + minutes
         in_rth = t_min >= RTH_OPEN and end <= RTH_CLOSE
+        if (cfg.drive_filter_k > 0 and end == 600 and not math.isnan(day_open)  # G318: the opening drive
+                and len(day_ranges) >= cfg.calm_short):
+            mv = c[i] / day_open - 1
+            if abs(mv) > cfg.drive_filter_k * sum(day_ranges[-cfg.calm_short:]) / cfg.calm_short:
+                drive_dir = 1 if mv > 0 else -1
 
         if cfg.gap_go:  # G60: gap and go, 09:35-10:00, before the bot's first fill
             if gg is not None and (t_min >= cfg.gap_go_exit or t.date() != idx[gg["bar"]].date()):
@@ -1264,6 +1275,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             events.append((i, "EXIT"))
 
         if t_min == RTH_OPEN:
+            drive_dir = 0  # G318
             block_dir = 0
             target_today = guard_today = False
             day_pnl = gap_day_pnl = 0.0

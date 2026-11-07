@@ -7117,3 +7117,10 @@ measure and G290's rule (development: more passes than U55, failures no higher; 
 / 7.2%, 2-6 10.9% / 7.7%, 2-8 the same (the ratio never reached 7). Unseen (933; U55 15.6% / 7.9% / 22.2%): 13.5% / 9.6%,
 13.6% / 10.5%, 13.6% / 10.5%. Bigger trades in calm stretches fail more and pass less: the calm stretches' breakouts are
 the weaker ones (G18, G285: the storms pay). U55 stays. `verification/noise_v2/g317_vol_size.txt`.
+
+## G318: the opening drive as a filter (registered 2026-11-07, before its run)
+
+`research/g318_drive.py`, on U55: when 09:30-10:00 moves more than 0.15x, 0.25x or 0.35x the last 10 sessions' average
+range (as a share of the open), no bot entries against that move for the rest of the day (3 variants; `drive_filter_k`;
+new in mnqbot/noise.py). G253's measure and G290's rule (development: more passes than U55, failures no higher; unseen:
+more than 15.6% passed, at most 7.9% failed, failed + near-frozen at most 22.2%). Run once.
