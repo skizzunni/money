@@ -6770,3 +6770,9 @@ weeks; U55 15.6% / 7.9% / 22.2%): k157 17.1% passed / 9.9% failed / 26.0% failed
 23.7%, k147 16.1% / 9.0% / 22.4%, k52 15.6% / 9.0%; the rest 12.8-14.9% passed (6.5-8.8% failed). Nothing passes more
 than 15.6% while failing at most 7.9%: under the cap, as before it, the extra passes come with extra failures. U55's
 settings stand. `verification/noise_v2/g292_cap_search.txt`, `g292_stage1.csv`, `g292_stage2.csv`.
+
+## G293: the gap trade's size under the day cap (registered 2026-11-07, before its run)
+
+G273 put the sprint's gap trade at 2 MNQ before the day cap existed. `research/g293_cap_gap.py`, on U55: the gap trade at
+3 or 4 MNQ (2 variants). G253's measure and G290's rule (development: more passes than U55, failures no higher; unseen:
+more than 15.6% passed, at most 7.9% failed, failed + near-frozen at most 22.2%). Run once.
