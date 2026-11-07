@@ -6447,3 +6447,9 @@ for 1.5x, 0.75x and 1.0x; 10.9% / 6.4% for none; `verification/noise_v2/g275_gap
 
 **U53 (2026-11-07): no gap break-even in the Test sprint.** Full suite: **678 passed**. `GapBreakEven` 0 in "Test sprint" mode (Funded growth keeps
 1.5). NinjaTrader tests 49 passed (`test_v38_test_sprint` with it).
+
+## G276: U53's Test sprint with the gap trade out at another time (registered 2026-11-07, before its run)
+
+U53 closes the gap trade at the 09:55 bar's open (`gap_go_exit` 595); here at 09:45, 10:10 or 10:25.
+`research/g276_gap_exit.py`, G253's measure. **Replaces U53's setting** if on the unseen weeks it passes more than
+12.2% and fails at most 8.4%. Run once.
