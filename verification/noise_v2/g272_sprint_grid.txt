@@ -1,0 +1,16 @@
+development (index 2011-18):
+                     weeks  passed  failed
+tag                                       
+3 MNQ                  405   0.057   0.054
+5 MNQ                  405   0.151   0.143
+U51 (4 MNQ, $1,100)    405   0.119   0.067
+day stop $1,000        405   0.119   0.069
+day stop $900          405   0.121   0.072
+unseen (NQ 2015-25 + index 2019-26):
+                     weeks  passed  failed
+tag                                       
+3 MNQ                  933   0.070   0.041
+5 MNQ                  933   0.143   0.173
+U51 (4 MNQ, $1,100)    933   0.115   0.091
+day stop $1,000        933   0.122   0.096
+day stop $900          933   0.124   0.095

@@ -6404,3 +6404,7 @@ consistency rule harder (the best day must stay under half the profit), so passe
 U51 (4 MNQ to +$5,000, day stop $1,100) against a day stop of $900 or $1,000, and a sprint of 3 or 5 MNQ.
 `research/g272_sprint_grid.py`, G253's measure. **Replaces U51's setting** if on the unseen weeks it passes more than
 11.5% and fails at most 9.1%. Run once.
+
+**G272 result (2026-11-07): rejected.** Unseen weeks (passed / failed): U51 11.5% / 9.1%; day stop $1,000 12.2% / 9.6%;
+$900 12.4% / 9.5%; 3 MNQ 7.0% / 4.1%; 5 MNQ 14.3% / 17.3% (`verification/noise_v2/g272_sprint_grid.txt`). The lower
+day stops pass a little more but fail more (9.5-9.6% against 9.1%); 5 MNQ nearly doubles the failures. U51 stays.
