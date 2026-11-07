@@ -6566,3 +6566,11 @@ variants that pass more and fail no more are from session 8 at 6 MNQ if up $2,00
 session 9 at 6 MNQ if up $2,000 (11.1% / 6.4%). On the unseen weeks (933) the chosen variant passes 11.9% and fails 8.4%,
 against U53's 12.2% / 8.4%. It passes fewer: rejected, U53 stays. (The pushes that add passes there, e.g. from 8 at 6 if
 up $1,000 at 12.8%, add failures too: 9.0%.) `verification/noise_v2/g282_push.txt`.
+
+## G283: the sprint sized from a fixed dollar risk (registered 2026-11-07, before its run)
+
+U53's sprint takes 4 MNQ whatever the trade's stop distance. `research/g283_risk_size.py`: each bot trade's size is
+instead its risk ($300, $450 or $600) over its own initial stop's distance plus costs, 1 to 6 or 8 MNQ (the engine's
+E50R sizing; 6 variants; the gap trade stays at 2 MNQ; the day's and the floor's room still cut the size). G253's
+measure; the same rule as G282 (the best development variant that passes more than U53 there and fails no more replaces
+U53 only if on the unseen weeks it passes more than 12.2% and fails at most 8.4%). Run once.
