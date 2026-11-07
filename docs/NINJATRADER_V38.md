@@ -6580,3 +6580,11 @@ passed / 6.4% failed; fixed-risk sizing $300 up to 6 / 8 MNQ 1.2% / 1.0%, 1.7% /
 $600 5.7% / 4.4%, 6.2% / 7.2%. No variant passes more than U53, so none goes to the unseen weeks (that part of the run
 was stopped; it could not change the verdict). The bot's own stops are wide (the noise line), so a fixed dollar risk
 buys 1-3 MNQ and the Test runs out of time. U53 stays. `verification/noise_v2/g283_risk_size.txt`.
+
+**G277 result (2026-11-07): rejected.** Stage 1 (300 combinations, index 2011-18, 405 weeks; U53 there 10.9% / 6.4%):
+the best pass 12.6% / 10.9% (k270), 12.1% / 8.9% (k247), 11.9% / 11.6% (k296). Stage 2 (the top 10, 933 unseen weeks;
+U53 12.2% / 8.4%): k296 13.8% passed / 10.6% failed, k270 13.2% / 12.3%, k104 12.0% / 7.4%, k3 11.5% / 8.6%, the rest
+10.9-11.5% passed with 10.6-12.2% failed. None passes more than 12.2% while failing at most 8.4%. The more passes,
+the more failures, as in G253-G261. The low-failure check found no stage-1 combination with at least 11% passed and at
+most 8% failed (the lowest-failure ones pass 2-6%), so it had nothing to run. U53 stays.
+`verification/noise_v2/g277_test_search.txt`, `g277_stage1.csv`, `g277_stage2.csv`.
