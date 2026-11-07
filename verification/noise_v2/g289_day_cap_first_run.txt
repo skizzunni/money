@@ -1,0 +1,14 @@
+development (index 2011-18):
+                weeks  passed  failed  stuck  failed_or_stuck
+tag                                                          
+U53               405   0.109   0.064  0.141            0.205
+day cap $1,100    405   0.109   0.057  0.141            0.198
+day cap $1,300    405   0.128   0.059  0.146            0.205
+day cap $1,500    405   0.133   0.059  0.141            0.200
+unseen (NQ 2015-25 + index 2019-26):
+                weeks  passed  failed  stuck  failed_or_stuck
+tag                                                          
+U53               933   0.122   0.084  0.139            0.223
+day cap $1,100    933   0.131   0.073  0.136            0.209
+day cap $1,300    933   0.135   0.075  0.141            0.217
+day cap $1,500    933   0.150   0.080  0.137            0.218

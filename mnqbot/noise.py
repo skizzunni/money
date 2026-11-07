@@ -1161,6 +1161,10 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                     close_part(i, pt)
                     if cfg.partial_be:
                         locked = True
+            cp, tp_checked = math.nan, False  # G289: the day's cap, a limit where today's P/L reaches day_stop_profit
+            if pos and cfg.day_cap_exit and cfg.day_stop_profit > 0:
+                need = cfg.day_stop_profit - day_pnl + 2 * cfg.commission_per_side * q_trade * rest
+                cp = entry_px + pos * math.ceil(need / (rest * q_trade * cfg.point_value) / cfg.tick - 1e-9) * cfg.tick
             if not pos or hit:
                 pass
             elif not math.isnan(tp_dist):  # research: the runner after the take-profit, and its second target
@@ -1173,18 +1177,19 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                 tp = (entry_px if entry_bar != i else est_px) * (1 + pos * tp_trade * sigma)
                 if cfg.nt_execution:
                     tp = entry_px + pos * br_trade[1] if entry_bar == i else on_grid(pos, tp)
+                tp_checked, why = True, "Target"
+                if not math.isnan(cp) and pos * (cp - tp) < 0:  # G289: the day's cap is nearer
+                    tp, why = cp, "Day cap"
                 if (pos > 0 and h[i] >= tp + cfg.tick) or (pos < 0 and l[i] <= tp - cfg.tick):
-                    keep = round(q_trade * cfg.tp_keep) if cfg.tp_keep > 0 and rest == 1.0 else 0
+                    keep = round(q_trade * cfg.tp_keep) if cfg.tp_keep > 0 and rest == 1.0 and why == "Target" else 0
                     if 0 < keep < q_trade:
                         close_part(i, tp, 1.0 - keep / q_trade)
                         tp_dist = abs(tp - entry_px)
                     else:
-                        close_pos(i, tp, "Target")
+                        close_pos(i, tp, why)
                     events.append((i, "TARGET"))
-            if (pos and not hit and cfg.day_cap_exit and cfg.day_stop_profit > 0  # G289: the day's cap
+            if (pos and not hit and not tp_checked and not math.isnan(cp)  # G289: the day's cap, no take-profit
                     and (entry_bar != i or cfg.target_on_fill_bar)):
-                need = cfg.day_stop_profit - day_pnl + 2 * cfg.commission_per_side * q_trade * rest
-                cp = entry_px + pos * math.ceil(need / (rest * q_trade * cfg.point_value) / cfg.tick - 1e-9) * cfg.tick
                 if (pos > 0 and h[i] >= cp + cfg.tick) or (pos < 0 and l[i] <= cp - cfg.tick):
                     close_pos(i, cp, "Day cap")
                     events.append((i, "TARGET"))

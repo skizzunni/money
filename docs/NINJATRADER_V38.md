@@ -6702,3 +6702,11 @@ G288: the trade still open runs past the day profit stop, and a day above half t
 limit at the price where the day's P/L reaches it (whole ticks; as the take-profit, only beyond it by a tick; 3
 variants). G253's measure and G285's rule (development: more passes than U53, failures no higher; unseen: more than
 12.2% passed, at most 8.4% failed, failed + near-frozen at most 22.3%). Run once.
+
+**G289 as first run (2026-11-07): not valid for adoption (a modelling error).** Development (405 weeks): day cap $1,100 /
+$1,300 / $1,500: 10.9% / 12.8% / 13.3% passed, 5.7% / 5.9% / 5.9% failed (U53 10.9% / 6.4%); unseen (933): 13.1% /
+13.5% / 15.0% passed, 7.3% / 7.5% / 8.0% failed, failed or near-frozen 20.9% / 21.7% / 21.8% (U53 12.2% / 8.4% /
+22.3%); `verification/noise_v2/g289_day_cap_first_run.txt`. But the model checked the take-profit before the day's cap,
+so on a bar that reached both it filled at the farther price; a real account's nearer limit fills first. **G289b**
+(registered now, before its run; same variants and rule): the nearer of the take-profit and the day's cap is the one
+that fills (`research/g289_day_cap.py`, mnqbot/noise.py).
