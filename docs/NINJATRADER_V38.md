@@ -6513,3 +6513,17 @@ at least 3 trading days.)
 signal settings, no gap trade) is one attempt; the first entry opens a bracket with the stop 25 / 50 / 100 points away
 and the target 1.0 / 1.25 / 1.5 x that; walked on 1-minute bars, stop first when a minute reaches both. The same
 entries reversed are the coin-flip baseline. Reported: wins, losses and attempts per pass, all years and 2020-25.
+
+**G280 result (2026-11-07):** 1,704 NQ sessions with a bot entry (`verification/noise_v2/g280_speedrun.{txt,csv}`).
+Wins per attempt, the bot's direction / the reverse (2020-25 in brackets for the bot):
+
+| stop | target 1.0x | 1.25x | 1.5x |
+|---|---|---|---|
+| 25 points | 54.5% (55.1%) / 42.4% | 49.4% (50.5%) / 37.4% | 45.3% (46.6%) / 33.3% |
+| 50 points | 53.5% (55.8%) / 45.0% | 47.5% (49.1%) / 39.2% | 42.3% (44.0%) / 34.1% |
+| 100 points | 48.2% (52.5%) / 40.5% | 40.9% (45.6%) / 33.9% | 35.6% (40.4%) / 28.7% |
+
+The bot's direction wins 6-12 points more often than the reverse: a real edge on the first entry. With the target 1.25x
+the drawdown, about every second attempt passes (2 fees per pass); every failed attempt is a failed evaluation. This
+does not fit TPT's 50K Test (one day can't be more than half the profit; 3 days minimum). Not built into the file
+without the user's go-ahead: it fails about half of all evaluations by design.
