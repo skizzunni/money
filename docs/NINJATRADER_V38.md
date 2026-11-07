@@ -6943,3 +6943,11 @@ measure and G290's rule (development: more passes than U55, failures no higher; 
 qualifies. Unseen (933; U55 15.6% / 7.9% / 22.2%): 15.0% / 6.5% / 22.3%, 15.2% / 6.5% / 22.4%, 13.8% / 7.8% / 22.8%:
 the failures it saves end as near-frozen Tests instead (as G284), and the passes fall. U55 stays.
 `verification/noise_v2/g305_day_guard.txt`.
+
+## G306: a bigger sprint behind the day guard (registered 2026-11-07, before its run)
+
+G305's $1,000 day guard and G301's 1.5x big-day rule each cut development failures at the same passes. Here the saving
+is spent on size: `research/g306_guard_size.py`, on U55: the sprint at 5 MNQ with the day guard at $1,000 or $800, or with
+the $1,000 guard and the big-day rule at 1.5x (3 variants). G253's measure and G290's rule (development: more passes
+than U55, failures no higher; unseen: more than 15.6% passed, at most 7.9% failed, failed + near-frozen at most
+22.2%). Run once.
