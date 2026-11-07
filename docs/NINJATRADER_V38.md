@@ -6536,3 +6536,9 @@ about $800 / $1,000 / $1,200 at the target and never a full stop past the floor 
 Test rules over 10 sessions from every Monday; NQ (1-minute paths). Development: Mondays 2015-2019; unseen: 2020-2025.
 **Built into the file as the Test sprint** only if the best development setting, on the unseen weeks, passes more than
 U53 does there (to be measured on the same NQ 2020-25 weeks with G253's measure) and fails at most as often. Run once.
+
+**G281 as first run: not valid (a modelling error, not a verdict).** It filled every stop exactly at the stop, so a
+loss could never pass the sizing's $100 above the floor and no Test ever failed (0% failed in every cell; passes up to
+17.9% development / 25.0% unseen; `verification/noise_v2/g281_daily_bracket_exact_fills.*`). Real stops slip, more so
+when a minute opens past them. **G281b** (registered now, before its run, same grid and rule): a stop fills at the stop
+or at the opening price of the minute that opened past it, whichever is worse, and a further tick.

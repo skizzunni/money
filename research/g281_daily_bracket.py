@@ -35,7 +35,7 @@ def outcomes(first, groups, s_pts, ratio):
         if g is None:
             continue
         g = g[g.index >= r.entry_time]
-        hi, lo, cl = g.high.to_numpy(), g.low.to_numpy(), g.close.to_numpy()
+        op, hi, lo, cl = g.open.to_numpy(), g.high.to_numpy(), g.low.to_numpy(), g.close.to_numpy()
         sgn = r.direction
         tp, sl = r.entry + sgn * ratio * s_pts, r.entry - sgn * s_pts
         hit_s = (lo <= sl) if sgn > 0 else (hi >= sl)
@@ -45,7 +45,11 @@ def outcomes(first, groups, s_pts, ratio):
         if i_s == i_t == 10 ** 9:
             out[day] = sgn * (cl[-1] - r.entry)
         else:
-            out[day] = ratio * s_pts if i_t < i_s else -s_pts
+            if i_t < i_s:
+                out[day] = ratio * s_pts
+            else:  # G281b: the stop fills at the stop or at the minute's open past it, less a tick more
+                fill = min(op[i_s], sl) if sgn > 0 else max(op[i_s], sl)
+                out[day] = sgn * (fill - r.entry) - 0.25
     return out
 
 
@@ -83,7 +87,7 @@ def main() -> None:
     tf = run(bars, cfg, minutes=5).trades_frame()
     tf["day"] = tf.entry_time.dt.tz_convert(NY).dt.date
     first = tf.sort_values("entry_time").groupby("day").first()
-    m1 = pd.read_pickle(f"{sys.argv[1]}/nq1m_scaled.pkl")[["high", "low", "close"]]
+    m1 = pd.read_pickle(f"{sys.argv[1]}/nq1m_scaled.pkl")[["open", "high", "low", "close"]]
     t = m1.index.tz_convert(NY)
     mins = t.hour * 60 + t.minute
     m1 = m1[(mins >= 570) & (mins < 960)]
@@ -102,7 +106,7 @@ def main() -> None:
                     rows.append({"stop": s_pts, "ratio": ratio, "target": target,
                                  "set": "development 2015-19" if d.year < 2020 else "unseen 2020-25", "res": res})
     df = pd.DataFrame(rows)
-    df.to_csv("verification/noise_v2/g281_daily_bracket.csv", index=False)
+    df.to_csv("verification/noise_v2/g281b_daily_bracket.csv", index=False)
     out = df.groupby(["set", "stop", "ratio", "target"]).res.value_counts(normalize=True).unstack().fillna(0).round(3)
     print(out.to_string(), flush=True)
 
