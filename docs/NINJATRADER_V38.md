@@ -6966,3 +6966,8 @@ G62 found the bot makes 2.5-3.4x its usual dollars on the monthly jobs-report da
 or 2x its 4 MNQ (2, 6 or 8; `news_mult`; the day's and the floor's room still cut it; 3 variants). G253's measure and
 G290's rule (development: more passes than U55, failures no higher; unseen: more than 15.6% passed, at most 7.9% failed,
 failed + near-frozen at most 22.2%). Run once.
+
+**G307 result (2026-11-07): rejected.** Development (405 weeks; U55 13.6% / 5.9% / 20.0%): jobs days 0.5x 13.1% / 6.7%,
+1.5x 13.8% / 6.2%, 2x 14.1% / 6.7%: the passes it adds come with more failures, so none qualifies. Unseen (933; U55
+15.6% / 7.9% / 22.2%): 14.5% / 7.8% / 21.2%, 16.2% / 7.8% / 22.7%, 16.3% / 8.5% / 23.4%. About one jobs day falls in a
+two-week Test, too few to move it much either way. U55 stays. `verification/noise_v2/g307_jobs_days.txt`.
