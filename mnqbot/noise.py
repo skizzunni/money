@@ -388,6 +388,10 @@ class NoiseConfig:
     sprint_push_from: int = 0
     sprint_push_qty: int = 0
     sprint_push_min: float = 0.0
+    # research (G284): the sprint's defence: with less than sprint_low_room above the trailing floor, the sprint takes
+    # sprint_low_qty contracts (0 = off)
+    sprint_low_room: float = 0.0
+    sprint_low_qty: int = 1
     profit_step_fast: float = 0.0  # research (G142): above profit_step_fast_from of profit, a contract per this much
     profit_step_fast_from: float = 10000.0
     profit_step_locked: float = 0.0  # G104: once the floor has stopped, a contract per this much profit (0: off)
@@ -674,7 +678,13 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
         return int(p // step_now())
 
     def sprint_q() -> int:
-        """G270: the sprint's size (sprint_qty_locked once the floor has stopped; G282: the push)."""
+        """G270: the sprint's size (sprint_qty_locked once the floor has stopped; G282: the push; G284: the defence)."""
+        if cfg.sprint_low_room > 0 and not math.isnan(trail_peak):
+            floor = trail_peak - cfg.trail_dd
+            if cfg.trail_cap >= 0:
+                floor = min(floor, trail_base + cfg.trail_cap)
+            if eq_curve[-1] - floor < cfg.sprint_low_room:
+                return cfg.sprint_low_qty
         if (cfg.sprint_push_qty > 0 and cfg.sprint_push_from > 0 and sprint_sessions >= cfg.sprint_push_from
                 and eq_curve[-1] - trail_base >= cfg.sprint_push_min):
             return cfg.sprint_push_qty

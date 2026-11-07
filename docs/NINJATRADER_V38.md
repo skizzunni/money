@@ -6588,3 +6588,11 @@ U53 12.2% / 8.4%): k296 13.8% passed / 10.6% failed, k270 13.2% / 12.3%, k104 12
 the more failures, as in G253-G261. The low-failure check found no stage-1 combination with at least 11% passed and at
 most 8% failed (the lowest-failure ones pass 2-6%), so it had nothing to run. U53 stays.
 `verification/noise_v2/g277_test_search.txt`, `g277_stage1.csv`, `g277_stage2.csv`.
+
+## G284: the sprint's defence near the floor (registered 2026-11-07, before its run)
+
+G277's k296 passes 13.8% of the unseen weeks but fails 10.6%. `research/g284_defence.py`: with less than $1,000 or
+$1,500 above the trailing floor, the sprint takes 1 or 2 MNQ instead of 4 (the gap trade stays at 2; the room still cuts
+the size), on U53 and on k296 (8 variants, and the two bases). G253's measure; the same rule as G282: the best
+development variant that passes more than U53 there and fails no more replaces U53 only if on the unseen weeks it
+passes more than 12.2% and fails at most 8.4%. Run once.
