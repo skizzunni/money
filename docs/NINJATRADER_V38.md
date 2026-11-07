@@ -7086,3 +7086,8 @@ and the 15:00 hour's entries average $4.70 against $10-33 for the hours 10:00-14
 U55: the gap trade off (`gap_go` False), the gap trade at 1 MNQ, or no bot entries after 15:00 (3 variants). G253's
 measure and G290's rule (development: more passes than U55, failures no higher; unseen: more than 15.6% passed, at
 most 7.9% failed, failed + near-frozen at most 22.2%). Run once.
+
+**G315 result (2026-11-07): rejected.** Development (405 weeks; U55 13.6% / 5.9% / 20.0%): gap trade off 11.9% / 5.9%,
+gap trade 1 MNQ 12.6% / 6.4%, last entry 15:00 12.6% / 6.7%. Unseen (933; U55 15.6% / 7.9% / 22.2%): 13.2% / 7.0%, 14.1%
+/ 7.8%, 14.8% / 7.7%. Though the gap trade nets little over eight years, inside a two-week Test its early wins carry
+passes; and the 15:00 entries add passes despite their small average. U55 stays. `verification/noise_v2/g315_gap_off.txt`.

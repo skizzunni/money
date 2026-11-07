@@ -1,0 +1,14 @@
+development (index 2011-18):
+                  weeks  passed  failed  stuck  failed_or_stuck
+tag                                                            
+U55                 405   0.136   0.059  0.141            0.200
+gap trade 1 MNQ     405   0.126   0.064  0.143            0.207
+gap trade off       405   0.119   0.059  0.156            0.215
+last entry 15:00    405   0.126   0.067  0.123            0.190
+unseen (NQ 2015-25 + index 2019-26):
+                  weeks  passed  failed  stuck  failed_or_stuck
+tag                                                            
+U55                 933   0.156   0.079  0.143            0.222
+gap trade 1 MNQ     933   0.141   0.078  0.145            0.223
+gap trade off       933   0.132   0.070  0.160            0.229
+last entry 15:00    933   0.148   0.077  0.133            0.210
