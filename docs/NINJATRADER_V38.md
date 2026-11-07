@@ -6930,3 +6930,10 @@ sprint at 5 MNQ 12.3% / 3.2% / 14.1%, 6 MNQ 15.3% / 8.1% / 24.9%, 8 MNQ 17.0% / 
 7.9% / 22.2%): 13.9% / 6.5% / 19.4%, 16.5% / 10.7% / 28.7%, 19.3% / 19.2% / 39.5%. With the filter, the size that
 gets back U55's passes (6 MNQ) also brings back more failures than U55. None qualifies; U55 stays.
 `verification/noise_v2/g304_eq_size.txt`.
+
+## G305: the day guard in the Test sprint (registered 2026-11-07, before its run)
+
+G128's day guard (a tick-level exit where today's P/L reaches minus the guard; tried on the growth bot only) on the
+two-week Test: `research/g305_day_guard.py`, on U55: the guard at $800, $1,000 or $1,200 (3 variants; `day_guard`). G253's
+measure and G290's rule (development: more passes than U55, failures no higher; unseen: more than 15.6% passed, at most
+7.9% failed, failed + near-frozen at most 22.2%). Run once.
