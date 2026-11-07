@@ -7005,3 +7005,12 @@ most 22.2%). Run once.
 6.7%, from 13:00 at $750 13.3% / 6.4%, from 14:00 at $500 11.6% / 6.7%: fewer passes, more failures. Unseen (933; U55
 15.6% / 7.9% / 22.2%): 14.5% / 7.1%, 15.2% / 7.4%, 15.3% / 7.8%. The afternoon entries on a green day add more passes
 than red days. U55 stays. `verification/noise_v2/g310_late_stop.txt`.
+
+## G311: the near misses together (registered 2026-11-07, before its run)
+
+Five rules each came close alone (fewer failures for about the same passes, or the reverse): G297's streak pause (skip
+2 signals after 4 losers), G301's big-day rule (1.5x), G305's day guard ($1,000), G294's day lock ($800 keeping $300),
+G307's jobs days (1.5x). `research/g311_combo_search.py`: every combination of the five on U55, with the sprint at 4 or
+5 MNQ (64 variants; variant 0 is U55 itself). Stage 1 on the development weeks; the 10 best by passes with failures at
+most U55's 5.9% go to stage 2 (the unseen weeks). **Replaces U55's settings** if on stage 2 it passes more than 15.6%,
+fails at most 7.9%, and failed + near-frozen is at most 22.2%. Run once (resumable).
