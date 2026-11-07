@@ -1016,13 +1016,13 @@ namespace NinjaTrader.NinjaScript.Strategies
                     if (Mode == "Funded growth Apex 100K") { DailyLoss = 1350; TrailDD = 3000; LossGuard = 1425; }
                     if (Mode == "Funded growth Apex 150K") { DailyLoss = 1800; TrailDD = 4000; LossGuard = 1900; }
                 }
-                if (sprintMode)  // G256 k317 + G269 + G273: the Test in two weeks (12.1% passed, 8.5% failed on unseen weeks; docs)
+                if (sprintMode)  // G256 k317 + G269 + G273 + G275: the Test in two weeks (12.2% passed, 8.4% failed on unseen weeks; docs)
                 {
                     DailyLoss = 2000; LossGuard = 1900; EarlyDayBudget = 0; MaxLosersPerDay = 3; TimeStop = 30;
                     RangePos = 0.7; TrendSessions = 0; BigDayK = 0; CalmK = 0.7; TakeProfit = 0.75; LockAt = 0.2;
                     EarlyNoEntryChecks = ""; SprintContracts = 4; sprintDays = 10; DayProfitStop = 1100;
                     NoiseSessions = 18; EntryWidth = 0.7; SqueezeMin = 0; LastEntry = "15:30"; GapTrigger = 0.5;
-                    StopBuffer = 0.24; LockPlus = 2.5;
+                    StopBuffer = 0.24; LockPlus = 2.5; GapBreakEven = 0;  // G275: no gap break-even in the sprint
                 }
                 else if (Mode == "Evaluation")  // v3.8: 1 MNQ, $260 a trade, $900 a day
                 {

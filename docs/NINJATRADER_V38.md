@@ -6439,3 +6439,11 @@ passes more while failing at most 8.5%. U52 stays.
 U52 moves the gap trade's stop to break-even once a bar closes 1.5x its risk in profit (G242); here at 0.75x, 1.0x, or
 never (`gap_go_be`). `research/g275_gap_be.py`, G253's measure. **Replaces U52's setting** if on the unseen weeks it
 passes more than 12.1% and fails at most 8.5%. Run once.
+
+**G275 result (2026-11-07): adopted by its rule (U53), by the smallest margin.** Unseen weeks (passed / failed): U52
+(1.5x) 12.1% / 8.5%; 0.75x 12.0% / 8.4%; 1.0x 12.0% / 8.4%; **no break-even 12.2% / 8.4%** (development: 10.9% / 6.2%
+for 1.5x, 0.75x and 1.0x; 10.9% / 6.4% for none; `verification/noise_v2/g275_gap_be.txt`). The difference is one week of
+933 either way: within noise, adopted because the pre-registered rule says so (and it removes a rule from the sprint).
+
+**U53 (2026-11-07): no gap break-even in the Test sprint.** `GapBreakEven` 0 in "Test sprint" mode (Funded growth keeps
+1.5). NinjaTrader tests 49 passed (`test_v38_test_sprint` with it).

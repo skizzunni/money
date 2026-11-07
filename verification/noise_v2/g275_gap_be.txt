@@ -1,0 +1,14 @@
+development (index 2011-18):
+                  weeks  passed  failed
+tag                                    
+U52 (1.5x)          405   0.109   0.062
+break-even 0.75x    405   0.109   0.062
+break-even 1.0x     405   0.109   0.062
+no break-even       405   0.109   0.064
+unseen (NQ 2015-25 + index 2019-26):
+                  weeks  passed  failed
+tag                                    
+U52 (1.5x)          933   0.121   0.085
+break-even 0.75x    933   0.120   0.084
+break-even 1.0x     933   0.120   0.084
+no break-even       933   0.122   0.084
