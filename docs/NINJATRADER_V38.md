@@ -6917,3 +6917,10 @@ Unseen (933; U55 15.6% / 7.9% / 22.2%): 14.3% / 7.5% / 19.4%, 12.2% / 5.3% / 18.
 passes more. The equity filter halves the failures and near-frozen Tests on both sets at a cost of about a quarter of
 the passes; a natural follow-up is the filter with a bigger sprint (G304). U55 stays.
 `verification/noise_v2/g303_cooldown.txt`.
+
+## G304: the equity filter with a bigger sprint (registered 2026-11-07, before its run)
+
+G303: half size below the 20-trade equity average halves the failures but costs about a quarter of the passes.
+`research/g304_eq_size.py`, on U55: that filter with the sprint at 5, 6 or 8 MNQ (halved, rounded, while below the
+average; 3 variants). G253's measure and G290's rule (development: more passes than U55, failures no higher; unseen:
+more than 15.6% passed, at most 7.9% failed, failed + near-frozen at most 22.2%). Run once.
