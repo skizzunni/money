@@ -1,0 +1,14 @@
+development (index 2011-18):
+                                 weeks  passed  failed  stuck  failed_or_stuck
+tag                                                                           
+U53                                405   0.109   0.064  0.141            0.205
+until passed, 5 MNQ from $3,000    405   0.104   0.062  0.141            0.202
+until passed, 6 MNQ from $3,000    405   0.106   0.062  0.141            0.202
+until passed, 8 MNQ from $3,000    405   0.106   0.062  0.141            0.202
+unseen (NQ 2015-25 + index 2019-26):
+                                 weeks  passed  failed  stuck  failed_or_stuck
+tag                                                                           
+U53                                933   0.122   0.084  0.139            0.223
+until passed, 5 MNQ from $3,000    933   0.118   0.084  0.139            0.223
+until passed, 6 MNQ from $3,000    933   0.115   0.084  0.139            0.223
+until passed, 8 MNQ from $3,000    933   0.113   0.084  0.139            0.223

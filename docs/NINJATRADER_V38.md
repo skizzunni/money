@@ -6675,3 +6675,8 @@ and G269 found the size kept past +$3,000 adds passes and no failures (the floor
 `research/g287_pass_push.py`: G286's sprint until the pass rule is met, at 5, 6 or 8 MNQ once the Test is up $3,000
 (4 before; 3 variants; the gap trade stays at 2). G253's measure and G285's rule (development: more passes than U53,
 failures no higher; unseen: more than 12.2% passed, at most 8.4% failed, failed + near-frozen at most 22.3%). Run once.
+
+**G287 result (2026-11-07): rejected.** Development (405 weeks): U53 10.9% passed; 5, 6, 8 MNQ from +$3,000 until
+passed: 10.4%, 10.6%, 10.6% (6.2% failed). Unseen (933): 11.8%, 11.5%, 11.3% against U53's 12.2% (failures and
+near-frozen unchanged). Bigger trades from +$3,000 make bigger single days, and the best day must stay under half the
+profit, so the Test takes longer. U53 stays. `verification/noise_v2/g287_pass_push.txt`.
