@@ -6667,3 +6667,11 @@ at 4, 3 or 2 MNQ from $3,000: 10.4%, 10.4%, 10.1% passed (6.2% failed). Unseen (
 12.2% (failures and near-frozen unchanged). Fewer passes: past +$5,000 U53 hands over to the growth sizing, which by then
 takes more than 4 MNQ, and that finishes the consistency rule sooner than a sprint held at 4 or less. U53 stays.
 `verification/noise_v2/g286_until_pass.txt`.
+
+## G287: a bigger sprint from +$3,000 until the Test is passed (registered 2026-11-07, before its run)
+
+G286: past +$5,000 the growth sizing (more than 4 MNQ) finishes the consistency rule sooner than a sprint held at 4,
+and G269 found the size kept past +$3,000 adds passes and no failures (the floor has stopped by then).
+`research/g287_pass_push.py`: G286's sprint until the pass rule is met, at 5, 6 or 8 MNQ once the Test is up $3,000
+(4 before; 3 variants; the gap trade stays at 2). G253's measure and G285's rule (development: more passes than U53,
+failures no higher; unseen: more than 12.2% passed, at most 8.4% failed, failed + near-frozen at most 22.3%). Run once.
