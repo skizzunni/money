@@ -6854,3 +6854,9 @@ measure and G290's rule (development: more passes than U55, failures no higher; 
 qualifies. Unseen (933; U55 15.6% / 7.9% / 22.2%): 9.2% / 4.2% / 13.5%, 12.5% / 5.8% / 18.2%, 14.0% / 6.3% / 19.0%.
 Smaller trades after a loser cut failures and near-frozen Tests a lot (2 MNQ after one: failed or near-frozen 13.5%
 against 22.2%) but cut the passes more. U55 stays. `verification/noise_v2/g298_after_loss.txt`.
+
+## G299: an earlier last entry in the Test sprint (registered 2026-11-07, before its run)
+
+The sprint searches kept the last entry at 15:00-15:30. `research/g299_last_entry.py`, on U55: no new entries after
+12:00, 13:00 or 14:00 (3 variants; `last_entry_end`). G253's measure and G290's rule (development: more passes than U55,
+failures no higher; unseen: more than 15.6% passed, at most 7.9% failed, failed + near-frozen at most 22.2%). Run once.
