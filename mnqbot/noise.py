@@ -396,6 +396,12 @@ class NoiseConfig:
     # sprint_hot_k x the last calm_long's, the sprint takes sprint_hot_qty contracts (0 = off)
     sprint_hot_k: float = 0.0
     sprint_hot_qty: int = 0
+    # research (G286): the sprint stays on until the Test's pass rule is met (profit at least sprint_pass_target, the best
+    # day under half of it, at least 3 days with a trade), whatever sprint_target; from sprint_pass_target on it takes
+    # sprint_pass_qty contracts (0 = sprint_qty)
+    sprint_until_pass: bool = False
+    sprint_pass_target: float = 3000.0
+    sprint_pass_qty: int = 0
     profit_step_fast: float = 0.0  # research (G142): above profit_step_fast_from of profit, a contract per this much
     profit_step_fast_from: float = 10000.0
     profit_step_locked: float = 0.0  # G104: once the floor has stopped, a contract per this much profit (0: off)
@@ -582,6 +588,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
     fill_next = fill_trade = False  # G73: is the pending / open trade a fill-in (trend_small's 1-contract short)?
     fill_pnl = 0.0  # G73: the fill-in trades' P/L so far
     sprint_sessions, sprint_done = 0, False  # G103: sessions since the account's start; target reached
+    sprint_eods: list[float] = []  # G286: the equity at each session's open since the start
     size_slip_c = cfg.size_slip_pts * cfg.point_value if minutes == 5 else 0.0  # G79: tested on 5-minute bars
     lock_next = lock_trade = cfg.lock_at  # their lock triggers, in max losses (after_loss_lock)
     ml_cfg = cfg.max_loss_per_trade  # G51: the max loss in force (ml_sigma: set at each check)
@@ -683,6 +690,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
 
     def sprint_q() -> int:
         """G270: the sprint's size (sprint_qty_locked once the floor has stopped; G282: the push; G284: the defence)."""
+        if cfg.sprint_until_pass and cfg.sprint_pass_qty > 0 and eq_curve[-1] - trail_base >= cfg.sprint_pass_target:
+            return cfg.sprint_pass_qty  # G286
         if cfg.sprint_low_room > 0 and not math.isnan(trail_peak):
             floor = trail_peak - cfg.trail_dd
             if cfg.trail_cap >= 0:
@@ -703,10 +712,22 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
         nonlocal sprint_done
         if cfg.sprint_qty <= 0 or sprint_done or math.isnan(trail_base):
             return False
-        if eq_curve[-1] - trail_base >= cfg.sprint_target:
+        if cfg.sprint_until_pass:  # G286
+            if test_passed():
+                sprint_done = True
+                return False
+        elif eq_curve[-1] - trail_base >= cfg.sprint_target:
             sprint_done = True
             return False
         return sprint_sessions <= cfg.sprint_days
+
+    def test_passed() -> bool:
+        """G286: is the Test's pass rule met (closed sessions and today so far)?"""
+        if not sprint_eods:
+            return False
+        days = [b - a for a, b in zip(sprint_eods, sprint_eods[1:])] + [eq_curve[-1] - sprint_eods[-1]]
+        p = eq_curve[-1] - trail_base
+        return p >= cfg.sprint_pass_target and max(days) < 0.5 * p and sum(abs(x) > 1e-9 for x in days) >= 3
 
     def braked() -> bool:
         """G99: has the account given back more than (1 - giveback_brake) of its best profit since the floor stopped?"""
@@ -1194,6 +1215,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                     trail_base = trail_peak = eq_curve[-1]
                 trail_peak = max(trail_peak, eq_curve[-1])
                 sprint_sessions += 1  # G103
+                sprint_eods.append(eq_curve[-1])  # G286
             prev_side = 0
             if cfg.calm_k and len(day_ranges) >= cfg.calm_long:
                 cs, cl = cfg.calm_short, cfg.calm_long

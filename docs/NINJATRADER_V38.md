@@ -6652,3 +6652,12 @@ near-frozen; every stormy-stretch variant fails more (6.9-9.9%; failed or near-f
 On the unseen weeks too (U53 12.2% / 8.4% / 22.3%) the variants pass 12.0-13.4% with 7.7-11.3% failed and 22.8-27.4%
 failed or near-frozen. A bigger sprint in storms adds failures as fast as passes. U53 stays.
 `verification/noise_v2/g285_storm_sprint.txt`.
+
+## G286: the sprint until the Test is passed (registered 2026-11-07, before its run)
+
+22 of U53's 1,322 two-week Tests (G278) end open at +$3,000 or more: the consistency rule (best day under half the
+profit) holds them back, and the sprint stops at +$5,000. `research/g286_until_pass.py`: the sprint stays on until the
+pass rule is met (at least +$3,000, the best day under half of it, 3 days with a trade), at 4 MNQ, or at 2 or 3 MNQ once
+the Test is up $3,000 (3 variants; the gap trade stays at 2). G253's measure and G285's rule: the best development
+variant (more passes than U53, failures no higher) replaces U53 only if on the unseen weeks it passes more than 12.2%,
+fails at most 8.4%, and failed + near-frozen is at most 22.3%. Run once.
