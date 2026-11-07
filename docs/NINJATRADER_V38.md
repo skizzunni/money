@@ -7161,3 +7161,11 @@ opening-drive filter (0.35x), the equity filter (eq_n 20), the side cooldown (1)
 stop (from 14:00 at $500), with the sprint at 4 or 5 MNQ. Stage 1 on the development weeks; the 10 best by passes with
 failures at most U55's 5.9% **and failed or near-frozen at most its 20.0%** go to stage 2. **Replaces U55's settings** if
 on stage 2 it passes more than 15.6%, fails at most 7.9%, and failed + near-frozen is at most 22.2%. Run once (resumable).
+
+**G321 result (2026-11-07): adopted (U56, pending NinjaTrader parity).** Stage 1 (200 variants, 405 development weeks;
+U55 13.6% / 5.9% / 20.0%): the best, k30, **14.1% / 3.7% / 16.8%**. Stage 2 (933 unseen weeks; U55 15.6% / 7.9% /
+22.2%): **k30 16.0% passed, 6.9% failed, 21.5% failed or near-frozen**, inside all three bounds; k107 15.8% / 6.0% /
+20.8% next; the other eight 12.5-15.5% passed. k30 = U55 with G297's streak pause (skip 2 signals after 4 losers in a
+row), the big-day rule at 1.5x (10 sessions), a $1,200 day guard (G128's tick-level exit, no new entries after it
+fires), and 1.5x the sprint's size on jobs-report days (6 MNQ). The gain is mostly in failures (−1.0 point, near-frozen
+−0.7); passes +0.4. `verification/noise_v2/g321_rule_search.txt`, `g321_stage1.csv`, `g321_stage2.csv`.

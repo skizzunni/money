@@ -1,0 +1,26 @@
+stage 1 best (index 2011-18):
+     weeks  passed  failed  failed_or_stuck                                                                                                                settings
+k                                                                                                                                                                  
+30     405   0.141   0.037            0.168                                              {"sprint": 4, "rules": {"streak": 1, "big day": 1, "guard": 2, "jobs": 1}}
+107    405   0.138   0.040            0.185                                  {"sprint": 4, "rules": {"streak": 1, "big day": 2, "guard": 2, "jobs": 1, "drive": 1}}
+33     405   0.136   0.035            0.173                                  {"sprint": 4, "rules": {"streak": 1, "big day": 1, "guard": 1, "jobs": 1, "drive": 1}}
+187    405   0.133   0.049            0.193                                                             {"sprint": 4, "rules": {"guard": 2, "jobs": 1, "drive": 1}}
+199    405   0.133   0.052            0.173                                                                     {"sprint": 4, "rules": {"streak": 1, "big day": 1}}
+63     405   0.131   0.049            0.178               {"sprint": 4, "rules": {"streak": 1, "big day": 2, "guard": 2, "day lock": 1, "jobs": 1, "late stop": 1}}
+142    405   0.131   0.020            0.123                    {"sprint": 5, "rules": {"guard": 1, "day lock": 1, "jobs": 1, "drive": 1, "eq": 1, "after loss": 1}}
+156    405   0.131   0.040            0.175                              {"sprint": 4, "rules": {"streak": 1, "big day": 2, "guard": 2, "day lock": 1, "drive": 1}}
+9      405   0.128   0.040            0.175  {"sprint": 4, "rules": {"streak": 1, "big day": 2, "guard": 2, "day lock": 1, "jobs": 1, "drive": 1, "after loss": 1}}
+157    405   0.128   0.022            0.143                                                 {"sprint": 5, "rules": {"guard": 1, "day lock": 1, "jobs": 1, "eq": 1}}
+stage 2 (NQ 2015-25 + index 2019-26):
+     weeks  passed  failed  failed_or_stuck                                                                                                                settings
+k                                                                                                                                                                  
+30     933   0.160   0.069            0.215                                              {"sprint": 4, "rules": {"streak": 1, "big day": 1, "guard": 2, "jobs": 1}}
+107    933   0.158   0.060            0.208                                  {"sprint": 4, "rules": {"streak": 1, "big day": 2, "guard": 2, "jobs": 1, "drive": 1}}
+199    933   0.155   0.071            0.196                                                                     {"sprint": 4, "rules": {"streak": 1, "big day": 1}}
+63     933   0.155   0.061            0.214               {"sprint": 4, "rules": {"streak": 1, "big day": 2, "guard": 2, "day lock": 1, "jobs": 1, "late stop": 1}}
+187    933   0.155   0.059            0.222                                                             {"sprint": 4, "rules": {"guard": 2, "jobs": 1, "drive": 1}}
+156    933   0.155   0.055            0.206                              {"sprint": 4, "rules": {"streak": 1, "big day": 2, "guard": 2, "day lock": 1, "drive": 1}}
+9      933   0.151   0.046            0.191  {"sprint": 4, "rules": {"streak": 1, "big day": 2, "guard": 2, "day lock": 1, "jobs": 1, "drive": 1, "after loss": 1}}
+33     933   0.148   0.063            0.206                                  {"sprint": 4, "rules": {"streak": 1, "big day": 1, "guard": 1, "jobs": 1, "drive": 1}}
+157    933   0.140   0.046            0.196                                                 {"sprint": 5, "rules": {"guard": 1, "day lock": 1, "jobs": 1, "eq": 1}}
+142    933   0.125   0.045            0.189                    {"sprint": 5, "rules": {"guard": 1, "day lock": 1, "jobs": 1, "drive": 1, "eq": 1, "after loss": 1}}
