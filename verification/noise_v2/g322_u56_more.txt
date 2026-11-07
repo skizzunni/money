@@ -1,0 +1,14 @@
+development (index 2011-18):
+                                  weeks  passed  failed  stuck  failed_or_stuck
+tag                                                                            
+U56                                 405   0.141   0.037  0.131            0.168
+U56 + drive filter 0.35x            405   0.143   0.040  0.136            0.175
+U56, sprint 5 MNQ                   405   0.168   0.059  0.180            0.240
+U56, sprint 5 MNQ + drive filter    405   0.170   0.062  0.170            0.232
+unseen (NQ 2015-25 + index 2019-26):
+                                  weeks  passed  failed  stuck  failed_or_stuck
+tag                                                                            
+U56                                 933   0.160   0.066  0.150            0.217
+U56 + drive filter 0.35x            933   0.155   0.064  0.141            0.206
+U56, sprint 5 MNQ                   933   0.173   0.114  0.161            0.274
+U56, sprint 5 MNQ + drive filter    933   0.173   0.108  0.165            0.273

@@ -7197,3 +7197,8 @@ the opening-drive filter at 0.35x (G321's runner-up k107 had it), and both (3 va
 U56's numbers: the best development variant (more passes than U56's 14.1%, failures no higher than 3.7%) replaces U56
 only if on the unseen weeks it passes more than 16.0%, fails at most 6.6%, and failed + near-frozen is at most 21.7%.
 Run once.
+
+**G322 result (2026-11-07): rejected.** Development (405 weeks; U56 14.1% / 3.7% / 16.8%): the drive filter 14.3% / 4.0%
+(more failures), 5 MNQ 16.8% / 5.9%, 5 MNQ + drive 17.0% / 6.2%: the variants that pass more all fail more. Unseen (933;
+U56 16.0% / 6.6% / 21.7%): 15.5% / 6.4%, 17.3% / 11.4% / 27.4%, 17.3% / 10.8% / 27.3%. A fifth contract still costs far
+more in failures than it adds in passes. U56 stays. `verification/noise_v2/g322_u56_more.txt`.
