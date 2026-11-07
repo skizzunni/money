@@ -6834,3 +6834,10 @@ The engine's streak rule (v2.1 study; tested for funded growth only) on the two-
 U55: after 3 or 4 losing trades in a row (across days; a winner resets the count) the next 1 or 2 entry signals are
 skipped (3 variants: 3 / 1, 3 / 2, 4 / 2). G253's measure and G290's rule (development: more passes than U55, failures no
 higher; unseen: more than 15.6% passed, at most 7.9% failed, failed + near-frozen at most 22.2%). Run once.
+
+**G297 result (2026-11-07): rejected at the development step.** Development (405 weeks; U55 13.6% / 5.9% / 20.0%): skip 1
+after 3 losers 11.6% / 8.6% / 22.0%; skip 2 after 3 losers 11.4% / 7.4% / 22.2%; skip 2 after 4 losers 13.1% / 6.2% /
+18.8%: none passes more than U55. Unseen (933; U55 15.6% / 7.9% / 22.2%): 15.9% / 6.5% / 20.5%, 15.0% / 8.4% / 21.5%,
+15.8% / 6.5% / 19.9%. The unseen weeks look better for two variants, but the rule picks on the development weeks first,
+and changing it after seeing the unseen results would make them no longer unseen. Not adopted; U55 stays.
+`verification/noise_v2/g297_streak.txt`.
