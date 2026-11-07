@@ -6910,3 +6910,10 @@ G138 tried these on the growth bot only. `research/g303_cooldown.py`, on U55: af
 2 entry signals on that side (`side_cooldown`); or half size while the equity is below its 20-trade average (`eq_n`
 20) (3 variants). G253's measure and G290's rule (development: more passes than U55, failures no higher; unseen: more
 than 15.6% passed, at most 7.9% failed, failed + near-frozen at most 22.2%). Run once.
+
+**G303 result (2026-11-07): rejected.** Development (405 weeks; U55 13.6% / 5.9% / 20.0%): side cooldown 1 9.6% / 5.4% /
+19.0%, side cooldown 2 8.4% / 4.7% / 14.6%, half size below the 20-trade equity average 9.9% / **2.0%** / **9.6%**.
+Unseen (933; U55 15.6% / 7.9% / 22.2%): 14.3% / 7.5% / 19.4%, 12.2% / 5.3% / 18.2%, 11.5% / **4.0%** / **13.4%**. None
+passes more. The equity filter halves the failures and near-frozen Tests on both sets at a cost of about a quarter of
+the passes; a natural follow-up is the filter with a bigger sprint (G304). U55 stays.
+`verification/noise_v2/g303_cooldown.txt`.
