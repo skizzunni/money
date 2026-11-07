@@ -6688,3 +6688,9 @@ profit); G287 found bigger days slow the Test. `research/g288_day_stop_consisten
 rises, on a day when it is more, to 0.8x, 0.9x or 0.95x the Test's profit before today (so a bigger day comes only when
 it stays under the rest of the profit; 3 variants). G253's measure and G285's rule (development: more passes than U53,
 failures no higher; unseen: more than 12.2% passed, at most 8.4% failed, failed + near-frozen at most 22.3%). Run once.
+
+**G288 result (2026-11-07): rejected.** Development (405 weeks): U53 10.9% passed; the day stop raised to 0.8x, 0.9x,
+0.95x the profit before today: 9.6%, 8.9%, 8.9% (6.4% failed, unchanged). Unseen (933): 8.7%, 7.8%, 7.8% against U53's
+12.2% (failures and near-frozen unchanged). The stop only blocks new entries: the trade still open runs past it, so a
+day allowed up to 0.9x the earlier profit often ends above it, and then it is more than half the profit. The flat
+$1,100 keeps that overshoot small. U53 stays. `verification/noise_v2/g288_day_stop_consistent.txt`.

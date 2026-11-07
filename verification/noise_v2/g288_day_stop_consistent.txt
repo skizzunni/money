@@ -1,0 +1,14 @@
+development (index 2011-18):
+                                              weeks  passed  failed  stuck  failed_or_stuck
+tag                                                                                        
+U53                                             405   0.109   0.064  0.141            0.205
+day stop up to 0.8x the profit before today     405   0.096   0.064  0.141            0.205
+day stop up to 0.95x the profit before today    405   0.089   0.064  0.141            0.205
+day stop up to 0.9x the profit before today     405   0.089   0.064  0.141            0.205
+unseen (NQ 2015-25 + index 2019-26):
+                                              weeks  passed  failed  stuck  failed_or_stuck
+tag                                                                                        
+U53                                             933   0.122   0.084  0.139            0.223
+day stop up to 0.8x the profit before today     933   0.087   0.084  0.140            0.224
+day stop up to 0.95x the profit before today    933   0.078   0.084  0.140            0.224
+day stop up to 0.9x the profit before today     933   0.078   0.084  0.140            0.224
