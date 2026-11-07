@@ -6458,3 +6458,13 @@ U53 closes the gap trade at the 09:55 bar's open (`gap_go_exit` 595); here at 09
 10:10 10.9% / 8.8%; 10:25 11.3% / 8.9% (development a little better for the others: 11.1-11.4% / 5.7-5.9% against
 10.9% / 6.4%; `verification/noise_v2/g276_gap_exit.txt`). The development gain does not carry to the unseen weeks.
 U53 stays.
+
+## G277: the two-week Test search around U53 (registered 2026-11-07, before its run)
+
+`research/g277_test_search.py`: G253's two stages and measure, 300 combinations (seed 277) around U53 with its
+sprint fixes held (4 MNQ to +$5,000, the gap trade at 2 MNQ from 0.5x, no gap break-even), varying the day stop
+($1,000-1,200), noise sessions (16-20), entry width (0.65-0.75), range position (0.65-0.75), calm (0.6-0.8), take
+profit (0.6-1.0), lock (0.15-0.25 / +1.5-3.5 points), losers (2-4), time stop (20-45), stop buffer (0.18-0.3).
+**Replaces U53's Test sprint** if on stage 2 it passes more than 12.2% and fails at most 8.4%; as G256, the five
+lowest-failure stage-1 combinations (at least 11% passed, at most 8% failed) also go to stage 2 under the same rule.
+Run once.
