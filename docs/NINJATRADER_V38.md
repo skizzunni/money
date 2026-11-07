@@ -6937,3 +6937,9 @@ G128's day guard (a tick-level exit where today's P/L reaches minus the guard; t
 two-week Test: `research/g305_day_guard.py`, on U55: the guard at $800, $1,000 or $1,200 (3 variants; `day_guard`). G253's
 measure and G290's rule (development: more passes than U55, failures no higher; unseen: more than 15.6% passed, at most
 7.9% failed, failed + near-frozen at most 22.2%). Run once.
+
+**G305 result (2026-11-07): rejected.** Development (405 weeks; U55 13.6% / 5.9% / 20.0%): the day guard at $1,000 13.6% /
+4.4% / 18.5%, $1,200 13.6% / 5.2% / 19.0%, $800 12.8% / 3.5% / 18.5%: fewer failures but no more passes, so none
+qualifies. Unseen (933; U55 15.6% / 7.9% / 22.2%): 15.0% / 6.5% / 22.3%, 15.2% / 6.5% / 22.4%, 13.8% / 7.8% / 22.8%:
+the failures it saves end as near-frozen Tests instead (as G284), and the passes fall. U55 stays.
+`verification/noise_v2/g305_day_guard.txt`.
