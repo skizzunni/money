@@ -162,6 +162,10 @@ class NoiseConfig:
     day_stop_consistent: float = 0.0
     # research (G289): the day profit stop also closes the open trade, at the price where the day's P/L reaches it
     day_cap_exit: bool = False
+    # research (G294): the day lock. Once today's P/L with the open trade at its best price since entry (bar extremes,
+    # through the last bar) reaches day_lock_at, the stop goes no lower than the price where today's P/L is day_lock_keep
+    day_lock_at: float = 0.0
+    day_lock_keep: float = 0.0
     skip_checks_early: bool = False  # research (G125): skip_checks only until the floor has stopped
     after_target_done: bool = False  # research: no new entries today after a take-profit fills
     # research (v2.4 study): the equity curve. While the closed-trade P&L is below its average over the last eq_n
@@ -1087,6 +1091,14 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                     tr = best - pos * cfg.trail_points
                     if (pos > 0 and tr > line) or (pos < 0 and tr < line):
                         line, reason = tr, "Trail"
+            if cfg.day_lock_at > 0 and entry_bar != i:  # G294: the day lock
+                bx = h[entry_bar:i].max() if pos > 0 else l[entry_bar:i].min()
+                per = rest * q_trade * cfg.point_value
+                costs_t = 2 * cfg.commission_per_side * q_trade * rest
+                if day_pnl + pos * (bx - entry_px) * per - costs_t >= cfg.day_lock_at:
+                    dl = entry_px + pos * (cfg.day_lock_keep - day_pnl + costs_t) / per
+                    if pos * (dl - line) > 0:
+                        line, reason = dl, "Day lock"
             if cfg.nt_execution:
                 if entry_bar == i:  # the bracket sent with the entry, points from the actual fill
                     line, reason = entry_px - pos * br_trade[0], br_trade[2]

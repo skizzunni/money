@@ -6781,3 +6781,11 @@ more than 15.6% passed, at most 7.9% failed, failed + near-frozen at most 22.2%)
 / 7.4% / 23.0%, at 4 MNQ 14.8% / 6.9% / 25.7%: more passes but more failures, so neither qualifies. Unseen (933; U55
 15.6% / 7.9% / 22.2%): 15.2% / 9.0% / 23.4% and 14.8% / 9.3% / 25.9%. U55 stays.
 `verification/noise_v2/g293_cap_gap.txt`.
+
+## G294: the day lock (registered 2026-11-07, before its run)
+
+The day cap keeps good days from growing too big; a good day can still turn around. `research/g294_day_lock.py`, on
+U55: once today's P/L, with the open trade at its best price since entry (bar highs / lows through the last bar), reaches
+$800, $1,000 or $1,200, the trade's stop goes no lower than the price where today's P/L is $300, $500 or $700 (3
+variants; whole ticks on NinjaTrader's grid). G253's measure and G290's rule (development: more passes than U55,
+failures no higher; unseen: more than 15.6% passed, at most 7.9% failed, failed + near-frozen at most 22.2%). Run once.
