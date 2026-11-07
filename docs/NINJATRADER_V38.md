@@ -6865,3 +6865,11 @@ failures no higher; unseen: more than 15.6% passed, at most 7.9% failed, failed 
 3.5%, 13:00 8.9% / 4.7%, 14:00 10.6% / 5.4%. Unseen (933; U55 15.6% / 7.9% / 22.2%): 6.5% / 4.4%, 10.4% / 6.4%, 12.3% /
 7.6%. The afternoon trades carry a large share of the passes; stopping earlier cuts them more than the failures. U55
 stays. `verification/noise_v2/g299_last_entry.txt`.
+
+## G300: the trend filter under the day cap (registered 2026-11-07, before its run)
+
+The sprint turned the 50K's trend filter off (G253, before the cap). `research/g300_trend.py`, on U55: shorts while the
+close is above its 45-session average take 1 MNQ (`trend_small`, as the 50K's growth mode), or are skipped; or the same
+1 MNQ with a 20-session average (3 variants; `trend_side` -1). G253's measure and G290's rule (development: more passes
+than U55, failures no higher; unseen: more than 15.6% passed, at most 7.9% failed, failed + near-frozen at most 22.2%).
+Run once.
