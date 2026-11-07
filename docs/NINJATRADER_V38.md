@@ -6490,3 +6490,11 @@ coming after the sprint ends; 25% is beyond 6 weeks. A follow-up measures 8 and 
 
 **G278 follow-up (2026-11-07):** within 8 weeks (40 sessions) 24.8% passed / 10.9% failed; within 12 weeks (60) 31.2% /
 12.9% (`verification/noise_v2/g278_horizon_long.{txt,csv}`). U53 reaches about 25% passes at 8 weeks.
+
+## G279: the Test sprint tuned for three weeks (registered 2026-11-07, before its run)
+
+The user's new horizon: three weeks (15 sessions). U53 there: 15.4% passed / 8.6% failed (G278). `research/g279_three_weeks.py`:
+U53 with the sprint over 15 sessions instead of 10, at 4 or 5 MNQ, with a day stop of $1,100 or $900; development and
+unseen weeks as G253, measured over 15 sessions. **Offered to the user** with its odds if on the unseen weeks it passes
+more than U53 does over 15 sessions there with failures at most 10%; a variant failing more is reported, not adopted.
+Run once.
