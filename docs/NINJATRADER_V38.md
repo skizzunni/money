@@ -6694,3 +6694,11 @@ failures no higher; unseen: more than 12.2% passed, at most 8.4% failed, failed 
 12.2% (failures and near-frozen unchanged). The stop only blocks new entries: the trade still open runs past it, so a
 day allowed up to 0.9x the earlier profit often ends above it, and then it is more than half the profit. The flat
 $1,100 keeps that overshoot small. U53 stays. `verification/noise_v2/g288_day_stop_consistent.txt`.
+
+## G289: the day profit stop closes the open trade too (registered 2026-11-07, before its run)
+
+G288: the trade still open runs past the day profit stop, and a day above half the profit holds the Test back.
+`research/g289_day_cap.py`: the day profit stop ($1,100 as U53, or $1,300 or $1,500) also closes the open trade, with a
+limit at the price where the day's P/L reaches it (whole ticks; as the take-profit, only beyond it by a tick; 3
+variants). G253's measure and G285's rule (development: more passes than U53, failures no higher; unseen: more than
+12.2% passed, at most 8.4% failed, failed + near-frozen at most 22.3%). Run once.

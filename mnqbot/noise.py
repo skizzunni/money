@@ -160,6 +160,8 @@ class NoiseConfig:
     # research (G288): the day profit stop rises to day_stop_consistent x the profit since the start before today, when
     # that is more (a big day only when it keeps the best day under half the profit; 0 = off)
     day_stop_consistent: float = 0.0
+    # research (G289): the day profit stop also closes the open trade, at the price where the day's P/L reaches it
+    day_cap_exit: bool = False
     skip_checks_early: bool = False  # research (G125): skip_checks only until the floor has stopped
     after_target_done: bool = False  # research: no new entries today after a take-profit fills
     # research (v2.4 study): the equity curve. While the closed-trade P&L is below its average over the last eq_n
@@ -1178,6 +1180,13 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                         tp_dist = abs(tp - entry_px)
                     else:
                         close_pos(i, tp, "Target")
+                    events.append((i, "TARGET"))
+            if (pos and not hit and cfg.day_cap_exit and cfg.day_stop_profit > 0  # G289: the day's cap
+                    and (entry_bar != i or cfg.target_on_fill_bar)):
+                need = cfg.day_stop_profit - day_pnl + 2 * cfg.commission_per_side * q_trade * rest
+                cp = entry_px + pos * math.ceil(need / (rest * q_trade * cfg.point_value) / cfg.tick - 1e-9) * cfg.tick
+                if (pos > 0 and h[i] >= cp + cfg.tick) or (pos < 0 and l[i] <= cp - cfg.tick):
+                    close_pos(i, cp, "Day cap")
                     events.append((i, "TARGET"))
             if deferred is not None and pos:  # then the stop, later in the same bar
                 close_pos(i, *deferred)
