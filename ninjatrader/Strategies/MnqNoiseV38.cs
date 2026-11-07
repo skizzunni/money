@@ -1972,24 +1972,24 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         [NinjaScriptProperty]
         [Range(0, 15)]
-        [Display(Name = "Sprint: the first 5 sessions from the start date, until +$3,000, every trade this many MNQ (0 = off; see the odds in the docs)", Order = 22, GroupName = "1. Size and risk")]
+        [Display(Name = "Sprint: the first 5 sessions from the start date, until +$3,000, every trade this many MNQ (0 = off; the Test sprint: 4 MNQ for 10 sessions, until +$5,000)", Order = 22, GroupName = "1. Size and risk")]
         public int SprintContracts { get; set; }
 
         int sprintDays = 5;  // G103: 5 sessions; the Test sprint 10
 
         [NinjaScriptProperty]
         [Range(2, 60)]
-        [Display(Name = "Noise area: sessions averaged (14; the Test sprint 16)", Order = 30, GroupName = "3. Filters")]
+        [Display(Name = "Noise area: sessions averaged (14; the Test sprint 18)", Order = 30, GroupName = "3. Filters")]
         public int NoiseSessions { get; set; }
 
         [NinjaScriptProperty]
         [Range(0.5, 2.0)]
-        [Display(Name = "Entry width: new entries need this x the noise area (1.0; the Test sprint 0.8)", Order = 31, GroupName = "3. Filters")]
+        [Display(Name = "Entry width: new entries need this x the noise area (1.0; the Test sprint 0.7)", Order = 31, GroupName = "3. Filters")]
         public double EntryWidth { get; set; }
 
         [NinjaScriptProperty]
         [Range(0, double.MaxValue)]
-        [Display(Name = "Day profit stop: no new entries once the day is up this much, $ (0 = off; the Test sprint 1,200)", Order = 32, GroupName = "3. Filters")]
+        [Display(Name = "Day profit stop: no new entries once the day is up this much, $ (0 = off; the Test sprint 1,500, and it also closes the open trade there)", Order = 32, GroupName = "3. Filters")]
         public double DayProfitStop { get; set; }
 
         [NinjaScriptProperty]
