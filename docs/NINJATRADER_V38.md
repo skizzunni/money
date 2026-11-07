@@ -6776,3 +6776,8 @@ settings stand. `verification/noise_v2/g292_cap_search.txt`, `g292_stage1.csv`, 
 G273 put the sprint's gap trade at 2 MNQ before the day cap existed. `research/g293_cap_gap.py`, on U55: the gap trade at
 3 or 4 MNQ (2 variants). G253's measure and G290's rule (development: more passes than U55, failures no higher; unseen:
 more than 15.6% passed, at most 7.9% failed, failed + near-frozen at most 22.2%). Run once.
+
+**G293 result (2026-11-07): rejected.** Development (405 weeks; U55 13.6% / 5.9% / 20.0%): the gap trade at 3 MNQ 14.1%
+/ 7.4% / 23.0%, at 4 MNQ 14.8% / 6.9% / 25.7%: more passes but more failures, so neither qualifies. Unseen (933; U55
+15.6% / 7.9% / 22.2%): 15.2% / 9.0% / 23.4% and 14.8% / 9.3% / 25.9%. U55 stays.
+`verification/noise_v2/g293_cap_gap.txt`.
