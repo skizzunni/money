@@ -7112,3 +7112,8 @@ G285 sized up in stormy stretches and added failures. The reverse: `research/g31
 stretches, smaller in stormy ones; 3 variants; `sprint_vol_lo` / `sprint_vol_hi`; the gap trade stays at 2). G253's
 measure and G290's rule (development: more passes than U55, failures no higher; unseen: more than 15.6% passed, at most
 7.9% failed, failed + near-frozen at most 22.2%). Run once.
+
+**G317 result (2026-11-07): rejected.** Development (405 weeks; U55 13.6% / 5.9% / 20.0%): volatility-sized 3-5 MNQ 10.6%
+/ 7.2%, 2-6 10.9% / 7.7%, 2-8 the same (the ratio never reached 7). Unseen (933; U55 15.6% / 7.9% / 22.2%): 13.5% / 9.6%,
+13.6% / 10.5%, 13.6% / 10.5%. Bigger trades in calm stretches fail more and pass less: the calm stretches' breakouts are
+the weaker ones (G18, G285: the storms pay). U55 stays. `verification/noise_v2/g317_vol_size.txt`.

@@ -1,0 +1,14 @@
+development (index 2011-18):
+                          weeks  passed  failed  stuck  failed_or_stuck
+tag                                                                    
+U55                         405   0.136   0.059  0.141            0.200
+volatility-sized 2-6 MNQ    405   0.109   0.077  0.138            0.215
+volatility-sized 2-8 MNQ    405   0.109   0.077  0.138            0.215
+volatility-sized 3-5 MNQ    405   0.106   0.072  0.148            0.220
+unseen (NQ 2015-25 + index 2019-26):
+                          weeks  passed  failed  stuck  failed_or_stuck
+tag                                                                    
+U55                         933   0.156   0.079  0.143            0.222
+volatility-sized 2-6 MNQ    933   0.136   0.105  0.131            0.236
+volatility-sized 2-8 MNQ    933   0.136   0.105  0.131            0.236
+volatility-sized 3-5 MNQ    933   0.135   0.096  0.141            0.238
