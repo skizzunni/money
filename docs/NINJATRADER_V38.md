@@ -6661,3 +6661,9 @@ pass rule is met (at least +$3,000, the best day under half of it, 3 days with a
 the Test is up $3,000 (3 variants; the gap trade stays at 2). G253's measure and G285's rule: the best development
 variant (more passes than U53, failures no higher) replaces U53 only if on the unseen weeks it passes more than 12.2%,
 fails at most 8.4%, and failed + near-frozen is at most 22.3%. Run once.
+
+**G286 result (2026-11-07): rejected.** Development (405 weeks): U53 10.9% passed / 6.4% failed; kept on until passed
+at 4, 3 or 2 MNQ from $3,000: 10.4%, 10.4%, 10.1% passed (6.2% failed). Unseen (933): 12.0%, 11.1%, 10.8% against U53's
+12.2% (failures and near-frozen unchanged). Fewer passes: past +$5,000 U53 hands over to the growth sizing, which by then
+takes more than 4 MNQ, and that finishes the consistency rule sooner than a sprint held at 4 or less. U53 stays.
+`verification/noise_v2/g286_until_pass.txt`.

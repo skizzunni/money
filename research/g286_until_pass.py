@@ -2,7 +2,7 @@
 +$5,000), at 4 MNQ, or at 2 or 3 MNQ once the Test is up $3,000 (the gap trade stays at 2). G253's measure; also the
 Tests that end open with less than $500 above the floor (G284b).
 
-    SESS=10 python research/g285_storm_sprint.py <data dir> <MNQ 09-26> <MNQ 12-26> <U48 JS json>
+    SESS=10 python research/g286_until_pass.py <data dir> <MNQ 09-26> <MNQ 12-26> <U48 JS json>
 """
 import json
 import os
