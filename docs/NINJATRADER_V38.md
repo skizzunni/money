@@ -6924,3 +6924,9 @@ G303: half size below the 20-trade equity average halves the failures but costs 
 `research/g304_eq_size.py`, on U55: that filter with the sprint at 5, 6 or 8 MNQ (halved, rounded, while below the
 average; 3 variants). G253's measure and G290's rule (development: more passes than U55, failures no higher; unseen:
 more than 15.6% passed, at most 7.9% failed, failed + near-frozen at most 22.2%). Run once.
+
+**G304 result (2026-11-07): rejected.** Development (405 weeks; U55 13.6% / 5.9% / 20.0%): the equity filter with the
+sprint at 5 MNQ 12.3% / 3.2% / 14.1%, 6 MNQ 15.3% / 8.1% / 24.9%, 8 MNQ 17.0% / 16.8% / 36.8%. Unseen (933; U55 15.6% /
+7.9% / 22.2%): 13.9% / 6.5% / 19.4%, 16.5% / 10.7% / 28.7%, 19.3% / 19.2% / 39.5%. With the filter, the size that
+gets back U55's passes (6 MNQ) also brings back more failures than U55. None qualifies; U55 stays.
+`verification/noise_v2/g304_eq_size.txt`.
