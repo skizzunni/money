@@ -6453,3 +6453,8 @@ for 1.5x, 0.75x and 1.0x; 10.9% / 6.4% for none; `verification/noise_v2/g275_gap
 U53 closes the gap trade at the 09:55 bar's open (`gap_go_exit` 595); here at 09:45, 10:10 or 10:25.
 `research/g276_gap_exit.py`, G253's measure. **Replaces U53's setting** if on the unseen weeks it passes more than
 12.2% and fails at most 8.4%. Run once.
+
+**G276 result (2026-11-07): rejected.** Unseen weeks (passed / failed): U53 (09:55) 12.2% / 8.4%; 09:45 10.5% / 8.6%;
+10:10 10.9% / 8.8%; 10:25 11.3% / 8.9% (development a little better for the others: 11.1-11.4% / 5.7-5.9% against
+10.9% / 6.4%; `verification/noise_v2/g276_gap_exit.txt`). The development gain does not carry to the unseen weeks.
+U53 stays.
