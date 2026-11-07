@@ -6800,3 +6800,17 @@ more than U55. Unseen (933; U55 15.6% / 7.9% / 22.2%): 14.5% / 7.7% / 22.4%, 14.
 
 A measurement, as G278 for U53 (no adoption rule): U55's Test sprint, the share of Tests passed, failed and near-frozen
 within 10, 15, 20, 30 and 40 sessions, NQ 2015-25 and the index 2011-26 Monday starts (`research/g295_horizon.py`).
+
+**G295 result (2026-11-07):** U55's Test sprint, 1,322 Monday starts (1,318 at 8 weeks;
+`verification/noise_v2/g295_horizon.{txt,csv}`), against U53 (G278):
+
+| weeks | U55 passed | failed | near-frozen | U53 passed | failed |
+|---|---|---|---|---|---|
+| 2 | 15.1% | 7.4% | 14.2% | 12.0% | 7.9% |
+| 3 | 18.5% | 8.2% | 13.3% | 15.4% | 8.6% |
+| 4 | 20.3% | 8.9% | 12.8% | 18.0% | 9.6% |
+| 6 | 24.2% | 9.8% | 12.7% | 21.0% | 10.5% |
+| 8 | 27.1% | 10.3% | 13.4% | 24.8% | 10.9% |
+
+U55 passes 2-3 points more than U53 at every horizon and fails less. About a quarter of Tests pass within 6-8 weeks;
+within two weeks, 15%.
