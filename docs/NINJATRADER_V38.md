@@ -7188,7 +7188,8 @@ today's P/L (or the room above the floor less $100) reaches −$1,200, on the ti
 it fires (`SprintDayGuard`, the live bracket's stop never wider than it); on the monthly jobs-report days the sprint's
 size is 1.5x (6 MNQ; `NewsDates` 2010-2028 by BLS's rule, `NewsMult`). NinjaTrader's code matches the model trade for
 trade on the test sample (which reaches the streak, big-day and jobs-day rules) and with a $300 guard (which fires;
-`test_v38_test_sprint_day_guard`). The gain over U55 is mostly in failures; still far from 25% in two weeks.
+`test_v38_test_sprint_day_guard`). Full suite: **679 passed**. The gain over U55 is mostly in failures; still far from
+25% in two weeks.
 
 ## G322: more on top of U56 (registered 2026-11-07, before its run)
 
