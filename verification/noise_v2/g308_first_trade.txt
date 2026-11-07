@@ -1,0 +1,14 @@
+development (index 2011-18):
+                      weeks  passed  failed  stuck  failed_or_stuck
+tag                                                                
+U55                     405   0.136   0.059  0.141            0.200
+first 5 MNQ, later 3    405   0.089   0.049  0.136            0.185
+first 6 MNQ, later 3    405   0.101   0.067  0.146            0.212
+first 6 MNQ, later 4    405   0.158   0.106  0.173            0.279
+unseen (NQ 2015-25 + index 2019-26):
+                      weeks  passed  failed  stuck  failed_or_stuck
+tag                                                                
+U55                     933   0.156   0.079  0.143            0.222
+first 5 MNQ, later 3    933   0.120   0.064  0.139            0.204
+first 6 MNQ, later 3    933   0.145   0.081  0.143            0.224
+first 6 MNQ, later 4    933   0.183   0.107  0.164            0.271

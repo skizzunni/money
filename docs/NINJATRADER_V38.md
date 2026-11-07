@@ -6979,3 +6979,8 @@ U55: the sprint's first bot trade of the day at 5 or 6 MNQ and the later ones at
 trade stays at 2; the room still cuts the size; `sprint_first_qty` / `sprint_later_qty`). G253's measure and G290's
 rule (development: more passes than U55, failures no higher; unseen: more than 15.6% passed, at most 7.9% failed, failed
 + near-frozen at most 22.2%). Run once.
+
+**G308 result (2026-11-07): rejected.** Development (405 weeks; U55 13.6% / 5.9% / 20.0%): first 5 / later 3 MNQ 8.9% /
+4.9%, 6 / 3 10.1% / 6.7%, 6 / 4 15.8% / 10.6%. Unseen (933; U55 15.6% / 7.9% / 22.2%): 12.0% / 6.4%, 14.5% / 8.1%, 18.3%
+/ 10.7%. The later trades carry as many passes as the first; a bigger first trade adds failures at the rate a bigger
+sprint does (G291). U55 stays. `verification/noise_v2/g308_first_trade.txt`.
