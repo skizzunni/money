@@ -7000,3 +7000,8 @@ turn red. `research/g310_late_stop.py`, on U55: from 13:00 (or 14:00), no new en
 (or $750 from 13:00) (3 variants; `day_stop_late_from` / `day_stop_late`). G253's measure and G290's rule (development:
 more passes than U55, failures no higher; unseen: more than 15.6% passed, at most 7.9% failed, failed + near-frozen at
 most 22.2%). Run once.
+
+**G310 result (2026-11-07): rejected.** Development (405 weeks; U55 13.6% / 5.9% / 20.0%): from 13:00 at $500 11.9% /
+6.7%, from 13:00 at $750 13.3% / 6.4%, from 14:00 at $500 11.6% / 6.7%: fewer passes, more failures. Unseen (933; U55
+15.6% / 7.9% / 22.2%): 14.5% / 7.1%, 15.2% / 7.4%, 15.3% / 7.8%. The afternoon entries on a green day add more passes
+than red days. U55 stays. `verification/noise_v2/g310_late_stop.txt`.
