@@ -6735,3 +6735,9 @@ G289b's passes rose with the cap ($1,100 → $1,500). `research/g290_cap_more.py
 and G277's k296 settings with the $1,500 cap (3 variants). G253's measure and the rule raised to U55's numbers: the best
 development variant (more passes than U55 there, failures no higher) replaces U55 only if on the unseen weeks it passes
 more than 15.6%, fails at most 7.9%, and failed + near-frozen is at most 22.2%. Run once.
+
+**G290 result (2026-11-07): rejected.** U55 reproduced (development 13.6% / 5.9% / 20.0%, unseen 15.6% / 7.9% / 22.2%).
+The cap at $1,700: development 10.9% / 6.2%, unseen 11.8% / 8.0%; at $2,000: 7.4% / 6.4%, 8.8% / 7.7%; k296 with the
+$1,500 cap: 13.8% / 11.6% (development), 14.6% / 11.3% (unseen). A cap past $1,500 lets one day reach half of the
+$3,000 target, so the consistency rule holds the Test back; k296 fails too often. U55 stays.
+`verification/noise_v2/g290_cap_more.txt`.

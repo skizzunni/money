@@ -1,0 +1,14 @@
+development (index 2011-18):
+                  weeks  passed  failed  stuck  failed_or_stuck
+tag                                                            
+U55                 405   0.136   0.059  0.141            0.200
+cap $1,700          405   0.109   0.062  0.143            0.205
+cap $2,000          405   0.074   0.064  0.138            0.202
+k296, cap $1,500    405   0.138   0.116  0.193            0.309
+unseen (NQ 2015-25 + index 2019-26):
+                  weeks  passed  failed  stuck  failed_or_stuck
+tag                                                            
+U55                 933   0.156   0.079  0.143            0.222
+cap $1,700          933   0.118   0.080  0.147            0.227
+cap $2,000          933   0.088   0.077  0.151            0.228
+k296, cap $1,500    933   0.146   0.113  0.181            0.294
