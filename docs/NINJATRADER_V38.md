@@ -6763,3 +6763,10 @@ lock 0.15-0.25 / +1.5-3.5 points, losers 2-4, time stop 20-45, stop buffer 0.18-
 +$5,000, gap at 2 MNQ, no gap break-even) and its $1,500 day cap held. Stage 1 on the development weeks; the 10 best by
 passes with failures at most 6.5% go to stage 2 (the unseen weeks). **Replaces U55's settings** if on stage 2 it passes
 more than 15.6%, fails at most 7.9%, and failed + near-frozen is at most 22.2%. Run once (resumable after a restart).
+
+**G292 result (2026-11-07): rejected.** Stage 1 (300 combinations, 405 development weeks; U55 there 13.6% / 5.9% /
+20.0%): the best with failures at most 6.5% pass 12.1-13.3%, none above U55's own 13.6%. Stage 2 (the top 10, 933 unseen
+weeks; U55 15.6% / 7.9% / 22.2%): k157 17.1% passed / 9.9% failed / 26.0% failed or near-frozen, k73 17.0% / 9.4% /
+23.7%, k147 16.1% / 9.0% / 22.4%, k52 15.6% / 9.0%; the rest 12.8-14.9% passed (6.5-8.8% failed). Nothing passes more
+than 15.6% while failing at most 7.9%: under the cap, as before it, the extra passes come with extra failures. U55's
+settings stand. `verification/noise_v2/g292_cap_search.txt`, `g292_stage1.csv`, `g292_stage2.csv`.
