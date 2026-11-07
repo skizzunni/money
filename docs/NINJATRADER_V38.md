@@ -7071,3 +7071,9 @@ The sets' Fed-day rule is off in G253's measure (the data sets carry their own n
 on U55, with the scheduled Fed days of `research/fomc_dates.csv`: no shorts before 14:00 on those days (`fed_no_shorts`),
 or no trading at all that day (2 variants). G253's measure and G290's rule (development: more passes than U55, failures
 no higher; unseen: more than 15.6% passed, at most 7.9% failed, failed + near-frozen at most 22.2%). Run once.
+
+**G314 result (2026-11-07): rejected on the unseen weeks.** Development (405 weeks; U55 13.6% / 5.9% / 20.0%): no shorts
+before 14:00 on Fed days 13.6% / 5.7% (a tie in passes); no trading on Fed days **13.8% / 5.4% / 18.8%** (the best,
+qualifies). Unseen (933; U55 15.6% / 7.9% / 22.2%): no trading on Fed days 14.9% / 7.3% / 21.4%: fewer passes, so it
+does not replace U55; no shorts before 14:00 15.8% / 7.9% / 22.0% (within noise, and it did not qualify on development).
+U55 stays. `verification/noise_v2/g314_fed_days.txt`.
