@@ -6984,3 +6984,11 @@ rule (development: more passes than U55, failures no higher; unseen: more than 1
 4.9%, 6 / 3 10.1% / 6.7%, 6 / 4 15.8% / 10.6%. Unseen (933; U55 15.6% / 7.9% / 22.2%): 12.0% / 6.4%, 14.5% / 8.1%, 18.3%
 / 10.7%. The later trades carry as many passes as the first; a bigger first trade adds failures at the rate a bigger
 sprint does (G291). U55 stays. `verification/noise_v2/g308_first_trade.txt`.
+
+## G309: is U55's gain over U53 real? (a check on saved results, 2026-11-07)
+
+`research/g309_paired.py`: G278's and G295's two-week rows, the same 1,322 Monday starts. U55 passes 51 Tests U53 does
+not, and U53 passes 9 that U55 does not; U55 fails 3 that U53 does not, U53 fails 9 that U55 does not. Over a bootstrap
+of calendar quarters (4,000 draws), the passes gained: **+3.2 points (95%: +1.9 to +4.5; never at or below zero)**; the
+failures: −0.45 points (95%: −0.9 to 0.0). The day cap's extra passes are not noise; its saving in failures is small.
+`verification/noise_v2/g309_paired.txt`.

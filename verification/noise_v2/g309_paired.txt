@@ -1,0 +1,5 @@
+starts 1322: passed U53 0.120 U55 0.151; failed U53 0.079 U55 0.074
+passed by U55 only 51 by U53 only 9
+failed by U55 only 3 by U53 only 9
+passed U55 - U53: +0.0318, 95% +0.0194 to +0.0444, draws at or below 0: 0.000
+failed U55 - U53: -0.0045, 95% -0.0091 to +0.0000, draws at or above 0: 0.032
