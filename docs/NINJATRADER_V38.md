@@ -6898,3 +6898,8 @@ The sprint has kept the 50K's $187.50 a contract (about 94 points; `max_loss_per
 initial stop and sets the lock's trigger (lock_at x the max loss). `research/g302_max_loss.py`, on U55: $125, $150 or
 $250 a contract (3 variants). G253's measure and G290's rule (development: more passes than U55, failures no higher;
 unseen: more than 15.6% passed, at most 7.9% failed, failed + near-frozen at most 22.2%). Run once.
+
+**G302 result (2026-11-07): rejected.** Development (405 weeks; U55 13.6% / 5.9% / 20.0%): the max loss a contract at $125
+8.9% / 7.4%, $150 11.6% / 7.2%, $250 11.9% / 7.7%: fewer passes and more failures either way. Unseen (933; U55 15.6% /
+7.9% / 22.2%): 12.2% / 7.7%, 13.5% / 8.6%, 14.9% / 9.0%. $187.50 sits at the best point. U55 stays.
+`verification/noise_v2/g302_max_loss.txt`.
