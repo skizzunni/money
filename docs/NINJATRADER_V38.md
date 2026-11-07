@@ -7152,3 +7152,12 @@ once.
 **G320 result (2026-11-07): rejected (no effect).** Development: all three the same as U55 (13.6% / 5.9%). Unseen: +$3,500
 15.6% / 7.9%, +$4,000 15.4% / 7.9%, +$6,000 15.6% / 7.9%. Under the $1,500 cap a Test past +$3,500 has nearly always
 passed already, so the handover point hardly matters. U55 stays. `verification/noise_v2/g320_sprint_target.txt`.
+
+## G321: today's rules, 200 random combinations (registered 2026-11-07, before its run)
+
+`research/g321_rule_search.py`: 200 random combinations (seed 321; variant 0 is U55) on U55 of the streak pause (4 / 2 or
+3 / 1), the big-day rule (1.5x or 2x), the day guard ($1,000 or $1,200), the day lock ($800 / $300), jobs days 1.5x, the
+opening-drive filter (0.35x), the equity filter (eq_n 20), the side cooldown (1), 3 MNQ after two losers, and the late
+stop (from 14:00 at $500), with the sprint at 4 or 5 MNQ. Stage 1 on the development weeks; the 10 best by passes with
+failures at most U55's 5.9% **and failed or near-frozen at most its 20.0%** go to stage 2. **Replaces U55's settings** if
+on stage 2 it passes more than 15.6%, fails at most 7.9%, and failed + near-frozen is at most 22.2%. Run once (resumable).
