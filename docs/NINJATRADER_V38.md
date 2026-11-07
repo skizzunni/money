@@ -6789,3 +6789,9 @@ U55: once today's P/L, with the open trade at its best price since entry (bar hi
 $800, $1,000 or $1,200, the trade's stop goes no lower than the price where today's P/L is $300, $500 or $700 (3
 variants; whole ticks on NinjaTrader's grid). G253's measure and G290's rule (development: more passes than U55,
 failures no higher; unseen: more than 15.6% passed, at most 7.9% failed, failed + near-frozen at most 22.2%). Run once.
+
+**G294 result (2026-11-07): rejected.** Development (405 weeks; U55 13.6% / 5.9% / 20.0%): the day lock at $1,000 keeping
+$500 13.6% / 5.9% (a tie, not more), at $1,200 keeping $700 13.3% / 5.9%, at $800 keeping $300 13.3% / 6.2%: none passes
+more than U55. Unseen (933; U55 15.6% / 7.9% / 22.2%): 14.5% / 7.7% / 22.4%, 14.7% / 7.8% / 22.0%, 15.8% / 6.8% / 22.3%
+(the last fails less but turns failures into near-frozen Tests, and it did not qualify on development). U55 stays.
+`verification/noise_v2/g294_day_lock.txt`.
