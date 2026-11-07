@@ -33,10 +33,10 @@ def main() -> None:
     G.BASE.update(json.load(open(sys.argv[4])))
     starts = [("nq", d.strftime("%Y-%m-%d")) for d in pd.date_range("2015-04-06", "2025-05-01", freq="W-MON")]
     starts += [("index", d.strftime("%Y-%m-%d")) for d in pd.date_range("2011-04-04", "2026-07-01", freq="W-MON")]
-    jobs = [(s, n, d) for s in (10, 15, 20, 30) for n, d in starts]
+    jobs = [(s, n, d) for s in tuple(int(x) for x in os.environ.get("HORIZONS", "10,15,20,30").split(",")) for n, d in starts]
     with ProcessPoolExecutor(int(os.environ.get("PROCS", "4"))) as ex:
         d = pd.DataFrame([r for r in ex.map(job, jobs, chunksize=16) if r])
-    d.to_csv("verification/noise_v2/g278_horizon.csv", index=False)
+    d.to_csv(f"verification/noise_v2/g278_horizon{os.environ.get('TAG', '')}.csv", index=False)
     print(d.groupby("sessions").agg(starts=("passed", "size"), passed=("passed", "mean"), failed=("failed", "mean"))
           .round(3).to_string(), flush=True)
 

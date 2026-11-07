@@ -6475,3 +6475,15 @@ The user asked for 25% passes. A measurement, no adoption rule: U53's Test sprin
 then the 50K's growth sizing) under G250's Test rules, the share passed and failed within 10, 15, 20 and 30 sessions,
 NQ 2015-25 and the index 2011-26 Monday starts (`research/g278_horizon.py`). Earlier rounds found no edge on the S&P
 (G56) or overnight (G57), so more sessions are the remaining source of passes.
+
+**G278 result (2026-11-07):** U53's Test sprint, 1,322 Monday starts (`verification/noise_v2/g278_horizon.{txt,csv}`):
+
+| within | passed | failed |
+|---|---|---|
+| 2 weeks (10 sessions) | 12.0% | 7.9% |
+| 3 weeks (15) | 15.4% | 8.6% |
+| 4 weeks (20) | 18.0% | 9.6% |
+| 6 weeks (30) | 21.0% | 10.5% |
+
+(The 2-week row here, all starts together, is 12.0% / 7.9%; G275's unseen-weeks split is 12.2% / 8.4%.) Passes keep
+coming after the sprint ends; 25% is beyond 6 weeks. A follow-up measures 8 and 12 weeks (40 and 60 sessions).
