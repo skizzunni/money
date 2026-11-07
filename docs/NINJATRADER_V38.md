@@ -6754,3 +6754,12 @@ near-frozen): the cap at $1,400 11.9% / 5.9% / 20.0%; the sprint at 5 MNQ 17.5% 
 / 36.3%. Unseen (933; U55 15.6% / 7.9% / 22.2%): $1,400 15.0% / 7.5% / 21.2%; 5 MNQ 17.7% / 12.0% / 29.8%; 6 MNQ 19.6% /
 18.3% / 37.8%. More contracts add passes but more failures (6 MNQ: about one extra failure for each extra pass); none
 qualifies. U55 stays. `verification/noise_v2/g291_cap_size.txt`.
+
+## G292: the two-week search under the day cap (registered 2026-11-07, before its run)
+
+G277's search, redone under U55's day cap: `research/g292_cap_search.py`, 300 combinations (seed 292) of U53's entry and
+exit settings (noise sessions 16-20, entry width 0.65-0.75, range position 0.65-0.75, calm 0.6-0.8, take profit 0.6-1.0,
+lock 0.15-0.25 / +1.5-3.5 points, losers 2-4, time stop 20-45, stop buffer 0.18-0.3), with U55's sprint (4 MNQ to
++$5,000, gap at 2 MNQ, no gap break-even) and its $1,500 day cap held. Stage 1 on the development weeks; the 10 best by
+passes with failures at most 6.5% go to stage 2 (the unseen weeks). **Replaces U55's settings** if on stage 2 it passes
+more than 15.6%, fails at most 7.9%, and failed + near-frozen is at most 22.2%. Run once (resumable after a restart).
