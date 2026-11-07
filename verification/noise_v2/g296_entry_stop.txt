@@ -1,0 +1,14 @@
+development (index 2011-18):
+                                    weeks  passed  failed  stuck  failed_or_stuck
+tag                                                                              
+U55                                   405   0.136   0.059  0.141            0.200
+entries stop at $1,000, cap $1,500    405   0.119   0.062  0.148            0.210
+entries stop at $1,200, cap $1,500    405   0.131   0.062  0.141            0.202
+entries stop at $1,300, cap $1,500    405   0.126   0.062  0.141            0.202
+unseen (NQ 2015-25 + index 2019-26):
+                                    weeks  passed  failed  stuck  failed_or_stuck
+tag                                                                              
+U55                                   933   0.156   0.079  0.143            0.222
+entries stop at $1,000, cap $1,500    933   0.148   0.081  0.138            0.220
+entries stop at $1,200, cap $1,500    933   0.156   0.079  0.140            0.220
+entries stop at $1,300, cap $1,500    933   0.159   0.079  0.141            0.221

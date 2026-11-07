@@ -6822,3 +6822,8 @@ U55's $1,500 is both the day profit stop (no new entries) and the cap (the open 
 trade is still closed at $1,500 (3 variants; `day_cap_at` in mnqbot/noise.py). G253's measure and G290's rule
 (development: more passes than U55, failures no higher; unseen: more than 15.6% passed, at most 7.9% failed, failed +
 near-frozen at most 22.2%). Run once.
+
+**G296 result (2026-11-07): rejected.** Development (405 weeks; U55 13.6% / 5.9% / 20.0%): new entries stopping at
+$1,000 / $1,200 / $1,300 with the cap at $1,500: 11.9% / 6.2%, 13.1% / 6.2%, 12.6% / 6.2%: fewer passes, more failures;
+none qualifies. Unseen (933; U55 15.6% / 7.9% / 22.2%): 14.8% / 8.1%, 15.6% / 7.9%, 15.9% / 7.9% (failed or near-frozen
+22.0-22.1%): within noise of U55. U55 stays. `verification/noise_v2/g296_entry_stop.txt`.
