@@ -7077,3 +7077,12 @@ before 14:00 on Fed days 13.6% / 5.7% (a tie in passes); no trading on Fed days 
 qualifies). Unseen (933; U55 15.6% / 7.9% / 22.2%): no trading on Fed days 14.9% / 7.3% / 21.4%: fewer passes, so it
 does not replace U55; no shorts before 14:00 15.8% / 7.9% / 22.0% (within noise, and it did not qualify on development).
 U55 stays. `verification/noise_v2/g314_fed_days.txt`.
+
+## G315: the gap trade off, or smaller; or no entries after 15:00 (registered 2026-11-07, before its run)
+
+A profile of U55-style trades (4 MNQ, no floor) on the development weeks only (index 2011-18, 5,028 trades;
+scratchpad script, not a test): the 09:35 gap trade nets about break-even (gap exits +$24,076, gap stops −$20,593),
+and the 15:00 hour's entries average $4.70 against $10-33 for the hours 10:00-14:00. `research/g315_gap_off.py`, on
+U55: the gap trade off (`gap_go` False), the gap trade at 1 MNQ, or no bot entries after 15:00 (3 variants). G253's
+measure and G290's rule (development: more passes than U55, failures no higher; unseen: more than 15.6% passed, at
+most 7.9% failed, failed + near-frozen at most 22.2%). Run once.
