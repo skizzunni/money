@@ -1,0 +1,14 @@
+development (index 2011-18):
+                                     weeks  passed  failed  stuck  failed_or_stuck
+tag                                                                               
+U55                                    405   0.136   0.059  0.141            0.200
+trend 20, shorts against it 1 MNQ      405   0.089   0.042  0.123            0.165
+trend 45, shorts against it 1 MNQ      405   0.091   0.040  0.136            0.175
+trend 45, shorts against it skipped    405   0.091   0.040  0.136            0.175
+unseen (NQ 2015-25 + index 2019-26):
+                                     weeks  passed  failed  stuck  failed_or_stuck
+tag                                                                               
+U55                                    933   0.156   0.079  0.143            0.222
+trend 20, shorts against it 1 MNQ      933   0.114   0.070  0.109            0.179
+trend 45, shorts against it 1 MNQ      933   0.120   0.074  0.106            0.180
+trend 45, shorts against it skipped    933   0.124   0.074  0.106            0.180

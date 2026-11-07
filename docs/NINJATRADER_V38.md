@@ -6873,3 +6873,9 @@ close is above its 45-session average take 1 MNQ (`trend_small`, as the 50K's gr
 1 MNQ with a 20-session average (3 variants; `trend_side` -1). G253's measure and G290's rule (development: more passes
 than U55, failures no higher; unseen: more than 15.6% passed, at most 7.9% failed, failed + near-frozen at most 22.2%).
 Run once.
+
+**G300 result (2026-11-07): rejected.** Development (405 weeks; U55 13.6% / 5.9% / 20.0%): the trend filter at 45
+sessions, shorts against it at 1 MNQ or skipped: 9.1% / 4.0% (both); at 20 sessions 8.9% / 4.2%. Unseen (933; U55 15.6% /
+7.9% / 22.2%): 12.0% / 7.4%, 12.4% / 7.4%, 11.4% / 7.0%. The shorts against the uptrend carry passes in a two-week Test;
+filtering them cuts passes more than failures, as G253 found before the cap. U55 stays.
+`verification/noise_v2/g300_trend.txt`.
