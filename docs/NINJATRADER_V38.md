@@ -6625,3 +6625,15 @@ G281c's lesson: fewer failures can mean accounts left stuck just above the floor
 933 unseen weeks, the share of U53's and U54's two-week Tests that end passed, failed, open with less than $500 above
 the trailing floor (near-frozen), or open with more. **U54 is reverted to U53** if its failed plus near-frozen share is
 higher than U53's. Run once.
+
+**G284b result (2026-11-07): U54 reverted to U53.** On the 933 unseen weeks (`verification/noise_v2/g284b_frozen.{txt,csv}`):
+
+| | passed | failed | open, under $500 above the floor | open, $500+ above | failed + near-frozen |
+|---|---|---|---|---|---|
+| U53 | 12.2% | 8.4% | 13.9% | 65.5% | 22.3% |
+| U54 | 13.6% | 6.8% | 17.9% | 61.7% | 24.7% |
+
+U54's defence turns some failures into Tests left just above the floor (median room of the open Tests $1,352 vs U53's
+$1,582). Failed plus near-frozen is higher than U53's, so by the registered rule U54 is reverted: the file's Test sprint
+is U53 again (the engine keeps `sprint_low_room` off by default, for research). The passes it adds (13.6% vs 12.2%) are
+real, but they come at the cost of more accounts that can barely trade.

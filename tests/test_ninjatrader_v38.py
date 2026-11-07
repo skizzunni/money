@@ -1071,17 +1071,17 @@ def test_v38_sprint(sim, sample_1m, tmp_path):  # noqa: F811
 
 
 # G256 k317 with G269's +$5,000 sprint target: the two-week Test sprint (G253's k61 before)
-SPRINT = {"daily_loss_limit": 2000.0, "early_daily_loss": 0.0, "max_losers": 4, "time_stop": 45, "range_pos_min": 0.7,
-          "trend_n": 0, "big_day_k": 0.0, "calm_k": 0.7, "take_profit": 0.6, "lock_at": 0.25, "skip_checks": "",
-          "sprint_qty": 4, "sprint_days": 10, "sprint_target": 5000.0, "sprint_gap_qty": 2, "gap_go_be": 0.0, "day_stop_profit": 1000.0, "lookback": 18,
-          "entry_k": 0.7, "squeeze_min": 0.0, "last_entry_end": 930, "gap_go_k": 0.5, "stop_buffer": 0.3,
-          "lock_plus": 2.5, "sprint_low_room": 1000.0, "sprint_low_qty": 2}  # U54: G277 k296 + G284
+SPRINT = {"daily_loss_limit": 2000.0, "early_daily_loss": 0.0, "max_losers": 3, "time_stop": 30, "range_pos_min": 0.7,
+          "trend_n": 0, "big_day_k": 0.0, "calm_k": 0.7, "take_profit": 0.75, "lock_at": 0.2, "skip_checks": "",
+          "sprint_qty": 4, "sprint_days": 10, "sprint_target": 5000.0, "sprint_gap_qty": 2, "gap_go_be": 0.0, "day_stop_profit": 1100.0, "lookback": 18,
+          "entry_k": 0.7, "squeeze_min": 0.0, "last_entry_end": 930, "gap_go_k": 0.5, "stop_buffer": 0.24,
+          "lock_plus": 2.5}
 
 
 @pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
 def test_v38_test_sprint(sim, sample_1m, tmp_path):  # noqa: F811
-    """G256 / U54: Mode "Test sprint" (G277 k296 + G284: 4 MNQ for the first 10 sessions until +$5,000, 2 MNQ with
-    less than $1,000 above the floor, a $1,000 day profit stop, the noise area over 18 sessions, entries at 0.7x it). NinjaTrader's code and the model
+    """G256: Mode "Test sprint" (k317: 4 MNQ for the first 10 sessions until +$3,000, a $1,100 day profit stop, the
+    noise area over 18 sessions, entries at 0.7x it, and the rest of k317's settings). NinjaTrader's code and the model
     agree trade for trade, and the sprint's 4 MNQ trades are there."""
     bars = resample(sample_1m, "5min")
     path = tmp_path / "bars.csv"
@@ -1101,6 +1101,3 @@ def test_v38_test_sprint(sim, sample_1m, tmp_path):  # noqa: F811
         assert float(a[2]) == t.entry and float(a[4]) == t.exit, (a, t)
         assert math.isclose(float(a[6]), t.pnl, abs_tol=1e-6), (a, t)
     assert any(t.qty == 4 for t in py)
-    # G284: the sample reaches the defence (2 MNQ with less than $1,000 above the floor), so the parity covers it
-    off = run(bars, dataclasses.replace(GROW, **{**SPRINT, "sprint_low_room": 0.0}, trail_from=start), minutes=5).trades
-    assert [(t.entry_bar, t.qty) for t in off] != [(t.entry_bar, t.qty) for t in py]

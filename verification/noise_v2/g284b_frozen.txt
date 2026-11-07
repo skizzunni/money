@@ -1,0 +1,8 @@
+ended  failed  open, $500+ above the floor  open, under $500 above the floor  passed
+tag                                                                                 
+U53     0.084                        0.655                             0.139   0.122
+U54     0.068                        0.617                             0.179   0.136
+     count    mean    std  min    25%     50%     75%     max
+tag                                                          
+U53  741.0  1422.0  820.0  4.0  866.0  1582.0  2000.0  5955.0
+U54  743.0  1279.0  833.0  2.0  575.0  1352.0  2000.0  5229.0
