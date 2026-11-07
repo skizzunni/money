@@ -6501,3 +6501,15 @@ Run once.
 
 **G279: cancelled before its result (2026-11-07)** — the user's "3 weeks" was a typo for 2 weeks; the two-week target
 (G253's measure) stands. G277's two-week search continues.
+
+## G280: the "speedrun" (the user's video), measured (registered 2026-11-07, before its run)
+
+**The video** ("speedrunning a 25k lucid"): a $90 Lucid 25K evaluation, 2 NQ in one trade with a stop about 26 points
+away (nearly the whole $1,000 drawdown), the target in one move; passed in 4 minutes. One all-in bracket per attempt:
+if it fails, the fee buys the next. (Not possible at TPT's 50K Test: the best day must be under half the profit, with
+at least 3 trading days.)
+
+**The measurement** (`research/g280_speedrun.py`, no adoption rule): every NQ session 2015-2025 with a bot entry (U53's
+signal settings, no gap trade) is one attempt; the first entry opens a bracket with the stop 25 / 50 / 100 points away
+and the target 1.0 / 1.25 / 1.5 x that; walked on 1-minute bars, stop first when a minute reaches both. The same
+entries reversed are the coin-flip baseline. Reported: wins, losses and attempts per pass, all years and 2020-25.
