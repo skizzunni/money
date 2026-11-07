@@ -1,0 +1,20 @@
+development (index 2011-18):
+                   weeks  passed  failed  stuck  failed_or_stuck
+tag                                                             
+5 MNQ above 1.1x     405   0.121   0.074  0.153            0.227
+5 MNQ above 1.25x    405   0.111   0.069  0.158            0.227
+5 MNQ above 1.4x     405   0.114   0.077  0.141            0.217
+6 MNQ above 1.1x     405   0.126   0.099  0.146            0.244
+6 MNQ above 1.25x    405   0.111   0.077  0.158            0.235
+6 MNQ above 1.4x     405   0.114   0.079  0.148            0.227
+U53                  405   0.109   0.064  0.141            0.205
+unseen (NQ 2015-25 + index 2019-26):
+                   weeks  passed  failed  stuck  failed_or_stuck
+tag                                                             
+5 MNQ above 1.1x     933   0.123   0.090  0.156            0.247
+5 MNQ above 1.25x    933   0.122   0.077  0.160            0.237
+5 MNQ above 1.4x     933   0.120   0.080  0.148            0.228
+6 MNQ above 1.1x     933   0.134   0.113  0.162            0.274
+6 MNQ above 1.25x    933   0.122   0.099  0.163            0.262
+6 MNQ above 1.4x     933   0.123   0.092  0.150            0.242
+U53                  933   0.122   0.084  0.139            0.223

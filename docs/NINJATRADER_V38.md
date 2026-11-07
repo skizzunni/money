@@ -6646,3 +6646,9 @@ stays at 2; the room still cuts the size). G253's measure, plus G284b's near-fro
 above the floor). The best development variant (more passes than U53 there, failures no higher) replaces U53 only if
 on the unseen weeks it passes more than 12.2%, fails at most 8.4%, and failed + near-frozen is at most U53's 22.3%.
 Run once.
+
+**G285 result (2026-11-07): rejected.** Development (405 weeks): U53 10.9% passed / 6.4% failed / 20.5% failed or
+near-frozen; every stormy-stretch variant fails more (6.9-9.9%; failed or near-frozen 21.7-24.4%), so none qualifies.
+On the unseen weeks too (U53 12.2% / 8.4% / 22.3%) the variants pass 12.0-13.4% with 7.7-11.3% failed and 22.8-27.4%
+failed or near-frozen. A bigger sprint in storms adds failures as fast as passes. U53 stays.
+`verification/noise_v2/g285_storm_sprint.txt`.
