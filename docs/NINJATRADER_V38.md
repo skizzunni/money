@@ -6795,3 +6795,8 @@ $500 13.6% / 5.9% (a tie, not more), at $1,200 keeping $700 13.3% / 5.9%, at $80
 more than U55. Unseen (933; U55 15.6% / 7.9% / 22.2%): 14.5% / 7.7% / 22.4%, 14.7% / 7.8% / 22.0%, 15.8% / 6.8% / 22.3%
 (the last fails less but turns failures into near-frozen Tests, and it did not qualify on development). U55 stays.
 `verification/noise_v2/g294_day_lock.txt`.
+
+## G295: U55 over 2, 3, 4, 6 and 8 weeks (registered 2026-11-07, before its run)
+
+A measurement, as G278 for U53 (no adoption rule): U55's Test sprint, the share of Tests passed, failed and near-frozen
+within 10, 15, 20, 30 and 40 sessions, NQ 2015-25 and the index 2011-26 Monday starts (`research/g295_horizon.py`).
