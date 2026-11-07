@@ -6741,3 +6741,10 @@ The cap at $1,700: development 10.9% / 6.2%, unseen 11.8% / 8.0%; at $2,000: 7.4
 $1,500 cap: 13.8% / 11.6% (development), 14.6% / 11.3% (unseen). A cap past $1,500 lets one day reach half of the
 $3,000 target, so the consistency rule holds the Test back; k296 fails too often. U55 stays.
 `verification/noise_v2/g290_cap_more.txt`.
+
+## G291: the sprint's size under the day cap (registered 2026-11-07, before its run)
+
+G272 chose 4 MNQ before the day cap existed; the cap now limits a day's gain. `research/g291_cap_size.py`, on U55: the
+sprint at 5 or 6 MNQ under the $1,500 cap, and the cap at $1,400 with 4 MNQ (3 variants). G253's measure and G290's rule
+(development: more passes than U55, failures no higher; unseen: more than 15.6% passed, at most 7.9% failed, failed +
+near-frozen at most 22.2%). Run once.
