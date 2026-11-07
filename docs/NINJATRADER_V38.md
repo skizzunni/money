@@ -6951,3 +6951,10 @@ is spent on size: `research/g306_guard_size.py`, on U55: the sprint at 5 MNQ wit
 the $1,000 guard and the big-day rule at 1.5x (3 variants). G253's measure and G290's rule (development: more passes
 than U55, failures no higher; unseen: more than 15.6% passed, at most 7.9% failed, failed + near-frozen at most
 22.2%). Run once.
+
+**G306 result (2026-11-07): rejected on the unseen weeks.** Development (405 weeks; U55 13.6% / 5.9% / 20.0%): 5 MNQ with
+the $1,000 guard **17.8% / 5.2%** (but 27.4% failed or near-frozen), with the $800 guard 16.3% / 3.7% / 26.4%, with the
+$1,000 guard and the big-day rule 16.3% / 5.7% / 26.9%. The best development variant (5 MNQ, $1,000 guard) on the unseen
+weeks (933; U55 15.6% / 7.9% / 22.2%): 17.0% passed but 9.8% failed and 28.4% failed or near-frozen; the others 16.2-16.8%
+/ 9.8-10.0%. The guard holds the failures down on development but not on the unseen weeks, and in both the near-frozen
+Tests grow. U55 stays. `verification/noise_v2/g306_guard_size.txt`.
