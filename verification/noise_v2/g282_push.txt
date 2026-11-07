@@ -1,0 +1,24 @@
+development (index 2011-18):
+                          weeks  passed  failed
+tag                                            
+U53                         405   0.109   0.064
+from 8 at 6 if up $1,000    405   0.116   0.072
+from 8 at 6 if up $2,000    405   0.114   0.064
+from 8 at 8 if up $1,000    405   0.114   0.069
+from 8 at 8 if up $2,000    405   0.111   0.067
+from 9 at 6 if up $1,000    405   0.114   0.067
+from 9 at 6 if up $2,000    405   0.111   0.064
+from 9 at 8 if up $1,000    405   0.119   0.067
+from 9 at 8 if up $2,000    405   0.109   0.064
+unseen (NQ 2015-25 + index 2019-26):
+                          weeks  passed  failed
+tag                                            
+U53                         933   0.122   0.084
+from 8 at 6 if up $1,000    933   0.128   0.090
+from 8 at 6 if up $2,000    933   0.119   0.084
+from 8 at 8 if up $1,000    933   0.122   0.106
+from 8 at 8 if up $2,000    933   0.110   0.088
+from 9 at 6 if up $1,000    933   0.122   0.086
+from 9 at 6 if up $2,000    933   0.120   0.084
+from 9 at 8 if up $1,000    933   0.120   0.106
+from 9 at 8 if up $2,000    933   0.113   0.086

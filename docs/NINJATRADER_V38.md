@@ -6560,3 +6560,9 @@ $2,000, the sprint takes 6 or 8 MNQ (8 variants; the gap trade stays at 2 MNQ; t
 the size). G253's measure. The best development variant (passes more than U53 there and fails no more; most passes)
 replaces U53 only if on the unseen weeks it passes more than 12.2% and fails at most 8.4%. None qualifying: rejected.
 Run once.
+
+**G282 result (2026-11-07): rejected.** Development (index 2011-18, 405 weeks): U53 10.9% passed / 6.4% failed; the
+variants that pass more and fail no more are from session 8 at 6 MNQ if up $2,000 (11.4% / 6.4%, the best) and from
+session 9 at 6 MNQ if up $2,000 (11.1% / 6.4%). On the unseen weeks (933) the chosen variant passes 11.9% and fails 8.4%,
+against U53's 12.2% / 8.4%. It passes fewer: rejected, U53 stays. (The pushes that add passes there, e.g. from 8 at 6 if
+up $1,000 at 12.8%, add failures too: 9.0%.) `verification/noise_v2/g282_push.txt`.
