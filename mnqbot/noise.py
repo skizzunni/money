@@ -381,6 +381,7 @@ class NoiseConfig:
     # sprint_target, every trade (the bot's, gap and go) takes sprint_qty contracts, still sized down to the day's room
     # and the floor's; then the usual sizing (0 = off)
     sprint_qty: int = 0
+    sprint_gap_qty: int = 0  # research (G273): the gap trade's size during the sprint (0 = the sprint's)
     sprint_qty_locked: int = 0  # research (G270): the sprint's size once the floor has stopped (0 = sprint_qty)
     profit_step_fast: float = 0.0  # research (G142): above profit_step_fast_from of profit, a contract per this much
     profit_step_fast_from: float = 10000.0
@@ -911,7 +912,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                         if one:
                             q = min(q, fill_q())
                         if sprint_on() and not one:  # G103: the sprint's size, as the room allows
-                            q = min(sprint_q(), fit_q)
+                            q = min(cfg.sprint_gap_qty or sprint_q(), fit_q)
                         if q < 1 and cfg.gap_squeeze and math.isfinite(room):  # G100: the gap trade squeezed
                             costs = (2 * cfg.commission_per_side + 2 * slip * cfg.point_value
                                      + cfg.gap_slip_pts * cfg.point_value)
