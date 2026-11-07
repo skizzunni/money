@@ -392,6 +392,10 @@ class NoiseConfig:
     # sprint_low_qty contracts (0 = off)
     sprint_low_room: float = 0.0
     sprint_low_qty: int = 1
+    # research (G285): the sprint in a stormy stretch: when the last calm_short sessions' average range is above
+    # sprint_hot_k x the last calm_long's, the sprint takes sprint_hot_qty contracts (0 = off)
+    sprint_hot_k: float = 0.0
+    sprint_hot_qty: int = 0
     profit_step_fast: float = 0.0  # research (G142): above profit_step_fast_from of profit, a contract per this much
     profit_step_fast_from: float = 10000.0
     profit_step_locked: float = 0.0  # G104: once the floor has stopped, a contract per this much profit (0: off)
@@ -685,6 +689,10 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                 floor = min(floor, trail_base + cfg.trail_cap)
             if eq_curve[-1] - floor < cfg.sprint_low_room:
                 return cfg.sprint_low_qty
+        if cfg.sprint_hot_k > 0 and cfg.sprint_hot_qty > 0 and len(day_ranges) >= cfg.calm_long:
+            cs, cl = cfg.calm_short, cfg.calm_long
+            if sum(day_ranges[-cs:]) / cs > cfg.sprint_hot_k * (sum(day_ranges[-cl:]) / cl):
+                return cfg.sprint_hot_qty
         if (cfg.sprint_push_qty > 0 and cfg.sprint_push_from > 0 and sprint_sessions >= cfg.sprint_push_from
                 and eq_curve[-1] - trail_base >= cfg.sprint_push_min):
             return cfg.sprint_push_qty

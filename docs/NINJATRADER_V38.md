@@ -6637,3 +6637,12 @@ U54's defence turns some failures into Tests left just above the floor (median r
 $1,582). Failed plus near-frozen is higher than U53's, so by the registered rule U54 is reverted: the file's Test sprint
 is U53 again (the engine keeps `sprint_low_room` off by default, for research). The passes it adds (13.6% vs 12.2%) are
 real, but they come at the cost of more accounts that can barely trade.
+
+## G285: a bigger sprint in stormy stretches (registered 2026-11-07, before its run)
+
+G18 found the storms pay. `research/g285_storm_sprint.py`: U53's Test sprint takes 5 or 6 MNQ when the last 10
+sessions' average range is above 1.1x, 1.25x or 1.4x the last 40's, and 4 MNQ otherwise (6 variants; the gap trade
+stays at 2; the room still cuts the size). G253's measure, plus G284b's near-frozen count (open with less than $500
+above the floor). The best development variant (more passes than U53 there, failures no higher) replaces U53 only if
+on the unseen weeks it passes more than 12.2%, fails at most 8.4%, and failed + near-frozen is at most U53's 22.3%.
+Run once.
