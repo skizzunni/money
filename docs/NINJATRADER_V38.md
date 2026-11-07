@@ -7014,3 +7014,11 @@ G307's jobs days (1.5x). `research/g311_combo_search.py`: every combination of t
 5 MNQ (64 variants; variant 0 is U55 itself). Stage 1 on the development weeks; the 10 best by passes with failures at
 most U55's 5.9% go to stage 2 (the unseen weeks). **Replaces U55's settings** if on stage 2 it passes more than 15.6%,
 fails at most 7.9%, and failed + near-frozen is at most 22.2%. Run once (resumable).
+
+## G312: size up while the account is up and alive (registered 2026-11-07, before its run)
+
+The user (2026-11-07): "size up, trade more, up to you, as long as the account is up and not down and dead". A
+measurement, no adoption rule by itself: U55's Test sprint at 4, 5, 6 and 8 MNQ, with or without G305's $1,000 day guard
+(8 variants), on all two-week Monday starts (NQ 2015-25, the index 2011-26): passed, failed, **up and alive** (profit
+above zero after the two weeks, not failed), and the median two weeks (`research/g312_size_scan.py`). U55 now (G295's
+rows): up and alive 56.0%, passed 15.1%, failed 7.4%.
