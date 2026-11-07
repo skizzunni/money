@@ -7099,3 +7099,8 @@ the hours 10:00 and 12:00-14:00 $24-33. `research/g316_skip_checks.py`, on U55: 
 or at 15:00 and 15:30, or at all four (3 variants; `skip_checks`). G253's measure and G290's rule (development: more
 passes than U55, failures no higher; unseen: more than 15.6% passed, at most 7.9% failed, failed + near-frozen at most
 22.2%). Run once.
+
+**G316 result (2026-11-07): rejected.** Development (405 weeks; U55 13.6% / 5.9% / 20.0%): no 11:00 / 11:30 checks 10.6% /
+8.1%, no 15:00 / 15:30 11.1% / 6.4%, neither 9.6% / 5.7%. Unseen (933; U55 15.6% / 7.9% / 22.2%): 11.9% / 9.0%, 13.8% /
+7.6%, 9.6% / 6.6%. An hour's average P/L over eight years does not say which entries a two-week Test needs: fewer entries,
+fewer passes. U55 stays. `verification/noise_v2/g316_skip_checks.txt`.

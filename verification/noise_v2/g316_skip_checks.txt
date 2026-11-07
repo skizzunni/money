@@ -1,0 +1,14 @@
+development (index 2011-18):
+                         weeks  passed  failed  stuck  failed_or_stuck
+tag                                                                   
+U55                        405   0.136   0.059  0.141            0.200
+neither                    405   0.096   0.057  0.084            0.141
+no 11:00 / 11:30 checks    405   0.106   0.081  0.099            0.180
+no 15:00 / 15:30 checks    405   0.111   0.064  0.128            0.193
+unseen (NQ 2015-25 + index 2019-26):
+                         weeks  passed  failed  stuck  failed_or_stuck
+tag                                                                   
+U55                        933   0.156   0.079  0.143            0.222
+neither                    933   0.096   0.066  0.139            0.206
+no 11:00 / 11:30 checks    933   0.119   0.090  0.140            0.230
+no 15:00 / 15:30 checks    933   0.138   0.076  0.137            0.213
