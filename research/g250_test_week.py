@@ -42,6 +42,7 @@ def one(job):
     name, start, sq, ds, *more = job
     extra = dict(more[0]) if more else {}  # G253: a variant's settings
     skip_more = extra.pop("skip_more", "")  # G266: extra no-trade dates
+    fed_more = extra.pop("fed_more", "")  # G314: Fed days for the no-shorts rule (the sets' own list is cleared)
     bars, _, skip = S.D[name]
     s0 = pd.Timestamp(start, tz=NY)
     b = bars[(bars.index >= s0 - pd.Timedelta(days=150)) & (bars.index < s0 + pd.Timedelta(days=7 + 7 * ((SESS + 4) // 5)))]
@@ -55,6 +56,8 @@ def one(job):
         cfg.skip_dates, cfg.fed_dates = skip, ""
     if skip_more:
         cfg.skip_dates = cfg.skip_dates + "," + skip_more
+    if fed_more:
+        cfg.fed_dates = fed_more
     cfg.trail_from = start
     res = run(b, cfg, minutes=S.MIN[0])
     bt = b.index.tz_convert(NY)

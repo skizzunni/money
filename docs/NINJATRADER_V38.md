@@ -7064,3 +7064,10 @@ near-frozen at most 22.2%). Run once.
 1% / 1.5% gap: 11.6% / 7.9%, 13.3% / 6.4%, 13.3% / 5.9%. Unseen (933; U55 15.6% / 7.9% / 22.2%): 14.5% / 8.1%, 14.9% /
 8.3%, 15.2% / 8.1%. Fewer passes and more failures; the trades against a gap are not the bad ones. U55 stays.
 `verification/noise_v2/g313_gap_block.txt`.
+
+## G314: Fed announcement days in the Test sprint (registered 2026-11-07, before its run)
+
+The sets' Fed-day rule is off in G253's measure (the data sets carry their own no-trade dates). `research/g314_fed_days.py`,
+on U55, with the scheduled Fed days of `research/fomc_dates.csv`: no shorts before 14:00 on those days (`fed_no_shorts`),
+or no trading at all that day (2 variants). G253's measure and G290's rule (development: more passes than U55, failures
+no higher; unseen: more than 15.6% passed, at most 7.9% failed, failed + near-frozen at most 22.2%). Run once.
