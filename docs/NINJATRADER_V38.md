@@ -7791,3 +7791,10 @@ the calm filter (`calm_k` 0), without the range-position filter (`range_pos_min`
 measures. **Replaces U57** if on both sets it trades on more sessions than U57 and the Tests meet G332's rule
 (development: more passes than 13.8%, failures at most 3.7%; unseen: more than 16.1% passed, at most 6.1% failed,
 failed + near-frozen at most 21.5%). Run once.
+
+**G366 result (2026-11-08): rejected.** Sessions with a trade, development / unseen (U57 68.0% / 62.4%): no calm filter
+71.7% / 66.0% (passes 13.6% / 16.6%, failures 4.0% / 6.3%: past both failure bounds); no streak pause 69.7% / 63.9%;
+no range-position filter 68.7% / 63.1%; none of the three 74.0% / 68.5% (10.4% / 14.4% passed, 4.7% / 7.0% failed);
+also at entry width 0.5 80.5% / 75.3%, but 38% winners and 8.9% / 11.6% passed. The days U57 sits out are mostly days
+with no breakout past the noise area at all; forcing trades on them adds losers. (Sessions after a failed Test count as
+untraded here.) U57 stays. `verification/noise_v2/g366_every_day.txt`.
