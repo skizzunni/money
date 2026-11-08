@@ -461,6 +461,8 @@ class NoiseConfig:
     # research (G361): new entries only when the high-low range since the last check is at most squeeze_k x the noise
     # (sigma) x the close: a breakout from a quiet half hour (0: off)
     squeeze_k: float = 0.0
+    # research (G362): the mirror, new entries only when that range is at least thrust_k x the noise x the close (0: off)
+    thrust_k: float = 0.0
     pdhl_mult: float = 1.0
     pdhl_in_mult: float = 1.0
     gap_go_skip_month_first: bool = False
@@ -1396,6 +1398,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                     fresh_ok = False  # G360: the day's move is already stretched
                 if cfg.squeeze_k > 0 and not math.isnan(seg_hi) and seg_hi - seg_lo > cfg.squeeze_k * sigma * c[i]:
                     fresh_ok = False  # G361: not out of a quiet half hour
+                if cfg.thrust_k > 0 and (math.isnan(seg_hi) or seg_hi - seg_lo < cfg.thrust_k * sigma * c[i]):
+                    fresh_ok = False  # G362: not out of a fast half hour
                 seg_hi = seg_lo = math.nan
                 up_e, lo_e = upper, lower  # the entry lines (entry_k: a wider area for entries only)
                 if cfg.entry_k != 1.0 or cfg.entry_k_short > 0:

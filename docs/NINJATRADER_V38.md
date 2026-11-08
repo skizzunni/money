@@ -7729,3 +7729,11 @@ mnqbot/noise.py). G253's measure and G332's rule (development: the best by passe
 0.75 / 1.0 x the noise 2.5% / 1.5%, 5.2% / 2.5%, 7.2% / 3.5%. Unseen (933; U57 16.1% / 6.1% / 21.5%): 3.9% / 4.9%, 5.8% /
 4.9%, 7.9% / 5.7%. The bot's breakouts come out of fast half hours; asking for a quiet one removes the good ones and
 keeps the failures. U57 stays. `verification/noise_v2/g361_quiet_half_hour.txt`.
+
+## G362: breakouts out of a fast half hour (registered 2026-11-08, before its run)
+
+G361's mirror: `research/g362_fast_half_hour.py`: U57 with new entries at a check only when the high-low range since the
+previous check (as G361) is at least 0.5, 1.0 or 1.5 x the check's noise x the close (3 variants; `thrust_k`, new in
+mnqbot/noise.py). G253's measure and G332's rule (development: the best by passes with failures no higher than U57's
+3.7%, and more passes than its 13.8%; unseen: more than 16.1% passed, at most 6.1% failed, failed + near-frozen at most
+21.5%). Run once.
