@@ -7433,3 +7433,8 @@ of each month and the first three of the next (from the data's own sessions), no
 sprint's size at 1.5x or 0.5x (`news2_dates` / `news2_mult`) (3 variants). G253's measure and G332's rule (development:
 more passes than U57's 13.8%, failures no higher than 3.7%; unseen: more than 16.1% passed, at most 6.1% failed, failed +
 near-frozen at most 21.5%). Run once.
+
+**G340 result (2026-11-08): rejected.** Development (405 weeks; U57 13.8% / 3.7%): no shorts at the turn of the month
+11.6% / 4.2%, 0.5x there 11.9% / 4.2%, 1.5x there 14.6% / 5.2% (more failures). Unseen (933; U57 16.1% / 6.1% / 21.5%):
+13.0% / 6.4%, 12.0% / 5.8%, 16.3% / 7.0% / 23.4%. The turn of the month moves passes and failures together. U57 stays.
+`verification/noise_v2/g340_turn_of_month.txt`.
