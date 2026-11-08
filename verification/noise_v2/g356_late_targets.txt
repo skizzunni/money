@@ -1,0 +1,14 @@
+development (index 2011-18):
+                            weeks  passed  failed  stuck  failed_or_stuck
+tag                                                                      
+U57                           405   0.138   0.037  0.131            0.168
+done after a take-profit      405   0.057   0.032  0.104            0.136
+take-profit 0.5 from 13:00    405   0.114   0.042  0.128            0.170
+take-profit 1.0 from 13:00    405   0.128   0.037  0.136            0.173
+unseen (NQ 2015-25 + index 2019-26):
+                            weeks  passed  failed  stuck  failed_or_stuck
+tag                                                                      
+U57                           933   0.161   0.061  0.154            0.215
+done after a take-profit      933   0.095   0.048  0.132            0.180
+take-profit 0.5 from 13:00    933   0.129   0.064  0.153            0.218
+take-profit 1.0 from 13:00    933   0.160   0.063  0.155            0.219

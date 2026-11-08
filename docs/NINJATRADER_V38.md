@@ -7656,3 +7656,8 @@ with the entries from checks closing at 13:00 or later taking 0.5 or 1.0 noise u
 0.75 (`late_tp` / `late_tp_from` 780) (3 variants). G253's measure and G332's rule (development: the best by passes with
 failures no higher than U57's 3.7%, and more passes than its 13.8%; unseen: more than 16.1% passed, at most 6.1% failed,
 failed + near-frozen at most 21.5%). Run once.
+
+**G356 result (2026-11-08): rejected.** Development (405 weeks; U57 13.8% / 3.7% / 16.8%): done after a take-profit 5.7% /
+3.2%; the afternoon's take-profit 0.5 11.4% / 4.2%, 1.0 12.8% / 3.7%. Unseen (933; U57 16.1% / 6.1% / 21.5%): 9.5% /
+4.8%, 12.9% / 6.4%, 16.0% / 6.3%. Trading on after a target pays: the second winner of a day is common. U57 stays.
+`verification/noise_v2/g356_late_targets.txt`.
