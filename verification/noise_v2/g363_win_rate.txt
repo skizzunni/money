@@ -1,0 +1,8 @@
+development (index 2011-18) (404 Tests):
+     trades  win_rate  avg_win  avg_loss  avg_trade  trades_per_session
+tag                                                                    
+U57    8699     0.485  238.377  -175.602     25.225               2.153
+unseen (NQ 2015-25 + index 2019-26) (889 Tests):
+     trades  win_rate  avg_win  avg_loss  avg_trade  trades_per_session
+tag                                                                    
+U57   17920     0.504   271.32  -207.428     33.816               2.016

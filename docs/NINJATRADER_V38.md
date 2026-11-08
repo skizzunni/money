@@ -7763,3 +7763,10 @@ failed / near-frozen, and over all 10 sessions of each Test the share of winning
 sessions with a trade, and the average trade. **A candidate** must, on both the development and the unseen Tests: win
 at least 80% of its trades, trade on at least 90% of the sessions, make more than $0 a trade after costs, and fail no
 more Tests than U57 (development 3.7%, unseen 6.1%); among candidates, the most unseen passes. Run once.
+
+**G364 result (2026-11-08): no candidate.** The highest win rate, the 0.1 take-profit with the 0.5 stop buffer, wins
+72.3% of trades on both the development and the unseen Tests, at 2.7-3.0 trades a session, but makes $1.50 / $3.48 a
+trade and passes 2.0% / 5.6% of Tests with 5.7% / 7.2% failed (U57: 48.5-50.4% winners, +$25-34 a trade, 13.8% / 16.1%
+passed). No variant reaches 80% winners; every step toward it shrinks the winners until the costs eat them. Also measured:
+**U57 trades on only 62-68% of sessions** (its filters sit out the rest; G364's variants the same). U57 stays.
+`verification/noise_v2/g364_win_rate_grid.txt`.
