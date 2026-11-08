@@ -7516,3 +7516,11 @@ no higher than 3.7%; unseen: more than 16.1% passed, at most 6.1% failed, failed
 15.6% / 5.2% / 24.4%, with 3 MNQ inside 14.8% / 6.2%: more passes, but past the failure bound. Unseen (933; U57 16.1% /
 6.1% / 21.5%): 16.3% / 9.1% / 26.9% and 13.9% / 7.9%. Even one contract more on those breakouts adds failures faster than
 passes. U57 stays. `verification/noise_v2/g346_prior_day_small.txt`.
+
+## G347: the size past and inside the prior day's range, a grid (registered 2026-11-08, before its run)
+
+G345 / G346: past the prior day's range the trades are better, inside they fail more. `research/g347_prior_day_grid.py`:
+U57 with 4, 5 or 6 MNQ past the prior session's high (long) / low (short) and 1, 2 or 3 MNQ inside (`pdhl_mult` 1.0 /
+1.25 / 1.5 and `pdhl_in_mult` 0.25 / 0.5 / 0.75 on the sprint's 4; 9 variants, two of them G345 / G346 again). G253's
+measure and G332's rule (development: the best by passes with failures no higher than U57's 3.7%, and more passes than
+its 13.8%; unseen: more than 16.1% passed, at most 6.1% failed, failed + near-frozen at most 21.5%). Run once.
