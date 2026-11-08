@@ -7327,3 +7327,11 @@ losing days 11.1% / 3.0%, 13.6% / 3.2%, 13.6% / 3.7%: fewer failures but fewer p
 16.0% / 6.6% / 21.7%): 11.8% / 6.2%, 15.3% / 6.4%, 15.5% / 6.6%. Sitting out after a losing run also sits out the
 recoveries: the day after a run of losses pays about as well as any other. U57 stays.
 `verification/noise_v2/g331_chop_pause.txt`.
+
+## G332: confirmed entries on U57 (registered 2026-11-08, before its run)
+
+G330: U56's failures are the breakouts that fall back inside. `research/g332_confirm.py`, on U57: an entry only when the
+previous check also closed past the line (`confirm`), or, after a losing trade on a side, the next entry that side only
+when past the line by 0.1 or 0.25 of the noise (`side_margin`) (3 variants). G253's measure; the rule at U57's numbers
+(development: more passes than U57 there, failures no higher; unseen: more than 16.1% passed, at most 6.1% failed,
+failed + near-frozen at most 21.5%). Run once.
