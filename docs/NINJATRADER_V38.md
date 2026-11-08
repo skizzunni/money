@@ -7347,3 +7347,8 @@ stays. `verification/noise_v2/g332_confirm.txt`.
 or $1,000 / $500 instead of $800 / $300 (6 variants). G253's measure and G332's rule (development: more passes than U57's
 13.8%, failures no higher than 3.7%; unseen: more than 16.1% passed, at most 6.1% failed, failed + near-frozen at most
 21.5%). Run once.
+
+**G333 result (2026-11-08): rejected.** Development (405 weeks; U57 13.8% / 3.7% / 16.8%): the best, $1,000 keeping $300,
+14.1% / 3.7% (qualifies); the others 12.8-13.6%. On the unseen weeks (933; U57 16.1% / 6.1% / 21.5%) it passes 15.6% and
+fails 7.4%: not better. The other levels: 14.4-15.6% passed, 5.6-7.4% failed. U57's $800 / $300 stays.
+`verification/noise_v2/g333_lock_grid.txt`.
