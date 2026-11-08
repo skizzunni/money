@@ -1,0 +1,14 @@
+development (index 2011-18):
+                                      weeks  passed  failed  stuck  failed_or_stuck
+tag                                                                                
+0.5x inside the prior day's range       405   0.101   0.040  0.094            0.133
+1.5x past the prior day's high / low    405   0.165   0.067  0.217            0.284
+1.5x past, 0.75x inside                 405   0.160   0.067  0.202            0.269
+U57                                     405   0.138   0.037  0.131            0.168
+unseen (NQ 2015-25 + index 2019-26):
+                                      weeks  passed  failed  stuck  failed_or_stuck
+tag                                                                                
+0.5x inside the prior day's range       933   0.116   0.036  0.141            0.178
+1.5x past the prior day's high / low    933   0.180   0.118  0.182            0.300
+1.5x past, 0.75x inside                 933   0.153   0.106  0.175            0.281
+U57                                     933   0.161   0.061  0.154            0.215

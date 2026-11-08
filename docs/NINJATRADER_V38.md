@@ -7498,3 +7498,16 @@ when it is not, or 1.5x past and 0.75x not (3 variants; `pdhl_mult` / `pdhl_in_m
 at least 1; the floor's and the day's room still cut the size). G253's measure and G332's rule (development: more passes
 than U57's 13.8%, failures no higher than 3.7%; unseen: more than 16.1% passed, at most 6.1% failed, failed + near-frozen
 at most 21.5%). Run once.
+
+**G345 result (2026-11-08): rejected.** Development (405 weeks; U57 13.8% / 3.7% / 16.8%): 1.5x past the prior day's high /
+low 16.5% / 6.7% / 28.4% (more passes, far more failures), 1.5x past and 0.75x inside 16.0% / 6.7%, 0.5x inside 10.1% /
+4.0%. None within the failure bound. Unseen (933; U57 16.1% / 6.1% / 21.5%): 18.0% / 11.8% / 30.0%, 15.3% / 10.6%, 11.6%
+/ 3.6%. The breakouts past the prior day's range are the better trades, but 6 MNQ on them doubles the failures. U57
+stays. `verification/noise_v2/g345_prior_day.txt`.
+
+## G346: a little bigger past the prior day's range (registered 2026-11-08, before its run)
+
+From G345's development weeks: `research/g346_prior_day_small.py`: U57 with 5 MNQ instead of 4 when the signal close is
+past the prior session's high (long) or low (short) (`pdhl_mult` 1.25), and the same with 3 MNQ when it is not
+(`pdhl_in_mult` 0.75) (2 variants). G253's measure and G332's rule (development: more passes than U57's 13.8%, failures
+no higher than 3.7%; unseen: more than 16.1% passed, at most 6.1% failed, failed + near-frozen at most 21.5%). Run once.
