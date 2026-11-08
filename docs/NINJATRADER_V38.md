@@ -7564,3 +7564,11 @@ jobs 1.25x, big day 2x, the equity filter at 40) passes 15.5% and fails **3.9%**
 unseen weeks, and k144 (5 MNQ, 0.75x past, 1.5x inside, the lock at $1,000, the gap trade at 1 MNQ, jobs 1.25x, big day
 2x, the equity filter) 15.0% / **3.0%** / 16.3%: both nearer U57's passes than G341's k68 (14.4% / 2.9%). U57 stays.
 `verification/noise_v2/g349_u57_prior_mix.txt`, `g349_stage1.csv`, `g349_stage2.csv`.
+
+## G350: G349's lowest-failure sets, bigger (registered 2026-11-08, before its run)
+
+G349's three sets with the fewest development failures among those near U57's passes (k19 13.8% / 1.0%, k35 13.1% /
+0.7%, k53 13.1% / 1.2%; chosen on the development weeks, though their G349 unseen results were seen) with the sprint at
+5 and 6 MNQ, and at their own size again (`research/g350_low_fail_bigger.py`; 9 variants). G253's measure and G332's rule
+(development: the best by passes with failures no higher than U57's 3.7%, and more passes than its 13.8%; unseen: more
+than 16.1% passed, at most 6.1% failed, failed + near-frozen at most 21.5%). Run once.
