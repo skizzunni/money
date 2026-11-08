@@ -377,6 +377,11 @@ class NoiseConfig:
     drive_none_mult: float = 1.0  # G374: with drive_size_k on, entries on a day without such a drive (and before 10:00)
     drive_tp: float = -1.0  # research (G376): entries with the opening drive (drive_size_k) take this take-profit (0: none; <0: off)
     drive_losers: int = 0  # research (G377): the day's loser limit on a day with an opening drive (drive_size_k; 0: off)
+    # research (G379): size by the volatility regime, the last calm_short sessions' average range over the last
+    # calm_long's: q x that ratio (vol_pro) or its inverse, kept within [vol_lo, vol_hi] (vol_hi 0: off)
+    vol_lo: float = 1.0
+    vol_hi: float = 0.0
+    vol_pro: bool = True
     # research (G69): small gaps. A gap at least gap_go_small_k x the average (but under gap_go_k), the 09:30 bar
     # closing its way, takes the same trade at 1 contract (-1 = off). Drive and small-gap trades are always 1 contract
     gap_go_small_k: float = -1.0
@@ -1479,6 +1484,12 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                         ml_next, q_next = ml_next / q_next * q_n, q_n
                     if cfg.news2_mult != 1.0 and t.strftime("%Y-%m-%d") in news2_set:  # G325: the Fed days
                         q_n = max(1, round(q_next * cfg.news2_mult))
+                        ml_next, q_next = ml_next / q_next * q_n, q_n
+                    if cfg.vol_hi > 0 and len(day_ranges) >= cfg.calm_long:  # G379: the volatility regime
+                        rs = sum(day_ranges[-cfg.calm_short:]) / cfg.calm_short
+                        rl = sum(day_ranges[-cfg.calm_long:]) / cfg.calm_long
+                        vr = rs / max(1e-12, rl) if cfg.vol_pro else rl / max(1e-12, rs)
+                        q_n = max(1, round(q_next * min(cfg.vol_hi, max(cfg.vol_lo, vr))))
                         ml_next, q_next = ml_next / q_next * q_n, q_n
                     if drive_sz and (cfg.drive_mult != 1.0 or cfg.drive_against_mult != 1.0):  # G373
                         q_n = max(1, round(q_next * (cfg.drive_mult if d == drive_sz else cfg.drive_against_mult)))

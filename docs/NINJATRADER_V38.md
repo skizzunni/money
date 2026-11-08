@@ -7994,3 +7994,10 @@ of 1.10 there (+$6,846 a year at $500 risk, 286 trades a year) and loses on ever
 year), the index 0.98 (−$1,170), the stand-in 0.90 (−$7,075). Every one of the 12 variants has a profit factor under 1
 on all three later sets (0.72-0.99). The video's trade is one morning; as a rule the sweep-and-reclaim of the 09:30-10:00
 range loses after costs. `verification/noise_v2/g378_am_sweep.txt`.
+
+## G379: size by the volatility regime, funded (registered 2026-11-08, before its run)
+
+`research/g379_vol_regime.py`: the funded mode (U48) with each entry's contracts times the ratio of the last calm_short
+sessions' average range to the last calm_long sessions' (bigger when the market has woken up), or its inverse (smaller
+then), kept within 0.5-1.5x or 0.75-2x (4 variants; `vol_pro`, `vol_lo`, `vol_hi`, new in mnqbot/noise.py; G317 tried
+the inverse on the Test sprint only). G372's measure and rule. Run once.
