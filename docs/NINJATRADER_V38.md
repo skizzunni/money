@@ -7401,3 +7401,11 @@ most 6.1% failed, failed + near-frozen at most 21.5%). Run once.
 **G337 result (2026-11-08): rejected.** Development (405 weeks; U57 13.8% / 3.7%): longs 0.6 / shorts 0.7 13.6% / 3.5%,
 0.65 / 0.75 12.6%, 0.7 / 0.6 12.3%, 0.7 / 0.8 13.1%: none passes more. Unseen (933; U57 16.1% / 6.1%): 14.7-15.6% passed.
 The same width both sides stays best. U57 stays. `verification/noise_v2/g337_side_width.txt`.
+
+## G338: a tighter max-loss stop alone (registered 2026-11-08, before its run)
+
+G330: in the failed Tests the max-loss exits average −$713. G302 changed the max loss itself, which also moves the lock's
+trigger. `research/g338_max_loss_frac.py`: U57 with only the max-loss stop at 0.6x, 0.75x or 0.9x of the max loss (in
+the bracket and while in the trade), the lock's trigger and the sizing unchanged (3 variants; `max_loss_frac`, new in
+mnqbot/noise.py). G253's measure and G332's rule (development: more passes than U57's 13.8%, failures no higher than
+3.7%; unseen: more than 16.1% passed, at most 6.1% failed, failed + near-frozen at most 21.5%). Run once.

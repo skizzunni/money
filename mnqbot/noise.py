@@ -112,6 +112,7 @@ class NoiseConfig:
     # this factor (the stops keep the area itself). late_tp / late_tp_from: entries from checks closing at or after
     # late_tp_from (minute of day) take late_tp noise units as their take-profit
     entry_k: float = 1.0
+    max_loss_frac: float = 1.0  # research (G338): the max-loss stop at this share of the max loss (the lock's trigger unchanged)
     entry_k_short: float = 0.0  # research (G337): the short side's entry width when it differs (0 = entry_k)
     # after a big session (its 09:30-16:00 range over big_day_k x the average of the last big_day_n sessions' ranges,
     # as a share of the open; that session included), no entries or heads-ups today in that session's direction (its
@@ -1123,7 +1124,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                 # from the fill price; on the fill bar itself from the expected fill (signal close + slippage), as a
                 # bracket order placed with the entry would be
                 base = entry_px if entry_bar != i else est_px
-                cap = base - pos * ml_trade / q_trade / cfg.point_value
+                cap = base - pos * cfg.max_loss_frac * ml_trade / q_trade / cfg.point_value  # G338: max_loss_frac
                 if (pos > 0 and cap > line) or (pos < 0 and cap < line):
                     line, reason = cap, "Max loss"
             if cfg.vwap_stop and not math.isnan(vwap_used):  # the paper's trailing stop
@@ -1516,7 +1517,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                         stop = upper * (1 - cfg.stop_buffer * sigma) if d > 0 else lower * (1 + cfg.stop_buffer * sigma)
                         at_line = stop
                         if ml_cfg > 0:
-                            cap = est_px - d * ml_next / q_next / cfg.point_value
+                            cap = est_px - d * cfg.max_loss_frac * ml_next / q_next / cfg.point_value  # G338
                             stop = max(stop, cap) if d > 0 else min(stop, cap)
                         if tp_next > 0:
                             tp = est_px * (1 + d * tp_next * sigma)
