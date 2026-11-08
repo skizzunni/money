@@ -7421,3 +7421,7 @@ G336 left the noise area's length out. `research/g339_lookback.py`: U57 with the
 22 sessions instead of 18 (4 variants; `lookback`). G253's measure and G332's rule (development: more passes than U57's
 13.8%, failures no higher than 3.7%; unseen: more than 16.1% passed, at most 6.1% failed, failed + near-frozen at most
 21.5%). Run once.
+
+**G339 result (2026-11-08): rejected.** Development (405 weeks; U57 13.8% / 3.7%): 14 / 16 / 20 / 22 sessions 9.6% / 3.5%,
+11.1% / 4.4%, 13.1% / 4.0%, 11.1% / 5.4%. Unseen (933; U57 16.1% / 6.1% / 21.5%): 14.7%, 14.9%, 16.1% / 6.4% / 22.0%,
+14.5%. 18 sessions stays best. U57 stays. `verification/noise_v2/g339_lookback.txt`.
