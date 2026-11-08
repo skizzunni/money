@@ -1,0 +1,14 @@
+development (index 2011-18):
+                        weeks  passed  failed  stuck  failed_or_stuck
+tag                                                                  
+U57                       405   0.138   0.037  0.131            0.168
+gap trade out at 10:15    405   0.141   0.037  0.133            0.170
+gap trigger 0.4x          405   0.133   0.042  0.121            0.163
+gap trigger 0.65x         405   0.141   0.032  0.126            0.158
+unseen (NQ 2015-25 + index 2019-26):
+                        weeks  passed  failed  stuck  failed_or_stuck
+tag                                                                  
+U57                       933   0.161   0.061  0.154            0.215
+gap trade out at 10:15    933   0.151   0.062  0.158            0.220
+gap trigger 0.4x          933   0.165   0.063  0.146            0.209
+gap trigger 0.65x         933   0.161   0.059  0.151            0.210

@@ -7471,3 +7471,9 @@ G274 / G276 set the gap trade before the day cap. `research/g343_gap_trade.py`: 
 0.4x or 0.65x instead of 0.5x (`gap_go_k`), or held to 10:15 instead of 09:55 (`gap_go_exit`) (3 variants). G253's
 measure and G332's rule (development: more passes than U57's 13.8%, failures no higher than 3.7%; unseen: more than
 16.1% passed, at most 6.1% failed, failed + near-frozen at most 21.5%). Run once.
+
+**G343 result (2026-11-08): rejected.** Development (405 weeks; U57 13.8% / 3.7% / 16.8%): the gap trigger at 0.65x 14.1%
+/ 3.2% / 15.8% (the best: more passes, fewer failures), out at 10:15 14.1% / 3.7%, the trigger at 0.4x 13.3% / 4.2%. On
+the unseen weeks (933; U57 16.1% / 6.1% / 21.5%) the 0.65x trigger passes 16.1% (150 weeks, the same as U57), fails 5.9%
+and fails or ends near-frozen 21.0%: not more passes, so it does not replace U57 (the rule asks for more). Out at 10:15
+15.1%; 0.4x 16.5% / 6.3%. U57 stays. `verification/noise_v2/g343_gap_trade.txt`.
