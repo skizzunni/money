@@ -7613,3 +7613,7 @@ G259 tried 10- and 15-minute checks on k317, before the day cap, guard and lock.
 the entry checks (and the noise area's grid) every 15 or every 60 minutes instead of 30 (2 variants; `check_step`).
 G253's measure and G332's rule (development: the best by passes with failures no higher than U57's 3.7%, and more passes
 than its 13.8%; unseen: more than 16.1% passed, at most 6.1% failed, failed + near-frozen at most 21.5%). Run once.
+
+**G353 result (2026-11-08): rejected.** Development (405 weeks; U57 13.8% / 3.7% / 16.8%): checks every 15 minutes 9.9% /
+5.7%, every 60 minutes 5.9% / 4.0%. Unseen (933; U57 16.1% / 6.1% / 21.5%): 12.4% / 8.0%, 5.8% / 4.5%. Thirty minutes
+stays best by far. U57 stays. `verification/noise_v2/g353_check_step.txt`.
