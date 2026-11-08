@@ -7778,3 +7778,7 @@ A trade that reaches a small profit and then comes back can end as a small winne
 stop then at the entry +1.0 or +2.5 points, with the take-profit at 0.3 or 0.75 (U57) (8 variants). G364's measures and
 candidate rule (both sets: at least 80% winners, a trade on at least 90% of the sessions, more than $0 a trade, failures
 no higher than U57's 3.7% / 6.1%; the most unseen passes). Run once.
+
+**G365 result (2026-11-08): no candidate.** Win rates 45-53% on both sets (U57 48.5% / 50.4%): an earlier lock turns some
+losers into scratches, but the stop at entry + 1-2.5 points is hit by ordinary noise, and after costs most scratches
+are small losers. Passes fall (unseen 5.5-11.1%, U57 16.1%). U57 stays. `verification/noise_v2/g365_early_lock.txt`.
