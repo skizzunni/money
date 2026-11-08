@@ -7865,3 +7865,11 @@ most 21.5%) with more trades a session than U57. Run once.
 U57 48.5% / 50.4%), 2.73 / 2.46 trades a session (U57 2.15 / 1.92), a trade on 77% / 72% of sessions (68% / 62%), net a
 session $60-65 / $73-81 (U57 $54 / $65). Passes 14.1-14.3% / 15.2-15.5% (U57 13.8% / 16.1%) but failures 6.4-10.9% /
 11.3-14.9% (U57 3.7% / 6.1%), with the same shortcut as G369. U57 stays. `verification/noise_v2/g370_u57_plus_fade.txt`.
+
+## G371: the funded account month by month (a measurement, registered 2026-11-08, before its run)
+
+The user's goal is $750 a day. `research/g371_funded_by_month.py`: the funded growth mode (U48's settings: 50K, $2,000
+end-of-day trailing floor, $900 daily loss, 60-minute time stop, sizes growing with the account) from a fresh start on
+the first Monday of every quarter (index 2011-2025, NQ 2015-2024), 12 months each. Per month since the start: $ per
+session (mean and median), the share of sessions at $750 or more, and the share of starts whose floor has been
+touched (end of day) by then.
