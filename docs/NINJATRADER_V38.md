@@ -7544,3 +7544,13 @@ most 21.5%). Run once.
 6.1% / 21.5%): 4 / 5 17.0% / 6.8% / 22.8%, 4 / 6 17.7% / 7.1%, 3 / 4 10.0% / 4.5%, 3 / 5 11.5% / 5.6%. More contracts on
 either kind of breakout buy passes with failures; the split does not escape it. U57 stays.
 `verification/noise_v2/g348_inside_bigger.txt`.
+
+## G349: the prior-day size rule mixed with U57's levels, 150 random combinations (registered 2026-11-08, before its run)
+
+`research/g349_u57_prior_mix.py`: 150 random sets (seed 349; k 0 is U57) of the size past the prior day's range (0.75x /
+1.25x), inside it (0.75x / 1.25x / 1.5x), the gap trigger 0.65x, the day guard ($1,000 / $1,400), the day lock ($1,000
+keeping $300 / $600 keeping $200), the gap trade at 1 MNQ, jobs days (1.25x / 2x), the big-day rule at 2x, the time lock
+and the equity filter (40 trades), with the sprint at 3, 4 or 5 MNQ. Stage 1 on the development weeks; the 10 best by
+passes with failures at most U57's 3.7% and failed or near-frozen at most its 16.8% go to stage 2. **Replaces U57's
+settings** if on stage 2 it passes more than 16.1%, fails at most 6.1%, and failed + near-frozen is at most 21.5%. Run
+once (resumable).
