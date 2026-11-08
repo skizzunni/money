@@ -1,0 +1,26 @@
+development (index 2011-18):
+                  weeks  passed  failed  stuck  failed_or_stuck
+tag                                                            
+4 past, 1 inside    405   0.086   0.040  0.081            0.121
+4 past, 2 inside    405   0.101   0.040  0.094            0.133
+4 past, 3 inside    405   0.111   0.037  0.116            0.153
+5 past, 1 inside    405   0.101   0.062  0.133            0.195
+5 past, 2 inside    405   0.128   0.069  0.141            0.210
+5 past, 3 inside    405   0.148   0.062  0.153            0.215
+6 past, 1 inside    405   0.126   0.077  0.165            0.242
+6 past, 2 inside    405   0.146   0.069  0.178            0.247
+6 past, 3 inside    405   0.160   0.067  0.202            0.269
+U57                 405   0.138   0.037  0.131            0.168
+unseen (NQ 2015-25 + index 2019-26):
+                  weeks  passed  failed  stuck  failed_or_stuck
+tag                                                            
+4 past, 1 inside    933   0.100   0.044  0.133            0.177
+4 past, 2 inside    933   0.116   0.036  0.141            0.178
+4 past, 3 inside    933   0.137   0.042  0.145            0.186
+5 past, 1 inside    933   0.122   0.070  0.174            0.243
+5 past, 2 inside    933   0.134   0.071  0.170            0.241
+5 past, 3 inside    933   0.139   0.079  0.162            0.241
+6 past, 1 inside    933   0.140   0.108  0.161            0.269
+6 past, 2 inside    933   0.150   0.106  0.177            0.283
+6 past, 3 inside    933   0.153   0.106  0.175            0.281
+U57                 933   0.161   0.061  0.154            0.215

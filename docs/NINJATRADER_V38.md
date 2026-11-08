@@ -7524,3 +7524,17 @@ U57 with 4, 5 or 6 MNQ past the prior session's high (long) / low (short) and 1,
 1.25 / 1.5 and `pdhl_in_mult` 0.25 / 0.5 / 0.75 on the sprint's 4; 9 variants, two of them G345 / G346 again). G253's
 measure and G332's rule (development: the best by passes with failures no higher than U57's 3.7%, and more passes than
 its 13.8%; unseen: more than 16.1% passed, at most 6.1% failed, failed + near-frozen at most 21.5%). Run once.
+
+**G347 result (2026-11-08): rejected.** Development (405 weeks; U57 13.8% / 3.7% / 16.8%): within the failure bound only
+4 past / 3 inside (11.1% / 3.7%); every 5 or 6 past fails 6.2-7.7%. Unseen (933; U57 16.1% / 6.1% / 21.5%): 4 past / 3
+inside 13.7% / 4.2%. The grid reads the other way from G345's guess: the size past the prior day's range drives the
+failures, while fewer contracts inside cut passes and leave the failures where they were (4 past / 1 inside: 8.6% /
+4.0%). U57 stays. `verification/noise_v2/g347_prior_day_grid.txt`.
+
+## G348: bigger inside the prior day's range (registered 2026-11-08, before its run)
+
+From G347's development weeks: `research/g348_inside_bigger.py`: U57 with 5 or 6 MNQ when the signal close is inside the
+prior session's range and 4 past it, or 3 past with 4 or 5 inside (`pdhl_in_mult` 1.25 / 1.5, `pdhl_mult` 0.75 on the
+sprint's 4; 4 variants). G253's measure and G332's rule (development: the best by passes with failures no higher than
+U57's 3.7%, and more passes than its 13.8%; unseen: more than 16.1% passed, at most 6.1% failed, failed + near-frozen at
+most 21.5%). Run once.
