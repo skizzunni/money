@@ -7833,3 +7833,14 @@ of trades (development / unseen) at −$1.51 / +$4.28 a trade, 0.57-0.63 trades 
 0.4% of Tests passed and 11.6% / 17.6% failed. The target at the open wins 62-64% (+$45 / +$2 a trade, 35% of unseen Tests
 failed). At about 80% winners the fade makes a few dollars a trade at best: too little to reach $3,000 in ten sessions,
 and its rare large losers end Tests far more often than U57 (6.1%). U57 stays. `verification/noise_v2/g368_fade_levels.txt`.
+
+## G369: more regular-hours trades: U57 plus the trend pullback (registered 2026-11-08, before its run)
+
+The user: trade more in 09:30-16:00 and make more. The trend pullback (`trendpb`, research/patterns.py, 3R) was the one
+pattern that held up on held-out history (docs/RESULTS.md, "The ONYX models"). `research/g369_add_pullback.py`: U57 with
+the pullback's trades added in the same Test account, entries to 12:00 or to 15:30, sized to $250 or $500 of risk
+(1-10 MNQ) (4 variants; two positions can be open at once, and the pullback does not see U57's day rules, so a real
+build would need them shared). `patterns.execute` now also returns each trade's exit time and prices. Measures: G253's
+Test and G364's, plus the net per session. **A candidate** must trade more a session than U57 on both sets and meet
+G332's rule (development: more passes than 13.8%, failures at most 3.7%; unseen: more than 16.1% passed, at most 6.1%
+failed, failed + near-frozen at most 21.5%). Run once.

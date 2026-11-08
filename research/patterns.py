@@ -414,9 +414,9 @@ def execute(days: list, trend: bool, be: bool, morning: bool, r_target: float, u
             else:
                 j, x = dy.n - 1, dy.c[-1] - d * TICK
             pnl = d * (x - px) * q * PV - 2 * FEE * q
-            rows.append((tt[e], d, q, pnl, risk_pts * q * PV, why, did))
+            rows.append((tt[e], d, q, pnl, risk_pts * q * PV, why, did, tt[j], px, x))
             busy_until = j
-    return pd.DataFrame(rows, columns=["time", "dir", "qty", "pnl", "risk", "why", "day"])
+    return pd.DataFrame(rows, columns=["time", "dir", "qty", "pnl", "risk", "why", "day", "exit_time", "entry", "exit"])
 
 
 def stats(f: pd.DataFrame, first: str | None) -> dict:
