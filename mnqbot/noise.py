@@ -420,6 +420,10 @@ class NoiseConfig:
     sprint_after_loss_n: int = 1
     # research (G308): the sprint's first bot trade of the day takes sprint_first_qty, later ones sprint_later_qty (0 = off)
     sprint_first_qty: int = 0
+    # research (G335): near the finish. Once the profit since the start is at least sprint_near_from, the sprint takes
+    # sprint_near_qty contracts (0 = off)
+    sprint_near_from: float = 0.0
+    sprint_near_qty: int = 0
     sprint_later_qty: int = 0
     sprint_hot_qty: int = 0
     # research (G317): the sprint sized by volatility: sprint_qty x (the last calm_long sessions' average range / the last
@@ -729,6 +733,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
 
     def sprint_q() -> int:
         """G270: the sprint's size (sprint_qty_locked once the floor has stopped; G282: the push; G284: the defence)."""
+        if cfg.sprint_near_qty > 0 and eq_curve[-1] - trail_base >= cfg.sprint_near_from:  # G335
+            return cfg.sprint_near_qty
         if cfg.sprint_vol_hi > 0 and len(day_ranges) >= cfg.calm_long:  # G317
             cs, cl = cfg.calm_short, cfg.calm_long
             ratio = (sum(day_ranges[-cl:]) / cl) / max(1e-12, sum(day_ranges[-cs:]) / cs)

@@ -7364,3 +7364,10 @@ passed, at most 6.1% failed, failed + near-frozen at most 21.5%). Run once.
 sessions 6.2% / 1.5%, 10.4% / 2.7%, 11.6% / 3.2%. Unseen (933; U57 16.1% / 6.1% / 21.5%): 6.9% / 2.9%, 11.0% / 3.8%,
 13.1% / 4.6%. A shorter sprint lowers the failures and the passes together (8 sessions: −3 points of passes for −1.5 of
 failures). U57 stays. `verification/noise_v2/g334_sprint_days.txt`.
+
+## G335: smaller near the finish (registered 2026-11-08, before its run)
+
+The prop-firm guides read on 2026-11-08 advise trading smaller near the profit target. `research/g335_near_finish.py`:
+U57 with the sprint at 2 or 3 MNQ once the Test is up $2,000, or at 2 MNQ from $2,500 (3 variants; `sprint_near_from` /
+`sprint_near_qty`). G253's measure and G332's rule (development: more passes than U57's 13.8%, failures no higher than
+3.7%; unseen: more than 16.1% passed, at most 6.1% failed, failed + near-frozen at most 21.5%). Run once.
