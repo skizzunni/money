@@ -7625,3 +7625,9 @@ at 15:15 / 15:45 within the 15:30 entry end... as the grid falls) instead of fro
 615; the noise area on the same grid). G253's measure and G332's rule (development: the best by passes with failures no
 higher than U57's 3.7%, and more passes than its 13.8%; unseen: more than 16.1% passed, at most 6.1% failed, failed +
 near-frozen at most 21.5%). Run once.
+
+**G354 result (2026-11-08): rejected.** Development (405 weeks; U57 13.8% / 3.7% / 16.8%): checks from 09:45 6.7% / 5.9%,
+from 10:15 5.7% / 5.4%. Unseen (933; U57 16.1% / 6.1% / 21.5%): 8.9% / 8.8%, 8.5% / 8.5%. A drop this large says U57's
+settings are fitted to the round half hours (the 30-minute bars' closes, the gap trade's 09:35-09:55 window and the
+10:00 first check); the shifted grid was not re-tuned, so this rejects the shift with U57's settings only. U57 stays.
+`verification/noise_v2/g354_check_shift.txt`.
