@@ -7844,3 +7844,11 @@ build would need them shared). `patterns.execute` now also returns each trade's 
 Test and G364's, plus the net per session. **A candidate** must trade more a session than U57 on both sets and meet
 G332's rule (development: more passes than 13.8%, failures at most 3.7%; unseen: more than 16.1% passed, at most 6.1%
 failed, failed + near-frozen at most 21.5%). Run once.
+
+**G369 result (2026-11-08): no candidate.** Trades a session, development / unseen (U57 2.15 / 1.92): +2-6% with the
+pullback to 12:00, +40-47% with it to 15:30 (2.99-3.05 / 2.74-2.83, a trade on 84-88% of sessions). Net a session (all
+10 sessions of each Test, at the sprint's size; U57 $54 / $65): $56-70 / $71-96. But the Tests fail far more often
+(unseen 12.9-43.6% against U57's 6.1%) and pass less (12.4-14.3% against 16.1%). Part of that is the test's shortcut:
+U57 sizes to its own room and does not see the pullback's losses, so it oversizes after them; a shared build would
+size both from one room, with fewer passes from the smaller size. Either way, more trades here buy a little more money
+with many more blown Tests. U57 stays. `verification/noise_v2/g369_add_pullback.txt`.
