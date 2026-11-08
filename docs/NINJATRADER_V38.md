@@ -7631,3 +7631,13 @@ from 10:15 5.7% / 5.4%. Unseen (933; U57 16.1% / 6.1% / 21.5%): 8.9% / 8.8%, 8.5
 settings are fitted to the round half hours (the 30-minute bars' closes, the gap trade's 09:35-09:55 window and the
 10:00 first check); the shifted grid was not re-tuned, so this rejects the shift with U57's settings only. U57 stays.
 `verification/noise_v2/g354_check_shift.txt`.
+
+## G355: four order mechanics on U57 (registered 2026-11-08, before its run)
+
+Knobs of mnqbot/noise.py from the v2.4-v2.8 studies never run on the Test sprint. `research/g355_mechanics.py`: U57 with
+(1) 2 MNQ more at the next bar's open once the lock arms, sharing the exits (`add_at_lock` 2); (2) each check's entry as
+a limit halfway back to the line, working until the next check (`limit_entry_frac` 0.5); (3) besides the checks, stop
+orders resting at the noise lines from 10:00, once a side per half hour (`touch_entry`); (4) until the first check after
+the fill, only the max-loss stop (`grace`) (4 variants). G253's measure and G332's rule (development: the best by passes
+with failures no higher than U57's 3.7%, and more passes than its 13.8%; unseen: more than 16.1% passed, at most 6.1%
+failed, failed + near-frozen at most 21.5%). Run once.
