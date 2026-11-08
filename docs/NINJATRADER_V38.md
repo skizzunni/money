@@ -7285,3 +7285,12 @@ Run once.
 **G328 result (2026-11-08): rejected.** Development (405 weeks; U56 14.1% / 3.7% / 16.8%): no entries either way after a
 1.5x day 10.4% / 4.2%, after a 2x day 12.8% / 4.0%. Unseen (933; U56 16.0% / 6.6% / 21.7%): 13.8% / 5.1% / 18.4%, 15.1% /
 5.5% / 21.2%: fewer failures but fewer passes. U56 stays. `verification/noise_v2/g328_big_day_both.txt`.
+
+## G329: further rules on top of U56, 150 random combinations (registered 2026-11-08, before its run)
+
+`research/g329_u56_rules.py`: 150 random combinations (seed 329; variant 0 is U56) on U56 of the opening-drive filter
+(0.35x / 0.5x), the equity filter (eq_n 20 / 40), the side cooldown, 3 MNQ after two losers, the late stop (from 14:00
+at $500), the gap block (1.5%), Fed days (1.5x / 0.5x), the gap trade's size (1 / 3), the day lock ($800 / $300) and the
+time lock (30 minutes), with the sprint at 4 or 5 MNQ. Stage 1 on the development weeks; the 10 best by passes with
+failures at most U56's 3.7% and failed or near-frozen at most its 16.8% go to stage 2. **Replaces U56's settings** if on
+stage 2 it passes more than 16.0%, fails at most 6.6%, and failed + near-frozen is at most 21.7%. Run once (resumable).
