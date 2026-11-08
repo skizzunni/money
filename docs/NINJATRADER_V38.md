@@ -7782,3 +7782,12 @@ no higher than U57's 3.7% / 6.1%; the most unseen passes). Run once.
 **G365 result (2026-11-08): no candidate.** Win rates 45-53% on both sets (U57 48.5% / 50.4%): an earlier lock turns some
 losers into scratches, but the stop at entry + 1-2.5 points is hit by ordinary noise, and after costs most scratches
 are small losers. Passes fall (unseen 5.5-11.1%, U57 16.1%). U57 stays. `verification/noise_v2/g365_early_lock.txt`.
+
+## G366: trading every session (registered 2026-11-08, before its run)
+
+The user asks for a trade every day; U57 trades on 62-68% of sessions (G364). `research/g366_every_day.py`: U57 without
+the calm filter (`calm_k` 0), without the range-position filter (`range_pos_min` 0), without the streak pause
+(`streak_k` 0), without all three, and without all three at the entry width 0.5 instead of 0.7 (5 variants). G364's
+measures. **Replaces U57** if on both sets it trades on more sessions than U57 and the Tests meet G332's rule
+(development: more passes than 13.8%, failures at most 3.7%; unseen: more than 16.1% passed, at most 6.1% failed,
+failed + near-frozen at most 21.5%). Run once.
