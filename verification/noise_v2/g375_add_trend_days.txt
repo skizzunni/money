@@ -1,0 +1,16 @@
+development (index 2011-18 starts):
+                                    per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                                         
+add 2 at the lock, every trade           52.253      19.962        80.037     104.772  0.320
+add 4 at the lock, every trade           48.075      34.582        63.144     102.492  0.491
+U48                                      39.221      18.490        73.495     114.895  0.032
+add 2 at the lock, drive days only       39.180      17.127        76.569      97.684  0.066
+add 4 at the lock, drive days only       32.762      19.654        56.610      75.918  0.258
+unseen (index 2019-25 + NQ 2015-24):
+                                    per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                                         
+add 2 at the lock, drive days only       80.292      45.488       117.862     130.785  0.047
+add 4 at the lock, drive days only       79.389      48.787       120.901     140.517  0.155
+U48                                      75.724      40.467       115.664     138.786  0.031
+add 2 at the lock, every trade           54.402      49.044        76.638     102.404  0.330
+add 4 at the lock, every trade           47.945      54.457        75.843      91.055  0.614

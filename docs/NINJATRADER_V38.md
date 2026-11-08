@@ -7946,3 +7946,9 @@ The trend-day angle again, without more risk at entry: add contracts only once a
 sharing the trade's exits (`add_at_lock`), on every trade or only on trades with the opening drive past 0.5
 (`add_drive_only`, new in mnqbot/noise.py) (4 variants). G372's measure and rule (development: the most $ a session
 among variants losing at most 5% of the starts; unseen: at most 5% lost and more $ a session than U48). Run once.
+
+**G375 result (2026-11-08): rejected.** Development (U48 $39.2 a session, 3.2% lost): adding 2 / 4 at the lock on every
+trade $52.3 / $48.1 with 32% / 49% lost; on drive days only $39.2 / $32.8 with 6.6% / 25.8% lost. No variant within 5%
+lost beats U48, so nothing goes forward. Unseen (U48 $75.7, 3.1%): 2 on drive days only $80.3 with 4.7% lost; every
+trade $48-54 with 33-61% lost. Adding at the lock turns the lock's small wins into full losers when the trade comes back.
+U48 stays. `verification/noise_v2/g375_add_trend_days.txt`.
