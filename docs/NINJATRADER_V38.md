@@ -7748,3 +7748,18 @@ mostly removes trades, good and bad alike. U57 stays. `verification/noise_v2/g36
 The user asks for at least 80% winning trades with many trades. `research/g363_win_rate.py`: U57's trades in each
 two-week Test (all 10 sessions, not cut at the pass or fail; development and unseen starts as G253): the share of
 winners (P/L above $0 after costs), trades a session, the average winner, loser and trade.
+
+**G363 result (2026-11-08):** U57 wins **48.5%** of its trades on the development Tests (404 Tests, 8,699 trades, 2.15 a
+session; average winner $238, loser −$176, trade +$25) and **50.4%** on the unseen ones (889 Tests, 17,920 trades, 2.02
+a session; $271 / −$207 / +$34). A breakout bot: half its trades lose small, the winners pay. 80% winners needs a
+different shape of trade. `verification/noise_v2/g363_win_rate.txt`.
+
+## G364: small targets, wide stops: a high-win-rate grid (registered 2026-11-08, before its run)
+
+The user's new bar: at least 80% winning trades, trading every day. A high win rate comes from a target nearer than the
+stop. `research/g364_win_rate_grid.py`: U57 with the take-profit at 0.1, 0.15, 0.2 or 0.3 noise units (U57 0.75), the
+stop buffer at 0.24 (U57) or 0.5, and the max-loss stop at 1x or 1.5x (16 variants). Per variant: G253's passed /
+failed / near-frozen, and over all 10 sessions of each Test the share of winning trades, trades a session, the share of
+sessions with a trade, and the average trade. **A candidate** must, on both the development and the unseen Tests: win
+at least 80% of its trades, trade on at least 90% of the sessions, make more than $0 a trade after costs, and fail no
+more Tests than U57 (development 3.7%, unseen 6.1%); among candidates, the most unseen passes. Run once.
