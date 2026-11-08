@@ -7884,9 +7884,11 @@ the larger sizes. `verification/noise_v2/g371_funded_by_month.txt`.
 ## G372: one funded account, faster sizing (registered 2026-11-08, before its run)
 
 The user: one account, $750 a day, "a little riskier" is fine as long as the account is not lost.
-`research/g372_faster_growth.py`: the funded growth mode (U48) starting at 1, 2, 3 or 4 MNQ, a contract more per
-$1,500 (U48), $1,000 or $600 of profit, the faster $650 steps from $9,000 (U48) or $3,000 (24 variants; the $900 daily
-loss and everything else as U48). Fresh starts on the first Monday of every quarter, 12 months each; **lost** = the
+`research/g372_faster_growth.py`: the funded growth mode (U48: 1 MNQ, +1 per $1,500, the $650 steps from $9,000)
+starting at 4, 6 or 8 MNQ, a contract more per $1,000 or $600 of profit, the $650 steps from $3,000, the max loss at
+$187.50 (U48) or $125 a contract (12 variants plus U48; the $900 daily loss, which caps the size, and everything else
+as U48). *Revised before any result was seen:* the first version (1-4 MNQ, and a bug that kept the position's max loss
+at 1 MNQ's $187.50 however many contracts) was stopped at the user's request ("do not start at 1") with no output. Fresh starts on the first Monday of every quarter, 12 months each; **lost** = the
 balance with the open trade at its worst price touches the floor at any time (stricter than G371's end of day; the
 P/L after a loss counts as $0). Per variant: $ per session over the 12 months, months 1-3 and 10-12, the best month's
 average, and the share of starts lost. **Rule:** the variant with the most $ per session on the development starts

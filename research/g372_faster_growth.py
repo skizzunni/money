@@ -1,5 +1,6 @@
-"""G372 (docs/NINJATRADER_V38.md): one funded account, faster sizing: the growth mode (U48) starting at 1-4 MNQ, a
-contract more per $1,500 / $1,000 / $600 of profit, the faster steps ($650) from $9,000 or $3,000. Fresh starts on the
+"""G372 (docs/NINJATRADER_V38.md): one funded account, faster sizing: the growth mode (U48) starting at 4, 6 or 8 MNQ
+(U48: 1), a contract more per $1,000 or $600 of profit (U48 $1,500), the faster $650 steps from $3,000 (U48 $9,000), the
+max loss $187.50 (U48) or $125 a contract. Fresh starts on the
 first Monday of every quarter, 12 months each. Lost = the account's balance with the open trade at its worst price
 (bar highs / lows) touches the floor (the highest end-of-day balance less $2,000, at most the start) at any time.
 Per variant: $ per session over the 12 months, months 1-3 and 10-12, the share of starts lost, and the best month.
@@ -17,10 +18,10 @@ import pandas as pd
 import g250_test_week as G
 from mnqbot.noise import NoiseConfig, run
 
-VARIANTS = {}
-for q, step, ff in itertools.product((1, 2, 3, 4), (1500.0, 1000.0, 600.0), (9000.0, 3000.0)):
-    VARIANTS[f"{q} MNQ, +1 per ${step:.0f}, fast from ${ff:.0f}"] = {"qty": q, "profit_step": step,
-                                                                     "profit_step_fast_from": ff}
+VARIANTS = {"U48 (1 MNQ, +1 per $1500, fast from $9000)": {}}
+for q, step, mlc in itertools.product((4, 6, 8), (1000.0, 600.0), (187.5, 125.0)):
+    VARIANTS[f"{q} MNQ, +1 per ${step:.0f}, ${mlc} a contract"] = {
+        "qty": q, "max_loss_per_trade": mlc * q, "profit_step": step, "profit_step_fast_from": 3000.0}
 
 
 def job(a):
