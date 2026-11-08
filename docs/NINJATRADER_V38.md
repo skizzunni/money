@@ -7988,3 +7988,9 @@ extreme; target the range's other side, 1R or 2R; entries to 12:00 or to 15:30 (
 the best profit factor on NQ 2015-2019 (at least 50 trades a year) passes if it has a profit factor of at least 1.2 and
 makes money on NQ 2020-2025, the index 2011-2026 and the 2025-2026 stand-in; only then is it tried with the funded bot.
 Run once.
+
+**G378 result (2026-11-08): rejected.** The best on NQ 2015-2019, `amsweep` to 15:30 with a 2R target, has a profit factor
+of 1.10 there (+$6,846 a year at $500 risk, 286 trades a year) and loses on every other set: NQ 2020-2025 0.87 (−$9,966 a
+year), the index 0.98 (−$1,170), the stand-in 0.90 (−$7,075). Every one of the 12 variants has a profit factor under 1
+on all three later sets (0.72-0.99). The video's trade is one morning; as a rule the sweep-and-reclaim of the 09:30-10:00
+range loses after costs. `verification/noise_v2/g378_am_sweep.txt`.
