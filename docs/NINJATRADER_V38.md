@@ -7455,3 +7455,8 @@ the list; the others 11.6-14.4% passed. Of note for a safer mode: k68 (5 MNQ wit
 0.5x, the gap trade at 1 MNQ, jobs days 1.25x, the big-day rule at 2x, the time lock) passes 14.4% and fails **2.9%**
 (failed or near-frozen 14.6%) on the unseen weeks: half U57's failures for 1.7 points fewer passes. U57 stays.
 `verification/noise_v2/g341_u57_rules.txt`, `g341_stage1.csv`, `g341_stage2.csv`.
+
+## G342: U57 over 2, 3, 4, 6 and 8 weeks (registered 2026-11-08, before its run)
+
+A measurement, as G326 for U56: U57's Test sprint, passed, failed and near-frozen within 10, 15, 20, 30 and 40 sessions,
+all Monday starts (`research/g342_horizon.py`).
