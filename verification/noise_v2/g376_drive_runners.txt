@@ -1,0 +1,16 @@
+development (index 2011-18 starts):
+                                           per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                                                
+U48                                             39.221      18.490        73.495     114.895  0.032
+drive past 0.25: take-profit none with it       38.711      20.727        71.497     106.765  0.000
+drive past 0.25: take-profit 3.0 with it        38.255      18.590        72.441     106.245  0.032
+drive past 0.5: take-profit 3.0 with it         35.345      18.573        69.942     102.360  0.000
+drive past 0.5: take-profit none with it        35.226      20.474        65.367      96.294  0.000
+unseen (index 2019-25 + NQ 2015-24):
+                                           per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                                                
+U48                                             75.724      40.467       115.664     138.786  0.031
+drive past 0.5: take-profit none with it        75.040      40.260       113.432     135.175  0.015
+drive past 0.5: take-profit 3.0 with it         72.542      39.275       109.436     133.449  0.031
+drive past 0.25: take-profit 3.0 with it        72.369      40.669       107.858     130.639  0.047
+drive past 0.25: take-profit none with it       60.481      37.349        86.751     103.898  0.062
