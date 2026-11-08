@@ -7742,3 +7742,9 @@ mnqbot/noise.py). G253's measure and G332's rule (development: the best by passe
 1.0 / 1.5 x the noise 6.9% / 2.7%, 1.7% / 1.0%, 1.0% / 0.5%. Unseen (933; U57 16.1% / 6.1% / 21.5%): 10.2% / 4.6%, 5.3%
 / 2.3%, 1.6% / 1.2%. With G361 this corrects G361's reading: the half hour's range sorts neither way; any filter on it
 mostly removes trades, good and bad alike. U57 stays. `verification/noise_v2/g362_fast_half_hour.txt`.
+
+## G363: U57's win rate (a measurement, registered 2026-11-08, before its run)
+
+The user asks for at least 80% winning trades with many trades. `research/g363_win_rate.py`: U57's trades in each
+two-week Test (all 10 sessions, not cut at the pass or fail; development and unseen starts as G253): the share of
+winners (P/L above $0 after costs), trades a session, the average winner, loser and trade.
