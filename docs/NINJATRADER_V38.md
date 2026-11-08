@@ -7335,3 +7335,8 @@ previous check also closed past the line (`confirm`), or, after a losing trade o
 when past the line by 0.1 or 0.25 of the noise (`side_margin`) (3 variants). G253's measure; the rule at U57's numbers
 (development: more passes than U57 there, failures no higher; unseen: more than 16.1% passed, at most 6.1% failed,
 failed + near-frozen at most 21.5%). Run once.
+
+**G332 result (2026-11-08): rejected.** Development (405 weeks; U57 13.8% / 3.7% / 16.8%): two checks past the line 6.4% /
+3.7%; past by 0.1 / 0.25 noise after a loss that side 10.9% / 3.7%, 10.6% / 3.0%. Unseen (933; U57 16.1% / 6.1% / 21.5%):
+8.1% / 5.6%, 13.2% / 6.5%, 13.3% / 5.4%. Waiting for confirmation misses the early, best part of the breakouts. U57
+stays. `verification/noise_v2/g332_confirm.txt`.
