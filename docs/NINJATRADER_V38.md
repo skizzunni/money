@@ -7371,3 +7371,8 @@ The prop-firm guides read on 2026-11-08 advise trading smaller near the profit t
 U57 with the sprint at 2 or 3 MNQ once the Test is up $2,000, or at 2 MNQ from $2,500 (3 variants; `sprint_near_from` /
 `sprint_near_qty`). G253's measure and G332's rule (development: more passes than U57's 13.8%, failures no higher than
 3.7%; unseen: more than 16.1% passed, at most 6.1% failed, failed + near-frozen at most 21.5%). Run once.
+
+**G335 result (2026-11-08): rejected.** Development (405 weeks; U57 13.8% / 3.7%): 2 MNQ from +$2,000 9.1%, 3 MNQ from
++$2,000 11.6%, 2 MNQ from +$2,500 12.8% (failures unchanged at 3.7%). Unseen (933; U57 16.1% / 6.1%): 12.0%, 14.6%,
+15.5% (failures 5.9-6.1%). Above +$2,000 the floor has nearly stopped and failures are rare, so smaller trades there only
+slow the pass. U57 stays. `verification/noise_v2/g335_near_finish.txt`.
