@@ -7661,3 +7661,12 @@ failed + near-frozen at most 21.5%). Run once.
 3.2%; the afternoon's take-profit 0.5 11.4% / 4.2%, 1.0 12.8% / 3.7%. Unseen (933; U57 16.1% / 6.1% / 21.5%): 9.5% /
 4.8%, 12.9% / 6.4%, 16.0% / 6.3%. Trading on after a target pays: the second winner of a day is common. U57 stays.
 `verification/noise_v2/g356_late_targets.txt`.
+
+## G357: a side's losing run, or a runner past the target (registered 2026-11-08, before its run)
+
+`research/g357_side_run_runner.py`: U57 with the next signal on a side skipped after 2 or 3 losing trades in a row on that
+side, across days (`side_run_k` 2 / 3, `side_run_skip` 1; a winner on that side resets it), or with half the contracts
+kept open past the take-profit, their stop at the entry plus half the target's distance (`tp_keep` 0.5, `runner_lock`
+0.5) (3 variants). G253's measure and G332's rule (development: the best by passes with failures no higher than U57's
+3.7%, and more passes than its 13.8%; unseen: more than 16.1% passed, at most 6.1% failed, failed + near-frozen at most
+21.5%). Run once.
