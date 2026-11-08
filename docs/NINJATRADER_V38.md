@@ -7425,3 +7425,11 @@ G336 left the noise area's length out. `research/g339_lookback.py`: U57 with the
 **G339 result (2026-11-08): rejected.** Development (405 weeks; U57 13.8% / 3.7%): 14 / 16 / 20 / 22 sessions 9.6% / 3.5%,
 11.1% / 4.4%, 13.1% / 4.0%, 11.1% / 5.4%. Unseen (933; U57 16.1% / 6.1% / 21.5%): 14.7%, 14.9%, 16.1% / 6.4% / 22.0%,
 14.5%. 18 sessions stays best. U57 stays. `verification/noise_v2/g339_lookback.txt`.
+
+## G340: the turn of the month on U57 (registered 2026-11-08, before its run)
+
+G151 tried the turn of the month on the growth bot only. `research/g340_turn_of_month.py`: U57 with, on the last session
+of each month and the first three of the next (from the data's own sessions), no shorts (`tom_no_shorts`), or the
+sprint's size at 1.5x or 0.5x (`news2_dates` / `news2_mult`) (3 variants). G253's measure and G332's rule (development:
+more passes than U57's 13.8%, failures no higher than 3.7%; unseen: more than 16.1% passed, at most 6.1% failed, failed +
+near-frozen at most 21.5%). Run once.
