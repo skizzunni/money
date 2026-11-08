@@ -455,6 +455,9 @@ class NoiseConfig:
     news2_mult: float = 1.0
     # research (G345): the entry's size x pdhl_mult when the signal close is past the prior session's 09:30-16:00 high
     # (long) or low (short), x pdhl_in_mult when it is not (1.0: off)
+    # research (G360): no new entries once today's 09:30 high-low range so far is above exhaust_k x the average of the
+    # last 10 sessions' ranges (0: off)
+    exhaust_k: float = 0.0
     pdhl_mult: float = 1.0
     pdhl_in_mult: float = 1.0
     gap_go_skip_month_first: bool = False
@@ -1381,6 +1384,9 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                 short_ok = (not (fed_today and end < FED_CUTOFF) and cfg.short_mult > 0
                             and not (tom_today and cfg.tom_no_shorts))
                 fresh_ok = losers_ok()  # the daily limit: new entries
+                if (cfg.exhaust_k > 0 and len(day_ranges) >= 10 and not math.isnan(day_hi)
+                        and (day_hi - day_lo) / day_open > cfg.exhaust_k * sum(day_ranges[-10:]) / 10):
+                    fresh_ok = False  # G360: the day's move is already stretched
                 up_e, lo_e = upper, lower  # the entry lines (entry_k: a wider area for entries only)
                 if cfg.entry_k != 1.0 or cfg.entry_k_short > 0:
                     up_e = max(day_open, prev_close) * (1 + cfg.entry_k * sigma)

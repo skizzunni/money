@@ -7702,3 +7702,11 @@ its 13.8%; unseen: more than 16.1% passed, at most 6.1% failed, failed + near-fr
 x the noise 10.9% / 4.9%, 12.1% / 3.5%, 11.6% / 3.7%. Unseen (933; U57 16.1% / 6.1% / 21.5%): 12.0% / 6.8%, 14.3% / 6.6%,
 12.3% / 8.3%. (The registration's "about $187.50 at 0.9" was an estimate, not measured.) The fixed max loss stays. U57
 stays. `verification/noise_v2/g359_ml_sigma.txt`.
+
+## G360: no entries once the day is stretched (registered 2026-11-08, before its run)
+
+New logic: a breakout late in a day that has already moved far is often near its end. `research/g360_exhaustion.py`:
+U57 with no new entries at a check once today's high-low range since 09:30 is above 1.25x, 1.5x or 2x the average of the
+last 10 sessions' ranges (3 variants; `exhaust_k`, new in mnqbot/noise.py; open trades run as usual). G253's measure and
+G332's rule (development: the best by passes with failures no higher than U57's 3.7%, and more passes than its 13.8%;
+unseen: more than 16.1% passed, at most 6.1% failed, failed + near-frozen at most 21.5%). Run once.
