@@ -7320,7 +7320,7 @@ failures. `verification/noise_v2/g329_u56_rules.txt`, `g329_stage1.csv`, `g329_s
 **U57 (2026-11-08): U56 with the day lock.** Once today's P/L, with the open trade at its best price since entry (bar
 highs / lows through the last bar), reaches $800, the trade's stop goes no lower than where today's P/L is $300 (on the
 tick grid with the line; `DayLockAt` / `DayLockKeep` in the C#, `day_lock_at` / `day_lock_keep` in the model).
-NinjaTrader's code matches the model trade for trade on the test sample, which reaches the day lock.
+NinjaTrader's code matches the model trade for trade on the test sample, which reaches the day lock. Full suite: **679 passed**.
 
 **G331 result (2026-11-08): rejected.** Development (405 weeks; U56 14.1% / 3.7% / 16.8%): a day off after 2 / 3 / 4
 losing days 11.1% / 3.0%, 13.6% / 3.2%, 13.6% / 3.7%: fewer failures but fewer passes, none qualifies. Unseen (933; U56
