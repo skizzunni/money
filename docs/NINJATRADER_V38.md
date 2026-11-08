@@ -7244,3 +7244,8 @@ passed, at most 6.6% failed, failed + near-frozen at most 21.7%). Run once.
 **G325 result (2026-11-08): rejected.** Development (405 weeks; U56 14.1% / 3.7% / 16.8%): Fed days 0.5x 13.8% / 3.2%,
 1.5x 14.1% / 3.7% / 18.3% (no more passes). Unseen (933; U56 16.0% / 6.6% / 21.7%): 15.2% / 6.5%, 16.1% / 7.0% / 22.4%.
 The eight Fed days a year move a two-week Test little either way. U56 stays. `verification/noise_v2/g325_fed_size.txt`.
+
+## G326: U56 over 2, 3, 4, 6 and 8 weeks (registered 2026-11-08, before its run)
+
+A measurement, as G295 for U55 (no adoption rule): U56's Test sprint, the share of Tests passed, failed and near-frozen
+within 10, 15, 20, 30 and 40 sessions, NQ 2015-25 and the index 2011-26 Monday starts (`research/g326_horizon.py`).
