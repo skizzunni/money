@@ -7964,3 +7964,10 @@ a session than U48). Run once.
 **G376 result (2026-11-08): rejected.** Development (U48 $39.2 a session, 3.2% lost): $35.2-38.7, 0-3.2% lost; none makes
 more than U48. Unseen (U48 $75.7, 3.1%): $60.5-75.0. The 2.0 take-profit already lets the trend days run far enough.
 U48 stays. `verification/noise_v2/g376_drive_runners.txt`.
+
+## G377: more tries on the trend days, fewer on the others (registered 2026-11-08, before its run)
+
+`research/g377_drive_losers.py`: the funded mode (U48: 3 losers a day) with the day's loser limit at 5 on days with an
+opening drive past 0.25 or 0.5 and 3 on the others, or 3 / 2, or 4 / 2 (6 variants; `drive_losers`, new in
+mnqbot/noise.py). G372's measure and rule (development: the most $ a session among variants losing at most 5% of the
+starts; unseen: at most 5% lost and more $ a session than U48). Run once.

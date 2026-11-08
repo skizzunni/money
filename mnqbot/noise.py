@@ -376,6 +376,7 @@ class NoiseConfig:
     drive_against_mult: float = 1.0
     drive_none_mult: float = 1.0  # G374: with drive_size_k on, entries on a day without such a drive (and before 10:00)
     drive_tp: float = -1.0  # research (G376): entries with the opening drive (drive_size_k) take this take-profit (0: none; <0: off)
+    drive_losers: int = 0  # research (G377): the day's loser limit on a day with an opening drive (drive_size_k; 0: off)
     # research (G69): small gaps. A gap at least gap_go_small_k x the average (but under gap_go_k), the 09:30 bar
     # closing its way, takes the same trade at 1 contract (-1 = off). Drive and small-gap trades are always 1 contract
     gap_go_small_k: float = -1.0
@@ -716,6 +717,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
     def losers_ok() -> bool:
         """The day's loser limit (G225: max_losers_locked once the floor has stopped)."""
         ml = cfg.max_losers_locked if cfg.max_losers_locked >= 0 and floor_stopped() else cfg.max_losers
+        if cfg.drive_losers > 0 and drive_sz:  # G377
+            ml = cfg.drive_losers
         return ml <= 0 or losers_today < ml
 
     def floor_stopped() -> bool:
