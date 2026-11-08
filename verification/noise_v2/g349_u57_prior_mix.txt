@@ -1,0 +1,26 @@
+stage 1 best (index 2011-18):
+     weeks  passed  failed  failed_or_stuck                                                                                                                                                   settings
+k                                                                                                                                                                                                     
+48     405   0.156   0.025            0.160                             {"sprint": 5, "rules": {"past": 2, "inside": 1, "gap trigger": 1, "guard": 2, "gap qty": 1, "jobs": 1, "big day": 1, "eq": 1}}
+17     405   0.141   0.032            0.160                                        {"sprint": 5, "rules": {"past": 2, "gap trigger": 1, "guard": 1, "jobs": 1, "big day": 1, "time lock": 1, "eq": 1}}
+72     405   0.141   0.027            0.163                                                             {"sprint": 5, "rules": {"past": 2, "guard": 1, "lock": 1, "jobs": 1, "time lock": 1, "eq": 1}}
+19     405   0.138   0.010            0.141                  {"sprint": 4, "rules": {"past": 2, "inside": 3, "gap trigger": 1, "guard": 2, "lock": 2, "gap qty": 1, "jobs": 1, "big day": 1, "eq": 1}}
+0      405   0.138   0.037            0.168                                                                                                                                 {"sprint": 4, "rules": {}}
+53     405   0.131   0.012            0.104  {"sprint": 4, "rules": {"past": 2, "inside": 2, "gap trigger": 1, "guard": 1, "lock": 2, "gap qty": 1, "jobs": 1, "big day": 1, "time lock": 1, "eq": 1}}
+35     405   0.131   0.007            0.146                           {"sprint": 4, "rules": {"past": 2, "gap trigger": 1, "lock": 1, "gap qty": 1, "jobs": 2, "big day": 1, "time lock": 1, "eq": 1}}
+145    405   0.131   0.022            0.131                           {"sprint": 4, "rules": {"past": 2, "inside": 2, "gap trigger": 1, "guard": 1, "jobs": 2, "big day": 1, "time lock": 1, "eq": 1}}
+144    405   0.131   0.037            0.136                                                {"sprint": 5, "rules": {"past": 1, "inside": 3, "lock": 1, "gap qty": 1, "jobs": 1, "big day": 1, "eq": 1}}
+79     405   0.128   0.037            0.168                                                                                                 {"sprint": 4, "rules": {"guard": 1, "lock": 2, "jobs": 1}}
+stage 2 (NQ 2015-25 + index 2019-26):
+     weeks  passed  failed  failed_or_stuck                                                                                                                                                   settings
+k                                                                                                                                                                                                     
+0      933   0.161   0.061            0.215                                                                                                                                 {"sprint": 4, "rules": {}}
+17     933   0.156   0.066            0.229                                        {"sprint": 5, "rules": {"past": 2, "gap trigger": 1, "guard": 1, "jobs": 1, "big day": 1, "time lock": 1, "eq": 1}}
+19     933   0.155   0.039            0.175                  {"sprint": 4, "rules": {"past": 2, "inside": 3, "gap trigger": 1, "guard": 2, "lock": 2, "gap qty": 1, "jobs": 1, "big day": 1, "eq": 1}}
+48     933   0.151   0.060            0.220                             {"sprint": 5, "rules": {"past": 2, "inside": 1, "gap trigger": 1, "guard": 2, "gap qty": 1, "jobs": 1, "big day": 1, "eq": 1}}
+144    933   0.150   0.030            0.163                                                {"sprint": 5, "rules": {"past": 1, "inside": 3, "lock": 1, "gap qty": 1, "jobs": 1, "big day": 1, "eq": 1}}
+79     933   0.144   0.068            0.212                                                                                                 {"sprint": 4, "rules": {"guard": 1, "lock": 2, "jobs": 1}}
+72     933   0.141   0.065            0.236                                                             {"sprint": 5, "rules": {"past": 2, "guard": 1, "lock": 1, "jobs": 1, "time lock": 1, "eq": 1}}
+35     933   0.137   0.042            0.153                           {"sprint": 4, "rules": {"past": 2, "gap trigger": 1, "lock": 1, "gap qty": 1, "jobs": 2, "big day": 1, "time lock": 1, "eq": 1}}
+145    933   0.136   0.061            0.176                           {"sprint": 4, "rules": {"past": 2, "inside": 2, "gap trigger": 1, "guard": 1, "jobs": 2, "big day": 1, "time lock": 1, "eq": 1}}
+53     933   0.135   0.035            0.154  {"sprint": 4, "rules": {"past": 2, "inside": 2, "gap trigger": 1, "guard": 1, "lock": 2, "gap qty": 1, "jobs": 1, "big day": 1, "time lock": 1, "eq": 1}}

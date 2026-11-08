@@ -7554,3 +7554,13 @@ and the equity filter (40 trades), with the sprint at 3, 4 or 5 MNQ. Stage 1 on 
 passes with failures at most U57's 3.7% and failed or near-frozen at most its 16.8% go to stage 2. **Replaces U57's
 settings** if on stage 2 it passes more than 16.1%, fails at most 6.1%, and failed + near-frozen is at most 21.5%. Run
 once (resumable).
+
+**G349 result (2026-11-08): rejected.** Stage 1 (150 sets, 405 development weeks; U57 13.8% / 3.7% / 16.8%): the best,
+k48 (5 MNQ, 1.25x past and 0.75x inside the prior day's range, the gap trigger 0.65x at 1 MNQ, the guard $1,400, jobs
+days 1.25x, the big-day rule 2x, the equity filter at 40), 15.6% / 2.5% / 16.0%; k17 and k72 14.1%. Stage 2 (933 unseen
+weeks; U57 16.1% / 6.1% / 21.5%): U57 tops the list; k48 15.1% / 6.0%, k17 15.6% / 6.6%. Of note for a safer mode: **k19**
+(4 MNQ, 1.25x past and 1.5x inside, the gap trigger 0.65x at 1 MNQ, the guard $1,400, the day lock at $600 keeping $200,
+jobs 1.25x, big day 2x, the equity filter at 40) passes 15.5% and fails **3.9%** (failed or near-frozen 17.5%) on the
+unseen weeks, and k144 (5 MNQ, 0.75x past, 1.5x inside, the lock at $1,000, the gap trade at 1 MNQ, jobs 1.25x, big day
+2x, the equity filter) 15.0% / **3.0%** / 16.3%: both nearer U57's passes than G341's k68 (14.4% / 2.9%). U57 stays.
+`verification/noise_v2/g349_u57_prior_mix.txt`, `g349_stage1.csv`, `g349_stage2.csv`.
