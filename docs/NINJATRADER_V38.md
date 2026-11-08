@@ -7601,3 +7601,8 @@ From G351's development weeks (pressing once up gained there) and G335 (failures
 `sprint_near_from` / `sprint_near_qty`). G253's measure and G332's rule (development: the best by passes with failures no
 higher than U57's 3.7%, and more passes than its 13.8%; unseen: more than 16.1% passed, at most 6.1% failed, failed +
 near-frozen at most 21.5%). Run once.
+
+**G352 result (2026-11-08): rejected.** Development (405 weeks; U57 13.8% / 3.7% / 16.8%): 5 MNQ once up $2,000 15.1% /
+3.7% (the best within the bound), 6 once up $2,000 14.6% / 3.7%, 6 once up $1,500 15.6% / 4.0%. Unseen (933; U57 16.1% /
+6.1% / 21.5%): 15.6% / 6.0%, 15.8% / 6.1%, 16.7% / 6.4% / 22.1%. Past +$2,000 bigger trades reach the $1,500 day cap
+sooner, and a big day there sets the consistency rule's bar higher. U57 stays. `verification/noise_v2/g352_press_higher.txt`.
