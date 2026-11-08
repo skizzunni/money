@@ -7737,3 +7737,8 @@ previous check (as G361) is at least 0.5, 1.0 or 1.5 x the check's noise x the c
 mnqbot/noise.py). G253's measure and G332's rule (development: the best by passes with failures no higher than U57's
 3.7%, and more passes than its 13.8%; unseen: more than 16.1% passed, at most 6.1% failed, failed + near-frozen at most
 21.5%). Run once.
+
+**G362 result (2026-11-08): rejected.** Development (405 weeks; U57 13.8% / 3.7% / 16.8%): a fast half hour at least 0.5 /
+1.0 / 1.5 x the noise 6.9% / 2.7%, 1.7% / 1.0%, 1.0% / 0.5%. Unseen (933; U57 16.1% / 6.1% / 21.5%): 10.2% / 4.6%, 5.3%
+/ 2.3%, 1.6% / 1.2%. With G361 this corrects G361's reading: the half hour's range sorts neither way; any filter on it
+mostly removes trades, good and bad alike. U57 stays. `verification/noise_v2/g362_fast_half_hour.txt`.
