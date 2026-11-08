@@ -7641,3 +7641,10 @@ orders resting at the noise lines from 10:00, once a side per half hour (`touch_
 the fill, only the max-loss stop (`grace`) (4 variants). G253's measure and G332's rule (development: the best by passes
 with failures no higher than U57's 3.7%, and more passes than its 13.8%; unseen: more than 16.1% passed, at most 6.1%
 failed, failed + near-frozen at most 21.5%). Run once.
+
+**G355 result (2026-11-08): rejected.** Development (405 weeks; U57 13.8% / 3.7% / 16.8%): 2 MNQ more at the lock 3.7% /
+3.7%; the limit entry 3.0% / 3.2%; stop entries at the lines 4.4% / 3.2%; the max-loss-only grace 13.6% / 3.7%. Unseen
+(933; U57 16.1% / 6.1% / 21.5%): 6.9% / 5.5%, 5.7% / 2.7%, 5.1% / 5.7%, 16.1% / 6.1% / 21.4% (the grace changes almost
+nothing). The collapse of the first three (the limit and stop entries also leave most Tests far from both ends) was not
+traced trade by trade: these knobs predate the day cap, guard and lock and may not work as meant with them; either way
+they are not a way forward from U57. U57 stays. `verification/noise_v2/g355_mechanics.txt`.
