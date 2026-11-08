@@ -7578,3 +7578,12 @@ best is k35 at 5 MNQ, 15.6% / 2.7% / 16.5% (k53 at 5 15.1% / 2.7%; k19 at 5 15.8
 MNQ fails 6.2-7.9%). Unseen (933; U57 16.1% / 6.1% / 21.5%): k35 at 5 MNQ 15.2% / 7.7% / 23.4%; k53 at 5 16.3% / 7.0%;
 k19 at 5 17.3% / 9.1%; at 6 MNQ 17.9-19.0% passed, 9.9-13.0% failed. The development weeks' low failures do not carry
 over once the size goes up. U57 stays. `verification/noise_v2/g350_low_fail_bigger.txt`.
+
+## G351: bigger once the Test is up (registered 2026-11-08, before its run)
+
+The prop-trading advice read on 2026-11-08: trade small until there is a cushion, then press with the market's money.
+G335 tried smaller near the finish; G282 / G287 bigger in the last sessions or past +$3,000. `research/g351_house_money.py`:
+U57 with 5 MNQ once the Test is up $1,000 or $1,500; or 3 MNQ to start, 4 once up $500; or 3 to start, 5 once up $1,000
+(4 variants; `sprint_near_from` / `sprint_near_qty`; the floor's room still cuts the size). G253's measure and G332's
+rule (development: the best by passes with failures no higher than U57's 3.7%, and more passes than its 13.8%; unseen:
+more than 16.1% passed, at most 6.1% failed, failed + near-frozen at most 21.5%). Run once.
