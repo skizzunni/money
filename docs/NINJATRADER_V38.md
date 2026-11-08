@@ -7860,3 +7860,8 @@ with many more blown Tests. U57 stays. `verification/noise_v2/g369_add_pullback.
 does not see the fade's P/L). Measures as G369. **A candidate** must, on both sets, meet G332's rule (development: more
 passes than 13.8%, failures at most 3.7%; unseen: more than 16.1% passed, at most 6.1% failed, failed + near-frozen at
 most 21.5%) with more trades a session than U57. Run once.
+
+**G370 result (2026-11-08): no candidate.** With the fade on when U57 is flat: winners 56.5% / 58.3% (development / unseen;
+U57 48.5% / 50.4%), 2.73 / 2.46 trades a session (U57 2.15 / 1.92), a trade on 77% / 72% of sessions (68% / 62%), net a
+session $60-65 / $73-81 (U57 $54 / $65). Passes 14.1-14.3% / 15.2-15.5% (U57 13.8% / 16.1%) but failures 6.4-10.9% /
+11.3-14.9% (U57 3.7% / 6.1%), with the same shortcut as G369. U57 stays. `verification/noise_v2/g370_u57_plus_fade.txt`.

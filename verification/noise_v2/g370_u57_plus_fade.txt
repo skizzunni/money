@@ -1,0 +1,12 @@
+development (index 2011-18):
+                     weeks  passed  failed  failed_or_stuck  win_rate  trades_per_session  sessions_traded  avg_trade  net_per_session
+tag                                                                                                                                   
+U57                    405   0.138   0.037            0.168     0.485               2.148             0.68     25.225           54.181
+U57 + fade at 1 MNQ    405   0.141   0.064            0.168     0.565               2.732             0.77     21.895           59.808
+U57 + fade at 2 MNQ    405   0.143   0.109            0.168     0.565               2.731             0.77     23.933           65.363
+unseen (NQ 2015-25 + index 2019-26):
+                     weeks  passed  failed  failed_or_stuck  win_rate  trades_per_session  sessions_traded  avg_trade  net_per_session
+tag                                                                                                                                   
+U57                    933   0.161   0.061            0.215     0.504               1.921            0.624     33.816           64.950
+U57 + fade at 1 MNQ    933   0.155   0.113            0.209     0.583               2.463            0.720     29.586           72.874
+U57 + fade at 2 MNQ    933   0.152   0.149            0.199     0.583               2.463            0.720     32.794           80.768
