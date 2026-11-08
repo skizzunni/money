@@ -7460,3 +7460,7 @@ the list; the others 11.6-14.4% passed. Of note for a safer mode: k68 (5 MNQ wit
 
 A measurement, as G326 for U56: U57's Test sprint, passed, failed and near-frozen within 10, 15, 20, 30 and 40 sessions,
 all Monday starts (`research/g342_horizon.py`).
+
+**G342 result (2026-11-08):** U57's Test sprint, 1,322 Monday starts (`verification/noise_v2/g342_horizon.{txt,csv}`):
+2 weeks 15.6% passed / 5.4% failed / 14.8% near-frozen; 3 weeks 19.2% / 6.0%; 4 weeks 21.1% / 6.2%; 6 weeks 25.6% /
+7.1%; 8 weeks 28.9% / 8.3%. Against U56 (G326) the same passes with slightly fewer failures at every horizon.
