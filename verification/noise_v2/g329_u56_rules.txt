@@ -1,0 +1,13 @@
+stage 1 best (index 2011-18):
+     weeks  passed  failed  failed_or_stuck                                                                                                  settings
+k                                                                                                                                                    
+0      405   0.141   0.037            0.168                                                                                {"sprint": 4, "rules": {}}
+34     405   0.138   0.037            0.168                                                                   {"sprint": 4, "rules": {"day lock": 1}}
+100    405   0.136   0.030            0.151                                               {"sprint": 5, "rules": {"drive": 2, "eq": 2, "gap qty": 2}}
+13     405   0.123   0.030            0.168                            {"sprint": 4, "rules": {"drive": 1, "after loss": 1, "fed": 1, "day lock": 1}}
+140    405   0.121   0.027            0.148  {"sprint": 5, "rules": {"eq": 2, "late stop": 1, "fed": 1, "gap qty": 2, "day lock": 1, "time lock": 1}}
+96     405   0.119   0.012            0.121                            {"sprint": 5, "rules": {"eq": 2, "gap block": 1, "gap qty": 1, "day lock": 1}}
+126    405   0.119   0.025            0.146           {"sprint": 5, "rules": {"eq": 2, "after loss": 1, "gap block": 1, "gap qty": 2, "day lock": 1}}
+110    405   0.111   0.012            0.111      {"sprint": 4, "rules": {"drive": 2, "eq": 2, "fed": 2, "gap qty": 2, "day lock": 1, "time lock": 1}}
+78     405   0.111   0.007            0.099            {"sprint": 5, "rules": {"drive": 2, "eq": 1, "after loss": 1, "late stop": 1, "gap block": 1}}
+33     405   0.109   0.015            0.121                {"sprint": 4, "rules": {"drive": 2, "eq": 2, "gap block": 1, "gap qty": 2, "day lock": 1}}
