@@ -7852,3 +7852,11 @@ pullback to 12:00, +40-47% with it to 15:30 (2.99-3.05 / 2.74-2.83, a trade on 8
 U57 sizes to its own room and does not see the pullback's losses, so it oversizes after them; a shared build would
 size both from one room, with fewer passes from the smaller size. Either way, more trades here buy a little more money
 with many more blown Tests. U57 stays. `verification/noise_v2/g369_add_pullback.txt`.
+
+## G370: U57 plus the fade when U57 is flat (registered 2026-11-08, before its run)
+
+`research/g370_u57_plus_fade.py`: U57 with G368's best-win-rate fade (target 0.15 noise, stop past the day's extreme) at
+1 or 2 MNQ, keeping only the fade trades during which U57 has no position (2 variants; the same shortcut as G369: U57
+does not see the fade's P/L). Measures as G369. **A candidate** must, on both sets, meet G332's rule (development: more
+passes than 13.8%, failures at most 3.7%; unseen: more than 16.1% passed, at most 6.1% failed, failed + near-frozen at
+most 21.5%) with more trades a session than U57. Run once.
