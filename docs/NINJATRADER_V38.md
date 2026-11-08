@@ -7484,3 +7484,8 @@ The noise-area paper trails its stop at the day's VWAP; the sprint never tried i
 the stop also never looser than the day's VWAP as of the last 30-minute check, or as of every bar (2 variants;
 `vwap_stop` "checks" / "bars"). G253's measure and G332's rule (development: more passes than U57's 13.8%, failures no
 higher than 3.7%; unseen: more than 16.1% passed, at most 6.1% failed, failed + near-frozen at most 21.5%). Run once.
+
+**G344 result (2026-11-08): rejected.** Development (405 weeks; U57 13.8% / 3.7% / 16.8%): the VWAP stop at the checks
+11.9% / 4.7% / 16.8%, every bar 11.4% / 4.2% / 17.0%: fewer passes, more failures. Unseen (933; U57 16.1% / 6.1% /
+21.5%): 15.5% / 6.4% / 20.9% and 15.4% / 6.2% / 20.9%. The VWAP stop closes breakouts on their first pullback, before the
+lock. U57 stays. `verification/noise_v2/g344_vwap_stop.txt`.
