@@ -7873,3 +7873,10 @@ end-of-day trailing floor, $900 daily loss, 60-minute time stop, sizes growing w
 the first Monday of every quarter (index 2011-2025, NQ 2015-2024), 12 months each. Per month since the start: $ per
 session (mean and median), the share of sessions at $750 or more, and the share of starts whose floor has been
 touched (end of day) by then.
+
+**G371 result (2026-11-08):** 95 starts (index 2011-2025, NQ 2015-2024), 12 months each. $ per session by month since the
+start: 1 $30, 2 $35, 3 $34, 4 $45, 5 $65, 6 $33, 7 $61, 8 $71, 9 $85, 10 $102, 11 $94, 12 $122; over the year $64 (index)
+/ $67 (NQ). The median session is $0 (most sessions have no trade or a scratch); sessions at $750 or more: 1.5% in month 1,
+8-9% by months 10-12. No start touched the floor at an end of day. A single funded account does not reach $750 a
+session on average in its first year; the long histories' ~$225 a session (U48's nets) come from the later years, at
+the larger sizes. `verification/noise_v2/g371_funded_by_month.txt`.
