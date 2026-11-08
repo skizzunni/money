@@ -7770,3 +7770,11 @@ trade and passes 2.0% / 5.6% of Tests with 5.7% / 7.2% failed (U57: 48.5-50.4% w
 passed). No variant reaches 80% winners; every step toward it shrinks the winners until the costs eat them. Also measured:
 **U57 trades on only 62-68% of sessions** (its filters sit out the rest; G364's variants the same). U57 stays.
 `verification/noise_v2/g364_win_rate_grid.txt`.
+
+## G365: an earlier break-even lock, for more winners (registered 2026-11-08, before its run)
+
+A trade that reaches a small profit and then comes back can end as a small winner instead of a loser.
+`research/g365_early_lock.py`: U57 (lock at 0.2 max losses, +2.5 points) with the lock at 0.05 or 0.1 max losses and the
+stop then at the entry +1.0 or +2.5 points, with the take-profit at 0.3 or 0.75 (U57) (8 variants). G364's measures and
+candidate rule (both sets: at least 80% winners, a trade on at least 90% of the sessions, more than $0 a trade, failures
+no higher than U57's 3.7% / 6.1%; the most unseen passes). Run once.
