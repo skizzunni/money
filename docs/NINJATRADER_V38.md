@@ -7810,3 +7810,11 @@ new entry once the day's closed P/L is up $1,500 or down $1,200; 4 MNQ, $0.62 a 
 market and stop fills, the stop first when a bar reaches both. G364's measures and candidate rule (both sets: at least
 80% winners, a trade on at least 90% of the sessions, more than $0 a trade, failures no higher than U57's 3.7% / 6.1%;
 the most unseen passes). Run once.
+
+**G367 result (2026-11-08): no candidate.** The fade with a 0.15 target and a 1.0 stop **wins 83% of its trades** on both
+sets (83.1% / 83.2%), but **loses money**: −$5.27 / −$4.73 a trade, 0.0% / 1.0% of Tests passed and 11.1% / 20.2% failed.
+The 0.15 / 0.6 version wins 78-79% at −$3.55 / +$0.99 a trade; 0.3 / 0.6 wins 66-67% at +$29 / +$12 a trade (passes
+1.5% / 2.1%, failed 11.6% / 21.0%). It trades on 45-49% of sessions, 0.55-0.64 trades a session. 80% winners are
+reachable by fading, but each loser (a failed fade, the breakout going on) takes several winners with it; per trade it
+is about break-even before the Test, and the Test's floor ends it more often than U57 (6.1% unseen).
+`verification/noise_v2/g367_fade.txt`.

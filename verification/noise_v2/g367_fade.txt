@@ -1,0 +1,14 @@
+development (index 2011-18):
+                                    weeks  passed  failed  stuck  win_rate  trades_per_session  sessions_traded  avg_trade
+tag                                                                                                                       
+fade, target 0.15 / stop 1.0 noise    405   0.000   0.111  0.040     0.831               0.624            0.489     -5.273
+fade, target 0.15 / stop 0.6 noise    405   0.000   0.084  0.025     0.777               0.641            0.489     -3.547
+fade, target 0.3 / stop 1.0 noise     405   0.025   0.163  0.027     0.742               0.601            0.489     24.630
+fade, target 0.3 / stop 0.6 noise     405   0.015   0.116  0.025     0.674               0.627            0.489     29.063
+unseen (NQ 2015-25 + index 2019-26):
+                                    weeks  passed  failed  stuck  win_rate  trades_per_session  sessions_traded  avg_trade
+tag                                                                                                                       
+fade, target 0.15 / stop 1.0 noise    933   0.010   0.202  0.024     0.832               0.570            0.453     -4.734
+fade, target 0.15 / stop 0.6 noise    933   0.005   0.134  0.013     0.786               0.581            0.454      0.986
+fade, target 0.3 / stop 1.0 noise     933   0.028   0.285  0.025     0.724               0.545            0.452     -4.500
+fade, target 0.3 / stop 0.6 noise     933   0.021   0.210  0.018     0.662               0.567            0.453     12.008
