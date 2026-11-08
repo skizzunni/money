@@ -7376,3 +7376,12 @@ U57 with the sprint at 2 or 3 MNQ once the Test is up $2,000, or at 2 MNQ from $
 +$2,000 11.6%, 2 MNQ from +$2,500 12.8% (failures unchanged at 3.7%). Unseen (933; U57 16.1% / 6.1%): 12.0%, 14.6%,
 15.5% (failures 5.9-6.1%). Above +$2,000 the floor has nearly stopped and failures are rare, so smaller trades there only
 slow the pass. U57 stays. `verification/noise_v2/g335_near_finish.txt`.
+
+## G336: small changes to U57, 150 random combinations (registered 2026-11-08, before its run)
+
+`research/g336_u57_mix.py`: 150 random sets of a few changes (seed 336; variant 0 is U57) to U57's take profit (0.6 /
+0.9), lock (0.15 / 0.25; +1.5 / +3.5 points), time stop (20 / 45), stop buffer (0.18 / 0.3), entry width (0.65 / 0.75),
+range position (0.65 / 0.75), calm (0.6 / 0.8), day guard ($1,000 / $1,400) and streak pause (3 / 2, 5 / 2). Stage 1 on
+the development weeks; the 10 best by passes with failures at most U57's 3.7% and failed or near-frozen at most its
+16.8% go to stage 2. **Replaces U57's settings** if on stage 2 it passes more than 16.1%, fails at most 6.1%, and failed
++ near-frozen is at most 21.5%. Run once (resumable).
