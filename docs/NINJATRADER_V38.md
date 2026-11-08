@@ -7670,3 +7670,8 @@ kept open past the take-profit, their stop at the entry plus half the target's d
 0.5) (3 variants). G253's measure and G332's rule (development: the best by passes with failures no higher than U57's
 3.7%, and more passes than its 13.8%; unseen: more than 16.1% passed, at most 6.1% failed, failed + near-frozen at most
 21.5%). Run once.
+
+**G357 result (2026-11-08): rejected.** Development (405 weeks; U57 13.8% / 3.7% / 16.8%): skipping a side after 2 / 3
+losers there 12.3% / 4.7%, 13.3% / 3.5%; the runner 8.4% / 4.0%. Unseen (933; U57 16.1% / 6.1% / 21.5%): 12.5% / 5.5%,
+14.9% / 5.3%, 10.3% / 7.1%. A side's losing run does not predict its next trade well enough, and the runner gives back
+the target's money (as G4 / G139 / G260 found). U57 stays. `verification/noise_v2/g357_side_run_runner.txt`.
