@@ -164,6 +164,9 @@ class NoiseConfig:
     # research (G289): the day profit stop also closes the open trade, at the price where the day's P/L reaches it
     day_cap_exit: bool = False
     day_cap_at: float = 0.0  # research (G296): the cap's amount when it differs from day_stop_profit (0 = the same)
+    # research (G331): the chop pause. After red_days_pause sessions in a row closed with a loss (the bot's and the gap
+    # trade's P/L), no trading the next session (0 = off)
+    red_days_pause: int = 0
     # research (G310): from day_stop_late_from (minute of day), no new entries once today's P/L is day_stop_late (0 = off)
     day_stop_late_from: int = 0
     day_stop_late: float = 0.0
@@ -526,6 +529,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
     day_open = prev_close = last_rth_close = math.nan
     upper = lower = sigma = math.nan  # the current noise lines and noise, set at each check
     skip_today = fed_today = False
+    red_hist: list[float] = []  # G331: the sessions' P/L, oldest first
+    red_seen = False  # G331: a session has started
     pos = 0
     entry_px, entry_bar = 0.0, 0
     est_px = math.nan  # expected fill of the pending entry
@@ -1284,6 +1289,9 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             drive_dir = 0  # G318
             block_dir = 0
             target_today = guard_today = False
+            if red_seen:
+                red_hist.append(day_pnl)  # G331: the session that just ended
+            red_seen = True
             day_pnl = gap_day_pnl = 0.0
             if t.isocalendar()[:2] != week_key:
                 week_key, week_start_eq = t.isocalendar()[:2], eq_curve[-1]
@@ -1324,6 +1332,9 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             upper = lower = sigma = math.nan
             today = [math.nan] * N_CHECKS
             skip_today = t.strftime("%Y-%m-%d") in cfg.skip_dates  # substring test, like Pine's str.contains
+            n_red = cfg.red_days_pause
+            if n_red > 0 and len(red_hist) >= n_red and all(x < 0 for x in red_hist[-n_red:]):
+                skip_today = True  # G331: the chop pause
             fed_today = cfg.fed_no_shorts and t.strftime("%Y-%m-%d") in cfg.fed_dates
             tom_today = t.strftime("%Y-%m-%d") in tom_days
         if in_rth:

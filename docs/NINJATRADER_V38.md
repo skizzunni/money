@@ -7294,3 +7294,19 @@ at $500), the gap block (1.5%), Fed days (1.5x / 0.5x), the gap trade's size (1 
 time lock (30 minutes), with the sprint at 4 or 5 MNQ. Stage 1 on the development weeks; the 10 best by passes with
 failures at most U56's 3.7% and failed or near-frozen at most its 16.8% go to stage 2. **Replaces U56's settings** if on
 stage 2 it passes more than 16.0%, fails at most 6.6%, and failed + near-frozen is at most 21.7%. Run once (resumable).
+
+## G330: why U56's Tests fail (a measurement on the development weeks only, 2026-11-08)
+
+`research/g330_autopsy.py`: the 15 failed two-week Tests of U56 among the 405 development weeks (index 2011-18), their
+trades up to the failure. Not one blowout: the worst day averages −$896 (at most −$1,200, the guard; below −$1,000 in 4
+of 15), and the failed Tests have 5-11 losing days (median 7) before the floor, on day 2-9 (median 7). The losses are
+the breakouts that fall back ("Back inside": 60 trades, −$12,267; "Max loss" 13, −$9,273; "Stop passed" 41, −$5,169;
+time stops 18, −$5,075), spread over every hour and both sides (longs −$10,125, shorts −$9,542); the gap trade nets
+−$843. Failure is a choppy stretch, not one bad day. `verification/noise_v2/g330_autopsy.txt`.
+
+## G331: the chop pause (registered 2026-11-08, before its run)
+
+From G330: `research/g331_chop_pause.py`: U56 with no trading for a session after 2, 3 or 4 sessions in a row that closed
+with a loss (3 variants; `red_days_pause`; the day off resets the run). G253's measure and G322's rule (development: more
+passes than 14.1%, failures no higher than 3.7%; unseen: more than 16.0% passed, at most 6.6% failed, failed +
+near-frozen at most 21.7%). Run once.

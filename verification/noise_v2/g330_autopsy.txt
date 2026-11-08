@@ -1,0 +1,52 @@
+failed Tests: 15 of 405 development weeks
+
+by exit reason (the trades up to the failure):
+             count      sum    mean
+reason
+Back inside     60 -12267.0  -204.0
+Max loss        13  -9273.0  -713.0
+Stop passed     41  -5169.0  -126.0
+Time stop       18  -5075.0  -282.0
+Gap stop        25  -3605.0  -144.0
+Day guard       11  -1827.0  -166.0
+16:00 close      3    277.0    92.0
+Lock            82    931.0    11.0
+Day cap          1   1071.0  1071.0
+Gap exit         9   2762.0   307.0
+Target          22  12508.0   569.0
+
+bot vs gap trade:
+      count      sum
+kind
+bot     251 -18824.0
+gap      34   -843.0
+
+by entry hour:
+      count     sum   mean
+hour
+9        34  -843.0  -25.0
+10       50 -1268.0  -25.0
+11       53 -5467.0 -103.0
+12       53 -2708.0  -51.0
+13       42 -4917.0 -117.0
+14       34 -2041.0  -60.0
+15       19 -2422.0 -127.0
+
+by side:
+     count      sum  mean
+dir
+-1     137  -9542.0 -70.0
+ 1     148 -10125.0 -68.0
+
+the failed Tests:
+       fail day  worst day  losing days     net
+count      15.0       15.0         15.0    15.0
+mean        6.0     -896.0          7.0 -1311.0
+std         2.0      165.0          2.0   934.0
+min         2.0    -1200.0          5.0 -2000.0
+25%         4.0    -1027.0          6.0 -1906.0
+50%         7.0     -845.0          7.0 -1799.0
+75%         8.0     -790.0          8.0  -998.0
+max         9.0     -672.0         11.0  1231.0
+
+worst single day below -$1,000 in 4 of 15
