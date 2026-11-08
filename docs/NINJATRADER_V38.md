@@ -7715,3 +7715,12 @@ unseen: more than 16.1% passed, at most 6.1% failed, failed + near-frozen at mos
 2x the usual range 7.9% / 4.7%, 8.9% / 4.2%, 13.1% / 4.0%. Unseen (933; U57 16.1% / 6.1% / 21.5%): 11.9% / 4.3%, 13.5% /
 4.9%, 15.2% / 6.3%. The stretched days are the trend days that pay for the bot; late breakouts on them are not spent.
 U57 stays. `verification/noise_v2/g360_exhaustion.txt`.
+
+## G361: breakouts out of a quiet half hour (registered 2026-11-08, before its run)
+
+New logic (the "tight base before the breakout" of the setups traders teach): `research/g361_quiet_half_hour.py`: U57
+with new entries at a check only when the high-low range since the previous check (09:30 for the first; the check's own
+bar included) is at most 0.5, 0.75 or 1.0 x the check's noise (sigma) x the close (3 variants; `squeeze_k`, new in
+mnqbot/noise.py). G253's measure and G332's rule (development: the best by passes with failures no higher than U57's
+3.7%, and more passes than its 13.8%; unseen: more than 16.1% passed, at most 6.1% failed, failed + near-frozen at most
+21.5%). Run once.

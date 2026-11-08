@@ -458,6 +458,9 @@ class NoiseConfig:
     # research (G360): no new entries once today's 09:30 high-low range so far is above exhaust_k x the average of the
     # last 10 sessions' ranges (0: off)
     exhaust_k: float = 0.0
+    # research (G361): new entries only when the high-low range since the last check is at most squeeze_k x the noise
+    # (sigma) x the close: a breakout from a quiet half hour (0: off)
+    squeeze_k: float = 0.0
     pdhl_mult: float = 1.0
     pdhl_in_mult: float = 1.0
     gap_go_skip_month_first: bool = False
@@ -553,6 +556,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
     loss_side = 0  # the side of the last losing trade
     day_hi = day_lo = math.nan  # today's 09:30-16:00 high and low (big_day_k)
     pd_hi = pd_lo = math.nan  # G345: the prior session's
+    seg_hi = seg_lo = math.nan  # G361: the high and low since the last check
     day_ranges: list[float] = []  # completed sessions' range / open, oldest first
     day_dirs: list[int] = []  # and their direction (close against open)
     block_dir = 0  # big_day_k: no entries on this side today
@@ -1333,6 +1337,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                     block_dir = day_dirs[-1]
             pd_hi, pd_lo = day_hi, day_lo
             day_hi = day_lo = math.nan
+            seg_hi = seg_lo = math.nan
             pv_sum = v_sum = 0.0
             vwap_now = vwap_used = math.nan
             prev_close = last_rth_close
@@ -1358,6 +1363,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             last_rth_close = c[i]
             day_hi = h[i] if math.isnan(day_hi) else max(day_hi, h[i])
             day_lo = l[i] if math.isnan(day_lo) else min(day_lo, l[i])
+            seg_hi = h[i] if math.isnan(seg_hi) else max(seg_hi, h[i])
+            seg_lo = l[i] if math.isnan(seg_lo) else min(seg_lo, l[i])
             if cfg.vwap_stop:
                 w = vol[i] if vol[i] > 0 else 1.0
                 pv_sum += w * (h[i] + l[i] + c[i]) / 3
@@ -1387,6 +1394,9 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                 if (cfg.exhaust_k > 0 and len(day_ranges) >= 10 and not math.isnan(day_hi)
                         and (day_hi - day_lo) / day_open > cfg.exhaust_k * sum(day_ranges[-10:]) / 10):
                     fresh_ok = False  # G360: the day's move is already stretched
+                if cfg.squeeze_k > 0 and not math.isnan(seg_hi) and seg_hi - seg_lo > cfg.squeeze_k * sigma * c[i]:
+                    fresh_ok = False  # G361: not out of a quiet half hour
+                seg_hi = seg_lo = math.nan
                 up_e, lo_e = upper, lower  # the entry lines (entry_k: a wider area for entries only)
                 if cfg.entry_k != 1.0 or cfg.entry_k_short > 0:
                     up_e = max(day_open, prev_close) * (1 + cfg.entry_k * sigma)
