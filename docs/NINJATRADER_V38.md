@@ -7464,3 +7464,10 @@ all Monday starts (`research/g342_horizon.py`).
 **G342 result (2026-11-08):** U57's Test sprint, 1,322 Monday starts (`verification/noise_v2/g342_horizon.{txt,csv}`):
 2 weeks 15.6% passed / 5.4% failed / 14.8% near-frozen; 3 weeks 19.2% / 6.0%; 4 weeks 21.1% / 6.2%; 6 weeks 25.6% /
 7.1%; 8 weeks 28.9% / 8.3%. Against U56 (G326) the same passes with slightly fewer failures at every horizon.
+
+## G343: the gap trade on U57 (registered 2026-11-08, before its run)
+
+G274 / G276 set the gap trade before the day cap. `research/g343_gap_trade.py`: U57 with the 09:35 gap trade's trigger at
+0.4x or 0.65x instead of 0.5x (`gap_go_k`), or held to 10:15 instead of 09:55 (`gap_go_exit`) (3 variants). G253's
+measure and G332's rule (development: more passes than U57's 13.8%, failures no higher than 3.7%; unseen: more than
+16.1% passed, at most 6.1% failed, failed + near-frozen at most 21.5%). Run once.
