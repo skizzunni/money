@@ -7438,3 +7438,13 @@ near-frozen at most 21.5%). Run once.
 11.6% / 4.2%, 0.5x there 11.9% / 4.2%, 1.5x there 14.6% / 5.2% (more failures). Unseen (933; U57 16.1% / 6.1% / 21.5%):
 13.0% / 6.4%, 12.0% / 5.8%, 16.3% / 7.0% / 23.4%. The turn of the month moves passes and failures together. U57 stays.
 `verification/noise_v2/g340_turn_of_month.txt`.
+
+## G341: further rules on top of U57, 150 random combinations (registered 2026-11-08, before its run)
+
+G329's search again (seed 341), on U57 (variant 0): the opening-drive filter (0.35x / 0.5x), the equity filter (eq_n 20
+/ 40), the side cooldown, 3 MNQ after two losers, the late stop, the gap block, Fed days (1.5x / 0.5x), the gap trade's
+size (1 / 3), the time lock, jobs days (1.25x / 2x instead of 1.5x), the big-day rule (1.25x / 2x instead of 1.5x) and
+the losers a day (2 / 4), with the sprint at 4 or 5 MNQ (`research/g341_u57_rules.py`). Stage 1 on the development
+weeks; the 10 best by passes with failures at most U57's 3.7% and failed or near-frozen at most its 16.8% go to stage 2.
+**Replaces U57's settings** if on stage 2 it passes more than 16.1%, fails at most 6.1%, and failed + near-frozen is at
+most 21.5%. Run once (resumable).
