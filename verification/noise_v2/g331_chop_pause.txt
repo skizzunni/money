@@ -1,0 +1,14 @@
+development (index 2011-18):
+                                 weeks  passed  failed  stuck  failed_or_stuck
+tag                                                                           
+U56                                405   0.141   0.037  0.131            0.168
+U56, a day off after 2 red days    405   0.111   0.030  0.101            0.131
+U56, a day off after 3 red days    405   0.136   0.032  0.158            0.190
+U56, a day off after 4 red days    405   0.136   0.037  0.126            0.163
+unseen (NQ 2015-25 + index 2019-26):
+                                 weeks  passed  failed  stuck  failed_or_stuck
+tag                                                                           
+U56                                933   0.160   0.066  0.150            0.217
+U56, a day off after 2 red days    933   0.118   0.062  0.124            0.186
+U56, a day off after 3 red days    933   0.153   0.064  0.136            0.200
+U56, a day off after 4 red days    933   0.155   0.066  0.141            0.208
