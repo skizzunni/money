@@ -7477,3 +7477,10 @@ measure and G332's rule (development: more passes than U57's 13.8%, failures no 
 the unseen weeks (933; U57 16.1% / 6.1% / 21.5%) the 0.65x trigger passes 16.1% (150 weeks, the same as U57), fails 5.9%
 and fails or ends near-frozen 21.0%: not more passes, so it does not replace U57 (the rule asks for more). Out at 10:15
 15.1%; 0.4x 16.5% / 6.3%. U57 stays. `verification/noise_v2/g343_gap_trade.txt`.
+
+## G344: the paper's VWAP stop on U57 (registered 2026-11-08, before its run)
+
+The noise-area paper trails its stop at the day's VWAP; the sprint never tried it. `research/g344_vwap_stop.py`: U57 with
+the stop also never looser than the day's VWAP as of the last 30-minute check, or as of every bar (2 variants;
+`vwap_stop` "checks" / "bars"). G253's measure and G332's rule (development: more passes than U57's 13.8%, failures no
+higher than 3.7%; unseen: more than 16.1% passed, at most 6.1% failed, failed + near-frozen at most 21.5%). Run once.
