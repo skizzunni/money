@@ -7587,3 +7587,17 @@ U57 with 5 MNQ once the Test is up $1,000 or $1,500; or 3 MNQ to start, 4 once u
 (4 variants; `sprint_near_from` / `sprint_near_qty`; the floor's room still cuts the size). G253's measure and G332's
 rule (development: the best by passes with failures no higher than U57's 3.7%, and more passes than its 13.8%; unseen:
 more than 16.1% passed, at most 6.1% failed, failed + near-frozen at most 21.5%). Run once.
+
+**G351 result (2026-11-08): rejected.** Development (405 weeks; U57 13.8% / 3.7% / 16.8%): 5 MNQ once up $1,500 16.0% /
+3.7% / 17.0% (the best within the bound), once up $1,000 15.6% / 3.7%; 3 MNQ to start 10.6-12.1% / 1.7-2.2%. Unseen
+(933; U57 16.1% / 6.1% / 21.5%): 5 once up $1,500 15.9% / 6.1% / 21.8%, not more passes; once up $1,000 16.4% / 6.4%;
+3 to start 12.9% / 3.0% and 11.9% / 3.2%. Starting smaller cuts both; pressing once up gained on the development weeks
+only. U57 stays. `verification/noise_v2/g351_house_money.txt`.
+
+## G352: pressing higher up (registered 2026-11-08, before its run)
+
+From G351's development weeks (pressing once up gained there) and G335 (failures are rare past +$2,000):
+`research/g352_press_higher.py`: U57 with 5 or 6 MNQ once the Test is up $2,000, or 6 once up $1,500 (3 variants;
+`sprint_near_from` / `sprint_near_qty`). G253's measure and G332's rule (development: the best by passes with failures no
+higher than U57's 3.7%, and more passes than its 13.8%; unseen: more than 16.1% passed, at most 6.1% failed, failed +
+near-frozen at most 21.5%). Run once.
