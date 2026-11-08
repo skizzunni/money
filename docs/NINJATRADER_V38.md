@@ -7894,3 +7894,11 @@ P/L after a loss counts as $0). Per variant: $ per session over the 12 months, m
 average, and the share of starts lost. **Rule:** the variant with the most $ per session on the development starts
 (index 2011-2018) among those losing at most 5% of them is adopted for the funded mode if on the unseen starts (index
 2019-2025, NQ 2015-2024) it also loses at most 5% and makes more a session than U48. Run once.
+
+**G372 result (2026-11-08): rejected.** U48 (1 MNQ) makes $39 / $76 a session over the year on the development / unseen
+starts ($18 / $40 in months 1-3, $73 / $116 in months 10-12, the best month $115 / $139) and loses 3.2% / 3.1% of the
+accounts (the open trade at its worst price touching the floor; G371's end-of-day check saw none). Starting at 4-8 MNQ
+loses **27-43% / 27-49%** of the accounts within the year and makes $35-62 / $55-94 a session (the best months $72-105 /
+$104-136), the P/L after a loss counted as $0. None loses at most 5%. The $900 daily loss and the $2,000 floor leave room
+for about 4-5 contracts at $187.50 at the start; more contracts mean tighter stops ($125: fewer winners) or the floor.
+No variant comes near $750 a session. U48 stays the funded mode. `verification/noise_v2/g372_faster_growth.txt`.
