@@ -7409,3 +7409,8 @@ trigger. `research/g338_max_loss_frac.py`: U57 with only the max-loss stop at 0.
 the bracket and while in the trade), the lock's trigger and the sizing unchanged (3 variants; `max_loss_frac`, new in
 mnqbot/noise.py). G253's measure and G332's rule (development: more passes than U57's 13.8%, failures no higher than
 3.7%; unseen: more than 16.1% passed, at most 6.1% failed, failed + near-frozen at most 21.5%). Run once.
+
+**G338 result (2026-11-08): rejected.** Development (405 weeks; U57 13.8% / 3.7%): the max-loss stop at 0.6x / 0.75x /
+0.9x 11.4% / 3.5%, 12.8% / 4.2%, 13.1% / 3.2%. Unseen (933; U57 16.1% / 6.1%): 13.6% / 4.2%, 14.7% / 5.3%, 14.8% / 6.3%.
+A tighter stop is hit more often by moves that come back; the passes fall more than the failures. U57 stays.
+`verification/noise_v2/g338_max_loss_frac.txt`.
