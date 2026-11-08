@@ -7249,3 +7249,17 @@ The eight Fed days a year move a two-week Test little either way. U56 stays. `ve
 
 A measurement, as G295 for U55 (no adoption rule): U56's Test sprint, the share of Tests passed, failed and near-frozen
 within 10, 15, 20, 30 and 40 sessions, NQ 2015-25 and the index 2011-26 Monday starts (`research/g326_horizon.py`).
+
+**G326 result (2026-11-08):** U56's Test sprint, 1,322 Monday starts (`verification/noise_v2/g326_horizon.{txt,csv}`),
+against U55 (G295):
+
+| weeks | U56 passed | failed | near-frozen | U55 passed | failed |
+|---|---|---|---|---|---|
+| 2 | 15.6% | 5.8% | 14.4% | 15.1% | 7.4% |
+| 3 | 19.3% | 6.2% | 13.5% | 18.5% | 8.2% |
+| 4 | 21.1% | 6.6% | 13.5% | 20.3% | 8.9% |
+| 6 | 25.3% | 7.6% | 13.2% | 24.2% | 9.8% |
+| 8 | 29.0% | 8.6% | 13.0% | 27.1% | 10.3% |
+
+U56 passes a little more than U55 at every horizon and fails about a fifth less. A quarter of Tests pass within 6
+weeks (25.3%); within two weeks, 15.6%.
