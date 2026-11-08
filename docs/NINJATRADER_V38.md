@@ -7648,3 +7648,11 @@ failed, failed + near-frozen at most 21.5%). Run once.
 nothing). The collapse of the first three (the limit and stop entries also leave most Tests far from both ends) was not
 traced trade by trade: these knobs predate the day cap, guard and lock and may not work as meant with them; either way
 they are not a way forward from U57. U57 stays. `verification/noise_v2/g355_mechanics.txt`.
+
+## G356: done after a target, or the afternoon's own target (registered 2026-11-08, before its run)
+
+`research/g356_late_targets.py`: U57 with no new entries for the day once a take-profit fills (`after_target_done`), or
+with the entries from checks closing at 13:00 or later taking 0.5 or 1.0 noise units as their take-profit instead of
+0.75 (`late_tp` / `late_tp_from` 780) (3 variants). G253's measure and G332's rule (development: the best by passes with
+failures no higher than U57's 3.7%, and more passes than its 13.8%; unseen: more than 16.1% passed, at most 6.1% failed,
+failed + near-frozen at most 21.5%). Run once.
