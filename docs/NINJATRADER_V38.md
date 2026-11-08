@@ -7880,3 +7880,15 @@ start: 1 $30, 2 $35, 3 $34, 4 $45, 5 $65, 6 $33, 7 $61, 8 $71, 9 $85, 10 $102, 1
 8-9% by months 10-12. No start touched the floor at an end of day. A single funded account does not reach $750 a
 session on average in its first year; the long histories' ~$225 a session (U48's nets) come from the later years, at
 the larger sizes. `verification/noise_v2/g371_funded_by_month.txt`.
+
+## G372: one funded account, faster sizing (registered 2026-11-08, before its run)
+
+The user: one account, $750 a day, "a little riskier" is fine as long as the account is not lost.
+`research/g372_faster_growth.py`: the funded growth mode (U48) starting at 1, 2, 3 or 4 MNQ, a contract more per
+$1,500 (U48), $1,000 or $600 of profit, the faster $650 steps from $9,000 (U48) or $3,000 (24 variants; the $900 daily
+loss and everything else as U48). Fresh starts on the first Monday of every quarter, 12 months each; **lost** = the
+balance with the open trade at its worst price touches the floor at any time (stricter than G371's end of day; the
+P/L after a loss counts as $0). Per variant: $ per session over the 12 months, months 1-3 and 10-12, the best month's
+average, and the share of starts lost. **Rule:** the variant with the most $ per session on the development starts
+(index 2011-2018) among those losing at most 5% of them is adopted for the funded mode if on the unseen starts (index
+2019-2025, NQ 2015-2024) it also loses at most 5% and makes more a session than U48. Run once.
