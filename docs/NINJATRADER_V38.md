@@ -7798,3 +7798,15 @@ no range-position filter 68.7% / 63.1%; none of the three 74.0% / 68.5% (10.4% /
 also at entry width 0.5 80.5% / 75.3%, but 38% winners and 8.9% / 11.6% passed. The days U57 sits out are mostly days
 with no breakout past the noise area at all; forcing trades on them adds losers. (Sessions after a failed Test count as
 untraded here.) U57 stays. `verification/noise_v2/g366_every_day.txt`.
+
+## G367: a new strategy, the failed-breakout fade (registered 2026-11-08, before its run)
+
+For the user's 80% winners: trade against the breakouts that fail. `research/g367_fade.py` (its own simulator; the Test
+measure is g250_test_week.one with these trades in place of the noise bot's): at a 30-minute check (10:00-15:30), when
+the previous check closed past U57's entry line (the noise area at width 0.7, 18 sessions) and this one closes back
+inside, enter the other way at the next bar's open; target 0.15 or 0.3 x the check's noise (sigma x the close), stop
+0.6 or 1.0 x the noise the other side, out at 16:00 otherwise (4 variants). One position at a time, at most 4 a day, no
+new entry once the day's closed P/L is up $1,500 or down $1,200; 4 MNQ, $0.62 a side a contract, 1 tick of slippage on
+market and stop fills, the stop first when a bar reaches both. G364's measures and candidate rule (both sets: at least
+80% winners, a trade on at least 90% of the sessions, more than $0 a trade, failures no higher than U57's 3.7% / 6.1%;
+the most unseen passes). Run once.
