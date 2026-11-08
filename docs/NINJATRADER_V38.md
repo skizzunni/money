@@ -7489,3 +7489,12 @@ higher than 3.7%; unseen: more than 16.1% passed, at most 6.1% failed, failed + 
 11.9% / 4.7% / 16.8%, every bar 11.4% / 4.2% / 17.0%: fewer passes, more failures. Unseen (933; U57 16.1% / 6.1% /
 21.5%): 15.5% / 6.4% / 20.9% and 15.4% / 6.2% / 20.9%. The VWAP stop closes breakouts on their first pullback, before the
 lock. U57 stays. `verification/noise_v2/g344_vwap_stop.txt`.
+
+## G345: the prior day's high and low as a size rule (registered 2026-11-08, before its run)
+
+Day traders watch the prior session's high and low; G246 traded them alone. `research/g345_prior_day.py`: U57 with the
+entry's size at 1.5x when the signal close is past the prior session's 09:30-16:00 high (long) or low (short), at 0.5x
+when it is not, or 1.5x past and 0.75x not (3 variants; `pdhl_mult` / `pdhl_in_mult`, new in mnqbot/noise.py, rounded,
+at least 1; the floor's and the day's room still cut the size). G253's measure and G332's rule (development: more passes
+than U57's 13.8%, failures no higher than 3.7%; unseen: more than 16.1% passed, at most 6.1% failed, failed + near-frozen
+at most 21.5%). Run once.

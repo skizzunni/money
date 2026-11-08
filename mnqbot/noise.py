@@ -453,6 +453,10 @@ class NoiseConfig:
     news_mult: float = 1.0
     news2_dates: str = ""  # research (G325): a second list of dates (the Fed days), with its own multiplier
     news2_mult: float = 1.0
+    # research (G345): the entry's size x pdhl_mult when the signal close is past the prior session's 09:30-16:00 high
+    # (long) or low (short), x pdhl_in_mult when it is not (1.0: off)
+    pdhl_mult: float = 1.0
+    pdhl_in_mult: float = 1.0
     gap_go_skip_month_first: bool = False
     # research (G13): a time lock. A trade not yet locked that is in profit at a bar close time_lock minutes or more
     # after its fill is locked (its stop to the entry plus lock_plus, from the next bar)
@@ -545,6 +549,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
     consec = skip_left = 0  # the v2.1 study's streak rule: losers in a row, signals still to skip
     loss_side = 0  # the side of the last losing trade
     day_hi = day_lo = math.nan  # today's 09:30-16:00 high and low (big_day_k)
+    pd_hi = pd_lo = math.nan  # G345: the prior session's
     day_ranges: list[float] = []  # completed sessions' range / open, oldest first
     day_dirs: list[int] = []  # and their direction (close against open)
     block_dir = 0  # big_day_k: no entries on this side today
@@ -1323,6 +1328,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                 avg = sum(day_ranges[-cfg.big_day_n:]) / cfg.big_day_n
                 if day_ranges[-1] > cfg.big_day_k * avg:
                     block_dir = day_dirs[-1]
+            pd_hi, pd_lo = day_hi, day_lo
             day_hi = day_lo = math.nan
             pv_sum = v_sum = 0.0
             vwap_now = vwap_used = math.nan
@@ -1435,6 +1441,10 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                         ml_next, q_next = ml_next / q_next * q_n, q_n
                     if cfg.news2_mult != 1.0 and t.strftime("%Y-%m-%d") in news2_set:  # G325: the Fed days
                         q_n = max(1, round(q_next * cfg.news2_mult))
+                        ml_next, q_next = ml_next / q_next * q_n, q_n
+                    if (cfg.pdhl_mult != 1.0 or cfg.pdhl_in_mult != 1.0) and not math.isnan(pd_hi):  # G345
+                        past = c[i] > pd_hi if d > 0 else c[i] < pd_lo
+                        q_n = max(1, round(q_next * (cfg.pdhl_mult if past else cfg.pdhl_in_mult)))
                         ml_next, q_next = ml_next / q_next * q_n, q_n
                     if cfg.trend_small and against_trend(d):  # G65: 1 contract, its max loss a contract
                         fq = fill_q()
