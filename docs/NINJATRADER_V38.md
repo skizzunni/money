@@ -7689,3 +7689,11 @@ near-frozen at most 21.5%). Run once.
 14.8% / 5.9%, once up $300 15.3% / 4.7% (past the failure bound); the squeezed contract 13.8% / 3.7% (no change).
 Unseen (933; U57 16.1% / 6.1% / 21.5%): 16.6% / 7.5%, 16.0% / 7.1%, 16.1% / 6.1%. Pressing a green day is one more way to
 buy passes with failures. U57 stays. `verification/noise_v2/g358_day_up_squeeze.txt`.
+
+## G359: the max loss scaled by the noise (registered 2026-11-08, before its run)
+
+U57's max loss is a fixed $187.50 a contract; G302 / G338 moved the fixed amount. `research/g359_ml_sigma.py`: U57 with
+the max loss set at each check to 0.6, 0.9 or 1.2 x the noise (sigma) x the close x $2 a contract (`ml_sigma`, G51; wider
+on wild days, tighter on calm ones; about $187.50 at 0.9 when sigma x close is about 104 points) (3 variants). G253's
+measure and G332's rule (development: the best by passes with failures no higher than U57's 3.7%, and more passes than
+its 13.8%; unseen: more than 16.1% passed, at most 6.1% failed, failed + near-frozen at most 21.5%). Run once.
