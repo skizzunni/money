@@ -7414,3 +7414,10 @@ mnqbot/noise.py). G253's measure and G332's rule (development: more passes than 
 0.9x 11.4% / 3.5%, 12.8% / 4.2%, 13.1% / 3.2%. Unseen (933; U57 16.1% / 6.1%): 13.6% / 4.2%, 14.7% / 5.3%, 14.8% / 6.3%.
 A tighter stop is hit more often by moves that come back; the passes fall more than the failures. U57 stays.
 `verification/noise_v2/g338_max_loss_frac.txt`.
+
+## G339: the noise area's sessions on U57 (registered 2026-11-08, before its run)
+
+G336 left the noise area's length out. `research/g339_lookback.py`: U57 with the noise area averaged over 14, 16, 20 or
+22 sessions instead of 18 (4 variants; `lookback`). G253's measure and G332's rule (development: more passes than U57's
+13.8%, failures no higher than 3.7%; unseen: more than 16.1% passed, at most 6.1% failed, failed + near-frozen at most
+21.5%). Run once.
