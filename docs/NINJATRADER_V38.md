@@ -7263,3 +7263,10 @@ against U55 (G295):
 
 U56 passes a little more than U55 at every horizon and fails about a fifth less. A quarter of Tests pass within 6
 weeks (25.3%); within two weeks, 15.6%.
+
+## G327: the losers a day on U56 (registered 2026-11-08, before its run)
+
+U56's day guard and streak pause now limit a bad day. `research/g327_losers.py`: U56 with at most 2, 4 or 5 losing
+trades a day instead of 3 (3 variants; `max_losers`). G253's measure and G322's rule (development: more passes than
+14.1%, failures no higher than 3.7%; unseen: more than 16.0% passed, at most 6.6% failed, failed + near-frozen at most
+21.7%). Run once.
