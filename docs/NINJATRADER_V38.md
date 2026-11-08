@@ -7938,3 +7938,11 @@ the drive past 0.5 with 1.5x with it / 0.5x against / 0.75x on other days, **$43
 3.1% lost): **$80.1, but 6.2% lost**, past the 5% bound. The others at 0.25: $86-89 with 10.8-12.4% lost. The tilt keeps
 most of G373's gain with fewer lost accounts, but on the unseen starts still twice U48's. U48 stays.
 `verification/noise_v2/g374_drive_tilt.txt`.
+
+## G375: add to the trend days' winners (registered 2026-11-08, before its run)
+
+The trend-day angle again, without more risk at entry: add contracts only once a trade is locked in profit.
+`research/g375_add_trend_days.py`: the funded mode (U48) adding 2 or 4 MNQ at the next bar's open once the lock arms,
+sharing the trade's exits (`add_at_lock`), on every trade or only on trades with the opening drive past 0.5
+(`add_drive_only`, new in mnqbot/noise.py) (4 variants). G372's measure and rule (development: the most $ a session
+among variants losing at most 5% of the starts; unseen: at most 5% lost and more $ a session than U48). Run once.

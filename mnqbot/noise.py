@@ -131,6 +131,7 @@ class NoiseConfig:
     # research (v2.4 study): once the lock arms, add add_at_lock contracts at the next bar's open; they share the
     # position's exits (stop, lock, take-profit, 16:00) and close with it
     add_at_lock: int = 0
+    add_drive_only: bool = False  # research (G375): add only to trades with the opening drive (drive_size_k)
     # research (v2.4 study): the trend, the last session's close against the average of the last trend_n sessions'
     # closes. A trade against it (on side trend_side only; 0: both) is skipped, or with trend_qty_div > 0 takes
     # cfg.qty / trend_qty_div contracts (the same max loss)
@@ -1303,7 +1304,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             at_check = FIRST_CHECK <= end <= LAST_CHECK and (end - FIRST_CHECK) % STEP == 0
             if not cfg.lock_at_checks or at_check:
                 locked = pos * (fav - entry_px) >= trigger
-            add_due = locked and cfg.add_at_lock > 0
+            add_due = locked and cfg.add_at_lock > 0 and (not cfg.add_drive_only or drive_sz == pos)
             if cfg.lock1_at > 0 and not locked1:
                 t1 = cfg.lock1_at * ml_trade / q_trade / cfg.point_value
                 locked1 = pos * ((h[i] if pos > 0 else l[i]) - entry_px) >= t1
