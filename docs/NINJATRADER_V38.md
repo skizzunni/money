@@ -7233,3 +7233,10 @@ once (resumable).
 passes as much fails more (k40 14.3% / 6.2%; k33, k45 14.1% / 5.4%, 4.2%); the three inside the failure bounds pass
 7.9-9.4%. Stage 2 (933 unseen weeks): those three 9.3-11.1% passed. U56's values are the best of their neighbourhood.
 U56 stays. `verification/noise_v2/g324_u56_tune.txt`, `g324_stage1.csv`, `g324_stage2.csv`.
+
+## G325: the Fed days' size on U56 (registered 2026-11-08, before its run)
+
+U56 trades 1.5x on the jobs-report days. `research/g325_fed_size.py`: U56 with the scheduled Fed announcement days
+(`research/fomc_dates.csv`) at 1.5x or 0.5x the sprint's size (2 variants; `news2_dates` / `news2_mult`). G253's measure
+and G322's rule (development: more passes than U56's 14.1%, failures no higher than 3.7%; unseen: more than 16.0%
+passed, at most 6.6% failed, failed + near-frozen at most 21.7%). Run once.

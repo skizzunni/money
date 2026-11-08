@@ -442,6 +442,8 @@ class NoiseConfig:
     # after the contract steps; the daily budget and the trailing floor still cap it
     news_dates: str = ""
     news_mult: float = 1.0
+    news2_dates: str = ""  # research (G325): a second list of dates (the Fed days), with its own multiplier
+    news2_mult: float = 1.0
     gap_go_skip_month_first: bool = False
     # research (G13): a time lock. A trade not yet locked that is in profit at a bar close time_lock minutes or more
     # after its fill is locked (its stop to the entry plus lock_plus, from the next bar)
@@ -569,6 +571,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
     drive_hist: list[float] = []  # gap_go_drive_k: the last sessions' 09:30 bar |body|
     drive_dir = 0  # G318: today's 09:30-10:00 direction when past drive_filter_k
     news_set = set(cfg.news_dates.split(",")) if cfg.news_dates else set()  # G62
+    news2_set = set(cfg.news2_dates.split(",")) if cfg.news2_dates else set()  # G325
     sess_month = sess_month_prev = None  # gap_go_skip_month_first: this session's and the last one's month
     side_lost = {1: False, -1: False}  # a loser on that side today (side_margin)
     side_run = {1: 0, -1: 0}  # losers in a row on each side, across days (side_run_k)
@@ -1410,6 +1413,9 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                         ml_next, q_next = ml_next / q_next * sprint_q(), sprint_q()
                     if cfg.news_mult != 1.0 and t.strftime("%Y-%m-%d") in news_set:  # G62: the jobs-report days
                         q_n = max(1, round(q_next * cfg.news_mult))
+                        ml_next, q_next = ml_next / q_next * q_n, q_n
+                    if cfg.news2_mult != 1.0 and t.strftime("%Y-%m-%d") in news2_set:  # G325: the Fed days
+                        q_n = max(1, round(q_next * cfg.news2_mult))
                         ml_next, q_next = ml_next / q_next * q_n, q_n
                     if cfg.trend_small and against_trend(d):  # G65: 1 contract, its max loss a contract
                         fq = fill_q()
