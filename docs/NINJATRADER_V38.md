@@ -7684,3 +7684,8 @@ when not even 1 contract fits the room, 1 MNQ with its max loss cut to the room 
 (`squeeze_min` 20) (3 variants). G253's measure and G332's rule (development: the best by passes with failures no higher
 than U57's 3.7%, and more passes than its 13.8%; unseen: more than 16.1% passed, at most 6.1% failed, failed +
 near-frozen at most 21.5%). Run once.
+
+**G358 result (2026-11-08): rejected.** Development (405 weeks; U57 13.8% / 3.7% / 16.8%): 6 MNQ once the day is green
+14.8% / 5.9%, once up $300 15.3% / 4.7% (past the failure bound); the squeezed contract 13.8% / 3.7% (no change).
+Unseen (933; U57 16.1% / 6.1% / 21.5%): 16.6% / 7.5%, 16.0% / 7.1%, 16.1% / 6.1%. Pressing a green day is one more way to
+buy passes with failures. U57 stays. `verification/noise_v2/g358_day_up_squeeze.txt`.
