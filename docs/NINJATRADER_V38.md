@@ -8001,3 +8001,9 @@ range loses after costs. `verification/noise_v2/g378_am_sweep.txt`.
 sessions' average range to the last calm_long sessions' (bigger when the market has woken up), or its inverse (smaller
 then), kept within 0.5-1.5x or 0.75-2x (4 variants; `vol_pro`, `vol_lo`, `vol_hi`, new in mnqbot/noise.py; G317 tried
 the inverse on the Test sprint only). G372's measure and rule. Run once.
+
+**G379 result (2026-11-08): rejected.** Development (U48 $39.2 a session, 3.2% lost): $34.6-37.8 at 3.2% lost; none beats
+U48, so nothing goes forward. Unseen (U48 $75.7, 3.1%): against the regime (smaller when the market has woken up)
+$82.3 / $81.3 at 3.2% / 3.1% lost; with it $74.5-75.4 at 6.3%. The inverse-volatility sizing is the best unseen result at
+U48's loss rate so far (+$6.6 a session), but it lost $1.7 a session on the development starts, so by the rule it is
+not adopted. U48 stays. `verification/noise_v2/g379_vol_regime.txt`.

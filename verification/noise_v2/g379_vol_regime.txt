@@ -1,0 +1,16 @@
+development (index 2011-18 starts):
+                               per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                                    
+U48                                 39.221      18.490        73.495     114.895  0.032
+with the regime, 0.5-1.5x           37.760      19.469        72.555      93.453  0.032
+against the regime, 0.5-1.5x        37.517      17.822        76.162     101.312  0.032
+with the regime, 0.75-2.0x          35.218      19.224        64.823      88.156  0.032
+against the regime, 0.75-2.0x       34.562      18.958        66.216      98.453  0.032
+unseen (index 2019-25 + NQ 2015-24):
+                               per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                                    
+against the regime, 0.5-1.5x        82.280      44.288       132.257     151.126  0.032
+against the regime, 0.75-2.0x       81.272      45.190       126.805     149.681  0.031
+U48                                 75.724      40.467       115.664     138.786  0.031
+with the regime, 0.5-1.5x           75.369      39.964       109.769     135.541  0.063
+with the regime, 0.75-2.0x          74.536      40.336       108.369     130.221  0.063
