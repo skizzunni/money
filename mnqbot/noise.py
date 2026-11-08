@@ -373,6 +373,7 @@ class NoiseConfig:
     drive_size_k: float = 0.0
     drive_mult: float = 1.0
     drive_against_mult: float = 1.0
+    drive_none_mult: float = 1.0  # G374: with drive_size_k on, entries on a day without such a drive (and before 10:00)
     # research (G69): small gaps. A gap at least gap_go_small_k x the average (but under gap_go_k), the 09:30 bar
     # closing its way, takes the same trade at 1 contract (-1 = off). Drive and small-gap trades are always 1 contract
     gap_go_small_k: float = -1.0
@@ -1476,6 +1477,9 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                         ml_next, q_next = ml_next / q_next * q_n, q_n
                     if drive_sz and (cfg.drive_mult != 1.0 or cfg.drive_against_mult != 1.0):  # G373
                         q_n = max(1, round(q_next * (cfg.drive_mult if d == drive_sz else cfg.drive_against_mult)))
+                        ml_next, q_next = ml_next / q_next * q_n, q_n
+                    elif not drive_sz and cfg.drive_size_k > 0 and cfg.drive_none_mult != 1.0:  # G374
+                        q_n = max(1, round(q_next * cfg.drive_none_mult))
                         ml_next, q_next = ml_next / q_next * q_n, q_n
                     if (cfg.pdhl_mult != 1.0 or cfg.pdhl_in_mult != 1.0) and not math.isnan(pd_hi):  # G345
                         past = c[i] > pd_hi if d > 0 else c[i] < pd_lo

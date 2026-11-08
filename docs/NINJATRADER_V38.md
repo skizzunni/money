@@ -7924,3 +7924,11 @@ U48). Run once.
 nothing goes forward. Unseen (U48 $75.7, 3.1% lost): past 0.25 $83-91 (10.8-14.0% lost), past 0.5 $81-82 (7.8-9.6%
 lost); the best months $161-177 against $139. Sizing up with the opening drive adds $5-15 a session and two to four
 times the lost accounts. U48 stays. `verification/noise_v2/g373_drive_size.txt`.
+
+## G374: tilt the size toward the trend days, not up (registered 2026-11-08, before its run)
+
+G373: entries with the opening drive pay more, but sizing them up adds lost accounts. Here the extra size on them is
+paid for by smaller size elsewhere. `research/g374_drive_tilt.py`: the funded mode (U48) with the drive past 0.25 or 0.5,
+entries with it / against it / on days with no such drive (and before 10:00) at 1.5x / 0.5x / 0.75x, 2x / 0.5x / 0.5x,
+or 1.5x / 0.75x / 0.75x the contracts (6 variants; `drive_none_mult`, new in mnqbot/noise.py). G372's measure and rule.
+Run once.
