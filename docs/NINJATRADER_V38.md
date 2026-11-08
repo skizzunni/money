@@ -7340,3 +7340,10 @@ failed + near-frozen at most 21.5%). Run once.
 3.7%; past by 0.1 / 0.25 noise after a loss that side 10.9% / 3.7%, 10.6% / 3.0%. Unseen (933; U57 16.1% / 6.1% / 21.5%):
 8.1% / 5.6%, 13.2% / 6.5%, 13.3% / 5.4%. Waiting for confirmation misses the early, best part of the breakouts. U57
 stays. `verification/noise_v2/g332_confirm.txt`.
+
+## G333: the day lock's levels (registered 2026-11-08, before its run)
+
+`research/g333_lock_grid.py`: U57 with the day lock at $600 / $200, $600 / $300, $800 / $200, $800 / $500, $1,000 / $300
+or $1,000 / $500 instead of $800 / $300 (6 variants). G253's measure and G332's rule (development: more passes than U57's
+13.8%, failures no higher than 3.7%; unseen: more than 16.1% passed, at most 6.1% failed, failed + near-frozen at most
+21.5%). Run once.
