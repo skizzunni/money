@@ -7274,3 +7274,10 @@ trades a day instead of 3 (3 variants; `max_losers`). G253's measure and G322's 
 **G327 result (2026-11-08): rejected.** Development (405 weeks; U56 14.1% / 3.7% / 16.8%): 2 losers a day 8.6% / 5.9%, 4
 13.3% / 4.4%, 5 13.3% / 5.2%. Unseen (933; U56 16.0% / 6.6% / 21.7%): 12.0% / 6.2%, 15.5% / 8.6%, 15.9% / 8.3%. Three
 losers a day stays the best. U56 stays. `verification/noise_v2/g327_losers.txt`.
+
+## G328: no entries either way after a big day, on U56 (registered 2026-11-08, before its run)
+
+`research/g328_big_day_both.py`: U56 with the big-day rule blocking both sides the next day (`big_day_both`), at 1.5x or
+at 2x the 10-session average range (2 variants). G253's measure and G322's rule (development: more passes than 14.1%,
+failures no higher than 3.7%; unseen: more than 16.0% passed, at most 6.6% failed, failed + near-frozen at most 21.7%).
+Run once.
