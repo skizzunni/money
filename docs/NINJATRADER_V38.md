@@ -7818,3 +7818,12 @@ The 0.15 / 0.6 version wins 78-79% at −$3.55 / +$0.99 a trade; 0.3 / 0.6 wins 
 reachable by fading, but each loser (a failed fade, the breakout going on) takes several winners with it; per trade it
 is about break-even before the Test, and the Test's floor ends it more often than U57 (6.1% unseen).
 `verification/noise_v2/g367_fade.txt`.
+
+## G368: the fade's levels (registered 2026-11-08, before its run)
+
+G367's fade loses on the breakouts that go on. `research/g368_fade_levels.py`: G367's fade with the stop 1.0 noise away
+(G367) or past the day's extreme so far (the high for a short, the low for a long, + 0.1 noise; no trade if the fill is
+already past it), and the target 0.15 or 0.3 noise away or at the day's 09:30 open when it lies the trade's way (else
+0.3 noise) (6 variants; the rest as G367). G364's measures and candidate rule (both sets: at least 80% winners, a trade
+on at least 90% of the sessions, more than $0 a trade, failures no higher than U57's 3.7% / 6.1%; the most unseen
+passes). Run once.
