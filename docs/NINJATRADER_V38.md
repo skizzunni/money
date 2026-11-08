@@ -7918,3 +7918,9 @@ against it 1x or 0.5x (6 variants: 2x / 1x, 2x / 0.5x, 1.5x / 1x at each thresho
 `drive_against_mult`, new in mnqbot/noise.py; the room still cuts the size). G372's measure and rule (development:
 the most $ a session among variants losing at most 5% of the starts; unseen: at most 5% lost and more $ a session than
 U48). Run once.
+
+**G373 result (2026-11-08): rejected.** Development (index 2011-18 starts; U48 $39.2 a session, 3.2% lost): the drive past
+0.25 $44-50 but 6.4% lost; past 0.5 $36.6-38.1 with 0% lost. Among variants losing at most 5%, U48 makes the most, so
+nothing goes forward. Unseen (U48 $75.7, 3.1% lost): past 0.25 $83-91 (10.8-14.0% lost), past 0.5 $81-82 (7.8-9.6%
+lost); the best months $161-177 against $139. Sizing up with the opening drive adds $5-15 a session and two to four
+times the lost accounts. U48 stays. `verification/noise_v2/g373_drive_size.txt`.

@@ -1,0 +1,20 @@
+development (index 2011-18 starts):
+                                          per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                                               
+drive past 0.25: 1.5x with, 1.0x against       49.754      21.521        87.429     108.234  0.064
+drive past 0.25: 2.0x with, 0.5x against       45.045      19.647        78.134      95.334  0.064
+drive past 0.25: 2.0x with, 1.0x against       44.218      19.744        74.206      93.542  0.064
+U48                                            39.221      18.490        73.495     114.895  0.032
+drive past 0.5: 1.5x with, 1.0x against        38.117      20.117        68.477      97.649  0.000
+drive past 0.5: 2.0x with, 0.5x against        37.499      19.692        63.258      83.316  0.000
+drive past 0.5: 2.0x with, 1.0x against        36.597      19.721        62.284      81.808  0.000
+unseen (index 2019-25 + NQ 2015-24):
+                                          per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                                               
+drive past 0.25: 2.0x with, 0.5x against       91.073      63.441       137.022     176.514  0.108
+drive past 0.25: 2.0x with, 1.0x against       90.314      62.962       137.371     172.177  0.108
+drive past 0.25: 1.5x with, 1.0x against       82.781      52.509       128.927     168.493  0.140
+drive past 0.5: 2.0x with, 0.5x against        82.046      46.873       129.107     167.460  0.080
+drive past 0.5: 2.0x with, 1.0x against        81.275      46.873       127.236     163.546  0.096
+drive past 0.5: 1.5x with, 1.0x against        80.899      46.037       122.773     161.522  0.078
+U48                                            75.724      40.467       115.664     138.786  0.031
