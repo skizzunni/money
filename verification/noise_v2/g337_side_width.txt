@@ -1,0 +1,16 @@
+development (index 2011-18):
+                         weeks  passed  failed  stuck  failed_or_stuck
+tag                                                                   
+U57                        405   0.138   0.037  0.131            0.168
+longs 0.6, shorts 0.7      405   0.136   0.035  0.128            0.163
+longs 0.65, shorts 0.75    405   0.126   0.035  0.158            0.193
+longs 0.7, shorts 0.6      405   0.123   0.037  0.146            0.183
+longs 0.7, shorts 0.8      405   0.131   0.037  0.148            0.185
+unseen (NQ 2015-25 + index 2019-26):
+                         weeks  passed  failed  stuck  failed_or_stuck
+tag                                                                   
+U57                        933   0.161   0.061  0.154            0.215
+longs 0.6, shorts 0.7      933   0.147   0.068  0.149            0.217
+longs 0.65, shorts 0.75    933   0.148   0.056  0.155            0.211
+longs 0.7, shorts 0.6      933   0.150   0.055  0.151            0.206
+longs 0.7, shorts 0.8      933   0.156   0.061  0.150            0.211
