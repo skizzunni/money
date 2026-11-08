@@ -1,0 +1,14 @@
+development (index 2011-18):
+                                       weeks  passed  failed  stuck  failed_or_stuck
+tag                                                                                 
+U57                                      405   0.138   0.037  0.131            0.168
+no entries past 1.25x the usual range    405   0.079   0.047  0.119            0.165
+no entries past 1.5x the usual range     405   0.089   0.042  0.116            0.158
+no entries past 2.0x the usual range     405   0.131   0.040  0.123            0.163
+unseen (NQ 2015-25 + index 2019-26):
+                                       weeks  passed  failed  stuck  failed_or_stuck
+tag                                                                                 
+U57                                      933   0.161   0.061  0.154            0.215
+no entries past 1.25x the usual range    933   0.119   0.043  0.110            0.153
+no entries past 1.5x the usual range     933   0.135   0.049  0.128            0.177
+no entries past 2.0x the usual range     933   0.152   0.063  0.151            0.214

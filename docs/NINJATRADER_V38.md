@@ -7710,3 +7710,8 @@ U57 with no new entries at a check once today's high-low range since 09:30 is ab
 last 10 sessions' ranges (3 variants; `exhaust_k`, new in mnqbot/noise.py; open trades run as usual). G253's measure and
 G332's rule (development: the best by passes with failures no higher than U57's 3.7%, and more passes than its 13.8%;
 unseen: more than 16.1% passed, at most 6.1% failed, failed + near-frozen at most 21.5%). Run once.
+
+**G360 result (2026-11-08): rejected.** Development (405 weeks; U57 13.8% / 3.7% / 16.8%): no entries past 1.25x / 1.5x /
+2x the usual range 7.9% / 4.7%, 8.9% / 4.2%, 13.1% / 4.0%. Unseen (933; U57 16.1% / 6.1% / 21.5%): 11.9% / 4.3%, 13.5% /
+4.9%, 15.2% / 6.3%. The stretched days are the trend days that pay for the bot; late breakouts on them are not spent.
+U57 stays. `verification/noise_v2/g360_exhaustion.txt`.
