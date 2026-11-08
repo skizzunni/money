@@ -7827,3 +7827,9 @@ already past it), and the target 0.15 or 0.3 noise away or at the day's 09:30 op
 0.3 noise) (6 variants; the rest as G367). G364's measures and candidate rule (both sets: at least 80% winners, a trade
 on at least 90% of the sessions, more than $0 a trade, failures no higher than U57's 3.7% / 6.1%; the most unseen
 passes). Run once.
+
+**G368 result (2026-11-08): no candidate.** The 0.15 target with the stop past the day's extreme wins **82.0% / 82.6%**
+of trades (development / unseen) at −$1.51 / +$4.28 a trade, 0.57-0.63 trades a session on 45-49% of sessions, 0.0% /
+0.4% of Tests passed and 11.6% / 17.6% failed. The target at the open wins 62-64% (+$45 / +$2 a trade, 35% of unseen Tests
+failed). At about 80% winners the fade makes a few dollars a trade at best: too little to reach $3,000 in ten sessions,
+and its rare large losers end Tests far more often than U57 (6.1%). U57 stays. `verification/noise_v2/g368_fade_levels.txt`.
