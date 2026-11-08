@@ -7932,3 +7932,9 @@ paid for by smaller size elsewhere. `research/g374_drive_tilt.py`: the funded mo
 entries with it / against it / on days with no such drive (and before 10:00) at 1.5x / 0.5x / 0.75x, 2x / 0.5x / 0.5x,
 or 1.5x / 0.75x / 0.75x the contracts (6 variants; `drive_none_mult`, new in mnqbot/noise.py). G372's measure and rule.
 Run once.
+
+**G374 result (2026-11-08): rejected, the nearest miss so far.** Development (U48 $39.2 a session, 3.2% lost): the pick,
+the drive past 0.5 with 1.5x with it / 0.5x against / 0.75x on other days, **$43.9 with 0% lost**. Unseen (U48 $75.7,
+3.1% lost): **$80.1, but 6.2% lost**, past the 5% bound. The others at 0.25: $86-89 with 10.8-12.4% lost. The tilt keeps
+most of G373's gain with fewer lost accounts, but on the unseen starts still twice U48's. U48 stays.
+`verification/noise_v2/g374_drive_tilt.txt`.

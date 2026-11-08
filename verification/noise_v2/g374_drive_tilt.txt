@@ -1,0 +1,20 @@
+development (index 2011-18 starts):
+                                                           per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                                                                
+drive past 0.25: 1.5x with, 0.5x against, 0.75x no drive        46.646      22.568        78.523      88.958  0.064
+drive past 0.25: 1.5x with, 0.75x against, 0.75x no drive       46.149      22.746        76.828      92.610  0.064
+drive past 0.5: 1.5x with, 0.5x against, 0.75x no drive         43.942      20.790        83.898     122.293  0.000
+drive past 0.5: 1.5x with, 0.75x against, 0.75x no drive        43.707      20.766        83.558     122.173  0.000
+drive past 0.5: 2.0x with, 0.5x against, 0.5x no drive          39.628      21.049        64.145      90.793  0.032
+U48                                                             39.221      18.490        73.495     114.895  0.032
+drive past 0.25: 2.0x with, 0.5x against, 0.5x no drive         32.337      19.712        55.762      82.224  0.098
+unseen (index 2019-25 + NQ 2015-24):
+                                                           per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                                                                
+drive past 0.25: 2.0x with, 0.5x against, 0.5x no drive         88.717      62.920       129.161     173.123  0.108
+drive past 0.25: 1.5x with, 0.75x against, 0.75x no drive       88.108      52.273       135.938     175.153  0.124
+drive past 0.25: 1.5x with, 0.5x against, 0.75x no drive        85.906      51.962       135.061     171.693  0.124
+drive past 0.5: 1.5x with, 0.5x against, 0.75x no drive         80.147      43.797       127.265     171.014  0.062
+drive past 0.5: 1.5x with, 0.75x against, 0.75x no drive        79.880      43.797       126.313     170.976  0.062
+U48                                                             75.724      40.467       115.664     138.786  0.031
+drive past 0.5: 2.0x with, 0.5x against, 0.5x no drive          66.553      42.107       101.233     138.786  0.109
