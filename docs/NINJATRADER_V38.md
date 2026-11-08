@@ -7240,3 +7240,7 @@ U56 trades 1.5x on the jobs-report days. `research/g325_fed_size.py`: U56 with t
 (`research/fomc_dates.csv`) at 1.5x or 0.5x the sprint's size (2 variants; `news2_dates` / `news2_mult`). G253's measure
 and G322's rule (development: more passes than U56's 14.1%, failures no higher than 3.7%; unseen: more than 16.0%
 passed, at most 6.6% failed, failed + near-frozen at most 21.7%). Run once.
+
+**G325 result (2026-11-08): rejected.** Development (405 weeks; U56 14.1% / 3.7% / 16.8%): Fed days 0.5x 13.8% / 3.2%,
+1.5x 14.1% / 3.7% / 18.3% (no more passes). Unseen (933; U56 16.0% / 6.6% / 21.7%): 15.2% / 6.5%, 16.1% / 7.0% / 22.4%.
+The eight Fed days a year move a two-week Test little either way. U56 stays. `verification/noise_v2/g325_fed_size.txt`.
