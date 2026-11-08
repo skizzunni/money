@@ -7281,3 +7281,7 @@ losers a day stays the best. U56 stays. `verification/noise_v2/g327_losers.txt`.
 at 2x the 10-session average range (2 variants). G253's measure and G322's rule (development: more passes than 14.1%,
 failures no higher than 3.7%; unseen: more than 16.0% passed, at most 6.6% failed, failed + near-frozen at most 21.7%).
 Run once.
+
+**G328 result (2026-11-08): rejected.** Development (405 weeks; U56 14.1% / 3.7% / 16.8%): no entries either way after a
+1.5x day 10.4% / 4.2%, after a 2x day 12.8% / 4.0%. Unseen (933; U56 16.0% / 6.6% / 21.7%): 13.8% / 5.1% / 18.4%, 15.1% /
+5.5% / 21.2%: fewer failures but fewer passes. U56 stays. `verification/noise_v2/g328_big_day_both.txt`.
