@@ -7359,3 +7359,8 @@ G330: the failed Tests reach the floor around day 7 (2-9). `research/g334_sprint
 for the first 5, 7 or 8 sessions instead of 10, then the 50K's growth sizing (3 variants; `sprint_days`). G253's measure
 and G332's rule (development: more passes than U57's 13.8%, failures no higher than 3.7%; unseen: more than 16.1%
 passed, at most 6.1% failed, failed + near-frozen at most 21.5%). Run once.
+
+**G334 result (2026-11-08): rejected.** Development (405 weeks; U57 13.8% / 3.7% / 16.8%): the sprint for 5 / 7 / 8
+sessions 6.2% / 1.5%, 10.4% / 2.7%, 11.6% / 3.2%. Unseen (933; U57 16.1% / 6.1% / 21.5%): 6.9% / 2.9%, 11.0% / 3.8%,
+13.1% / 4.6%. A shorter sprint lowers the failures and the passes together (8 sessions: −3 points of passes for −1.5 of
+failures). U57 stays. `verification/noise_v2/g334_sprint_days.txt`.
