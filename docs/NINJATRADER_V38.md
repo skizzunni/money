@@ -7448,3 +7448,10 @@ the losers a day (2 / 4), with the sprint at 4 or 5 MNQ (`research/g341_u57_rule
 weeks; the 10 best by passes with failures at most U57's 3.7% and failed or near-frozen at most its 16.8% go to stage 2.
 **Replaces U57's settings** if on stage 2 it passes more than 16.1%, fails at most 6.1%, and failed + near-frozen is at
 most 21.5%. Run once (resumable).
+
+**G341 result (2026-11-08): rejected.** Stage 1 (150 combinations, 405 development weeks; U57 13.8% / 3.7% / 16.8%): U57
+first; the others within the failure bounds 10.4-12.8%. Stage 2 (933 unseen weeks; U57 16.1% / 6.1% / 21.5%): U57 tops
+the list; the others 11.6-14.4% passed. Of note for a safer mode: k68 (5 MNQ with the equity filter at 40 trades, Fed days
+0.5x, the gap trade at 1 MNQ, jobs days 1.25x, the big-day rule at 2x, the time lock) passes 14.4% and fails **2.9%**
+(failed or near-frozen 14.6%) on the unseen weeks: half U57's failures for 1.7 points fewer passes. U57 stays.
+`verification/noise_v2/g341_u57_rules.txt`, `g341_stage1.csv`, `g341_stage2.csv`.
