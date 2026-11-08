@@ -7538,3 +7538,9 @@ prior session's range and 4 past it, or 3 past with 4 or 5 inside (`pdhl_in_mult
 sprint's 4; 4 variants). G253's measure and G332's rule (development: the best by passes with failures no higher than
 U57's 3.7%, and more passes than its 13.8%; unseen: more than 16.1% passed, at most 6.1% failed, failed + near-frozen at
 most 21.5%). Run once.
+
+**G348 result (2026-11-08): rejected.** Development (405 weeks; U57 13.8% / 3.7% / 16.8%): 4 past / 5 inside 14.1% / 4.2%,
+4 / 6 14.3% / 5.4% (past the failure bound); 3 past / 4 or 5 inside 6.2% / 2.5%, 8.4% / 2.2%. Unseen (933; U57 16.1% /
+6.1% / 21.5%): 4 / 5 17.0% / 6.8% / 22.8%, 4 / 6 17.7% / 7.1%, 3 / 4 10.0% / 4.5%, 3 / 5 11.5% / 5.6%. More contracts on
+either kind of breakout buy passes with failures; the split does not escape it. U57 stays.
+`verification/noise_v2/g348_inside_bigger.txt`.
