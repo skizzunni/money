@@ -112,6 +112,7 @@ class NoiseConfig:
     # this factor (the stops keep the area itself). late_tp / late_tp_from: entries from checks closing at or after
     # late_tp_from (minute of day) take late_tp noise units as their take-profit
     entry_k: float = 1.0
+    entry_k_short: float = 0.0  # research (G337): the short side's entry width when it differs (0 = entry_k)
     # after a big session (its 09:30-16:00 range over big_day_k x the average of the last big_day_n sessions' ranges,
     # as a share of the open; that session included), no entries or heads-ups today in that session's direction (its
     # close against its open). 0 = off; the Pine script's default since v2.3 is 1.5 x the last 10 sessions
@@ -1374,9 +1375,9 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                             and not (tom_today and cfg.tom_no_shorts))
                 fresh_ok = losers_ok()  # the daily limit: new entries
                 up_e, lo_e = upper, lower  # the entry lines (entry_k: a wider area for entries only)
-                if cfg.entry_k != 1.0:
+                if cfg.entry_k != 1.0 or cfg.entry_k_short > 0:
                     up_e = max(day_open, prev_close) * (1 + cfg.entry_k * sigma)
-                    lo_e = min(day_open, prev_close) * (1 - cfg.entry_k * sigma)
+                    lo_e = min(day_open, prev_close) * (1 - (cfg.entry_k_short or cfg.entry_k) * sigma)  # G337
                 if skip_today:
                     pass
                 elif use_stop and pos:

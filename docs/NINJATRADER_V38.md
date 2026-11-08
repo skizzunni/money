@@ -7390,3 +7390,10 @@ the development weeks; the 10 best by passes with failures at most U57's 3.7% an
 k103 (time stop 45, calm 0.8), 14.1% / 3.0% / 15.6%; U57 itself second. Stage 2 (933 unseen weeks; U57 16.1% / 6.1% /
 21.5%): U57 tops the list; the others pass 13.4-15.4% (k103 14.8% / 5.0% / 19.2%). No change to U57's settings beats it
 on the unseen weeks. U57 stays. `verification/noise_v2/g336_u57_mix.txt`, `g336_stage1.csv`, `g336_stage2.csv`.
+
+## G337: the entry width by side (registered 2026-11-08, before its run)
+
+NQ has drifted up. `research/g337_side_width.py`: U57 (entry width 0.7 both sides) with longs at 0.65 and shorts at 0.75,
+0.7 / 0.8, 0.6 / 0.7, or the reverse 0.7 / 0.6 (4 variants; `entry_k_short`, new in mnqbot/noise.py). G253's measure and
+G332's rule (development: more passes than U57's 13.8%, failures no higher than 3.7%; unseen: more than 16.1% passed, at
+most 6.1% failed, failed + near-frozen at most 21.5%). Run once.
