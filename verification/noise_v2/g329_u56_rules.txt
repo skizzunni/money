@@ -11,3 +11,16 @@ k
 110    405   0.111   0.012            0.111      {"sprint": 4, "rules": {"drive": 2, "eq": 2, "fed": 2, "gap qty": 2, "day lock": 1, "time lock": 1}}
 78     405   0.111   0.007            0.099            {"sprint": 5, "rules": {"drive": 2, "eq": 1, "after loss": 1, "late stop": 1, "gap block": 1}}
 33     405   0.109   0.015            0.121                {"sprint": 4, "rules": {"drive": 2, "eq": 2, "gap block": 1, "gap qty": 2, "day lock": 1}}
+stage 2 (NQ 2015-25 + index 2019-26):
+     weeks  passed  failed  failed_or_stuck                                                                                                  settings
+k                                                                                                                                                    
+34     933   0.161   0.061            0.215                                                                   {"sprint": 4, "rules": {"day lock": 1}}
+0      933   0.160   0.066            0.217                                                                                {"sprint": 4, "rules": {}}
+13     933   0.151   0.051            0.194                            {"sprint": 4, "rules": {"drive": 1, "after loss": 1, "fed": 1, "day lock": 1}}
+140    933   0.138   0.053            0.186  {"sprint": 5, "rules": {"eq": 2, "late stop": 1, "fed": 1, "gap qty": 2, "day lock": 1, "time lock": 1}}
+100    933   0.135   0.066            0.190                                               {"sprint": 5, "rules": {"drive": 2, "eq": 2, "gap qty": 2}}
+96     933   0.130   0.040            0.150                            {"sprint": 5, "rules": {"eq": 2, "gap block": 1, "gap qty": 1, "day lock": 1}}
+33     933   0.123   0.035            0.148                {"sprint": 4, "rules": {"drive": 2, "eq": 2, "gap block": 1, "gap qty": 2, "day lock": 1}}
+126    933   0.122   0.049            0.178           {"sprint": 5, "rules": {"eq": 2, "after loss": 1, "gap block": 1, "gap qty": 2, "day lock": 1}}
+110    933   0.121   0.035            0.151      {"sprint": 4, "rules": {"drive": 2, "eq": 2, "fed": 2, "gap qty": 2, "day lock": 1, "time lock": 1}}
+78     933   0.111   0.046            0.152            {"sprint": 5, "rules": {"drive": 2, "eq": 1, "after loss": 1, "late stop": 1, "gap block": 1}}
