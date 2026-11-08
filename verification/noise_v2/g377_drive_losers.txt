@@ -1,0 +1,20 @@
+development (index 2011-18 starts):
+                                                      per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                                                           
+U48                                                        39.221      18.490        73.495     114.895  0.032
+drive past 0.5: 5 losers on drive days, 3 on others        38.522      18.285        71.298     116.830  0.032
+drive past 0.25: 5 losers on drive days, 3 on others       35.905      18.328        68.568     107.733  0.032
+drive past 0.25: 3 losers on drive days, 2 on others       33.763      16.844        61.938      85.287  0.000
+drive past 0.5: 3 losers on drive days, 2 on others        32.648      16.146        56.656      78.644  0.000
+drive past 0.5: 4 losers on drive days, 2 on others        32.050      15.941        55.292      76.449  0.000
+drive past 0.25: 4 losers on drive days, 2 on others       31.054      16.806        54.857      82.701  0.030
+unseen (index 2019-25 + NQ 2015-24):
+                                                      per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                                                           
+U48                                                        75.724      40.467       115.664     138.786  0.031
+drive past 0.25: 5 losers on drive days, 3 on others       74.815      40.405       114.243     143.486  0.047
+drive past 0.5: 5 losers on drive days, 3 on others        74.740      40.210       112.469     139.903  0.031
+drive past 0.25: 3 losers on drive days, 2 on others       73.449      39.662       104.252     144.249  0.047
+drive past 0.25: 4 losers on drive days, 2 on others       73.410      39.762       106.520     142.301  0.047
+drive past 0.5: 3 losers on drive days, 2 on others        73.403      39.542       107.899     140.487  0.047
+drive past 0.5: 4 losers on drive days, 2 on others        70.525      39.068       101.439     144.025  0.061

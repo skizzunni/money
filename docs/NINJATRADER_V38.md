@@ -7971,3 +7971,7 @@ U48 stays. `verification/noise_v2/g376_drive_runners.txt`.
 opening drive past 0.25 or 0.5 and 3 on the others, or 3 / 2, or 4 / 2 (6 variants; `drive_losers`, new in
 mnqbot/noise.py). G372's measure and rule (development: the most $ a session among variants losing at most 5% of the
 starts; unseen: at most 5% lost and more $ a session than U48). Run once.
+
+**G377 result (2026-11-08): rejected.** Development (U48 $39.2 a session, 3.2% lost): $31.1-38.5, 0-3.2% lost; none beats
+U48. Unseen (U48 $75.7, 3.1%): $70.5-74.8. More tries on drive days add nothing; fewer on the others cost. U48 stays.
+`verification/noise_v2/g377_drive_losers.txt`.
