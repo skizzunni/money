@@ -1,0 +1,14 @@
+development (index 2011-18):
+                     weeks  passed  failed  stuck  failed_or_stuck
+tag                                                               
+U56                    405   0.141   0.037  0.131            0.168
+U56, 2 losers a day    405   0.086   0.059  0.106            0.165
+U56, 4 losers a day    405   0.133   0.044  0.148            0.193
+U56, 5 losers a day    405   0.133   0.052  0.146            0.198
+unseen (NQ 2015-25 + index 2019-26):
+                     weeks  passed  failed  stuck  failed_or_stuck
+tag                                                               
+U56                    933   0.160   0.066  0.150            0.217
+U56, 2 losers a day    933   0.120   0.062  0.113            0.175
+U56, 4 losers a day    933   0.155   0.086  0.141            0.227
+U56, 5 losers a day    933   0.159   0.083  0.150            0.233
