@@ -1080,7 +1080,8 @@ SPRINT = {"daily_loss_limit": 2000.0, "early_daily_loss": 0.0, "max_losers": 3, 
           # U56: G321's k30, the streak pause, the big-day rule, the day guard, 1.5x on the jobs-report days
           "streak_k": 4, "streak_skip": 2, "big_day_k": 1.5, "big_day_n": 10, "day_guard": 1200.0, "day_guard_grid": True,
           "news_dates": ",".join(pd.read_csv(Path(__file__).parent.parent / "research" / "nfp_dates.csv").date),
-          "news_mult": 1.5}
+          "news_mult": 1.5,
+          "day_lock_at": 800.0, "day_lock_keep": 300.0}  # U57: G329's day lock
 
 
 @pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
@@ -1108,6 +1109,7 @@ def test_v38_test_sprint(sim, sample_1m, tmp_path):  # noqa: F811
         assert math.isclose(float(a[6]), t.pnl, abs_tol=1e-6), (a, t)
     assert any(t.qty == 4 for t in py)
     assert any(t.reason == "Day cap" for t in py)  # U55: the sample reaches G289's day cap, so the parity covers it
+    assert any(t.reason == "Day lock" for t in py)  # U57: and G329's day lock
 
 
 @pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")

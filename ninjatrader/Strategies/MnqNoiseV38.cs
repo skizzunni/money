@@ -116,6 +116,9 @@ namespace NinjaTrader.NinjaScript.Strategies
         // G62 / G321: on these dates (the jobs-report days), NewsMult x the contracts, after the sprint's size
         public string NewsDates = "";
         public double NewsMult = 1.0;
+        // G294 / G329: the day lock. Once today's P/L with the open trade at its best price since entry (bar extremes,
+        // through the last bar) reaches DayLockAt, the stop goes no lower than where today's P/L is DayLockKeep (0 = off)
+        public double DayLockAt = 0, DayLockKeep = 0;
         public double SprintTarget = 3000;
         // G76: the bot's sizing counts this many points more slippage at the stop (0 = off)
         public double SizeSlipPts = 0;
@@ -163,6 +166,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         int consec;                       // losing trades in a row, across days
         int skipLeft;                     // G321: entry signals still to skip after a losing streak
         bool guardToday;                  // G321: the day guard closed a trade today
+        double dlFav = double.NaN;        // G329: the open trade's best bar extreme since entry, through the last bar
         int losersToday;                  // G204: losing trades closed today
         double equity;                    // the closed P/L so far
         double trailBase = double.NaN, trailPeak = double.NaN;
@@ -373,6 +377,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 double lk = entry + p * s.LockPlus;
                 if ((p > 0 && lk > line) || (p < 0 && lk < line)) line = lk;
             }
+            double dlk = DayLockPx(entry);  // G329: the day lock
+            if (!double.IsNaN(dlk) && ((p > 0 && dlk > line) || (p < 0 && dlk < line))) line = dlk;
             line = OnGrid(p, line);
             if (s.TightenOnly && !double.IsNaN(held) && ((p > 0 && held > line) || (p < 0 && held < line)))
                 line = held;
@@ -421,6 +427,16 @@ namespace NinjaTrader.NinjaScript.Strategies
             brStopTrade = brStopNext;
             brTpTrade = brTpNext;
             brWhyTrade = brWhyNext;
+            dlFav = double.NaN;
+        }
+
+        // G329: the day lock's stop for the open trade (NaN = not armed)
+        double DayLockPx(double entry)
+        {
+            if (s.DayLockAt <= 0 || Position == 0 || double.IsNaN(dlFav) || qTrade <= 0) return double.NaN;
+            double per = qTrade * s.PointValue, costs = 2 * s.CommissionPerSide * qTrade;
+            if (DayPnl + Position * (dlFav - entry) * per - costs < s.DayLockAt) return double.NaN;
+            return entry + Position * (s.DayLockKeep - DayPnl + costs) / per;
         }
 
         void Close(int i, double price, string reason)
@@ -585,6 +601,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                     double lk = EntryPrice + p * s.LockPlus;
                     if ((p > 0 && lk > line) || (p < 0 && lk < line)) { line = lk; reason = "Lock"; }
                 }
+                double dlk = EntryBar != i ? DayLockPx(EntryPrice) : double.NaN;  // G329: the day lock
+                if (!double.IsNaN(dlk) && ((p > 0 && dlk > line) || (p < 0 && dlk < line))) { line = dlk; reason = "Day lock"; }
                 if (EntryBar == i) { line = EntryPrice - p * brStopTrade; reason = brWhyTrade; }  // the bracket
                 else line = OnGrid(p, line);
                 if (s.TightenOnly)
@@ -640,6 +658,11 @@ namespace NinjaTrader.NinjaScript.Strategies
                 }
             }
 
+            if (Position != 0)  // G329: the day lock's best extreme, from the next bar
+            {
+                double xb = Position > 0 ? h : l;
+                dlFav = double.IsNaN(dlFav) ? xb : (Position > 0 ? Math.Max(dlFav, xb) : Math.Min(dlFav, xb));
+            }
             if (Position != 0 && !Locked && s.LockAt > 0 && s.MaxLoss > 0)  // the lock arms from the next bar
             {
                 double trigger = s.LockAt * mlTrade / qTrade / s.PointValue;
@@ -1149,6 +1172,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 st.StreakSkip = 2;
                 st.NewsDates = sprintMode ? JobsReportDays : "";  // G321: 1.5x on the jobs-report days
                 st.NewsMult = sprintMode ? 1.5 : 1.0;
+                st.DayLockAt = sprintMode ? 800 : 0;  // G329: the day lock, $800 keeping $300
+                st.DayLockKeep = 300;
                 st.Lookback = NoiseSessions; st.EntryK = EntryWidth; st.DayStopProfit = DayProfitStop;  // G253
                 st.SizeSlipPts = Mode != "Evaluation" ? SizeSlip : 0;  // G79: the Funded growth modes and Custom
                 st.ProtectRoom = Mode != "Evaluation" ? NearFloorGate : 0;  // G87

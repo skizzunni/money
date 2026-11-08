@@ -7310,3 +7310,14 @@ From G330: `research/g331_chop_pause.py`: U56 with no trading for a session afte
 with a loss (3 variants; `red_days_pause`; the day off resets the run). G253's measure and G322's rule (development: more
 passes than 14.1%, failures no higher than 3.7%; unseen: more than 16.0% passed, at most 6.6% failed, failed +
 near-frozen at most 21.7%). Run once.
+
+**G329 result (2026-11-08): adopted as U57.** Stage 1 (150 combinations, 405 development weeks; U56 14.1% / 3.7% /
+16.8%): within the failure bounds the best was U56 itself; next k34 (U56 + the day lock at $800 keeping $300) 13.8% /
+3.7% / 16.8%. Stage 2 (933 unseen weeks; U56 16.0% / 6.6% / 21.7%): **k34 16.1% passed / 6.1% failed / 21.5% failed or
+near-frozen**, inside all three bounds (the registered rule); the other nine 11.1-15.1% passed. A small gain, mostly in
+failures. `verification/noise_v2/g329_u56_rules.txt`, `g329_stage1.csv`, `g329_stage2.csv`.
+
+**U57 (2026-11-08): U56 with the day lock.** Once today's P/L, with the open trade at its best price since entry (bar
+highs / lows through the last bar), reaches $800, the trade's stop goes no lower than where today's P/L is $300 (on the
+tick grid with the line; `DayLockAt` / `DayLockKeep` in the C#, `day_lock_at` / `day_lock_keep` in the model).
+NinjaTrader's code matches the model trade for trade on the test sample, which reaches the day lock.
