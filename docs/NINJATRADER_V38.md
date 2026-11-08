@@ -7511,3 +7511,8 @@ From G345's development weeks: `research/g346_prior_day_small.py`: U57 with 5 MN
 past the prior session's high (long) or low (short) (`pdhl_mult` 1.25), and the same with 3 MNQ when it is not
 (`pdhl_in_mult` 0.75) (2 variants). G253's measure and G332's rule (development: more passes than U57's 13.8%, failures
 no higher than 3.7%; unseen: more than 16.1% passed, at most 6.1% failed, failed + near-frozen at most 21.5%). Run once.
+
+**G346 result (2026-11-08): rejected.** Development (405 weeks; U57 13.8% / 3.7% / 16.8%): 5 MNQ past the prior day's range
+15.6% / 5.2% / 24.4%, with 3 MNQ inside 14.8% / 6.2%: more passes, but past the failure bound. Unseen (933; U57 16.1% /
+6.1% / 21.5%): 16.3% / 9.1% / 26.9% and 13.9% / 7.9%. Even one contract more on those breakouts adds failures faster than
+passes. U57 stays. `verification/noise_v2/g346_prior_day_small.txt`.
