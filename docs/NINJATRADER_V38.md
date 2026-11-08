@@ -7697,3 +7697,8 @@ the max loss set at each check to 0.6, 0.9 or 1.2 x the noise (sigma) x the clos
 on wild days, tighter on calm ones; about $187.50 at 0.9 when sigma x close is about 104 points) (3 variants). G253's
 measure and G332's rule (development: the best by passes with failures no higher than U57's 3.7%, and more passes than
 its 13.8%; unseen: more than 16.1% passed, at most 6.1% failed, failed + near-frozen at most 21.5%). Run once.
+
+**G359 result (2026-11-08): rejected.** Development (405 weeks; U57 13.8% / 3.7% / 16.8%): the max loss at 0.6 / 0.9 / 1.2
+x the noise 10.9% / 4.9%, 12.1% / 3.5%, 11.6% / 3.7%. Unseen (933; U57 16.1% / 6.1% / 21.5%): 12.0% / 6.8%, 14.3% / 6.6%,
+12.3% / 8.3%. (The registration's "about $187.50 at 0.9" was an estimate, not measured.) The fixed max loss stays. U57
+stays. `verification/noise_v2/g359_ml_sigma.txt`.
