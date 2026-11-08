@@ -1,0 +1,26 @@
+stage 1 best (index 2011-18):
+     weeks  passed  failed  failed_or_stuck                                                                 settings
+k                                                                                                                   
+103    405   0.141   0.030            0.156                      {"sprint": 4, "rules": {"time stop": 2, "calm": 2}}
+0      405   0.138   0.037            0.168                                               {"sprint": 4, "rules": {}}
+43     405   0.133   0.030            0.141                                      {"sprint": 4, "rules": {"calm": 2}}
+76     405   0.133   0.037            0.168             {"sprint": 4, "rules": {"take profit": 2, "entry width": 2}}
+28     405   0.131   0.032            0.143    {"sprint": 4, "rules": {"lock plus": 1, "stop buffer": 2, "calm": 2}}
+84     405   0.131   0.030            0.165  {"sprint": 4, "rules": {"take profit": 2, "lock": 1, "stop buffer": 2}}
+1      405   0.128   0.030            0.138                    {"sprint": 4, "rules": {"entry width": 2, "calm": 2}}
+32     405   0.128   0.032            0.168                                     {"sprint": 4, "rules": {"guard": 1}}
+75     405   0.123   0.025            0.138                          {"sprint": 4, "rules": {"calm": 2, "guard": 1}}
+66     405   0.123   0.037            0.165   {"sprint": 4, "rules": {"lock plus": 1, "entry width": 2, "guard": 1}}
+stage 2 (NQ 2015-25 + index 2019-26):
+     weeks  passed  failed  failed_or_stuck                                                                 settings
+k                                                                                                                   
+0      933   0.161   0.061            0.215                                               {"sprint": 4, "rules": {}}
+32     933   0.154   0.055            0.210                                     {"sprint": 4, "rules": {"guard": 1}}
+66     933   0.154   0.057            0.219   {"sprint": 4, "rules": {"lock plus": 1, "entry width": 2, "guard": 1}}
+28     933   0.150   0.061            0.202    {"sprint": 4, "rules": {"lock plus": 1, "stop buffer": 2, "calm": 2}}
+103    933   0.148   0.050            0.192                      {"sprint": 4, "rules": {"time stop": 2, "calm": 2}}
+76     933   0.148   0.054            0.228             {"sprint": 4, "rules": {"take profit": 2, "entry width": 2}}
+1      933   0.141   0.046            0.179                    {"sprint": 4, "rules": {"entry width": 2, "calm": 2}}
+43     933   0.140   0.054            0.179                                      {"sprint": 4, "rules": {"calm": 2}}
+84     933   0.140   0.061            0.213  {"sprint": 4, "rules": {"take profit": 2, "lock": 1, "stop buffer": 2}}
+75     933   0.134   0.050            0.176                          {"sprint": 4, "rules": {"calm": 2, "guard": 1}}

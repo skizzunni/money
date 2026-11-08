@@ -7385,3 +7385,8 @@ range position (0.65 / 0.75), calm (0.6 / 0.8), day guard ($1,000 / $1,400) and 
 the development weeks; the 10 best by passes with failures at most U57's 3.7% and failed or near-frozen at most its
 16.8% go to stage 2. **Replaces U57's settings** if on stage 2 it passes more than 16.1%, fails at most 6.1%, and failed
 + near-frozen is at most 21.5%. Run once (resumable).
+
+**G336 result (2026-11-08): rejected.** Stage 1 (150 sets, 405 development weeks; U57 13.8% / 3.7% / 16.8%): the best,
+k103 (time stop 45, calm 0.8), 14.1% / 3.0% / 15.6%; U57 itself second. Stage 2 (933 unseen weeks; U57 16.1% / 6.1% /
+21.5%): U57 tops the list; the others pass 13.4-15.4% (k103 14.8% / 5.0% / 19.2%). No change to U57's settings beats it
+on the unseen weeks. U57 stays. `verification/noise_v2/g336_u57_mix.txt`, `g336_stage1.csv`, `g336_stage2.csv`.
