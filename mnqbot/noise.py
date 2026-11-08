@@ -368,6 +368,11 @@ class NoiseConfig:
     # research (G318): the opening drive as a filter. When 09:30-10:00 moves more than drive_filter_k x the average of the
     # last calm_short sessions' ranges (a share of the open), no bot entries against that move today (0 = off)
     drive_filter_k: float = 0.0
+    # research (G373): size by the opening drive. When 09:30-10:00 moves more than drive_size_k x the average of the last
+    # calm_short sessions' ranges, entries with that move take drive_mult x the contracts, against it drive_against_mult
+    drive_size_k: float = 0.0
+    drive_mult: float = 1.0
+    drive_against_mult: float = 1.0
     # research (G69): small gaps. A gap at least gap_go_small_k x the average (but under gap_go_k), the 09:30 bar
     # closing its way, takes the same trade at 1 contract (-1 = off). Drive and small-gap trades are always 1 contract
     gap_go_small_k: float = -1.0
@@ -595,6 +600,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
     gap_hist: list[float] = []  # gap_go: the last sessions' |gap|
     drive_hist: list[float] = []  # gap_go_drive_k: the last sessions' 09:30 bar |body|
     drive_dir = 0  # G318: today's 09:30-10:00 direction when past drive_filter_k
+    drive_sz = 0  # G373: the same for drive_size_k
     news_set = set(cfg.news_dates.split(",")) if cfg.news_dates else set()  # G62
     news2_set = set(cfg.news2_dates.split(",")) if cfg.news2_dates else set()  # G325
     sess_month = sess_month_prev = None  # gap_go_skip_month_first: this session's and the last one's month
@@ -981,6 +987,11 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             mv = c[i] / day_open - 1
             if abs(mv) > cfg.drive_filter_k * sum(day_ranges[-cfg.calm_short:]) / cfg.calm_short:
                 drive_dir = 1 if mv > 0 else -1
+        if (cfg.drive_size_k > 0 and end == 600 and not math.isnan(day_open)  # G373: the opening drive, for size
+                and len(day_ranges) >= cfg.calm_short):
+            mv = c[i] / day_open - 1
+            if abs(mv) > cfg.drive_size_k * sum(day_ranges[-cfg.calm_short:]) / cfg.calm_short:
+                drive_sz = 1 if mv > 0 else -1
 
         if cfg.gap_go:  # G60: gap and go, 09:35-10:00, before the bot's first fill
             if gg is not None and (t_min >= cfg.gap_go_exit or t.date() != idx[gg["bar"]].date()):
@@ -1309,6 +1320,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
 
         if t_min == RTH_OPEN:
             drive_dir = 0  # G318
+            drive_sz = 0  # G373
             block_dir = 0
             target_today = guard_today = False
             if red_seen:
@@ -1461,6 +1473,9 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                         ml_next, q_next = ml_next / q_next * q_n, q_n
                     if cfg.news2_mult != 1.0 and t.strftime("%Y-%m-%d") in news2_set:  # G325: the Fed days
                         q_n = max(1, round(q_next * cfg.news2_mult))
+                        ml_next, q_next = ml_next / q_next * q_n, q_n
+                    if drive_sz and (cfg.drive_mult != 1.0 or cfg.drive_against_mult != 1.0):  # G373
+                        q_n = max(1, round(q_next * (cfg.drive_mult if d == drive_sz else cfg.drive_against_mult)))
                         ml_next, q_next = ml_next / q_next * q_n, q_n
                     if (cfg.pdhl_mult != 1.0 or cfg.pdhl_in_mult != 1.0) and not math.isnan(pd_hi):  # G345
                         past = c[i] > pd_hi if d > 0 else c[i] < pd_lo

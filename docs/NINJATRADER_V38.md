@@ -7908,3 +7908,13 @@ session by calendar year: 2015 $26, 2016 $258, 2017 $81, 2018 $314, 2019 $184, 2
 $253, 2024 $161, 2025 (to June) $933. From 2019-01-07 on the index: 2019 $18, 2020 $474, 2021 $151, 2022 $256, 2023
 $112, 2024 $203, 2025 $482, 2026 (to September) $205. One account passes $750 a session for a year only once in these
 two paths, years in, at the sizes it has grown to by then.
+
+## G373: a new angle, size the trend days: the opening drive (registered 2026-11-08, before its run)
+
+The bot's money is in a few trend days (docs/RESULTS.md); G318 used the opening drive only to block entries against
+it. Here it sizes: `research/g373_drive_size.py`: the funded mode (U48) where, when 09:30-10:00 moves more than 0.25 or
+0.5 x the average of the last sessions' ranges, entries with that move take 2x or 1.5x the contracts and entries
+against it 1x or 0.5x (6 variants: 2x / 1x, 2x / 0.5x, 1.5x / 1x at each threshold; `drive_size_k`, `drive_mult`,
+`drive_against_mult`, new in mnqbot/noise.py; the room still cuts the size). G372's measure and rule (development:
+the most $ a session among variants losing at most 5% of the starts; unseen: at most 5% lost and more $ a session than
+U48). Run once.
