@@ -7352,3 +7352,10 @@ or $1,000 / $500 instead of $800 / $300 (6 variants). G253's measure and G332's 
 14.1% / 3.7% (qualifies); the others 12.8-13.6%. On the unseen weeks (933; U57 16.1% / 6.1% / 21.5%) it passes 15.6% and
 fails 7.4%: not better. The other levels: 14.4-15.6% passed, 5.6-7.4% failed. U57's $800 / $300 stays.
 `verification/noise_v2/g333_lock_grid.txt`.
+
+## G334: a shorter sprint on U57 (registered 2026-11-08, before its run)
+
+G330: the failed Tests reach the floor around day 7 (2-9). `research/g334_sprint_days.py`: U57 with the sprint's 4 MNQ
+for the first 5, 7 or 8 sessions instead of 10, then the 50K's growth sizing (3 variants; `sprint_days`). G253's measure
+and G332's rule (development: more passes than U57's 13.8%, failures no higher than 3.7%; unseen: more than 16.1%
+passed, at most 6.1% failed, failed + near-frozen at most 21.5%). Run once.
