@@ -7952,3 +7952,11 @@ trade $52.3 / $48.1 with 32% / 49% lost; on drive days only $39.2 / $32.8 with 6
 lost beats U48, so nothing goes forward. Unseen (U48 $75.7, 3.1%): 2 on drive days only $80.3 with 4.7% lost; every
 trade $48-54 with 33-61% lost. Adding at the lock turns the lock's small wins into full losers when the trade comes back.
 U48 stays. `verification/noise_v2/g375_add_trend_days.txt`.
+
+## G376: let the trend days run (registered 2026-11-08, before its run)
+
+The trend-day angle on the exit side, no extra size: `research/g376_drive_runners.py`: the funded mode (U48, take-profit
+2.0 noise units) where entries in the direction of an opening drive past 0.25 or 0.5 take a 3.0 take-profit or none
+(the stops, lock and 16:00 close as before) (4 variants; `drive_tp`, new in mnqbot/noise.py). G372's measure and rule
+(development: the most $ a session among variants losing at most 5% of the starts; unseen: at most 5% lost and more $
+a session than U48). Run once.

@@ -375,6 +375,7 @@ class NoiseConfig:
     drive_mult: float = 1.0
     drive_against_mult: float = 1.0
     drive_none_mult: float = 1.0  # G374: with drive_size_k on, entries on a day without such a drive (and before 10:00)
+    drive_tp: float = -1.0  # research (G376): entries with the opening drive (drive_size_k) take this take-profit (0: none; <0: off)
     # research (G69): small gaps. A gap at least gap_go_small_k x the average (but under gap_go_k), the 09:30 bar
     # closing its way, takes the same trade at 1 contract (-1 = off). Drive and small-gap trades are always 1 contract
     gap_go_small_k: float = -1.0
@@ -1561,6 +1562,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                         tp_next = cfg.big_day_against_tp
                     if cfg.trend_with_tp > 0 and trend == d:
                         tp_next = cfg.trend_with_tp
+                    if cfg.drive_tp >= 0 and drive_sz == d:  # G376: let the trend days run
+                        tp_next = cfg.drive_tp
                     est_px = c[i] + d * slip  # the expected fill, for the max loss on the fill bar
                     stop = tp = math.nan
                     if use_stop:  # the bracket: the closer of the line stop and the max loss, and the take-profit
