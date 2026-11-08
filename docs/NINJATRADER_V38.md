@@ -7902,3 +7902,9 @@ loses **27-43% / 27-49%** of the accounts within the year and makes $35-62 / $55
 $104-136), the P/L after a loss counted as $0. None loses at most 5%. The $900 daily loss and the $2,000 floor leave room
 for about 4-5 contracts at $187.50 at the start; more contracts mean tighter stops ($125: fewer winners) or the floor.
 No variant comes near $750 a session. U48 stays the funded mode. `verification/noise_v2/g372_faster_growth.txt`.
+
+**A quick look after G372 (not registered; one path per set, 2026-11-08):** U48 funded from 2015-04-06 on NQ, $ a
+session by calendar year: 2015 $26, 2016 $258, 2017 $81, 2018 $314, 2019 $184, 2020 $354, 2021 $123, 2022 $269, 2023
+$253, 2024 $161, 2025 (to June) $933. From 2019-01-07 on the index: 2019 $18, 2020 $474, 2021 $151, 2022 $256, 2023
+$112, 2024 $203, 2025 $482, 2026 (to September) $205. One account passes $750 a session for a year only once in these
+two paths, years in, at the sizes it has grown to by then.
