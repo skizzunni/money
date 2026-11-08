@@ -7227,3 +7227,9 @@ jobs days (1.5x, 1.25x, 2x) and the day cap ($1,500, $1,400, $1,600). Stage 1 on
 passes with failures at most U56's 3.7% and failed or near-frozen at most its 16.8% go to stage 2. **Replaces U56's
 settings** if on stage 2 it passes more than 16.0%, fails at most 6.6%, and failed + near-frozen is at most 21.7%. Run
 once (resumable).
+
+**G324 result (2026-11-07): rejected.** Stage 1 (60 neighbours, 405 development weeks): U56 reproduced (14.07% / 3.70% /
+16.79%; it fell just outside the selection's 3.7% by rounding, and it is the base, not a candidate). Every neighbour that
+passes as much fails more (k40 14.3% / 6.2%; k33, k45 14.1% / 5.4%, 4.2%); the three inside the failure bounds pass
+7.9-9.4%. Stage 2 (933 unseen weeks): those three 9.3-11.1% passed. U56's values are the best of their neighbourhood.
+U56 stays. `verification/noise_v2/g324_u56_tune.txt`, `g324_stage1.csv`, `g324_stage2.csv`.
