@@ -7724,3 +7724,8 @@ bar included) is at most 0.5, 0.75 or 1.0 x the check's noise (sigma) x the clos
 mnqbot/noise.py). G253's measure and G332's rule (development: the best by passes with failures no higher than U57's
 3.7%, and more passes than its 13.8%; unseen: more than 16.1% passed, at most 6.1% failed, failed + near-frozen at most
 21.5%). Run once.
+
+**G361 result (2026-11-08): rejected.** Development (405 weeks; U57 13.8% / 3.7% / 16.8%): a quiet half hour at most 0.5 /
+0.75 / 1.0 x the noise 2.5% / 1.5%, 5.2% / 2.5%, 7.2% / 3.5%. Unseen (933; U57 16.1% / 6.1% / 21.5%): 3.9% / 4.9%, 5.8% /
+4.9%, 7.9% / 5.7%. The bot's breakouts come out of fast half hours; asking for a quiet one removes the good ones and
+keeps the failures. U57 stays. `verification/noise_v2/g361_quiet_half_hour.txt`.

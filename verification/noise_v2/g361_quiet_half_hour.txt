@@ -1,0 +1,14 @@
+development (index 2011-18):
+                                                                   weeks  passed  failed  stuck  failed_or_stuck
+tag                                                                                                             
+U57                                                                  405   0.138   0.037  0.131            0.168
+entries only if the half hour's range is at most 0.5 x the noise     405   0.025   0.015  0.064            0.079
+entries only if the half hour's range is at most 0.75 x the noise    405   0.052   0.025  0.123            0.148
+entries only if the half hour's range is at most 1.0 x the noise     405   0.072   0.035  0.104            0.138
+unseen (NQ 2015-25 + index 2019-26):
+                                                                   weeks  passed  failed  stuck  failed_or_stuck
+tag                                                                                                             
+U57                                                                  933   0.161   0.061  0.154            0.215
+entries only if the half hour's range is at most 0.5 x the noise     933   0.039   0.049  0.075            0.124
+entries only if the half hour's range is at most 0.75 x the noise    933   0.058   0.049  0.124            0.174
+entries only if the half hour's range is at most 1.0 x the noise     933   0.079   0.057  0.141            0.198
