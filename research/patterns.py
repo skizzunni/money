@@ -254,6 +254,20 @@ def signals(day: Day, setup: str):
                 if h[i] > day.pdh > c[i]:
                     out.append((i, -1, h[:i + 1].max() + TICK, None, "R"))
                     break
+    elif setup in ("amsweep", "amsweep_cisd"):  # G378: the 09:30-10:00 range swept after 10:00, then reclaimed
+        rng = [j for j in range(n) if 570 <= day.mins[j] < 600]
+        if len(rng) >= 3:
+            hi_r, lo_r = h[rng].max(), l[rng].min()
+            for d in (1, -1):
+                swept = None
+                for i in range(rng[-1] + 1, n - 1):
+                    if swept is None and (l[i] < lo_r if d > 0 else h[i] > hi_r):
+                        swept = i
+                    if swept is not None and (c[i] > lo_r if d > 0 else c[i] < hi_r) and (
+                            setup == "amsweep" or (c[i] > h[i - 1] if d > 0 else c[i] < l[i - 1])):
+                        ext = l[swept:i + 1].min() if d > 0 else h[swept:i + 1].max()
+                        out.append((i, d, ext - d * TICK, hi_r if d > 0 else lo_r, "pattern"))
+                        break
     elif setup == "ema":
         e9, e21, e200 = day.e9, day.e21, day.e200
         for i in range(1, n - 1):

@@ -7975,3 +7975,16 @@ starts; unseen: at most 5% lost and more $ a session than U48). Run once.
 **G377 result (2026-11-08): rejected.** Development (U48 $39.2 a session, 3.2% lost): $31.1-38.5, 0-3.2% lost; none beats
 U48. Unseen (U48 $75.7, 3.1%): $70.5-74.8. More tries on drive days add nothing; fewer on the others cost. U48 stays.
 `verification/noise_v2/g377_drive_losers.txt`.
+
+## G378: the user's video: the morning range swept, then reclaimed (registered 2026-11-08, before its run)
+
+The video (TikTok @whaley_nq, MNQ 1-minute, Oct 28): price sweeps the "NY AM Low", reclaims it ("CISD"), long 9 MNQ with
+the stop under the sweep and the target at the "NY AM High", +$2,214. One trade, picked by its poster. As a rule
+(`research/patterns.py` setups `amsweep` / `amsweep_cisd`, new; `research/g378_am_sweep.py`): the 09:30-10:00 range;
+after 10:00, once price trades below its low (above its high), the first 5-minute close back inside the range (with
+`_cisd` also above the previous bar's high / below its low) enters at the next open; stop a tick past the sweep's
+extreme; target the range's other side, 1R or 2R; entries to 12:00 or to 15:30 (12 variants). patterns.py's execution
+($500 risk, 1-10 MNQ, a tick of slippage, $0.62 a side, one trade at a time, flat at 16:00). **Rule:** the variant with
+the best profit factor on NQ 2015-2019 (at least 50 trades a year) passes if it has a profit factor of at least 1.2 and
+makes money on NQ 2020-2025, the index 2011-2026 and the 2025-2026 stand-in; only then is it tried with the funded bot.
+Run once.
