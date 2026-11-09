@@ -8240,3 +8240,9 @@ session, 0% lost): start 2 MNQ **$154.9** (+13%, 0% lost); cap 100 $141.9; +1 pe
 lost). Unseen (150K as U48 $235.7, 0%): start 2 MNQ **$275.7** (+17%, 1.8% lost); year three $356 a session. This is
 for a 150K-style account only (the user's is a 50K; U48 there is unchanged). The best one-account figure measured:
 about $276 a session over three years, $356 in year three. `verification/noise_v2/g397_150k_sizing.txt`.
+
+## G398: the 150K-style pick tuned further (registered 2026-11-09, before its run)
+
+`research/g398_150k_more.py`: G397's pick (150K-style, start 2 MNQ) with a cap of 100 contracts, the fast $650 steps from
+$6,000, or the day budget at $2,900 (under a $3,000 daily loss) (3 variants). G397's measure and rule against the pick.
+Run once.
