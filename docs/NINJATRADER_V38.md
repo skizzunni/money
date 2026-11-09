@@ -8050,3 +8050,10 @@ contract per $1,000, the fast steps from $3,000, G379's inverse-volatility size 
 check with entries to 15:30, take-profit 2.5, time stop 90, the big-day rule at 2.0, the day lock at $800 / $300.
 G372's measure and rule (development: the most $ a session among sets losing at most 5% of the starts; unseen: at most
 5% lost and more $ a session than U48). Run once.
+
+**G383 result (2026-11-09): rejected.** Development (U48 $39.2 a session, 3.2% lost): within 5% lost the best is fast steps
++ inverse-volatility size + drive tilt + every check to 15:30 + take-profit 2.5, **$55.7 at 3.4%**; starting at 2 MNQ
+makes $48-68 but loses 13-29%. Unseen (U48 $75.7, 3.1%): the pick makes $76.5 but loses **6.3%**, past the bound. The
+best unseen at most 5% lost: "step, vol, checks, day lock" $83.3 (4.7%) and "step, drive, checks, tp, big day" $83.4
+(4.8%); the most unseen at any loss $87.4 (17.4% lost). The development gain does not carry over. U48 stays.
+`verification/noise_v2/g383_funded_mix.txt`.

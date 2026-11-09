@@ -1,0 +1,126 @@
+development (index 2011-18 starts):
+                                                                per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                                                                     
+start, vol, checks, tp                                               68.388      32.600       106.593     154.508  0.195
+start, step, drive, checks, tp                                       65.367      36.133        88.089     125.768  0.229
+start, fast, drive, checks, tp                                       64.459      32.141       101.912     135.692  0.194
+start, checks, day lock                                              63.627      30.619       107.057     162.811  0.162
+start, drive, checks, day lock                                       60.192      30.832       107.706     157.297  0.227
+start, fast, checks, time stop                                       59.194      25.033       106.593     162.319  0.133
+start, step, fast, drive, checks, time stop                          56.553      27.853       106.476     171.728  0.195
+start, step, vol, drive, checks, day lock                            56.121      32.099        82.981     105.003  0.259
+fast, vol, drive, checks, tp                                         55.730      21.994        98.135     127.602  0.034
+start, step, fast, vol, drive, checks, tp, time stop, day lock       55.623      25.594        91.237     126.311  0.293
+start, fast, time stop, day lock                                     53.555      31.987        61.212      82.772  0.131
+start, fast, vol, checks, time stop, day lock                        53.305      29.973        87.350     147.255  0.098
+step, fast, vol, checks, tp, time stop                               52.799      19.061        93.847     112.305  0.113
+start, checks, big day, day lock                                     52.056      26.186        90.077     143.001  0.128
+start, vol, drive, tp, time stop                                     52.053      28.095        87.305     124.929  0.131
+start, time stop, day lock                                           51.009      33.650        64.302      96.106  0.131
+start, step                                                          49.633      34.115        72.457     111.391  0.195
+step, vol, checks, day lock                                          49.434      19.116        80.028     147.613  0.032
+step, vol, drive, time stop, day lock                                49.434      22.062        84.267     113.034  0.064
+start, fast, vol, drive, checks, time stop                           48.833      26.516        86.427     119.684  0.163
+start, fast, drive                                                   48.393      29.401        64.432      80.953  0.131
+start, vol, drive, big day                                           47.790      27.563        80.400     124.103  0.232
+drive, checks, tp, big day                                           47.090      21.685        81.167     116.162  0.098
+start, fast, vol, drive, checks, time stop, big day, day lock        46.869      23.824        91.355     149.494  0.131
+start, step, drive, tp, big day, day lock                            46.824      31.231        70.019      95.746  0.232
+start, step, fast, drive, checks, tp, big day                        46.822      31.828        70.197      81.921  0.259
+vol, tp, day lock                                                    46.773      19.099        85.643     135.324  0.032
+start, fast, checks, tp, time stop, big day, day lock                46.497      25.912        73.044     103.521  0.197
+drive, tp                                                            46.429      21.519        89.551     113.001  0.000
+vol, tp                                                              46.376      19.393        88.561     110.822  0.000
+fast, vol, tp, day lock                                              46.052      18.263        81.400     125.544  0.032
+step, drive, time stop, day lock                                     45.684      22.734        64.086     101.659  0.034
+start, checks, time stop, big day                                    44.286      24.489        89.572     143.097  0.101
+start, step, fast, vol, tp, big day, day lock                        44.130      24.923        72.234     103.743  0.296
+start, step, fast, vol, tp, time stop, big day                       43.053      27.638        64.814      91.192  0.227
+step, fast, vol, tp, time stop, day lock                             42.802      18.148        62.952     108.639  0.000
+start, fast, big day, day lock                                       42.574      27.412        57.817      79.283  0.165
+day lock                                                             41.536      19.057        80.785     122.928  0.000
+start, vol, time stop, big day                                       40.786      23.240        76.466     111.172  0.163
+vol, drive, checks, tp, time stop, big day                           40.716      19.223        80.207     100.087  0.066
+step, fast, vol, time stop, day lock                                 39.868      19.128        58.356      93.488  0.000
+start, vol, checks, tp, time stop, big day, day lock                 39.686      26.684        59.462      97.962  0.229
+checks, time stop, big day                                           39.614      17.461        84.214     138.323  0.034
+U48                                                                  39.221      18.490        73.495     114.895  0.032
+start, vol, tp, time stop, big day                                   38.984      25.783        64.620      84.475  0.130
+step, vol, drive, time stop, big day, day lock                       38.416      19.415        64.205      91.512  0.066
+start, drive, tp, time stop, big day, day lock                       38.248      31.233        41.920      61.966  0.099
+step, drive, checks, tp, big day                                     38.149      20.905        49.908      75.586  0.197
+fast, vol, drive, checks, tp, big day                                37.622      20.299        58.465      95.423  0.066
+step, fast, checks, tp, time stop, big day                           37.157      16.299        61.312      87.291  0.000
+step, fast, vol, drive, tp, time stop                                37.112      19.873        46.343      78.768  0.034
+step, vol, drive, tp, big day                                        36.605      19.622        54.135      85.426  0.098
+fast, drive, checks, tp, time stop, big day                          35.279      18.523        52.411      95.620  0.099
+step, checks, big day, day lock                                      34.774      16.660        57.878     120.879  0.064
+start, fast, vol, drive, time stop, big day, day lock                34.369      23.526        51.779      71.650  0.165
+start, fast, time stop, big day                                      30.339      23.495        48.213      94.482  0.133
+vol, tp, time stop, big day, day lock                                30.210      17.642        57.603     100.529  0.000
+vol, checks, tp, time stop, big day                                  28.130      17.184        49.626      82.834  0.066
+fast, vol, tp, time stop, big day, day lock                          27.818      16.616        46.076      68.578  0.000
+start, fast, vol, drive, tp, big day                                 23.877      23.131        37.472      64.367  0.198
+unseen (index 2019-25 + NQ 2015-24):
+                                                                per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                                                                     
+start, step, fast, vol, drive, checks, tp, time stop, day lock       87.398      69.463       112.497     135.036  0.174
+start, step, drive, checks, tp                                       86.386      67.523       123.942     138.882  0.127
+step, fast, vol, time stop, day lock                                 85.863      46.931       125.014     174.454  0.111
+start, fast, drive, checks, tp                                       83.681      63.895       124.544     136.560  0.157
+step, drive, checks, tp, big day                                     83.425      50.718       128.270     161.859  0.048
+step, vol, checks, day lock                                          83.318      42.421       110.443     147.909  0.047
+step, fast, vol, checks, tp, time stop                               81.315      54.704       119.647     135.000  0.110
+start, step, fast, vol, tp, big day, day lock                        80.927      56.941       112.620     147.520  0.171
+start, step, fast, drive, checks, tp, big day                        80.495      69.414       107.719     144.977  0.096
+step, vol, drive, tp, big day                                        80.088      49.813       119.485     148.693  0.078
+start, checks, day lock                                              79.988      55.760       112.770     130.838  0.174
+start, step                                                          79.402      64.390       112.557     153.265  0.172
+start, vol, checks, tp                                               79.242      67.444       123.172     133.758  0.172
+start, vol, drive, big day                                           79.113      61.402       130.541     153.937  0.140
+step, drive, time stop, day lock                                     79.072      47.063       125.869     168.371  0.093
+start, fast, vol, drive, checks, time stop                           78.839      68.646       119.806     131.589  0.158
+step, vol, drive, time stop, big day, day lock                       78.684      43.608       134.353     177.273  0.078
+start, drive, checks, day lock                                       78.138      54.057       115.484     132.078  0.157
+start, vol, drive, tp, time stop                                     78.007      57.811       111.703     128.997  0.173
+fast, drive, checks, tp, time stop, big day                          77.896      45.048       121.596     166.713  0.047
+step, fast, vol, tp, time stop, day lock                             77.717      42.786       103.710     126.362  0.064
+start, step, fast, drive, checks, time stop                          77.348      65.793       104.927     117.038  0.172
+step, vol, drive, time stop, day lock                                77.345      44.678       129.879     163.640  0.093
+start, fast, checks, time stop                                       77.294      67.677       102.461     119.331  0.223
+step, fast, vol, drive, tp, time stop                                76.962      51.402       114.250     148.161  0.047
+start, vol, tp, time stop, big day                                   76.919      61.015       112.382     120.475  0.204
+start, fast, vol, drive, checks, time stop, big day, day lock        76.816      59.123       107.330     118.133  0.141
+start, fast, drive                                                   76.551      60.180       118.273     146.369  0.141
+fast, vol, drive, checks, tp                                         76.536      44.608       117.506     150.224  0.063
+start, fast, time stop, day lock                                     76.208      58.732       111.689     139.839  0.095
+start, time stop, day lock                                           76.107      52.707       111.990     137.778  0.095
+U48                                                                  75.724      40.467       115.664     138.786  0.031
+start, step, fast, vol, tp, time stop, big day                       75.525      66.731       100.537     118.919  0.236
+start, fast, vol, checks, time stop, day lock                        75.473      66.622       112.011     140.455  0.173
+start, vol, time stop, big day                                       75.396      64.799       125.792     147.144  0.188
+fast, vol, drive, checks, tp, big day                                74.824      45.897       114.003     160.706  0.047
+fast, vol, tp, day lock                                              74.502      31.991       121.409     146.343  0.047
+start, step, drive, tp, big day, day lock                            74.385      53.900       113.831     139.424  0.156
+start, step, vol, drive, checks, day lock                            74.117      58.462       102.494     120.884  0.156
+drive, checks, tp, big day                                           73.726      43.823       108.885     139.844  0.047
+start, fast, vol, drive, time stop, big day, day lock                73.491      56.479       115.039     135.233  0.108
+vol, tp                                                              73.327      39.243       111.785     129.862  0.047
+step, fast, checks, tp, time stop, big day                           73.295      50.062        94.885     105.437  0.079
+start, vol, checks, tp, time stop, big day, day lock                 73.005      60.218        99.937     124.618  0.173
+drive, tp                                                            72.959      39.927       112.504     129.725  0.077
+start, checks, time stop, big day                                    72.633      59.978        97.825     114.386  0.187
+start, drive, tp, time stop, big day, day lock                       72.490      53.196       108.823     123.920  0.172
+start, fast, checks, tp, time stop, big day, day lock                72.132      59.782        88.833     110.443  0.143
+start, fast, vol, drive, tp, big day                                 71.969      61.530       109.350     132.689  0.220
+day lock                                                             71.596      34.689       114.592     146.145  0.031
+vol, drive, checks, tp, time stop, big day                           70.535      46.411       101.594     126.956  0.063
+step, checks, big day, day lock                                      70.413      42.369        92.887     106.463  0.064
+start, checks, big day, day lock                                     69.279      52.042       102.096     104.250  0.187
+start, fast, big day, day lock                                       68.505      59.152        90.672     135.879  0.140
+vol, tp, day lock                                                    68.456      28.102       118.969     146.629  0.047
+start, fast, time stop, big day                                      68.298      63.940       103.964     132.637  0.079
+fast, vol, tp, time stop, big day, day lock                          68.134      32.263       101.242     125.410  0.048
+checks, time stop, big day                                           66.475      40.944       102.413     140.234  0.032
+vol, checks, tp, time stop, big day                                  65.479      42.800       103.821     153.166  0.016
+vol, tp, time stop, big day, day lock                                65.253      30.651       105.544     125.142  0.032
