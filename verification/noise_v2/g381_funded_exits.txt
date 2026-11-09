@@ -1,0 +1,18 @@
+development (index 2011-18 starts):
+                  per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                       
+take-profit 2.5        41.050      17.806        66.584      87.840  0.032
+U48                    39.221      18.490        73.495     114.895  0.032
+time stop 90 min       37.535      19.256        68.918      90.992  0.000
+time stop 30 min       34.707      19.148        64.099     102.088  0.032
+take-profit 3.0        31.560      16.114        55.186      84.117  0.064
+take-profit 1.5        26.868      17.889        47.723      77.090  0.066
+unseen (index 2019-25 + NQ 2015-24):
+                  per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                       
+U48                    75.724      40.467       115.664     138.786  0.031
+time stop 90 min       74.656      40.491       112.568     138.552  0.032
+take-profit 2.5        71.805      36.676       113.840     132.531  0.047
+time stop 30 min       70.431      43.018        97.817     112.169  0.016
+take-profit 1.5        66.875      38.634        85.326     119.130  0.016
+take-profit 3.0        63.884      35.882        90.172     115.015  0.031

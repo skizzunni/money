@@ -8024,3 +8024,7 @@ $300, $41.5 with 0% lost. Unseen (U48 $75.7, 3.1%): $71.6 at 3.1%, less than U48
 settings file, which overrides the runner's 60; G371 / G372's "60-minute time stop" wording was wrong, the runs used 45)
 with the take-profit at 1.5, 2.5 or 3.0, or the time stop at 30 or 90 minutes (5 variants). G372's measure and rule.
 Run once.
+
+**G381 result (2026-11-09): rejected.** Development (U48 $39.2 a session, 3.2% lost): the pick, take-profit 2.5, $41.1 at
+3.2%. Unseen (U48 $75.7, 3.1%): $71.8 at 4.7%, less than U48; the others $63.9-74.7. U48's exits stay.
+`verification/noise_v2/g381_funded_exits.txt`.
