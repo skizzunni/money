@@ -8222,3 +8222,8 @@ is, on a 50K ($2,000 floor, $900 day budget, $750 before the floor stops), a 100
 $1,500) and a 150K-style account ($4,500 floor, $2,700 / $2,250), the rest of U48's 50K settings unchanged (not tuned
 for the bigger accounts). G391's starts and 36 months; by year: $ a session, months at $750+, lost (intraday, each
 account's own floor). A measurement, not a candidate.
+
+**G396 result (2026-11-09):** $ a session by year (80 starts): 50K (U48) $68 / $171 / $215 (lost 2.5%); 100K-style $84 /
+$217 / $278 (1.2%); 150K-style $91 / $208 / $323 (0%). Months at $750+: 2-8% (50K), 3-14% (100K), 4-19% (150K). Even
+a 150K-style account with U48's untuned settings averages about $320 a session in year three; $750 a session on average
+is not reached on any single account size tested. `verification/noise_v2/g396_bigger_account.txt`.
