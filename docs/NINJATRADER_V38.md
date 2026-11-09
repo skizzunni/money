@@ -8431,3 +8431,11 @@ skipped, the day lock $1,500 / $750, the trend over 20 sessions") **$177.4 (+62%
 run 5.4 weeks: less consistent, so not recommended. Of the next five development picks, the best unseen are $220.8
 (5.3% lost, 63.6%) and $217.1 (1.8%, 62.7%); none keeps U48's green months. Third search in a row (G400, G408, G410)
 where more money comes with fewer green months. U48 stays. `verification/noise_v2/g410_wide_search_final.csv`.
+
+## G411: the wide search again, consistency first (registered 2026-11-09, before its run)
+
+`research/g411_wide_search2.py`: G410's knobs plus Fridays 1.25x, the early budget $600 and the fast steps from $6,000;
+200 random sets (seed 411; U48 first); G408's measure. **Rule (consistency first):** on development, among sets losing
+at most 5% with green months at least 3 points above U48's, the most $; recommended if on unseen it loses at most 5%,
+makes at least 10% more than U48, keeps green months at least U48's and the longest losing run no longer, and then
+passes G409's fresh-start check. Run once (resumable).
