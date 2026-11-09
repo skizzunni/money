@@ -1,0 +1,206 @@
+development (index 2011-18 starts):
+                                                                                      per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                                                                                           
+step, drive, weekday, checks, time stop, day lock, early budget                            67.233      19.357       126.258     163.318  0.000
+step, vol, drive, weekday, checks, time stop, early budget                                 58.957      23.966       103.084     157.560  0.067
+fast, vol, drive, weekday, checks, tp, time stop, day lock, early budget                   51.893      18.694        97.159     136.054  0.067
+step, drive, weekday, checks, tp, day lock, early budget, losers                           50.166      23.996        71.085      90.812  0.034
+step, fast, vol, drive, checks, tp, time stop                                              46.777      17.114        68.447     128.661  0.034
+vol, weekday, tp, time stop, day lock, losers                                              45.777      18.112        87.418     127.290  0.034
+vol, tp, time stop, day lock                                                               43.779      20.832        81.671     120.780  0.000
+vol, drive, weekday, tp, time stop, day lock, early budget                                 43.766      18.074        79.737     122.975  0.032
+fast, vol, weekday, checks, time stop, day lock, early budget, losers                      43.475      17.614        85.175      88.015  0.066
+step, drive, weekday, tp, big day, day lock                                                42.535      18.571        64.853      92.881  0.099
+step, fast, vol, checks, time stop, day lock, early budget, losers                         41.599      17.157        55.585      63.839  0.000
+step, fast, vol, drive, weekday, tp, time stop, day lock, losers                           41.424      14.915        63.685      96.584  0.000
+step, fast, weekday, time stop, day lock                                                   41.039      19.323        69.207      98.010  0.000
+fast, vol, drive, weekday, checks, big day                                                 40.441      17.519        68.310      86.411  0.066
+step, vol, drive, weekday, checks, time stop, big day, early budget, losers                39.753      18.606        68.720      93.290  0.032
+fast, drive, weekday, checks, tp, big day, early budget, losers                            39.700      18.806        49.730      90.773  0.098
+vol, drive, weekday, checks, time stop, big day, day lock, early budget, losers            39.477      17.669        72.946     106.655  0.034
+U48                                                                                        39.221      18.490        73.495     114.895  0.032
+step, weekday, checks, tp, big day, day lock                                               38.897      16.042        70.318      94.783  0.098
+fast, drive, weekday, tp, time stop, day lock, early budget, losers                        38.798      23.066        52.447      86.725  0.000
+fast, drive, weekday, checks, tp, time stop, day lock, early budget, losers                38.734      17.596        62.443      90.258  0.032
+step, fast, vol, drive, checks, tp                                                         38.677      19.232        59.218      75.037  0.034
+step, vol, weekday, checks, time stop, day lock, losers                                    38.510      18.069        53.754      69.052  0.000
+step, fast, vol, weekday, checks, tp, time stop, losers                                    38.236      15.636        65.303     117.211  0.127
+fast, vol, tp, day lock, early budget, losers                                              38.213      17.749        63.386      96.290  0.032
+vol, drive, checks, tp, time stop, big day, day lock, early budget, losers                 38.180      22.130        68.359     110.448  0.066
+vol, checks, time stop, big day, losers                                                    38.107      17.757        78.667     127.274  0.000
+fast, drive, weekday, tp, day lock, early budget, losers                                   37.982      19.833        61.165      96.416  0.000
+step, vol, weekday, checks, big day                                                        37.807      17.891        67.526     132.488  0.000
+step, vol, weekday, checks, tp, big day, day lock, early budget                            37.685      15.716        73.243     138.369  0.066
+step, fast, vol, weekday, tp, time stop, day lock, losers                                  36.511      14.722        52.254      71.874  0.032
+fast, vol, drive, tp, day lock, losers                                                     36.406      20.600        56.594      88.727  0.000
+step, fast, vol, weekday, checks, time stop, losers                                        36.356      15.942        47.336      74.009  0.062
+step, fast, vol, checks, tp, time stop, day lock, losers                                   36.273      14.815        54.997      69.153  0.099
+step, vol, weekday, checks, day lock, early budget, losers                                 36.192      15.298        51.700      79.652  0.062
+step, fast, drive, weekday, day lock, losers                                               36.139      16.496        61.826      86.457  0.000
+step, vol, drive, weekday, checks, big day, day lock, early budget, losers                 35.914      14.982        69.297      84.134  0.066
+step, vol, drive, weekday, tp, time stop, big day, losers                                  35.674      17.181        57.286      84.778  0.101
+step, vol, drive, time stop, losers                                                        35.393      15.821        59.105      77.551  0.000
+step, fast, vol, drive, checks, big day, early budget, losers                              35.320      18.294        60.514      91.398  0.032
+vol, drive, weekday, checks, tp, time stop, day lock, early budget, losers                 35.208      21.382        47.669      97.083  0.000
+fast, weekday, checks, day lock, losers                                                    35.076      18.288        51.945      66.237  0.000
+fast, weekday, checks, tp, day lock, losers                                                34.837      17.366        54.332      89.629  0.098
+vol, weekday, checks, tp, big day, day lock                                                34.735      15.305        68.455     112.894  0.000
+fast, weekday, checks, day lock, early budget, losers                                      34.660      17.446        52.190      59.605  0.000
+step, checks, tp, time stop, big day, losers                                               34.376      14.866        54.197      92.474  0.066
+step, vol, drive, weekday, checks, tp, time stop, big day, day lock, losers                34.356      20.928        40.666      69.972  0.066
+fast, vol, drive, tp, time stop, day lock, early budget                                    34.054      17.937        50.811      85.059  0.032
+step, vol, drive, tp, time stop, big day, day lock, early budget                           33.964      17.835        59.269      75.476  0.000
+drive, weekday, checks, tp, time stop, day lock, losers                                    33.857      20.399        52.814      75.851  0.000
+fast, vol, checks, time stop, big day                                                      33.361      16.287        62.851      77.271  0.034
+vol, weekday, checks, tp, time stop                                                        33.290      17.818        52.000      73.501  0.000
+step, fast, vol, drive, weekday, checks, tp, time stop, big day                            33.269      18.452        46.576      74.110  0.032
+fast, vol, weekday, checks, time stop, big day, early budget                               32.807      16.348        61.319      82.595  0.034
+drive, weekday, checks, tp, big day, day lock, losers                                      32.354      19.633        52.280     100.823  0.000
+step, drive, weekday, checks, big day, early budget, losers                                31.187      16.040        47.676      58.365  0.066
+vol, checks, tp, time stop, big day, day lock, losers                                      31.130      16.047        60.342     106.499  0.000
+step, vol, drive, weekday, time stop, big day, early budget                                31.064      15.123        61.126      75.172  0.000
+fast, vol, drive, weekday, tp, time stop, day lock                                         30.810      18.018        47.309      82.310  0.000
+fast, vol, drive, checks, time stop, losers                                                30.770      18.744        44.854      51.917  0.032
+vol, weekday, tp, time stop, big day, day lock, early budget                               30.506      17.026        55.027      93.565  0.000
+step, fast, weekday, tp, time stop, day lock, losers                                       30.307      16.758        39.286      52.140  0.034
+step, fast, checks, tp, time stop, big day, day lock, losers                               29.609      16.702        42.702      75.306  0.032
+weekday, checks, time stop, big day, day lock, early budget                                29.407      17.788        55.304      96.991  0.066
+step, fast, vol, drive, weekday, checks, time stop, big day, losers                        29.138      16.554        44.891      57.115  0.064
+fast, vol, drive, tp, big day, losers                                                      28.705      19.026        39.567      70.662  0.032
+vol, drive, weekday, tp, time stop, big day, day lock                                      28.552      19.599        49.061      83.910  0.066
+fast, drive, checks, tp, big day, losers                                                   28.222      17.894        33.469      52.021  0.067
+step, vol, drive, tp, time stop, big day, early budget, losers                             28.201      16.047        36.818      64.699  0.133
+vol, drive, weekday, checks, time stop, big day, early budget, losers                      27.882      18.442        43.830      49.636  0.000
+drive, weekday, checks, time stop, big day, early budget, losers                           27.865      19.287        44.898      51.015  0.034
+fast, time stop, big day, day lock, early budget                                           27.401      15.992        44.698      67.434  0.000
+step, vol, weekday, checks, tp, time stop, big day, early budget                           27.225      17.058        36.789      55.436  0.067
+fast, vol, weekday, checks, tp, time stop, big day, day lock, early budget, losers         27.079      15.397        56.956     101.891  0.000
+vol, drive, weekday, tp, time stop, big day, day lock, early budget, losers                26.814      20.748        42.988      63.066  0.067
+step, fast, vol, drive, weekday, tp, time stop, big day, day lock, losers                  26.616      17.685        33.186      61.883  0.064
+fast, vol, drive, weekday, tp, time stop, big day, day lock, losers                        26.503      19.576        31.689      69.208  0.032
+step, vol, drive, weekday, checks, tp, time stop, big day, day lock                        26.274      19.299        34.323      47.952  0.066
+fast, drive, tp, time stop, big day, early budget, losers                                  26.205      17.252        36.216      60.900  0.032
+vol, drive, weekday, checks, tp, time stop, big day, day lock, losers                      26.193      16.122        42.905      65.536  0.000
+step, drive, weekday, tp, time stop, big day, day lock, early budget, losers               26.137      17.231        32.356      52.340  0.032
+step, drive, weekday, checks, tp, time stop, big day, day lock, early budget, losers       25.299      14.185        34.483      47.594  0.096
+fast, vol, drive, weekday, checks, tp, time stop, big day, early budget                    25.153      14.594        44.594      62.853  0.000
+step, fast, vol, weekday, checks, tp, big day, day lock, early budget, losers              25.036      15.564        28.102      56.484  0.099
+step, fast, weekday, checks, time stop, big day, day lock, early budget, losers            24.743      14.323        37.609      56.207  0.098
+step, vol, drive, tp, time stop, big day, day lock                                         24.690      19.724        32.683      70.744  0.066
+step, fast, vol, time stop, big day, day lock, early budget, losers                        23.681      15.064        36.835      41.093  0.000
+step, vol, drive, tp, big day, day lock, early budget                                      23.632      15.091        34.013      48.741  0.032
+vol, drive, tp, time stop, big day, day lock                                               22.911      15.813        34.521      68.367  0.000
+fast, vol, weekday, checks, time stop, big day, losers                                     22.303      17.040        35.343      40.985  0.000
+step, fast, weekday, tp, big day, day lock, early budget, losers                           22.290      13.027        28.752      45.286  0.000
+fast, vol, drive, weekday, checks, tp, time stop, big day, day lock, losers                22.250      15.060        34.137      61.458  0.000
+step, drive, weekday, time stop, big day, losers                                           22.021      14.692        29.052      38.213  0.034
+fast, drive, tp, time stop, big day, day lock, early budget, losers                        21.170      15.313        31.576      61.047  0.000
+step, vol, weekday, checks, tp, time stop, big day, day lock, early budget, losers         20.508      15.123        21.971      57.990  0.047
+step, fast, weekday, tp, time stop, big day, day lock, early budget                        18.454      13.389        23.060      53.008  0.000
+step, fast, drive, weekday, tp, time stop, big day, early budget, losers                   18.335      17.095        19.011      48.159  0.067
+fast, checks, tp, time stop, big day, early budget                                         17.831      14.071        24.707      62.984  0.099
+step, vol, drive, tp, time stop, big day, day lock, losers                                 15.312      14.838        13.649      45.142  0.000
+step, fast, vol, drive, weekday, checks, tp, time stop, big day, losers                    11.012      12.112         6.266      35.085  0.099
+unseen (index 2019-25 + NQ 2015-24):
+                                                                                      per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                                                                                           
+fast, drive, tp, time stop, big day, early budget, losers                                 102.044      56.356       137.180     182.732  0.031
+step, fast, weekday, tp, time stop, day lock, losers                                      101.280      65.188       140.185     193.402  0.047
+step, fast, vol, drive, checks, tp, time stop                                              99.629      69.161       126.535     163.221  0.062
+fast, drive, weekday, tp, time stop, day lock, early budget, losers                        96.650      53.057       131.846     167.081  0.062
+step, drive, weekday, checks, tp, day lock, early budget, losers                           96.224      58.068       119.747     156.685  0.063
+step, vol, drive, weekday, checks, tp, time stop, big day, day lock                        95.255      63.462       131.009     174.284  0.047
+step, fast, weekday, tp, time stop, big day, day lock, early budget                        94.901      61.070       124.414     176.252  0.079
+fast, vol, drive, weekday, tp, time stop, big day, day lock, losers                        93.866      56.635       130.973     166.110  0.063
+step, vol, drive, weekday, time stop, big day, early budget                                93.646      53.551       142.219     177.698  0.078
+vol, drive, weekday, checks, tp, time stop, day lock, early budget, losers                 92.101      44.586       135.282     168.724  0.042
+step, fast, vol, drive, weekday, tp, time stop, big day, day lock, losers                  91.709      64.118       130.009     160.569  0.073
+step, vol, drive, weekday, checks, time stop, big day, early budget, losers                91.222      56.264       115.568     157.944  0.092
+fast, vol, drive, tp, time stop, day lock, early budget                                    91.019      42.654       128.003     183.316  0.016
+fast, vol, drive, weekday, tp, time stop, day lock                                         90.772      54.609       122.226     194.619  0.079
+step, vol, drive, weekday, checks, time stop, early budget                                 89.576      52.984       142.078     176.786  0.031
+step, vol, drive, time stop, losers                                                        88.972      52.061       114.398     180.245  0.121
+vol, drive, weekday, tp, time stop, big day, day lock                                      88.813      52.543       127.347     168.299  0.046
+fast, vol, drive, tp, day lock, losers                                                     88.665      43.623       123.707     167.232  0.015
+step, drive, weekday, time stop, big day, losers                                           88.051      52.281       129.321     173.607  0.047
+step, vol, weekday, checks, tp, time stop, big day, day lock, early budget, losers         85.689      56.391       120.171     177.653  0.075
+vol, weekday, checks, tp, time stop                                                        85.446      51.763       111.747     163.570  0.079
+step, fast, checks, tp, time stop, big day, day lock, losers                               85.442      45.045       113.255     149.251  0.047
+fast, drive, tp, time stop, big day, day lock, early budget, losers                        84.834      51.070       119.467     160.566  0.073
+step, fast, vol, weekday, checks, time stop, losers                                        84.813      54.431       110.134     181.219  0.124
+step, fast, vol, checks, tp, time stop, day lock, losers                                   84.560      52.485       109.564     133.397  0.046
+fast, drive, weekday, checks, tp, time stop, day lock, early budget, losers                84.176      36.267       120.031     139.413  0.064
+step, vol, drive, tp, time stop, big day, day lock                                         83.805      50.076       122.543     160.756  0.046
+vol, drive, weekday, tp, time stop, big day, day lock, early budget, losers                83.778      46.500       114.470     144.145  0.047
+step, vol, weekday, checks, tp, time stop, big day, early budget                           83.661      51.133       121.398     152.166  0.063
+step, vol, drive, tp, big day, day lock, early budget                                      83.511      46.733       115.610     135.990  0.032
+step, drive, weekday, tp, big day, day lock                                                83.317      47.570       129.192     158.932  0.047
+fast, vol, drive, weekday, checks, tp, time stop, big day, early budget                    83.179      47.407       127.872     156.729  0.047
+step, fast, vol, drive, weekday, tp, time stop, day lock, losers                           82.342      46.446       122.664     166.202  0.047
+step, fast, weekday, time stop, day lock                                                   82.286      41.278       119.027     170.574  0.047
+step, fast, vol, weekday, checks, tp, big day, day lock, early budget, losers              82.079      69.397       109.340     163.432  0.063
+step, vol, drive, weekday, tp, time stop, big day, losers                                  82.013      48.739       118.430     147.317  0.094
+fast, weekday, checks, tp, day lock, losers                                                81.689      39.780       110.602     145.358  0.016
+fast, vol, drive, weekday, checks, tp, time stop, day lock, early budget                   81.186      39.411       123.211     153.717  0.032
+fast, checks, tp, time stop, big day, early budget                                         80.932      49.394       103.376     137.675  0.032
+step, fast, vol, drive, weekday, checks, tp, time stop, big day                            80.581      56.627       124.710     147.429  0.093
+step, fast, vol, time stop, big day, day lock, early budget, losers                        80.550      52.405       112.729     150.818  0.140
+step, vol, weekday, checks, tp, big day, day lock, early budget                            80.546      53.394       108.717     168.615  0.047
+step, fast, vol, drive, checks, big day, early budget, losers                              80.176      55.376       115.481     161.841  0.095
+step, fast, drive, weekday, tp, time stop, big day, early budget, losers                   79.989      62.293       102.500     130.015  0.101
+step, vol, drive, tp, time stop, big day, day lock, early budget                           79.701      40.420       121.722     140.555  0.079
+step, vol, weekday, checks, time stop, day lock, losers                                    79.561      41.825       116.212     149.938  0.063
+step, weekday, checks, tp, big day, day lock                                               79.368      43.476       111.673     143.977  0.031
+step, vol, weekday, checks, big day                                                        79.334      48.988       129.147     150.540  0.032
+step, vol, drive, tp, time stop, big day, early budget, losers                             79.303      51.195       110.747     147.116  0.063
+step, fast, drive, weekday, day lock, losers                                               79.301      52.711       110.974     154.424  0.055
+fast, vol, drive, weekday, checks, tp, time stop, big day, day lock, losers                79.014      42.425       110.238     151.304  0.079
+fast, vol, weekday, checks, time stop, big day, losers                                     78.591      48.963       117.968     161.403  0.031
+fast, drive, weekday, checks, tp, big day, early budget, losers                            78.347      45.050       109.590     142.466  0.061
+vol, weekday, tp, time stop, day lock, losers                                              77.893      38.834       125.175     150.572  0.032
+vol, drive, weekday, checks, tp, time stop, big day, day lock, losers                      77.717      41.498       103.036     138.460  0.032
+step, fast, vol, drive, checks, tp                                                         77.681      52.480       101.888     141.469  0.109
+fast, drive, weekday, tp, day lock, early budget, losers                                   77.086      37.308       111.126     140.599  0.063
+step, checks, tp, time stop, big day, losers                                               76.683      47.774        97.473     127.538  0.065
+step, fast, vol, drive, weekday, checks, tp, time stop, big day, losers                    76.674      59.197        95.729     160.747  0.047
+vol, tp, time stop, day lock                                                               76.583      39.667       126.084     135.956  0.032
+step, fast, vol, weekday, tp, time stop, day lock, losers                                  76.540      39.275       107.035     140.507  0.095
+step, vol, weekday, checks, day lock, early budget, losers                                 76.327      38.450       113.355     158.140  0.047
+vol, drive, tp, time stop, big day, day lock                                               76.107      39.309       108.310     141.960  0.048
+step, vol, drive, tp, time stop, big day, day lock, losers                                 76.064      48.928        90.523     124.844  0.047
+fast, vol, drive, weekday, checks, big day                                                 75.844      45.189       109.970     132.102  0.047
+U48                                                                                        75.724      40.467       115.664     138.786  0.031
+step, drive, weekday, checks, time stop, day lock, early budget                            75.604      51.705       105.682     138.159  0.080
+fast, vol, checks, time stop, big day                                                      75.394      46.935       111.729     136.648  0.031
+fast, vol, tp, day lock, early budget, losers                                              75.348      31.653       122.677     140.651  0.016
+fast, vol, weekday, checks, time stop, big day, early budget                               75.010      47.480       109.031     139.208  0.031
+fast, vol, drive, tp, big day, losers                                                      74.656      44.848       110.252     138.166  0.062
+step, fast, vol, checks, time stop, day lock, early budget, losers                         73.577      45.205        97.626     141.541  0.118
+vol, drive, checks, tp, time stop, big day, day lock, early budget, losers                 73.435      43.862       116.807     138.208  0.030
+drive, weekday, checks, tp, big day, day lock, losers                                      73.319      38.920       105.369     138.435  0.015
+step, fast, weekday, tp, big day, day lock, early budget, losers                           72.946      54.063        84.310     143.635  0.054
+step, drive, weekday, tp, time stop, big day, day lock, early budget, losers               72.660      42.065       111.289     131.954  0.109
+step, vol, drive, weekday, checks, tp, time stop, big day, day lock, losers                70.892      44.128       119.087     149.760  0.118
+fast, time stop, big day, day lock, early budget                                           70.549      45.066        94.949     132.376  0.031
+step, fast, vol, drive, weekday, checks, time stop, big day, losers                        70.548      51.408        99.357     127.490  0.093
+step, vol, drive, weekday, checks, big day, day lock, early budget, losers                 70.376      46.554        95.443     113.262  0.062
+vol, checks, time stop, big day, losers                                                    70.337      43.336       102.478     123.198  0.016
+fast, vol, drive, checks, time stop, losers                                                69.755      45.029       107.625     138.634  0.076
+fast, vol, weekday, checks, time stop, day lock, early budget, losers                      69.668      35.587       106.699     137.978  0.078
+fast, weekday, checks, day lock, early budget, losers                                      69.442      42.097        97.284     122.807  0.031
+step, fast, vol, weekday, checks, tp, time stop, losers                                    68.317      47.222       100.426     120.700  0.077
+step, drive, weekday, checks, big day, early budget, losers                                68.145      48.704        88.394     120.636  0.077
+vol, drive, weekday, tp, time stop, day lock, early budget                                 67.567      29.158       113.435     130.967  0.032
+weekday, checks, time stop, big day, day lock, early budget                                67.053      36.969       106.536     129.302  0.031
+vol, drive, weekday, checks, time stop, big day, day lock, early budget, losers            66.914      38.228        93.704     112.261  0.062
+step, fast, weekday, checks, time stop, big day, day lock, early budget, losers            66.359      49.416        88.124     120.308  0.063
+drive, weekday, checks, tp, time stop, day lock, losers                                    66.256      34.374       101.011     125.352  0.063
+fast, drive, checks, tp, big day, losers                                                   66.180      43.626        96.469     125.108  0.064
+step, drive, weekday, checks, tp, time stop, big day, day lock, early budget, losers       66.079      33.672       101.586     121.789  0.094
+vol, weekday, checks, tp, big day, day lock                                                65.579      29.065       107.567     128.172  0.031
+vol, checks, tp, time stop, big day, day lock, losers                                      62.709      32.763        95.135     117.707  0.032
+fast, weekday, checks, day lock, losers                                                    62.337      39.745        79.341     104.507  0.062
+vol, weekday, tp, time stop, big day, day lock, early budget                               61.047      32.849        89.804     103.753  0.031
+vol, drive, weekday, checks, time stop, big day, early budget, losers                      60.535      39.934        92.508     120.070  0.061
+drive, weekday, checks, time stop, big day, early budget, losers                           60.271      41.375        90.644     114.539  0.078
+fast, vol, weekday, checks, tp, time stop, big day, day lock, early budget, losers         55.228      32.210        95.181     124.546  0.047

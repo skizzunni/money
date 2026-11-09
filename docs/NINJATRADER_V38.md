@@ -8138,3 +8138,11 @@ from $3,000, inverse-volatility size (0.5-1.5x or 0.75-1.25x), the drive tilt (1
 big-day rule at 2.0, the day lock ($800 / $300 or $1,500 / $750), the early budget $600, 2 or 4 losers a day. G372's
 measure with the minimum gain (development: the most $ a session among sets losing at most 5% and at least 10% above
 U48; unseen: at most 5% lost and at least 10% more $ a session than U48). Run once.
+
+**G389 result (2026-11-09): rejected.** Development (U48 $39.2 a session, 3.2% lost): the pick (the most $ within 5% lost,
+at least 10% above U48) "step, drive, weekday, checks, time stop, day lock, early budget" **$67.2 with 0% lost** (+71%).
+Unseen (U48 $75.7, 3.1%): **$75.6 with 8.0% lost**: the gain vanishes and the losses rise. The next development picks:
+$50.2 → unseen $96.2 at 6.3% lost; $46.8 → $99.6 at 6.2%; $45.8 → $77.9 at 3.2%. The best unseen within 5% lost,
+"fast, drive, tp, time stop, big day, early budget, losers", $102.0 at 3.1%, was not a development pick; choosing it now
+would be choosing on the unseen weeks. Large combinations fit the development years and do not hold. U48 stays.
+`verification/noise_v2/g389_funded_mix2.txt`.
