@@ -8344,3 +8344,7 @@ execution; not investigated, as the plain partial already fails.) U48 stays. `ve
 
 `research/g404_early_lock.py`: U48 (lock at 0.35 max losses, +2.5 points) with the lock at 0.25 or 0.2, or at 0.2 with
 the stop at entry +5 points (3 variants). G402's measure and rule. Run once.
+
+**G404 result (2026-11-09): rejected.** Green days, development / unseen (U48 37.1% / 35.9%): 37.0-37.5% / 35.7-36.9%,
+no gain; $ a session lower ($94-99 / $128-163) and development losses 8.7-13.0%. A sooner lock does not make more days
+green. U48 stays. `verification/noise_v2/g404_early_lock.txt`.
