@@ -1,0 +1,12 @@
+development (index 2011-18 starts):
+                                       per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                                            
+U48                                         39.221      18.490        73.495     114.895  0.032
+U48 + Williams in the gaps, $200 risk        2.323      -4.602        12.679      43.298  0.970
+U48 + Williams in the gaps, $400 risk       -4.337     -16.955         0.000       0.000  1.000
+unseen (index 2019-25 + NQ 2015-24):
+                                       per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                                            
+U48                                         75.724      40.467       115.664     138.786  0.031
+U48 + Williams in the gaps, $200 risk       24.066      17.537        33.503      75.541  0.825
+U48 + Williams in the gaps, $400 risk        1.892       2.656         5.311      20.224  0.951

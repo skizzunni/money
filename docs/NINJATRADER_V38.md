@@ -8121,3 +8121,11 @@ $200 or $400 of risk, out at the close) and keeps a Williams trade only while no
 not see the Williams P/L when it sizes). G372's measure and rule with the minimum gain (development: the most $ a
 session among variants losing at most 5% of the starts and at least 10% above U48; unseen: at most 5% lost and at least
 10% more $ a session than U48). Run once.
+
+**G388 result (2026-11-09): rejected.** Development (U48 $39.2 a session, 3.2% lost): with the Williams trades in the gaps
+at $200 risk, **97% of the accounts lost**, $2.3 a session; at $400 all lost. Unseen (U48 $75.7, 3.1%): 82.5% / 95.1%
+lost. A trace (index from 2012-04-02): U48 alone has a −$2,050 month without touching the floor; the Williams trades add
+about −$700 in that month and the floor is touched. Part of this is the test's shortcut (U48 sizes to a room that does
+not count the Williams P/L, so it oversizes after Williams losses); a shared build would size both from one room and
+make less. Either way, at a $2,000 trailing floor the account has no spare room for a second strategy. U48 stays.
+`verification/noise_v2/g388_williams_gaps.txt`.
