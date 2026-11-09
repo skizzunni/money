@@ -8111,3 +8111,13 @@ $600, **$39.25** (+$0.03) at 3.2%; $900 $38.5 (6.4%); $900 / $950 $36.1 (6.4%). 
 (+$0.49, +0.6%) at 3.1%. It meets the letter of G372's rule, which set no minimum gain; a change of 3 cents a session on
 the development starts and 49 cents on the unseen ones is noise, not an improvement worth a new NinjaTrader build, so
 U48 stays. (Later rules in this series will name a minimum gain.) `verification/noise_v2/g387_day_budget.txt`.
+
+## G388: U48 plus the Williams breakout in the bot's gaps (registered 2026-11-09, before its run)
+
+The Williams volatility breakout (rounds 97-101, docs/RESULTS.md) was the one outside setup positive with t >= 2 on all
+three data sets; added in the bot's gaps it lifted $ a week by $85-130 on the older bot. `research/g388_williams_gaps.py`
+rebuilds it on 5-minute bars (k 0.5, the first side only, entries by 15:00, stop 0.25 x yesterday's range, contracts to
+$200 or $400 of risk, out at the close) and keeps a Williams trade only while no U48 trade is open (2 variants; U48 does
+not see the Williams P/L when it sizes). G372's measure and rule with the minimum gain (development: the most $ a
+session among variants losing at most 5% of the starts and at least 10% above U48; unseen: at most 5% lost and at least
+10% more $ a session than U48). Run once.
