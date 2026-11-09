@@ -8465,3 +8465,11 @@ above 0 in both; only a passing market goes on to an account test with the Nasda
 DAX 0.80 / −0.26 (at most $4.60 a day), Euro Stoxx 50 t 0.43 on 2019-2026 ($3-6 a day), crude 0.31, silver 0.06, the
 euro below; none near the bar (2.5 / 1.5). With round 68 (gold, silver, crude, euro) and G412 (gold), the Nasdaq
 breakout has no worthwhile edge on any other market in the data. `verification/noise_v2/g413_markets.txt`.
+
+## G414: seven more markets (registered 2026-11-09, before its run)
+
+The user: "search every and all markets". `research/g414_more_markets.py`: G413's test on the FTSE 100, the CAC 40,
+Brent, the pound, the Australian and New Zealand dollars and the dollar index (HistData 1-minute, 2011 - Sep 2026,
+downloaded today; sessions and contract values in the script; which of these the account can trade is not checked).
+The Dow and the Russell are not in the free data; the Nikkei, Hang Seng and ASX sessions cross midnight in New York
+time and do not fit the engine. Round 68's bar. Run once.
