@@ -8028,3 +8028,10 @@ Run once.
 **G381 result (2026-11-09): rejected.** Development (U48 $39.2 a session, 3.2% lost): the pick, take-profit 2.5, $41.1 at
 3.2%. Unseen (U48 $75.7, 3.1%): $71.8 at 4.7%, less than U48; the others $63.9-74.7. U48's exits stay.
 `verification/noise_v2/g381_funded_exits.txt`.
+
+## G382: the Test sprint's signal settings on the funded account (registered 2026-11-09, before its run)
+
+The funded mode (U48) enters at the full noise line (entry width 1.0) over 14 sessions, skips the 13:00 and 14:30
+checks and stops entries at 15:00; the Test sprint (k317, G253-G270) found 0.7 over 18 sessions, every check, to 15:30.
+`research/g382_funded_signals.py`: U48 with the entry width 0.85 or 0.7, the noise over 18 sessions, every check with
+entries to 15:30, or all of k317's together (5 variants). G372's measure and rule. Run once.
