@@ -8080,3 +8080,8 @@ Step 1 (development data only): U48's trades on the index 2011-2018 (one continu
 check time (bar end); the two weakest and the two strongest checks with at least 200 trades are named. Step 2
 (`research/g385_check_time.py`): U48 with the weakest two at 0.5x, the strongest two at 1.5x, or both (3 variants;
 `check_mult`, new in mnqbot/noise.py). G372's measure and rule. Run once.
+
+**G385 step 1 (development only):** U48 on the index 2011-2018, $ a contract by fill time (the check's close): 09:35 (the
+gap trade, not a check) $12.02 (1,334); **10:00 $24.57** (372); **10:30 $11.59** (303); **11:00 $20.08** (256); 11:30
+$5.24 (198); **12:00 $39.07** (223); 12:30-15:00 $14.97-24.65 (126-158 each). With 200+ trades only 10:00, 10:30, 11:00
+and 12:00 qualify: the weakest two 10:30 and 11:00, the strongest two 12:00 and 10:00.
