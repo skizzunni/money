@@ -8180,3 +8180,11 @@ Not a candidate for the bot.
 grown account, but even three times U48's (past the account's $1,000 daily loss rule) gives $309 a session in year three.
 On one 50K account with this signal, $750 a session on average is not in reach of size alone.
 `verification/noise_v2/g392_day_cap.txt`.
+
+## G393: the grown account's day budget in smaller pieces (registered 2026-11-09, before its run)
+
+G392: the day budget caps the grown account. U48 lets a trade risk all of the day's budget left (`budget_frac` 1), so a
+big loser ends the day. `research/g393_budget_frac.py`: U48 with each trade risking half or two thirds of what is left
+(2 variants), 36 months from quarterly starts; judged on months 13-36: development (index starts 2011-2016) the most $ a
+session within 5% lost and at least 10% above U48; unseen (index 2017-2023, NQ 2015-2022) at most 5% lost and at least
+10% more than U48. Run once.
