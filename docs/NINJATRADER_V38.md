@@ -8348,3 +8348,8 @@ the stop at entry +5 points (3 variants). G402's measure and rule. Run once.
 **G404 result (2026-11-09): rejected.** Green days, development / unseen (U48 37.1% / 35.9%): 37.0-37.5% / 35.7-36.9%,
 no gain; $ a session lower ($94-99 / $128-163) and development losses 8.7-13.0%. A sooner lock does not make more days
 green. U48 stays. `verification/noise_v2/g404_early_lock.txt`.
+
+## G405: a nearer target or a shorter time stop, for green days (registered 2026-11-09, before its run)
+
+`research/g405_target_time.py`: U48 (take-profit 2.0 noise units, time stop 45 minutes) with the take-profit at 1.5 or
+1.0, or the time stop at 30 minutes (3 variants). G402's measure and rule. Run once.
