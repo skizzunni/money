@@ -8064,3 +8064,7 @@ Step 1 (development data only): U48's trades on the index 2011-2018 (one continu
 weekday; the weakest and the strongest weekday are named. Step 2 (`research/g384_weekday.py`): U48 with the weakest at
 0.5x, the strongest at 1.5x, or both (3 variants; `weekday_mult`, new in mnqbot/noise.py, at least 1 contract). G372's
 measure and rule. Run once.
+
+**G384 step 1 (development only):** U48 on the index 2011-2018, $ a contract by entry weekday: Monday $20.29 (651 trades),
+Tuesday $19.12 (730), **Wednesday $7.33** (736), Thursday $12.62 (780), **Friday $26.73** (650). Step 2's variants:
+Wednesdays 0.5x, Fridays 1.5x, both.
