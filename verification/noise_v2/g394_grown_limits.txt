@@ -1,0 +1,14 @@
+development (23 starts):
+                                     per_session_m13_36  at_750   lost
+tag                                                                   
+4 losers a day once the floor stops             138.089   0.053  0.043
+5 losers                                        138.062   0.053  0.043
+U48                                             143.695   0.054  0.043
+day budget $975                                 155.837   0.060  0.043
+unseen (57 starts):
+                                     per_session_m13_36  at_750   lost
+tag                                                                   
+4 losers a day once the floor stops             213.569   0.072  0.018
+5 losers                                        213.510   0.072  0.035
+U48                                             212.673   0.075  0.018
+day budget $975                                 224.317   0.094  0.018

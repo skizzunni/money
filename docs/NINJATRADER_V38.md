@@ -8198,3 +8198,8 @@ every trade, including the trend days'. U48 stays. `verification/noise_v2/g393_b
 `research/g394_grown_limits.py`: U48 with 4 or 5 losers a day once the floor has stopped (`max_losers_locked`; U48 3), or
 the day budget at $975 instead of $900 (still under the $1,000 daily loss) (3 variants). G393's measure and rule (months
 13-36). Run once.
+
+**G394 result (2026-11-09): rejected.** Months 13-36: development (U48 $143.7 a session, 4.3% lost) the $975 day budget
+$155.8 (+8.4%, short of the 10% minimum), 4 or 5 losers $138.1; unseen (U48 $212.7, 1.8%) $224.3 (+5.5%), $213.5-213.6.
+The extra $75 of daily budget buys about 5-8% more, in line with G392, and leaves only $25 against slippage before the
+$1,000 daily loss. U48 stays. `verification/noise_v2/g394_grown_limits.txt`.
