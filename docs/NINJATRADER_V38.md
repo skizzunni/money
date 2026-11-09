@@ -8262,3 +8262,17 @@ minimum gain on development and unseen, at most 5% lost). Run once.
 **26.1% lost**; unseen (U48 $169.1, 1.8%) $146.5 with **15.8% lost**. On the 50K's $2,000 floor, 2 MNQ at the start loses
 one account in six to four and makes less, the lost accounts counted at $0. U48 stays.
 `verification/noise_v2/g399_50k_start2.txt`.
+
+## G400: a big search on the 50K with the day budget free and the floor guarded (registered 2026-11-09, before its run)
+
+The user: "fk this limit shit. just trade under right signals but have protected losses so i dont lose the account...
+10000 trials". 10,000 sets would take about four days here (about 35 seconds a set over 80 starts x 36 months); this
+runs 300. `research/g400_big_search.py`: 300 random sets (seed 400; the first is U48) over the day budget ($900 / $1,500
+/ $2,000 / $3,000), the early budget ($750 / $1,000 / $1,500), a floor guard (the trade closed inside the bar before the
+floor: off / $100 / $300 buffer), start 1 or 2 MNQ, steps $1,500 / $1,000, the fast steps from $9,000 / $6,000, the cap
+60 / 100, take-profit 2.0 / 2.5, time stop 45 / 90, 3 / 4 losers, inverse-volatility size, the drive tilt, every check.
+Measures (36 months; development index starts 2011-2016, unseen index 2017-2023 and NQ 2015-2022): $ a session, starts
+lost (intraday floor check), share of days below −$1,000, worst day. **Rule:** on development, among sets losing at most
+5% of the starts, the most $ a session; it is recommended if on unseen it also loses at most 5% and makes at least 10%
+more than U48. Days below −$1,000 are reported (they break a $1,000 daily loss rule if the account has one). Results
+appended in chunks to `verification/noise_v2/g400_big_search.csv` (resumable). Run once.
