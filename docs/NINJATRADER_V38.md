@@ -8099,3 +8099,9 @@ G331 tried it on the Test sprint only. `research/g386_funded_chop_pause.py`: U48
 **G386 result (2026-11-09): rejected.** Development (U48 $39.2 a session, 3.2% lost): the pick, a day off after 3 losing
 days, $44.8 with 0% lost. Unseen (U48 $75.7, 3.1%): $61.3 at 3.1%; after 2 $53.7, after 4 $68.5. As in G331, the day
 after a losing run pays as well as any other. U48 stays. `verification/noise_v2/g386_funded_chop_pause.txt`.
+
+## G387: the day's loss budget before the floor stops (registered 2026-11-09, before its run)
+
+U48 sizes each day to a $750 budget until the floor has stopped (`early_daily_loss`), $900 after (`daily_loss_limit`,
+under the $1,000 daily loss). `research/g387_day_budget.py`: U48 with the early budget at $900, at $900 with the day's
+at $950, or at $600 (3 variants). G372's measure and rule. Run once.
