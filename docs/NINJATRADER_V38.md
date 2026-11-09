@@ -8452,3 +8452,11 @@ account with the Nasdaq bot. Run once.
 $2.55 a day, t 1.64 / 0.43, 4.4-4.5 trades a week, 40% winners; every variant t 1.21-1.64 / 0.20-0.43, below the bar
 (2.5 / 1.5). Smaller size cuts the costs but the breakout has almost no edge on gold, least of all in the recent years
 (a $1-3 a day). Gold is not added. `verification/noise_v2/g412_gold.txt`.
+
+## G413: other markets, small and wide (registered 2026-11-09, before its run)
+
+The user: "explore diff markets for my goals". `research/g413_markets.py`: round 68's engine on silver, crude, the euro
+(round 68 at 3-20 contracts and $200; here 1 or 2 at $100 / $200 / $300 a contract, as G412 did for gold), and two
+markets never tried, the DAX and the Euro Stoxx 50 (Eurex micros, EUR 1 a point; whether the user's account can trade
+them is not checked). **Pass (round 68's bar):** t >= 2.5 on 2011-2018 and t >= 1.5 on 2019 - Sep 2026 with $ a day
+above 0 in both; only a passing market goes on to an account test with the Nasdaq bot. Run once.
