@@ -8105,3 +8105,9 @@ after a losing run pays as well as any other. U48 stays. `verification/noise_v2/
 U48 sizes each day to a $750 budget until the floor has stopped (`early_daily_loss`), $900 after (`daily_loss_limit`,
 under the $1,000 daily loss). `research/g387_day_budget.py`: U48 with the early budget at $900, at $900 with the day's
 at $950, or at $600 (3 variants). G372's measure and rule. Run once.
+
+**G387 result (2026-11-09): not adopted.** Development (U48 $39.22 a session, 3.2% lost): the pick, the early budget at
+$600, **$39.25** (+$0.03) at 3.2%; $900 $38.5 (6.4%); $900 / $950 $36.1 (6.4%). Unseen (U48 $75.72, 3.1%): **$76.21**
+(+$0.49, +0.6%) at 3.1%. It meets the letter of G372's rule, which set no minimum gain; a change of 3 cents a session on
+the development starts and 49 cents on the unseen ones is noise, not an improvement worth a new NinjaTrader build, so
+U48 stays. (Later rules in this series will name a minimum gain.) `verification/noise_v2/g387_day_budget.txt`.
