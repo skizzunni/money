@@ -1,0 +1,14 @@
+development:
+                           per_session  trades_per_session   lost  green_days  green_weeks  green_months  longest_losing_weeks  worst_month
+U48                            109.743               1.528  0.043       0.371        0.465         0.639                 7.826    -5949.163
+day lock $300 keep $100        117.056               1.632  0.043       0.401        0.470         0.626                 6.565    -5736.121
+day lock $500 keep $250        121.781               1.660  0.000       0.395        0.481         0.640                 5.696    -5158.785
+stop for the day at +$400       52.656               1.334  0.000       0.404        0.497         0.621                 5.870    -3566.252
+stop for the day at +$800       63.873               1.392  0.043       0.390        0.481         0.620                 6.000    -4692.377
+unseen:
+                           per_session  trades_per_session   lost  green_days  green_weeks  green_months  longest_losing_weeks  worst_month
+U48                            171.277               1.568  0.018       0.359        0.457         0.649                 5.263    -6215.101
+day lock $300 keep $100        145.807               1.501  0.105       0.396        0.423         0.592                 4.930    -5214.246
+day lock $500 keep $250        159.521               1.645  0.018       0.383        0.464         0.642                 4.965    -5769.065
+stop for the day at +$400       66.910               1.281  0.000       0.403        0.497         0.650                 4.544    -4133.462
+stop for the day at +$800       91.505               1.396  0.000       0.385        0.506         0.671                 4.719    -4551.857

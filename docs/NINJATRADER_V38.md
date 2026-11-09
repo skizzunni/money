@@ -8322,3 +8322,8 @@ U48 with a day lock at $300 keeping $100 or at $500 keeping $250, or no new entr
 variants), 36 months. **Rule:** on development (index starts 2011-2016) and unseen (index 2017-2023, NQ 2015-2022) both:
 green days at least 5 points above U48, $ a session at least 90% of U48's, lost at most 5%, green months no fewer. Run
 once.
+
+**G402 result (2026-11-09): rejected.** Green days of traded days, development / unseen (U48 37.1% / 35.9%): day lock
+$300/$100 40.1% / 39.6% ($117 / $146 a session, unseen 10.5% lost); $500/$250 39.5% / 38.3% ($122 / $160); stop at +$400
+40.4% / 40.3% ($53 / $67); +$800 39.0% / 38.5% ($64 / $92). None adds 5 points of green days at 90% of U48's $; capping
+the green days removes the big days the money comes from. U48 stays. `verification/noise_v2/g402_green_days.txt`.
