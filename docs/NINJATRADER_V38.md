@@ -8227,3 +8227,10 @@ account's own floor). A measurement, not a candidate.
 $217 / $278 (1.2%); 150K-style $91 / $208 / $323 (0%). Months at $750+: 2-8% (50K), 3-14% (100K), 4-19% (150K). Even
 a 150K-style account with U48's untuned settings averages about $320 a session in year three; $750 a session on average
 is not reached on any single account size tested. `verification/noise_v2/g396_bigger_account.txt`.
+
+## G397: the 150K-style account's sizing (registered 2026-11-09, before its run)
+
+`research/g397_150k_sizing.py`: G396's 150K-style account ($4,500 floor, $2,700 / $2,250 day budgets) with U48's sizing,
+or starting at 2 or 3 MNQ ($187.50 a contract), a contract per $1,000, or a cap of 100 contracts (4 variants). Months
+1-36; development (index starts 2011-2016) the most $ a session within 5% lost and at least 10% above the 150K as U48;
+unseen (index 2017-2023, NQ 2015-2022) at most 5% lost and at least 10% more. Run once.
