@@ -8412,3 +8412,14 @@ no fewer. Run once.
 start count by the number of sets), 12 months each: U48 $30.4 a session, 6.2% lost (1 of 16), green days 43.1%, green
 months 63.0%; G408's pick $32.4 (+7%, short of +10%), 6.2%, 59.9% green months; G408 steady $26.8 (−12%), 6.2%, 61.5%.
 Neither beats U48 on these starts. U48 stays. `verification/noise_v2/g409_fresh_check.txt`.
+
+## G410: a wide search on the 50K, money and consistency (registered 2026-11-09, before its run)
+
+The user: "keep running and keep adding more". `research/g410_wide_search.py`: 200 random sets (seed 410; U48 first)
+over the day budget ($900 / $1,200 / $1,500), steps ($1,500 / $1,250), take-profit (2.0 / 1.75 / 2.5), time stop (45 /
+30 / 60), the trade lock (0.35 / 0.3 / 0.45), losers a day (3 / 2 / 4), inverse-volatility 0.75-1.25x, a mild drive
+tilt (1.25 / 0.75), Wednesdays 0.75x, checks (U48's / only 13:00 skipped / every to 15:30), the day lock $1,500 / $750,
+the big-day rule at 2.0, the trend over 45 / 20 / 100 sessions, the entry width 1.0 / 0.9. G408's measure and rule
+(development: within 5% lost and green months at least U48's, the most $; unseen: at most 5% lost, at least 10% more
+$, green months and the longest losing run no worse), then G409's fresh-start check (at least 10% more than U48 there,
+at most 5% lost, green months no fewer) before any recommendation. Run once (resumable).
