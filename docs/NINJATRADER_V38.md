@@ -8373,3 +8373,8 @@ days worth the money. U48 stays. `verification/noise_v2/g406_fewer_tries.txt`.
 U48 sizes trades against the 45-session trend to 1 MNQ (`trend_n` 45, `trend_small`). `research/g407_trend_filter.py`:
 no trend filter, or the trend over 20 or 100 sessions (3 variants), 36 months on the 50K. Rule: on development and
 unseen, at least 10% more $ a session than U48, at most 5% lost, green months no fewer. Run once.
+
+**G407 result (2026-11-09): rejected.** Development (U48 $109.7 a session, 4.3% lost): trend over 20 sessions $133.1
+(+21%, 0% lost, green months 67.1% vs 63.9%), over 100 $128.2, none $115.7. Unseen (U48 $171.3, 1.8%): over 20 $168.4
+(−2%), over 100 $169.3, none $154.7. The development gain does not carry over. U48 stays.
+`verification/noise_v2/g407_trend_filter.txt`.

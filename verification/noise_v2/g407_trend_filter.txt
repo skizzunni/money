@@ -1,0 +1,12 @@
+development:
+                         per_session  trades_per_session   lost  green_days  green_weeks  green_months  longest_losing_weeks  worst_month
+U48                          109.743               1.528  0.043       0.371        0.465         0.639                 7.826    -5949.163
+no trend filter              115.663               1.565  0.000       0.359        0.447         0.597                 7.435    -6672.134
+trend over 100 sessions      128.233               1.537  0.043       0.369        0.457         0.621                 8.087    -6272.890
+trend over 20 sessions       133.061               1.592  0.000       0.363        0.476         0.671                 8.000    -6653.175
+unseen:
+                         per_session  trades_per_session   lost  green_days  green_weeks  green_months  longest_losing_weeks  worst_month
+U48                          171.277               1.568  0.018       0.359        0.457         0.649                 5.263    -6215.101
+no trend filter              154.701               1.585  0.035       0.345        0.436         0.589                 5.456    -7202.302
+trend over 100 sessions      169.275               1.600  0.000       0.354        0.464         0.660                 5.842    -6476.641
+trend over 20 sessions       168.423               1.563  0.000       0.357        0.457         0.650                 5.421    -6783.304
