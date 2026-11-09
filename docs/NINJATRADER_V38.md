@@ -8334,3 +8334,8 @@ the green days removes the big days the money comes from. U48 stays. `verificati
 limit working from the bar after the fill), or at 0.5 with the rest's stop then at the entry (3 variants; `partial_at`,
 `partial_be`). G402's measure and rule (green days +5 points at 90% of U48's $, at most 5% lost, green months no fewer,
 on development and unseen). Run once.
+
+**G403 result (2026-11-09): rejected.** Green days, development / unseen (U48 37.1% / 35.9%): half off at 0.5R 39.9% /
+39.5% at $64 / $78 a session (U48 $110 / $171); at 1R 38.7% / 38.1% at $92 / $124. At most 4 points more green days
+for a quarter to half of the money. (The break-even variant ran identical to plain 0.5R: `partial_be` did not act in this
+execution; not investigated, as the plain partial already fails.) U48 stays. `verification/noise_v2/g403_partials.txt`.
