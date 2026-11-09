@@ -8188,3 +8188,7 @@ big loser ends the day. `research/g393_budget_frac.py`: U48 with each trade risk
 (2 variants), 36 months from quarterly starts; judged on months 13-36: development (index starts 2011-2016) the most $ a
 session within 5% lost and at least 10% above U48; unseen (index 2017-2023, NQ 2015-2022) at most 5% lost and at least
 10% more than U48. Run once.
+
+**G393 result (2026-11-09): rejected.** Months 13-36: development (23 starts; U48 $143.7 a session, 4.3% lost) half the
+budget $91.7, two thirds $102.9; unseen (57 starts; U48 $212.7, 1.8%) $97.9 / $134.4. Smaller pieces cut the size of
+every trade, including the trend days'. U48 stays. `verification/noise_v2/g393_budget_frac.txt`.

@@ -1,0 +1,12 @@
+development (23 starts):
+                                           per_session_m13_36  at_750   lost
+tag                                                                         
+U48                                                   143.695   0.054  0.043
+each trade risks half the day budget left              91.699   0.000  0.000
+two thirds                                            102.904   0.004  0.043
+unseen (57 starts):
+                                           per_session_m13_36  at_750   lost
+tag                                                                         
+U48                                                   212.673   0.075  0.018
+each trade risks half the day budget left              97.938   0.018  0.000
+two thirds                                            134.433   0.033  0.000
