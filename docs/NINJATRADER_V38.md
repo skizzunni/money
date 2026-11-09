@@ -8423,3 +8423,11 @@ the big-day rule at 2.0, the trend over 45 / 20 / 100 sessions, the entry width 
 (development: within 5% lost and green months at least U48's, the most $; unseen: at most 5% lost, at least 10% more
 $, green months and the longest losing run no worse), then G409's fresh-start check (at least 10% more than U48 there,
 at most 5% lost, green months no fewer) before any recommendation. Run once (resumable).
+
+**G410 result (2026-11-09): not recommended.** Development (U48 $109.7 a session, green months 63.9%): the pick ("$1,500
+day budget, take-profit 1.75, time stop 60, lock 0.3, 2 losers a day, the mild drive tilt, Wednesdays 0.75x, only 13:00
+skipped, the day lock $1,500 / $750, the trend over 20 sessions") **$177.4 (+62%)**, 0% lost, green months 65.3%. Unseen
+(U48 $171.3, 1.8% lost, green months 64.9%): **$208.5 (+22%)**, 1.8% lost, but **green months 62.4%**, longest losing
+run 5.4 weeks: less consistent, so not recommended. Of the next five development picks, the best unseen are $220.8
+(5.3% lost, 63.6%) and $217.1 (1.8%, 62.7%); none keeps U48's green months. Third search in a row (G400, G408, G410)
+where more money comes with fewer green months. U48 stays. `verification/noise_v2/g410_wide_search_final.csv`.
