@@ -8389,3 +8389,11 @@ keep $1,250), a floor guard ($200 buffer), the early budget ($750 / $600 / $900)
 U48's, the most $ a session; recommended if on unseen it loses at most 5%, makes at least 10% more than U48, and has
 green months at least U48's and a longest losing-week run no longer. Run once (resumable; results in
 `verification/noise_v2/g408_local_search.csv`, copied to `g408_local_search_final.csv` when recorded).
+
+**G408 result (2026-11-09): not recommended.** Development (U48 $109.7 a session, 4.3% lost, green months 63.9%): the pick
+("$2,000 day budget, $1,500 steps, the fast steps from $6,000, inverse-volatility size 0.75-1.25x, only 13:00 skipped,
+the day lock at $1,500 keeping $750") **$156.4 (+42%)**, 0% lost, green months 64.0%. Unseen (U48 $171.3, 1.8%, green
+months 64.9%, longest losing run 5.3 weeks): **$219.3 (+28%)**, 3.5% lost, but **green months 61.5%** and a longest
+losing run of 5.5 weeks: less consistent than U48, so by the rule not recommended. The next development picks: $153.8 →
+$193.5 unseen (5.3% lost, 60.1% green months); $141.8 → $182.4 (1.8%, 60.7%); $141.6 → $198.8 (0%, **65.8%**, longest run
+6.0). More money keeps coming with less steady months. U48 stays. `verification/noise_v2/g408_local_search_final.csv`.
