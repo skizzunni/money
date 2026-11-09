@@ -8214,3 +8214,11 @@ the drive tilt (1.5 / 0.5 / 0.75), or every check with the inverse-volatility si
 **G395 result (2026-11-09): rejected.** Months 13-36: development (U48 $143.7 a session, 4.3% lost) $132.7-143.4; unseen
 (U48 $212.7, 1.8%) $196.1-212.5. None makes more than U48 on the grown account. U48 stays.
 `verification/noise_v2/g395_grown_signals.txt`.
+
+## G396: one bigger account (a measurement, registered 2026-11-09, before its run)
+
+G391 / G392: on a 50K the day budget caps the bot at about $200 a session. `research/g396_bigger_account.py`: U48 as it
+is, on a 50K ($2,000 floor, $900 day budget, $750 before the floor stops), a 100K-style account ($3,000 floor, $1,800 /
+$1,500) and a 150K-style account ($4,500 floor, $2,700 / $2,250), the rest of U48's 50K settings unchanged (not tuned
+for the bigger accounts). G391's starts and 36 months; by year: $ a session, months at $750+, lost (intraday, each
+account's own floor). A measurement, not a candidate.
