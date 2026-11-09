@@ -8162,3 +8162,15 @@ faster steps barely act in it. U48 stays. `verification/noise_v2/g390_fast_steps
 When does one account reach $750 a session? `research/g391_three_years.py`: U48 funded from the first Monday of every
 quarter (index 2011-2023, NQ 2015-2022), run 36 months each: by month since the start, the $ a session (lost accounts at
 $0 from the loss), the share of starts making $750 a session or more that month, and the share lost (intraday check).
+
+**G391 result (2026-11-09):** 80 starts, 36 months each. $ a session by month: 1 $32, 6 $39, 12 $128, 18 $167, 24 $170,
+30 $200, 36 $188; it levels off at about **$190-230 a session from month 22** (best month average $290, month 34). The
+share of starts making $750 or more in a month: 0-2.5% in year one, 4-9% in years two and three. Lost: 2.5% (by month 6;
+none after). The plateau suggests the $900 daily loss budget, not the account's growth, caps the size. `verification/
+noise_v2/g391_three_years.txt`.
+
+## G392: what caps the funded account (a measurement, registered 2026-11-09, before its run)
+
+To check the plateau's cause: G391's run with the bot's daily loss budget at $900 (U48), $2,000 or $3,000 (hypothetical:
+the account's $1,000 daily loss rule allows only the first), months 25-36 only reported (`research/g392_day_cap.py`).
+Not a candidate for the bot.
