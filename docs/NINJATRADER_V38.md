@@ -8234,3 +8234,9 @@ is not reached on any single account size tested. `verification/noise_v2/g396_bi
 or starting at 2 or 3 MNQ ($187.50 a contract), a contract per $1,000, or a cap of 100 contracts (4 variants). Months
 1-36; development (index starts 2011-2016) the most $ a session within 5% lost and at least 10% above the 150K as U48;
 unseen (index 2017-2023, NQ 2015-2022) at most 5% lost and at least 10% more. Run once.
+
+**G397 result (2026-11-09): starting at 2 MNQ passes for the 150K-style account.** Development (150K as U48 $137.2 a
+session, 0% lost): start 2 MNQ **$154.9** (+13%, 0% lost); cap 100 $141.9; +1 per $1,000 $118.6; start 3 MNQ $91.4 (13%
+lost). Unseen (150K as U48 $235.7, 0%): start 2 MNQ **$275.7** (+17%, 1.8% lost); year three $356 a session. This is
+for a 150K-style account only (the user's is a 50K; U48 there is unchanged). The best one-account figure measured:
+about $276 a session over three years, $356 in year three. `verification/noise_v2/g397_150k_sizing.txt`.
