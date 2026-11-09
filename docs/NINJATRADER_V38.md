@@ -8152,3 +8152,7 @@ choosing it now would be choosing on the unseen weeks. Large combinations fit th
 U48 adds a contract per $1,500 of profit, then per $650 from $9,000 (G142). `research/g390_fast_steps.py`: the faster steps
 at $400 or $300 from $9,000, or $400 from $6,000 (3 variants). G372's measure and rule with the 10% minimum gain. Run
 once.
+
+**G390 result (2026-11-09): rejected.** Development (U48 $39.2 a session, 3.2% lost): $37.5-39.9 (at most +1.7%), short of
+the 10% minimum. Unseen (U48 $75.7, 3.1%): $77.1-79.4 at 3.1%. Few accounts pass $9,000 within the first year, so the
+faster steps barely act in it. U48 stays. `verification/noise_v2/g390_fast_steps.txt`.
