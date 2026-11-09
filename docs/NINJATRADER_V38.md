@@ -8210,3 +8210,7 @@ G382 / G379 / G374 helped on some sets in year one; the grown account (months 13
 `research/g395_grown_signals.py`: U48 with every check and entries to 15:30, the inverse-volatility size (0.5-1.5x),
 the drive tilt (1.5 / 0.5 / 0.75), or every check with the inverse-volatility size (4 variants). G393's measure and rule
 (months 13-36; 10% minimum gain on development and unseen, at most 5% lost). Run once.
+
+**G395 result (2026-11-09): rejected.** Months 13-36: development (U48 $143.7 a session, 4.3% lost) $132.7-143.4; unseen
+(U48 $212.7, 1.8%) $196.1-212.5. None makes more than U48 on the grown account. U48 stays.
+`verification/noise_v2/g395_grown_signals.txt`.

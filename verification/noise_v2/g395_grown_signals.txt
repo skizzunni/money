@@ -1,0 +1,16 @@
+development (23 starts):
+                                  per_session_m13_36  at_750   lost
+tag                                                                
+U48                                          143.695   0.054  0.043
+drive tilt                                   132.725   0.053  0.043
+every check + inverse-volatility             140.887   0.053  0.043
+every check to 15:30                         143.388   0.051  0.087
+inverse-volatility size                      141.040   0.053  0.043
+unseen (57 starts):
+                                  per_session_m13_36  at_750   lost
+tag                                                                
+U48                                          212.673   0.075  0.018
+drive tilt                                   209.108   0.068  0.035
+every check + inverse-volatility             196.135   0.074  0.018
+every check to 15:30                         200.966   0.073  0.018
+inverse-volatility size                      212.483   0.073  0.018
