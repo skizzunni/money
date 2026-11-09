@@ -1,0 +1,6 @@
+80 starts
+                   per_session_year3  at_750   lost
+tag                                                
+U48                          214.762   0.077  0.025
+day budget $2,000            267.180   0.142  0.038
+day budget $3,000            309.093   0.180  0.038

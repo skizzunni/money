@@ -8174,3 +8174,9 @@ noise_v2/g391_three_years.txt`.
 To check the plateau's cause: G391's run with the bot's daily loss budget at $900 (U48), $2,000 or $3,000 (hypothetical:
 the account's $1,000 daily loss rule allows only the first), months 25-36 only reported (`research/g392_day_cap.py`).
 Not a candidate for the bot.
+
+**G392 result (2026-11-09):** months 25-36, 80 starts: U48 ($900 day budget) **$215 a session**, 7.7% of months at $750+,
+2.5% lost; a $2,000 budget $267, 14.2%, 3.8% lost; a $3,000 budget $309, 18.0%, 3.8% lost. The day budget does cap the
+grown account, but even three times U48's (past the account's $1,000 daily loss rule) gives $309 a session in year three.
+On one 50K account with this signal, $750 a session on average is not in reach of size alone.
+`verification/noise_v2/g392_day_cap.txt`.
