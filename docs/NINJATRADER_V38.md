@@ -8282,3 +8282,10 @@ appended in chunks to `verification/noise_v2/g400_big_search.csv` (resumable). R
 The user: "change it to 2-5 contracts max" and "how much trades it takes a day". `research/g401_two_to_five.py`: U48 on
 the 50K as it is, starting at 2 MNQ with at most 5, or 1 to 5 (2 variants), 36 months (G397's starts): $ a session,
 trades a session, lost, year three.
+
+**G401 result (2026-11-09):** 36 months. Development (23 starts) / unseen (57): U48 $107.5 / $169.1 a session, 1.53 /
+1.57 trades a session, 4.3% / 1.8% lost, year three $173 / $232; **2-5 MNQ** $60.9 / $83.1, 1.21 / 1.38 trades,
+**26.1% / 15.8% lost**, year three $78 / $95; **1-5 MNQ** $70.6 / $91.8, 1.55 / 1.60 trades, 4.3% / 1.8% lost, year three
+$101 / $109. A 5-contract cap halves the grown account's $ a session; starting at 2 loses one account in four to six.
+The bot is not changed (the NinjaTrader settings "Contracts" and "Most contracts" in Custom mode do this if wanted).
+`verification/noise_v2/g401_two_to_five.txt`.

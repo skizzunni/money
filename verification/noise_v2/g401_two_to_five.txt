@@ -1,0 +1,12 @@
+development (23 starts):
+            per_session   lost  trades_per_session    year3
+tag                                                        
+1-5 MNQ          70.586  0.043               1.548  100.824
+2-5 MNQ          60.929  0.261               1.214   77.801
+50K as U48      107.473  0.043               1.528  173.096
+unseen (57 starts):
+            per_session   lost  trades_per_session    year3
+tag                                                        
+1-5 MNQ          91.819  0.018               1.596  109.179
+2-5 MNQ          83.114  0.158               1.382   94.871
+50K as U48      169.115  0.018               1.568  231.574
