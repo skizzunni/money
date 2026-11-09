@@ -8251,3 +8251,9 @@ Run once.
 from $6,000 $129.0, $2,900 day budget $135.8; none above the pick. Unseen (pick $275.7, 1.8%): $253.9-284.2. G397's pick
 stays the best 150K-style setting: about $276 a session over three years, $356 in year three.
 `verification/noise_v2/g398_150k_more.txt`.
+
+## G399: G397's pick on the user's 50K (registered 2026-11-09, before its run)
+
+The user: "do that on a 50k account". `research/g399_50k_start2.py`: U48 on the 50K starting at 2 MNQ ($187.50 a
+contract), alone or with a cap of 100 contracts (2 variants), 36 months. G397's measure and rule against U48 (10%
+minimum gain on development and unseen, at most 5% lost). Run once.
