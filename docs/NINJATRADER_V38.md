@@ -8129,3 +8129,12 @@ about −$700 in that month and the floor is touched. Part of this is the test's
 not count the Williams P/L, so it oversizes after Williams losses); a shared build would size both from one room and
 make less. Either way, at a $2,000 trailing floor the account has no spare room for a second strategy. U48 stays.
 `verification/noise_v2/g388_williams_gaps.txt`.
+
+## G389: the funded levers together again, 100 random combinations (registered 2026-11-09, before its run)
+
+`research/g389_funded_mix2.py`: 100 random sets (seed 389; the first is U48) of: a contract per $1,000, the fast steps
+from $3,000, inverse-volatility size (0.5-1.5x or 0.75-1.25x), the drive tilt (1.5 / 0.5 / 0.75 or 1.25 / 0.75), Wednesdays
+0.5x or Fridays 1.25x, every check to 15:30 or only 13:00 skipped, take-profit 2.5 or 1.75, time stop 90 or 60, the
+big-day rule at 2.0, the day lock ($800 / $300 or $1,500 / $750), the early budget $600, 2 or 4 losers a day. G372's
+measure with the minimum gain (development: the most $ a session among sets losing at most 5% and at least 10% above
+U48; unseen: at most 5% lost and at least 10% more $ a session than U48). Run once.
