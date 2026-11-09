@@ -1,0 +1,14 @@
+development (23 starts):
+                          per_session  lost    year3
+tag                                                 
++ cap 100                     149.121   0.0  242.016
++ day budget $2,900           135.821   0.0  207.023
++ fast steps from $6,000      128.970   0.0  200.691
+150K start 2 MNQ (G397)       154.929   0.0  259.308
+unseen (57 starts):
+                          per_session   lost    year3
+tag                                                  
++ cap 100                     284.151  0.018  368.707
++ day budget $2,900           253.911  0.035  334.759
++ fast steps from $6,000      266.992  0.035  358.923
+150K start 2 MNQ (G397)       275.711  0.018  355.968

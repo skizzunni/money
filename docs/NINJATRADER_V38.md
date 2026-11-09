@@ -8246,3 +8246,8 @@ about $276 a session over three years, $356 in year three. `verification/noise_v
 `research/g398_150k_more.py`: G397's pick (150K-style, start 2 MNQ) with a cap of 100 contracts, the fast $650 steps from
 $6,000, or the day budget at $2,900 (under a $3,000 daily loss) (3 variants). G397's measure and rule against the pick.
 Run once.
+
+**G398 result (2026-11-09): rejected.** Development (G397's pick $154.9 a session, 0% lost): cap 100 $149.1, fast steps
+from $6,000 $129.0, $2,900 day budget $135.8; none above the pick. Unseen (pick $275.7, 1.8%): $253.9-284.2. G397's pick
+stays the best 150K-style setting: about $276 a session over three years, $356 in year three.
+`verification/noise_v2/g398_150k_more.txt`.
