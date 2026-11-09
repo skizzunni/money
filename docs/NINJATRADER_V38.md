@@ -8314,3 +8314,11 @@ months; `verification/noise_v2/g400_consistency.txt`): pick / U48 $224.5 / $171.
 run of losing weeks 5.3 / 5.3, worst month −$12,230 / −$6,215. It is less consistent than U48 on green months (and
 weeks), so by the addendum it is not recommended. U48 stays. (Measured here for the first time: U48 ends about 36% of
 its traded days and 65% of its months green; the money comes from fewer, larger winning days.)
+
+## G402: more green days on the 50K (registered 2026-11-09, before its run)
+
+The user wants mostly green days; U48 ends 36% of its traded days green (G400's check). `research/g402_green_days.py`:
+U48 with a day lock at $300 keeping $100 or at $500 keeping $250, or no new entries once the day is up $400 or $800 (4
+variants), 36 months. **Rule:** on development (index starts 2011-2016) and unseen (index 2017-2023, NQ 2015-2022) both:
+green days at least 5 points above U48, $ a session at least 90% of U48's, lost at most 5%, green months no fewer. Run
+once.
