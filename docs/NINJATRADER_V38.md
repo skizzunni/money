@@ -8367,3 +8367,9 @@ than about 4 points: the bot's days are mostly small losses and a few large wins
 **G406 result (2026-11-09): rejected.** Green days, development / unseen (U48 37.1% / 35.9%): 2 losers 36.5% / 35.7%, 1
 loser 35.8% / 35.0%, done after a take-profit 39.3% / 36.9% ($63 / $132 a session against $110 / $171). No gain in green
 days worth the money. U48 stays. `verification/noise_v2/g406_fewer_tries.txt`.
+
+## G407: the trend filter over three years (registered 2026-11-09, before its run)
+
+U48 sizes trades against the 45-session trend to 1 MNQ (`trend_n` 45, `trend_small`). `research/g407_trend_filter.py`:
+no trend filter, or the trend over 20 or 100 sessions (3 variants), 36 months on the 50K. Rule: on development and
+unseen, at least 10% more $ a session than U48, at most 5% lost, green months no fewer. Run once.
