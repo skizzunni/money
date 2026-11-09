@@ -8035,3 +8035,9 @@ The funded mode (U48) enters at the full noise line (entry width 1.0) over 14 se
 checks and stops entries at 15:00; the Test sprint (k317, G253-G270) found 0.7 over 18 sessions, every check, to 15:30.
 `research/g382_funded_signals.py`: U48 with the entry width 0.85 or 0.7, the noise over 18 sessions, every check with
 entries to 15:30, or all of k317's together (5 variants). G372's measure and rule. Run once.
+
+**G382 result (2026-11-09): rejected.** Development (U48 $39.2 a session, 3.2% lost): every check with entries to 15:30
+$57.9 but 6.6% lost; all of k317's $47.5 with 16.5% lost; entry width 0.7 $37.9 (3.2%), 0.85 $37.9 (6.4%), 18 sessions
+$29.7 (6.4%). Within 5% lost U48 makes the most. Unseen (U48 $75.7, 3.1%): every check $73.4 (3.2%), the rest $54.8-73.3.
+The sprint's signal settings suit a two-week push, not the funded account's year. U48 stays.
+`verification/noise_v2/g382_funded_signals.txt`.

@@ -1,0 +1,18 @@
+development (index 2011-18 starts):
+                               per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                                    
+every check, entries to 15:30       57.907      21.404       117.623     179.242  0.066
+all of k317's signal settings       47.489      19.667        94.751     129.475  0.165
+U48                                 39.221      18.490        73.495     114.895  0.032
+entry width 0.7                     37.863      15.696        66.477      78.403  0.032
+entry width 0.85                    37.862      17.397        64.212     104.736  0.064
+noise over 18 sessions              29.693      16.723        56.845      83.933  0.064
+unseen (index 2019-25 + NQ 2015-24):
+                               per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                                    
+U48                                 75.724      40.467       115.664     138.786  0.031
+every check, entries to 15:30       73.361      40.924       111.207     128.613  0.032
+entry width 0.85                    73.268      40.908       112.114     140.378  0.078
+noise over 18 sessions              67.108      35.803        93.209     100.680  0.032
+entry width 0.7                     59.650      40.648        77.107     106.810  0.093
+all of k317's signal settings       54.767      42.041        64.385      76.072  0.047
