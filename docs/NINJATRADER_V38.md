@@ -8299,3 +8299,6 @@ green months and the longest losing run.
 **G400 addendum 2 (2026-11-09, before the unseen results):** the final check also reports, for the pick and U48 on the
 unseen starts, trades a session and the share of green days among traded days; the user asks for as many trades as it
 can and green days.
+
+**G400 addendum 3 (2026-11-09):** the user's target is 80-90% green days; the final check reports the pick's share
+against it.
