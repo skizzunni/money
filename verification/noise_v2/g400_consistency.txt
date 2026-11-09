@@ -1,0 +1,4 @@
+unseen:
+           per_session  trades_per_session   lost  green_days  green_weeks  green_months  longest_losing_weeks  worst_month
+G400 pick      224.523               1.484  0.035       0.381        0.429         0.578                 5.333   -12229.791
+U48            171.277               1.568  0.018       0.359        0.457         0.649                 5.263    -6215.101

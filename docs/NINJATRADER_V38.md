@@ -8302,3 +8302,15 @@ can and green days.
 
 **G400 addendum 3 (2026-11-09):** the user's target is 80-90% green days; the final check reports the pick's share
 against it.
+
+**G400 result (2026-11-09): not recommended.** The run stopped at the session's 2-hour limit for a background job after
+all 300 development sets and 180 of the 300 unseen ones (results in `verification/noise_v2/g400_big_search_final.csv`).
+The rule's pick was among those done: on development (U48 $107.5 a session, 4.3% lost) the most $ within 5% lost is
+"$2,000 day budget, a contract per $1,000, the fast steps from $6,000, inverse-volatility size, every check to 15:30",
+**$143.1 with 0% lost**; on unseen (U48 $169.1, 1.8%) **$220.9 (+31%) with 3.5% lost**, 12.2% of days below −$1,000,
+worst day −$2,000: it meets the $ / lost rule. The addenda's check (`research/g400_consistency.py`, unseen starts, 36
+months; `verification/noise_v2/g400_consistency.txt`): pick / U48 $224.5 / $171.3 a session, trades a session 1.48 /
+1.57, **green days (of traded days) 38.1% / 35.9%**, green weeks 42.9% / 45.7%, **green months 57.8% / 64.9%**, longest
+run of losing weeks 5.3 / 5.3, worst month −$12,230 / −$6,215. It is less consistent than U48 on green months (and
+weeks), so by the addendum it is not recommended. U48 stays. (Measured here for the first time: U48 ends about 36% of
+its traded days and 65% of its months green; the money comes from fewer, larger winning days.)
