@@ -8353,3 +8353,8 @@ green. U48 stays. `verification/noise_v2/g404_early_lock.txt`.
 
 `research/g405_target_time.py`: U48 (take-profit 2.0 noise units, time stop 45 minutes) with the take-profit at 1.5 or
 1.0, or the time stop at 30 minutes (3 variants). G402's measure and rule. Run once.
+
+**G405 result (2026-11-09): rejected.** Green days, development / unseen (U48 37.1% / 35.9%): 36.6-37.2% / 35.7-36.3%,
+no gain; $ a session unseen $103-158 against $171. Across G402-G405 no exit or day rule moves U48's green days by more
+than about 4 points: the bot's days are mostly small losses and a few large wins by construction. U48 stays.
+`verification/noise_v2/g405_target_time.txt`.
