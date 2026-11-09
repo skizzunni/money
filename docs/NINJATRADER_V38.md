@@ -8041,3 +8041,12 @@ $57.9 but 6.6% lost; all of k317's $47.5 with 16.5% lost; entry width 0.7 $37.9 
 $29.7 (6.4%). Within 5% lost U48 makes the most. Unseen (U48 $75.7, 3.1%): every check $73.4 (3.2%), the rest $54.8-73.3.
 The sprint's signal settings suit a two-week push, not the funded account's year. U48 stays.
 `verification/noise_v2/g382_funded_signals.txt`.
+
+## G383: the funded mode's levers together, 60 random combinations (registered 2026-11-09, before its run)
+
+The funded mode was tuned for long-run net (G1-G262); G372's measure is the first year's $ a session with the account
+kept. `research/g383_funded_mix.py`: 60 random sets (seed 383; the first is U48) of: start at 2 MNQ ($375 max loss), a
+contract per $1,000, the fast steps from $3,000, G379's inverse-volatility size (0.5-1.5x), G374's drive tilt, every
+check with entries to 15:30, take-profit 2.5, time stop 90, the big-day rule at 2.0, the day lock at $800 / $300.
+G372's measure and rule (development: the most $ a session among sets losing at most 5% of the starts; unseen: at most
+5% lost and more $ a session than U48). Run once.
