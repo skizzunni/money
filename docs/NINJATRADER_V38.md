@@ -8473,3 +8473,10 @@ Brent, the pound, the Australian and New Zealand dollars and the dollar index (H
 downloaded today; sessions and contract values in the script; which of these the account can trade is not checked).
 The Dow and the Russell are not in the free data; the Nikkei, Hang Seng and ASX sessions cross midnight in New York
 time and do not fit the engine. Round 68's bar. Run once.
+
+**G414 result (2026-11-09): rejected, every market.** The best t of each market on either period: Brent 0.85 (2011-18;
+−2.77 on 2019-26), FTSE −0.45, dollar index −0.50, CAC −1.50, pound −8.0, Australian dollar −9.7, New Zealand dollar
+−12.4. Every variant of every market loses on 2019-2026. Across G412-G414 and round 68 (13 markets: gold, silver, crude,
+Brent, the euro, the pound, the Australian and New Zealand dollars, the dollar index, the DAX, the Euro Stoxx 50, the
+FTSE, the CAC), the noise-area breakout has no edge outside the US stock indices, and the S&P (MES) had none either
+(docs/RESULTS.md). `verification/noise_v2/g414_more_markets.txt`.
