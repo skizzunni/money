@@ -8017,3 +8017,10 @@ $1,500 (3 variants; `day_lock_at` / `day_lock_keep`). G372's measure and rule. R
 **G380 result (2026-11-09): rejected.** Development (U48 $39.2 a session, 3.2% lost): the pick, the lock at $800 keeping
 $300, $41.5 with 0% lost. Unseen (U48 $75.7, 3.1%): $71.6 at 3.1%, less than U48; the others $69.5-74.4. U48 stays.
 `verification/noise_v2/g380_funded_day_lock.txt`.
+
+## G381: the funded account's exits again (registered 2026-11-09, before its run)
+
+`research/g381_funded_exits.py`: U48 as G372 runs it (take-profit 2.0 noise units, time stop 45 minutes from the U48
+settings file, which overrides the runner's 60; G371 / G372's "60-minute time stop" wording was wrong, the runs used 45)
+with the take-profit at 1.5, 2.5 or 3.0, or the time stop at 30 or 90 minutes (5 variants). G372's measure and rule.
+Run once.
