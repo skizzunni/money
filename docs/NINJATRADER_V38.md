@@ -8447,3 +8447,8 @@ and $200 a trade: fees and slippage ate it ($19.71 / $2.27 a day, t 1.74 / 0.20)
 engine on gold at 1 or 2 MGC with $100 / $200 / $300 of max loss a contract (6 variants). **Pass (round 68's bar):** a
 variant with t >= 2.5 on 2011-2018 and t >= 1.5 on 2019 - Sep 2026, $ a day above 0 in both; only then is it tried on the
 account with the Nasdaq bot. Run once.
+
+**G412 result (2026-11-09): rejected.** Gold, 2011-2018 / 2019 - Sep 2026: the best, 2 MGC at $300 a contract, $8.48 /
+$2.55 a day, t 1.64 / 0.43, 4.4-4.5 trades a week, 40% winners; every variant t 1.21-1.64 / 0.20-0.43, below the bar
+(2.5 / 1.5). Smaller size cuts the costs but the breakout has almost no edge on gold, least of all in the recent years
+(a $1-3 a day). Gold is not added. `verification/noise_v2/g412_gold.txt`.
