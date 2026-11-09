@@ -1,0 +1,14 @@
+development (index 2011-18 starts):
+                               per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                                    
+day lock at $800, keep $300         41.536      19.057        80.785     122.928  0.000
+day lock at $3000, keep $1500       39.698      18.490        75.306     113.117  0.032
+U48                                 39.221      18.490        73.495     114.895  0.032
+day lock at $1500, keep $750        35.212      18.490        60.285     104.774  0.032
+unseen (index 2019-25 + NQ 2015-24):
+                               per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                                    
+U48                                 75.724      40.467       115.664     138.786  0.031
+day lock at $1500, keep $750        74.380      40.648       116.423     136.922  0.031
+day lock at $800, keep $300         71.596      34.689       114.592     146.145  0.031
+day lock at $3000, keep $1500       69.546      40.332       100.625     117.542  0.031

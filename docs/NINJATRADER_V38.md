@@ -8013,3 +8013,7 @@ not adopted. U48 stays. `verification/noise_v2/g379_vol_regime.txt`.
 U57's day lock (G294 / U57) protects a green day in the Test; the funded mode has never had it.
 `research/g380_funded_day_lock.py`: U48 with the day lock at $800 keeping $300, $1,500 keeping $750, or $3,000 keeping
 $1,500 (3 variants; `day_lock_at` / `day_lock_keep`). G372's measure and rule. Run once.
+
+**G380 result (2026-11-09): rejected.** Development (U48 $39.2 a session, 3.2% lost): the pick, the lock at $800 keeping
+$300, $41.5 with 0% lost. Unseen (U48 $75.7, 3.1%): $71.6 at 3.1%, less than U48; the others $69.5-74.4. U48 stays.
+`verification/noise_v2/g380_funded_day_lock.txt`.
