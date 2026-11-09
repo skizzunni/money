@@ -8156,3 +8156,9 @@ once.
 **G390 result (2026-11-09): rejected.** Development (U48 $39.2 a session, 3.2% lost): $37.5-39.9 (at most +1.7%), short of
 the 10% minimum. Unseen (U48 $75.7, 3.1%): $77.1-79.4 at 3.1%. Few accounts pass $9,000 within the first year, so the
 faster steps barely act in it. U48 stays. `verification/noise_v2/g390_fast_steps.txt`.
+
+## G391: one funded account over three years (a measurement, registered 2026-11-09, before its run)
+
+When does one account reach $750 a session? `research/g391_three_years.py`: U48 funded from the first Monday of every
+quarter (index 2011-2023, NQ 2015-2022), run 36 months each: by month since the start, the $ a session (lost accounts at
+$0 from the loss), the share of starts making $750 a session or more that month, and the share lost (intraday check).
