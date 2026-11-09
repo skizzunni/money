@@ -8460,3 +8460,8 @@ The user: "explore diff markets for my goals". `research/g413_markets.py`: round
 markets never tried, the DAX and the Euro Stoxx 50 (Eurex micros, EUR 1 a point; whether the user's account can trade
 them is not checked). **Pass (round 68's bar):** t >= 2.5 on 2011-2018 and t >= 1.5 on 2019 - Sep 2026 with $ a day
 above 0 in both; only a passing market goes on to an account test with the Nasdaq bot. Run once.
+
+**G413 result (2026-11-09): rejected, every market.** Best t on 2011-2018 / 2019-2026 across the 6 variants each:
+DAX 0.80 / −0.26 (at most $4.60 a day), Euro Stoxx 50 t 0.43 on 2019-2026 ($3-6 a day), crude 0.31, silver 0.06, the
+euro below; none near the bar (2.5 / 1.5). With round 68 (gold, silver, crude, euro) and G412 (gold), the Nasdaq
+breakout has no worthwhile edge on any other market in the data. `verification/noise_v2/g413_markets.txt`.
