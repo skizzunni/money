@@ -8289,3 +8289,9 @@ trades a session, lost, year three.
 $101 / $109. A 5-contract cap halves the grown account's $ a session; starting at 2 loses one account in four to six.
 The bot is not changed (the NinjaTrader settings "Contracts" and "Most contracts" in Custom mode do this if wanted).
 `verification/noise_v2/g401_two_to_five.txt`.
+
+**G400 addendum (2026-11-09, while the run is in progress; interim development rows had been looked at, unseen not):**
+the user asks for consistency ("dont have 1 good day and then endless bad days"). Before any recommendation, the set
+the rule picks is re-run on the unseen starts with U48 for: the share of green weeks and green months, the longest
+run of losing weeks, and the worst calendar month. It is recommended only if it is at least as consistent as U48 on
+green months and the longest losing run.
