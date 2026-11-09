@@ -8085,3 +8085,8 @@ check time (bar end); the two weakest and the two strongest checks with at least
 gap trade, not a check) $12.02 (1,334); **10:00 $24.57** (372); **10:30 $11.59** (303); **11:00 $20.08** (256); 11:30
 $5.24 (198); **12:00 $39.07** (223); 12:30-15:00 $14.97-24.65 (126-158 each). With 200+ trades only 10:00, 10:30, 11:00
 and 12:00 qualify: the weakest two 10:30 and 11:00, the strongest two 12:00 and 10:00.
+
+**G385 result (2026-11-09): rejected.** Development (U48 $39.2 a session, 3.2% lost): the pick, both, $59.0 with 0% lost.
+Unseen (U48 $75.7, 3.1%): $70.6 with 10.8% lost; 10:00 and 12:00 at 1.5x $75.1 (10.8%); 10:30 and 11:00 at 0.5x $68.0
+(3.1%). The check-time pattern of 2011-2018 does not hold later: a development-chosen tilt, like G383 / G384, looks
+strong in-sample and fades. U48 stays. `verification/noise_v2/g385_check_time.txt`.
