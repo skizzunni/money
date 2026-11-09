@@ -1,0 +1,5 @@
+fresh starts used: 5
+             per_session  trades_per_session   lost  green_days  green_weeks  green_months  longest_losing_weeks  worst_month
+G408 pick         32.434               1.179  0.062       0.441        0.432         0.599                 4.000    -2483.556
+G408 steady       26.763               1.156  0.062       0.437        0.417         0.615                 4.562    -2366.302
+U48               30.356               1.217  0.062       0.431        0.431         0.630                 4.188    -1988.351

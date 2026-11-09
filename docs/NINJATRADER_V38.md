@@ -8407,3 +8407,8 @@ each quarter, NQ 2023-2024, the index 2024-2025, the MNQ stand-in from 2025. Cav
 also inside G400-G408's unseen 36-month windows, so this is a check on new start dates, not fully new data. **Rule:** a
 candidate is recommended if here it makes at least 10% more a session than U48, loses at most 5%, and has green months
 no fewer. Run once.
+
+**G409 result (2026-11-09): neither recommended.** 16 fresh starts (the log's "5" is a printing slip: it divided the
+start count by the number of sets), 12 months each: U48 $30.4 a session, 6.2% lost (1 of 16), green days 43.1%, green
+months 63.0%; G408's pick $32.4 (+7%, short of +10%), 6.2%, 59.9% green months; G408 steady $26.8 (−12%), 6.2%, 61.5%.
+Neither beats U48 on these starts. U48 stays. `verification/noise_v2/g409_fresh_check.txt`.
