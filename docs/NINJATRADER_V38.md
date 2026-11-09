@@ -8192,3 +8192,9 @@ session within 5% lost and at least 10% above U48; unseen (index 2017-2023, NQ 2
 **G393 result (2026-11-09): rejected.** Months 13-36: development (23 starts; U48 $143.7 a session, 4.3% lost) half the
 budget $91.7, two thirds $102.9; unseen (57 starts; U48 $212.7, 1.8%) $97.9 / $134.4. Smaller pieces cut the size of
 every trade, including the trend days'. U48 stays. `verification/noise_v2/g393_budget_frac.txt`.
+
+## G394: the grown account's daily limits (registered 2026-11-09, before its run)
+
+`research/g394_grown_limits.py`: U48 with 4 or 5 losers a day once the floor has stopped (`max_losers_locked`; U48 3), or
+the day budget at $975 instead of $900 (still under the $1,000 daily loss) (3 variants). G393's measure and rule (months
+13-36). Run once.
