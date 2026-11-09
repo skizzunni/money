@@ -8090,3 +8090,8 @@ and 12:00 qualify: the weakest two 10:30 and 11:00, the strongest two 12:00 and 
 Unseen (U48 $75.7, 3.1%): $70.6 with 10.8% lost; 10:00 and 12:00 at 1.5x $75.1 (10.8%); 10:30 and 11:00 at 0.5x $68.0
 (3.1%). The check-time pattern of 2011-2018 does not hold later: a development-chosen tilt, like G383 / G384, looks
 strong in-sample and fades. U48 stays. `verification/noise_v2/g385_check_time.txt`.
+
+## G386: the chop pause on the funded account (registered 2026-11-09, before its run)
+
+G331 tried it on the Test sprint only. `research/g386_funded_chop_pause.py`: U48 with no trading for a session after 2,
+3 or 4 sessions in a row that closed with a loss (3 variants; `red_days_pause`). G372's measure and rule. Run once.
