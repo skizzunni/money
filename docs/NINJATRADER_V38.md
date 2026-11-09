@@ -8439,3 +8439,11 @@ where more money comes with fewer green months. U48 stays. `verification/noise_v
 at most 5% with green months at least 3 points above U48's, the most $; recommended if on unseen it loses at most 5%,
 makes at least 10% more than U48, keeps green months at least U48's and the longest losing run no longer, and then
 passes G409's fresh-start check. Run once (resumable).
+
+## G412: the breakout on gold, smaller and wider (registered 2026-11-09, before its run)
+
+The user's chart (Micro Gold, 1-minute): "open urself to diff markets". Round 68 (docs/RESULTS.md) tried gold at 8 MGC
+and $200 a trade: fees and slippage ate it ($19.71 / $2.27 a day, t 1.74 / 0.20). `research/g412_gold.py`: round 68's
+engine on gold at 1 or 2 MGC with $100 / $200 / $300 of max loss a contract (6 variants). **Pass (round 68's bar):** a
+variant with t >= 2.5 on 2011-2018 and t >= 1.5 on 2019 - Sep 2026, $ a day above 0 in both; only then is it tried on the
+account with the Nasdaq bot. Run once.
