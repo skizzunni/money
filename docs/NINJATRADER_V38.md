@@ -8203,3 +8203,10 @@ the day budget at $975 instead of $900 (still under the $1,000 daily loss) (3 va
 $155.8 (+8.4%, short of the 10% minimum), 4 or 5 losers $138.1; unseen (U48 $212.7, 1.8%) $224.3 (+5.5%), $213.5-213.6.
 The extra $75 of daily budget buys about 5-8% more, in line with G392, and leaves only $25 against slippage before the
 $1,000 daily loss. U48 stays. `verification/noise_v2/g394_grown_limits.txt`.
+
+## G395: the year-one near misses on the grown account (registered 2026-11-09, before its run)
+
+G382 / G379 / G374 helped on some sets in year one; the grown account (months 13-36) has more cushion.
+`research/g395_grown_signals.py`: U48 with every check and entries to 15:30, the inverse-volatility size (0.5-1.5x),
+the drive tilt (1.5 / 0.5 / 0.75), or every check with the inverse-volatility size (4 variants). G393's measure and rule
+(months 13-36; 10% minimum gain on development and unseen, at most 5% lost). Run once.
