@@ -8257,3 +8257,8 @@ stays the best 150K-style setting: about $276 a session over three years, $356 i
 The user: "do that on a 50k account". `research/g399_50k_start2.py`: U48 on the 50K starting at 2 MNQ ($187.50 a
 contract), alone or with a cap of 100 contracts (2 variants), 36 months. G397's measure and rule against U48 (10%
 minimum gain on development and unseen, at most 5% lost). Run once.
+
+**G399 result (2026-11-09): rejected.** Months 1-36: development (U48 $107.5 a session, 4.3% lost) start 2 MNQ $85.8 with
+**26.1% lost**; unseen (U48 $169.1, 1.8%) $146.5 with **15.8% lost**. On the 50K's $2,000 floor, 2 MNQ at the start loses
+one account in six to four and makes less, the lost accounts counted at $0. U48 stays.
+`verification/noise_v2/g399_50k_start2.txt`.

@@ -1,0 +1,12 @@
+development (23 starts):
+                          per_session   lost    year3
+tag                                                  
+50K as U48                    107.473  0.043  173.096
+50K start 2 MNQ                85.761  0.261  134.188
+50K start 2 MNQ, cap 100       83.117  0.261  130.285
+unseen (57 starts):
+                          per_session   lost    year3
+tag                                                  
+50K as U48                    169.115  0.018  231.574
+50K start 2 MNQ               146.457  0.158  181.895
+50K start 2 MNQ, cap 100      147.866  0.158  180.457
