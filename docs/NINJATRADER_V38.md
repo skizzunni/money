@@ -8295,3 +8295,7 @@ the user asks for consistency ("dont have 1 good day and then endless bad days")
 the rule picks is re-run on the unseen starts with U48 for: the share of green weeks and green months, the longest
 run of losing weeks, and the worst calendar month. It is recommended only if it is at least as consistent as U48 on
 green months and the longest losing run.
+
+**G400 addendum 2 (2026-11-09, before the unseen results):** the final check also reports, for the pick and U48 on the
+unseen starts, trades a session and the share of green days among traded days; the user asks for as many trades as it
+can and green days.
