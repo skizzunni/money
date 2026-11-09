@@ -8327,3 +8327,10 @@ once.
 $300/$100 40.1% / 39.6% ($117 / $146 a session, unseen 10.5% lost); $500/$250 39.5% / 38.3% ($122 / $160); stop at +$400
 40.4% / 40.3% ($53 / $67); +$800 39.0% / 38.5% ($64 / $92). None adds 5 points of green days at 90% of U48's $; capping
 the green days removes the big days the money comes from. U48 stays. `verification/noise_v2/g402_green_days.txt`.
+
+## G403: half off at a small profit, for green days (registered 2026-11-09, before its run)
+
+`research/g403_partials.py`: U48 closing half the contracts at 0.5 or 1.0 times the max loss a contract in profit (the
+limit working from the bar after the fill), or at 0.5 with the rest's stop then at the entry (3 variants; `partial_at`,
+`partial_be`). G402's measure and rule (green days +5 points at 90% of U48's $, at most 5% lost, green months no fewer,
+on development and unseen). Run once.
