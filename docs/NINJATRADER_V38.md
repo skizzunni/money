@@ -8143,6 +8143,6 @@ U48; unseen: at most 5% lost and at least 10% more $ a session than U48). Run on
 at least 10% above U48) "step, drive, weekday, checks, time stop, day lock, early budget" **$67.2 with 0% lost** (+71%).
 Unseen (U48 $75.7, 3.1%): **$75.6 with 8.0% lost**: the gain vanishes and the losses rise. The next development picks:
 $50.2 → unseen $96.2 at 6.3% lost; $46.8 → $99.6 at 6.2%; $45.8 → $77.9 at 3.2%. The best unseen within 5% lost,
-"fast, drive, tp, time stop, big day, early budget, losers", $102.0 at 3.1%, was not a development pick; choosing it now
-would be choosing on the unseen weeks. Large combinations fit the development years and do not hold. U48 stays.
+"fast, drive, tp, time stop, big day, early budget, losers", $102.0 at 3.1%, was not a development pick (it made $26.2 there, less than U48);
+choosing it now would be choosing on the unseen weeks. Large combinations fit the development years and do not hold. U48 stays.
 `verification/noise_v2/g389_funded_mix2.txt`.
