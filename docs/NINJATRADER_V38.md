@@ -8007,3 +8007,9 @@ U48, so nothing goes forward. Unseen (U48 $75.7, 3.1%): against the regime (smal
 $82.3 / $81.3 at 3.2% / 3.1% lost; with it $74.5-75.4 at 6.3%. The inverse-volatility sizing is the best unseen result at
 U48's loss rate so far (+$6.6 a session), but it lost $1.7 a session on the development starts, so by the rule it is
 not adopted. U48 stays. `verification/noise_v2/g379_vol_regime.txt`.
+
+## G380: the day lock on the funded account (registered 2026-11-09, before its run)
+
+U57's day lock (G294 / U57) protects a green day in the Test; the funded mode has never had it.
+`research/g380_funded_day_lock.py`: U48 with the day lock at $800 keeping $300, $1,500 keeping $750, or $3,000 keeping
+$1,500 (3 variants; `day_lock_at` / `day_lock_keep`). G372's measure and rule. Run once.
