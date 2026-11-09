@@ -8276,3 +8276,9 @@ lost (intraday floor check), share of days below −$1,000, worst day. **Rule:**
 5% of the starts, the most $ a session; it is recommended if on unseen it also loses at most 5% and makes at least 10%
 more than U48. Days below −$1,000 are reported (they break a $1,000 daily loss rule if the account has one). Results
 appended in chunks to `verification/noise_v2/g400_big_search.csv` (resumable). Run once.
+
+## G401: 2-5 contracts on the 50K (a measurement for the user, registered 2026-11-09, before its run)
+
+The user: "change it to 2-5 contracts max" and "how much trades it takes a day". `research/g401_two_to_five.py`: U48 on
+the 50K as it is, starting at 2 MNQ with at most 5, or 1 to 5 (2 variants), 36 months (G397's starts): $ a session,
+trades a session, lost, year three.
