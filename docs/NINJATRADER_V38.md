@@ -8378,3 +8378,14 @@ unseen, at least 10% more $ a session than U48, at most 5% lost, green months no
 (+21%, 0% lost, green months 67.1% vs 63.9%), over 100 $128.2, none $115.7. Unseen (U48 $171.3, 1.8%): over 20 $168.4
 (−2%), over 100 $169.3, none $154.7. The development gain does not carry over. U48 stays.
 `verification/noise_v2/g407_trend_filter.txt`.
+
+## G408: a search around G400's pick, judged on money and consistency (registered 2026-11-09, before its run)
+
+`research/g408_local_search.py`: 150 random sets (seed 408; U48 and G400's pick first) of: the day budget ($900 / $1,200
+/ $1,500 / $2,000), steps ($1,500 / $1,250 / $1,000), fast steps from $9,000 / $6,000, inverse-volatility size (off /
+0.5-1.5 / 0.75-1.25), checks (U48's / every to 15:30 / only 13:00 skipped), a day lock (off / $1,500 keep $750 / $2,500
+keep $1,250), a floor guard ($200 buffer), the early budget ($750 / $600 / $900), the trend over 45 / 20 / 100 sessions.
+36 months, development and unseen. **Rule:** on development, among sets losing at most 5% with green months at least
+U48's, the most $ a session; recommended if on unseen it loses at most 5%, makes at least 10% more than U48, and has
+green months at least U48's and a longest losing-week run no longer. Run once (resumable; results in
+`verification/noise_v2/g408_local_search.csv`, copied to `g408_local_search_final.csv` when recorded).
