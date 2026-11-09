@@ -8146,3 +8146,9 @@ $50.2 → unseen $96.2 at 6.3% lost; $46.8 → $99.6 at 6.2%; $45.8 → $77.9 at
 "fast, drive, tp, time stop, big day, early budget, losers", $102.0 at 3.1%, was not a development pick (it made $26.2 there, less than U48);
 choosing it now would be choosing on the unseen weeks. Large combinations fit the development years and do not hold. U48 stays.
 `verification/noise_v2/g389_funded_mix2.txt`.
+
+## G390: faster steps once the cushion is big (registered 2026-11-09, before its run)
+
+U48 adds a contract per $1,500 of profit, then per $650 from $9,000 (G142). `research/g390_fast_steps.py`: the faster steps
+at $400 or $300 from $9,000, or $400 from $6,000 (3 variants). G372's measure and rule with the 10% minimum gain. Run
+once.
