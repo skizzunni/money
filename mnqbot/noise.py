@@ -383,6 +383,7 @@ class NoiseConfig:
     vol_hi: float = 0.0
     vol_pro: bool = True
     weekday_mult: str = ""  # research (G384): "d:m,..." Monday=0: entries on weekday d take m x the contracts (at least 1)
+    check_mult: str = ""  # research (G385): "minute:m,..." entries from the check closing at that minute take m x (at least 1)
     # research (G69): small gaps. A gap at least gap_go_small_k x the average (but under gap_go_k), the 09:30 bar
     # closing its way, takes the same trade at 1 contract (-1 = off). Drive and small-gap trades are always 1 contract
     gap_go_small_k: float = -1.0
@@ -1486,6 +1487,11 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                     if cfg.news2_mult != 1.0 and t.strftime("%Y-%m-%d") in news2_set:  # G325: the Fed days
                         q_n = max(1, round(q_next * cfg.news2_mult))
                         ml_next, q_next = ml_next / q_next * q_n, q_n
+                    if cfg.check_mult:  # G385
+                        cm = dict(x.split(":") for x in cfg.check_mult.split(","))
+                        if str(end) in cm:
+                            q_n = max(1, round(q_next * float(cm[str(end)])))
+                            ml_next, q_next = ml_next / q_next * q_n, q_n
                     if cfg.weekday_mult:  # G384
                         wm = dict(x.split(":") for x in cfg.weekday_mult.split(","))
                         if str(t.weekday()) in wm:

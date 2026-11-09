@@ -8073,3 +8073,10 @@ Wednesdays 0.5x, Fridays 1.5x, both.
 and Fridays 1.5x, **$57.2 with 0% lost**; Fridays 1.5x alone $52.8 (0%), Wednesdays 0.5x alone $43.8 (0%). Unseen (U48
 $75.7, 3.1%): the pick **$81.0 but 6.1% lost**, past the 5% bound; Fridays 1.5x alone $86.1 at 4.6%; Wednesdays 0.5x
 alone $73.6. U48 stays. `verification/noise_v2/g384_weekday.txt`.
+
+## G385: size by the check's time, chosen on the development years (registered 2026-11-09, before its run)
+
+Step 1 (development data only): U48's trades on the index 2011-2018 (one continuous run), $ a contract by the signal's
+check time (bar end); the two weakest and the two strongest checks with at least 200 trades are named. Step 2
+(`research/g385_check_time.py`): U48 with the weakest two at 0.5x, the strongest two at 1.5x, or both (3 variants;
+`check_mult`, new in mnqbot/noise.py). G372's measure and rule. Run once.
