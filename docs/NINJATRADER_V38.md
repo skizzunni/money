@@ -8068,3 +8068,8 @@ measure and rule. Run once.
 **G384 step 1 (development only):** U48 on the index 2011-2018, $ a contract by entry weekday: Monday $20.29 (651 trades),
 Tuesday $19.12 (730), **Wednesday $7.33** (736), Thursday $12.62 (780), **Friday $26.73** (650). Step 2's variants:
 Wednesdays 0.5x, Fridays 1.5x, both.
+
+**G384 result (2026-11-09): rejected, narrowly.** Development (U48 $39.2 a session, 3.2% lost): the pick, Wednesdays 0.5x
+and Fridays 1.5x, **$57.2 with 0% lost**; Fridays 1.5x alone $52.8 (0%), Wednesdays 0.5x alone $43.8 (0%). Unseen (U48
+$75.7, 3.1%): the pick **$81.0 but 6.1% lost**, past the 5% bound; Fridays 1.5x alone $86.1 at 4.6%; Wednesdays 0.5x
+alone $73.6. U48 stays. `verification/noise_v2/g384_weekday.txt`.
