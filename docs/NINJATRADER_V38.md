@@ -8397,3 +8397,13 @@ months 64.9%, longest losing run 5.3 weeks): **$219.3 (+28%)**, 3.5% lost, but *
 losing run of 5.5 weeks: less consistent than U48, so by the rule not recommended. The next development picks: $153.8 →
 $193.5 unseen (5.3% lost, 60.1% green months); $141.8 → $182.4 (1.8%, 60.7%); $141.6 → $198.8 (0%, **65.8%**, longest run
 6.0). More money keeps coming with less steady months. U48 stays. `verification/noise_v2/g408_local_search_final.csv`.
+
+## G409: a fresh check of G408's candidates (registered 2026-11-09, before its run)
+
+`research/g409_fresh_check.py`: U48, G408's pick, and G408's steadiest strong set ("G408 steady": $1,200 day budget,
+$1,250 steps, inverse-volatility 0.75-1.25x, the day lock $1,500 / $750, the trend over 20 sessions; unseen $198.8 a
+session, 0% lost, 65.8% green months, not the rule's pick) on starts no search used: 12 months from the first Monday of
+each quarter, NQ 2023-2024, the index 2024-2025, the MNQ stand-in from 2025. Caveat: the price history from 2023 on was
+also inside G400-G408's unseen 36-month windows, so this is a check on new start dates, not fully new data. **Rule:** a
+candidate is recommended if here it makes at least 10% more a session than U48, loses at most 5%, and has green months
+no fewer. Run once.
