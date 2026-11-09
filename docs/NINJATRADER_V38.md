@@ -8095,3 +8095,7 @@ strong in-sample and fades. U48 stays. `verification/noise_v2/g385_check_time.tx
 
 G331 tried it on the Test sprint only. `research/g386_funded_chop_pause.py`: U48 with no trading for a session after 2,
 3 or 4 sessions in a row that closed with a loss (3 variants; `red_days_pause`). G372's measure and rule. Run once.
+
+**G386 result (2026-11-09): rejected.** Development (U48 $39.2 a session, 3.2% lost): the pick, a day off after 3 losing
+days, $44.8 with 0% lost. Unseen (U48 $75.7, 3.1%): $61.3 at 3.1%; after 2 $53.7, after 4 $68.5. As in G331, the day
+after a losing run pays as well as any other. U48 stays. `verification/noise_v2/g386_funded_chop_pause.txt`.
