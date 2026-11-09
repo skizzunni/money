@@ -1,0 +1,12 @@
+development:
+                          per_session  trades_per_session   lost  green_days  green_weeks  green_months  longest_losing_weeks  worst_month
+1 loser a day                  85.722               1.182  0.000       0.358        0.424         0.607                 8.130    -5274.900
+2 losers a day                115.771               1.520  0.000       0.365        0.473         0.676                 7.913    -6337.344
+U48                           109.743               1.528  0.043       0.371        0.465         0.639                 7.826    -5949.163
+done after a take-profit       63.323               1.334  0.000       0.393        0.475         0.638                 5.696    -4882.170
+unseen:
+                          per_session  trades_per_session   lost  green_days  green_weeks  green_months  longest_losing_weeks  worst_month
+1 loser a day                 114.686               1.186  0.035       0.350        0.426         0.585                 5.667    -5163.526
+2 losers a day                168.595               1.491  0.018       0.357        0.456         0.642                 5.404    -6432.562
+U48                           171.277               1.568  0.018       0.359        0.457         0.649                 5.263    -6215.101
+done after a take-profit      131.524               1.455  0.000       0.369        0.492         0.667                 5.018    -5955.720

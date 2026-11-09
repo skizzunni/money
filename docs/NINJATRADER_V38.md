@@ -8363,3 +8363,7 @@ than about 4 points: the bot's days are mostly small losses and a few large wins
 
 `research/g406_fewer_tries.py`: U48 (3 losers a day) with 2 or 1 loser a day, or no new entries once a take-profit fills
 (3 variants). G402's measure and rule. Run once.
+
+**G406 result (2026-11-09): rejected.** Green days, development / unseen (U48 37.1% / 35.9%): 2 losers 36.5% / 35.7%, 1
+loser 35.8% / 35.0%, done after a take-profit 39.3% / 36.9% ($63 / $132 a session against $110 / $171). No gain in green
+days worth the money. U48 stays. `verification/noise_v2/g406_fewer_tries.txt`.
