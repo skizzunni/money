@@ -8057,3 +8057,10 @@ makes $48-68 but loses 13-29%. Unseen (U48 $75.7, 3.1%): the pick makes $76.5 bu
 best unseen at most 5% lost: "step, vol, checks, day lock" $83.3 (4.7%) and "step, drive, checks, tp, big day" $83.4
 (4.8%); the most unseen at any loss $87.4 (17.4% lost). The development gain does not carry over. U48 stays.
 `verification/noise_v2/g383_funded_mix.txt`.
+
+## G384: size by weekday, chosen on the development years (registered 2026-11-09, before its run)
+
+Step 1 (development data only): U48's trades on the index 2011-2018 (one continuous run), $ a contract by the entry's
+weekday; the weakest and the strongest weekday are named. Step 2 (`research/g384_weekday.py`): U48 with the weakest at
+0.5x, the strongest at 1.5x, or both (3 variants; `weekday_mult`, new in mnqbot/noise.py, at least 1 contract). G372's
+measure and rule. Run once.

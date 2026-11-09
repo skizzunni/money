@@ -382,6 +382,7 @@ class NoiseConfig:
     vol_lo: float = 1.0
     vol_hi: float = 0.0
     vol_pro: bool = True
+    weekday_mult: str = ""  # research (G384): "d:m,..." Monday=0: entries on weekday d take m x the contracts (at least 1)
     # research (G69): small gaps. A gap at least gap_go_small_k x the average (but under gap_go_k), the 09:30 bar
     # closing its way, takes the same trade at 1 contract (-1 = off). Drive and small-gap trades are always 1 contract
     gap_go_small_k: float = -1.0
@@ -1485,6 +1486,11 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                     if cfg.news2_mult != 1.0 and t.strftime("%Y-%m-%d") in news2_set:  # G325: the Fed days
                         q_n = max(1, round(q_next * cfg.news2_mult))
                         ml_next, q_next = ml_next / q_next * q_n, q_n
+                    if cfg.weekday_mult:  # G384
+                        wm = dict(x.split(":") for x in cfg.weekday_mult.split(","))
+                        if str(t.weekday()) in wm:
+                            q_n = max(1, round(q_next * float(wm[str(t.weekday())])))
+                            ml_next, q_next = ml_next / q_next * q_n, q_n
                     if cfg.vol_hi > 0 and len(day_ranges) >= cfg.calm_long:  # G379: the volatility regime
                         rs = sum(day_ranges[-cfg.calm_short:]) / cfg.calm_short
                         rl = sum(day_ranges[-cfg.calm_long:]) / cfg.calm_long
