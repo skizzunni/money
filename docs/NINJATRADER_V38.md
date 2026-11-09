@@ -8339,3 +8339,8 @@ on development and unseen). Run once.
 39.5% at $64 / $78 a session (U48 $110 / $171); at 1R 38.7% / 38.1% at $92 / $124. At most 4 points more green days
 for a quarter to half of the money. (The break-even variant ran identical to plain 0.5R: `partial_be` did not act in this
 execution; not investigated, as the plain partial already fails.) U48 stays. `verification/noise_v2/g403_partials.txt`.
+
+## G404: the trade lock sooner, for green days (registered 2026-11-09, before its run)
+
+`research/g404_early_lock.py`: U48 (lock at 0.35 max losses, +2.5 points) with the lock at 0.25 or 0.2, or at 0.2 with
+the stop at entry +5 points (3 variants). G402's measure and rule. Run once.
