@@ -8922,3 +8922,9 @@ Hourly round. PRO's drawdown trails the highest balance including open profit, s
 floor for good. U58 with the lock at 0.25 max losses (U58 0.35) and, separately, the take-profit at 1.5 noise units (U58
 2.0), G428's measure. G437's rule (at least 5 fewer PRO losses than U58's 51, median net at least 95% of U58's on each
 set). Run once.
+
+**G444 result (2026-11-10): rejected, both.** Under PRO, 526 starts: lock at 0.25 loses **83** (30 + 10, 31 + 12) against U58's
+51, median nets down (index $30,005 / $29,372, NQ $43,406 / $38,840); take-profit 1.5 loses **53** (17 + 11, 14 + 11), the
+same as U58, with the index nets down by a third ($29,886 / $29,584; NQ $48,561 / $47,697). Banking sooner cuts the
+winners that build the cushion; the floor creep from faded open profit is not where the PRO losses come from.
+`verification/noise_v2/g444_pro_lock_tp.txt`, `g248_pro_{u58lock25,u58tp15}_{MS,MID}.csv`.

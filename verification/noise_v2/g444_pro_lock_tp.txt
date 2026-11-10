@@ -1,0 +1,9 @@
+index u58lock25 MS starts 160 PRO lost (worst order) 30 (best order) 30 median net 30005
+nq u58lock25 MS starts 103 PRO lost (worst order) 10 (best order) 10 median net 43406
+index u58lock25 MID starts 160 PRO lost (worst order) 31 (best order) 31 median net 29372
+nq u58lock25 MID starts 103 PRO lost (worst order) 12 (best order) 12 median net 38840
+index u58tp15 MS starts 160 PRO lost (worst order) 17 (best order) 17 median net 29886
+nq u58tp15 MS starts 103 PRO lost (worst order) 11 (best order) 11 median net 48561
+index u58tp15 MID starts 160 PRO lost (worst order) 14 (best order) 14 median net 29584
+nq u58tp15 MID starts 103 PRO lost (worst order) 11 (best order) 11 median net 47697
+
