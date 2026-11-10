@@ -8843,3 +8843,8 @@ the stops sit closer and normal moves take them out more often; the early accoun
 The mirror of G437: a smaller early budget tightened the early stops and lost 85 PRO starts against 51. Here
 `early_daily_loss` $1,000 (U58 $750), G428's measure. G437's rule (at least 5 fewer PRO losses than 51, median net at
 least 95% of U58's on each set). Run once.
+
+**G438 result (2026-11-10): rejected (no effect).** Under PRO, 526 starts: a $1,000 early budget loses **51** (16 + 11, 15 +
+9) as U58 does (15 + 12, 15 + 9); median nets the same or a little higher on NQ (index $42,241 / $42,175, the same; NQ
+$51,866 / $50,927 against $50,445 / $50,246). With G437: the early budget hurts when cut and does nothing when raised;
+$750 stays. `verification/noise_v2/g438_pro_early1000.txt`, `g248_pro_u58e1000_{MS,MID}.csv`.
