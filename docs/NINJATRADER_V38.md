@@ -8659,3 +8659,9 @@ on unseen and development). Run once.
 1.25 $46.0 (both 0 lost, a few more trades). Development (U58 $42.0, 0%): $42.4 at 9.8% lost, $41.4 at 12.7%. Unseen (U58
 $80.5, 1.6%): $67.5 at 3.3%, $74.7 at 1.6%. The calm stretches' trend days still pay the full target; cutting it costs
 more than the extra hits bring. `verification/noise_v2/g425_calm_target.txt`.
+
+## G426: U58 without (or with a looser) calm-stretch filter (registered 2026-11-10, before its run)
+
+Hourly round. U58 trades narrower lines on a calm stretch, but still skips days after a very calm one (`calm_k` 0.7, from
+v2.6); the two were never tested together. `research/g426_u58_calm_filter.py`: U58 with `calm_k` 0 (off) and 0.6.
+G423's rule against U58. Run once.
