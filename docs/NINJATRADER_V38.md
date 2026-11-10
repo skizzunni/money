@@ -8488,3 +8488,12 @@ makes $160.1 (+46%) with green months 67.4% on development; unseen $187.8 (+10%)
 58.5%** (U48 64.9%): fails. The other, $158.0 → unseen $188.1 (0% lost, green months 63.6%), also falls short of U48's
 green months. Fourth search in a row (G400, G408, G410, G411): steadier months on the development years do not stay
 steadier on the unseen ones. U48 stays. `verification/noise_v2/g411_wide_search2_final.csv`.
+
+## G415: the final pick for the 50K (registered 2026-11-10, before its run)
+
+The user: "50k is all u get. Either size up, trade more, idc. Pick what u think is best and get my results"; only the
+$2,000 drawdown matters. The two best money-first picks so far: G400's (unseen 36 months $224.5 a session, 3.5% lost)
+and G410's ($208.5, 1.8% lost). `research/g415_final_pick.py`: both and U48 on G409's 16 fresh start dates, 12 months
+each. **Rule:** the pick with the most $ a session there that makes at least 10% more than U48 and loses at most 5%
+becomes the bot's funded mode (built into NinjaTrader with parity and the full test suite); if neither, U48 stays.
+Run once.
