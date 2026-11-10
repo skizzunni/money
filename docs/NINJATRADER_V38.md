@@ -8906,3 +8906,8 @@ reaches the bar of 26; the PRO mode stays a documented user choice (G440), not b
 A measurement for the user's choice (G440: the PRO mode loses 29 PRO starts against U58's 51 over 21 months, at 86-89% of
 the net). `research/g443_pro_mode_fresh.py`: U58 and U58 + the PRO mode on G409's 16 recent 12-month starts (2023-25):
 $ a session, starts lost, green months. No adoption rule; reported beside G440.
+
+**G443 result (2026-11-10):** on the 16 recent 12-month starts, U58 **$49.2 a session**, 0 lost, green months 68.2%; U58 +
+the PRO mode **$40.3** (−18%), 0 lost, green months 63.0%, worst month −$1,766 (U58 −$1,893). On recent markets the PRO
+mode costs about a fifth of the money (21 months of history: about an eighth), for about 43% fewer PRO accounts lost
+over 21 months (G440). Still the user's choice; not built. `verification/noise_v2/g443_pro_mode_fresh.txt`.

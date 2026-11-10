@@ -1,0 +1,4 @@
+fresh starts used: 16
+                per_session  trades_per_session  lost  green_days  green_weeks  green_months  longest_losing_weeks  worst_month
+U58                  49.191               1.543   0.0       0.420        0.478         0.682                 3.750    -1892.504
+U58 + PRO mode       40.280               1.433   0.0       0.415        0.441         0.630                 3.688    -1766.330
