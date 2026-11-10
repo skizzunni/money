@@ -390,6 +390,7 @@ class NoiseConfig:
     # while it is below 0 day_down_mult x (at least 1; 1.0 = off)
     day_up_mult: float = 1.0
     day_down_mult: float = 1.0
+    day_up_from: float = 0.0  # research (G418): day_up_mult only while the account's closed profit is at least this
     after_red_mult: float = 1.0
     check_mult: str = ""  # research (G385): "minute:m,..." entries from the check closing at that minute take m x (at least 1)
     # research (G69): small gaps. A gap at least gap_go_small_k x the average (but under gap_go_k), the 09:30 bar
@@ -1505,7 +1506,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                         q_n = max(1, round(q_next * pm))
                         ml_next, q_next = ml_next / q_next * q_n, q_n
                     if (cfg.day_up_mult != 1.0 or cfg.day_down_mult != 1.0) and day_pnl != 0:  # G417
-                        q_n = max(1, round(q_next * (cfg.day_up_mult if day_pnl > 0 else cfg.day_down_mult)))
+                        up_ok = eq_curve[-1] - trail_base >= cfg.day_up_from  # G418
+                        q_n = max(1, round(q_next * ((cfg.day_up_mult if up_ok else 1.0) if day_pnl > 0 else cfg.day_down_mult)))
                         ml_next, q_next = ml_next / q_next * q_n, q_n
                     if cfg.weekday_mult:  # G384
                         wm = dict(x.split(":") for x in cfg.weekday_mult.split(","))

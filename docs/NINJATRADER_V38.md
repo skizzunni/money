@@ -8527,3 +8527,15 @@ money"). `day_up_mult` / `day_down_mult` in `mnqbot/noise.py` (off by default): 
 (below) 0 take that multiple of their contracts (at least 1). `research/g417_house_money.py`: U48 with (up, down) =
 (1.5, 1), (2, 1), (1, 0.5), (1, 1.5), (1.5, 0.5), (0.5, 1). G416's measure and rule (development pick within 5% lost and
 at least 10% above U48; unseen at most 5% lost and at least 10% more $ a session; then G409's fresh starts). Run once.
+
+**G417 result (2026-11-10): rejected (no development pick).** Development (U48 $39.2 a session, 3.2% lost): day up x2
+$81.5 (+108%) at 9.8% lost; up x1.5 $76.7 at 10.1%; up x1.5 / down x0.5 $76.6 at 13.3%; down x1.5 $50.2 at 13.1%; down
+x0.5 $34.2 at 3.2%; up x0.5 $30.8 at 0%. None makes 10% more within 5% lost. Unseen (U48 $75.7, 3.1%): up x1.5 $107.0
+(+41%) at 12.7% lost; up x2 $106.6 at 31.3%. Pressing a green day pays, but at a small cushion the bigger trades reach
+the floor. `verification/noise_v2/g417_house_money.txt`.
+
+## G418: house money only on a grown account (registered 2026-11-10, before its run)
+
+From G417: its losses come from pressing while the cushion is small. `day_up_from` in `mnqbot/noise.py` (0 = off): day
+up x`day_up_mult` only while the account's closed profit is at least that. `research/g418_house_money_grown.py`: U48 with
+up x1.5 or x2 from $2,000, $4,000 or $6,000 of profit (6 variants). G416's measure and rule. Run once.
