@@ -8884,3 +8884,9 @@ A follow-up to G440 (chosen after seeing it, so weigh it as such): U58 with the 
 the guard $100 above the floor (bar 26). Here `pro_guard` $200 and $300, G428's measure. G440's rule (at most 26 lost,
 median net at least 80% of U58's on each set); if both pass, the one with fewer losses. Passing makes it a documented
 PRO option only; building it into `MnqNoiseV38.cs` waits for the user. Run once.
+
+**G441 result (2026-11-10): rejected; a bigger guard loses more.** Under PRO, 526 starts: guard $200 **39** lost (7 + 10, 12 +
+10), $300 **38** (13 + 8, 9 + 8), against G440's $100 guard 29 and plain U58 51; median nets $35.4-46.0k, about the same as
+$100's. A higher guard stops trades sooner whenever the account is near its floor, and the extra stop-outs bring the
+floor down faster. The $100 guard of G440 stays the best PRO option found (29 lost); still a user choice, not built.
+`verification/noise_v2/g441_pro_guard.txt`, `g248_pro_u58pro{200,300}_{MS,MID}.csv`.

@@ -1,0 +1,9 @@
+index u58pro200 MS starts 160 PRO lost (worst order) 7 (best order) 7 median net 36157
+nq u58pro200 MS starts 103 PRO lost (worst order) 10 (best order) 10 median net 46008
+index u58pro200 MID starts 160 PRO lost (worst order) 12 (best order) 12 median net 36308
+nq u58pro200 MID starts 103 PRO lost (worst order) 10 (best order) 10 median net 43359
+index u58pro300 MS starts 160 PRO lost (worst order) 13 (best order) 13 median net 35821
+nq u58pro300 MS starts 103 PRO lost (worst order) 8 (best order) 8 median net 43185
+index u58pro300 MID starts 160 PRO lost (worst order) 9 (best order) 9 median net 35445
+nq u58pro300 MID starts 103 PRO lost (worst order) 8 (best order) 8 median net 42309
+
