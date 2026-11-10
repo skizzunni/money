@@ -290,6 +290,7 @@ class NoiseConfig:
     # research (G422): entry lines at entry_k_regime noise instead of entry_k when the last calm_short sessions' average
     # range is below (regime_calm) or above (not regime_calm) the last calm_long sessions' (0 = off)
     entry_k_regime: float = 0.0
+    tp_calm: float = 0.0  # research (G425): the take-profit on a calm stretch (entry_k_regime's test; 0 = off)
     entry_k_wild: float = 0.0  # research (G423): the entry lines on a stretch that is not calm (regime_calm's test; 0 = off)
     regime_calm: bool = True
     win_side_only: bool = False
@@ -1651,6 +1652,10 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                         tp_next = cfg.trend_with_tp
                     if cfg.drive_tp >= 0 and drive_sz == d:  # G376: let the trend days run
                         tp_next = cfg.drive_tp
+                    if cfg.tp_calm > 0 and len(day_ranges) >= cfg.calm_long and (  # G425: nearer on a calm stretch
+                            sum(day_ranges[-cfg.calm_short:]) / cfg.calm_short
+                            < sum(day_ranges[-cfg.calm_long:]) / cfg.calm_long):
+                        tp_next = cfg.tp_calm
                     est_px = c[i] + d * slip  # the expected fill, for the max loss on the fill bar
                     stop = tp = math.nan
                     if use_stop:  # the bracket: the closer of the line stop and the max loss, and the take-profit

@@ -8646,3 +8646,11 @@ at least U58's $ on unseen, no more fresh starts lost, at most 5% lost on unseen
 $43.0 at 0%. Unseen (U58 $80.5, 1.6%): +1 per $1,200 **$78.6 at 4.7%** (below U58), +1 per $1,000 $83.3 at 4.6%, fast
 from $6,000 $78.5 at 1.6%. The $1,200 steps make more on the fresh starts and less on unseen, with three times the
 losses there. `verification/noise_v2/g424_u58_steps.txt`.
+
+## G425: a nearer take-profit on calm stretches (registered 2026-11-10, before its run)
+
+Hourly round, on U58. U58 narrows its entry lines on a calm stretch; its take-profit stays 1.5 noise units, which smaller
+moves may seldom reach. `tp_calm` in `mnqbot/noise.py` (off by default): on a calm stretch (U58's test), entries take
+that take-profit. `research/g425_calm_target.py`: U58 with 1.0 and 1.25. G423's rule against U58 (the most $ a session
+on the fresh starts, at least 10% above U58 there, at least U58's $ on unseen, no more fresh starts lost, at most 5% lost
+on unseen and development). Run once.
