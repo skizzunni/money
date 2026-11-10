@@ -8480,3 +8480,11 @@ time and do not fit the engine. Round 68's bar. Run once.
 Brent, the euro, the pound, the Australian and New Zealand dollars, the dollar index, the DAX, the Euro Stoxx 50, the
 FTSE, the CAC), the noise-area breakout has no edge outside the US stock indices, and the S&P (MES) had none either
 (docs/RESULTS.md). `verification/noise_v2/g414_more_markets.txt`.
+
+**G411 result (2026-11-10): not recommended.** Only 2 of 200 sets lose at most 5% with green months 3 points above
+U48's on development. The pick ("$1,500 day budget, take-profit 2.5, time stop 60, lock 0.45, inverse-volatility,
+the mild drive tilt, Wednesdays 0.75x, the day lock, Fridays 1.25x, the early budget $600, the fast steps from $6,000")
+makes $160.1 (+46%) with green months 67.4% on development; unseen $187.8 (+10%) with 3.5% lost but **green months
+58.5%** (U48 64.9%): fails. The other, $158.0 → unseen $188.1 (0% lost, green months 63.6%), also falls short of U48's
+green months. Fourth search in a row (G400, G408, G410, G411): steadier months on the development years do not stay
+steadier on the unseen ones. U48 stays. `verification/noise_v2/g411_wide_search2_final.csv`.
