@@ -8777,3 +8777,10 @@ no more failures; then also measured on the funded 12-month measure before any d
 same 16 starts frozen (median days to pass 124 / 123 / 123). The frozen Tests are not lost to one oversized trade: they
 are long losing stretches at 1 MNQ that wear the room down trade by trade, and a smaller share per trade only slows the
 same slide until the 20-point minimum stop no longer fits. U58 as it is. `verification/noise_v2/g432_trail_frac.csv`.
+
+## G433: the no-deadline Test, faster contract steps from 1 MNQ (registered 2026-11-10, before its run)
+
+From G429/G431: U58 passes 86% of no-deadline Tests in a median 124 trading days; starting bigger cost 28 points of pass
+rate. Here the start stays 1 MNQ and the size grows only out of profit, but sooner: a contract more per $1,000 or $750 of
+profit (U58 $1,500). `research/g429_test_no_deadline.py`. **Rule:** recommended for the Test if its pass rate is within
+2 points of U58's and its median days to pass at most 85% of U58's; no default changes. Run once.
