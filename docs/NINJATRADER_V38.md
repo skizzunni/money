@@ -8633,3 +8633,10 @@ most 5% unseen, replaces U58. Run once.
 calm $35.1, 1.2 $41.5 (both 0 lost). Development (U58 $42.0, 0%): $39.5 at 6.6%, $26.3 at 6.6%. Unseen (U58 $80.5, 1.6%):
 $59.6 at 9.6%, $65.5 at 4.8%. Wider lines on the other days cost more than the false breakouts they skip.
 `verification/noise_v2/g423_wide_when_wild.txt`.
+
+## G424: U58 sized up faster (registered 2026-11-10, before its run)
+
+U58 loses fewer starts than U48 (0 of 16 fresh, 0% development, 1.6% unseen), so it may carry faster steps.
+`research/g424_u58_steps.py`: U58 with a contract more per $1,200 or $1,000 of profit (U58 $1,500), or the $650 fast steps
+from $6,000 (U58 $9,000). G423's rule against U58 (the most $ a session on the fresh starts, at least 10% above U58 there,
+at least U58's $ on unseen, no more fresh starts lost, at most 5% lost on unseen and development). Run once.
