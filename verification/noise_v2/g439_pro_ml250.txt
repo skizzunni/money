@@ -1,0 +1,5 @@
+index u58ml250 MS starts 160 PRO lost (worst order) 35 (best order) 35 median net 25685
+nq u58ml250 MS starts 103 PRO lost (worst order) 21 (best order) 21 median net 41923
+index u58ml250 MID starts 160 PRO lost (worst order) 28 (best order) 28 median net 25677
+nq u58ml250 MID starts 103 PRO lost (worst order) 19 (best order) 19 median net 42223
+

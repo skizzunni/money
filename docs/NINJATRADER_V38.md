@@ -8854,3 +8854,9 @@ $750 stays. `verification/noise_v2/g438_pro_early1000.txt`, `g248_pro_u58e1000_{
 From G437 / G438: tighter early stops lost 34 more PRO starts; a bigger budget alone changed nothing (the stop did not
 move). Here the stop itself: `max_loss_per_trade` $250 a contract (U58 $187.50), G428's measure. G437's rule (at least 5
 fewer PRO losses than U58's 51, median net at least 95% of U58's on each set). Run once.
+
+**G439 result (2026-11-10): rejected; much worse.** Under PRO, 526 starts: a $250 max loss a contract loses **103** (35 +
+21, 28 + 19) against U58's 51, and the median nets fall by a fifth to two fifths (index $25,685 / $25,677 against $42,241
+/ $42,175; NQ $41,923 / $42,223 against $50,445 / $50,246). A wider stop on the same budget means fewer contracts and
+bigger single losses against the intraday floor. With G437: U58's $187.50 sits between a too-tight and a too-wide stop;
+it stays. `verification/noise_v2/g439_pro_ml250.txt`, `g248_pro_u58ml250_{MS,MID}.csv`.
