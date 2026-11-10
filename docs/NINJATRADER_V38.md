@@ -8807,3 +8807,7 @@ Hourly round. U58 sizes each trade to fit the day's budget, $750 until the floor
 that budget sets how big the Test's trades are. `research/g429_test_no_deadline.py`, U58 with $500 and $1,000. **Rule:**
 recommended for the Test if it raises the pass rate (frozen counted as lost) by at least 3 points, or keeps it within 2
 points with median days at most 85% of U58's; no default changes. Run once.
+
+**G435 result (2026-11-10): rejected.** Passed / frozen / median days: U58 ($750) **86.2% / 16 / 124**; $1,000 the same to
+the start; $500 87.1% / 15 / 124 (one start more, under the 3-point bar). The early budget rarely binds at the Test's
+early size. `verification/noise_v2/g435_test_budget.csv`.
