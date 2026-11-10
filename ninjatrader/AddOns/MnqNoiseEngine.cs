@@ -30,7 +30,14 @@ namespace NinjaTrader.NinjaScript.AddOns.MnqBot
         public double LockAt = 1.0;          // in max losses of profit; then the stop moves to entry + LockPlus
         public double LockPlus = 2.5;        // points
         public int MaxLosers = 4;            // no new entries after this many losers today; 0 = no limit
-        public bool TightenOnly = false;     // in a trade the stop never moves back toward the price (round 139)
+        // v2 stops (docs/V2_STOPS.md), on by default:
+        public bool TightenOnly = true;      // in a trade the stop never moves back toward the price (round 139)
+        // a resting stop where today's closed P/L plus the open trade's (after its exit commission) reaches this, $;
+        // then, or once the closed P/L is at or below it, no new entries today (0 = off)
+        public double DailyLossLimit = -400.0;
+        // the lock arms at this many noise units of the current check in profit (x the entry price); 0 = LockAt max losses
+        public double LockTriggerNoise = 0.75;
+        public bool GapGuard = true;         // no new entries today after a stop fills past 2x its intended loss distance
     }
 
     public sealed class NoiseTrade
@@ -81,6 +88,8 @@ namespace NinjaTrader.NinjaScript.AddOns.MnqBot
         int pendingKind, pendingDir;  // pendingKind 1: entry in pendingDir, 2: close; filled at the next bar's open
         double estPx = double.NaN;
         double held = double.NaN;     // TightenOnly: the stop so far in this trade, and what set it
+        bool guardToday, gapToday;
+        double fav = double.NaN;      // the best price since the fill (high for a long, low for a short), for the lock    // v2: the daily loss limit fired / a stop filled past 2x its distance today
         string heldWhy = "";
 
         public readonly List<NoiseTrade> Trades = new List<NoiseTrade>();
@@ -129,9 +138,19 @@ namespace NinjaTrader.NinjaScript.AddOns.MnqBot
         public double CapPoints { get { return s.MaxLoss > 0 ? s.MaxLoss / s.Qty / s.PointValue : double.NaN; } }
         public double LockPoints
         {
-            get { return s.LockAt > 0 && s.MaxLoss > 0 ? s.LockAt * s.MaxLoss / s.Qty / s.PointValue : double.NaN; }
+            get
+            {
+                if (s.LockTriggerNoise > 0)
+                    return Position != 0 && !double.IsNaN(Sigma) ? s.LockTriggerNoise * Sigma * EntryPrice : double.NaN;
+                return s.LockAt > 0 && s.MaxLoss > 0 ? s.LockAt * s.MaxLoss / s.Qty / s.PointValue : double.NaN;
+            }
         }
-        public bool FreshOk { get { return s.MaxLosers <= 0 || LosersCounted < s.MaxLosers; } }
+        // v2: the daily loss limit or the gap guard has ended new entries for today
+        public bool DayBlocked
+        {
+            get { return gapToday || (s.DailyLossLimit < 0 && (guardToday || DayPnl <= s.DailyLossLimit)); }
+        }
+        public bool FreshOk { get { return !DayBlocked && (s.MaxLosers <= 0 || LosersCounted < s.MaxLosers); } }
         // the losers the daily limit counts: the model's own (LosersToday), or, when the wrapper sets it (>= 0), the
         // day's losing positions from the account's fills (the NinjaTrader strategy placing orders)
         public int ExternalLosers = -1;
@@ -167,7 +186,18 @@ namespace NinjaTrader.NinjaScript.AddOns.MnqBot
                 line = held;
                 reason = heldWhy;
             }
+            double g = GuardPx();
+            if (!double.IsNaN(g) && p * (g - line) > 0) { line = g; reason = "Day guard"; }
             return line;
+        }
+
+        // v2: the daily loss limit's stop price for the open trade (NaN when off or flat)
+        double GuardPx()
+        {
+            if (s.DailyLossLimit >= 0 || Position == 0)
+                return double.NaN;
+            double allow = -s.DailyLossLimit + DayPnl;
+            return EntryPrice - Position * (allow - 2 * s.CommissionPerSide * s.Qty) / (s.Qty * s.PointValue);
         }
 
         public double TargetNow()
@@ -231,6 +261,7 @@ namespace NinjaTrader.NinjaScript.AddOns.MnqBot
             DayTrades++;
             Position = 0;
             Locked = false;
+            fav = double.NaN;
             held = double.NaN;
             heldWhy = "";
         }
@@ -294,6 +325,8 @@ namespace NinjaTrader.NinjaScript.AddOns.MnqBot
                     held = line;
                     heldWhy = reason;
                 }
+                double g = GuardPx();  // v2: the daily loss limit, after the tighten-only hold (as the Python model)
+                if (!double.IsNaN(g) && p * (g - line) > 0) { line = g; reason = "Day guard"; }
                 bool hit;
                 double price;
                 if (EntryBar == i)  // a stop attached to the entry can fill on the fill bar itself
@@ -313,8 +346,13 @@ namespace NinjaTrader.NinjaScript.AddOns.MnqBot
                 }
                 if (hit)
                 {
+                    double want = p * (EntryPrice - line);  // v2 gap guard: a fill past 2x the intended loss distance
+                    if (s.GapGuard && want > 0 && p * (EntryPrice - price) > 2 * want)
+                        gapToday = true;
                     ClosePos(i, price, reason);
                     Event(i, "EXIT");
+                    if (reason == "Day guard")
+                        guardToday = true;
                 }
                 else if (s.TakeProfit > 0 && EntryBar != i)  // the take-profit limit, from the bar after the fill
                 {
@@ -327,11 +365,15 @@ namespace NinjaTrader.NinjaScript.AddOns.MnqBot
                 }
             }
 
-            if (Position != 0 && !Locked && s.LockAt > 0 && s.MaxLoss > 0)
+            if (Position != 0 && !Locked && ((s.LockAt > 0 && s.MaxLoss > 0) || s.LockTriggerNoise > 0))
             {
-                // the lock arms when the bar reaches the trigger (high for a long, low for a short), from the next bar
-                double trigger = s.LockAt * s.MaxLoss / s.Qty / s.PointValue;
-                Locked = Position * ((Position > 0 ? h : l) - EntryPrice) >= trigger;
+                // the lock arms when the bar reaches the trigger (high for a long, low for a short), from the next bar;
+                // v2: LockTriggerNoise x the current check's noise x the entry price
+                double trigger = s.LockTriggerNoise > 0 ? s.LockTriggerNoise * Sigma * EntryPrice
+                                                         : s.LockAt * s.MaxLoss / s.Qty / s.PointValue;
+                double ext = Position > 0 ? h : l;
+                fav = double.IsNaN(fav) ? ext : Position > 0 ? Math.Max(fav, ext) : Math.Min(fav, ext);
+                Locked = Position * (fav - EntryPrice) >= trigger;
             }
 
             if (Position != 0 && (!inRth || tMin == RthOpen))  // a session ended early (half day, data gap)
@@ -347,6 +389,7 @@ namespace NinjaTrader.NinjaScript.AddOns.MnqBot
                 LosersToday = 0;
                 DayPnl = 0;
                 DayTrades = 0;
+                guardToday = gapToday = false;
                 Upper = Lower = Sigma = double.NaN;
                 today = NewToday();
                 SkipToday = InList(s.SkipDates, nyStart);

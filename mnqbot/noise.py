@@ -158,6 +158,13 @@ class NoiseConfig:
     day_guard: float = 0.0
     day_guard_grid: bool = False  # G321b: the day guard's stop on the tick grid with nt_execution (a long's rounds up)
     guard_floor_buffer: float = 100.0
+    # v2 stops (docs/V2_STOPS.md, off by default): dll_v2, the daily loss limit as a day guard (a stop where today's
+    # closed P/L plus the open trade's reaches -dll_v2; then, or once the closed P/L is at or below it, no new entries);
+    # lock_noise, the lock's trigger in noise units of the current check (instead of lock_at max losses); gap_guard, no
+    # new entries for the day after a stop fills more than 2x its intended loss distance from the entry
+    dll_v2: float = 0.0
+    lock_noise: float = 0.0
+    gap_guard: bool = False
     guard_reserve_pts: float = 0.0  # G133: the guard fires this many points per contract early (room for its own slippage)
     guard_slip_pts: float = 0.0  # research: the day guard's fill this many points worse (a fast market)
     day_stop_profit: float = 0.0  # research (G127): no new entries today once today's closed P/L is at least this, $
@@ -608,6 +615,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
     target_today = False  # after_target_done: a take-profit filled today
     day_pnl = 0.0  # daily_loss_limit: today's realized P/L
     guard_today = False  # G128: the day guard closed a trade today
+    gap_today = [False]  # v2 gap guard: a stop filled past 2x its distance today
     gap_day_pnl = 0.0  # gap_no_budget: today's gap-slot P/L
     week_key, week_start_eq = None, 0.0  # week_stop: this week, and the closed equity at its first session
     trail_base = trail_peak = math.nan  # trail_dd: the closed equity at its start, the highest end-of-day equity
@@ -747,6 +755,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
         ml = cfg.max_losers_locked if cfg.max_losers_locked >= 0 and floor_stopped() else cfg.max_losers
         if cfg.drive_losers > 0 and drive_sz:  # G377
             ml = cfg.drive_losers
+        if gap_today[0] or (cfg.dll_v2 > 0 and (guard_today or day_pnl <= -cfg.dll_v2)):  # v2 stops
+            return False
         return ml <= 0 or losers_today < ml
 
     def floor_stopped() -> bool:
@@ -1224,8 +1234,9 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                 if entry_bar != i and ((pos > 0 and held > line) or (pos < 0 and held < line)):
                     line, reason = held, held_why
                 held, held_why = line, reason
-            if cfg.day_guard > 0 and (not cfg.day_guard_locked or floor_stopped()):  # G128: the day guard, a tick-level exit
-                allow = cfg.day_guard + day_pnl
+            gd = cfg.day_guard if cfg.day_guard > 0 else cfg.dll_v2  # v2: the daily loss limit is this guard
+            if gd > 0 and (not cfg.day_guard_locked or floor_stopped()):  # G128: the day guard, a tick-level exit
+                allow = gd + day_pnl
                 if cfg.trail_dd > 0 and not math.isnan(trail_peak):
                     fl = trail_peak - cfg.trail_dd
                     if cfg.trail_cap >= 0:
@@ -1278,6 +1289,10 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             if hit and reason == "Day guard":
                 price -= pos * cfg.guard_slip_pts
             if hit:
+                if cfg.gap_guard and reason != "Time stop":  # v2: a fill past 2x the stop's intended loss distance
+                    want = pos * (entry_px - line)
+                    if want > 0 and pos * (entry_px - price) > 2 * want:
+                        gap_today[0] = True
                 close_pos(i, price, reason)
                 events.append((i - 1 if reason == "Time stop" else i, "EXIT"))  # the time stop's alert: at the close
                 if reason == "Day guard":
@@ -1331,9 +1346,11 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             bp = h[i] if pos > 0 else l[i]
             best = bp if math.isnan(best) else (max(best, bp) if pos > 0 else min(best, bp))
 
-        if use_stop and pos and not locked and lock_trade > 0 and ml_cfg > 0:
-            # the lock arms when the bar reaches the trigger (high for a long, low for a short), from the next bar
-            trigger = lock_trade * ml_trade / q_trade / cfg.point_value
+        if use_stop and pos and not locked and ((lock_trade > 0 and ml_cfg > 0) or cfg.lock_noise > 0):
+            # the lock arms when the bar reaches the trigger (high for a long, low for a short), from the next bar;
+            # v2: lock_noise x the current check's noise x the entry price
+            trigger = (cfg.lock_noise * sigma * entry_px if cfg.lock_noise > 0
+                       else lock_trade * ml_trade / q_trade / cfg.point_value)
             fav = (h[i] if pos > 0 else l[i]) if math.isnan(fav) else (max(fav, h[i]) if pos > 0 else min(fav, l[i]))
             at_check = FIRST_CHECK <= end <= LAST_CHECK and (end - FIRST_CHECK) % STEP == 0
             if not cfg.lock_at_checks or at_check:
@@ -1359,6 +1376,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             drive_sz = 0  # G373
             block_dir = 0
             target_today = guard_today = False
+            gap_today[0] = False
             if red_seen:
                 red_hist.append(day_pnl)  # G331: the session that just ended
             red_seen = True

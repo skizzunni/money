@@ -7,6 +7,7 @@ model, and the trades it places on the stand-in's account must be the bot's trad
 """
 from __future__ import annotations
 
+import dataclasses
 import math
 import os
 import shutil
@@ -35,7 +36,9 @@ ENV = {**os.environ, "DOTNET_CLI_TELEMETRY_OPTOUT": "1", "DOTNET_NOLOGO": "1"}
 # Python setting -> C# NoiseSettings field
 FIELDS = {"qty": "Qty", "max_loss_per_trade": "MaxLoss", "take_profit": "TakeProfit", "lock_at": "LockAt",
           "lock_plus": "LockPlus", "max_losers": "MaxLosers", "stop_buffer": "StopBuffer", "lookback": "Lookback",
-          "skip_dates": "SkipDates", "fed_dates": "FedDates", "fed_no_shorts": "FedNoShorts"}
+          "skip_dates": "SkipDates", "fed_dates": "FedDates", "fed_no_shorts": "FedNoShorts",
+          # v2 stops (docs/V2_STOPS.md); the daily loss limit is passed as -dll_v2
+          "tighten_only": "TightenOnly", "lock_noise": "LockTriggerNoise", "gap_guard": "GapGuard"}
 
 
 def build(project: Path, out: Path) -> None:
@@ -62,7 +65,7 @@ def write_bars(bars: pd.DataFrame, tmp: Path) -> Path:
 
 def run_cs(harness, bars: pd.DataFrame, cfg: NoiseConfig, minutes: int = 5, tmp: Path | None = None):
     path = write_bars(bars, tmp)
-    args = [f"{FIELDS[k]}={getattr(cfg, k)}" for k in FIELDS]
+    args = [f"{FIELDS[k]}={getattr(cfg, k)}" for k in FIELDS] + [f"DailyLossLimit={-cfg.dll_v2!r}"]
     r = subprocess.run([DOTNET, str(harness), str(path), str(minutes), *args], capture_output=True, text=True,
                        env=ENV)
     assert r.returncode == 0, r.stderr
@@ -118,6 +121,14 @@ SETTINGS = {
     "no take-profit": NoiseConfig(qty=3, take_profit=0.0),
     "stop on the line": NoiseConfig(qty=3, stop_buffer=0.0),
     "daily limit 1": NoiseConfig(qty=10, max_losers=1),
+    # v2 stops (docs/V2_STOPS.md) at 2 MNQ
+    "v2 stops": NoiseConfig(qty=2, dll_v2=400.0, lock_noise=0.75, gap_guard=True, tighten_only=True),
+    "v2, daily limit 300, buffer 0.35": NoiseConfig(qty=2, dll_v2=300.0, lock_noise=0.75, gap_guard=True,
+                                                    tighten_only=True, stop_buffer=0.35),
+    "v2, tight cap": NoiseConfig(qty=2, max_loss_per_trade=100.0, dll_v2=400.0, lock_noise=0.75, gap_guard=True,
+                                 tighten_only=True),
+    "v2, no gap guard": NoiseConfig(qty=2, dll_v2=500.0, lock_noise=0.75, gap_guard=False, tighten_only=True),
+    "v1.5 stops at 2 MNQ": NoiseConfig(qty=2),
 }
 
 
@@ -1351,3 +1362,41 @@ def test_realtime_errors_are_never_ignored(name):
     assert src.count("RealtimeErrorHandling = RealtimeErrorHandling.StopCancelCloseIgnoreRejects;") == 1
     handler = src[src.index("protected override void OnOrderUpdate"):]
     assert "OrderState.Rejected" in handler[:4000]
+
+
+V2 = NoiseConfig(qty=2, dll_v2=400.0, lock_noise=0.75, gap_guard=True, tighten_only=True)
+
+
+@pytest.mark.parametrize("seed", [3, 5, 9])
+def test_v2_stops_on_gaps(harness, tmp_path, seed):
+    """docs/V2_STOPS.md: the v2 stops agree with the Python model trade for trade on bars with gaps, at the plan's
+    defaults and with a tighter daily loss limit."""
+    bars = gappy(synth_bars(sessions=120, seed=seed), seed)
+    assert assert_same(harness, bars, V2, tmp_path).trades
+    assert assert_same(harness, bars, dataclasses.replace(V2, dll_v2=150.0, qty=6), tmp_path).trades
+
+
+def test_v2_stops_fire_and_block():
+    """Each v2 stop acts: the daily loss limit closes trades ("Day guard") and blocks the rest of the day, the gap
+    guard ends a day's entries after a fill past 2x the stop's distance, and the noise-unit lock changes the locks."""
+    from mnqbot.noise import run
+    reasons, guard_days, gap_effect, lock_effect = set(), 0, False, False
+    for seed in (3, 5, 9):
+        bars = gappy(synth_bars(sessions=120, seed=seed), seed)
+        cfg = dataclasses.replace(V2, dll_v2=150.0, qty=6)
+        res = run(bars, cfg).trades
+        reasons |= {t.reason for t in res}
+        days = {}
+        for t in res:
+            days.setdefault(t.entry_time.date(), []).append(t)
+        for ts in days.values():
+            g = [k for k, t in enumerate(ts) if t.reason == "Day guard"]
+            if g:
+                guard_days += 1
+                assert g[0] == len(ts) - 1, "no entry after the daily loss limit fired"
+        no_gap = run(bars, dataclasses.replace(cfg, gap_guard=False)).trades
+        gap_effect |= [(t.entry_bar, t.exit_bar) for t in res] != [(t.entry_bar, t.exit_bar) for t in no_gap]
+        old_lock = run(bars, dataclasses.replace(cfg, lock_noise=0.0)).trades
+        lock_effect |= [(t.exit_bar, t.reason) for t in res] != [(t.exit_bar, t.reason) for t in old_lock]
+    assert "Day guard" in reasons and guard_days > 0
+    assert gap_effect and lock_effect
