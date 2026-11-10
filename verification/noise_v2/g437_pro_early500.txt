@@ -1,0 +1,5 @@
+index u58e500 MS starts 160 PRO lost (worst order) 30 (best order) 30 median net 38971
+nq u58e500 MS starts 103 PRO lost (worst order) 16 (best order) 16 median net 48452
+index u58e500 MID starts 160 PRO lost (worst order) 26 (best order) 26 median net 40607
+nq u58e500 MID starts 103 PRO lost (worst order) 13 (best order) 13 median net 50927
+

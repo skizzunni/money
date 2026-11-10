@@ -8831,3 +8831,9 @@ G435 hinted a smaller early budget saves a start on the Test. `research/g248_pro
 `early_daily_loss` $500 (U58 $750) until the floor has stopped. **Rule:** adopted as a PRO recommendation (a setting,
 documented; built into a mode only on a later pass of the full funded measure) if it loses at least 5 fewer PRO starts
 than U58's 51 with the median net at least 95% of U58's on each set. Run once.
+
+**G437 result (2026-11-10): rejected; worse.** Under PRO, 526 starts: U58 with a $500 early budget loses **85** (30 + 16
+on the 1st, 26 + 13 mid-month) against U58's **51**, and the median nets fall (index $38,971 / $40,607 against $42,241 /
+$42,175; NQ $48,452 / $50,927 against $50,445 / $50,246). A smaller budget cuts each early trade's max loss to fit, so
+the stops sit closer and normal moves take them out more often; the early account bleeds instead of being protected.
+`verification/noise_v2/g437_pro_early500.txt`, `g248_pro_u58e500_{MS,MID}.csv`.
