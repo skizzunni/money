@@ -8795,3 +8795,8 @@ From G431/G433: bigger or faster sizing early costs pass rate. Here U58 starts a
 is $2,000 (or $1,500) up, where the end-of-day floor stops at the start balance; from there, a contract more per $500 of
 profit (U58: $650 steps only from $9,000). `research/g429_test_no_deadline.py`. G433's rule (pass rate within 2 points of
 U58's, median days at most 85%). Run once.
+
+**G434 result (2026-11-10): rejected.** Passed / median days: U58 **86.2% / 124**; pressing from $2,000 83.6% / 126; from
+$1,500 76.7% / 130 (worst drawdown $15,248 in both). Not faster at all: the bigger late days raise the best day, and the
+Test's consistency rule (best day under half the profit) then asks for more profit before it passes. On this Test,
+steady size is both safer and as fast. `verification/noise_v2/g434_test_push.csv`.
