@@ -8868,3 +8868,12 @@ $100 above that floor, `pro_guard`) cut U48's PRO losses from 55 to 38 but cost 
 rejected against its bar of 27. On U58 (51 PRO losses, G428) it has not been run. G428's measure. **Rule:** offered as a
 documented PRO setting (not a default) if it loses at most 26 of 526 (half of U58's) with the median net at least 80% of
 U58's on each set; else rejected. Run once.
+
+**G440 result (2026-11-10): rejected as registered, narrowly; the best PRO result so far.** Under PRO, 526 starts: U58 with
+G249's PRO mode loses **29** (5 + 8 on the 1st, 8 + 8 mid-month) against U58's **51**, 43% fewer, in both bar orders; the
+bar was 26. Median nets: index $36,258 / $36,308 (86% of U58's $42,241 / $42,175), NQ $45,041 / $43,434 (89% / 86% of
+$50,445 / $50,246), above the 80% bar. On U48 the same mode gave 38 lost at 70% of the net (G249); on U58 it keeps more of
+both. Not adopted (the registered bar stands); it is a trade-off the user can choose: about 5.5% of funded accounts lost
+instead of 9.7%, for about 12% less net over 21 months. The mode exists in the Python model only; on the funded account
+it would need building into `MnqNoiseV38.cs` with parity tests first. `verification/noise_v2/g440_pro_mode_u58.txt`,
+`g248_pro_u58pro_{MS,MID}.csv`.
