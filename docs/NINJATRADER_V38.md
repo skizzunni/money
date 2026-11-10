@@ -8837,3 +8837,9 @@ on the 1st, 26 + 13 mid-month) against U58's **51**, and the median nets fall (i
 $42,175; NQ $48,452 / $50,927 against $50,445 / $50,246). A smaller budget cuts each early trade's max loss to fit, so
 the stops sit closer and normal moves take them out more often; the early account bleeds instead of being protected.
 `verification/noise_v2/g437_pro_early500.txt`, `g248_pro_u58e500_{MS,MID}.csv`.
+
+## G438: PRO, U58 with a $1,000 early day budget (registered 2026-11-10, before its run)
+
+The mirror of G437: a smaller early budget tightened the early stops and lost 85 PRO starts against 51. Here
+`early_daily_loss` $1,000 (U58 $750), G428's measure. G437's rule (at least 5 fewer PRO losses than 51, median net at
+least 95% of U58's on each set). Run once.
