@@ -8685,3 +8685,15 @@ against U48 $33.9 at 3.2%; unseen U58 **$67.6** at 3.2% against U48 $63.2 at 3.1
 dollars (it trades more: −$11.0 a session on the fresh starts against U48's −$3.8), but it stays ahead everywhere. The
 unseen loss rates (3.2% / 3.1%) are the same two starts; the measure counts a start lost partway through month 12 by the
 share of the month left, so the difference is less than one start. `verification/noise_v2/g427_u58_slippage.txt`.
+
+## The stop-placement check on MnqNoiseV38 (2026-11-10, a safety port, no rule change)
+
+Hourly round. v3 Fix 2 (`docs/V2_STOPS.md`) added a stop-placement check to `MnqNoiseMomentum.cs`; the funded strategy,
+`MnqNoiseV38.cs`, had none. Ported: every stop sent is logged ("MnqNoiseV38 stop placed: ..."), and at every bar close an
+open position (bot or gap trade) must have a live stop (the platform's own report of the stop order when it gives one,
+else the stop sent) and the engine's stop (`PeekStop`) may not be tighter than it by more than two ticks; a failure
+prints and, live, alerts "STOP CHECK FAILED ... Put a stop in by hand now". The run's last line counts placements and
+flags. **Results:** the 2025-26 window, U58 on 5-minute bars with the platform reporting stop orders: **6,295 placements,
+0 flagged**; the NinjaTrader growth run unchanged ($75,486.34 on 5-minute, $28,191.46 on 30-minute: the check changes no
+trade); a stop the broker cancels mid-trade is flagged (`tests/test_ninjatrader_v38.py::test_v38_stop_placement_check`).
+All V38 and release tests pass (54).

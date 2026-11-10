@@ -1145,3 +1145,31 @@ def test_v38_test_sprint_day_guard(sim, sample_1m, tmp_path):  # noqa: F811
         assert float(a[2]) == t.entry and float(a[4]) == t.exit, (a, t)
         assert math.isclose(float(a[6]), t.pnl, abs_tol=1e-6), (a, t)
     assert any(t.reason == "Day guard" for t in py)
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+def test_v38_stop_placement_check(sim, sample_1m, tmp_path):  # noqa: F811
+    """docs/V2_STOPS.md (v3 Fix 2), on the funded strategy: with the platform reporting the stop order's state, every open
+    position (bot and gap trades) has a live stop at every bar close and the engine's stop is never tighter than it: no
+    flag over the sample, a placement logged for every trade. When the broker cancels the bot's stop mid-trade, that
+    bar is flagged."""
+    bars = resample(sample_1m, "5min")
+    path = tmp_path / "bars.csv"
+    with path.open("w") as f:
+        for t, r in zip(bars.index, bars.itertuples(), strict=True):
+            f.write(f"{t:%Y-%m-%d %H:%M},{r.open!r},{r.high!r},{r.low!r},{r.close!r}\n")
+    base = [DOTNET, str(sim), str(path), "5", "Strategy=V38", *GROW_ARGS, "SimStopUpdates=True"]
+    r = subprocess.run(base, capture_output=True, text=True, env=ENV)
+    assert r.returncode == 0, r.stderr[-2000:]
+    printed = [x for x in r.stdout.splitlines() if x.startswith("P,")]
+    trades = [x.split(",")[1:] for x in r.stdout.splitlines() if x.startswith("T,")]
+    assert len(trades) >= 20
+    assert not [x for x in printed if "STOP CHECK FAILED" in x]
+    assert sum("stop placed:" in x for x in printed) >= len(trades)
+    assert any("stop check:" in x and " 0 flagged" in x for x in printed)
+    bot = [t for t in trades if int(t[3]) - int(t[1]) >= 4]
+    at = int(bot[0][1]) + 2
+    r = subprocess.run([*base, f"SimCancelStopsAt={at}"], capture_output=True, text=True, env=ENV)
+    assert r.returncode == 0, r.stderr[-2000:]
+    flags = [x for x in r.stdout.splitlines() if x.startswith("P,") and "STOP CHECK FAILED" in x]
+    assert flags and "no live stop order" in flags[0] and "cancelled or rejected" in flags[0], flags

@@ -1006,6 +1006,12 @@ namespace NinjaTrader.NinjaScript.Strategies
         // fill quality: the price each order was planned at (the close when the entry or a market exit was sent, the
         // resting stop), and the running ticks paid worse than that
         double entryRef = double.NaN, exitRef = double.NaN, stopRef = double.NaN, entryStopPts = double.NaN;
+        // the stop-placement check (docs/V2_STOPS.md, v3 Fix 2): the stop sent for the open position (a price; the bracket
+        // in ticks from the fill, or the gap trade's price, until the entry fills), the platform's own word on the stop
+        // order when it reports one (-1 none yet, 1 working, 0 gone), and the counts of placements and of flags
+        double scPx = double.NaN, scPendTicks = double.NaN, scPendPx = double.NaN;
+        int scLive = -1, scPlaced, scFlags;
+        bool scFlatten;
         double entrySlipSum, exitSlipSum;
         int entrySlipN, exitSlipN;
         int realDayWins;          // today's winners, for the day's summary
@@ -1283,6 +1289,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                       ", closed drawdown $" + maxDd.ToString("0.00", CultureInfo.InvariantCulture) +
                       ", worst day $" + worstDay.ToString("0.00", CultureInfo.InvariantCulture) +
                       (journalPath.Length > 0 ? ", journal " + journalPath : ""));
+                if (PlaceOrders)
+                    Print("MnqNoiseV38 stop check: " + scPlaced + " stop placements, " + scFlags + " flagged");
             }
         }
 
@@ -1383,6 +1391,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             else if (real != 0 && engine.GapPos == real && engine.GapExitNow)
             {
                 exitRef = Close[0];
+                scFlatten = true;
                 if (real > 0) ExitLong("Gap exit", GapLongName);
                 else ExitShort("Gap exit", GapShortName);
             }
@@ -1391,6 +1400,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 // G60: gap and go, a market entry with its stop at the 09:30 open attached first
                 string name = engine.GapNewEntry > 0 ? GapLongName : GapShortName;
                 SetStopLoss(name, CalculationMode.Price, engine.GapNewStop, false);
+                scPendPx = engine.GapNewStop;
                 if (engine.GapNewEntry > 0) EnterLong(engine.GapNewQty, name);
                 else EnterShort(engine.GapNewQty, name);
                 entryRef = Close[0];
@@ -1404,6 +1414,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 // the bracket first, in ticks from the fill, so it is attached the moment the entry fills
                 string name = engine.NewEntry > 0 ? LongName : ShortName;
                 SetStopLoss(name, CalculationMode.Ticks, Math.Max(1, Math.Round(engine.NewStopPts / TickSize)), false);
+                scPendTicks = Math.Max(1, Math.Round(engine.NewStopPts / TickSize));
                 if (!double.IsNaN(engine.NewTpPts))
                     SetProfitTarget(name, CalculationMode.Ticks, Math.Max(1, Math.Round(engine.NewTpPts / TickSize)));
                 if (engine.NewEntry > 0) EnterLong(engine.NewQty, name);
@@ -1432,6 +1443,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                     {
                         SetStopLoss(name, CalculationMode.Price, stop, false);
                         stopRef = stop;
+                        ScSent(real, stop, "the engine's stop for the next bar");
                         double tp = engine.PeekTarget(avg);
                         if (!double.IsNaN(tp))
                             SetProfitTarget(name, CalculationMode.Price, tp);
@@ -1444,12 +1456,82 @@ namespace NinjaTrader.NinjaScript.Strategies
                 double be = Position.AveragePrice + real * TickSize;
                 SetStopLoss(real > 0 ? GapLongName : GapShortName, CalculationMode.Price, be, false);
                 stopRef = be;
+                ScSent(real, be, "gap trade at break-even");
                 Say("gapbe", "Gap trade: stop moved to break-even, " + be.ToString("0.00", CultureInfo.InvariantCulture));
             }
             else if (real != 0 && engine.Position == 0 && engine.GapPos != real)
                 Flatten(real, "Model flat");  // the model closed (a fill elsewhere): don't hold an unmanaged position
+            if (PlaceOrders)
+                CheckStops(real);
             WriteTrades(platform);
             Dashboard(endNy);
+        }
+
+        // ── The stop-placement check (docs/V2_STOPS.md, v3 Fix 2). Every stop sent is logged; at each bar close an open
+        // position must have a live stop (the platform's report when it gives one, else the stop sent) and the engine's
+        // own stop for it may not be tighter than that order (beyond two ticks). A missing stop on a funded account is a
+        // safety failure: printed, and alerted live.
+        void ScSent(int dir, double px, string why)
+        {
+            scPlaced++;
+            bool same = !double.IsNaN(scPx) && Math.Abs(px - scPx) < TickSize / 2;
+            scPx = px;
+            scPendTicks = scPendPx = double.NaN;  // a price supersedes the stop sent with the entry
+            if (!same)
+                Print("MnqNoiseV38 stop placed: " + (dir > 0 ? "LONG" : "SHORT") + " " + Math.Abs(Position.Quantity) + ", stop " +
+                      px.ToString("0.00", CultureInfo.InvariantCulture) + " (" + why + ")");
+        }
+
+        void ScFlag(string what)
+        {
+            scFlags++;
+            string msg = "STOP CHECK FAILED: " + what + ". Put a stop in by hand now.";
+            Print("MnqNoiseV38 " + Time[0].ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture) + " " + msg);
+            Say("stopcheck", msg);
+        }
+
+        void CheckStops(int real)
+        {
+            bool flat = scFlatten;
+            scFlatten = false;
+            if (real == 0)
+            {
+                scPx = double.NaN;
+                scLive = -1;
+                return;
+            }
+            if (flat)
+                return;  // closing at market
+            if (!double.IsNaN(scPendTicks))
+                ScSent(real, Position.AveragePrice - real * scPendTicks * TickSize, "bracket sent with the entry");
+            else if (!double.IsNaN(scPendPx))
+                ScSent(real, scPendPx, "gap trade's stop sent with the entry");
+            string side = real > 0 ? "long" : "short";
+            if (double.IsNaN(scPx) || scLive == 0)
+            {
+                ScFlag("the open " + side + " has no live stop order" + (scLive == 0 ? " (the platform cancelled or rejected it)" : ""));
+                return;
+            }
+            if (engine.Position == real)
+            {
+                double def = engine.PeekStop(Position.AveragePrice);
+                if (!double.IsNaN(def) && real * (def - scPx) > 2 * TickSize)
+                    ScFlag("the engine's stop " + def.ToString("0.00", CultureInfo.InvariantCulture) + " is tighter than the live order " +
+                           scPx.ToString("0.00", CultureInfo.InvariantCulture) + ": a defined stop was not placed");
+            }
+        }
+
+        protected override void OnOrderUpdate(Order order, double limitPrice, double stopPrice, int quantity, int filled,
+                                              double averageFillPrice, OrderState orderState, DateTime time,
+                                              ErrorCode error, string comment)
+        {
+            if (order == null || order.Name != "Stop loss")
+                return;
+            if (orderState == OrderState.Accepted || orderState == OrderState.Working ||
+                orderState == OrderState.ChangePending || orderState == OrderState.ChangeSubmitted)
+                scLive = 1;
+            else if (orderState == OrderState.Cancelled || orderState == OrderState.Rejected || orderState == OrderState.Filled)
+                scLive = 0;
         }
 
         const string JournalHeader = "kind,entry time,exit time,side,contracts,trades today,entry,exit,exit kind,P/L,day P/L,total P/L,room today,room above floor,next contracts,entry slip ticks,exit slip ticks\n";
@@ -1627,6 +1709,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         void Flatten(int real, string why)
         {
+            scFlatten = true;  // the stop check: a market exit is on its way
             if (double.IsNaN(exitRef)) exitRef = Close[0];  // the price the exit was sent at (the guard sets its tick's)
             if (real > 0) ExitLong(why, "");
             else ExitShort(why, "");
