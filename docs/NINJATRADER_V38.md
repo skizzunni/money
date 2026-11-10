@@ -8513,3 +8513,9 @@ U48 with (green, red) = (1.5, 1), (1.25, 1), (1, 1.5), (1, 1.25), (1, 0.5), (0.5
 rule, with the minimum gain: development pick = the most $ a session within 5% lost and at least 10% above U48; it
 passes only if on unseen it loses at most 5% and makes at least 10% more $ a session than U48; then G409's fresh-start
 check before anything is built. Run once.
+
+**G416 result (2026-11-10): rejected.** Development (U48 $39.2 a session, 3.2% lost): the pick (within 5% lost, at least
+10% above U48) "after green x1.5" **$46.9 with 0% lost** (+20%); "after red x1.5" made $50.7 but lost 16.3%. Unseen
+(U48 $75.7, 3.1%): the pick **$79.5 with 0% lost, +5.0%**, under the 10% minimum gain. After red x1.5 $95.7 at 4.7% (not
+the development pick: 16% lost there); after red x0.5 $64.3. The sign of yesterday adds little; U48 stays.
+`verification/noise_v2/g416_after_day.txt`.

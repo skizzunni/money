@@ -1,0 +1,20 @@
+development (index 2011-18 starts):
+                                   per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                                        
+after green x1.0, after red x1.5        50.724      26.489        85.771     125.907  0.163
+after green x1.5, after red x1.0        46.864      20.620        84.243     107.120  0.000
+after green x1.0, after red x0.5        45.453      19.398        91.797     134.747  0.000
+U48                                     39.221      18.490        73.495     114.895  0.032
+after green x1.0, after red x1.25       37.995      18.435        72.353     107.200  0.032
+after green x1.25, after red x1.0       35.709      18.419        65.619      97.937  0.032
+after green x0.5, after red x1.0        32.017      18.872        61.473      87.341  0.032
+unseen (index 2019-25 + NQ 2015-24):
+                                   per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                                        
+after green x1.0, after red x1.5        95.667      54.275       144.615     166.781  0.047
+after green x1.5, after red x1.0        79.543      45.121       122.616     145.156  0.000
+after green x1.25, after red x1.0       76.770      39.552       121.130     141.909  0.015
+U48                                     75.724      40.467       115.664     138.786  0.031
+after green x1.0, after red x1.25       75.410      39.789       116.172     134.321  0.031
+after green x0.5, after red x1.0        70.857      36.303       110.934     133.404  0.031
+after green x1.0, after red x0.5        64.265      35.947        95.468     107.131  0.031
