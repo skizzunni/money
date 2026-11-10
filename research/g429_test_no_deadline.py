@@ -37,6 +37,8 @@ def job(a):
     base = {"trail_from": start, "slippage_ticks": 2, "skip_dates": V.BASE["skip_dates"], "fed_dates": V.FOMC}
     if tag.startswith("U58, squeeze "):  # G430: the smallest cut-to-the-room stop, points
         base["squeeze_min"] = float(tag.split()[-1])
+    if tag == "U58, sprint signals":  # G436: the Test sprint's signal settings (18 sessions, entry lines at 0.7)
+        base["lookback"], base["entry_k"] = 18, 0.7
     if tag.startswith("U58, early budget "):  # G435: the day's budget until the floor has stopped (U58 $750)
         base["early_daily_loss"] = float(tag.split()[-1])
     if tag.startswith("U58, push from "):  # G434: from this profit, a contract more per $500 (U58: $650 from $9,000)

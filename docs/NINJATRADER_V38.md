@@ -8811,3 +8811,10 @@ points with median days at most 85% of U58's; no default changes. Run once.
 **G435 result (2026-11-10): rejected.** Passed / frozen / median days: U58 ($750) **86.2% / 16 / 124**; $1,000 the same to
 the start; $500 87.1% / 15 / 124 (one start more, under the 3-point bar). The early budget rarely binds at the Test's
 early size. `verification/noise_v2/g435_test_budget.csv`.
+
+## G436: the no-deadline Test, U58's sizing with the sprint's signals (registered 2026-11-10, before its run)
+
+Hourly round. The Test sprint (U57) trades an 18-session noise average and entry lines at 0.7 noise units (U58: 14
+sessions, lines at 1.0, 0.8 on a calm stretch). G382 put them on the funded measure, never on the no-deadline Test with
+U58's sizing. `research/g429_test_no_deadline.py`, U58 with `lookback` 18 and `entry_k` 0.7 (the calm 0.8 lines then do
+not narrow further than 0.7... they replace them on a calm stretch, as coded). G435's rule. Run once.
