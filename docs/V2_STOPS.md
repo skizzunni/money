@@ -253,3 +253,42 @@ simulator against the Python model, 2 MNQ, $350, 4 losers, $0.62 a side, 2 ticks
 **What runs:** v1.5 at 2 MNQ, `MnqNoiseMomentum.cs`, in alerts-only mode on a Take Profit Trader account (the firm bans
 automation), on SIM for at least two weeks first. The 1-tick and Fed-day differences above should be closed before
 it is trusted trade for trade.
+
+# v3 (plan of 2026-11-10, second): parity fixes, the no-time-limit gates, the combination, PRO
+
+**Rules confirmed against this file before anything ran:** the user's list (Test: $2,000 end-of-day trail, $3,000 target,
+at least 3 days, best day under 50%, no daily limit; PRO: intraday trail including open profit; automation banned)
+matches Phase 0 above. No conflict, so the gates below stand.
+
+## v3 pre-registration (written and committed 2026-11-10, before any v3 result)
+
+**Rules:** v1.5 (Phase 3's list) at a fixed size, its stops ($350 for the position, line 0.24, lock 1 max loss, take-profit
+1.5, 4 losers). NQ Jan 2015 - Jul 2025, 5-minute, the closures and holes skipped, $0.62 a side, 2 ticks on market and stop
+fills (`research/v2_stops_eval.py`'s data and costs).
+
+**The evaluation replay, no expiry:** a fresh $50K Test started every 30 calendar days from 2015-02-02 to 2024-07-22 (one
+year before the data ends), each run until it passes or fails: pass at the first day's end with closed profit ≥ $3,000,
+at least 3 trading days and the best day under 50% of the profit; fail when the balance, open trades marked at each bar's
+worst price, touches the floor (the highest end-of-day balance less $2,000, at most the start). A start still open when
+the data ends counts as not passed (reported).
+
+**Gates (1, 2 and 3 MNQ each):** **G1** pass rate ≥ 60% (v1.5 at 2 MNQ measured 53% with 5 minimum days); **G2** median
+trading days to pass, reported (target ≤ 75); **G3** worst end-of-day drawdown inside an evaluation, reported; **G4**
+profit factor ≥ 1.35 (all trades, run continuously); **G5** largest single-trade loss ≤ $500; **G6** NinjaTrader ↔
+Python trade-for-trade parity first (Fix 1, on the user's 2026 MNQ bars at 2 MNQ).
+
+**The v3 candidate, noise + Williams** (`research/v2_combo.py`'s Williams: levels at the open ± half of yesterday's
+range, first side only, stop a quarter of the range from the fill, out at the close, entries to 15:00) **at 2 MNQ, the
+same size as noise**, one position at a time (the first entry owns the account until flat), and the day's 4-loser limit
+counting both sleeves' losers (one shared risk budget). Run through the same replay against noise-only.
+**Selection:** the combination is adopted only if it passes G1, G4, G5 (and G6 for its NinjaTrader build) at a size where
+noise-only does not pass, or makes a higher G1 than noise-only at the same size with G4 and G5 passing. Otherwise it is
+rejected and v1.5 stays. Pine v1.6 is built only if it is adopted.
+
+**PRO (reported, no default changes):** from the same starts, 12 months (252 sessions) on a funded account with the
+intraday trail including open profit (bar extremes, the worst order: the bar's best mark raises the floor first), the
+floor stopping at the start: the share of starts that survive, and the median balance gain at 12 months, for v1.5 at
+2 MNQ and with the daily loss limit (the engine's guard: a stop where today's P/L reaches it, then no entries) at
+−$300 / −$400 / −$500.
+
+**The expected path at 2 MNQ (V3.4):** $ a day and the median days to $3,000 from the replay; no further sizes.
