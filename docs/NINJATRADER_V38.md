@@ -8818,3 +8818,8 @@ Hourly round. The Test sprint (U57) trades an 18-session noise average and entry
 sessions, lines at 1.0, 0.8 on a calm stretch). G382 put them on the funded measure, never on the no-deadline Test with
 U58's sizing. `research/g429_test_no_deadline.py`, U58 with `lookback` 18 and `entry_k` 0.7 (the calm 0.8 lines then do
 not narrow further than 0.7... they replace them on a calm stretch, as coded). G435's rule. Run once.
+
+**G436 result (2026-11-10): rejected.** Passed / frozen / median days: U58 **86.2% / 16 / 124**; with the sprint's signals
+82.8% / 20 / 132 (worst drawdown $3,899). (On a calm stretch U58's 0.8 lines replace the 0.7, as the registration's
+garbled parenthesis meant to say.) The sprint's wider-net signals trade more and lose more at this size.
+`verification/noise_v2/g436_test_sprint_signals.csv`.
