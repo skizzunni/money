@@ -8565,3 +8565,9 @@ after a win. `win_side_only` / `win_side_target` in `mnqbot/noise.py` (off by de
 U48 with the block after the first winner, after the first target, and the first plus G417's day up x1.5. G416's
 measure and rule (development pick within 5% lost and at least 10% above U48; unseen at most 5% lost and at least 10%
 more $ a session; then G409's fresh starts). Run once.
+
+**G420 result (2026-11-10): rejected.** Development (U48 $39.2 a session, 3.2% lost): no entries against the first
+winner $38.3 (3.2%); against the first target $39.1 (3.2%); the first plus day up x1.5 $78.2 at 13.3% lost. No pick (none
+10% above U48 within 5% lost). Unseen (U48 $75.7, 3.1%): $71.9 at 4.7%; $75.7 (the same trades: after a target the bot
+rarely gets a second signal the other way); $99.3 at 18.9%. Trades against the day's winner pay as well as the rest.
+`verification/noise_v2/g420_win_side.txt`.

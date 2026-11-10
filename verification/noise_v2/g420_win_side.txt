@@ -1,0 +1,14 @@
+development (index 2011-18 starts):
+                                        per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                                             
+against the first winner + day up x1.5       78.200      34.345       123.943     138.722  0.133
+U48                                          39.221      18.490        73.495     114.895  0.032
+no entries against the first target          39.070      18.490        73.551     115.232  0.032
+no entries against the first winner          38.260      18.478        70.943     114.523  0.032
+unseen (index 2019-25 + NQ 2015-24):
+                                        per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                                             
+against the first winner + day up x1.5       99.252      74.001       143.329     211.479  0.189
+U48                                          75.724      40.467       115.664     138.786  0.031
+no entries against the first target          75.724      40.467       115.664     138.786  0.031
+no entries against the first winner          71.939      39.956       108.972     133.098  0.047
