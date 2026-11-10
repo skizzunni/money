@@ -1,0 +1,4 @@
+fresh starts used: 16
+                                 per_session  trades_per_session   lost  green_days  green_weeks  green_months  longest_losing_weeks  worst_month
+G418 pick: day up x2 from $2000       25.692               1.080  0.125       0.429        0.402         0.583                 4.125    -2044.658
+U48                                   30.356               1.217  0.062       0.431        0.431         0.630                 4.188    -1988.351

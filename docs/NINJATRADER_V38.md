@@ -8551,3 +8551,8 @@ lost, at least 10% more). `verification/noise_v2/g418_house_money_grown.txt`.
 `research/g419_fresh_house.py`: G418's pick and U48 on G409's 16 fresh starts (G415's runner and table). **Rule:** the
 pick becomes the funded mode (built into NinjaTrader with parity and the tests) if it makes at least 10% more $ a
 session than U48 there and loses at most 5% more of the starts (at most one more start of 16). Else U48 stays. Run once.
+
+**G419 result (2026-11-10): rejected; U48 stays.** On the 16 fresh starts (12 months): U48 **$30.4 a session**, 6.2%
+lost (1 start), green months 63.0%; G418's pick **$25.7 (−15%)**, 12.5% lost (2 starts), green months 58.3%. The gain on
+the older starts does not reach the fresh ones, as with G400's and G410's picks (G415).
+`verification/noise_v2/g419_fresh_house.txt`.
