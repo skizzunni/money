@@ -8611,3 +8611,20 @@ least U48's money on the fresh starts and on unseen within the loss limits, so i
 **Caveats:** the fresh starts have now been looked at in G409, G415, G419, G421 and G422, and this idea came from G421's
 fresh-vs-unseen split, so they are no longer fully unseen; its unseen and development gains are modest (+6-7%) and its
 fewer losses are the steadier part. `verification/noise_v2/g422_regime_lines.txt`.
+
+**U58 checks (2026-11-10):** built into `MnqNoiseV38.cs` as Funded growth on the 50K's **5-minute chart** (no range
+filter, no loser limit, every entry check, `CalmEntryWidth` 0.8 on a calm stretch). On the 30-minute chart U58 made
+less in NinjaTrader's growth run ($16,918 against U48's $28,191 on the window), and G422 was measured on 5-minute bars
+only, so that chart keeps U48's G204 / G125 settings. The NinjaTrader tests, 50 passed (parity trade for trade). The
+NinjaTrader growth run on the window: **5-minute $75,486.34** (U48 $61,047.16), 784 trades, 50.2% winners, profit factor
+1.907 (1.665), closed drawdown $5,196.41 ($6,106.23), worst day −$899.38; differences from the model only at the stand-in
+data's 2026-03-09 hole, as U48; 30-minute $28,191.46, identical to the model and to U48
+(`verification/noise_v2/v38g_nt_u58.txt`).
+
+## G423: wider entry lines when the market is not calm (registered 2026-11-10, before its run)
+
+Hourly round, on U58. G422: the 0.8 lines lost money when the market was not calm. `entry_k_wild` in `mnqbot/noise.py`
+(off by default): on a stretch that is not calm, the entry lines at that width. `research/g423_wide_when_wild.py`: U58
+with 1.1 and 1.2 there. G421's measures; **rule:** the variant with the most $ a session on the fresh starts that makes
+at least 10% more than U58 there and at least U58's $ a session on unseen, loses no more fresh starts than U58 and at
+most 5% unseen, replaces U58. Run once.

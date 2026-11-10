@@ -283,6 +283,7 @@ class NoiseConfig:
     # research (G422): entry lines at entry_k_regime noise instead of entry_k when the last calm_short sessions' average
     # range is below (regime_calm) or above (not regime_calm) the last calm_long sessions' (0 = off)
     entry_k_regime: float = 0.0
+    entry_k_wild: float = 0.0  # research (G423): the entry lines on a stretch that is not calm (regime_calm's test; 0 = off)
     regime_calm: bool = True
     win_side_only: bool = False
     win_side_target: bool = False
@@ -1459,6 +1460,9 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                     if reg_calm == cfg.regime_calm:
                         up_e = max(day_open, prev_close) * (1 + cfg.entry_k_regime * sigma)
                         lo_e = min(day_open, prev_close) * (1 - cfg.entry_k_regime * sigma)
+                    elif cfg.entry_k_wild > 0:  # G423
+                        up_e = max(day_open, prev_close) * (1 + cfg.entry_k_wild * sigma)
+                        lo_e = min(day_open, prev_close) * (1 - cfg.entry_k_wild * sigma)
                 if skip_today:
                     pass
                 elif use_stop and pos:
