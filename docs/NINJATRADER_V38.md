@@ -8911,3 +8911,7 @@ $ a session, starts lost, green months. No adoption rule; reported beside G440.
 the PRO mode **$40.3** (−18%), 0 lost, green months 63.0%, worst month −$1,766 (U58 −$1,893). On recent markets the PRO
 mode costs about a fifth of the money (21 months of history: about an eighth), for about 43% fewer PRO accounts lost
 over 21 months (G440). Still the user's choice; not built. `verification/noise_v2/g443_pro_mode_fresh.txt`.
+
+**Full suite (2026-11-10, after G416-G443, the v2 stops, the v3 fixes and the stop-placement checks):** 703 passed, none
+failed (32 min). Every research setting added today is off by default; the NinjaTrader parity, release-package and MNQ
+tests are all in it.
