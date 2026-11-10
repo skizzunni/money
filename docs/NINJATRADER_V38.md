@@ -8895,3 +8895,8 @@ floor down faster. The $100 guard of G440 stays the best PRO option found (29 lo
 
 The other side of G441 ($200 / $300 lost 39 / 38 against $100's 29): `pro_guard` $50, G428's measure, G440's rule (at most
 26 lost, median net at least 80% of U58's on each set). A follow-up to seen results. Run once.
+
+**G442 result (2026-11-10): rejected.** Under PRO, 526 starts: guard $50 loses **31** (6 + 9, 8 + 8) at much the same nets
+($36.1-46.0k). The bracket: $50 31, **$100 29**, $200 39, $300 38, no PRO mode 51. $100 is the best guard, but no setting
+reaches the bar of 26; the PRO mode stays a documented user choice (G440), not built.
+`verification/noise_v2/g442_pro_guard50.txt`, `g248_pro_u58pro50_{MS,MID}.csv`.
