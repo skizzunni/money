@@ -8697,3 +8697,12 @@ flags. **Results:** the 2025-26 window, U58 on 5-minute bars with the platform r
 0 flagged**; the NinjaTrader growth run unchanged ($75,486.34 on 5-minute, $28,191.46 on 30-minute: the check changes no
 trade); a stop the broker cancels mid-trade is flagged (`tests/test_ninjatrader_v38.py::test_v38_stop_placement_check`).
 All V38 and release tests pass (54).
+
+## G428: U58 under the PRO account's intraday drawdown (registered 2026-11-10, before its run)
+
+Hourly round, a measurement. G248 found U48 losing 55 of 526 starts under Take Profit Trader's PRO rule (the $2,000
+drawdown trails intraday including open profit) against 21 under the Test's end-of-day rule; U58 replaced U48 on
+end-of-day measures only. `research/g248_pro_intraday.py` (unchanged), 21 months from the 1st and the 15th of each month
+(NQ 2015-23, the index 2011-24), run for U48 and U58 on today's code. **Rule:** if U58 loses more PRO starts than U48, the
+funded mode's documentation says so and recommends U48 on a PRO account (U58 stays the default for the Test-to-funded
+path under end-of-day trailing); if not, nothing changes. Run once.
