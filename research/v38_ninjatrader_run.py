@@ -21,9 +21,9 @@ FILL = {**FILL, "size_slip_pts": SLIP, "giveback_brake": GIVEBACK, "size_up_to":
         "after_loss_ml_locked": 1.0, "skip_checks": "", "skip_checks_early": True,  # G422 (U58): every check
         "profit_step_fast": 650.0, "profit_step_fast_from": 9000.0, "fill_qty3_room": 8000.0, "fill_qty2_room": 5000.0, "fill_min_room": 2750.0, "after_loss_ml_mult5": 1.0, "gap_skip_braked": True}  # G121: 50 on 5-minute bars (G106: 20); G119; G125
 # G204: the 50K's Funded growth on either chart (NinjaTrader applies them on both)
-G204 = {"max_losers": 0, "early_daily_loss": 750.0, "time_stop": 45, "range_pos_min": 0.0, "gap_go_k": 0.65,
-        "trend_n": 45, "gap_go_be": 1.5,  # and G241's trend, G242's gap trigger and break-even
-        "entry_k_regime": 0.8}  # G422 (U58): no loser limit, no range filter, entry lines at 0.8 on a calm stretch
+G204 = {"max_losers": 3, "early_daily_loss": 750.0, "time_stop": 45, "range_pos_min": 0.7, "gap_go_k": 0.65,
+        "trend_n": 45, "gap_go_be": 1.5}  # and G241's trend, G242's gap trigger and break-even
+U58 = {"max_losers": 0, "range_pos_min": 0.0, "entry_k_regime": 0.8}  # G422: the 5-minute chart (with FILL's every check)
 from mnqbot.noise import NoiseConfig, run
 S = "/tmp/claude-0/-home-user-money/b0ea31b5-d9fc-525a-a114-db6430eff3ed/scratchpad"
 SIM = "ninjatrader/tests/Sim/bin/Release/net8.0/Sim"
@@ -51,7 +51,7 @@ for m in (30, 5):
                       columns=["d", "eb", "entry", "xb", "exit", "why", "pnl"])
     base = ({**VS.V23, **T.REFERENCE, "daily_loss_limit": 900.0, "trail_dd": 2000.0, "trail_from": "2025-01-02",
              "time_stop": 60, "gap_go": True, "gap_go_max_qty": 1, "gap_go_locked_qty": LQ, **G204,
-             **(FILL if m == 5 else {})} if GROW
+             **({**FILL, **U58} if m == 5 else {})} if GROW
             else {**E.config(1, 2.0, 260.0, 0), "daily_loss_limit": 900.0})
     cfg = NoiseConfig(**{**base, "tv_path": False, "nt_execution": True, "round_prices": True, "target_on_fill_bar": True})
     if GROW and m == 5 and PROTECT > 0:  # G87: the shadow gate's closed days, on the bars the strategy sees

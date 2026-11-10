@@ -1121,8 +1121,12 @@ namespace NinjaTrader.NinjaScript.Strategies
                     AfterLossMaxLoss = minutes == 5 ? 187.5 : 250;  // G168: as every trade on the 5-minute chart (G167 1.1x, G165 1.2x, 1.33x before)
                     ProfitStep = 1500; SizeByOwnStop = true;
                     TimeStop = Mode == "Funded growth" ? 45 : 60;  // G204 on the 50K (G6: 60)
-                    RangePos = Mode == "Funded growth" ? 0 : 0.65;  // G422 (U58) on the 50K: off (G204: 0.7)
-                    if (Mode != "Funded growth") EarlyNoEntryChecks = "13:00,14:30";  // G125, as tested on the bigger accounts (U58 is the 50K's)
+                    // G422 (U58) on the 50K's 5-minute chart: no range filter, no loser limit, every check (tested on 5-minute
+                    // bars; on 30-minute bars it made less, so that chart keeps U48's G204 settings)
+                    bool u58 = Mode == "Funded growth" && minutes == 5;
+                    RangePos = u58 ? 0 : Mode == "Funded growth" ? 0.7 : 0.65;  // G204 on the 50K: 0.7
+                    if (Mode == "Funded growth" && !u58) MaxLosersPerDay = 3;  // G204
+                    if (!u58) EarlyNoEntryChecks = "13:00,14:30";  // G125, as tested (U48 and the bigger accounts)
                     TrendSessions = Mode == "Funded growth" ? 45 : 50;  // G241 on the 50K
                     MaxContracts = Mode == "Funded growth" && minutes == 5 ? 60 : 15;  // G247: 60, Take Profit Trader's 50K limit (G212: 75; G106: 20, G120: 30, G121: 50)
                     // G40: a bigger account trades the 50K's size; its larger limits are cushion (a $2,000 / $3,000
@@ -1186,7 +1190,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 st.DayLockAt = sprintMode ? 800 : 0;  // G329: the day lock, $800 keeping $300
                 st.DayLockKeep = 300;
                 st.Lookback = NoiseSessions; st.EntryK = EntryWidth; st.DayStopProfit = DayProfitStop;  // G253
-                st.EntryKCalm = (Mode == "Funded growth" && !sprintMode) || Mode == "Custom" ? CalmEntryWidth : 0;  // G422 (U58)
+                st.EntryKCalm = (Mode == "Funded growth" && !sprintMode && minutes == 5) || Mode == "Custom" ? CalmEntryWidth : 0;  // G422 (U58)
                 st.SizeSlipPts = Mode != "Evaluation" ? SizeSlip : 0;  // G79: the Funded growth modes and Custom
                 st.ProtectRoom = Mode != "Evaluation" ? NearFloorGate : 0;  // G87
                 st.Tick = TickSize;

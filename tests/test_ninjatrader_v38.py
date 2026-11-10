@@ -63,7 +63,14 @@ PRE_G204 = {"max_losers": 0, "early_daily_loss": 0.0, "range_pos_min": 0.65, "ga
 PRE_G204_ARGS = ["MaxLosersPerDay=0", "EarlyDayBudget=0", "RangePos=0.65", "GapTrigger=0.5", "TimeStop=60", "TrendSessions=50", "GapBreakEven=0"]
 # the bigger accounts' modes also keep G125's skipped checks and no calm entry width (U58 is the 50K's)
 BIG = {**PRE_G204, "skip_checks": "780,870", "entry_k_regime": 0.0}
-GROW_ARGS = ["Mode=Funded growth"]  # the default; its settings are the tested ones above
+GROW_ARGS = ["Mode=Funded growth"]
+
+
+def grow_cfg(minutes: int) -> NoiseConfig:
+    """Funded growth on this chart: U58 (G422) on 5-minute bars; the 30-minute chart keeps U48's G204 / G125 settings."""
+    if minutes == 5:
+        return GROW
+    return dataclasses.replace(GROW, max_losers=3, range_pos_min=0.7, skip_checks="780,870", entry_k_regime=0.0)  # the default; its settings are the tested ones above
 # G72's fill-in trades off (NinjaTrader's More trading days needs gap and go on)
 NO_FILL = {"gap_go_small_k": -1.0, "trend_small": False, "gap_go_drive_k": 0.0, "fill_after_lock": False,
            "fill_min_room": 0.0}
@@ -83,14 +90,14 @@ def test_v38_time_stop_agrees(sim, sample_1m, minutes, tmp_path):  # noqa: F811
     r = subprocess.run(args, capture_output=True, text=True, env=ENV)
     assert r.returncode == 0, r.stderr[-2000:]
     nt = [x.split(",")[1:] for x in r.stdout.splitlines() if x.startswith("T,")]
-    py = run(bars, GROW, minutes=minutes).trades
+    py = run(bars, grow_cfg(minutes), minutes=minutes).trades
     assert len(nt) == len(py) >= 20
     for a, t in zip(nt, py, strict=True):
         assert (int(a[0]), int(a[1]), int(a[3])) == (t.direction, t.entry_bar, t.exit_bar), (a, t)
         assert float(a[2]) == t.entry and float(a[4]) == t.exit, (a, t)
         assert math.isclose(float(a[6]), t.pnl, abs_tol=1e-6), (a, t)
     assert sum(t.reason == "Time stop" for t in py) >= 1
-    off = run(bars, dataclasses.replace(GROW, time_stop=0), minutes=minutes).trades
+    off = run(bars, dataclasses.replace(grow_cfg(minutes), time_stop=0), minutes=minutes).trades
     assert [(t.entry_bar, t.exit_bar) for t in off] != [(t.entry_bar, t.exit_bar) for t in py]
 
 
@@ -106,7 +113,7 @@ def sample_1m():
 @pytest.mark.parametrize("minutes", [5, 30])
 def test_v38_ninjatrader_code_and_python_agree(sim, sample_1m, minutes, grow, tmp_path):  # noqa: F811
     assert CFG.max_loss_per_trade == 260.0 and CFG.daily_loss_limit == 900.0 and CFG.take_profit == 2.0
-    cfg = GROW if grow else CFG
+    cfg = grow_cfg(minutes) if grow else CFG
     bars = resample(sample_1m, f"{minutes}min")
     path = tmp_path / "bars.csv"
     with path.open("w") as f:
@@ -171,13 +178,13 @@ def test_v38_gentle_start_agrees(sim, sample_1m, minutes, tmp_path):  # noqa: F8
     r = subprocess.run(args, capture_output=True, text=True, env=ENV)
     assert r.returncode == 0, r.stderr[-2000:]
     nt = [x.split(",")[1:] for x in r.stdout.splitlines() if x.startswith("T,")]
-    py = run(bars, dataclasses.replace(GROW, steps_after_lock=True), minutes=minutes).trades
+    py = run(bars, dataclasses.replace(grow_cfg(minutes), steps_after_lock=True), minutes=minutes).trades
     assert len(nt) == len(py) >= 20
     for a, t in zip(nt, py, strict=True):
         assert (int(a[0]), int(a[1]), int(a[3])) == (t.direction, t.entry_bar, t.exit_bar), (a, t)
         assert float(a[2]) == t.entry and float(a[4]) == t.exit, (a, t)
         assert math.isclose(float(a[6]), t.pnl, abs_tol=1e-6), (a, t)
-    plain = run(bars, GROW, minutes=minutes).trades
+    plain = run(bars, grow_cfg(minutes), minutes=minutes).trades
     if max(t.qty for t in plain) >= 2:  # (U46's 5-minute sample stays at 1 MNQ, so there is nothing to hold back)
         assert [t.qty for t in py] != [t.qty for t in plain], "the gentle start changes the sizes"
     else:
