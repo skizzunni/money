@@ -278,6 +278,10 @@ class NoiseConfig:
     tom_no_shorts: bool = False
     tom_mult: float = 1.0
     day_up_mult: float = 1.0
+    # research (G420): after today's first winning trade (win_side_target: the first that reached its target), no entries
+    # on the other side for the rest of the session (off by default)
+    win_side_only: bool = False
+    win_side_target: bool = False
     day_up_from: float = 0.0
     # research (G11, docs/NINJATRADER_V38.md): day_up_mult only once the trailing floor has stopped at the starting
     # equity plus trail_cap (the highest end-of-day equity trail_dd above that), so a new account presses no size
@@ -578,6 +582,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
     entry_px, entry_bar = 0.0, 0
     est_px = math.nan  # expected fill of the pending entry
     losers_today = 0  # losing trades closed today
+    win_side = [0]  # G420: the side of today's first winner (0: none yet)
     bot_trades_today = 0  # G308: the bot's trades closed today (before an entry, all of today's entries so far)
     consec = skip_left = 0  # the v2.1 study's streak rule: losers in a row, signals still to skip
     loss_side = 0  # the side of the last losing trade
@@ -708,6 +713,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             fill_pnl += pnl + part_pnl
         if reason == "Target":
             target_today = True
+        if pnl + part_pnl > 0 and not win_side[0] and (reason == "Target" or not cfg.win_side_target):
+            win_side[0] = pos  # G420
         if reason == "Time stop" and cfg.ts_block:
             ts_done[pos] = True
             if cfg.ts_block == "day":
@@ -1139,6 +1146,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                 d = 1 if upper - o[i] <= o[i] - lower else -1
             elif up_hit or dn_hit:
                 d = 1 if up_hit else -1
+            if cfg.win_side_only and d and win_side[0] == -d:
+                d = 0  # G420: the day has shown its side
             if d and touched[d] != n_checks_seen and study_ok(d, True):
                 after = consec > 0
                 q_next = max(1, round(cfg.qty / cfg.after_loss_qty_div)) if after else cfg.qty
@@ -1383,6 +1392,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
             if cfg.gap_block > 0 and not math.isnan(prev_close) and abs(day_open / prev_close - 1) > cfg.gap_block:
                 gap_dir = 1 if day_open > prev_close else -1
             losers_today = 0
+            win_side[0] = 0  # G420
             bot_trades_today = 0
             side_cd[1] = side_cd[-1] = 0
             ts_done[1] = ts_done[-1] = False
@@ -1450,11 +1460,12 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                 elif pos < 0 and c[i] > lower:
                     pending = ("entry", 1) if c[i] > upper else ("close", 0)
                     events.append((i, "REVERSE" if c[i] > upper else "EXIT"))
-                elif pos == 0 and c[i] > up_e and fresh_ok:
+                elif pos == 0 and c[i] > up_e and fresh_ok and not (cfg.win_side_only and win_side[0] < 0):  # G420
                     if study_ok(1, c[i] > upper * (1 + cfg.side_margin * sigma)):
                         pending = ("entry", 1)
                         events.append((i, "BUY"))
-                elif pos == 0 and c[i] < lo_e and short_ok and fresh_ok:
+                elif (pos == 0 and c[i] < lo_e and short_ok and fresh_ok
+                      and not (cfg.win_side_only and win_side[0] > 0)):  # G420
                     if study_ok(-1, c[i] < lower * (1 - cfg.side_margin * sigma)):
                         pending = ("entry", -1)
                         events.append((i, "SELL"))

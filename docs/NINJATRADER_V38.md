@@ -8556,3 +8556,12 @@ session than U48 there and loses at most 5% more of the starts (at most one more
 lost (1 start), green months 63.0%; G418's pick **$25.7 (−15%)**, 12.5% lost (2 starts), green months 58.3%. The gain on
 the older starts does not reach the fresh ones, as with G400's and G410's picks (G415).
 `verification/noise_v2/g419_fresh_house.txt`.
+
+## G420: no trades against the side of the day's first winner (registered 2026-11-10, before its run)
+
+Hourly round. Not tested before: G-rounds blocked a side after it lost (`side_lost`, cooldowns), never the other side
+after a win. `win_side_only` / `win_side_target` in `mnqbot/noise.py` (off by default): after today's first winning trade
+(or the first that reached its target), no new entries on the other side that session. `research/g420_win_side.py`:
+U48 with the block after the first winner, after the first target, and the first plus G417's day up x1.5. G416's
+measure and rule (development pick within 5% lost and at least 10% above U48; unseen at most 5% lost and at least 10%
+more $ a session; then G409's fresh starts). Run once.
