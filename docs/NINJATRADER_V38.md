@@ -8665,3 +8665,8 @@ more than the extra hits bring. `verification/noise_v2/g425_calm_target.txt`.
 Hourly round. U58 trades narrower lines on a calm stretch, but still skips days after a very calm one (`calm_k` 0.7, from
 v2.6); the two were never tested together. `research/g426_u58_calm_filter.py`: U58 with `calm_k` 0 (off) and 0.6.
 G423's rule against U58. Run once.
+
+**G426 result (2026-11-10): rejected; U58 stays.** Fresh starts (U58 $49.2, 0 lost): calm filter off $45.2, 0.6 $44.3 (0
+lost, slightly more trades). Development (U58 $42.0, 0%): off $45.7 at 0%, 0.6 $39.3 at 3.2%. Unseen (U58 $80.5, 1.6%):
+off $74.4 at 1.6%, 0.6 $75.1 at 3.1%. The very calm days U58 skips lose on the recent and unseen starts; the filter
+stays at 0.7. `verification/noise_v2/g426_u58_calm_filter.txt`.
