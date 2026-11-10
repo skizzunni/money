@@ -8640,3 +8640,9 @@ U58 loses fewer starts than U48 (0 of 16 fresh, 0% development, 1.6% unseen), so
 `research/g424_u58_steps.py`: U58 with a contract more per $1,200 or $1,000 of profit (U58 $1,500), or the $650 fast steps
 from $6,000 (U58 $9,000). G423's rule against U58 (the most $ a session on the fresh starts, at least 10% above U58 there,
 at least U58's $ on unseen, no more fresh starts lost, at most 5% lost on unseen and development). Run once.
+
+**G424 result (2026-11-10): rejected; U58 stays.** Fresh starts (U58 $49.2, 0 lost): +1 per $1,200 **$58.3 (+19%)**, 0 lost;
++1 per $1,000 $53.1 (+8%), 1 lost; fast steps from $6,000 $44.3. Development (U58 $42.0, 0%): $43.5 at 3.2%, $44.3 at 0%,
+$43.0 at 0%. Unseen (U58 $80.5, 1.6%): +1 per $1,200 **$78.6 at 4.7%** (below U58), +1 per $1,000 $83.3 at 4.6%, fast
+from $6,000 $78.5 at 1.6%. The $1,200 steps make more on the fresh starts and less on unseen, with three times the
+losses there. `verification/noise_v2/g424_u58_steps.txt`.
