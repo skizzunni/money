@@ -8784,3 +8784,7 @@ From G429/G431: U58 passes 86% of no-deadline Tests in a median 124 trading days
 rate. Here the start stays 1 MNQ and the size grows only out of profit, but sooner: a contract more per $1,000 or $750 of
 profit (U58 $1,500). `research/g429_test_no_deadline.py`. **Rule:** recommended for the Test if its pass rate is within
 2 points of U58's and its median days to pass at most 85% of U58's; no default changes. Run once.
+
+**G433 result (2026-11-10): rejected.** Passed / median days: U58 ($1,500 steps) **86.2% / 124**; $1,000 steps 73.3% / 113
+(31 frozen); $750 steps 74.1% / 110 (28 frozen, 2 failed, worst drawdown $13,011). Growing sooner gains ten days and loses
+twelve points of pass rate: the bigger size arrives before the cushion is real. `verification/noise_v2/g433_test_steps.csv`.
