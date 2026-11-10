@@ -166,10 +166,6 @@ namespace NinjaTrader.NinjaScript.Strategies
                 PayoutStopInHistory = false;
                 RememberPayoutCycle = true;
                 TightenOnly = true;    // the stop never moves back toward the price (docs/RESULTS.md round 139)
-                // v2 stops (docs/V2_STOPS.md): off here until Phase 4 selects a variant
-                V2DailyLossLimit = 0;
-                LockTriggerNoise = 0;
-                GapGuard = false;
                 DailyMaxLosers = 0;    // shared daily gate, both setups (docs/VERIFICATION.md): off by default
                 DailyLossLimit = 0;
                 PartialAtR = 0;        // half off at 1R: frozen for the forward test, off by default
@@ -205,9 +201,11 @@ namespace NinjaTrader.NinjaScript.Strategies
                 settings.LockPlus = LockPlus;
                 settings.MaxLosers = MaxLosers;
                 settings.TightenOnly = TightenOnly;
-                settings.DailyLossLimit = V2DailyLossLimit;  // v2 stops
-                settings.LockTriggerNoise = LockTriggerNoise;
-                settings.GapGuard = GapGuard;
+                // v2 stops (docs/V2_STOPS.md): rejected on the gates, and this strategy's own orders do not place the
+                // daily limit's stop, so it runs the engine with v1.5's stops (TightenOnly as set above)
+                settings.DailyLossLimit = 0;
+                settings.LockTriggerNoise = 0;
+                settings.GapGuard = false;
                 settings.Lookback = Lookback;
                 settings.FedNoShorts = FedNoShorts;
                 settings.SkipDates = SkipDates ?? "";
@@ -1817,20 +1815,6 @@ namespace NinjaTrader.NinjaScript.Strategies
         [NinjaScriptProperty]
         [Display(Name = "Stop only ever tightens (never moves back toward the price; round 139)", Order = 21, GroupName = "1. Account")]
         public bool TightenOnly { get; set; }
-
-        [NinjaScriptProperty]
-        [Range(-100000, 0)]
-        [Display(Name = "v2 daily loss limit, $: a stop where today's P/L reaches this, then no new entries today (0 = off)", Order = 40, GroupName = "1. Account")]
-        public double V2DailyLossLimit { get; set; }
-
-        [NinjaScriptProperty]
-        [Range(0, 10)]
-        [Display(Name = "v2 lock trigger, noise units in profit (0 = the max-loss lock above)", Order = 41, GroupName = "1. Account")]
-        public double LockTriggerNoise { get; set; }
-
-        [NinjaScriptProperty]
-        [Display(Name = "v2 gap guard: no new entries today after a stop fills past 2x its distance", Order = 42, GroupName = "1. Account")]
-        public bool GapGuard { get; set; }
 
         [NinjaScriptProperty]
         [Range(0.0, 10.0)]

@@ -123,7 +123,8 @@ beat noise-only's ratio, no sizing up.
 (0 = LockAt in max losses), **GapGuard** true, **TightenOnly** true, as the plan's defaults. The Python reference
 (`mnqbot/noise.py`): `dll_v2`, `lock_noise`, `gap_guard`, `tighten_only` (off by default, as every other research
 setting). The strategies built on the engine before v2 (Runner, C, D) keep v1.5's stops explicitly (`V15Stops()`).
-`MnqNoiseMomentum.cs` exposes the three new settings (off until a variant is selected; none was). On the fill bar the
+`MnqNoiseMomentum.cs` runs the engine with v1.5's stops: its own order management does not place the daily limit's
+stop, so after the rejection the v2 settings were taken off it rather than left half working (see the MNQ check). On the fill bar the
 daily limit's stop is measured from the expected fill, as the max-loss stop's is (a bracket sent with the entry).
 **G6, parity: passed.** The engine and the Python model agree trade for trade (`tests/test_ninjatrader.py`: the v2
 settings on random and gapped sessions, a tighter daily limit at 6 MNQ, a $100 cap; every v2 stop shown to act); all
@@ -237,3 +238,18 @@ is −$695.)
 - Phase 5 (native NinjaTrader on SIM, two weeks of alert-assisted paper trading before any funded attempt) applies to
   v1.5 at 2 MNQ: `MnqNoiseMomentum.cs` with Qty 2, MaxLoss 350 and the v2 settings at 0, in alerts-only mode on a
   Take Profit Trader account.
+
+## Phase 5: the MNQ execution check and NinjaTrader
+
+On the user's MNQ bars (6/29-10/16/2026, 1-minute, traded from 7/20, 65 sessions; `MnqNoiseMomentum.cs` on the
+simulator against the Python model, 2 MNQ, $350, 4 losers, $0.62 a side, 2 ticks):
+- **v1.5 stops:** 65 Python trades, 64 NinjaTrader. Two fill-bar stops exit a tick apart ($1 each), and on 9/16 (a Fed
+  day, three losing longs) NinjaTrader skips the third long at 12:30 (−$80.48 in the model). +$5,758.80 in the model,
+  **$44.30 a day a contract**, worst day −$987, largest loss −$354. Not trade-for-trade at these settings (the repository's
+  parity test, frozen B at 4 MNQ and $200, is exact); an open item for Phase 5 before any funded attempt.
+- **v2 defaults:** the strategy did not place the daily limit's stop (trades ran to −$354 where the model's limit closed
+  them), so its v2 settings were removed; the engine keeps them with its parity.
+
+**What runs:** v1.5 at 2 MNQ, `MnqNoiseMomentum.cs`, in alerts-only mode on a Take Profit Trader account (the firm bans
+automation), on SIM for at least two weeks first. The 1-tick and Fed-day differences above should be closed before
+it is trusted trade for trade.
