@@ -8503,3 +8503,13 @@ months 63.0%; G400's pick $21.1 (âˆ’30%), 6.2% lost, 54.2%; G410's pick $15.1 (â
 where no search looked. The money-first picks of the big searches (G400-G411) were fitted to the years they were chosen
 on; the bot as it is (U48 funded, U57 for the Test) is the best measured for the 50K.
 `verification/noise_v2/g415_final_pick.txt`.
+
+## G416: size by how the previous session closed (registered 2026-11-10, before its run)
+
+Hourly round. Not tested before: G386 paused after losing runs; nothing sized the next session by the last one's sign.
+`after_green_mult` / `after_red_mult` in `mnqbot/noise.py` (off by default): the session after a green (red) one, every
+entry takes that multiple of its contracts (at least 1; flat sessions count as neither). `research/g416_after_day.py`:
+U48 with (green, red) = (1.5, 1), (1.25, 1), (1, 1.5), (1, 1.25), (1, 0.5), (0.5, 1). G372's 12-month measure and
+rule, with the minimum gain: development pick = the most $ a session within 5% lost and at least 10% above U48; it
+passes only if on unseen it loses at most 5% and makes at least 10% more $ a session than U48; then G409's fresh-start
+check before anything is built. Run once.
