@@ -8601,3 +8601,13 @@ Run once.
 flag, so every regime variant also stopped trading on many days (0.75-0.91 trades a session against U48's 1.22). Its
 numbers (`verification/noise_v2/g422_regime_lines_buggy.txt`) measure the bug, not the idea. Fixed (`reg_calm`); G422 is
 run again, once, with the same variants and rule.
+
+**G422 result (2026-11-10, the fixed run): passes; U58 = G421's C with the 0.8 entry lines on calm stretches becomes the
+funded mode.** Fresh starts (U48 1.22 trades a session, $30.4, 1 of 16 lost): **C with 0.8 when calm 1.54 trades, $49.2
+(+62%), 0 lost, green months 68.2%**; C 1.38 / $29.4 / 0; C 0.8 when wild 1.37 / $23.9 / 2; U48 0.8 when calm 1.20 / $29.0
+/ 2; U48 0.8 when wild 1.26 / $25.9 / 2. Development (U48 $39.2, 3.2%): **$42.0 (+7%), 0% lost**. Unseen (U48 $75.7, 3.1%):
+**$80.5 (+6%), 1.6% lost**; U48 0.8 when calm $76.9 at 4.6%; the wild variants $65.1-70.6. Only the calm C variant makes at
+least U48's money on the fresh starts and on unseen within the loss limits, so it is the pick.
+**Caveats:** the fresh starts have now been looked at in G409, G415, G419, G421 and G422, and this idea came from G421's
+fresh-vs-unseen split, so they are no longer fully unseen; its unseen and development gains are modest (+6-7%) and its
+fewer losses are the steadier part. `verification/noise_v2/g422_regime_lines.txt`.
