@@ -42,7 +42,7 @@ SEP = {}
 for cap in (100.0, 200.0, 350.0):
     SEP[f"cap ${cap:.0f}, lock 0.75 noise"] = {"max_loss_per_trade": cap, "lock_noise": 0.75}
 for cap in (100.0, 200.0, 350.0):  # v1.5's lock at 1 max loss of a $cap cap, with the cap at $350
-    SEP[f"cap $350, lock at {cap / 2:.1f} points"] = {"max_loss_per_trade": 350.0, "lock_at": cap / 350.0}
+    SEP[f"cap $350, lock at {cap / 4:.1f} points"] = {"max_loss_per_trade": 350.0, "lock_at": cap / 350.0}
 B: dict = {}
 
 

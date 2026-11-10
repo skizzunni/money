@@ -196,18 +196,18 @@ namespace NinjaTrader.NinjaScript.AddOns.MnqBot
                 line = held;
                 reason = heldWhy;
             }
-            double g = GuardPx();
+            double g = GuardPx(EntryPrice);
             if (!double.IsNaN(g) && p * (g - line) > 0) { line = g; reason = "Day guard"; }
             return line;
         }
 
         // v2: the daily loss limit's stop price for the open trade (NaN when off or flat)
-        double GuardPx()
+        double GuardPx(double basePx)
         {
             if (s.DailyLossLimit >= 0 || Position == 0)
                 return double.NaN;
             double allow = -s.DailyLossLimit + DayPnl;
-            return EntryPrice - Position * (allow - 2 * s.CommissionPerSide * s.Qty) / (s.Qty * s.PointValue);
+            return basePx - Position * (allow - 2 * s.CommissionPerSide * s.Qty) / (s.Qty * s.PointValue);
         }
 
         public double TargetNow()
@@ -335,7 +335,9 @@ namespace NinjaTrader.NinjaScript.AddOns.MnqBot
                     held = line;
                     heldWhy = reason;
                 }
-                double g = GuardPx();  // v2: the daily loss limit, after the tighten-only hold (as the Python model)
+                // v2: the daily loss limit, after the tighten-only hold (as the Python model); on the fill bar from the
+                // expected fill, like the bracket's max loss
+                double g = GuardPx(EntryBar != i ? EntryPrice : estPx);
                 if (!double.IsNaN(g) && p * (g - line) > 0) { line = g; reason = "Day guard"; }
                 bool hit;
                 double price;

@@ -1243,7 +1243,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                         fl = min(fl, trail_base + cfg.trail_cap)
                     allow = min(allow, eq_curve[-1] - fl - cfg.guard_floor_buffer)
                 allow -= rest * q_trade * cfg.guard_reserve_pts * cfg.point_value
-                gpx = entry_px - pos * (allow - 2 * cfg.commission_per_side * q_trade) / (rest * q_trade * cfg.point_value)
+                g_base = est_px if (cfg.dll_v2 > 0 and cfg.day_guard <= 0 and entry_bar == i) else entry_px  # v2: a bracket
+                gpx = g_base - pos * (allow - 2 * cfg.commission_per_side * q_trade) / (rest * q_trade * cfg.point_value)
                 if cfg.nt_execution and cfg.day_guard_grid:  # G321b: a real stop sits on the tick grid
                     gpx = on_grid(pos, gpx)
                 if pos * (gpx - line) > 0:

@@ -116,3 +116,124 @@ units; (ii) cap fixed at $350 with the lock trigger at the points the $100 / $20
 MNQ, and whether any size reaches $750 a day with max drawdown under $2,000. Then the noise + Williams combination
 (both sleeves, one shared risk budget): $ a day, drawdown and profit / drawdown against noise-only v2; if it does not
 beat noise-only's ratio, no sizing up.
+
+## Phase 2: the engine (done)
+
+`ninjatrader/AddOns/MnqNoiseEngine.cs` `NoiseSettings`: **DailyLossLimit** −400 (0 = off), **LockTriggerNoise** 0.75
+(0 = LockAt in max losses), **GapGuard** true, **TightenOnly** true, as the plan's defaults. The Python reference
+(`mnqbot/noise.py`): `dll_v2`, `lock_noise`, `gap_guard`, `tighten_only` (off by default, as every other research
+setting). The strategies built on the engine before v2 (Runner, C, D) keep v1.5's stops explicitly (`V15Stops()`).
+`MnqNoiseMomentum.cs` exposes the three new settings (off until a variant is selected; none was). On the fill bar the
+daily limit's stop is measured from the expected fill, as the max-loss stop's is (a bracket sent with the entry).
+**G6, parity: passed.** The engine and the Python model agree trade for trade (`tests/test_ninjatrader.py`: the v2
+settings on random and gapped sessions, a tighter daily limit at 6 MNQ, a $100 cap; every v2 stop shown to act); all
+152 NinjaTrader tests pass. **Pine v1.6 is not built:** the v2 stops were rejected (below), so it would carry rules
+that lost on the gates; it can be written on request.
+
+## Phase 4: results (NQ 2015-01 to 2025-07, 127 windows of 30 days, 2 MNQ, run once)
+
+`research/v2_stops_eval.py`; files `verification/noise_v2/v2_stops_*.csv`. Closures, half days and sessions with
+missing data are skipped, as in every NQ result here (a first run without them held a Black Friday trade over the
+weekend into the monthly rescaling, −$5,518; that run was discarded before any comparison).
+
+**v2 against v1.5, the gates** (end-of-day trailing; intraday in brackets):
+
+| Variant | G1 pass ≥60% | G2 expiry ≤15% | fail | G3 worst window DD ≤$1,500 | G4 PF ≥1.35 | G5 largest loss ≤$500 |
+|---|---|---|---|---|---|---|
+| **v1.5 stops** | **13.4%** (11.8%) | 67.7% | 18.9% (37.0%) | $2,648 | 1.267 | −$397 |
+| v2 −300 / 0.24 / gap on | 6.3% (5.5%) | 79.5% | 14.2% (29.1%) | $2,121 | 1.246 | −$377 |
+| v2 −300 / 0.35 / gap on | 6.3% (6.3%) | 80.3% | 13.4% (24.4%) | $2,127 | 1.252 | −$377 |
+| v2 −400 / 0.24 / gap on (defaults) | 7.1% (6.3%) | 74.0% | 18.9% (31.5%) | $2,218 | 1.278 | −$377 |
+| v2 −400 / 0.35 / gap on | 8.7% (7.9%) | 72.4% | 18.9% (31.5%) | $2,269 | 1.274 | −$377 |
+| v2 −500 / 0.24 / gap on | 12.6% (9.4%) | 70.9% | 16.5% (37.0%) | $2,366 | 1.283 | −$382 |
+| v2 −500 / 0.35 / gap on | 11.8% (9.4%) | 68.5% | 19.7% (34.6%) | $2,174 | 1.275 | −$377 |
+
+The gap guard off changes one or two trades in ten years in every pair (same pass rates): real gaps past a stop are
+rare in regular hours. **No variant passes G1, G2, G3 or G4; all pass G5 and G6.** At 2 MNQ the rules make about $41-48
+a day, about $1,000 in 30 days, so two windows in three expire short of $3,000.
+
+**Selection: none. Kill criteria met:** the best v2 variant (12.6%) does not beat v1.5 (13.4%) on G1, so **the v2 stops
+are rejected**; the answer is size + a daily limit, with no further stop tuning on this data.
+
+**Context, not pre-registered:** Take Profit Trader's Test has no time limit. Run from the same starts until pass or
+fail (116 starts to mid-2024): v1.5 passes **53.4%** end-of-day (38.8% intraday), v2 −400 41.4% (33.6%), v2 −500
+50.9% (33.6%). The v2 stops lower the pass rate there too.
+
+**The tight-stop grid** (2 MNQ, v1.5 lock, per contract, 2015-2025):
+
+| Cap / buffer | $/day/contract | max DD/contract | profit/DD | win | PF | worst day/contract |
+|---|---|---|---|---|---|---|
+| $100 / 0.10 | 8.23 | 3,106 | 7.2 | 42.5% | 1.150 | −228 |
+| $100 / 0.24 | 8.38 | 3,023 | 7.5 | 43.6% | 1.152 | −228 |
+| $100 / 0.35 | 8.30 | 3,026 | 7.5 | 43.7% | 1.150 | −228 |
+| $200 / 0.10 | 16.48 | 3,933 | 11.4 | 46.7% | 1.223 | −413 |
+| $200 / 0.24 | 19.07 | 4,318 | 12.0 | 50.0% | 1.256 | −413 |
+| $200 / 0.35 | 19.47 | 3,858 | 13.7 | 50.8% | 1.258 | −413 |
+| $350 / 0.10 | 21.54 | 3,123 | 18.8 | 42.6% | 1.248 | −740 |
+| **$350 / 0.24 (v1.5)** | **23.88** | 3,349 | **19.4** | 47.6% | 1.267 | −740 |
+| $350 / 0.35 | 23.40 | 3,486 | 18.3 | 49.2% | 1.256 | −740 |
+
+**The long run refutes the $100 cap:** a third of the money ($8.38 against $23.88 a day a contract) and less than half
+the profit / drawdown (7.5 against 19.4). Idris's 20-day result (cap $100 best, ratio 3.80) does not hold over ten
+years; **$350 stays**. The tight line (0.10) is worst at every cap, as in his sample.
+
+**Separating the two effects:**
+
+| Held fixed | Varied | $/day/contract | max DD/contract | profit/DD | win |
+|---|---|---|---|---|---|
+| lock 0.75 noise | cap $100 | 9.86 | 2,773 | 9.7 | 24.1% |
+| lock 0.75 noise | cap $200 | 19.07 | 5,239 | 9.9 | 36.9% |
+| lock 0.75 noise | cap $350 | 23.73 | 4,165 | 15.5 | 45.4% |
+| cap $350 | lock at 25 points (the $100 cap's) | 18.82 | 2,958 | 17.3 | 64.9% |
+| cap $350 | lock at 50 points (the $200 cap's) | 22.26 | 3,837 | 15.8 | 58.3% |
+| cap $350 | lock at 87.5 points (v1.5's) | 23.88 | 3,349 | 19.4 | 47.6% |
+
+(The run's labels for the last three say 50 / 100 / 175 points, a label slip; the triggers run were 25 / 50 / 87.5 as
+registered.) **The $100 cap's loss comes from the tighter stop:** with the lock held fixed, the $100 cap still makes
+under half. The earlier lock raises the win rate (47.6% → 64.9%) but lowers $/day; neither effect pays on ten years.
+
+## Phase 4b: $750 a day
+
+**$ a day and max drawdown by size** (2015-2025, end-of-day, the whole history; the $350 cap and the −$400 limit are
+for the whole position, as the rules define them):
+
+| Size | v1.5 stops: $/day | max DD | worst day | v2 defaults: $/day | max DD | worst day |
+|---|---|---|---|---|---|---|
+| 1 MNQ | 29.34 | 3,069 | −1,052 | 26.74 | 3,108 | −408 |
+| 2 MNQ | 47.76 | 6,698 | −1,479 | 41.23 | 7,763 | −445 |
+| 3 MNQ | 59.07 | 10,003 | −1,439 | 44.75 | 11,509 | −468 |
+| 5 MNQ | 59.21 | 17,631 | −1,519 | 35.06 | 13,182 | −513 |
+| 8 MNQ | 65.94 | 23,091 | −1,628 | 40.99 | 17,697 | −524 |
+
+**No size reaches $750 a day, and none keeps the drawdown under $2,000** (even 1 MNQ's ten-year drawdown is about
+$3,100). With a whole-position cap, more contracts mean a tighter stop for each, so $/day stops growing. With the cap
+scaled per contract ($175 each), $/day grows in proportion (about $24 a contract) and so does the drawdown (about
+$3,350 a contract): $750 a day needs about 31 contracts and a drawdown near $105,000. The plan's arithmetic holds: the
+profit / drawdown this needs is far beyond the strategy's.
+
+**Noise + Williams on one account** (`research/v2_combo.py`; one position at a time, a shared −$400 daily limit,
+Williams at $200 risk, 1-10 MNQ, on the same 5-minute bars):
+
+| | $/day | max DD | profit/DD | PF | worst day |
+|---|---|---|---|---|---|
+| noise-only v2, 2 MNQ | 41.23 | 7,763 | 14.4 | 1.278 | −445 |
+| Williams only | 21.62 | 3,599 | 16.3 | 1.375 | −577 |
+| **noise v2 + Williams** | **43.23** | **5,990** | **19.6** | 1.291 | −695 |
+
+The combination beats noise-only's ratio (19.6 against 14.4): a little more money, a smaller drawdown. It does not
+change the $750 answer: at its ratio $750 a day needs about 17 times the size and a drawdown of about $100,000. (The
+shared limit gates new trades; a Williams trade open when the day passes −$400 runs to its own stop, so its worst day
+is −$695.)
+
+## What this means
+
+- **The v2 stops are rejected** under the kill criteria. Keep v1.5's stops: the $350 cap at 2 MNQ, the line at 0.24,
+  the lock at 1 max loss.
+- **Size: 2 MNQ**, fixed. A daily loss limit caps the worst day (−$1,479 → about −$445 at −$400) but costs pass rate in
+  every measure here, so on the Test it is a choice of steadier days over passing sooner, not a free improvement.
+- **Do not let the Pine's growth sizing set live size.** The −$2,313 and −$1,917 days were 94-point stops on 10-12
+  contracts.
+- **$750 a day is not reachable** with these rules on one $50K account at any size that survives the $2,000 drawdown.
+- Phase 5 (native NinjaTrader on SIM, two weeks of alert-assisted paper trading before any funded attempt) applies to
+  v1.5 at 2 MNQ: `MnqNoiseMomentum.cs` with Qty 2, MaxLoss 350 and the v2 settings at 0, in alerts-only mode on a
+  Take Profit Trader account.
