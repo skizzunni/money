@@ -8848,3 +8848,9 @@ least 95% of U58's on each set). Run once.
 9) as U58 does (15 + 12, 15 + 9); median nets the same or a little higher on NQ (index $42,241 / $42,175, the same; NQ
 $51,866 / $50,927 against $50,445 / $50,246). With G437: the early budget hurts when cut and does nothing when raised;
 $750 stays. `verification/noise_v2/g438_pro_early1000.txt`, `g248_pro_u58e1000_{MS,MID}.csv`.
+
+## G439: PRO, U58 with a wider max loss ($250 a contract) (registered 2026-11-10, before its run)
+
+From G437 / G438: tighter early stops lost 34 more PRO starts; a bigger budget alone changed nothing (the stop did not
+move). Here the stop itself: `max_loss_per_trade` $250 a contract (U58 $187.50), G428's measure. G437's rule (at least 5
+fewer PRO losses than U58's 51, median net at least 95% of U58's on each set). Run once.
