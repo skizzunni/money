@@ -96,3 +96,28 @@ def test_python_matches_the_native_ninjatrader_run(sample, python_trades):
     moved = late[(late.entry_nt != late.entry_py) | (late.exit_nt != late.exit_py)]
     assert len(moved) <= 1 and ((moved.entry_nt - moved.entry_py) == (moved.exit_nt - moved.exit_py)).all()
     assert (m.net_nt - m.net_py).abs().max() <= 4.0 + 1e-9
+
+
+V15_2 = NoiseConfig(qty=2, max_loss_per_trade=350.0, max_losers=4, target_on_fill_bar=True, commission_per_side=0.62,
+                    slippage_ticks=2, nt_execution=True, round_prices=True)
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+def test_v15_two_mnq_trade_for_trade(sim, sample):  # noqa: F811
+    """docs/V2_STOPS.md, v3 Fix 1: v1.5 at 2 MNQ ($350, 4 losers, no tighten-only, $0.62 a side, 2 ticks), where the
+    line stop often sets the bracket. Every trade agrees: (a) the model follows the account, so after the broker's
+    tick-grid stop fills before the model's unrounded line, the next check's entry is taken (9/16 12:30); (b) the
+    expected fill uses the platform's slippage (2 ticks), so the bracket's distance from the fill is the model's."""
+    path, bars = sample
+    py = run(bars, V15_2, minutes=1).trades
+    r = subprocess.run([DOTNET, str(sim), str(path), "1", "UseBreakout=False", "SimSlippageTicks=2",
+                        "SimCommissionPerSide=0.62", "EvalQty=2", "EvalMaxLoss=350", "EvalMaxLosers=4", "TightenOnly=False"],
+                       capture_output=True, text=True, env=ENV)
+    assert r.returncode == 0, r.stderr[-2000:]
+    nt = [x.split(",")[1:] for x in r.stdout.splitlines() if x.startswith("T,")]
+    assert len(nt) == len(py) == 65
+    for a, t in zip(nt, py, strict=True):
+        assert (int(a[0]), int(a[1]), int(a[3])) == (t.direction, t.entry_bar, t.exit_bar), (a, t)
+        assert float(a[2]) == t.entry and float(a[4]) == t.exit, (a, t)
+        assert math.isclose(float(a[6]), t.pnl, abs_tol=1e-6), (a, t)
+    assert any(str(t.entry_time) == "2026-09-16 12:30:00-04:00" for t in py)

@@ -314,7 +314,8 @@ namespace NinjaTrader.NinjaScript.Strategies
         public string RejectStopsAt { get; set; }  // "bar,bar,...": the broker rejects a stop change on these bars
         public string RejectExitsAt { get; set; }  // "bar,bar,...": the broker rejects a market exit sent on these bars
         public int SlippageTicks = 1;
-        public int SimSlippageTicks { get { return SlippageTicks; } set { SlippageTicks = value; } }  // ticks a market fill
+        public int SimSlippageTicks { get { return SlippageTicks; } set { SlippageTicks = value; } }
+        public int Slippage { get { return SlippageTicks; } set { SlippageTicks = value; } }  // NinjaTrader's own name  // ticks a market fill
         public double SimCommissionPerSide { get { return CommissionPerSide; } set { CommissionPerSide = value; } }
         public readonly List<SimTrade> SimTrades = new List<SimTrade>();
         public readonly List<string> OrderLog = new List<string>();

@@ -99,7 +99,9 @@ namespace NinjaTrader.NinjaScript.AddOns.MnqBot
         double estPx = double.NaN;
         double held = double.NaN;     // TightenOnly: the stop so far in this trade, and what set it
         bool guardToday, gapToday;
-        double fav = double.NaN;      // the best price since the fill (high for a long, low for a short), for the lock    // v2: the daily loss limit fired / a stop filled past 2x its distance today
+        double fav = double.NaN;      // the best price since the fill (high for a long, low for a short), for the lock
+        double extFlatPx = double.NaN;  // the account's exit of the bot's trade, to apply at the next bar (ExternalFlat)
+        string extFlatWhy = "";    // v2: the daily loss limit fired / a stop filled past 2x its distance today
         string heldWhy = "";
 
         public readonly List<NoiseTrade> Trades = new List<NoiseTrade>();
@@ -283,6 +285,15 @@ namespace NinjaTrader.NinjaScript.AddOns.MnqBot
             Events.Add(e);
         }
 
+        // The account closed the bot's trade (its stop or target filled at the broker, on the tick grid) while this
+        // model, with its unrounded lines, still holds it: close the model's trade at the account's price in the next
+        // bar given, before that bar's stops and check, so the model is flat when the account is (v3 Fix 1).
+        public void ExternalFlat(double price, string reason)
+        {
+            extFlatPx = price;
+            extFlatWhy = reason;
+        }
+
         public void OnBar(DateTime nyStart, double o, double h, double l, double c)
         {
             int i = ++Bar;
@@ -305,6 +316,15 @@ namespace NinjaTrader.NinjaScript.AddOns.MnqBot
                     if (Position == 0)
                         OpenPos(o, i, d);
                 }
+            }
+            if (!double.IsNaN(extFlatPx))  // v3 Fix 1: the account is already flat
+            {
+                if (Position != 0)
+                {
+                    ClosePos(i, extFlatPx, extFlatWhy);
+                    Event(i, "EXIT");
+                }
+                extFlatPx = double.NaN;
             }
 
             // the resting stop (checked before the rest, like the broker)

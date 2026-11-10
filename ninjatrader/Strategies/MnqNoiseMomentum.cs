@@ -57,6 +57,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         bool exitRejected;          // one of the strategy's own exits was rejected: sent again at the next bar
         double lastStop = double.NaN;  // TightenOnly: the bot's stop so far in this trade
         double entryStopPts = double.NaN;  // the bot's bracket stop, points from the fill
+        double lastExitPx = double.NaN;    // v3 Fix 1: the price of the account's last exit fill
         string halfName = "";            // PartialAtR: the entry name of this trade's half ("": not split)
         double halfPts = double.NaN;     // its take-profit, points from the fill (PartialAtR x R)
         bool evalDone;              // the evaluation's target was reached: everything closed, no new trades
@@ -193,6 +194,9 @@ namespace NinjaTrader.NinjaScript.Strategies
                 settings = new NoiseSettings();
                 settings.Qty = Qty;
                 settings.Tick = TickSize;
+                // v3 Fix 1: the expected fill (signal close +/- slippage, for the bracket) uses the platform's own
+                // slippage setting, the one its fills use (at least a tick)
+                settings.SlippageTicks = Math.Max(1, Slippage);
                 settings.PointValue = Instrument.MasterInstrument.PointValue;
                 settings.MaxLoss = MaxLoss;
                 settings.TakeProfit = TakeProfit;
@@ -564,6 +568,15 @@ namespace NinjaTrader.NinjaScript.Strategies
                 double br;
                 Ledger(DayRecords(start), true, out bn, out bl, out br);
                 engine.ExternalLosers = bl;
+            }
+            // v3 Fix 1: the broker's stop or target (on the tick grid) closed the bot's trade before the model's own
+            // unrounded line did; the model follows the account, so it is flat for the next check, as the account is
+            if (PlaceOrders && engine.Position != 0 && RealDir == 0)
+            {
+                int nt = SystemPerformance.AllTrades.Count;  // the account's last exit (every NinjaTrader keeps this)
+                double xp = nt > 0 ? SystemPerformance.AllTrades[nt - 1].Exit.Price : lastExitPx;
+                if (!double.IsNaN(xp))
+                    engine.ExternalFlat(xp, "Account flat");
             }
             engine.OnBar(start, Open[0], High[0], Low[0], Close[0]);
             // the breakout only while the bot is flat with no entry coming, and the account is flat
@@ -1113,6 +1126,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                                                   MarketPosition marketPosition, string orderId, DateTime time)
         {
             Order o = execution == null ? null : execution.Order;
+            if (o != null && !IsEntry(o.Name))
+                lastExitPx = price;  // v3 Fix 1: the account's exit price, for the model
             if (o != null && IsEntry(o.Name))
             {
                 dExecs++;
