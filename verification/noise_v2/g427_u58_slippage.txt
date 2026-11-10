@@ -1,0 +1,21 @@
+fresh starts used: 16
+              per_session  trades_per_session   lost  green_days  green_weeks  green_months  longest_losing_weeks  worst_month
+U48                30.356               1.217  0.062       0.431        0.431         0.630                 4.188    -1988.351
+U48, 2 ticks       26.511               1.169  0.062       0.434        0.424         0.578                 4.250    -1811.864
+U58                49.191               1.543  0.000       0.420        0.478         0.682                 3.750    -1892.504
+U58, 2 ticks       38.195               1.491  0.000       0.427        0.466         0.667                 4.312    -1617.566
+development (index 2011-18 starts):
+              per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                   
+U58                41.964      21.212        72.223     112.465  0.000
+U48                39.221      18.490        73.495     114.895  0.032
+U58, 2 ticks       35.733      18.740        52.999      86.954  0.032
+U48, 2 ticks       33.912      17.016        64.967      99.242  0.032
+unseen (index 2019-25 + NQ 2015-24):
+              per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                   
+U58                80.461      42.044       117.888     142.938  0.016
+U48                75.724      40.467       115.664     138.786  0.031
+U58, 2 ticks       67.623      37.200        96.527     127.963  0.032
+U48, 2 ticks       63.168      35.343        91.961     122.121  0.031
+

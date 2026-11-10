@@ -8678,3 +8678,10 @@ Hourly round, a robustness check rather than a new rule. U58 replaced U48 on mod
 `research/g427_u58_slippage.py`: U48 and U58 at the usual slippage and at 2 ticks on every market and stop fill.
 **Rule:** if at 2 ticks U58 makes less $ a session than U48 on the fresh starts or on unseen, or loses more starts on
 either, the funded mode goes back to U48 (a revert, built with the tests); otherwise U58 stays. Run once.
+
+**G427 result (2026-11-10): U58 stays.** At 2 ticks of slippage on every market and stop fill: fresh starts U58 **$38.2 a
+session, 0 of 16 lost** against U48 $26.5, 1 lost (at the usual slippage $49.2 / $30.4); development U58 $35.7 at 3.2%
+against U48 $33.9 at 3.2%; unseen U58 **$67.6** at 3.2% against U48 $63.2 at 3.1%. The extra tick costs U58 more in
+dollars (it trades more: −$11.0 a session on the fresh starts against U48's −$3.8), but it stays ahead everywhere. The
+unseen loss rates (3.2% / 3.1%) are the same two starts; the measure counts a start lost partway through month 12 by the
+share of the month left, so the difference is less than one start. `verification/noise_v2/g427_u58_slippage.txt`.
