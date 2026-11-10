@@ -8737,3 +8737,11 @@ passed, as registered. (A first run cut each start at 760 days, against the regi
 the rerun to the end of the data gave the same numbers: no frozen start ever moves.) **Per the rule: for a trader with no
 deadline, Funded growth on the Test passes about 86% of the time (median about 6 months); the Test sprint passes about
 57%, but a tenth of starts pass within two weeks.** No code changes. `verification/noise_v2/g429_test_no_deadline.csv`.
+
+## G430: unfreezing the Test, a smaller cut-to-the-room stop (registered 2026-11-10, before its run)
+
+From G429: with no deadline, 16 of 116 U58 Tests freeze just above the floor (no trade fits; `squeeze_min` 20 points is
+the smallest stop the bot will cut a trade to). `research/g429_test_no_deadline.py` (G429's measure), U58 with
+`squeeze_min` 20 (as is), 10 and 5 points. **Rule:** a smaller value is recommended for the no-deadline Test (a setting,
+documented) only if it raises the pass rate and fails no more starts than U58; the funded default is not changed by this
+test. Run once.
