@@ -8580,3 +8580,10 @@ E = D with entries to 15:30. Run once on G409's 16 fresh starts (trades a sessio
 months) and once on G372's development / unseen starts. **Rule:** the variant with the most trades a session on the fresh
 starts that makes at least U48's $ a session on the fresh starts and on unseen, loses at most one more fresh start than
 U48 and at most 5% of the unseen starts, becomes the funded mode (built with parity and the tests). Else U48 stays.
+
+**G421 result (2026-11-10): rejected; U48 stays.** Fresh starts (U48 1.22 trades a session, $30.4, 1 of 16 lost): A 1.21 /
+$28.6 / 1; B 1.31 / $27.9 / 1; C 1.38 / $29.4 / 0; **D 1.58 / $35.1 / 0**; E 1.59 / $26.5 / 1. Development (U48 $39.2,
+3.2%): A $43.5 / 0%, B $51.7 / 6.7%, C $52.8 / 0%, D $51.6 / 0%, E $44.6 / 3.2%. Unseen (U48 $75.7, 3.1%): A $73.7 / 3.1%,
+B $72.0 / 3.1%, C $72.5 / 3.2%, **D $66.5 / 4.7%**, E $76.0 / 4.7%. Only D makes more on the fresh starts (+16%, 30% more
+trades), and it makes 12% less on unseen; E matches U48 on unseen and makes 13% less on the fresh starts. No variant
+meets the rule. `verification/noise_v2/g421_trade_more.txt`.

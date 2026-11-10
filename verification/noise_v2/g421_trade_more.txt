@@ -1,0 +1,26 @@
+fresh starts used: 16
+                         per_session  trades_per_session   lost  green_days  green_weeks  green_months  longest_losing_weeks  worst_month
+A: every check                28.595               1.212  0.062       0.437        0.444         0.630                 3.750    -1958.814
+B: A + no range filter        27.924               1.309  0.062       0.430        0.436         0.625                 4.062    -1770.626
+C: B + no loser limit         29.423               1.377  0.000       0.435        0.444         0.667                 4.188    -1832.959
+D: C + entry lines 0.8        35.062               1.582  0.000       0.406        0.456         0.615                 3.562    -1565.804
+E: D + entries to 15:30       26.497               1.586  0.062       0.415        0.453         0.599                 3.062    -1029.598
+U48                           30.356               1.217  0.062       0.431        0.431         0.630                 4.188    -1988.351
+development (index 2011-18 starts):
+                         per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                              
+C: B + no loser limit         52.821      22.709        82.744     138.163  0.000
+B: A + no range filter        51.713      22.844        84.118     111.657  0.067
+D: C + entry lines 0.8        51.611      20.408        95.704     141.609  0.000
+E: D + entries to 15:30       44.603      25.537        66.404     104.783  0.032
+A: every check                43.462      20.088        70.985      94.198  0.000
+U48                           39.221      18.490        73.495     114.895  0.032
+unseen (index 2019-25 + NQ 2015-24):
+                         per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                              
+E: D + entries to 15:30       75.998      46.904       119.078     150.065  0.047
+U48                           75.724      40.467       115.664     138.786  0.031
+A: every check                73.707      41.829       113.503     138.508  0.031
+C: B + no loser limit         72.481      42.805        99.748     115.891  0.032
+B: A + no range filter        72.041      40.784       110.021     141.955  0.031
+D: C + entry lines 0.8        66.459      41.578        95.787     106.320  0.047
