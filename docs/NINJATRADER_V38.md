@@ -8890,3 +8890,8 @@ PRO option only; building it into `MnqNoiseV38.cs` waits for the user. Run once.
 $100's. A higher guard stops trades sooner whenever the account is near its floor, and the extra stop-outs bring the
 floor down faster. The $100 guard of G440 stays the best PRO option found (29 lost); still a user choice, not built.
 `verification/noise_v2/g441_pro_guard.txt`, `g248_pro_u58pro{200,300}_{MS,MID}.csv`.
+
+## G442: the PRO mode's guard at $50 (registered 2026-11-10, before its run)
+
+The other side of G441 ($200 / $300 lost 39 / 38 against $100's 29): `pro_guard` $50, G428's measure, G440's rule (at most
+26 lost, median net at least 80% of U58's on each set). A follow-up to seen results. Run once.
