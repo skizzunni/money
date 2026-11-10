@@ -37,6 +37,9 @@ def job(a):
     base = {"trail_from": start, "slippage_ticks": 2, "skip_dates": V.BASE["skip_dates"], "fed_dates": V.FOMC}
     if tag.startswith("U58, squeeze "):  # G430: the smallest cut-to-the-room stop, points
         base["squeeze_min"] = float(tag.split()[-1])
+    if tag.startswith("U58, start "):  # G431: the starting contracts (the max loss is for the whole position)
+        q = int(tag.split()[-1])
+        base["qty"], base["max_loss_per_trade"] = q, GROW.max_loss_per_trade * q
     cfg = dataclasses.replace(GROW, **base) if tag.startswith("U58") else dataclasses.replace(GROW, **{**SPRINT, **base})
     tr = [t for t in run(w, cfg, 5).trades if t.entry_time >= s0]
     closed, worst, _ = V.marks(w, tr)

@@ -8751,3 +8751,10 @@ passed, 0 failed and 16 frozen, trade for trade. The frozen Tests sit within a f
 in G429: $9 above it), less than even a 5-point stop's risk plus fees (about $12 at 1 MNQ), so no stop setting can free
 them: **a frozen Test is in practice a lost one**, and G429's 13.8% frozen for U58 (40.5% for U57) should be read as
 losses. `verification/noise_v2/g430_squeeze.csv`.
+
+## G431: the no-deadline Test at U58 starting with 2 or 3 MNQ (registered 2026-11-10, before its run)
+
+From G429: with no deadline U58's sizing passes 86% of Tests but in a median 124 trading days. `research/g429_test_no_deadline.py`:
+U58 starting at 2 and 3 MNQ (the max loss for the whole position scaled with it; the contract steps as U58). **Rule:** a
+start is recommended as the faster no-deadline option if its pass rate (frozen counted as lost) is within 5 points of
+U58's and its median days to pass at most 75% of U58's; otherwise 1 MNQ stays the recommendation. No code changes. Run once.
