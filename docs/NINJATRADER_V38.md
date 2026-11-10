@@ -8823,3 +8823,11 @@ not narrow further than 0.7... they replace them on a calm stretch, as coded). G
 82.8% / 20 / 132 (worst drawdown $3,899). (On a calm stretch U58's 0.8 lines replace the 0.7, as the registration's
 garbled parenthesis meant to say.) The sprint's wider-net signals trade more and lose more at this size.
 `verification/noise_v2/g436_test_sprint_signals.csv`.
+
+## G437: PRO, U58 with a $500 early day budget (registered 2026-11-10, before its run)
+
+Hourly round. Under PRO's intraday drawdown U58 loses 51 of 526 starts (G428), mostly before the floor has stopped;
+G435 hinted a smaller early budget saves a start on the Test. `research/g248_pro_intraday.py` (G428's measure), U58 with
+`early_daily_loss` $500 (U58 $750) until the floor has stopped. **Rule:** adopted as a PRO recommendation (a setting,
+documented; built into a mode only on a later pass of the full funded measure) if it loses at least 5 fewer PRO starts
+than U58's 51 with the median net at least 95% of U58's on each set. Run once.
