@@ -8745,3 +8745,9 @@ the smallest stop the bot will cut a trade to). `research/g429_test_no_deadline.
 `squeeze_min` 20 (as is), 10 and 5 points. **Rule:** a smaller value is recommended for the no-deadline Test (a setting,
 documented) only if it raises the pass rate and fails no more starts than U58; the funded default is not changed by this
 test. Run once.
+
+**G430 result (2026-11-10): no effect; nothing recommended.** U58 with `squeeze_min` 20 / 10 / 5 points: the same 86.2%
+passed, 0 failed and 16 frozen, trade for trade. The frozen Tests sit within a few dollars of the floor (the one inspected
+in G429: $9 above it), less than even a 5-point stop's risk plus fees (about $12 at 1 MNQ), so no stop setting can free
+them: **a frozen Test is in practice a lost one**, and G429's 13.8% frozen for U58 (40.5% for U57) should be read as
+losses. `verification/noise_v2/g430_squeeze.csv`.
