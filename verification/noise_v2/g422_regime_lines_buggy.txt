@@ -1,0 +1,26 @@
+fresh starts used: 16
+                          per_session  trades_per_session   lost  green_days  green_weeks  green_months  longest_losing_weeks  worst_month
+C                              29.423               1.377  0.000       0.435        0.444         0.667                 4.188    -1832.959
+C, lines 0.8 when calm         16.733               0.757  0.125       0.435        0.370         0.599                 3.750    -1121.312
+C, lines 0.8 when wild         14.995               0.912  0.062       0.403        0.400         0.589                 3.625    -1185.708
+U48                            30.356               1.217  0.062       0.431        0.431         0.630                 4.188    -1988.351
+U48, lines 0.8 when calm       17.328               0.750  0.062       0.432        0.379         0.573                 3.500    -1453.458
+U48, lines 0.8 when wild       15.477               0.855  0.062       0.409        0.400         0.583                 3.625    -1440.298
+development (index 2011-18 starts):
+                          per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                               
+C                              52.821      22.709        82.744     138.163  0.000
+U48                            39.221      18.490        73.495     114.895  0.032
+C, lines 0.8 when calm         31.249      18.895        42.394      77.782  0.000
+C, lines 0.8 when wild         23.028      16.825        37.971      53.775  0.093
+U48, lines 0.8 when wild       18.681      13.815        24.399      34.671  0.062
+U48, lines 0.8 when calm       16.130      14.501        23.919      31.900  0.000
+unseen (index 2019-25 + NQ 2015-24):
+                          per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                               
+U48                            75.724      40.467       115.664     138.786  0.031
+C                              72.481      42.805        99.748     115.891  0.032
+C, lines 0.8 when calm         38.247      21.577        51.228      56.091  0.058
+U48, lines 0.8 when calm       34.651      22.248        45.447      61.601  0.039
+C, lines 0.8 when wild         34.289      23.121        46.088      61.157  0.060
+U48, lines 0.8 when wild       32.926      20.557        43.574      68.405  0.045

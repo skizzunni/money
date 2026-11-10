@@ -1454,9 +1454,9 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                     up_e = max(day_open, prev_close) * (1 + cfg.entry_k * sigma)
                     lo_e = min(day_open, prev_close) * (1 - (cfg.entry_k_short or cfg.entry_k) * sigma)  # G337
                 if cfg.entry_k_regime > 0 and len(day_ranges) >= cfg.calm_long:  # G422
-                    calm = (sum(day_ranges[-cfg.calm_short:]) / cfg.calm_short
-                            < sum(day_ranges[-cfg.calm_long:]) / cfg.calm_long)
-                    if calm == cfg.regime_calm:
+                    reg_calm = (sum(day_ranges[-cfg.calm_short:]) / cfg.calm_short
+                                < sum(day_ranges[-cfg.calm_long:]) / cfg.calm_long)  # not `calm`: calm_k's flag
+                    if reg_calm == cfg.regime_calm:
                         up_e = max(day_open, prev_close) * (1 + cfg.entry_k_regime * sigma)
                         lo_e = min(day_open, prev_close) * (1 - cfg.entry_k_regime * sigma)
                 if skip_today:

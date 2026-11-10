@@ -8596,3 +8596,8 @@ range is below (calm) or above (wild) the last 60's. `research/g422_regime_lines
 calm and when wild. G421's measures and rule (the most trades a session on the fresh starts among variants making at
 least U48's $ a session on the fresh starts and on unseen, losing at most one more fresh start and at most 5% unseen).
 Run once.
+
+**G422 first run (2026-11-10): void, a bug.** The new code named its flag `calm`, the name of calm_k's no-new-trades
+flag, so every regime variant also stopped trading on many days (0.75-0.91 trades a session against U48's 1.22). Its
+numbers (`verification/noise_v2/g422_regime_lines_buggy.txt`) measure the bug, not the idea. Fixed (`reg_calm`); G422 is
+run again, once, with the same variants and rule.
