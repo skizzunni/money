@@ -8713,3 +8713,12 @@ lost** (15 + 12, 15 + 9); the same in both bar orders. Median net over the 21 mo
 horizon (index $42,241 / $42,175 against $43,865 / $44,259; NQ $50,445 / $50,246 against $51,072 / $58,720), unlike the
 12-month measures where it led; the PRO risk is about one start in ten either way. Logs
 `verification/noise_v2/g428_pro_u58.txt`, `g248_pro_{u48now,u58}_{MS,MID}.csv`.
+
+## G429: the Test with no time limit, the sprint (U57) against the funded mode's sizing (U58) (registered 2026-11-10, before its run)
+
+Hourly round. U57 was chosen to pass the Test within two weeks (G251-G321); Take Profit Trader's Test has no time limit
+(Phase 0 of `docs/V2_STOPS.md`), and the v3 replay found that with no deadline smaller size passes far more often (v1.5:
+87% at 1 MNQ, 53% at 2). `research/g429_test_no_deadline.py`: U57 and U58 (the NinjaTrader tests' configurations) on the
+v3 replay's 116 starts (NQ 2015-24, 5-minute, 2 ticks), each run until pass or fail. **Rule:** if U58's sizing passes
+more starts than U57, the docs recommend Funded growth on the Test for a trader with no deadline, and U57 only for a
+deadline; no code changes either way. Run once.
