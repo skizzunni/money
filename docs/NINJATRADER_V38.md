@@ -8877,3 +8877,10 @@ both. Not adopted (the registered bar stands); it is a trade-off the user can ch
 instead of 9.7%, for about 12% less net over 21 months. The mode exists in the Python model only; on the funded account
 it would need building into `MnqNoiseV38.cs` with parity tests first. `verification/noise_v2/g440_pro_mode_u58.txt`,
 `g248_pro_u58pro_{MS,MID}.csv`.
+
+## G441: the PRO mode's guard at $200 and $300 above the floor (registered 2026-11-10, before its run)
+
+A follow-up to G440 (chosen after seeing it, so weigh it as such): U58 with the PRO mode lost 29 of 526 PRO starts with
+the guard $100 above the floor (bar 26). Here `pro_guard` $200 and $300, G428's measure. G440's rule (at most 26 lost,
+median net at least 80% of U58's on each set); if both pass, the one with fewer losses. Passing makes it a documented
+PRO option only; building it into `MnqNoiseV38.cs` waits for the user. Run once.
