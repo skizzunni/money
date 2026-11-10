@@ -8860,3 +8860,11 @@ fewer PRO losses than U58's 51, median net at least 95% of U58's on each set). R
 / $42,175; NQ $41,923 / $42,223 against $50,445 / $50,246). A wider stop on the same budget means fewer contracts and
 bigger single losses against the intraday floor. With G437: U58's $187.50 sits between a too-tight and a too-wide stop;
 it stays. `verification/noise_v2/g439_pro_ml250.txt`, `g248_pro_u58ml250_{MS,MID}.csv`.
+
+## G440: G249's PRO mode on U58 (registered 2026-11-10, before its run)
+
+G249's PRO mode (the floor, sizing and the floor's stop from the intraday peak, `trail_intraday`; every stop tightened to
+$100 above that floor, `pro_guard`) cut U48's PRO losses from 55 to 38 but cost a third of the median net, and was
+rejected against its bar of 27. On U58 (51 PRO losses, G428) it has not been run. G428's measure. **Rule:** offered as a
+documented PRO setting (not a default) if it loses at most 26 of 526 (half of U58's) with the median net at least 80% of
+U58's on each set; else rejected. Run once.
