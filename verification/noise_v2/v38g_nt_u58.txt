@@ -1,5 +1,5 @@
 30 min: 16:00 bars added 410 of 486 sessions
-{'max qty': 13, 'bars': 30, 'identical in the window': True, 'identical overall': True, 'trades nt': 361, 'trades py': 361, 'window trades': 310, 'net $': 16918.38, 'win %': 48.1, 'pf': 1.662, 'closed dd $': 2787.54, 'largest loss $': -1416.49, 'worst day $': -886.29}
+{'max qty': 15, 'bars': 30, 'identical in the window': True, 'identical overall': True, 'trades nt': 301, 'trades py': 301, 'window trades': 254, 'net $': 28191.46, 'win %': 53.5, 'pf': 1.933, 'closed dd $': 3633.6, 'largest loss $': -1634.41, 'worst day $': -899.2}
 5 min: 16:00 bars added 410 of 486 sessions
 first difference at trade 77 of 863 864
     d    eb    entry    xb      exit         why     pnl
