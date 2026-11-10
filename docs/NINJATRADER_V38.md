@@ -8800,3 +8800,10 @@ U58's, median days at most 85%). Run once.
 $1,500 76.7% / 130 (worst drawdown $15,248 in both). Not faster at all: the bigger late days raise the best day, and the
 Test's consistency rule (best day under half the profit) then asks for more profit before it passes. On this Test,
 steady size is both safer and as fast. `verification/noise_v2/g434_test_push.csv`.
+
+## G435: the no-deadline Test with a smaller or larger early day budget (registered 2026-11-10, before its run)
+
+Hourly round. U58 sizes each trade to fit the day's budget, $750 until the floor has stopped (`early_daily_loss`), so
+that budget sets how big the Test's trades are. `research/g429_test_no_deadline.py`, U58 with $500 and $1,000. **Rule:**
+recommended for the Test if it raises the pass rate (frozen counted as lost) by at least 3 points, or keeps it within 2
+points with median days at most 85% of U58's; no default changes. Run once.
