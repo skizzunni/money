@@ -8764,3 +8764,11 @@ median trading days to pass: U58 at 1 MNQ **86.2% / 124**; at 2 MNQ 58.6% / 70 (
 frozen, 1 failed). A bigger start reaches the target sooner when it passes, but a third more of the starts sink to the
 floor first and freeze. The pass-rate cost (−28 points) is far beyond the 5 the rule allowed.
 `verification/noise_v2/g431_test_start_size.csv`.
+
+## G432: a trade may risk only part of the room above the floor, on the no-deadline Test (registered 2026-11-10, before its run)
+
+From G429/G430: U58's no-deadline Tests that fail all freeze just above the floor (14%). `trail_frac` (U58: 1.0, a trade
+may risk all the room left) at 0.5 and 0.33 makes each trade risk at most that share, so a run of losers shrinks the room
+by a fraction each time instead of to nothing. `research/g429_test_no_deadline.py`, U58 with `trail_frac` 1.0 / 0.5 / 0.33.
+**Rule:** recommended as a Test setting if it raises the pass rate (frozen counted as lost) by at least 3 points with
+no more failures; then also measured on the funded 12-month measure before any default changes. Run once.
