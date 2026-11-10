@@ -8628,3 +8628,8 @@ Hourly round, on U58. G422: the 0.8 lines lost money when the market was not cal
 with 1.1 and 1.2 there. G421's measures; **rule:** the variant with the most $ a session on the fresh starts that makes
 at least 10% more than U58 there and at least U58's $ a session on unseen, loses no more fresh starts than U58 and at
 most 5% unseen, replaces U58. Run once.
+
+**G423 result (2026-11-10): rejected; U58 stays.** Fresh starts (U58 $49.2 a session, 1.54 trades, 0 lost): 1.1 when not
+calm $35.1, 1.2 $41.5 (both 0 lost). Development (U58 $42.0, 0%): $39.5 at 6.6%, $26.3 at 6.6%. Unseen (U58 $80.5, 1.6%):
+$59.6 at 9.6%, $65.5 at 4.8%. Wider lines on the other days cost more than the false breakouts they skip.
+`verification/noise_v2/g423_wide_when_wild.txt`.
