@@ -1,0 +1,20 @@
+development (index 2011-18 starts):
+                               per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                                    
+day up x2.0 from $2000 profit       43.283      18.965        89.971      96.329  0.032
+day up x2.0 from $6000 profit       41.728      18.539        85.356     111.127  0.032
+day up x1.5 from $6000 profit       41.035      18.539        80.389     116.667  0.032
+day up x1.5 from $2000 profit       39.383      18.689        78.603      97.900  0.032
+U48                                 39.221      18.490        73.495     114.895  0.032
+day up x2.0 from $4000 profit       38.553      18.339        77.676      96.257  0.032
+day up x1.5 from $4000 profit       36.759      18.342        73.331      93.976  0.032
+unseen (index 2019-25 + NQ 2015-24):
+                               per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                                    
+day up x2.0 from $2000 profit       92.877      64.353       130.898     152.277  0.047
+day up x2.0 from $4000 profit       92.779      55.553       139.750     171.972  0.031
+day up x1.5 from $4000 profit       86.209      44.501       138.733     160.211  0.031
+day up x1.5 from $2000 profit       84.943      54.459       126.061     152.819  0.047
+day up x2.0 from $6000 profit       83.850      42.377       120.568     160.306  0.047
+day up x1.5 from $6000 profit       80.894      41.277       117.746     152.316  0.047
+U48                                 75.724      40.467       115.664     138.786  0.031

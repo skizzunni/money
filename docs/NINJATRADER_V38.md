@@ -8539,3 +8539,15 @@ the floor. `verification/noise_v2/g417_house_money.txt`.
 From G417: its losses come from pressing while the cushion is small. `day_up_from` in `mnqbot/noise.py` (0 = off): day
 up x`day_up_mult` only while the account's closed profit is at least that. `research/g418_house_money_grown.py`: U48 with
 up x1.5 or x2 from $2,000, $4,000 or $6,000 of profit (6 variants). G416's measure and rule. Run once.
+
+**G418 result (2026-11-10): passes development and unseen; to the fresh check.** Development (U48 $39.2 a session, 3.2%
+lost): the pick **day up x2 from $2,000 of profit, $43.3 with 3.2% lost** (+10.4%); x2 from $6,000 $41.7, x1.5 from
+$6,000 $41.0, x1.5 from $2,000 $39.4, from $4,000 $38.6 / $36.8. Unseen (U48 $75.7, 3.1%): the pick **$92.9 with 4.7%
+lost (+22.7%)**; x2 from $4,000 $92.8 at 3.1%; x1.5 from $4,000 $86.2 at 3.1%. The pick passes G416's rule (at most 5%
+lost, at least 10% more). `verification/noise_v2/g418_house_money_grown.txt`.
+
+## G419: the fresh-start check for G418's pick (registered 2026-11-10, before its run)
+
+`research/g419_fresh_house.py`: G418's pick and U48 on G409's 16 fresh starts (G415's runner and table). **Rule:** the
+pick becomes the funded mode (built into NinjaTrader with parity and the tests) if it makes at least 10% more $ a
+session than U48 there and loses at most 5% more of the starts (at most one more start of 16). Else U48 stays. Run once.
