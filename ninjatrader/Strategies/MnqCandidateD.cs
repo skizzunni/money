@@ -347,7 +347,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             {
                 newYork = NewYork();
                 pv = Instrument.MasterInstrument.PointValue;
-                NoiseSettings ns = new NoiseSettings();  // only its lines are used: B's lookback, buffer and dates
+                NoiseSettings ns = new NoiseSettings().V15Stops();  // only its lines are used: B's lookback, buffer and dates
                 ns.Qty = 2;
                 ns.Tick = TickSize;
                 ns.PointValue = pv;

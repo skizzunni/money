@@ -130,7 +130,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 newYork = NewYork();
                 badChart = BarsPeriod.BarsPeriodType != BarsPeriodType.Minute || BarsPeriod.Value != 1;
                 pv = Instrument.MasterInstrument.PointValue;
-                settings = new NoiseSettings();  // B's settings, so the signals are B's
+                settings = new NoiseSettings().V15Stops();  // B's settings, so the signals are B's
                 settings.Qty = 4;
                 settings.Tick = TickSize;
                 settings.PointValue = pv;

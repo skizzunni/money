@@ -38,6 +38,16 @@ namespace NinjaTrader.NinjaScript.AddOns.MnqBot
         // the lock arms at this many noise units of the current check in profit (x the entry price); 0 = LockAt max losses
         public double LockTriggerNoise = 0.75;
         public bool GapGuard = true;         // no new entries today after a stop fills past 2x its intended loss distance
+
+        // the stops as before v2 (strategies built on v1.5's engine keep their tested behaviour)
+        public NoiseSettings V15Stops()
+        {
+            TightenOnly = false;
+            DailyLossLimit = 0;
+            LockTriggerNoise = 0;
+            GapGuard = false;
+            return this;
+        }
     }
 
     public sealed class NoiseTrade
