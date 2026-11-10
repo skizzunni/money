@@ -8788,3 +8788,10 @@ profit (U58 $1,500). `research/g429_test_no_deadline.py`. **Rule:** recommended 
 **G433 result (2026-11-10): rejected.** Passed / median days: U58 ($1,500 steps) **86.2% / 124**; $1,000 steps 73.3% / 113
 (31 frozen); $750 steps 74.1% / 110 (28 frozen, 2 failed, worst drawdown $13,011). Growing sooner gains ten days and loses
 twelve points of pass rate: the bigger size arrives before the cushion is real. `verification/noise_v2/g433_test_steps.csv`.
+
+## G434: the no-deadline Test, press only once the floor has stopped (registered 2026-11-10, before its run)
+
+From G431/G433: bigger or faster sizing early costs pass rate. Here U58 starts and grows as it does until the account
+is $2,000 (or $1,500) up, where the end-of-day floor stops at the start balance; from there, a contract more per $500 of
+profit (U58: $650 steps only from $9,000). `research/g429_test_no_deadline.py`. G433's rule (pass rate within 2 points of
+U58's, median days at most 85%). Run once.
