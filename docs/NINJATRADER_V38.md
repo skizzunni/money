@@ -8571,3 +8571,12 @@ winner $38.3 (3.2%); against the first target $39.1 (3.2%); the first plus day u
 10% above U48 within 5% lost). Unseen (U48 $75.7, 3.1%): $71.9 at 4.7%; $75.7 (the same trades: after a target the bot
 rarely gets a second signal the other way); $99.3 at 18.9%. Trades against the day's winner pay as well as the rest.
 `verification/noise_v2/g420_win_side.txt`.
+
+## G421: trade more often on the funded account (registered 2026-11-10, before its run)
+
+The user: "trade more". `research/g421_trade_more.py`, cumulative: A = U48 with every check (no skipped 13:00 / 14:30);
+B = A without the range-position filter; C = B without the loser limit; D = C with entry lines at 0.8 noise (U48 1.0);
+E = D with entries to 15:30. Run once on G409's 16 fresh starts (trades a session, $ a session, lost, green days and
+months) and once on G372's development / unseen starts. **Rule:** the variant with the most trades a session on the fresh
+starts that makes at least U48's $ a session on the fresh starts and on unseen, loses at most one more fresh start than
+U48 and at most 5% of the unseen starts, becomes the funded mode (built with parity and the tests). Else U48 stays.
