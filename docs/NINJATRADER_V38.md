@@ -8915,3 +8915,10 @@ over 21 months (G440). Still the user's choice; not built. `verification/noise_v
 **Full suite (2026-11-10, after G416-G443, the v2 stops, the v3 fixes and the stop-placement checks):** 703 passed, none
 failed (32 min). Every research setting added today is off by default; the NinjaTrader parity, release-package and MNQ
 tests are all in it.
+
+## G444: PRO, lock or bank winners sooner (registered 2026-11-10, before its run)
+
+Hourly round. PRO's drawdown trails the highest balance including open profit, so open gains that fade still raise the
+floor for good. U58 with the lock at 0.25 max losses (U58 0.35) and, separately, the take-profit at 1.5 noise units (U58
+2.0), G428's measure. G437's rule (at least 5 fewer PRO losses than U58's 51, median net at least 95% of U58's on each
+set). Run once.
