@@ -8758,3 +8758,9 @@ From G429: with no deadline U58's sizing passes 86% of Tests but in a median 124
 U58 starting at 2 and 3 MNQ (the max loss for the whole position scaled with it; the contract steps as U58). **Rule:** a
 start is recommended as the faster no-deadline option if its pass rate (frozen counted as lost) is within 5 points of
 U58's and its median days to pass at most 75% of U58's; otherwise 1 MNQ stays the recommendation. No code changes. Run once.
+
+**G431 result (2026-11-10): rejected; 1 MNQ stays the no-deadline recommendation.** Passed (frozen counted as lost) /
+median trading days to pass: U58 at 1 MNQ **86.2% / 124**; at 2 MNQ 58.6% / 70 (48 starts frozen); at 3 MNQ 56.9% / 57 (49
+frozen, 1 failed). A bigger start reaches the target sooner when it passes, but a third more of the starts sink to the
+floor first and freeze. The pass-rate cost (−28 points) is far beyond the 5 the rule allowed.
+`verification/noise_v2/g431_test_start_size.csv`.
