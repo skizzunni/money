@@ -8519,3 +8519,11 @@ check before anything is built. Run once.
 (U48 $75.7, 3.1%): the pick **$79.5 with 0% lost, +5.0%**, under the 10% minimum gain. After red x1.5 $95.7 at 4.7% (not
 the development pick: 16% lost there); after red x0.5 $64.3. The sign of yesterday adds little; U48 stays.
 `verification/noise_v2/g416_after_day.txt`.
+
+## G417: size within the day by today's P/L (registered 2026-11-10, before its run)
+
+Not tested before: `after_loss_qty_div` cut the trade after a loss; nothing pressed after a winning start ("house
+money"). `day_up_mult` / `day_down_mult` in `mnqbot/noise.py` (off by default): entries while today's closed P/L is above
+(below) 0 take that multiple of their contracts (at least 1). `research/g417_house_money.py`: U48 with (up, down) =
+(1.5, 1), (2, 1), (1, 0.5), (1, 1.5), (1.5, 0.5), (0.5, 1). G416's measure and rule (development pick within 5% lost and
+at least 10% above U48; unseen at most 5% lost and at least 10% more $ a session; then G409's fresh starts). Run once.
