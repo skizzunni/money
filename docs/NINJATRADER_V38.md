@@ -8587,3 +8587,12 @@ $28.6 / 1; B 1.31 / $27.9 / 1; C 1.38 / $29.4 / 0; **D 1.58 / $35.1 / 0**; E 1.5
 B $72.0 / 3.1%, C $72.5 / 3.2%, **D $66.5 / 4.7%**, E $76.0 / 4.7%. Only D makes more on the fresh starts (+16%, 30% more
 trades), and it makes 12% less on unseen; E matches U48 on unseen and makes 13% less on the fresh starts. No variant
 meets the rule. `verification/noise_v2/g421_trade_more.txt`.
+
+## G422: the narrow entry lines only in one kind of market (registered 2026-11-10, before its run)
+
+From G421: entry lines at 0.8 noise (D) made more on the 2023-25 fresh starts and less on unseen. `entry_k_regime` /
+`regime_calm` in `mnqbot/noise.py` (off by default): the entry lines at 0.8 only while the last 10 sessions' average
+range is below (calm) or above (wild) the last 60's. `research/g422_regime_lines.py`: G421's C and U48, each with 0.8 when
+calm and when wild. G421's measures and rule (the most trades a session on the fresh starts among variants making at
+least U48's $ a session on the fresh starts and on unseen, losing at most one more fresh start and at most 5% unseen).
+Run once.

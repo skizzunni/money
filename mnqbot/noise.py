@@ -280,6 +280,10 @@ class NoiseConfig:
     day_up_mult: float = 1.0
     # research (G420): after today's first winning trade (win_side_target: the first that reached its target), no entries
     # on the other side for the rest of the session (off by default)
+    # research (G422): entry lines at entry_k_regime noise instead of entry_k when the last calm_short sessions' average
+    # range is below (regime_calm) or above (not regime_calm) the last calm_long sessions' (0 = off)
+    entry_k_regime: float = 0.0
+    regime_calm: bool = True
     win_side_only: bool = False
     win_side_target: bool = False
     day_up_from: float = 0.0
@@ -1449,6 +1453,12 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                 if cfg.entry_k != 1.0 or cfg.entry_k_short > 0:
                     up_e = max(day_open, prev_close) * (1 + cfg.entry_k * sigma)
                     lo_e = min(day_open, prev_close) * (1 - (cfg.entry_k_short or cfg.entry_k) * sigma)  # G337
+                if cfg.entry_k_regime > 0 and len(day_ranges) >= cfg.calm_long:  # G422
+                    calm = (sum(day_ranges[-cfg.calm_short:]) / cfg.calm_short
+                            < sum(day_ranges[-cfg.calm_long:]) / cfg.calm_long)
+                    if calm == cfg.regime_calm:
+                        up_e = max(day_open, prev_close) * (1 + cfg.entry_k_regime * sigma)
+                        lo_e = min(day_open, prev_close) * (1 - cfg.entry_k_regime * sigma)
                 if skip_today:
                     pass
                 elif use_stop and pos:
