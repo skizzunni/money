@@ -1,0 +1,18 @@
+fresh starts used: 16
+                            per_session  trades_per_session  lost  green_days  green_weeks  green_months  longest_losing_weeks  worst_month
+U58                              49.191               1.543   0.0       0.420        0.478         0.682                 3.750    -1892.504
+U58, target 1.0 when calm        46.550               1.642   0.0       0.423        0.460         0.688                 4.375    -1841.268
+U58, target 1.25 when calm       45.999               1.613   0.0       0.427        0.472         0.719                 4.125    -1806.748
+development (index 2011-18 starts):
+                            per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                                 
+U58, target 1.0 when calm        42.414      20.393        57.215     129.865  0.098
+U58                              41.964      21.212        72.223     112.465  0.000
+U58, target 1.25 when calm       41.370      19.148        60.781     119.739  0.127
+unseen (index 2019-25 + NQ 2015-24):
+                            per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                                 
+U58                              80.461      42.044       117.888     142.938  0.016
+U58, target 1.25 when calm       74.651      34.999       110.329     131.742  0.016
+U58, target 1.0 when calm        67.525      33.992        96.259     118.778  0.033
+

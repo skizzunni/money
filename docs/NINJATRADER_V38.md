@@ -8654,3 +8654,8 @@ moves may seldom reach. `tp_calm` in `mnqbot/noise.py` (off by default): on a ca
 that take-profit. `research/g425_calm_target.py`: U58 with 1.0 and 1.25. G423's rule against U58 (the most $ a session
 on the fresh starts, at least 10% above U58 there, at least U58's $ on unseen, no more fresh starts lost, at most 5% lost
 on unseen and development). Run once.
+
+**G425 result (2026-11-10): rejected; U58 stays.** Fresh starts (U58 $49.2 a session, 0 lost): target 1.0 when calm $46.6,
+1.25 $46.0 (both 0 lost, a few more trades). Development (U58 $42.0, 0%): $42.4 at 9.8% lost, $41.4 at 12.7%. Unseen (U58
+$80.5, 1.6%): $67.5 at 3.3%, $74.7 at 1.6%. The calm stretches' trend days still pay the full target; cutting it costs
+more than the extra hits bring. `verification/noise_v2/g425_calm_target.txt`.
