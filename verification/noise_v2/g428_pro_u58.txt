@@ -1,0 +1,9 @@
+index u48now MS starts 160 PRO lost (worst order) 18 (best order) 18 median net 43865
+nq u48now MS starts 103 PRO lost (worst order) 13 (best order) 13 median net 51072
+index u48now MID starts 160 PRO lost (worst order) 13 (best order) 13 median net 44259
+nq u48now MID starts 103 PRO lost (worst order) 11 (best order) 11 median net 58720
+index u58 MS starts 160 PRO lost (worst order) 15 (best order) 15 median net 42241
+nq u58 MS starts 103 PRO lost (worst order) 12 (best order) 12 median net 50445
+index u58 MID starts 160 PRO lost (worst order) 15 (best order) 15 median net 42175
+nq u58 MID starts 103 PRO lost (worst order) 9 (best order) 9 median net 50246
+

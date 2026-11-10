@@ -8706,3 +8706,10 @@ end-of-day measures only. `research/g248_pro_intraday.py` (unchanged), 21 months
 (NQ 2015-23, the index 2011-24), run for U48 and U58 on today's code. **Rule:** if U58 loses more PRO starts than U48, the
 funded mode's documentation says so and recommends U48 on a PRO account (U58 stays the default for the Test-to-funded
 path under end-of-day trailing); if not, nothing changes. Run once.
+
+**G428 result (2026-11-10): U58 stays; it loses fewer PRO starts than U48.** Under PRO's intraday drawdown, 21 months,
+526 starts: **U48 55 lost** (18 + 13 on the 1st, 13 + 11 mid-month; G248's count reproduced on today's code), **U58 51
+lost** (15 + 12, 15 + 9); the same in both bar orders. Median net over the 21 months: U58 a little lower on the long
+horizon (index $42,241 / $42,175 against $43,865 / $44,259; NQ $50,445 / $50,246 against $51,072 / $58,720), unlike the
+12-month measures where it led; the PRO risk is about one start in ten either way. Logs
+`verification/noise_v2/g428_pro_u58.txt`, `g248_pro_{u48now,u58}_{MS,MID}.csv`.
