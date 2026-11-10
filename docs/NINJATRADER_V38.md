@@ -8772,3 +8772,8 @@ may risk all the room left) at 0.5 and 0.33 makes each trade risk at most that s
 by a fraction each time instead of to nothing. `research/g429_test_no_deadline.py`, U58 with `trail_frac` 1.0 / 0.5 / 0.33.
 **Rule:** recommended as a Test setting if it raises the pass rate (frozen counted as lost) by at least 3 points with
 no more failures; then also measured on the funded 12-month measure before any default changes. Run once.
+
+**G432 result (2026-11-10): rejected (no effect).** `trail_frac` 1.0 / 0.5 / 0.33: the same 86.2% passed, 0 failed and the
+same 16 starts frozen (median days to pass 124 / 123 / 123). The frozen Tests are not lost to one oversized trade: they
+are long losing stretches at 1 MNQ that wear the room down trade by trade, and a smaller share per trade only slows the
+same slide until the 20-point minimum stop no longer fits. U58 as it is. `verification/noise_v2/g432_trail_frac.csv`.
