@@ -292,3 +292,85 @@ floor stopping at the start: the share of starts that survive, and the median ba
 −$300 / −$400 / −$500.
 
 **The expected path at 2 MNQ (V3.4):** $ a day and the median days to $3,000 from the replay; no further sizes.
+
+## v3 Fix 1: NinjaTrader ↔ model parity on the 2026 MNQ bars, 65 of 65
+
+v1.5 at 2 MNQ ($350, 4 losers, no tighten-only, $0.62 a side, 2 ticks), 1-minute bars 7/20-10/16/2026. Before: 62 of 65.
+- **(a) The Fed-day trade (9/16 12:30): NinjaTrader was wrong.** Not a Fed-rule difference (it was a long; longs are allowed
+  before 14:00). The 11:00 long's stop filled at the broker at 12:22 (29467.00, its order on the tick grid). The
+  strategy's engine models the stop at the unrounded line (29465.76) and so kept "holding" the trade until 13:01; at the
+  12:30 check it reported "in a trade" and the entry was skipped, though the account was flat. The model (the account's
+  view) was right. **Fix:** the engine follows the account. When the account is flat and the engine still holds the
+  bot's trade, the account's exit price (its last closed trade) closes the engine's trade before the next bar's stops
+  and check (`NoiseEngine.ExternalFlat`).
+- **(b) The two exits a tick apart: a rule difference, not rounding or order timing.** Both were fill-bar stops set by
+  the line. The bracket sent with the entry is a distance from the *expected* fill (the signal close ± slippage). The
+  strategy never set the engine's slippage, so it used its default 1 tick while the platform and the model used 2; the
+  bracket came out a tick short of the model's whenever the line set it. (Under frozen B the $200 cap, a fixed 25 points,
+  always set the bracket, which hid this.) **Fix:** the engine takes NinjaTrader's own `Slippage` setting (at least a
+  tick), the one its fills use.
+- **G6 re-run: 65 of 65 trades identical** (direction, entry and exit bar, prices, P/L), kept as
+  `tests/test_parity_mnq.py::test_v15_two_mnq_trade_for_trade`; the frozen-B parity and all NinjaTrader tests still pass.
+
+## v3 Fix 2: the stop-placement check
+
+`MnqNoiseMomentum.cs` now logs every stop it sends ("MNQ stop placed: ...") and at every bar close checks the open
+position: it must have a live stop (the platform's own report of the stop order when it gives one; else the stop the
+strategy sent), and no stop the engine defines may be tighter than that order (beyond two ticks and the fill
+difference). A failure prints and alerts "STOP CHECK FAILED ... Put a stop in by hand now." The run's audit line counts
+placements and flags.
+
+| Run | Stop placements | Flagged |
+|---|---|---|
+| v1.5 at 2 MNQ, the 2026 MNQ bars (as shipped) | 5,330 | **0** |
+| synthetic sessions, bot and breakout, evaluation and funded | logged for every trade | **0** |
+| the broker cancels a stop mid-trade (test) | | 1 (that bar) |
+| **the v2 daily limit switched back on in a throwaway build** (the bug found in v2) | 5,140 | **153**: "the engine's stop 28686.51 (Day guard) is tighter than the live order 28749.00: a defined stop was not placed" |
+
+So the check finds exactly the v2 bug, and finds nothing in the shipped strategy. (A first version of the check flagged
+3 trades in 106 for a lock reached on the fill bar; that was the check's own ordering, which overwrote the moved stop
+with the entry bracket. Fixed before these numbers.)
+
+## v3 results (run once, 2026-11-10; `research/v3_eval.py`, `verification/noise_v2/v3_*.csv`)
+
+**The Test, no time limit** (116 starts every 30 days, Feb 2015 - Jul 2024; none left open when the data ended):
+
+| | Size | G1 pass ≥60% | fail | G2 median days to pass | G3 worst DD | G4 PF ≥1.35 | G5 largest loss ≤$500 | $/day |
+|---|---|---|---|---|---|---|---|---|
+| noise-only | 1 MNQ | **87.1%** | 12.9% | 100 | $2,685 | 1.315 | −$366 | 29.34 |
+| noise-only | **2 MNQ** | **53.4%** | 46.6% | **39** | $3,665 | 1.267 | −$397 | **47.76** |
+| noise-only | 3 MNQ | 39.7% | 60.3% | 28.5 | $5,791 | 1.249 | −$421 | 59.07 |
+| noise + Williams | 1 MNQ | 75.0% | 25.0% | 69 | $2,346 | 1.346 | −$577 | 37.72 |
+| noise + Williams | 2 MNQ | 50.9% | 49.1% | 33 | $7,497 | 1.315 | −$1,154 | 66.17 |
+| noise + Williams | 3 MNQ | 34.5% | 65.5% | 21 | $5,458 | 1.312 | −$1,732 | 91.08 |
+
+- **No row passes every gate.** G4 (profit factor 1.35) fails everywhere (noise 1.25-1.32); the strategy's edge is
+  real but thin per trade.
+- **The combination is rejected.** It makes a lower pass rate than noise-only at every size (75.0% vs 87.1%, 50.9% vs
+  53.4%, 34.5% vs 39.7%) and fails G5 at every size: a Williams stop is a quarter of yesterday's range, often 50-90
+  points, so a 2-MNQ Williams loser reaches −$1,154. **v1.5 stays; Pine v1.6 is not built.**
+- **Size decides the Test.** 1 MNQ passes 87% of starts but takes a median 100 trading days; 2 MNQ passes 53% in a
+  median 39; 3 MNQ 40% in 28.5. With no deadline, the smaller size is much more likely to pass.
+
+**PRO, 12 months at 2 MNQ** (intraday trail including open profit, stopping at the start; 116 starts):
+
+| Daily limit | Survived 12 months | Median 12-month gain, all | Median gain, survivors | Worst day |
+|---|---|---|---|---|
+| none (v1.5) | **35.3%** | −$72 | $12,269 | −$1,479 |
+| −$300 | 31.0% | −$83 | $13,610 | −$345 |
+| −$400 | 31.9% | −$72 | $12,079 | −$421 |
+| −$500 | 31.0% | −$119 | $12,069 | −$541 |
+
+PRO's intraday trail is much harder than the Test's: at 2 MNQ about one funded account in three lasts a year. A daily
+limit caps the worst day but lowers survival at every level, so it is not added.
+
+**The expected path at 2 MNQ (V3.4):** $47.76 a day on average (all sessions, 2015-2025); $3,000 at that rate is about
+63 trading days. Among the evaluations that pass, the median is 39 trading days (the ones that pass are the ones that
+start well).
+
+## The selected configuration
+
+**v1.5's rules and stops, fixed size, no daily limit, no Williams**, in `MnqNoiseMomentum.cs` with Fix 1 and Fix 2,
+alerts-only on Take Profit Trader. On size: the gates were registered at 1, 2 and 3 MNQ and none passes G4, so none is
+"selected" by them; at 2 MNQ (the size asked for) the Test passes about half the time, and at 1 MNQ about 87% of the
+time, more slowly. That choice is the user's.

@@ -1400,3 +1400,32 @@ def test_v2_stops_fire_and_block():
         lock_effect |= [(t.exit_bar, t.reason) for t in res] != [(t.exit_bar, t.reason) for t in old_lock]
     assert "Day guard" in reasons and guard_days > 0
     assert gap_effect and lock_effect
+
+
+@pytest.mark.parametrize("funded", [False, True])
+def test_stop_placement_check_passes_and_logs_every_stop(sim, tmp_path, funded):
+    """v3 Fix 2 (docs/V2_STOPS.md): with the platform reporting the stop order's state, every open position has a live
+    stop at every bar close and no stop the engine defines is tighter than it: no flag in a whole run, with or without
+    the breakout, and a placement is logged for every trade."""
+    bars = synth_bars(sessions=90, seed=5)
+    for breakout in (False, True):
+        trades, _, _, printed = run_sim(sim, bars, tmp_path, breakout=breakout, Funded=funded,
+                                        SimStopUpdates=True, Diagnostics=True)
+        assert trades
+        assert not [p for p in printed if "STOP CHECK FAILED" in p]
+        assert sum("MNQ stop placed:" in p for p in printed) >= len(trades)
+        summary = next(p for p in printed if "stop check (v3 Fix 2)" in p)
+        assert " 0 flagged" in summary
+
+
+def test_stop_placement_check_flags_a_missing_stop(sim, tmp_path):
+    """v3 Fix 2: the broker cancels the bot's stop in the middle of a trade: the check flags the position as having no
+    live stop at that bar's close (a safety failure, printed and alerted), and only then."""
+    bars = synth_bars(sessions=60, seed=3)
+    trades, _, _, _ = run_sim(sim, bars, tmp_path, RoundPrices=False)
+    long_ones = [t for t in trades if int(t[3]) - int(t[1]) >= 4]
+    at = int(long_ones[0][1]) + 2
+    _, _, _, printed = run_sim(sim, bars, tmp_path, RoundPrices=False, SimStopUpdates=True, SimCancelStopsAt=str(at),
+                               Diagnostics=True)
+    flags = [p for p in printed if "STOP CHECK FAILED" in p]
+    assert len(flags) == 1 and "no live stop order" in flags[0] and "cancelled or rejected" in flags[0], flags

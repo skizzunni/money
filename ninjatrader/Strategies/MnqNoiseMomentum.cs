@@ -58,6 +58,14 @@ namespace NinjaTrader.NinjaScript.Strategies
         double lastStop = double.NaN;  // TightenOnly: the bot's stop so far in this trade
         double entryStopPts = double.NaN;  // the bot's bracket stop, points from the fill
         double lastExitPx = double.NaN;    // v3 Fix 1: the price of the account's last exit fill
+        // v3 Fix 2, the stop-placement check: the stop sent for the open position (a price; or, for the bracket sent
+        // with the entry, ticks from the fill until it fills), the platform's own word on that order when it reports
+        // one, and the count of placements and of flags (a position without a live stop, or a stop the engine defines
+        // that no order carries)
+        double stopSentPx = double.NaN, stopPendTicks = double.NaN;
+        int stopLive = -1;                 // -1: the platform has not reported a stop order; 1 working; 0 gone
+        int stopPlaced, stopFlags;
+        bool flattenSent;
         string halfName = "";            // PartialAtR: the entry name of this trade's half ("": not split)
         double halfPts = double.NaN;     // its take-profit, points from the fill (PartialAtR x R)
         bool evalDone;              // the evaluation's target was reached: everything closed, no new trades
@@ -594,8 +602,12 @@ namespace NinjaTrader.NinjaScript.Strategies
             boldMult = BoldDay(start) ? BoldSize : 1.0;
             PayoutCheck(start, lastBarDay);
             lastBarDay = TradingDay(start);
+            flattenSent = false;
             if (PlaceOrders)
+            {
                 ManageOrders(start, nOrders);
+                CheckStops();  // v3 Fix 2
+            }
             if (PlaceOrders && LiveBook)
                 SaveLiveDay(start);
             CountSent(nOrders);
@@ -907,6 +919,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 }
                 double stopTicks = StopTicks(o.Direction * (o.Expected - o.Stop));
                 SetStopLoss(name, CalculationMode.Ticks, stopTicks, false);
+                stopPendTicks = stopTicks;  // v3 Fix 2: the bracket, placed with the entry
                 entryStopPts = stopTicks * TickSize;  // R: the initial risk, points from the fill
                 lastStop = double.NaN;
                 double tpPts = double.IsNaN(o.Target) ? double.NaN : o.Direction * (o.Target - o.Expected);
@@ -947,6 +960,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 string wname = williams.Signal > 0 ? WLongName : WShortName;
                 int wq = BreakoutQty;
                 SetStopLoss(wname, CalculationMode.Ticks, StopTicks(williams.StopPoints), false);
+                stopPendTicks = StopTicks(williams.StopPoints);  // v3 Fix 2
                 double wPts = BreakoutTarget > 0 ? BreakoutTarget * williams.StopPoints : double.NaN;
                 double wEval = EvalPoints(wq);
                 if (!double.IsNaN(wEval) && (double.IsNaN(wPts) || wEval < wPts))
@@ -1007,6 +1021,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 return;
             }
             SetStopLoss(name2, CalculationMode.Price, stop, false);
+            stopPendTicks = double.NaN;  // v3 Fix 2: this price supersedes the bracket sent with the entry
+            StopSent(real, stop, "moved with the line, the max loss or the lock");
             if (halfName.Length > 0)  // the half's stop moves with the rest (kept for the next entry if it is closed)
                 SetStopLoss(halfName, CalculationMode.Price, stop, false);
             double tp = TakeProfit > 0 && !double.IsNaN(engine.Sigma) ? avg * (1 + real * TakeProfit * engine.Sigma) : double.NaN;
@@ -1059,8 +1075,62 @@ namespace NinjaTrader.NinjaScript.Strategies
             return line;
         }
 
+        // ── v3 Fix 2: the stop-placement check (docs/V2_STOPS.md). Every stop sent is logged; at each bar close, an open
+        // position must have a live stop (the platform's report when it gives one, else the stop the strategy sent), and
+        // no stop the engine defines may be tighter than that order (beyond rounding and the fill difference). A missing
+        // stop on a funded account is a safety failure: it is printed and alerted.
+        void StopSent(int dir, double px, string why)
+        {
+            stopPlaced++;
+            bool same = !double.IsNaN(stopSentPx) && Math.Abs(px - stopSentPx) < TickSize / 2;
+            stopSentPx = px;
+            if (!same)
+                Print("MNQ stop placed: " + (dir > 0 ? "LONG" : "SHORT") + " " + Math.Abs(Position.Quantity) + ", stop " + P(px) +
+                      " (" + why + ")");
+        }
+
+        void StopFlag(string what)
+        {
+            stopFlags++;
+            Say("stopcheck", "STOP CHECK FAILED: " + what + ". Put a stop in by hand now.");
+        }
+
+        void CheckStops()
+        {
+            int real = RealDir;
+            if (real == 0)
+            {
+                stopSentPx = double.NaN;
+                stopLive = -1;
+                return;
+            }
+            if (flattenSent)
+                return;  // closing at market
+            if (!double.IsNaN(stopPendTicks))  // the bracket sent with the entry, now that the fill is known
+            {
+                StopSent(real, Position.AveragePrice - real * stopPendTicks * TickSize, "bracket sent with the entry");
+                stopPendTicks = double.NaN;
+            }
+            string side = real > 0 ? "long" : "short";
+            if (double.IsNaN(stopSentPx) || stopLive == 0)
+            {
+                StopFlag("the open " + side + " has no live stop order" + (stopLive == 0 ? " (the platform cancelled or rejected it)" : ""));
+                return;
+            }
+            if (owner == Bot && engine.Position == real)
+            {
+                string why;
+                double def = engine.StopNow(out why);
+                double tol = 2 * TickSize + Math.Abs(Position.AveragePrice - engine.EntryPrice);
+                if (!double.IsNaN(def) && real * (def - stopSentPx) > tol)
+                    StopFlag("the engine's stop " + P(def) + " (" + why + ") is tighter than the live order " + P(stopSentPx) +
+                             ": a defined stop was not placed");
+            }
+        }
+
         void Flatten(int real, string why)  // the whole position, whichever setup's it is
         {
+            flattenSent = true;  // v3 Fix 2: a market exit is on its way; no stop is needed
             if (real > 0)
                 ExitLong(why, "");
             else if (real < 0)
@@ -1098,6 +1168,15 @@ namespace NinjaTrader.NinjaScript.Strategies
                                               ErrorCode error, string comment)
         {
             CountOrder(order, orderState, quantity, filled, averageFillPrice, error, comment);
+            if (order != null && order.Name == "Stop loss")  // v3 Fix 2: the platform's word on the stop order
+            {
+                if (orderState == OrderState.Accepted || orderState == OrderState.Working ||
+                    orderState == OrderState.ChangePending || orderState == OrderState.ChangeSubmitted)
+                    stopLive = 1;
+                else if (orderState == OrderState.Cancelled || orderState == OrderState.Rejected ||
+                         orderState == OrderState.Filled)
+                    stopLive = 0;
+            }
             if (orderState != OrderState.Rejected)
                 return;
             string msg = "ORDER REJECTED: " + order.Name + " (" + comment + ").";
@@ -1330,6 +1409,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             Print("  7 filled: " + dFilled.Count + " (" + dExecs + " executions; cancelled unfilled " + dCancelled + ")");
             Print("  8 completed trades: " + positions.Count + " (NinjaTrader trade records " + SystemPerformance.AllTrades.Count +
                   ")" + "; runtime errors " + dErrors);
+            Print("  stop check (v3 Fix 2): " + stopPlaced + " stop placements, " + stopFlags + " flagged");
             List<string> keys = new List<string>(blockedOrder);  // by step, then as they first happened
             keys.Sort(delegate (string a, string b)
             {

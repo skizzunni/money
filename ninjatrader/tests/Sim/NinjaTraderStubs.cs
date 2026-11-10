@@ -57,7 +57,7 @@ namespace NinjaTrader.Cbi
             throw new NotSupportedException();
         }
     }
-    public enum OrderState { Initialized, Submitted, Accepted, Working, PartFilled, Filled, CancelPending, Cancelled, Rejected }
+    public enum OrderState { Initialized, Submitted, Accepted, Working, ChangePending, ChangeSubmitted, PartFilled, Filled, CancelPending, Cancelled, Rejected }
     public enum ErrorCode { NoError, OrderRejected }
     public class Position
     {
@@ -313,6 +313,18 @@ namespace NinjaTrader.NinjaScript.Strategies
         public double CommissionPerSide = 0.62;
         public string RejectStopsAt { get; set; }  // "bar,bar,...": the broker rejects a stop change on these bars
         public string RejectExitsAt { get; set; }  // "bar,bar,...": the broker rejects a market exit sent on these bars
+        // v3 Fix 2's tests: report the stop order's state through OnOrderUpdate (Working when it is placed or moved), and
+        // have the broker cancel it on these bars (the position then has no stop until it is placed again)
+        public bool SimStopUpdates { get; set; }
+        public string SimCancelStopsAt { get; set; }
+        void StopUpdate(Lot lot, OrderState st)
+        {
+            if (!SimStopUpdates)
+                return;
+            Order so = new Order();
+            so.Name = "Stop loss"; so.FromEntrySignal = lot.Name; so.Quantity = lot.Qty; so.OrderState = st;
+            OnOrderUpdate(so, 0, lot.Stop, lot.Qty, 0, 0, st, Time[0], ErrorCode.NoError, "");
+        }
         public int SlippageTicks = 1;
         public int SimSlippageTicks { get { return SlippageTicks; } set { SlippageTicks = value; } }
         public int Slippage { get { return SlippageTicks; } set { SlippageTicks = value; } }  // NinjaTrader's own name  // ticks a market fill
@@ -442,6 +454,13 @@ namespace NinjaTrader.NinjaScript.Strategies
                 if ((d > 0 && value >= Close[0]) || (d < 0 && value <= Close[0]))
                     throw new InvalidOperationException("bar " + CurrentBar + ": a stop at or past the price would be rejected");
                 lot.Stop = value;
+                if (SimCancelStopsAt != null && Array.IndexOf(SimCancelStopsAt.Split(','), CurrentBar.ToString()) >= 0)
+                {
+                    lot.Stop = double.NaN;  // the broker cancelled it
+                    StopUpdate(lot, OrderState.Cancelled);
+                }
+                else
+                    StopUpdate(lot, OrderState.Working);
             }
         }
 
