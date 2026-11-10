@@ -8900,3 +8900,9 @@ The other side of G441 ($200 / $300 lost 39 / 38 against $100's 29): `pro_guard`
 ($36.1-46.0k). The bracket: $50 31, **$100 29**, $200 39, $300 38, no PRO mode 51. $100 is the best guard, but no setting
 reaches the bar of 26; the PRO mode stays a documented user choice (G440), not built.
 `verification/noise_v2/g442_pro_guard50.txt`, `g248_pro_u58pro50_{MS,MID}.csv`.
+
+## G443: the PRO mode's cost on the recent starts (registered 2026-11-10, before its run)
+
+A measurement for the user's choice (G440: the PRO mode loses 29 PRO starts against U58's 51 over 21 months, at 86-89% of
+the net). `research/g443_pro_mode_fresh.py`: U58 and U58 + the PRO mode on G409's 16 recent 12-month starts (2023-25):
+$ a session, starts lost, green months. No adoption rule; reported beside G440.
