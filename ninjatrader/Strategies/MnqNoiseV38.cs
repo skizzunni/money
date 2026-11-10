@@ -107,6 +107,9 @@ namespace NinjaTrader.NinjaScript.Strategies
         public int SprintGapQty = 0;  // G273: the gap trade's size during the sprint (0 = SprintQty)
         // G253: a wider area for new entries only (entry_k), and no new entries once the day is up DayStopProfit
         public double EntryK = 1.0, DayStopProfit = 0;
+        // G422 (U58): on a calm stretch (the last CalmShort sessions' average range below the last CalmLong's), the entry
+        // lines at EntryKCalm x the noise area (0 = off)
+        public double EntryKCalm = 0;
         public bool DayCapExit = false;  // G289: DayStopProfit also closes the open trade (a limit where today's P/L reaches it)
         // G128 / G321: the day guard, a stop where today's P/L (or the room above the floor less GuardFloorBuffer) reaches
         // -DayGuard; no new entries after it fires (0 = off)
@@ -744,6 +747,12 @@ namespace NinjaTrader.NinjaScript.Strategies
                         upE = Math.Max(dayOpen, prevClose) * (1 + s.EntryK * Sigma);
                         loE = Math.Min(dayOpen, prevClose) * (1 - s.EntryK * Sigma);
                     }
+                    if (s.EntryKCalm > 0 && dayRanges.Count >= s.CalmLong
+                        && Avg(dayRanges, s.CalmShort) < Avg(dayRanges, s.CalmLong))  // G422: narrower on a calm stretch
+                    {
+                        upE = Math.Max(dayOpen, prevClose) * (1 + s.EntryKCalm * Sigma);
+                        loE = Math.Min(dayOpen, prevClose) * (1 - s.EntryKCalm * Sigma);
+                    }
                     if (SkipToday || Position != 0) { }
                     else if (c > upE && StudyOk(1, end, c)) dir = 1;
                     else if (c < loE && !shortOk) Note = "Fed day: no shorts before 14:00";
@@ -1015,7 +1024,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (State == State.SetDefaults)
             {
                 Name = "MnqNoiseV38";
-                Description = "MNQ Noise-Area Momentum v3.8, Funded growth: 1 MNQ to start, $187.50 max loss a contract ($250 after a loser), $900 a day, a $2,000 end-of-day trailing floor, a contract more per $1,500 of profit up to 20, the 60-minute time stop; gap and go at 1 MNQ, up to 10 once the trailing floor has stopped at the start; More trading days (fill-in trades once $3,000 above the stopped floor: 1 MNQ, 2 from $6,000); sizing with 4 points more stop slippage.";
+                Description = "MNQ Noise-Area Momentum v3.8, Funded growth: 1 MNQ to start, $187.50 max loss a contract ($250 after a loser), $900 a day, a $2,000 end-of-day trailing floor, a contract more per $1,500 of profit up to 20, the 60-minute time stop; gap and go at 1 MNQ, up to 10 once the trailing floor has stopped at the start; More trading days (fill-in trades once $3,000 above the stopped floor: 1 MNQ, 2 from $6,000); sizing with 4 points more stop slippage; U58 (G422): every entry check, no range filter or loser limit, entry lines at 0.8x the noise area on a calm stretch.";
                 Calculate = Calculate.OnBarClose;
                 EntriesPerDirection = 1;
                 EntryHandling = EntryHandling.UniqueEntries;
@@ -1035,7 +1044,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 LastEntry = "15:00";
                 BigDayK = 1.5;
                 CalmK = 0.7;
-                RangePos = 0.7;  // G204 (0.65 before; Evaluation keeps 0.65)
+                RangePos = 0;  // G422 (U58): off (G204: 0.7; Evaluation keeps 0.65, the Test sprint 0.7)
                 TrendSessions = 45;  // G241 (50 before; Evaluation and the bigger accounts keep 50)
                 FedNoShorts = true;
                 SkipDates = SkipDefault;
@@ -1064,12 +1073,12 @@ namespace NinjaTrader.NinjaScript.Strategies
                 MoreDaysQty3Room = 8000;  // G212 (G210: 9000)
                 GivebackBrake = 0.45;  // G243 (G99c: 0.5)
                 GapSkipBraked = true;  // G191
-                MaxLosersPerDay = 3;  // G204
+                MaxLosersPerDay = 0;  // G422 (U58): no limit (G204: 3; the Test sprint 3)
                 EarlyDayBudget = 750;  // G204
                 GapTrigger = 0.65;  // G242 (G60: 0.5, G204: 0.6)
                 GapBreakEven = 1.5;  // G242
                 AfterLossLocked = 187.5;  // G119
-                EarlyNoEntryChecks = "13:00,14:30";  // G125
+                EarlyNoEntryChecks = "";  // G422 (U58): every check (G125: "13:00,14:30", the bigger accounts' modes keep it)
                 FastSteps = 650;  // G212 (G142: 750, G210: 700)
                 FastStepsFrom = 9000;  // G243 (G142: 10000, G210: 8000)
                 PropStartBalance = 50000;
@@ -1077,6 +1086,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 SizeToAccountRoom = true;
                 SprintContracts = 0;  // G103: off
                 NoiseSessions = 14; EntryWidth = 1.0; DayProfitStop = 0;  // G253
+                CalmEntryWidth = 0.8;  // G422 (U58): Funded growth (50K) only
                 SprintDayGuard = 1200;  // G321
                 NearFloorGate = 0;  // G87b: off (it lost more accounts)
                 TestedWinRate = 49.3;  // U48: the window's 5-minute win rate in NinjaTrader's execution (61.2 was v3.8's)
@@ -1111,7 +1121,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                     AfterLossMaxLoss = minutes == 5 ? 187.5 : 250;  // G168: as every trade on the 5-minute chart (G167 1.1x, G165 1.2x, 1.33x before)
                     ProfitStep = 1500; SizeByOwnStop = true;
                     TimeStop = Mode == "Funded growth" ? 45 : 60;  // G204 on the 50K (G6: 60)
-                    RangePos = Mode == "Funded growth" ? 0.7 : 0.65;  // G204 on the 50K
+                    RangePos = Mode == "Funded growth" ? 0 : 0.65;  // G422 (U58) on the 50K: off (G204: 0.7)
+                    if (Mode != "Funded growth") EarlyNoEntryChecks = "13:00,14:30";  // G125, as tested on the bigger accounts (U58 is the 50K's)
                     TrendSessions = Mode == "Funded growth" ? 45 : 50;  // G241 on the 50K
                     MaxContracts = Mode == "Funded growth" && minutes == 5 ? 60 : 15;  // G247: 60, Take Profit Trader's 50K limit (G212: 75; G106: 20, G120: 30, G121: 50)
                     // G40: a bigger account trades the 50K's size; its larger limits are cushion (a $2,000 / $3,000
@@ -1175,6 +1186,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 st.DayLockAt = sprintMode ? 800 : 0;  // G329: the day lock, $800 keeping $300
                 st.DayLockKeep = 300;
                 st.Lookback = NoiseSessions; st.EntryK = EntryWidth; st.DayStopProfit = DayProfitStop;  // G253
+                st.EntryKCalm = (Mode == "Funded growth" && !sprintMode) || Mode == "Custom" ? CalmEntryWidth : 0;  // G422 (U58)
                 st.SizeSlipPts = Mode != "Evaluation" ? SizeSlip : 0;  // G79: the Funded growth modes and Custom
                 st.ProtectRoom = Mode != "Evaluation" ? NearFloorGate : 0;  // G87
                 st.Tick = TickSize;
@@ -2069,6 +2081,11 @@ namespace NinjaTrader.NinjaScript.Strategies
         [Range(0.5, 2.0)]
         [Display(Name = "Entry width: new entries need this x the noise area (1.0; the Test sprint 0.7)", Order = 31, GroupName = "3. Filters")]
         public double EntryWidth { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, 3)]
+        [Display(Name = "Calm entry width: on a calm stretch, new entries need this x the noise area (Funded growth 50K: 0.8; 0 = off)", Order = 32, GroupName = "3. Filters")]
+        public double CalmEntryWidth { get; set; }
 
         [NinjaScriptProperty]
         [Range(0, double.MaxValue)]

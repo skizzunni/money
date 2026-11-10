@@ -18,11 +18,12 @@ NTARGS += [f"NearFloorGate={PROTECT}"] if GROW else []
 GIVEBACK = float(os.environ.get("GIVEBACK", "0.45"))  # G243  # G99: the giveback brake (0 = off)
 NTARGS += [f"GivebackBrake={GIVEBACK}"] if GROW else []
 FILL = {**FILL, "size_slip_pts": SLIP, "giveback_brake": GIVEBACK, "size_up_to": 60,
-        "after_loss_ml_locked": 1.0, "skip_checks": "780,870", "skip_checks_early": True,
+        "after_loss_ml_locked": 1.0, "skip_checks": "", "skip_checks_early": True,  # G422 (U58): every check
         "profit_step_fast": 650.0, "profit_step_fast_from": 9000.0, "fill_qty3_room": 8000.0, "fill_qty2_room": 5000.0, "fill_min_room": 2750.0, "after_loss_ml_mult5": 1.0, "gap_skip_braked": True}  # G121: 50 on 5-minute bars (G106: 20); G119; G125
 # G204: the 50K's Funded growth on either chart (NinjaTrader applies them on both)
-G204 = {"max_losers": 3, "early_daily_loss": 750.0, "time_stop": 45, "range_pos_min": 0.7, "gap_go_k": 0.65,
-        "trend_n": 45, "gap_go_be": 1.5}  # and G241's trend, G242's gap trigger and break-even
+G204 = {"max_losers": 0, "early_daily_loss": 750.0, "time_stop": 45, "range_pos_min": 0.0, "gap_go_k": 0.65,
+        "trend_n": 45, "gap_go_be": 1.5,  # and G241's trend, G242's gap trigger and break-even
+        "entry_k_regime": 0.8}  # G422 (U58): no loser limit, no range filter, entry lines at 0.8 on a calm stretch
 from mnqbot.noise import NoiseConfig, run
 S = "/tmp/claude-0/-home-user-money/b0ea31b5-d9fc-525a-a114-db6430eff3ed/scratchpad"
 SIM = "ninjatrader/tests/Sim/bin/Release/net8.0/Sim"

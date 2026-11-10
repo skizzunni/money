@@ -53,12 +53,16 @@ GROW = NoiseConfig(**{**V21, "qty": 1, "lookback": 14, "max_loss_per_trade": 187
                       # G210: $700 steps above $8,000, and 3-MNQ fill-ins from $9,000 above the floor
                       "profit_step_fast_from": 9000.0, "fill_qty3_room": 8000.0,  # G243: from 9,000; G212: 650 / 8,000 / 2 MNQ from 4,000 / 75
                       # G165 / G167 / G168: the after-loss max loss as every trade's ($187.50) on 5-minute bars
-                      "after_loss_ml_mult5": 1.0},
+                      "after_loss_ml_mult5": 1.0,
+                      # G422 (U58): every check, no range filter, no loser limit, entry lines at 0.8 on a calm stretch
+                      "max_losers": 0, "range_pos_min": 0.0, "skip_checks": "", "entry_k_regime": 0.8},
                    nt_execution=True, round_prices=True, target_on_fill_bar=True)
 # the bigger accounts' modes keep the settings from before G204
 PRE_G204 = {"max_losers": 0, "early_daily_loss": 0.0, "range_pos_min": 0.65, "gap_go_k": 0.5, "time_stop": 60, "trend_n": 50,
             "gap_go_be": 0.0}
 PRE_G204_ARGS = ["MaxLosersPerDay=0", "EarlyDayBudget=0", "RangePos=0.65", "GapTrigger=0.5", "TimeStop=60", "TrendSessions=50", "GapBreakEven=0"]
+# the bigger accounts' modes also keep G125's skipped checks and no calm entry width (U58 is the 50K's)
+BIG = {**PRE_G204, "skip_checks": "780,870", "entry_k_regime": 0.0}
 GROW_ARGS = ["Mode=Funded growth"]  # the default; its settings are the tested ones above
 # G72's fill-in trades off (NinjaTrader's More trading days needs gap and go on)
 NO_FILL = {"gap_go_small_k": -1.0, "trend_small": False, "gap_go_drive_k": 0.0, "fill_after_lock": False,
@@ -240,8 +244,8 @@ def test_v38_today_line(sim, sample_1m, tmp_path):  # noqa: F811
             assert "shorts yes" in rule or ("shorts after 14:00" in rule and hhmm.hour >= 14), (t, rule)
     rules = {v[0] for v in today.values()}
     assert any("shorts no (uptrend" in x for x in rules) and any("longs yes; shorts yes" in x for x in rules), rules
-    # U33: until the floor stops (it doesn't in this sample) the line names the checks without entries
-    assert all("no entries at 13:00, 14:30 until the floor stops" in x for x in rules if x.startswith("longs")), rules
+    # U58 (G422): every check takes entries, so the line names no skipped checks (U33's note is for EarlyNoEntryChecks)
+    assert not any("no entries at" in x for x in rules), rules
     for b, (_, nxt) in today.items():
         end = bars.index[b] + pd.Timedelta(minutes=5)
         m = end.hour * 60 + end.minute
@@ -676,7 +680,7 @@ def test_v38_bigger_accounts_agree(sim, sample_1m, minutes, mode, daily, trail, 
     assert not [x for x in r.stdout.splitlines() if x.startswith("P,") and "WARNING" in x]
     nt = [x.split(",")[1:] for x in r.stdout.splitlines() if x.startswith("T,")]
     # G204's settings are the 50K's only
-    py = run(bars, dataclasses.replace(GROW, daily_loss_limit=daily, trail_dd=trail, **PRE_G204), minutes=minutes).trades
+    py = run(bars, dataclasses.replace(GROW, daily_loss_limit=daily, trail_dd=trail, **BIG), minutes=minutes).trades
     assert len(nt) == len(py) >= 20
     for a, t in zip(nt, py, strict=True):
         assert (int(a[0]), int(a[1]), int(a[3])) == (t.direction, t.entry_bar, t.exit_bar), (a, t)
@@ -910,7 +914,7 @@ def test_v38_after_loss_locked(sim, sample_1m, tmp_path):  # noqa: F811
 @pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
 def test_v38_early_no_entry_checks(sim, sample_1m, tmp_path):  # noqa: F811
     """G125: no entries at the 13:00 and 14:30 checks until the floor has stopped. NinjaTrader's code and the model agree
-    trade for trade with it on (the default) and off (blank), it changes the trades, and before the floor stops no
+    trade for trade with it on (13:00,14:30) and off (blank, U58's default), it changes the trades, and before the floor stops no
     entry fills at 13:00 or 14:30."""
     bars = resample(sample_1m, "5min")
     path = tmp_path / "bars.csv"
@@ -918,7 +922,7 @@ def test_v38_early_no_entry_checks(sim, sample_1m, tmp_path):  # noqa: F811
         for t, r in zip(bars.index, bars.itertuples(), strict=True):
             f.write(f"{t:%Y-%m-%d %H:%M},{r.open!r},{r.high!r},{r.low!r},{r.close!r}\n")
     got = {}
-    for arg, sk in ((None, "780,870"), ("EarlyNoEntryChecks=", "")):
+    for arg, sk in (("EarlyNoEntryChecks=13:00,14:30", "780,870"), (None, "")):  # G422 (U58): every check by default
         r = subprocess.run([DOTNET, str(sim), str(path), "5", "Strategy=V38", *GROW_ARGS, *([arg] if arg else [])],
                            capture_output=True, text=True, env=ENV)
         assert r.returncode == 0, r.stderr[-2000:]
@@ -1073,7 +1077,7 @@ def test_v38_sprint(sim, sample_1m, tmp_path):  # noqa: F811
 
 # G256 k317 with G269's +$5,000 sprint target: the two-week Test sprint (G253's k61 before)
 SPRINT = {"daily_loss_limit": 2000.0, "early_daily_loss": 0.0, "max_losers": 3, "time_stop": 30, "range_pos_min": 0.7,
-          "trend_n": 0, "big_day_k": 0.0, "calm_k": 0.7, "take_profit": 0.75, "lock_at": 0.2, "skip_checks": "",
+          "trend_n": 0, "big_day_k": 0.0, "calm_k": 0.7, "take_profit": 0.75, "lock_at": 0.2, "skip_checks": "", "entry_k_regime": 0.0,
           "sprint_qty": 4, "sprint_days": 10, "sprint_target": 5000.0, "sprint_gap_qty": 2, "gap_go_be": 0.0, "day_stop_profit": 1500.0, "lookback": 18,
           "entry_k": 0.7, "squeeze_min": 0.0, "last_entry_end": 930, "gap_go_k": 0.5, "stop_buffer": 0.24,
           "lock_plus": 2.5, "day_cap_exit": True,  # U55: G289's day cap
