@@ -8670,3 +8670,11 @@ G423's rule against U58. Run once.
 lost, slightly more trades). Development (U58 $42.0, 0%): off $45.7 at 0%, 0.6 $39.3 at 3.2%. Unseen (U58 $80.5, 1.6%):
 off $74.4 at 1.6%, 0.6 $75.1 at 3.1%. The very calm days U58 skips lose on the recent and unseen starts; the filter
 stays at 0.7. `verification/noise_v2/g426_u58_calm_filter.txt`.
+
+## G427: does U58 still beat U48 at 2 ticks of slippage? (registered 2026-11-10, before its run)
+
+Hourly round, a robustness check rather than a new rule. U58 replaced U48 on modest margins outside the fresh starts
+(+6% unseen, +7% development) and trades about a quarter more often, so higher costs hit it harder.
+`research/g427_u58_slippage.py`: U48 and U58 at the usual slippage and at 2 ticks on every market and stop fill.
+**Rule:** if at 2 ticks U58 makes less $ a session than U48 on the fresh starts or on unseen, or loses more starts on
+either, the funded mode goes back to U48 (a revert, built with the tests); otherwise U58 stays. Run once.
