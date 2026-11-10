@@ -33,7 +33,7 @@ def job(a):
     tag, start = a
     b = B["b"]
     s0 = pd.Timestamp(start, tz=V.NY)
-    w = b[(b.index >= s0 - pd.Timedelta(days=150)) & (b.index < s0 + pd.Timedelta(days=760))]
+    w = b[b.index >= s0 - pd.Timedelta(days=150)]  # to the end of the data, as registered
     base = {"trail_from": start, "slippage_ticks": 2, "skip_dates": V.BASE["skip_dates"], "fed_dates": V.FOMC}
     cfg = dataclasses.replace(GROW, **base) if tag == "U58" else dataclasses.replace(GROW, **{**SPRINT, **base})
     tr = [t for t in run(w, cfg, 5).trades if t.entry_time >= s0]

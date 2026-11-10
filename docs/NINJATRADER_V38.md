@@ -8722,3 +8722,18 @@ Hourly round. U57 was chosen to pass the Test within two weeks (G251-G321); Take
 v3 replay's 116 starts (NQ 2015-24, 5-minute, 2 ticks), each run until pass or fail. **Rule:** if U58's sizing passes
 more starts than U57, the docs recommend Funded growth on the Test for a trader with no deadline, and U57 only for a
 deadline; no code changes either way. Run once.
+
+**G429 result (2026-11-10): with no deadline, the funded mode's sizing passes the Test far more often than the sprint.**
+116 starts, each run to the end of the data:
+
+| | Passed | Failed | Frozen (never passes or fails) | Median trading days to pass | Passed within 10 days |
+|---|---|---|---|---|---|
+| U57 (Test sprint) | **56.9%** | 2.6% | 47 starts (40.5%) | 54 | 10.3% |
+| U58 (Funded growth sizing) | **86.2%** | 0.0% | 16 starts (13.8%) | 124 | 0.0% |
+
+"Frozen": the balance sits just above the floor (which stops at the start once the account has been $2,000 up), so no
+trade's stop fits the room left and the bot, correctly, takes none; such a Test can never pass, so it counts as not
+passed, as registered. (A first run cut each start at 760 days, against the registration's "until it passes or fails";
+the rerun to the end of the data gave the same numbers: no frozen start ever moves.) **Per the rule: for a trader with no
+deadline, Funded growth on the Test passes about 86% of the time (median about 6 months); the Test sprint passes about
+57%, but a tenth of starts pass within two weeks.** No code changes. `verification/noise_v2/g429_test_no_deadline.csv`.
