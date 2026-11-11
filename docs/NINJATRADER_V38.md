@@ -9267,3 +9267,17 @@ G462 / G463: the 100K as U58 loses 8.7% of its development starts (2 of 23) and 
 against each trade risking at most half the room above the floor (`trail_frac` 0.5; U58 1.0). **Rule (survival
 first):** a variant passes only if it loses fewer funded starts on development and no more on unseen, with at least
 95% of the 100K as U58's $ a session on both, and passes at least as many Tests. Run once.
+
+**G465 result (2026-11-11): rejected by its rule, both; but +1 per $2,000 is the first 100K variant better funded on
+both halves.**
+
+| 100K-style | Test passed (frozen) | Funded development $ a session (lost) | Funded unseen $ a session (lost) |
+|---|---|---|---|
+| U58 as it is | **92.2%** (9) | $110.7 (8.7%) | $205.0 (1.8%) |
+| +1 per $2,000 | 88.8% (13) | **$122.2 (+10%), 0% lost** | **$222.9 (+9%), 0% lost** |
+| at most half the room | 92.2% (9) | $110.6 (4.3%) | $205.0 (3.5%) |
+
++1 per $2,000 loses no funded start on either half and makes 9-10% more, but passes 4 fewer Tests (the registered rule
+needs at least as many), so it fails as one setting for both. Half the room changes only a few trades: one fewer
+development loss, one more unseen. A funded-only use of the $2,000 steps (the Test keeping $1,500) is a new question,
+not adopted by this run; it needs its own registered test. `verification/noise_v2/g465_100k_fewer_lost.txt`.
