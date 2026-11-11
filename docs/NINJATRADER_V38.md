@@ -8985,3 +8985,10 @@ U58's $ on unseen, loses no more fresh starts, and loses at most 5% on unseen an
 **$34.2 (−30%)**, 60 **$42.2 (−14%)**, both 0 lost. Development (U58 $42.0, 0%): 30 $42.7 at 3.2%, 60 $43.2 at 3.2%.
 Unseen (U58 $80.5, 1.6%): 30 $76.9 at 1.6%, 60 **$85.3 (+6%) at 3.3%**. Neither beats U58 on the fresh starts; 60 makes
 a little more on unseen with twice the losses. `verification/noise_v2/g446_u58_time_stop.txt`.
+
+## G447: the calm-stretch entry lines at 0.7 or 0.9 (registered 2026-11-11, before its run)
+
+Hourly round. U58's entry lines on a calm stretch sit at 0.8 noise, the one width G421 tried; no other width was
+measured with G422's calm-only rule. `research/g447_calm_width.py`: U58 with them at 0.7 and at 0.9. G423's rule against
+U58 (the variant with the most $ a session on the fresh starts replaces U58 only if it makes at least 10% more there, at
+least U58's $ on unseen, loses no more fresh starts, and loses at most 5% on unseen and on development). Run once.
