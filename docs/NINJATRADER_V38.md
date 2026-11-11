@@ -8998,3 +8998,11 @@ $47.5 (−3%), 1.66 trades; 0.9 **$27.9 (−43%)**; both 0 lost. Development (U5
 0%). Unseen (U58 $80.5, 1.6%): 0.7 $80.6 at 1.6%, 0.9 $76.6 at 3.2%. Neither width beats 0.8 by 10% on the fresh starts;
 0.7 matches it on unseen and is worse on development, 0.9 is worse on both recent sets. 0.8 sits at the top of what was
 measured. `verification/noise_v2/g447_calm_width.txt`.
+
+## G448: U58's max loss on the funded account (registered 2026-11-11, before its run)
+
+Hourly round. G439 measured a wider max loss only under PRO's intraday drawdown (worse); on the 50K's end-of-day floor
+U58's $187.50 a contract (from T.REFERENCE) was never re-checked. `research/g448_u58_max_loss.py`: U58 with
+`max_loss_per_trade` $150 and $250 a contract. G423's rule against U58 (the variant with the most $ a session on the
+fresh starts replaces U58 only if it makes at least 10% more there, at least U58's $ on unseen, loses no more fresh
+starts, and loses at most 5% on unseen and on development). Run once.
