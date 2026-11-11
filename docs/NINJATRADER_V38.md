@@ -9128,3 +9128,8 @@ sprint (G268, G315, G343); on the funded account it was never removed since U58 
 `research/g457_u58_no_gap_trade.py`: U58 with `gap_go` off. G423's rule against U58 (the variant replaces U58 only if it
 makes at least 10% more $ a session on the fresh starts, at least U58's $ on unseen, loses no more fresh starts, and
 loses at most 5% on unseen and on development). Run once.
+
+**G457 result (2026-11-11): rejected; the gap trade stays, and it carries a large share of U58.** Without it: fresh starts
+**$25.5 a session (−48%)**, 1.11 trades (U58 $49.2, 1.54), 0 lost; development $28.0 (−33%), 0%; unseen **$45.2 (−44%)**
+at 7.9% lost (U58 1.6%). The gap-and-go trade (and the fill-ins that ride on it) is close to half of U58's profit on the
+recent and unseen starts. `verification/noise_v2/g457_u58_no_gap_trade.txt`.
