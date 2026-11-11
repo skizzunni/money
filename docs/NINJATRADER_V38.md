@@ -9302,3 +9302,14 @@ more there and loses no more starts. A 100K funded mode would then step by $2,00
 Note: on the fresh starts the 100K as U58 makes less than the 50K ($26.7 against $49.2): its floor stops only after
 +$3,000, so the gap trade stays at 1 MNQ (`gap_go_max_qty` until the floor stops) for longer.
 `verification/noise_v2/g466_slower_steps.txt`.
+
+## G467: the 100K with 2 gap contracts before the floor stops (registered 2026-11-11, before its run)
+
+G466: on the 100K the floor stops only after +$3,000, so the gap trade (about half of U58's profit, G457) stays at 1 MNQ
+for longer than on the 50K. 2 early gap contracts were rejected on the 50K (G61, G173), never tried with the 100K's
+$3,000 floor. `research/g462_100k_sizing.py` with `G467=1` (the Test: 100K U58 against it with `gap_go_max_qty` 2; the
+funded measure: the 100K funded mode, $2,000 steps, against it with 2) and `research/g467_100k_gap_early_fresh.py`
+(G415's fresh starts, the funded pair). **Funded rule:** at least 10% more $ a session than the 100K funded mode on
+G397's development and unseen starts and at least 5% more on the fresh starts, with no more starts lost on any.
+**Test rule:** the pass rate within 2 points of 92.2% with the median days at most 85% of 189. Each part passes or fails
+on its own. Run once.
