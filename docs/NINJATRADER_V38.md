@@ -9081,3 +9081,11 @@ more fresh starts, and loses at most 5% on unseen and on development). Run once.
 Unseen (U58 $80.5, 1.6%): $1,000 $81.0 at 3.2%, $500 $78.5 at 1.6%. The budget barely matters on the funded account
 (it binds only until the floor stops); $1,000 gains 5% recent with twice the unseen losses. Not worth a change.
 `verification/noise_v2/g453_u58_early_budget.txt`.
+
+## G454: U58's stop buffer (registered 2026-11-11, before its run)
+
+Hourly round. The resting stop sits `stop_buffer` (0.24) x the noise area beyond the noise line, from G93 / G116 on U25
+and U29; U58's calm-stretch lines are narrower, so its stops may want a different cushion. `research/g454_u58_stop_buffer.py`:
+U58 with 0.18 and 0.30. G423's rule against U58 (the variant with the most $ a session on the fresh starts replaces U58
+only if it makes at least 10% more there, at least U58's $ on unseen, loses no more fresh starts, and loses at most 5%
+on unseen and on development). Run once.
