@@ -9259,3 +9259,11 @@ the floor has stopped). Funded development (100K as U58 $110.7 a session, 8.7% l
 (−8%), cap 20 **$79.4 (−28%)**, worst day −$1,971 for both. Unseen ($205.0, 1.8%, −$1,800): cap 15 $223.0 (+9%), cap 20
 $237.4 (+16%), worst day −$1,815 / −$1,952. Bigger gap trades win on 2017-2025 and lose on 2011-2016; they fail the
 development half and bring the worst day near the assumed $2,000 limit. `verification/noise_v2/g464_100k_gap_cap.txt`.
+
+## G465: fewer lost 100K starts (registered 2026-11-11, before its run)
+
+G462 / G463: the 100K as U58 loses 8.7% of its development starts (2 of 23) and 7.8% of its Tests (frozen).
+`research/g462_100k_sizing.py` with `G465=1`: the 100K as U58 against +1 MNQ per $2,000 of profit (U58 $1,500), and
+against each trade risking at most half the room above the floor (`trail_frac` 0.5; U58 1.0). **Rule (survival
+first):** a variant passes only if it loses fewer funded starts on development and no more on unseen, with at least
+95% of the 100K as U58's $ a session on both, and passes at least as many Tests. Run once.
