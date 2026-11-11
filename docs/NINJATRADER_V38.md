@@ -9199,3 +9199,15 @@ U58 starts at 1 MNQ and adds a contract per $1,500 of profit on either account, 
 larger floor and day budget let it size up further later (year three +50%). Its Test needs twice the profit at the same
 starting size, so it takes about half as long again. Not tuned for the 100K (G397's 150K-style result: starting at 2 MNQ
 added 13-17%). `verification/noise_v2/g461_100k.txt`.
+
+## G462: U58's sizing on the 100K (registered 2026-11-11, before its run)
+
+The user: "trade more, make more, win more, on 100k". G461: U58 starts the 100K at the 50K's 1 MNQ, so year one is the
+same and the Test takes 189 trading days. `research/g462_100k_sizing.py`: U58 on the 100K-style account as it is, or
+starting at 2 or 3 MNQ (the max loss for the whole position, $187.50 a contract), +1 MNQ per $1,000 of profit (U58
+$1,500), or 2 MNQ and +1 per $1,000 (4 variants).
+**Funded rule (G397's):** development (index starts 2011-2016) the variant with the most $ a session within 5% lost and
+at least 10% above the 100K as U58; it passes only if on unseen (index 2017-2023, NQ 2015-2022) it also makes at least
+10% more with at most 5% lost. **Test (reported; recommended for the 100K Test only if):** the pass rate within 2 points
+of the 100K as U58's 92.2% and the median trading days to pass at most 85% of its 189. A pass would be built as a 100K
+mode of `MnqNoiseV38.cs` with parity tests. Run once.

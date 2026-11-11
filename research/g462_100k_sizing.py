@@ -1,0 +1,78 @@
+"""G462 (docs/NINJATRADER_V38.md): U58's sizing on a 100K-style account ($3,000 floor, $1,800 day budget, $1,500 until
+the floor stops): as it is (1 MNQ, +1 per $1,500), starting at 2 or 3 MNQ, +1 per $1,000, or 2 MNQ and +1 per $1,000.
+
+  funded: G397's measure (months 1-36; development = index starts 2011-2016, unseen = index 2017-2023 + NQ 2015-2022).
+  test:   G461's no-deadline Test (+$6,000 over $3,000, an assumed target), 116 starts.
+
+    PROCS=4 python research/g462_100k_sizing.py funded <data dir> <MNQ 09-26> <MNQ 12-26> <U48 JS json>
+    PROCS=4 python research/g462_100k_sizing.py test <data dir>
+"""
+from __future__ import annotations
+
+import dataclasses
+import os
+import sys
+from concurrent.futures import ProcessPoolExecutor
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tests"))
+
+K100 = {"trail_dd": 3000.0, "daily_loss_limit": 1800.0, "early_daily_loss": 1500.0}
+SIZING = {"100K U58": {}, "start 2 MNQ": {"qty": 2, "max_loss_per_trade": 375.0},
+          "start 3 MNQ": {"qty": 3, "max_loss_per_trade": 562.5}, "+1 per $1,000": {"profit_step": 1000.0},
+          "start 2 MNQ, +1 per $1,000": {"qty": 2, "max_loss_per_trade": 375.0, "profit_step": 1000.0}}
+B: dict = {}
+
+
+def test_job(a):
+    import v2_stops_eval as V
+    import v3_eval as E
+    from test_ninjatrader_v38 import GROW
+
+    from mnqbot.noise import run
+    tag, start = a
+    E.TARGET, E.DD = 6000.0, 3000.0
+    b = B["b"]
+    s0 = pd.Timestamp(start, tz=V.NY)
+    w = b[b.index >= s0 - pd.Timedelta(days=150)]
+    cfg = dataclasses.replace(GROW, trail_from=start, slippage_ticks=2, skip_dates=V.BASE["skip_dates"],
+                              fed_dates=V.FOMC, **K100, **SIZING[tag])
+    tr = [t for t in run(w, cfg, 5).trades if t.entry_time >= s0]
+    closed, worst, _ = V.marks(w, tr)
+    day = np.asarray(w.index.tz_convert(V.NY).strftime("%Y-%m-%d"))
+    out, sessions, mdd = E.test_run(day, closed, worst, int(np.searchsorted(w.index, s0)), len(w))
+    return {"tag": tag, "start": start, "outcome": out, "sessions": sessions, "dd": mdd}
+
+
+def test_init(d):
+    import v2_stops_eval as V
+    B["b"] = V.load(d)
+
+
+def main() -> None:
+    part = sys.argv.pop(1)
+    if part == "funded":
+        import g397_150k_sizing as G397
+        from g423_wide_when_wild import U58
+        G397.VARIANTS.clear()
+        G397.VARIANTS.update({k: {**U58, **K100, **v} for k, v in SIZING.items()})
+        G397.main()
+        return
+    import v3_eval as E
+    jobs = [(t, s.strftime("%Y-%m-%d")) for t in SIZING for s in E.STARTS]
+    with ProcessPoolExecutor(int(os.environ.get("PROCS", "4")), initializer=test_init, initargs=(sys.argv[1],)) as ex:
+        d = pd.DataFrame(list(ex.map(test_job, jobs, chunksize=4)))
+    for tag, g in d.groupby("tag", sort=False):
+        p = g[g.outcome == "pass"]
+        print(f"{tag}: starts {len(g)}, passed {len(p) / len(g):.1%}, failed {(g.outcome == 'fail').mean():.1%}, "
+              f"open {(g.outcome == 'open').sum()}, median trading days to pass {p.sessions.median():.0f}, "
+              f"quartiles {p.sessions.quantile(0.25):.0f}-{p.sessions.quantile(0.75):.0f}", flush=True)
+
+
+if __name__ == "__main__":
+    main()
