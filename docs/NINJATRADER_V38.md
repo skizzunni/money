@@ -8980,3 +8980,8 @@ U58 trades more often, on narrower lines when the market is calm, so its false b
 exit. `research/g446_u58_time_stop.py`: U58 with the time stop at 30 and at 60 minutes. G423's rule against U58 (the
 variant with the most $ a session on the fresh starts replaces U58 only if it makes at least 10% more there, at least
 U58's $ on unseen, loses no more fresh starts, and loses at most 5% on unseen and on development). Run once.
+
+**G446 result (2026-11-11): rejected; U58 keeps 45 minutes.** Fresh starts (U58 $49.2 a session, 0 lost): time stop 30
+**$34.2 (−30%)**, 60 **$42.2 (−14%)**, both 0 lost. Development (U58 $42.0, 0%): 30 $42.7 at 3.2%, 60 $43.2 at 3.2%.
+Unseen (U58 $80.5, 1.6%): 30 $76.9 at 1.6%, 60 **$85.3 (+6%) at 3.3%**. Neither beats U58 on the fresh starts; 60 makes
+a little more on unseen with twice the losses. `verification/noise_v2/g446_u58_time_stop.txt`.
