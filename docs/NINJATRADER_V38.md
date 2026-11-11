@@ -9,6 +9,29 @@ add-on to install. It trades `pine/mnq_noise_momentum.pine` v3.8 (docs/CANDIDATE
   holidays;
 - flat at 16:00.
 
+## Quick start (current, 2026-11-11)
+
+**The file:** `ninjatrader/Strategies/MnqNoiseV38.cs` (one file, nothing else to install).
+
+1. Copy it into `Documents\NinjaTrader 8\bin\Custom\Strategies\` (replace the old one).
+2. **New → NinjaScript Editor**, press **F5**. It must report no errors (the repository compiles it as C# 5 with warnings
+   as errors, as NinjaTrader 8 does; 703 tests pass).
+3. Open a **5-minute MNQ chart** (the front month, e.g. MNQ 12-26), trading hours **CME US Index Futures ETH**, **Days to
+   load 120** or more (the filters need about 60 sessions before they trade as tested).
+4. Add **MnqNoiseV38** to the chart with:
+   - **Mode: Funded growth**, for the Test and the funded account alike (G429: with no deadline it passes about 86% of
+     Tests against the sprint's 57%, in a median of about 6 months; it is U58, the tested funded mode, on 5-minute bars);
+   - Calculate: **On bar close** (the default); leave the other settings as they are;
+   - **Place orders:** on, the strategy sends the orders (automated trading); off, it only alerts and you place each
+     order by hand. Take Profit Trader's rules do not allow automated trading.
+5. Enable it. The dashboard (top right) shows the mode, the next check and the stop; the Output window logs every stop
+   it sends ("MnqNoiseV38 stop placed") and alerts **STOP CHECK FAILED** if a position is ever without a live stop.
+
+**What it does:** U58. Entries at the half-hour checks (10:00-15:30 New York) when price closes outside the noise area
+(narrower on calm stretches), a stop with every entry ($187.50 a contract at most), the size from the profit so far and
+the room above the $2,000 floor, the 45-minute time stop, flat at 16:00. On the 2025-26 window, NinjaTrader's own
+backtest of this file: $75,486 on 5-minute bars, 784 trades, profit factor 1.91, worst day −$899.
+
 ## Verified
 
 **The strategy's own code on the NinjaTrader simulator** (`ninjatrader/tests/Sim`) against the Python reference
