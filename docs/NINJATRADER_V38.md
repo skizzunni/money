@@ -9062,3 +9062,8 @@ Zarattini's setting; G24 tried 10 and 20 on the growth mode of 2026-11-02, long 
 G423's rule against U58 (the variant with the most $ a session on the fresh starts replaces U58 only if it makes at
 least 10% more there, at least U58's $ on unseen, loses no more fresh starts, and loses at most 5% on unseen and on
 development). Run once.
+
+**G452 result (2026-11-11): rejected, both; U58 keeps 14 sessions.** Fresh starts (U58 $49.2 a session, 0 lost): 10
+sessions $42.5 (−14%), 1 of 16 lost; 18 sessions $43.2 (−12%), 0 lost. Development (U58 $42.0, 0%): 10 **$20.1 at 3.2%**,
+18 $33.8 at 9.8%. Unseen (U58 $80.5, 1.6%): 10 $73.5 at **13.4%**, 18 $75.8 at 3.2%. U58 is best on every set; 14 stays.
+`verification/noise_v2/g452_u58_lookback.txt`.
