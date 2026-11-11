@@ -9183,3 +9183,19 @@ end-of-day trailing floor, $1,800 day budget, $1,500 until the floor stops; noth
 quarterly starts and 36 months: $ a session by year, months at $750+, lost. **Test:** G429's no-deadline replay (116
 starts): passed, failed, median trading days to pass; the 50K at +$3,000 over $2,000, the 100K at **+$6,000 over $3,000
 (the target is assumed; check the firm's)**. A measurement, not a candidate; no default changes. Run once.
+
+**G461 result (2026-11-11), a measurement.**
+
+| | 50K (U58) | 100K-style (U58, untuned) |
+|---|---|---|
+| Test, no deadline: passed / failed / still open | 86.2% / 0% / 16 of 116 | 92.2% / 0% / 9 of 116 |
+| Test: median trading days to pass (middle half) | 124 (81-181) | 189 (135-277) |
+| Test: passed within 60 trading days | 10.3% | 3.4% |
+| Funded $ a session, years 1 / 2 / 3 | $71 / $160 / $176 | $71 / $199 / $264 |
+| Funded: months at $750+ a session, year 3 | 7.3% | 15.8% |
+| Funded: lost by year 3 | 2.5% | 3.8% |
+
+U58 starts at 1 MNQ and adds a contract per $1,500 of profit on either account, so year one is the same; the 100K's
+larger floor and day budget let it size up further later (year three +50%). Its Test needs twice the profit at the same
+starting size, so it takes about half as long again. Not tuned for the 100K (G397's 150K-style result: starting at 2 MNQ
+added 13-17%). `verification/noise_v2/g461_100k.txt`.

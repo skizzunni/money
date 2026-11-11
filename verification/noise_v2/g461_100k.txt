@@ -1,0 +1,11 @@
+100K: starts 116, passed 92.2%, failed 0.0%, open 9, median trading days to pass 189, quartiles 135-277, passed within 60 days 3.4%
+50K: starts 116, passed 86.2%, failed 0.0%, open 16, median trading days to pass 124, quartiles 81-181, passed within 60 days 10.3%
+80 starts
+                per_session  at_750   lost
+tag       year                            
+100K, U58 1          71.210   0.030  0.011
+          2         198.867   0.112  0.038
+          3         263.546   0.158  0.038
+50K, U58  1          71.024   0.024  0.008
+          2         159.793   0.071  0.025
+          3         176.100   0.073  0.025
