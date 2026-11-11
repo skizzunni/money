@@ -9149,3 +9149,11 @@ variant came out identical to U58 on every set because **U58's last entry check 
 model, `LastEntry` "15:00" in `MnqNoiseV38.cs`'s Funded growth; only the Test sprint takes 15:30). The registration's
 "10:00 to 15:30" was wrong, so the 15:30 variant tested nothing; the quick start above said the same and is corrected.
 `verification/noise_v2/g458_u58_first_last_check.txt`.
+
+## G459: U58 with entries to the 15:30 check (registered 2026-11-11, before its run)
+
+Hourly round, from G458. U58's last entry check is 15:00 (`last_entry_end` 900); the sprint uses 15:30. Close to tested
+before: G8 (growth mode, 2026-10-31) and G382's "every check with entries to 15:30" on U48 (rejected); not on U58 alone,
+with its calm-stretch lines. `research/g459_u58_last_1530.py`: U58 with `last_entry_end` 930. G423's rule against U58
+(the variant replaces U58 only if it makes at least 10% more $ a session on the fresh starts, at least U58's $ on
+unseen, loses no more fresh starts, and loses at most 5% on unseen and on development). Run once.
