@@ -8972,3 +8972,11 @@ starts, and loses at most 5% on unseen and on development). Run once.
 **$36.5 (−26%)**, 1.47 trades, 0 lost. Development (U58 $42.0, 0%): $44.9 (+7%), 0%. Unseen (U58 $80.5, 1.6%): $78.1,
 1.6%. It fails on the fresh starts and on unseen: the narrow line against the trend earns its keep on calm stretches
 too. `verification/noise_v2/g445_calm_trend_side.txt`.
+
+## G446: U58's time stop re-checked (registered 2026-11-11, before its run)
+
+Hourly round. U58 kept G204's 45-minute time stop (a losing trade not locked is closed after 45 minutes), chosen on U48;
+U58 trades more often, on narrower lines when the market is calm, so its false breakouts may want a quicker or slower
+exit. `research/g446_u58_time_stop.py`: U58 with the time stop at 30 and at 60 minutes. G423's rule against U58 (the
+variant with the most $ a session on the fresh starts replaces U58 only if it makes at least 10% more there, at least
+U58's $ on unseen, loses no more fresh starts, and loses at most 5% on unseen and on development). Run once.
