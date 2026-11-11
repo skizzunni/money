@@ -299,6 +299,9 @@ class NoiseConfig:
     tp_calm: float = 0.0  # research (G425): the take-profit on a calm stretch (entry_k_regime's test; 0 = off)
     # research (G423): the entry lines on a stretch that is not calm (regime_calm's test; 0 = off)
     entry_k_wild: float = 0.0
+    # research (G445): entry_k_regime's narrow lines only on the side of the trend_n trend (the other side, and both
+    # when there is no trend, keep the entry lines they had)
+    regime_trend_side: bool = False
     regime_calm: bool = True
     win_side_only: bool = False
     win_side_target: bool = False
@@ -1502,8 +1505,10 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                     reg_calm = (sum(day_ranges[-cfg.calm_short:]) / cfg.calm_short
                                 < sum(day_ranges[-cfg.calm_long:]) / cfg.calm_long)  # not `calm`: calm_k's flag
                     if reg_calm == cfg.regime_calm:
-                        up_e = max(day_open, prev_close) * (1 + cfg.entry_k_regime * sigma)
-                        lo_e = min(day_open, prev_close) * (1 - cfg.entry_k_regime * sigma)
+                        if not cfg.regime_trend_side or trend > 0:
+                            up_e = max(day_open, prev_close) * (1 + cfg.entry_k_regime * sigma)
+                        if not cfg.regime_trend_side or trend < 0:
+                            lo_e = min(day_open, prev_close) * (1 - cfg.entry_k_regime * sigma)
                     elif cfg.entry_k_wild > 0:  # G423
                         up_e = max(day_open, prev_close) * (1 + cfg.entry_k_wild * sigma)
                         lo_e = min(day_open, prev_close) * (1 - cfg.entry_k_wild * sigma)

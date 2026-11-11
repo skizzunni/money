@@ -8957,3 +8957,13 @@ set). Run once.
 same as U58, with the index nets down by a third ($29,886 / $29,584; NQ $48,561 / $47,697). Banking sooner cuts the
 winners that build the cushion; the floor creep from faded open profit is not where the PRO losses come from.
 `verification/noise_v2/g444_pro_lock_tp.txt`, `g248_pro_{u58lock25,u58tp15}_{MS,MID}.csv`.
+
+## G445: the narrow calm-stretch entry lines only on the trend's side (registered 2026-11-11, before its run)
+
+Hourly round, on U58. U58 narrows both entry lines to 0.8 noise on a calm stretch (G422). A calm market drifting with
+its trend may give true breakouts on the trend's side and false ones against it. `regime_trend_side` in
+`mnqbot/noise.py` (off by default): on a calm stretch the 0.8 line only on the side of U58's 45-session trend (last
+close above its average: the upper line; below: the lower); the other side, and both on a day with no trend, keep their
+usual lines. `research/g445_calm_trend_side.py`: U58 against U58 with it. G423's rule against U58 (the variant replaces
+U58 only if it makes at least 10% more $ a session on the fresh starts, at least U58's $ on unseen, loses no more fresh
+starts, and loses at most 5% on unseen and on development). Run once.
