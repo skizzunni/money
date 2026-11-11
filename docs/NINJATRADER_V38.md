@@ -9011,3 +9011,12 @@ starts, and loses at most 5% on unseen and on development). Run once.
 (−55%)**, 0 lost; $250 **$25.8 (−48%)**, 1 lost. Development (U58 $42.0, 0%): $150 $48.6 at 6.6%, $250 $47.0 at 13.3%.
 Unseen (U58 $80.5, 1.6%): $150 $62.8 at 3.2%, $250 $58.3 at 9.5%. As under PRO (G437 / G439), $187.50 sits between a
 too-tight and a too-wide stop on the funded account too. `verification/noise_v2/g448_u58_max_loss.txt`.
+
+## G449: U58's trade lock later (registered 2026-11-11, before its run)
+
+Hourly round. The lock (the stop moved to entry +2.5 points once a trade is up `lock_at` x its max loss) is at 0.35. A
+sooner lock was rejected on U48 (G404) and under PRO (G444); a later one alone was never measured (only inside G411's
+combined pick). U58 trades narrower lines on calm stretches, whose winners may need more room before the lock.
+`research/g449_u58_later_lock.py`: U58 with `lock_at` 0.45 and 0.55. G423's rule against U58 (the variant with the most $
+a session on the fresh starts replaces U58 only if it makes at least 10% more there, at least U58's $ on unseen, loses
+no more fresh starts, and loses at most 5% on unseen and on development). Run once.
