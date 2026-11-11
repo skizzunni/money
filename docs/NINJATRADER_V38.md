@@ -33,7 +33,7 @@ add-on to install. It trades `pine/mnq_noise_momentum.pine` v3.8 (docs/CANDIDATE
    (it is printed once and the next bar redraws it). The Output window logs every stop it sends ("MnqNoiseV38 stop
    placed") and alerts **STOP CHECK FAILED** if a position is ever without a live stop.
 
-**What it does:** U58. Entries at the half-hour checks (10:00-15:30 New York) when price closes outside the noise area
+**What it does:** U58. Entries at the half-hour checks (10:00-15:00 New York in Funded growth; the Test sprint to 15:30) when price closes outside the noise area
 (narrower on calm stretches), a stop with every entry ($187.50 a contract at most), the size from the profit so far and
 the room above the $2,000 floor, the 45-minute time stop, flat at 16:00. On the 2025-26 window, NinjaTrader's own
 backtest of this file: $75,486 on 5-minute bars, 784 trades, profit factor 1.91, worst day −$899.
@@ -9142,3 +9142,10 @@ own. `research/g458_u58_first_last_check.py`: U58 with no entries at the 10:00 c
 15:30 check ("930"), always (`skip_checks_early` off). G423's rule against U58 (the variant with the most $ a session on
 the fresh starts replaces U58 only if it makes at least 10% more there, at least U58's $ on unseen, loses no more fresh
 starts, and loses at most 5% on unseen and on development). Run once.
+
+**G458 result (2026-11-11): rejected; and a registration error.** Without the 10:00 check: fresh starts **$43.6 a session
+(−11%)**, 0 lost; development $38.5 at 9.5%; unseen $68.0 at 3.2% (U58 $49.2 / $42.0 at 0% / $80.5 at 1.6%). The 15:30
+variant came out identical to U58 on every set because **U58's last entry check is 15:00** (`last_entry_end` 900 in the
+model, `LastEntry` "15:00" in `MnqNoiseV38.cs`'s Funded growth; only the Test sprint takes 15:30). The registration's
+"10:00 to 15:30" was wrong, so the 15:30 variant tested nothing; the quick start above said the same and is corrected.
+`verification/noise_v2/g458_u58_first_last_check.txt`.
