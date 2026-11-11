@@ -9120,3 +9120,11 @@ at most 5% on unseen and on development). Run once.
 past 1.5x **$30.8 (−37%)**, each 1 of 16 lost. Development (U58 $42.0, 0%): $20.4 at 6.4%, $42.5 at 0%. Unseen (U58
 $80.5, 1.6%): $41.2 at 6.3%, $61.3 at 3.1%. As on the sprint (G360): the stretched days are the trend days that pay.
 `verification/noise_v2/g456_u58_stretched_day.txt`.
+
+## G457: U58 without the gap-and-go trade (registered 2026-11-11, before its run)
+
+Hourly round, an ablation. The gap trade (09:30-09:55 on a big opening gap, G60 on) was tested off only on the Test
+sprint (G268, G315, G343); on the funded account it was never removed since U58 changed the day's other trades.
+`research/g457_u58_no_gap_trade.py`: U58 with `gap_go` off. G423's rule against U58 (the variant replaces U58 only if it
+makes at least 10% more $ a session on the fresh starts, at least U58's $ on unseen, loses no more fresh starts, and
+loses at most 5% on unseen and on development). Run once.
