@@ -9238,3 +9238,10 @@ $1,000, and of $2,000 (with the day budget at $2,000). Rules: G462's (funded: de
 lost and 10% above the 100K as U58, then unseen at least 10% more within 5% lost; Test: pass rate within 2 points of
 92.2% with the median days at most 85% of 189). Run once. (Commit 821b5f2 carried only the runner change; this text is
 its registration, committed before the run.)
+
+**G463 result (2026-11-11): rejected; the 100K keeps $1,500 (the budget barely binds).** The Test part's first run
+crashed before any result (a bug in the runner: the budget passed twice to the config); fixed (`{**K100, **SIZING[tag]}`)
+and run once. **Test:** identical for all three (92.2% passed, 9 frozen, median 189 days): at 1 MNQ the budget never
+limits a Test trade. **Funded:** development (100K as U58 $110.7, 8.7% lost): $1,000 $110.6 at 4.3%, $2,000 **$115.0
+(+4%, short of 10%)** at 8.7%; unseen ($205.0, 1.8%): $1,000 $205.0, $2,000 $218.9 (+7%) at 1.8%, year three $334 (+11%).
+`verification/noise_v2/g463_100k_early_budget.txt`.

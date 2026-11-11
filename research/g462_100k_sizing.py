@@ -45,7 +45,7 @@ def test_job(a):
     s0 = pd.Timestamp(start, tz=V.NY)
     w = b[b.index >= s0 - pd.Timedelta(days=150)]
     cfg = dataclasses.replace(GROW, trail_from=start, slippage_ticks=2, skip_dates=V.BASE["skip_dates"],
-                              fed_dates=V.FOMC, **K100, **SIZING[tag])
+                              fed_dates=V.FOMC, **{**K100, **SIZING[tag]})
     tr = [t for t in run(w, cfg, 5).trades if t.entry_time >= s0]
     closed, worst, _ = V.marks(w, tr)
     day = np.asarray(w.index.tz_convert(V.NY).strftime("%Y-%m-%d"))
