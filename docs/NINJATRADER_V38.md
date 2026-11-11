@@ -9053,3 +9053,12 @@ on unseen, loses no more fresh starts, and loses at most 5% on unseen and on dev
 sessions $44.6 (−9%), 1 of 16 lost; 60 sessions $39.5 (−20%), 0 lost. Development (U58 $42.0, 0%): 30 $46.6, 60 $45.1
 (both 0%). Unseen (U58 $80.5, 1.6%): 30 **$65.8 at 6.1%**, 60 **$69.2 at 3.2%**. Both trend lengths help a little on
 2011-18 and cost a sixth or more on the recent and unseen starts. `verification/noise_v2/g451_u58_trend_len.txt`.
+
+## G452: U58's noise lookback (registered 2026-11-11, before its run)
+
+Hourly round. The noise area (the average move from the open at each time of day) is taken over the last 14 sessions,
+Zarattini's setting; G24 tried 10 and 20 on the growth mode of 2026-11-02, long before U58 and its calm-stretch lines
+(which scale with the noise). The Test sprint uses 18. `research/g452_u58_lookback.py`: U58 with `lookback` 10 and 18.
+G423's rule against U58 (the variant with the most $ a session on the fresh starts replaces U58 only if it makes at
+least 10% more there, at least U58's $ on unseen, loses no more fresh starts, and loses at most 5% on unseen and on
+development). Run once.
