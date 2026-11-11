@@ -9048,3 +9048,8 @@ below; and the trend-side fill-ins) uses 45 sessions, from G241's screen on U44;
 trades more often. `research/g451_u58_trend_len.py`: U58 with `trend_n` 30 and 60. G423's rule against U58 (the variant
 with the most $ a session on the fresh starts replaces U58 only if it makes at least 10% more there, at least U58's $
 on unseen, loses no more fresh starts, and loses at most 5% on unseen and on development). Run once.
+
+**G451 result (2026-11-11): rejected, both; U58 keeps 45 sessions.** Fresh starts (U58 $49.2 a session, 0 lost): 30
+sessions $44.6 (−9%), 1 of 16 lost; 60 sessions $39.5 (−20%), 0 lost. Development (U58 $42.0, 0%): 30 $46.6, 60 $45.1
+(both 0%). Unseen (U58 $80.5, 1.6%): 30 **$65.8 at 6.1%**, 60 **$69.2 at 3.2%**. Both trend lengths help a little on
+2011-18 and cost a sixth or more on the recent and unseen starts. `verification/noise_v2/g451_u58_trend_len.txt`.
