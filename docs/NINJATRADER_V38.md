@@ -9174,3 +9174,12 @@ development). Run once.
 **G460 result (2026-11-11): rejected, both; U58 keeps 40.** Fresh starts (U58 $49.2 a session, 0 lost): against 30
 sessions **$37.2 (−24%)**, against 60 $47.6 (−3%); both 0 lost. Development (U58 $42.0, 0%): $41.9 at 0%, $41.1 at 3.2%.
 Unseen (U58 $80.5, 1.6%): $75.5 at 1.6%, **$61.2 at 6.3%**. `verification/noise_v2/g460_u58_calm_window.txt`.
+
+## G461: U58 on a 100K account (a measurement for the user, registered 2026-11-11, before its run)
+
+The user asked what a 100K account would make a day and how long its Test takes. G396 measured U48 (not U58) on a
+100K-style account, funded only. `research/g461_100k.py`: U58 as it is, on the 50K and on a 100K-style account ($3,000
+end-of-day trailing floor, $1,800 day budget, $1,500 until the floor stops; nothing else retuned). **Funded:** G396's 80
+quarterly starts and 36 months: $ a session by year, months at $750+, lost. **Test:** G429's no-deadline replay (116
+starts): passed, failed, median trading days to pass; the 50K at +$3,000 over $2,000, the 100K at **+$6,000 over $3,000
+(the target is assumed; check the firm's)**. A measurement, not a candidate; no default changes. Run once.
