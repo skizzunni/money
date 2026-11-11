@@ -9331,3 +9331,11 @@ keeps $1,500, G465.) Run once.
 $1,750 $126.0 (+3%), $2,500 $115.2 (−6%); unseen ($222.9, 0%): $221.1 (−1%), $197.0 (−12%, 1.8% lost); fresh starts
 ($32.7): $31.5 (−4%), $27.9 (−15%). $2,000 is the best of the three on two sets of three and close on the third. (The
 Test part of the runner was not run: the Test keeps $1,500, G465.) `verification/noise_v2/g468_100k_step.txt`.
+
+## G469: the giveback brake on the 100K funded mode (registered 2026-11-11, before its run)
+
+Once the floor has stopped, while the profit is under `giveback_brake` (0.45) x the best end-of-day profit, every trade
+is 1 MNQ (G99, tuned on the 50K's $2,000 floor). `research/g462_100k_sizing.py` with `G469=1` (G397's development /
+unseen starts) and `research/g469_100k_brake_fresh.py` (G415's fresh starts): the 100K funded mode ($2,000 steps) with
+the brake at 0.35 and 0.55. G468's rule (a brake replaces 0.45 only with at least 5% more $ a session on all three start
+sets and no more starts lost on any). Run once.
