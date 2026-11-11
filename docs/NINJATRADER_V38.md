@@ -9133,3 +9133,12 @@ loses at most 5% on unseen and on development). Run once.
 **$25.5 a session (−48%)**, 1.11 trades (U58 $49.2, 1.54), 0 lost; development $28.0 (−33%), 0%; unseen **$45.2 (−44%)**
 at 7.9% lost (U58 1.6%). The gap-and-go trade (and the fill-ins that ride on it) is close to half of U58's profit on the
 recent and unseen starts. `verification/noise_v2/g457_u58_no_gap_trade.txt`.
+
+## G458: U58 without its first or its last entry check (registered 2026-11-11, before its run)
+
+Hourly round. U58 takes every half-hour check from 10:00 to 15:30 (G422 dropped G125's skipped 13:00 / 14:30). The
+first check follows the gap trade's half hour; the last one leaves 30 minutes to 16:00. Neither was ever removed on its
+own. `research/g458_u58_first_last_check.py`: U58 with no entries at the 10:00 check (`skip_checks` "600") or at the
+15:30 check ("930"), always (`skip_checks_early` off). G423's rule against U58 (the variant with the most $ a session on
+the fresh starts replaces U58 only if it makes at least 10% more there, at least U58's $ on unseen, loses no more fresh
+starts, and loses at most 5% on unseen and on development). Run once.
