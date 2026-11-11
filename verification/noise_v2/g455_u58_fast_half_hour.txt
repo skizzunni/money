@@ -1,0 +1,19 @@
+fresh starts used: 16
+                          per_session  trades_per_session   lost  green_days  green_weeks  green_months  longest_losing_weeks  worst_month
+U58                            49.191               1.543  0.000       0.420        0.478         0.682                 3.750    -1892.504
+U58, fast half hour 0.5        21.083               1.173  0.000       0.408        0.428         0.620                 4.562    -1271.928
+U58, fast half hour 0.75       14.358               0.863  0.062       0.441        0.417         0.573                 4.312    -1059.929
+development (index 2011-18 starts):
+                          per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                               
+U58                            41.964      21.212        72.223     112.465  0.000
+U58, fast half hour 0.5        36.610      20.112        51.326      93.876  0.166
+U58, fast half hour 0.75       27.330      12.745        46.113      92.798  0.067
+unseen (index 2019-25 + NQ 2015-24):
+                          per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                               
+U58                            80.461      42.044       117.888     142.938  0.016
+U58, fast half hour 0.5        57.536      30.271        83.232      98.783  0.016
+U58, fast half hour 0.75       50.761      25.588        69.622      95.472  0.031
+
+[exited with code 0]

@@ -9102,3 +9102,8 @@ the Test sprint (U57), not on the funded account, where U58 also trades narrower
 `research/g455_u58_fast_half_hour.py`: U58 with `thrust_k` 0.5 and 0.75. G423's rule against U58 (the variant with the
 most $ a session on the fresh starts replaces U58 only if it makes at least 10% more there, at least U58's $ on unseen,
 loses no more fresh starts, and loses at most 5% on unseen and on development). Run once.
+
+**G455 result (2026-11-11): rejected, both; much worse.** Fresh starts (U58 $49.2 a session, 1.54 trades, 0 lost): 0.5
+**$21.1 (−57%)**, 1.17 trades; 0.75 **$14.4 (−71%)**, 0.86 trades, 1 lost. Development (U58 $42.0, 0%): $36.6 at 16.6%,
+$27.3 at 6.7%. Unseen (U58 $80.5, 1.6%): $57.5 at 1.6%, $50.8 at 3.1%. Requiring a fast half hour drops a quarter to
+nearly half the trades, and many of the dropped ones were winners. `verification/noise_v2/g455_u58_fast_half_hour.txt`.
