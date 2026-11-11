@@ -9318,3 +9318,11 @@ on its own. Run once.
 contracts 92.2% / 8 frozen / 1 failed / 188 (no faster). Funded (100K funded mode, $2,000 steps): development $122.2 →
 $116.9 (−4%), unseen $222.9 → $221.3 (−1%, one start lost), fresh starts $32.7 → **$27.6 (−15%)**. A second early gap
 contract does not pay on the 100K either. `verification/noise_v2/g467_100k_gap_early.txt`.
+
+## G468: the 100K funded mode's contract step around $2,000 (registered 2026-11-11, before its run)
+
+G466 confirmed +1 MNQ per $2,000 for the 100K funded mode (against $1,500); is $2,000 the best? `research/g462_100k_sizing.py`
+with `G468=1` (G397's development / unseen starts) and `research/g468_100k_step_fresh.py` (G415's fresh starts): the
+100K funded mode with steps of $2,000 (as G466), $1,750 and $2,500. **Rule:** a step replaces $2,000 only if it makes at
+least 5% more $ a session on all three start sets with no more starts lost on any. (The Test part prints too; the Test
+keeps $1,500, G465.) Run once.

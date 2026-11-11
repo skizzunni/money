@@ -2,6 +2,7 @@
 $1,500 until the floor stops): as it is (1 MNQ, +1 per $1,500), starting at 2 or 3 MNQ, +1 per $1,000, or 2 MNQ
 and +1 per $1,000. G463 (G463=1): the early day budget at $1,000 or $2,000. G464 (G464=1): gap cap 15 / 20.
 G465 (G465=1): +1 per $2,000, or at most half the room a trade. G467 (G467=1): 2 gap contracts early.
+G468 (G468=1): steps $1,750 / $2,500.
 
   funded: G397's measure (months 1-36; development = index starts 2011-2016, unseen = index 2017-2023 + NQ 2015-2022).
   test:   G461's no-deadline Test (+$6,000 over $3,000, an assumed target), 116 starts.
@@ -28,6 +29,9 @@ K100 = {"trail_dd": 3000.0, "daily_loss_limit": 1800.0, "early_daily_loss": 1500
 SIZING = {"100K U58": {}, "start 2 MNQ": {"qty": 2, "max_loss_per_trade": 375.0},
           "start 3 MNQ": {"qty": 3, "max_loss_per_trade": 562.5}, "+1 per $1,000": {"profit_step": 1000.0},
           "start 2 MNQ, +1 per $1,000": {"qty": 2, "max_loss_per_trade": 375.0, "profit_step": 1000.0}}
+if os.environ.get("G468"):  # G468: the 100K funded mode's step around G466's $2,000
+    SIZING = {"100K funded ($2,000 steps)": {"profit_step": 2000.0}, "+1 per $1,750": {"profit_step": 1750.0},
+              "+1 per $2,500": {"profit_step": 2500.0}}
 if os.environ.get("G467"):  # G467: 2 gap contracts before the floor stops (U58 1), Test pair and funded pair
     SIZING = {"100K U58": {}, "100K U58, gap 2 early": {"gap_go_max_qty": 2},
               "100K funded ($2,000 steps)": {"profit_step": 2000.0},
