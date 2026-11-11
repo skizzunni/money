@@ -9281,3 +9281,13 @@ both halves.**
 needs at least as many), so it fails as one setting for both. Half the room changes only a few trades: one fewer
 development loss, one more unseen. A funded-only use of the $2,000 steps (the Test keeping $1,500) is a new question,
 not adopted by this run; it needs its own registered test. `verification/noise_v2/g465_100k_fewer_lost.txt`.
+
+## G466: slower contract steps on the funded account, checked on other starts (registered 2026-11-11, before its run)
+
+From G465: +1 MNQ per $2,000 of profit (U58 $1,500) made the 100K 9-10% more on G397's starts with no start lost, but
+passed fewer Tests; as a funded-only setting it needs its own test. `research/g466_slower_steps.py`: **50K:** U58 against
+U58 with `profit_step` 2,000, on G415's fresh starts and G372's development / unseen starts, G423's rule (at least 10%
+more $ a session on the fresh starts, at least U58's $ on unseen, no more fresh starts lost, at most 5% lost on unseen
+and development). **100K-style:** the same pair on G415's fresh starts; it confirms G465 only if it makes at least 5%
+more there and loses no more starts. A 100K funded mode would then step by $2,000 and its Test by $1,500. Run once.
+(Commit e5690d8 carried only the runner; this is its registration, committed before the run.)

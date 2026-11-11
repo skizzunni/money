@@ -1,9 +1,11 @@
-"""G466 (docs/NINJATRADER_V38.md): slower contract steps on the funded account, +1 MNQ per $2,000 of profit (U58 $1,500).
+"""G466 (docs/NINJATRADER_V38.md): slower contract steps on the funded account, +1 MNQ per $2,000 (U58 $1,500).
 50K: U58 against it, G415's fresh starts then G372's development / unseen (G386's runner). 100K-style ($3,000 floor,
 $1,800 / $1,500 day budgets): the same pair on G415's fresh starts only (G386's runner judges losses at the 50K's $2,000
 floor; G415's uses each account's own).
 
-    python research/g466_slower_steps.py <data dir> <MNQ 09-26> <MNQ 12-26> <U48 JS json> 50k-fresh|50k-unseen|100k-fresh
+    python research/g466_slower_steps.py <data dir> <MNQ 09-26> <MNQ 12-26> <U48 JS json> <part>
+
+part: 50k-fresh, 50k-unseen or 100k-fresh.
 """
 import sys
 
