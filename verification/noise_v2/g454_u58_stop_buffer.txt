@@ -1,0 +1,19 @@
+fresh starts used: 16
+                       per_session  trades_per_session  lost  green_days  green_weeks  green_months  longest_losing_weeks  worst_month
+U58                         49.191               1.543   0.0       0.420        0.478         0.682                 3.750    -1892.504
+U58, stop buffer 0.18       37.244               1.526   0.0       0.399        0.447         0.656                 4.312    -2048.721
+U58, stop buffer 0.30       40.448               1.476   0.0       0.428        0.459         0.620                 4.188    -1873.411
+development (index 2011-18 starts):
+                       per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                            
+U58, stop buffer 0.18       43.667      20.480        61.837     109.435  0.066
+U58                         41.964      21.212        72.223     112.465  0.000
+U58, stop buffer 0.30       35.175      22.896        42.005      74.558  0.000
+unseen (index 2019-25 + NQ 2015-24):
+                       per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                            
+U58                         80.461      42.044       117.888     142.938  0.016
+U58, stop buffer 0.30       79.006      42.869       111.622     117.236  0.048
+U58, stop buffer 0.18       67.097      43.319        85.373     115.573  0.032
+
+[exited with code 0]

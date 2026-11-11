@@ -9089,3 +9089,7 @@ and U29; U58's calm-stretch lines are narrower, so its stops may want a differen
 U58 with 0.18 and 0.30. G423's rule against U58 (the variant with the most $ a session on the fresh starts replaces U58
 only if it makes at least 10% more there, at least U58's $ on unseen, loses no more fresh starts, and loses at most 5%
 on unseen and on development). Run once.
+
+**G454 result (2026-11-11): rejected, both; U58 keeps 0.24.** Fresh starts (U58 $49.2 a session, 0 lost): 0.18 **$37.2
+(−24%)**, 0.30 **$40.4 (−18%)**; both 0 lost. Development (U58 $42.0, 0%): 0.18 $43.7 at 6.6%, 0.30 $35.2 at 0%. Unseen
+(U58 $80.5, 1.6%): 0.18 $67.1 at 3.2%, 0.30 $79.0 at 4.8%. `verification/noise_v2/g454_u58_stop_buffer.txt`.
