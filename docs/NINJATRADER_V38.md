@@ -9040,3 +9040,11 @@ loses no more fresh starts, and loses at most 5% on unseen and on development). 
 (−22%)**; 2.5 **$51.4 (+5%, short of the 10% bar)**; both 0 lost. Development (U58 $42.0, 0%): 1.5 $43.0 at 9.8%, 2.5
 **$27.3 at 9.6%**. Unseen (U58 $80.5, 1.6%): 1.5 $74.0 at 4.9%, 2.5 $76.6 at 1.6%. 2.5 gains a little on the recent
 starts only and loses a third on development; 2.0 stays. `verification/noise_v2/g450_u58_take_profit.txt`.
+
+## G451: U58's trend length (registered 2026-11-11, before its run)
+
+Hourly round. U58's trend (no shorts while the last close is above the average of the last `trend_n` closes, no longs
+below; and the trend-side fill-ins) uses 45 sessions, from G241's screen on U44; it was never re-checked on U58, which
+trades more often. `research/g451_u58_trend_len.py`: U58 with `trend_n` 30 and 60. G423's rule against U58 (the variant
+with the most $ a session on the fresh starts replaces U58 only if it makes at least 10% more there, at least U58's $
+on unseen, loses no more fresh starts, and loses at most 5% on unseen and on development). Run once.
