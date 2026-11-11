@@ -1,0 +1,23 @@
+== 50k-fresh
+fresh starts used: 16
+                    per_session  trades_per_session  lost  green_days  green_weeks  green_months  longest_losing_weeks  worst_month
+U58                      49.191               1.543   0.0       0.420        0.478         0.682                 3.750    -1892.504
+U58, +1 per $2,000       33.855               1.545   0.0       0.436        0.478         0.688                 4.375    -1587.842
+== 50k-unseen
+development (index 2011-18 starts):
+                    per_session  months_1_3  months_10_12  best_month  lost
+tag                                                                        
+U58, +1 per $2,000       43.233      20.931        77.146     136.590   0.0
+U58                      41.964      21.212        72.223     112.465   0.0
+unseen (index 2019-25 + NQ 2015-24):
+                    per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                         
+U58                      80.461      42.044       117.888     142.938  0.016
+U58, +1 per $2,000       68.844      38.729        99.770     116.408  0.016
+== 100k-fresh
+fresh starts used: 16
+                     per_session  trades_per_session  lost  green_days  green_weeks  green_months  longest_losing_weeks  worst_month
+100K U58                  26.710               1.472   0.0       0.434        0.455         0.641                 4.062    -2312.794
+100K, +1 per $2,000       32.661               1.516   0.0       0.440        0.474         0.693                 4.125    -1748.518
+
+[exited with code 0]

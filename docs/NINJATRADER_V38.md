@@ -9291,3 +9291,14 @@ more $ a session on the fresh starts, at least U58's $ on unseen, no more fresh 
 and development). **100K-style:** the same pair on G415's fresh starts; it confirms G465 only if it makes at least 5%
 more there and loses no more starts. A 100K funded mode would then step by $2,000 and its Test by $1,500. Run once.
 (Commit e5690d8 carried only the runner; this is its registration, committed before the run.)
+
+**G466 result (2026-11-11): the 50K rejected; the 100K confirmed.**
+- **50K:** +1 per $2,000 fresh starts **$33.9 a session (−31%)** (U58 $49.2), both 0 lost; development $43.2 (+3%), 0%;
+  unseen **$68.8 (−14%)** at 1.6%. U58's $1,500 steps stay on the 50K.
+- **100K-style, G415's fresh starts:** U58 $26.7 a session, 0 of 16 lost, worst month −$2,313; +1 per $2,000 **$32.7
+  (+22%)**, 0 lost, green months 69.3% (64.1%), worst month −$1,749. With G465 (G397's starts: +10% development, +9%
+  unseen, no start lost on either) it passes on all three 100K start sets, so a 100K funded mode steps by $2,000; its
+  Test keeps $1,500 (G465: 92.2% against 88.8%).
+Note: on the fresh starts the 100K as U58 makes less than the 50K ($26.7 against $49.2): its floor stops only after
++$3,000, so the gap trade stays at 1 MNQ (`gap_go_max_qty` until the floor stops) for longer.
+`verification/noise_v2/g466_slower_steps.txt`.
