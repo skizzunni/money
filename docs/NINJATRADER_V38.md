@@ -9115,3 +9115,8 @@ sessions' average range) was measured only on the Test sprint (U57). `research/g
 funded account with k 1.25 and 1.5. G423's rule against U58 (the variant with the most $ a session on the fresh starts
 replaces U58 only if it makes at least 10% more there, at least U58's $ on unseen, loses no more fresh starts, and loses
 at most 5% on unseen and on development). Run once.
+
+**G456 result (2026-11-11): rejected, both.** Fresh starts (U58 $49.2 a session, 0 lost): past 1.25x **$28.8 (−42%)**,
+past 1.5x **$30.8 (−37%)**, each 1 of 16 lost. Development (U58 $42.0, 0%): $20.4 at 6.4%, $42.5 at 0%. Unseen (U58
+$80.5, 1.6%): $41.2 at 6.3%, $61.3 at 3.1%. As on the sprint (G360): the stretched days are the trend days that pay.
+`verification/noise_v2/g456_u58_stretched_day.txt`.
