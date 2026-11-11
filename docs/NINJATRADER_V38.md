@@ -9035,3 +9035,8 @@ measured only under PRO (G444, 1.5) and on calm stretches (G425); not on the 50K
 `research/g450_u58_take_profit.py`: U58 with `take_profit` 1.5 and 2.5. G423's rule against U58 (the variant with the
 most $ a session on the fresh starts replaces U58 only if it makes at least 10% more there, at least U58's $ on unseen,
 loses no more fresh starts, and loses at most 5% on unseen and on development). Run once.
+
+**G450 result (2026-11-11): rejected, both; U58 keeps 2.0.** Fresh starts (U58 $49.2 a session, 0 lost): 1.5 **$38.4
+(−22%)**; 2.5 **$51.4 (+5%, short of the 10% bar)**; both 0 lost. Development (U58 $42.0, 0%): 1.5 $43.0 at 9.8%, 2.5
+**$27.3 at 9.6%**. Unseen (U58 $80.5, 1.6%): 1.5 $74.0 at 4.9%, 2.5 $76.6 at 1.6%. 2.5 gains a little on the recent
+starts only and loses a third on development; 2.0 stays. `verification/noise_v2/g450_u58_take_profit.txt`.
