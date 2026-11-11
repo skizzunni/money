@@ -9313,3 +9313,8 @@ funded measure: the 100K funded mode, $2,000 steps, against it with 2) and `rese
 G397's development and unseen starts and at least 5% more on the fresh starts, with no more starts lost on any.
 **Test rule:** the pass rate within 2 points of 92.2% with the median days at most 85% of 189. Each part passes or fails
 on its own. Run once.
+
+**G467 result (2026-11-11): rejected, both parts.** Test: 100K U58 92.2% passed / 9 frozen / median 189; with 2 early gap
+contracts 92.2% / 8 frozen / 1 failed / 188 (no faster). Funded (100K funded mode, $2,000 steps): development $122.2 →
+$116.9 (−4%), unseen $222.9 → $221.3 (−1%, one start lost), fresh starts $32.7 → **$27.6 (−15%)**. A second early gap
+contract does not pay on the 100K either. `verification/noise_v2/g467_100k_gap_early.txt`.
