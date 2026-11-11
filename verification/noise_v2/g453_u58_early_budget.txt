@@ -1,0 +1,19 @@
+fresh starts used: 16
+                          per_session  trades_per_session  lost  green_days  green_weeks  green_months  longest_losing_weeks  worst_month
+U58                            49.191               1.543   0.0       0.420        0.478         0.682                 3.750    -1892.504
+U58, early budget $1,000       51.874               1.553   0.0       0.419        0.475         0.688                 3.875    -1960.852
+U58, early budget $500         49.352               1.544   0.0       0.419        0.471         0.672                 3.875    -1951.686
+development (index 2011-18 starts):
+                          per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                               
+U58                            41.964      21.212        72.223     112.465  0.000
+U58, early budget $1,000       41.602      21.072        71.802     113.276  0.000
+U58, early budget $500         41.272      19.856        69.688     108.544  0.067
+unseen (index 2019-25 + NQ 2015-24):
+                          per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                               
+U58, early budget $1,000       81.026      42.452       117.444     142.625  0.032
+U58                            80.461      42.044       117.888     142.938  0.016
+U58, early budget $500         78.518      42.600       112.449     134.181  0.016
+
+[exited with code 0]

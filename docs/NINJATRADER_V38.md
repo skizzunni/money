@@ -9075,3 +9075,9 @@ measured $500 / $1,000 on the no-deadline Test, G437 / G438 under PRO; not on th
 `research/g453_u58_early_budget.py`: U58 with $500 and $1,000. G423's rule against U58 (the variant with the most $ a
 session on the fresh starts replaces U58 only if it makes at least 10% more there, at least U58's $ on unseen, loses no
 more fresh starts, and loses at most 5% on unseen and on development). Run once.
+
+**G453 result (2026-11-11): rejected, both; U58 keeps $750.** Fresh starts (U58 $49.2 a session, 0 lost): $1,000 $51.9
+(+5%, short of 10%), $500 $49.4 (+0%); both 0 lost. Development (U58 $42.0, 0%): $1,000 $41.6 at 0%, $500 $41.3 at 6.7%.
+Unseen (U58 $80.5, 1.6%): $1,000 $81.0 at 3.2%, $500 $78.5 at 1.6%. The budget barely matters on the funded account
+(it binds only until the floor stops); $1,000 gains 5% recent with twice the unseen losses. Not worth a change.
+`verification/noise_v2/g453_u58_early_budget.txt`.
