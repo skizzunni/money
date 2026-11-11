@@ -9020,3 +9020,9 @@ combined pick). U58 trades narrower lines on calm stretches, whose winners may n
 `research/g449_u58_later_lock.py`: U58 with `lock_at` 0.45 and 0.55. G423's rule against U58 (the variant with the most $
 a session on the fresh starts replaces U58 only if it makes at least 10% more there, at least U58's $ on unseen, loses
 no more fresh starts, and loses at most 5% on unseen and on development). Run once.
+
+**G449 result (2026-11-11): rejected, both; U58 keeps 0.35.** Fresh starts (U58 $49.2 a session, 0 lost): 0.45 **$32.3
+(−34%)**, 0 lost; 0.55 **$24.6 (−50%)**, 2 of 16 lost. Development (U58 $42.0, 0%): 0.45 $48.3, 0.55 $56.8 (+35%), both
+0%. Unseen (U58 $80.5, 1.6%): 0.45 $62.3 at 4.8%, 0.55 $69.0 at 6.3%. A later lock helped only on the 2011-18 index
+years; on the recent and unseen starts it gives back trades that U58 locks. With G404 / G444: 0.35 stays.
+`verification/noise_v2/g449_u58_later_lock.txt`.
