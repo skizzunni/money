@@ -9326,3 +9326,8 @@ with `G468=1` (G397's development / unseen starts) and `research/g468_100k_step_
 100K funded mode with steps of $2,000 (as G466), $1,750 and $2,500. **Rule:** a step replaces $2,000 only if it makes at
 least 5% more $ a session on all three start sets with no more starts lost on any. (The Test part prints too; the Test
 keeps $1,500, G465.) Run once.
+
+**G468 result (2026-11-11): rejected, both; the 100K funded mode keeps $2,000.** Development ($2,000 $122.2, 0% lost):
+$1,750 $126.0 (+3%), $2,500 $115.2 (−6%); unseen ($222.9, 0%): $221.1 (−1%), $197.0 (−12%, 1.8% lost); fresh starts
+($32.7): $31.5 (−4%), $27.9 (−15%). $2,000 is the best of the three on two sets of three and close on the third. (The
+Test part of the runner was not run: the Test keeps $1,500, G465.) `verification/noise_v2/g468_100k_step.txt`.
