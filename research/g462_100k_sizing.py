@@ -1,5 +1,6 @@
-"""G462 / G463 (docs/NINJATRADER_V38.md): U58's sizing on a 100K-style account ($3,000 floor, $1,800 day budget, $1,500 until
-the floor stops): as it is (1 MNQ, +1 per $1,500), starting at 2 or 3 MNQ, +1 per $1,000, or 2 MNQ and +1 per $1,000.
+"""G462 / G463 (docs/NINJATRADER_V38.md): U58's sizing on a 100K-style account ($3,000 floor, $1,800 day budget,
+$1,500 until the floor stops): as it is (1 MNQ, +1 per $1,500), starting at 2 or 3 MNQ, +1 per $1,000, or 2 MNQ
+and +1 per $1,000. G463 (G463=1): the early day budget at $1,000 or $2,000.
 
   funded: G397's measure (months 1-36; development = index starts 2011-2016, unseen = index 2017-2023 + NQ 2015-2022).
   test:   G461's no-deadline Test (+$6,000 over $3,000, an assumed target), 116 starts.

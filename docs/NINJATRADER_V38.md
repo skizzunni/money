@@ -9226,3 +9226,15 @@ Funded: no variant makes 10% more on development (the best, +1 per $1,000, makes
 Test: a bigger start passes sooner when it passes (129 / 87 days against 189), but far fewer pass (79% / 62% against
 92%): the rest sit near the floor at a size the room no longer allows and never reach the target. Neither meets the
 registered Test rule. `verification/noise_v2/g462_100k_sizing.txt`.
+
+**Reading G461 / G462 with G430:** a Test still "open" at the end of the data is frozen just above the floor and in
+practice lost. So the 100K as U58 loses about 7.8% of its Tests (9 of 116), starting at 2 MNQ 20.7%, at 3 MNQ 38%.
+
+## G463: the 100K's day budget until the floor stops (registered 2026-11-11, before its run)
+
+G461 / G462 assumed a $1,500 budget until the floor stops on the 100K (the 50K's $750 scaled; $1,800 after). It sets how
+big the early trades are. `research/g462_100k_sizing.py` with `G463=1`: the 100K as U58 against an early budget of
+$1,000, and of $2,000 (with the day budget at $2,000). Rules: G462's (funded: development the most $ a session within 5%
+lost and 10% above the 100K as U58, then unseen at least 10% more within 5% lost; Test: pass rate within 2 points of
+92.2% with the median days at most 85% of 189). Run once. (Commit 821b5f2 carried only the runner change; this text is
+its registration, committed before the run.)
