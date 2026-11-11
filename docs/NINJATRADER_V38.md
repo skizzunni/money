@@ -9339,3 +9339,16 @@ is 1 MNQ (G99, tuned on the 50K's $2,000 floor). `research/g462_100k_sizing.py` 
 unseen starts) and `research/g469_100k_brake_fresh.py` (G415's fresh starts): the 100K funded mode ($2,000 steps) with
 the brake at 0.35 and 0.55. G468's rule (a brake replaces 0.45 only with at least 5% more $ a session on all three start
 sets and no more starts lost on any). Run once.
+
+**G469 result (2026-11-11): passes; the 100K funded mode takes the giveback brake at 0.35.**
+
+| 100K funded ($2,000 steps) | development $ a session (lost) | unseen | fresh starts (worst month) |
+|---|---|---|---|
+| brake 0.45 (U58) | $122.2 (0%) | $222.9 (0%) | $32.7 (−$1,749) |
+| **brake 0.35** | **$146.8 (+20%)** (0%) | **$239.4 (+7%)** (0%) | **$34.9 (+7%)** (−$2,086) |
+| brake 0.55 | $86.1 (−30%) (0%) | $186.7 (−16%) (0%) | $27.0 (−17%) (−$1,577) |
+
+0.35 makes at least 5% more on all three start sets with no start lost on any, so it meets G468's rule; its worst month
+on the fresh starts is $337 deeper. The 100K funded mode is now: U58 on the 100K's limits, +1 MNQ per $2,000 (G466),
+brake 0.35 (G469). The brake applies only once the floor has stopped, so the Test is unchanged. Not yet built into
+`MnqNoiseV38.cs` (it waits for the user's 100K rules). `verification/noise_v2/g469_100k_brake.txt`.

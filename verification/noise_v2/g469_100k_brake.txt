@@ -1,0 +1,19 @@
+development (23 starts):
+                            per_session  lost    year3
+tag                                                   
+100K funded ($2,000 steps)      122.174   0.0  192.435
+brake 0.35                      146.792   0.0  247.894
+brake 0.55                       86.134   0.0  139.024
+unseen (57 starts):
+                            per_session  lost    year3
+tag                                                   
+100K funded ($2,000 steps)      222.878   0.0  330.518
+brake 0.35                      239.441   0.0  347.802
+brake 0.55                      186.721   0.0  291.651
+fresh starts used: 16
+             per_session  trades_per_session  lost  green_days  green_weeks  green_months  longest_losing_weeks  worst_month
+100K funded       32.661               1.516   0.0       0.440        0.474         0.693                 4.125    -1748.518
+brake 0.35        34.885               1.572   0.0       0.442        0.483         0.708                 4.500    -2085.575
+brake 0.55        27.026               1.467   0.0       0.440        0.465         0.667                 4.062    -1576.790
+
+[exited with code 0]
