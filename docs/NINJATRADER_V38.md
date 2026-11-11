@@ -8992,3 +8992,9 @@ Hourly round. U58's entry lines on a calm stretch sit at 0.8 noise, the one widt
 measured with G422's calm-only rule. `research/g447_calm_width.py`: U58 with them at 0.7 and at 0.9. G423's rule against
 U58 (the variant with the most $ a session on the fresh starts replaces U58 only if it makes at least 10% more there, at
 least U58's $ on unseen, loses no more fresh starts, and loses at most 5% on unseen and on development). Run once.
+
+**G447 result (2026-11-11): rejected; U58 keeps 0.8.** Fresh starts (U58 $49.2 a session, 1.54 trades, 0 lost): 0.7
+$47.5 (−3%), 1.66 trades; 0.9 **$27.9 (−43%)**; both 0 lost. Development (U58 $42.0, 0%): 0.7 $37.0, 0.9 $45.7 (both
+0%). Unseen (U58 $80.5, 1.6%): 0.7 $80.6 at 1.6%, 0.9 $76.6 at 3.2%. Neither width beats 0.8 by 10% on the fresh starts;
+0.7 matches it on unseen and is worse on development, 0.9 is worse on both recent sets. 0.8 sits at the top of what was
+measured. `verification/noise_v2/g447_calm_width.txt`.
