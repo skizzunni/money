@@ -9245,3 +9245,11 @@ and run once. **Test:** identical for all three (92.2% passed, 9 frozen, median 
 limits a Test trade. **Funded:** development (100K as U58 $110.7, 8.7% lost): $1,000 $110.6 at 4.3%, $2,000 **$115.0
 (+4%, short of 10%)** at 8.7%; unseen ($205.0, 1.8%): $1,000 $205.0, $2,000 $218.9 (+7%) at 1.8%, year three $334 (+11%).
 `verification/noise_v2/g463_100k_early_budget.txt`.
+
+## G464: the 100K's gap-trade cap once the floor has stopped (registered 2026-11-11, before its run)
+
+G457: the gap trade carries about half of U58's profit. Once the floor stops it takes up to `gap_go_locked_qty` 10 MNQ,
+set on the 50K (G84), where 15 broke the $1,000 daily loss once (G83). The 100K has a $1,800 day budget and a $3,000
+floor. `research/g462_100k_sizing.py` with `G464=1`: the 100K as U58 against the gap cap at 15 and 20 MNQ. G462's rules
+(funded: development the most $ a session within 5% lost and 10% above the 100K as U58, then unseen at least 10% more
+within 5% lost; Test reported). The worst funded day is also reported and must stay above −$2,000. Run once.
