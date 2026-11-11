@@ -9026,3 +9026,12 @@ no more fresh starts, and loses at most 5% on unseen and on development). Run on
 0%. Unseen (U58 $80.5, 1.6%): 0.45 $62.3 at 4.8%, 0.55 $69.0 at 6.3%. A later lock helped only on the 2011-18 index
 years; on the recent and unseen starts it gives back trades that U58 locks. With G404 / G444: 0.35 stays.
 `verification/noise_v2/g449_u58_later_lock.txt`.
+
+## G450: U58's take-profit on the funded account (registered 2026-11-11, before its run)
+
+Hourly round. U58's take-profit is **2.0 noise units** (T.REFERENCE; the U48 settings file sets none). G425's text above
+says "1.5": a slip in the doc, not in the run (G425 compared calm-stretch targets against U58's 2.0). The target was
+measured only under PRO (G444, 1.5) and on calm stretches (G425); not on the 50K's end-of-day floor.
+`research/g450_u58_take_profit.py`: U58 with `take_profit` 1.5 and 2.5. G423's rule against U58 (the variant with the
+most $ a session on the fresh starts replaces U58 only if it makes at least 10% more there, at least U58's $ on unseen,
+loses no more fresh starts, and loses at most 5% on unseen and on development). Run once.
