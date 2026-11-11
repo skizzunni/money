@@ -9006,3 +9006,8 @@ U58's $187.50 a contract (from T.REFERENCE) was never re-checked. `research/g448
 `max_loss_per_trade` $150 and $250 a contract. G423's rule against U58 (the variant with the most $ a session on the
 fresh starts replaces U58 only if it makes at least 10% more there, at least U58's $ on unseen, loses no more fresh
 starts, and loses at most 5% on unseen and on development). Run once.
+
+**G448 result (2026-11-11): rejected, both; U58 keeps $187.50.** Fresh starts (U58 $49.2 a session, 0 lost): $150 **$22.1
+(−55%)**, 0 lost; $250 **$25.8 (−48%)**, 1 lost. Development (U58 $42.0, 0%): $150 $48.6 at 6.6%, $250 $47.0 at 13.3%.
+Unseen (U58 $80.5, 1.6%): $150 $62.8 at 3.2%, $250 $58.3 at 9.5%. As under PRO (G437 / G439), $187.50 sits between a
+too-tight and a too-wide stop on the funded account too. `verification/noise_v2/g448_u58_max_loss.txt`.
