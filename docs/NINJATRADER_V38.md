@@ -9253,3 +9253,9 @@ set on the 50K (G84), where 15 broke the $1,000 daily loss once (G83). The 100K 
 floor. `research/g462_100k_sizing.py` with `G464=1`: the 100K as U58 against the gap cap at 15 and 20 MNQ. G462's rules
 (funded: development the most $ a session within 5% lost and 10% above the 100K as U58, then unseen at least 10% more
 within 5% lost; Test reported). The worst funded day is also reported and must stay above −$2,000. Run once.
+
+**G464 result (2026-11-11): rejected, both; the 100K keeps a gap cap of 10.** Test: identical (the cap applies only once
+the floor has stopped). Funded development (100K as U58 $110.7 a session, 8.7% lost, worst day −$1,800): cap 15 $101.5
+(−8%), cap 20 **$79.4 (−28%)**, worst day −$1,971 for both. Unseen ($205.0, 1.8%, −$1,800): cap 15 $223.0 (+9%), cap 20
+$237.4 (+16%), worst day −$1,815 / −$1,952. Bigger gap trades win on 2017-2025 and lose on 2011-2016; they fail the
+development half and bring the worst day near the assumed $2,000 limit. `verification/noise_v2/g464_100k_gap_cap.txt`.
