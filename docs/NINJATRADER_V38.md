@@ -9161,3 +9161,12 @@ unseen, loses no more fresh starts, and loses at most 5% on unseen and on develo
 **G459 result (2026-11-11): rejected; U58 keeps 15:00.** Entries to 15:30: fresh starts **$34.1 a session (−31%)**, 0 lost
 (U58 $49.2); development $48.9 (+17%) but **9.6% lost** (U58 0%); unseen $80.4 (U58 $80.5) at 4.9% lost (1.6%). The
 15:30 entries cost the recent starts a third and triple the losses elsewhere. `verification/noise_v2/g459_u58_last_1530.txt`.
+
+## G460: U58's calm-stretch baseline (registered 2026-11-11, before its run)
+
+Hourly round. A calm stretch is the last 10 sessions' average range against the last `calm_long` (40) sessions'; it now
+drives both the calm-day filter (`calm_k` 0.7) and U58's 0.8 entry lines (G422). G49 varied the windows on the growth
+mode of 2026-11-03, before the lines used them. `research/g460_u58_calm_window.py`: U58 with `calm_long` 30 and 60.
+G423's rule against U58 (the variant with the most $ a session on the fresh starts replaces U58 only if it makes at
+least 10% more there, at least U58's $ on unseen, loses no more fresh starts, and loses at most 5% on unseen and on
+development). Run once.
