@@ -8967,3 +8967,8 @@ close above its average: the upper line; below: the lower); the other side, and 
 usual lines. `research/g445_calm_trend_side.py`: U58 against U58 with it. G423's rule against U58 (the variant replaces
 U58 only if it makes at least 10% more $ a session on the fresh starts, at least U58's $ on unseen, loses no more fresh
 starts, and loses at most 5% on unseen and on development). Run once.
+
+**G445 result (2026-11-11): rejected; U58 stays.** Fresh starts (U58 $49.2 a session, 1.54 trades, 0 lost): trend side only
+**$36.5 (−26%)**, 1.47 trades, 0 lost. Development (U58 $42.0, 0%): $44.9 (+7%), 0%. Unseen (U58 $80.5, 1.6%): $78.1,
+1.6%. It fails on the fresh starts and on unseen: the narrow line against the trend earns its keep on calm stretches
+too. `verification/noise_v2/g445_calm_trend_side.txt`.

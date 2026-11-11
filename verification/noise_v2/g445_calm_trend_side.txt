@@ -1,0 +1,14 @@
+fresh starts used: 16
+                                          per_session  trades_per_session  lost  green_days  green_weeks  green_months  longest_losing_weeks  worst_month
+U58                                            49.191               1.543   0.0       0.420        0.478         0.682                 3.750    -1892.504
+U58, narrow lines on the trend side only       36.471               1.466   0.0       0.431        0.465         0.667                 3.688    -1673.606
+development (index 2011-18 starts):
+                                          per_session  months_1_3  months_10_12  best_month  lost
+tag                                                                                              
+U58, narrow lines on the trend side only       44.897      20.971        75.190     127.214   0.0
+U58                                            41.964      21.212        72.223     112.465   0.0
+unseen (index 2019-25 + NQ 2015-24):
+                                          per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                                               
+U58                                            80.461      42.044       117.888     142.938  0.016
+U58, narrow lines on the trend side only       78.073      43.021       115.033     141.672  0.016
