@@ -67,6 +67,9 @@ def main() -> None:
         from g423_wide_when_wild import U58
         G397.VARIANTS.clear()
         G397.VARIANTS.update({k: {**U58, **K100, **v} for k, v in SIZING.items()})
+        if os.environ.get("G464"):  # G464 also reports the worst day (each row is one session's P/L)
+            base_table = G397.table
+            G397.table = lambda d: base_table(d).assign(worst_day=d.groupby("tag").pnl.min())
         G397.main()
         return
     import v3_eval as E
