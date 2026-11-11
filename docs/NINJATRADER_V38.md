@@ -9107,3 +9107,11 @@ loses no more fresh starts, and loses at most 5% on unseen and on development). 
 **$21.1 (−57%)**, 1.17 trades; 0.75 **$14.4 (−71%)**, 0.86 trades, 1 lost. Development (U58 $42.0, 0%): $36.6 at 16.6%,
 $27.3 at 6.7%. Unseen (U58 $80.5, 1.6%): $57.5 at 1.6%, $50.8 at 3.1%. Requiring a fast half hour drops a quarter to
 nearly half the trades, and many of the dropped ones were winners. `verification/noise_v2/g455_u58_fast_half_hour.txt`.
+
+## G456: U58 with no entries once the day is stretched (registered 2026-11-11, before its run)
+
+Hourly round. G360's filter (`exhaust_k`: no new entries once the day's high-low range is already k x the last 10
+sessions' average range) was measured only on the Test sprint (U57). `research/g456_u58_stretched_day.py`: U58 on the
+funded account with k 1.25 and 1.5. G423's rule against U58 (the variant with the most $ a session on the fresh starts
+replaces U58 only if it makes at least 10% more there, at least U58's $ on unseen, loses no more fresh starts, and loses
+at most 5% on unseen and on development). Run once.
