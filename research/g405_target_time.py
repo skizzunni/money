@@ -1,21 +1,23 @@
-"""G405 (docs/NINJATRADER_V38.md): more green days on the 50K: U48 with a nearer take-profit or a shorter time stop, 36 months, development (index starts 2011-2016) and unseen (index 2017-2023,
+"""G405 (docs/NINJATRADER_V38.md): more green days on the 50K: U48 with a nearer take-profit or a shorter time stop, 36
+months, development (index starts 2011-2016) and unseen (index 2017-2023,
 NQ 2015-2022): $ a session, lost, trades a session, green days of traded days, green weeks / months, longest losing-week
 run, worst month.
 
     python research/g405_target_time.py <data dir> <MNQ 09-26> <MNQ 12-26> <U48 JS json>
 """
-import itertools
 import json
 import os
 import sys
 from concurrent.futures import ProcessPoolExecutor
 
+import g250_test_week as G
 import numpy as np
 import pandas as pd
-import g250_test_week as G
+
 from mnqbot.noise import NoiseConfig, run
 
-VARIANTS = {"U48": {}, "take-profit 1.5": {"take_profit": 1.5}, "take-profit 1.0": {"take_profit": 1.0}, "time stop 30": {"time_stop": 30}}
+VARIANTS = {"U48": {}, "take-profit 1.5": {"take_profit": 1.5}, "take-profit 1.0": {"take_profit": 1.0},
+    "time stop 30": {"time_stop": 30}}
 
 
 def job(a):
@@ -34,7 +36,8 @@ def job(a):
     res = run(b, cfg, minutes=G.S.MIN[0])
     bt = b.index.tz_convert(G.NY)
     bd = np.array(bt.date)
-    days = sorted({d for d, m in zip(bt.date, bt.hour * 60 + bt.minute) if d >= s0.date() and 570 <= m < 960})
+    days = sorted({d for d, m in zip(bt.date, bt.hour * 60 + bt.minute,
+        strict=False) if d >= s0.date() and 570 <= m < 960})
     hi, lo = b.high.to_numpy(), b.low.to_numpy()
     adv, closed = np.zeros(len(b)), np.zeros(len(b))
     pnl = {d: 0.0 for d in days}
@@ -58,7 +61,8 @@ def job(a):
         peak = max(peak, eod)
         month = (pd.Timestamp(d).year - s0.year) * 12 + pd.Timestamp(d).month - s0.month + 1
         if month <= 36:
-            rows.append({"tag": tag, "set": name, "start": start, "month": month, "pnl": 0.0 if lost else pnl[d], "n": 0 if lost else nt[d], "date": str(d),
+            rows.append({"tag": tag, "set": name, "start": start, "month": month, "pnl": 0.0 if lost else pnl[d],
+                "n": 0 if lost else nt[d], "date": str(d),
                          "lost": lost})
     return rows
 

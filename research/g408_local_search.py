@@ -12,9 +12,9 @@ import random
 import sys
 from concurrent.futures import ProcessPoolExecutor
 
-import pandas as pd
 import g250_test_week as G
 import g400_consistency as M
+import pandas as pd
 
 PICK = {"daily_loss_limit": 2000.0, "profit_step": 1000.0, "profit_step_fast_from": 6000.0, "vol_pro": False,
         "vol_lo": 0.5, "vol_hi": 1.5, "skip_checks": "", "last_entry_end": 930}

@@ -1,5 +1,6 @@
 """G400 (docs/NINJATRADER_V38.md): a big random search on the user's 50K for the most $ a session over 36 months with
-the account kept, the bot's own $900 day budget free to rise (the user: "fk this limit... protected losses so i dont lose
+the account kept, the bot's own $900 day budget free to rise (the user: "fk this limit... protected losses so i dont
+lose
 the account"). 300 random sets (seed 400; the first is U48) over: the day budget, the early budget, a floor guard (the
 trade closed inside the bar before the floor; `day_guard` very large, `guard_floor_buffer` $100 / $300), the start size,
 the steps, the cap, take-profit, time stop, losers a day, inverse-volatility size, the drive tilt, the checks. Each set
@@ -15,14 +16,15 @@ import random
 import sys
 from concurrent.futures import ProcessPoolExecutor
 
-import pandas as pd
 import g250_test_week as G
 import g397_150k_sizing as M
+import pandas as pd
 
 CHOICES = {
     "day budget": [None, {"daily_loss_limit": 1500.0}, {"daily_loss_limit": 2000.0}, {"daily_loss_limit": 3000.0}],
     "early budget": [None, {"early_daily_loss": 1000.0}, {"early_daily_loss": 1500.0}],
-    "floor guard": [None, {"day_guard": 1e9, "guard_floor_buffer": 100.0}, {"day_guard": 1e9, "guard_floor_buffer": 300.0}],
+    "floor guard": [None, {"day_guard": 1e9, "guard_floor_buffer": 100.0}, {"day_guard": 1e9,
+        "guard_floor_buffer": 300.0}],
     "start": [None, {"qty": 2, "max_loss_per_trade": 375.0}],
     "step": [None, {"profit_step": 1000.0}],
     "fast": [None, {"profit_step_fast_from": 6000.0}],

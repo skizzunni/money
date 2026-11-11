@@ -1,22 +1,24 @@
 """G396 (docs/NINJATRADER_V38.md): a measurement. U48 on bigger single accounts: 100K ($3,000 floor, $1,800 day
-budget) and 150K ($4,500 floor, $2,700 day budget), sizing as U48 otherwise. G391: U48 funded from fresh starts on the first Monday of every quarter, run
+budget) and 150K ($4,500 floor, $2,700 day budget), sizing as U48 otherwise. G391: U48 funded from fresh starts on the
+first Monday of every quarter, run
 36 months: $ a session by month since the start, the share of starts lost (G372's intraday check), and the share of
 starts averaging $750 a session in that month.
 
     python research/g396_bigger_account.py <data dir> <MNQ 09-26> <MNQ 12-26> <U48 JS json>
 """
-import itertools
 import json
 import os
 import sys
 from concurrent.futures import ProcessPoolExecutor
 
+import g250_test_week as G
 import numpy as np
 import pandas as pd
-import g250_test_week as G
+
 from mnqbot.noise import NoiseConfig, run
 
-VARIANTS = {"50K (U48)": {}, "100K": {"trail_dd": 3000.0, "daily_loss_limit": 1800.0, "early_daily_loss": 1500.0}, "150K": {"trail_dd": 4500.0, "daily_loss_limit": 2700.0, "early_daily_loss": 2250.0}}
+VARIANTS = {"50K (U48)": {}, "100K": {"trail_dd": 3000.0, "daily_loss_limit": 1800.0, "early_daily_loss": 1500.0},
+    "150K": {"trail_dd": 4500.0, "daily_loss_limit": 2700.0, "early_daily_loss": 2250.0}}
 
 
 def job(a):
@@ -35,7 +37,8 @@ def job(a):
     res = run(b, cfg, minutes=G.S.MIN[0])
     bt = b.index.tz_convert(G.NY)
     bd = np.array(bt.date)
-    days = sorted({d for d, m in zip(bt.date, bt.hour * 60 + bt.minute) if d >= s0.date() and 570 <= m < 960})
+    days = sorted({d for d, m in zip(bt.date, bt.hour * 60 + bt.minute,
+        strict=False) if d >= s0.date() and 570 <= m < 960})
     hi, lo = b.high.to_numpy(), b.low.to_numpy()
     adv, closed = np.zeros(len(b)), np.zeros(len(b))
     pnl = {d: 0.0 for d in days}

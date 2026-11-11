@@ -115,7 +115,8 @@ def simulate(sess: list[dict], start: str, end: str, p: dict) -> tuple[pd.DataFr
                          - (QN + qs) * FEE)
                     marks.append((i, j, w, c))
                     continue
-            if pos is None and n_trades < max_trades and 595 <= mi[j] <= 895 and j + 1 < len(mi) and abs(z[j]) >= p["Z"]:
+            if (pos is None and n_trades < max_trades and 595 <= mi[j] <= 895 and j + 1 < len(mi)
+                    and abs(z[j]) >= p["Z"]):
                 sign = 1 if z[j] > 0 else -1
                 dn = sign if follow else -sign
                 qs = max(1, int(round(QN * s["beta"] * PV_N * s["nc"][j] / (PV_S * s["sc"][j]))))

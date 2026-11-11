@@ -21,7 +21,7 @@ from mnqbot.noise import NoiseConfig, run
 S.init({}, *sys.argv[1:4])
 PACK = json.loads(os.environ["PACK_JSON"])
 NY = "America/New_York"
-for name, (bars, first, skip) in S.D.items():
+for name, (bars, _first, skip) in S.D.items():
     if name in ("win", "proxy"):
         continue
     cfg = NoiseConfig(**{**S.V23, **T.REFERENCE, "daily_loss_limit": 900.0, "trail_dd": 2000.0, "time_stop": 60,

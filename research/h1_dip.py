@@ -36,7 +36,8 @@ WINDOWS = {"dev": [("nq", "2015-01-01", "2019-12-31"), ("index", "2011-01-01", "
 
 def load(data: Path) -> tuple[dict, pd.Series]:
     nq = G.sessions(G.rth5(pd.read_pickle(data / "nq1m_all.pkl")), True)
-    ix_raw = pd.concat([load_histdata(f) for f in sorted(glob.glob(str(data / "histdata_raw/*/DAT_ASCII_NSXUSD_M1_*.csv")))])
+    raw_files = sorted(glob.glob(str(data / "histdata_raw/*/DAT_ASCII_NSXUSD_M1_*.csv")))
+    ix_raw = pd.concat([load_histdata(f) for f in raw_files])
     ix_raw = ix_raw[~ix_raw.index.duplicated()].sort_index()
     ix = G.sessions(G.rth5(ix_raw), False)
     px = G.sessions(G.rth5(pd.read_pickle(data / "proxy_5m.pkl")), False)
@@ -144,7 +145,8 @@ def stats(tf: pd.DataFrame, book: dict, years: float) -> dict:
     aw, al = (wins.mean() if len(wins) else 0.0), (losses.mean() if len(losses) else 0.0)
     closed_dd, marked_dd = drawdowns(tf, book)
     return {"trades": len(p), "trades/yr": round(len(p) / years, 1),
-            "gross $/trade": round(float(tf.gross.mean()), 2), "cost $/trade": round(float((tf.gross - tf.pnl).mean()), 2),
+            "gross $/trade": round(float(tf.gross.mean()), 2), "cost $/trade": round(float((tf.gross - tf.pnl).mean()),
+                2),
             "net $/trade": round(float(p.mean()), 2),
             "t": round(float(p.mean() / (p.std(ddof=1) / np.sqrt(len(p)))), 2) if len(p) > 1 else 0.0,
             "net win %": round(100 * len(wins) / len(p), 1),
@@ -191,7 +193,8 @@ def main() -> None:
             rows += rs
             if ok and (best is None or t > best[0]):
                 best = (t, p)
-            print(p, [(r["set"], r.get("trades/yr"), r.get("net $/trade"), r.get("net win %"), r.get("pf")) for r in rs],
+            print(p, [(r["set"], r.get("trades/yr"), r.get("net $/trade"), r.get("net win %"),
+                r.get("pf")) for r in rs],
                   round(t, 2), ok, flush=True)
         print("SELECTED", best, flush=True)
     else:

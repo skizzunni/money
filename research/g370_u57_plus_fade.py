@@ -4,14 +4,10 @@ trade measures, plus the net a session.
 
     SESS=10 python research/g370_u57_plus_fade.py <data dir> <MNQ 09-26> <MNQ 12-26> <U48 JS json>
 """
-import json
-import os
-import sys
-from concurrent.futures import ProcessPoolExecutor
 
-import pandas as pd
 import g250_test_week as G
 import g368_fade_levels as F
+import pandas as pd
 from g343_gap_trade import U57
 from g367_fade import Res
 
@@ -27,7 +23,8 @@ def job(a):
         res = _run(b, cfg, minutes=minutes)
         if VARIANTS[tag]:
             F.P.clear()
-            F.P.update({"tp": 0.15, "sl": "extreme", "entry_k": 0.7, "lookback": 18, "qty": VARIANTS[tag], "max_trades": 4})
+            F.P.update({"tp": 0.15, "sl": "extreme", "entry_k": 0.7, "lookback": 18, "qty": VARIANTS[tag],
+                "max_trades": 4})
             busy = [(t.entry_bar, t.exit_bar) for t in res.trades]
             fade = [t for t in F.fade_run(b, cfg, minutes).trades
                     if not any(e <= t.exit_bar and t.entry_bar <= x for e, x in busy)]
@@ -41,7 +38,8 @@ def job(a):
         return None
     s0 = pd.Timestamp(start, tz=G.NY)
     bt = box["b"].index.tz_convert(G.NY)
-    days = sorted({d for d, m in zip(bt.date, bt.hour * 60 + bt.minute) if d >= s0.date() and 570 <= m < 960})[:G.SESS]
+    days = sorted({d for d, m in zip(bt.date, bt.hour * 60 + bt.minute,
+        strict=False) if d >= s0.date() and 570 <= m < 960})[:G.SESS]
     tr = [t for t in box["res"].trades if t.entry_time >= s0 and t.exit_time.tz_convert(G.NY).date() <= days[-1]]
     return {"tag": tag, **r, "n": len(tr), "wins": sum(t.pnl > 0 for t in tr), "pnl": sum(t.pnl for t in tr),
             "days_traded": len({t.entry_time.tz_convert(G.NY).date() for t in tr})}

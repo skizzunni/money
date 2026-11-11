@@ -16,7 +16,6 @@ import v24_scan as S
 from mnqbot.noise import NoiseConfig, run
 
 
-
 def with_1600(bars: pd.DataFrame, m: int) -> pd.DataFrame:
     """A 16:00 bar at the last price where a session's data stops at 16:00 (as research/g69_days.py)."""
     t = bars.index.tz_convert("America/New_York")

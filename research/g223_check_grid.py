@@ -1,9 +1,9 @@
-"""G223 (docs/NINJATRADER_V38.md): the check grid around U44; G195's runner (the chart's execution on the window, NQ and the index).
+"""G223 (docs/NINJATRADER_V38.md): the check grid around U44; G195's runner (the chart's execution on the window, NQ and
+the index).
 
     python research/g223_check_grid.py <data dir> <MNQ 09-26 file> <MNQ 12-26 file>
 """
 import json
-import random
 import sys
 from concurrent.futures import ProcessPoolExecutor
 

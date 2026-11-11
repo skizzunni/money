@@ -10,11 +10,11 @@ G372's measure (U48 does not see the Williams P/L when it sizes).
 """
 import math
 
-import numpy as np
-import pandas as pd
 import g250_test_week as G
 import g372_faster_growth as M
+import numpy as np
 from g367_fade import Res, Tr
+
 from mnqbot.noise import run as noise_run
 
 TICK, PV, FEE = 0.25, 2.0, 0.62
@@ -30,7 +30,7 @@ def williams(b, risk):
     out, prev_rng = [], math.nan
     starts = np.flatnonzero(np.r_[True, dates[1:] != dates[:-1]])
     ends = np.r_[starts[1:], len(b)]
-    for a, z in zip(starts, ends):
+    for a, z in zip(starts, ends, strict=False):
         rth = [k for k in range(a, z) if 570 <= mins[k] < 960]
         if not rth:
             continue

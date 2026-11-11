@@ -10,7 +10,8 @@ import g135_gap_screen as G
 import v24_scan as S
 
 G.U33 = {**G.U33, "profit_step_fast": 750.0}  # U34
-G.VARIANTS = [{}, {"gap_go_exit": 590}, {"gap_go_exit": 600}, {"lookback": 12}, {"lookback": 16}, {"size_slip_pts": 3.0}, {"size_slip_pts": 5.0}]
+G.VARIANTS = [{}, {"gap_go_exit": 590}, {"gap_go_exit": 600}, {"lookback": 12}, {"lookback": 16},
+    {"size_slip_pts": 3.0}, {"size_slip_pts": 5.0}]
 
 if __name__ == "__main__":
     S.init({}, *sys.argv[1:4])

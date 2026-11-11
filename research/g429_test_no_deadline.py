@@ -2,7 +2,8 @@
 (the funded mode's sizing, 1 MNQ growing with profit). The 116 starts of docs/V2_STOPS.md's v3 replay (every 30 days,
 Feb 2015 - Jul 2024, NQ 5-minute, closures skipped), $0.62 a side and 2 ticks, each run until it passes (+$3,000, 3
 days, best day under half the profit) or fails (the balance, open trades at their bars' worst prices, touches the
-highest end-of-day balance less $2,000, at most the start). The configurations are the NinjaTrader tests' (GROW, SPRINT).
+highest end-of-day balance less $2,000, at most the start). The configurations are the NinjaTrader tests' (GROW,
+SPRINT).
 
     PROCS=4 python research/g429_test_no_deadline.py <data dir>
 """
@@ -50,7 +51,8 @@ def job(a):
     if tag.startswith("U58, start "):  # G431: the starting contracts (the max loss is for the whole position)
         q = int(tag.split()[-1])
         base["qty"], base["max_loss_per_trade"] = q, GROW.max_loss_per_trade * q
-    cfg = dataclasses.replace(GROW, **base) if tag.startswith("U58") else dataclasses.replace(GROW, **{**SPRINT, **base})
+    cfg = dataclasses.replace(GROW, **base) if tag.startswith("U58") else dataclasses.replace(GROW, **{**SPRINT,
+        **base})
     tr = [t for t in run(w, cfg, 5).trades if t.entry_time >= s0]
     closed, worst, _ = V.marks(w, tr)
     day = np.asarray(w.index.tz_convert(V.NY).strftime("%Y-%m-%d"))
@@ -75,7 +77,8 @@ def main() -> None:
         p = g[g.outcome == "pass"]
         print(f"{tag}: starts {len(g)}, passed {len(p) / len(g):.1%}, failed {(g.outcome == 'fail').mean():.1%}, "
               f"open {(g.outcome == 'open').sum()}, median trading days to pass {p.sessions.median():.0f}, "
-              f"passed within 10 days {(p.sessions <= 10).sum() / len(g):.1%}, worst drawdown ${g.dd.max():,.0f}", flush=True)
+              f"passed within 10 days {(p.sessions <= 10).sum() / len(g):.1%}, worst drawdown ${g.dd.max():,.0f}",
+                  flush=True)
 
 
 if __name__ == "__main__":

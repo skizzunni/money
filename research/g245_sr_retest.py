@@ -1,4 +1,5 @@
-"""G245 (docs/NINJATRADER_V38.md): support and resistance, breakout and retest (the user's video, 2026-11-05). A measurement.
+"""G245 (docs/NINJATRADER_V38.md): support and resistance, breakout and retest (the user's video, 2026-11-05). A
+measurement.
 
 5-minute RTH bars, 1 MNQ, $1.24 commission and a tick each way per round trip:
   levels: a pivot high (low) is a bar whose high (low) is at least (at most) the 3 bars on each side; it is known only
@@ -105,5 +106,6 @@ for name, (bars, first, skip) in S.D.items():
     print(f"\n{name}: {len(df)} trades, net ${df.pnl.sum():,.0f} per MNQ, win {100 * (df.pnl > 0).mean():.1f}%, "
           f"years up {(yr > 0).sum()} of {len(yr)}; U47 days ${df[df.u47].pnl.sum():,.0f} ({int(df.u47.sum())}), "
           f"idle days ${idle.pnl.sum():,.0f} ({len(idle)}, years up {(yi > 0).sum()} of {len(yi)})")
-    print(pd.DataFrame({"net": yr, "U47 days": df[df.u47].groupby("y").pnl.sum().round(0), "idle days": yi}).to_string(),
+    print(pd.DataFrame({"net": yr, "U47 days": df[df.u47].groupby("y").pnl.sum().round(0),
+        "idle days": yi}).to_string(),
           flush=True)

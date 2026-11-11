@@ -10,9 +10,9 @@ import os
 import sys
 from concurrent.futures import ProcessPoolExecutor
 
-import pandas as pd
 import g250_test_week as G
 import g277_test_search as G7
+import pandas as pd
 from g282_push import U53
 
 K296 = dict(G7.VARIANTS[296])
@@ -45,7 +45,8 @@ def main() -> None:
     conf += [("index", d.strftime("%Y-%m-%d")) for d in pd.date_range("2019-01-07", "2026-08-31", freq="W-MON")]
     for label, starts in (("development (index 2011-18)", dev), ("unseen (NQ 2015-25 + index 2019-26)", conf)):
         with ProcessPoolExecutor(int(os.environ.get("PROCS", "4"))) as ex:
-            d = pd.DataFrame([r for r in ex.map(job, [(t, n, s) for t in VARIANTS for n, s in starts], chunksize=16) if r])
+            d = pd.DataFrame([r for r in ex.map(job, [(t, n, s) for t in VARIANTS for n, s in starts],
+                chunksize=16) if r])
         print(label + ":\n" + d.groupby("tag").agg(weeks=("passed", "size"), passed=("passed", "mean"),
                                                   failed=("failed", "mean")).round(3).to_string(), flush=True)
 

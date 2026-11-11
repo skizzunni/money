@@ -18,7 +18,8 @@ from mnqbot.noise import NoiseConfig, run
 NY = "America/New_York"
 VARIANT = sys.argv[4] if len(sys.argv) > 4 else "base"
 MONTHS = int(os.environ.get("HORIZON_MONTHS", "21"))  # G43: 60, and the months to +$50,000
-import json as _json  # G164: VARIANT "json" takes its settings from VARIANT_JSON and its name from VARIANT_TAG
+# G164: VARIANT "json" takes its settings from VARIANT_JSON and its name from VARIANT_TAG
+import json as _json  # noqa: E402
 
 EXTRA = {"base": {}, "gentle": {"steps_after_lock": True}, "cap10": {"size_up_to": 10},
          "reserve500": {"trail_buffer": 500.0}, "half": {"trail_frac": 0.5},
@@ -284,12 +285,14 @@ EXTRA = {"base": {}, "gentle": {"steps_after_lock": True}, "cap10": {"size_up_to
                     "gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
                     "fill_min_room": 3000.0, "size_slip_pts": 4.0, "fill_qty2_room": 6000.0,
                     "giveback_brake": 0.5, "after_loss_ml_locked": 1.0, "size_up_to": 50, "skip_checks": "780,870",
-                    "skip_checks_early": True, "day_guard": 900.0, "room_mult_room": 3000.0, "day_guard_locked": True, "room_mult": 3.0},
+                    "skip_checks_early": True, "day_guard": 900.0, "room_mult_room": 3000.0, "day_guard_locked": True,
+                        "room_mult": 3.0},
          "u33rm4": {"gap_go": True, "gap_go_skip_month_first": True, "gap_go_max_qty": 1, "gap_go_locked_qty": 10,
                     "gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
                     "fill_min_room": 3000.0, "size_slip_pts": 4.0, "fill_qty2_room": 6000.0,
                     "giveback_brake": 0.5, "after_loss_ml_locked": 1.0, "size_up_to": 50, "skip_checks": "780,870",
-                    "skip_checks_early": True, "day_guard": 900.0, "room_mult_room": 3000.0, "day_guard_locked": True, "room_mult": 4.0},
+                    "skip_checks_early": True, "day_guard": 900.0, "room_mult_room": 3000.0, "day_guard_locked": True,
+                        "room_mult": 4.0},
          "u33rm4s2": {"gap_go": True, "gap_go_skip_month_first": True, "gap_go_max_qty": 1, "gap_go_locked_qty": 10,
                     "gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
                     "fill_min_room": 3000.0, "size_slip_pts": 4.0, "fill_qty2_room": 6000.0,
@@ -373,13 +376,16 @@ EXTRA = {"base": {}, "gentle": {"steps_after_lock": True}, "cap10": {"size_up_to
                     "gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
                     "fill_min_room": 3000.0, "size_slip_pts": 4.0, "fill_qty2_room": 6000.0,
                     "giveback_brake": 0.5, "after_loss_ml_locked": 1.0, "size_up_to": 50, "skip_checks": "780,870",
-                    "skip_checks_early": True, "profit_step_fast": 750.0}, "fill_after_lock": False, "gap_go_small_k": -1.0, "trend_small": False, "gap_go_drive_k": 0.0},
-         "u34noDrive": {**{"gap_go": True, "gap_go_skip_month_first": True, "gap_go_max_qty": 1, "gap_go_locked_qty": 10,
+                    "skip_checks_early": True, "profit_step_fast": 750.0}, "fill_after_lock": False,
+                        "gap_go_small_k": -1.0, "trend_small": False, "gap_go_drive_k": 0.0},
+         "u34noDrive": {**{"gap_go": True, "gap_go_skip_month_first": True, "gap_go_max_qty": 1,
+             "gap_go_locked_qty": 10,
                     "gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
                     "fill_min_room": 3000.0, "size_slip_pts": 4.0, "fill_qty2_room": 6000.0,
                     "giveback_brake": 0.5, "after_loss_ml_locked": 1.0, "size_up_to": 50, "skip_checks": "780,870",
                     "skip_checks_early": True, "profit_step_fast": 750.0}, "gap_go_drive_k": 0.0},
-         "u34noBrake": {**{"gap_go": True, "gap_go_skip_month_first": True, "gap_go_max_qty": 1, "gap_go_locked_qty": 10,
+         "u34noBrake": {**{"gap_go": True, "gap_go_skip_month_first": True, "gap_go_max_qty": 1,
+             "gap_go_locked_qty": 10,
                     "gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
                     "fill_min_room": 3000.0, "size_slip_pts": 4.0, "fill_qty2_room": 6000.0,
                     "giveback_brake": 0.5, "after_loss_ml_locked": 1.0, "size_up_to": 50, "skip_checks": "780,870",
@@ -398,7 +404,8 @@ EXTRA = {"base": {}, "gentle": {"steps_after_lock": True}, "cap10": {"size_up_to
                     "gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.5, "fill_after_lock": True,
                     "fill_min_room": 3000.0, "size_slip_pts": 4.0, "fill_qty2_room": 6000.0,
                     "giveback_brake": 0.5, "after_loss_ml_locked": 1.0, "size_up_to": 50, "skip_checks": "780,870",
-                    "skip_checks_early": True, "profit_step_fast": 750.0, "after_loss_ml_mult": 1.2}}.get(VARIANT) if VARIANT != "json" \
+                    "skip_checks_early": True, "profit_step_fast": 750.0,
+                        "after_loss_ml_mult": 1.2}}.get(VARIANT) if VARIANT != "json" \
     else _json.loads(os.environ["VARIANT_JSON"])
 if VARIANT == "json":
     VARIANT = os.environ.get("VARIANT_TAG", "json")

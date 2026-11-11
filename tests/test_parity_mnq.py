@@ -111,7 +111,8 @@ def test_v15_two_mnq_trade_for_trade(sim, sample):  # noqa: F811
     path, bars = sample
     py = run(bars, V15_2, minutes=1).trades
     r = subprocess.run([DOTNET, str(sim), str(path), "1", "UseBreakout=False", "SimSlippageTicks=2",
-                        "SimCommissionPerSide=0.62", "EvalQty=2", "EvalMaxLoss=350", "EvalMaxLosers=4", "TightenOnly=False"],
+                        "SimCommissionPerSide=0.62", "EvalQty=2", "EvalMaxLoss=350", "EvalMaxLosers=4",
+                            "TightenOnly=False"],
                        capture_output=True, text=True, env=ENV)
     assert r.returncode == 0, r.stderr[-2000:]
     nt = [x.split(",")[1:] for x in r.stdout.splitlines() if x.startswith("T,")]

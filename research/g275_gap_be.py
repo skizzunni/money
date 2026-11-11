@@ -9,8 +9,8 @@ import os
 import sys
 from concurrent.futures import ProcessPoolExecutor
 
-import pandas as pd
 import g250_test_week as G
+import pandas as pd
 
 K317 = {"lookback": 18, "entry_k": 0.7, "range_pos_min": 0.7, "calm_k": 0.7, "take_profit": 0.75, "lock_at": 0.2,
         "skip_checks": "", "max_losers": 3, "time_stop": 30, "trend_n": 0, "big_day_k": 0.0, "stop_buffer": 0.24,
@@ -20,7 +20,8 @@ VARIANTS = {"U52 (1.5x)": 1.5, "break-even 0.75x": 0.75, "break-even 1.0x": 1.0,
 
 def job(a):
     tag, name, start = a
-    r = G.one((name, start, 4, 1100.0, {**K317, "sprint_target": 5000.0, "sprint_gap_qty": 2, "gap_go_be": VARIANTS[tag]}))
+    r = G.one((name, start, 4, 1100.0, {**K317, "sprint_target": 5000.0, "sprint_gap_qty": 2,
+        "gap_go_be": VARIANTS[tag]}))
     return None if r is None else {"tag": tag, **r}
 
 
@@ -33,7 +34,8 @@ def main() -> None:
     conf += [("index", d.strftime("%Y-%m-%d")) for d in pd.date_range("2019-01-07", "2026-08-31", freq="W-MON")]
     for label, starts in (("development (index 2011-18)", dev), ("unseen (NQ 2015-25 + index 2019-26)", conf)):
         with ProcessPoolExecutor(int(os.environ.get("PROCS", "4"))) as ex:
-            d = pd.DataFrame([r for r in ex.map(job, [(t, n, s) for t in VARIANTS for n, s in starts], chunksize=16) if r])
+            d = pd.DataFrame([r for r in ex.map(job, [(t, n, s) for t in VARIANTS for n, s in starts],
+                chunksize=16) if r])
         print(label + ":\n" + d.groupby("tag").agg(weeks=("passed", "size"), passed=("passed", "mean"),
                                                   failed=("failed", "mean")).round(3).to_string(), flush=True)
 

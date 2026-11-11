@@ -11,8 +11,8 @@ import os
 import sys
 from concurrent.futures import ProcessPoolExecutor
 
-import pandas as pd
 import g250_test_week as G
+import pandas as pd
 
 K317 = {"lookback": 18, "entry_k": 0.7, "range_pos_min": 0.7, "calm_k": 0.7, "take_profit": 0.75, "lock_at": 0.2,
         "skip_checks": "", "max_losers": 3, "time_stop": 30, "trend_n": 0, "big_day_k": 0.0, "stop_buffer": 0.24,
@@ -36,7 +36,8 @@ def main() -> None:
     G.BASE.update(json.load(open(sys.argv[4])))
     starts = [("nq", d.strftime("%Y-%m-%d")) for d in pd.date_range("2015-04-06", "2025-05-01", freq="W-MON")]
     starts += [("index", d.strftime("%Y-%m-%d")) for d in pd.date_range("2011-04-04", "2026-07-01", freq="W-MON")]
-    jobs = [(s, n, d) for s in tuple(int(x) for x in os.environ.get("HORIZONS", "10,15,20,30").split(",")) for n, d in starts]
+    jobs = [(s, n, d) for s in tuple(int(x) for x in os.environ.get("HORIZONS", "10,15,20,30").split(",")) for n,
+        d in starts]
     with ProcessPoolExecutor(int(os.environ.get("PROCS", "4"))) as ex:
         d = pd.DataFrame([r for r in ex.map(job, jobs, chunksize=16) if r])
     d.to_csv(f"verification/noise_v2/g326_horizon{os.environ.get('TAG', '')}.csv", index=False)

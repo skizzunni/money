@@ -148,7 +148,8 @@ def stats(pnl: np.ndarray, worst: np.ndarray, n_sess: int) -> dict:
     sd = pnl.std(ddof=1) if len(pnl) > 1 else 0.0
     return {"n": len(pnl), "per yr": round(len(pnl) / (n_sess / 252), 1), "win": round(100 * (pnl > 0).mean(), 1),
             "pf": round(float(w / l_) if l_ > 0 else 99.0, 3), "net": round(float(pnl.sum())),
-            "avg": round(float(pnl.mean()), 2), "t": round(float(pnl.mean() / (sd / np.sqrt(len(pnl)))) if sd else 0, 2),
+            "avg": round(float(pnl.mean()), 2), "t": round(float(pnl.mean() / (sd / np.sqrt(len(pnl)))) if sd else 0,
+                2),
             "mdd": round(mdd)}
 
 

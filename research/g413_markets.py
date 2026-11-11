@@ -11,8 +11,8 @@ import itertools
 import math
 import sys
 
-import pandas as pd
 import other_markets as O
+import pandas as pd
 
 EXTRA = {
     "dax": O.Spec("dax", "GRXEUR", 180, 690, 210, 660, 1.08, 1.0, 0.50, 2.0),
@@ -39,7 +39,8 @@ def main() -> None:
                 t = daily.mean() / (daily.std(ddof=1) / math.sqrt(len(daily))) if daily.std() > 0 else 0.0
                 rows.append({"market": name, "contracts": q, "max loss a contract": mlc, "period": per,
                              "$ a day": round(daily.mean(), 2), "t": round(t, 2),
-                             "trades a week": round(len(x) / (len(dd) / 5), 1), "winners": round((x.pnl > 0).mean(), 3)})
+                             "trades a week": round(len(x) / (len(dd) / 5), 1), "winners": round((x.pnl > 0).mean(),
+                                 3)})
         print(name, "done", flush=True)
     print(pd.DataFrame(rows).to_string(index=False))
 

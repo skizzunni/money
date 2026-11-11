@@ -1,4 +1,5 @@
-"""docs/V2_STOPS.md, Phase 4: the v1.5 rules at a fixed 2 MNQ, v1.5 stops against the v2 stops, on NQ 2015-2025 (5-minute,
+"""docs/V2_STOPS.md, Phase 4: the v1.5 rules at a fixed 2 MNQ, v1.5 stops against the v2 stops, on NQ 2015-2025
+(5-minute,
 back-adjusted, rescaled), as consecutive 30-day $50K evaluations under Take Profit Trader's Test rules, end-of-day and
 intraday trailing. Also the tight-stop grid and the lock / cap separation (reported, not selected on).
 
@@ -51,7 +52,8 @@ def load(data: str) -> pd.DataFrame:
     trade there would be held to the next session, across the monthly rescaling); a 16:00 bar added where missing."""
     b = S.drop_bad(pd.read_pickle(Path(data) / "nq5m_scaled.pkl")[["open", "high", "low", "close", "volume"]])
     t = b.index.tz_convert(NY)
-    g = pd.DataFrame({"d": t.strftime("%Y-%m-%d"), "m": t.hour * 60 + t.minute}).groupby("d").m.agg(["count", "min", "max"])
+    g = pd.DataFrame({"d": t.strftime("%Y-%m-%d"), "m": t.hour * 60 + t.minute}).groupby("d").m.agg(["count", "min",
+        "max"])
     holes = g[(g["max"] < 955) | (g["min"] > 570) | (g["count"] < 70)].index
     BASE["skip_dates"] = S.CLOSURES + "," + ",".join(holes)
     m = t.hour * 60 + t.minute

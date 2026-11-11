@@ -1,4 +1,5 @@
-"""G220 (docs/NINJATRADER_V38.md): 30 random combinations of the exit settings around U44; G195's runner (the chart's execution on the window, NQ and the index).
+"""G220 (docs/NINJATRADER_V38.md): 30 random combinations of the exit settings around U44; G195's runner (the chart's
+execution on the window, NQ and the index).
 
     python research/g220_exit_search.py <data dir> <MNQ 09-26 file> <MNQ 12-26 file>
 """

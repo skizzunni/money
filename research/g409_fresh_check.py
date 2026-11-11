@@ -4,18 +4,22 @@
 
     python research/g409_fresh_check.py <data dir> <MNQ 09-26> <MNQ 12-26> <U48 JS json>
 """
-import itertools
 import json
 import os
 import sys
 from concurrent.futures import ProcessPoolExecutor
 
+import g250_test_week as G
 import numpy as np
 import pandas as pd
-import g250_test_week as G
+
 from mnqbot.noise import NoiseConfig, run
 
-VARIANTS = {"U48": {}, "G408 steady": {"daily_loss_limit": 1200.0, "profit_step": 1250.0, "profit_step_fast_from": 9000.0, "vol_pro": False, "vol_lo": 0.75, "vol_hi": 1.25, "day_lock_at": 1500.0, "day_lock_keep": 750.0, "trend_n": 20}, "G408 pick": {"daily_loss_limit": 2000.0, "profit_step": 1500.0, "profit_step_fast_from": 6000.0, "vol_pro": False, "vol_lo": 0.75, "vol_hi": 1.25, "skip_checks": "780", "day_lock_at": 1500.0, "day_lock_keep": 750.0}}
+VARIANTS = {"U48": {}, "G408 steady": {"daily_loss_limit": 1200.0, "profit_step": 1250.0,
+    "profit_step_fast_from": 9000.0, "vol_pro": False, "vol_lo": 0.75, "vol_hi": 1.25, "day_lock_at": 1500.0,
+        "day_lock_keep": 750.0, "trend_n": 20}, "G408 pick": {"daily_loss_limit": 2000.0, "profit_step": 1500.0,
+            "profit_step_fast_from": 6000.0, "vol_pro": False, "vol_lo": 0.75, "vol_hi": 1.25, "skip_checks": "780",
+                "day_lock_at": 1500.0, "day_lock_keep": 750.0}}
 
 
 def job(a):
@@ -34,7 +38,8 @@ def job(a):
     res = run(b, cfg, minutes=G.S.MIN[0])
     bt = b.index.tz_convert(G.NY)
     bd = np.array(bt.date)
-    days = sorted({d for d, m in zip(bt.date, bt.hour * 60 + bt.minute) if d >= s0.date() and 570 <= m < 960})
+    days = sorted({d for d, m in zip(bt.date, bt.hour * 60 + bt.minute,
+        strict=False) if d >= s0.date() and 570 <= m < 960})
     hi, lo = b.high.to_numpy(), b.low.to_numpy()
     adv, closed = np.zeros(len(b)), np.zeros(len(b))
     pnl = {d: 0.0 for d in days}
@@ -58,7 +63,8 @@ def job(a):
         peak = max(peak, eod)
         month = (pd.Timestamp(d).year - s0.year) * 12 + pd.Timestamp(d).month - s0.month + 1
         if month <= 12:
-            rows.append({"tag": tag, "set": name, "start": start, "month": month, "pnl": 0.0 if lost else pnl[d], "n": 0 if lost else nt[d], "date": str(d),
+            rows.append({"tag": tag, "set": name, "start": start, "month": month, "pnl": 0.0 if lost else pnl[d],
+                "n": 0 if lost else nt[d], "date": str(d),
                          "lost": lost})
     return rows
 

@@ -28,7 +28,8 @@ CFG = NoiseConfig(**{**V21, "qty": 1, "lookback": 14, "trail_from": "", "tv_path
 # funded growth (docs/NINJATRADER_V38.md): v3.6's sizing at $900 a day and a $2,000 end-of-day trailing drawdown, and
 # G6's 60-minute time stop
 GROW = NoiseConfig(**{**V21, "qty": 1, "lookback": 14, "max_loss_per_trade": 187.5, "after_loss_ml_mult": 250 / 187.5,
-                      "trail_dd": 2000.0, "trail_from": "", "profit_step": 1500.0, "size_up_to": 60,  # G247: the firm's 60 (G212: 75)
+                      # G247: the firm's 60 (G212: 75)
+                      "trail_dd": 2000.0, "trail_from": "", "profit_step": 1500.0, "size_up_to": 60,
                       "budget_actual": True, "time_stop": 45, "tv_path": False, "gap_go": True, "gap_go_max_qty": 1,
                       "gap_go_locked_qty": 10, "trail_cap": 0.0,
                       # G79: More trading days and the 2-point sizing allowance
@@ -51,26 +52,31 @@ GROW = NoiseConfig(**{**V21, "qty": 1, "lookback": 14, "max_loss_per_trade": 187
                       # G142: a contract per $750 above $10,000 of profit
                       "profit_step_fast": 650.0,
                       # G210: $700 steps above $8,000, and 3-MNQ fill-ins from $9,000 above the floor
-                      "profit_step_fast_from": 9000.0, "fill_qty3_room": 8000.0,  # G243: from 9,000; G212: 650 / 8,000 / 2 MNQ from 4,000 / 75
+                      # G243: from 9,000; G212: 650 / 8,000 / 2 MNQ from 4,000 / 75
+                      "profit_step_fast_from": 9000.0, "fill_qty3_room": 8000.0,
                       # G165 / G167 / G168: the after-loss max loss as every trade's ($187.50) on 5-minute bars
                       "after_loss_ml_mult5": 1.0,
                       # G422 (U58): every check, no range filter, no loser limit, entry lines at 0.8 on a calm stretch
-                      "max_losers": 0, "range_pos_min": 0.0, "skip_checks": "", "entry_k_regime": 0.8},
+                      "max_losers": 0, "range_pos_min": 0.0, "skip_checks": "", "entry_k_regime": 0.8},  # noqa: F601
                    nt_execution=True, round_prices=True, target_on_fill_bar=True)
 # the bigger accounts' modes keep the settings from before G204
-PRE_G204 = {"max_losers": 0, "early_daily_loss": 0.0, "range_pos_min": 0.65, "gap_go_k": 0.5, "time_stop": 60, "trend_n": 50,
+PRE_G204 = {"max_losers": 0, "early_daily_loss": 0.0, "range_pos_min": 0.65, "gap_go_k": 0.5, "time_stop": 60,
+    "trend_n": 50,
             "gap_go_be": 0.0}
-PRE_G204_ARGS = ["MaxLosersPerDay=0", "EarlyDayBudget=0", "RangePos=0.65", "GapTrigger=0.5", "TimeStop=60", "TrendSessions=50", "GapBreakEven=0"]
+PRE_G204_ARGS = ["MaxLosersPerDay=0", "EarlyDayBudget=0", "RangePos=0.65", "GapTrigger=0.5", "TimeStop=60",
+    "TrendSessions=50", "GapBreakEven=0"]
 # the bigger accounts' modes also keep G125's skipped checks and no calm entry width (U58 is the 50K's)
 BIG = {**PRE_G204, "skip_checks": "780,870", "entry_k_regime": 0.0}
 GROW_ARGS = ["Mode=Funded growth"]
 
 
 def grow_cfg(minutes: int) -> NoiseConfig:
-    """Funded growth on this chart: U58 (G422) on 5-minute bars; the 30-minute chart keeps U48's G204 / G125 settings."""
+    """Funded growth on this chart: U58 (G422) on 5-minute bars; the 30-minute chart keeps U48's G204 / G125
+    settings."""
     if minutes == 5:
         return GROW
-    return dataclasses.replace(GROW, max_losers=3, range_pos_min=0.7, skip_checks="780,870", entry_k_regime=0.0)  # the default; its settings are the tested ones above
+    # the default; its settings are the tested ones above
+    return dataclasses.replace(GROW, max_losers=3, range_pos_min=0.7, skip_checks="780,870", entry_k_regime=0.0)
 # G72's fill-in trades off (NinjaTrader's More trading days needs gap and go on)
 NO_FILL = {"gap_go_small_k": -1.0, "trend_small": False, "gap_go_drive_k": 0.0, "fill_after_lock": False,
            "fill_min_room": 0.0}
@@ -213,6 +219,40 @@ def test_v38_dashboard_shows_the_open_trade(sim, sample_1m, tmp_path):  # noqa: 
     assert all(" MNQ @ " in x and ", stop " in x and " min in, " in x for x in open_)
     assert any("time stop in " in x for x in open_), "the countdown while a trade is losing room to run"
     assert any("locked (can't lose)" in x for x in open_)
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+def test_v38_live_dashboard(sim, sample_1m, tmp_path):  # noqa: F811
+    """Live, the dashboard is redrawn on the ticks as well as at the bar closes: it says LIVE, when it was updated and
+    the
+    last price, and
+    an open trade shows its P/L at the last price and the points to its stop. History draws only at the bar closes.
+    The trades are the same with and without the redraws."""
+    import re
+
+    bars = resample(sample_1m, "5min")
+    path = tmp_path / "bars.csv"
+    with path.open("w") as f:
+        for t, r in zip(bars.index, bars.itertuples(), strict=True):
+            f.write(f"{t:%Y-%m-%d %H:%M},{r.open!r},{r.high!r},{r.low!r},{r.close!r}\n")
+    live = 1000
+    base = [DOTNET, str(sim), str(path), "5", "Strategy=V38", *GROW_ARGS, f"SimRealtimeFrom={live}"]
+    r = subprocess.run([*base, "DashHistory"], capture_output=True, text=True, env=ENV)
+    assert r.returncode == 0, r.stderr[-2000:]
+    assert "live dashboard error" not in r.stdout
+    plain = subprocess.run(base, capture_output=True, text=True, env=ENV)
+    assert [x for x in r.stdout.splitlines() if x.startswith("T,")] == \
+        [x for x in plain.stdout.splitlines() if x.startswith("T,")]
+    dash = [x.split(",", 3) for x in r.stdout.splitlines() if x.startswith("DH,v38_dash,")]
+    hist = [d for d in dash if int(d[2]) < live]
+    real = [d for d in dash if int(d[2]) >= live]
+    assert hist and not any("LIVE" in d[3] for d in hist)
+    assert len(hist) == len({d[2] for d in hist}), "history: one draw a bar"
+    assert len(real) > 2 * len({d[2] for d in real}), "redrawn between the bar closes"
+    assert all(re.match(r"LIVE, updated \d\d:\d\d:\d\d New York, last [\d.]+ \|", d[3]) for d in real)
+    opened = [d for d in real if "Open trade: LONG" in d[3] or "Open trade: SHORT" in d[3]]
+    assert opened and all(re.search(r", open \$-?[\d.]+ at [\d.]+", d[3]) for d in opened)
+    assert any(" pts to the stop" in d[3] for d in opened)
 
 
 @pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
@@ -630,7 +670,8 @@ def test_v38_milestones(sim, sample_1m, tmp_path):  # noqa: F811
 @pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
 def test_v38_win_rate_check(sim, sample_1m, tmp_path):  # noqa: F811
     """U13: the dashboard's win-rate check equals research/journal_report.py's binomial tail for the journal's trades;
-    in line at the tested 49.3% (U46), a warning (and one live alert) when the tested rate is set far above the real one."""
+    in line at the tested 49.3% (U46), a warning (and one live alert) when the tested rate is set far above the real
+    one."""
     import re
     import sys
 
@@ -701,7 +742,8 @@ def test_v38_bigger_accounts_agree(sim, sample_1m, minutes, mode, daily, trail, 
 @pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
 def test_v38_gap_go_locked(sim, sample_1m, tmp_path):  # noqa: F811
     """G67b: once the trailing floor has stopped at the start, a gap trade takes up to GapGoLocked contracts (3 in
-    Funded growth), 1 before. A $600 trailing drawdown (Custom mode) makes the floor stop within the sample. NinjaTrader's code and
+    Funded growth), 1 before. A $600 trailing drawdown (Custom mode) makes the floor stop within the sample.
+    NinjaTrader's code and
     the model agree trade for trade at 3 and at 0 (1 contract always), and only the locked account's gap trades grow."""
     bars = resample(sample_1m, "5min")
     path = tmp_path / "bars.csv"
@@ -710,11 +752,13 @@ def test_v38_gap_go_locked(sim, sample_1m, tmp_path):  # noqa: F811
             f.write(f"{t:%Y-%m-%d %H:%M},{r.open!r},{r.high!r},{r.low!r},{r.close!r}\n")
     sizes = {}
     for lq in (3, 0):
-        r = subprocess.run([DOTNET, str(sim), str(path), "5", "Strategy=V38", "Mode=Custom", "TrailDD=600", "EarlyNoEntryChecks=", *PRE_G204_ARGS,
+        r = subprocess.run([DOTNET, str(sim), str(path), "5", "Strategy=V38", "Mode=Custom", "TrailDD=600",
+            "EarlyNoEntryChecks=", *PRE_G204_ARGS,
                             f"GapGoLocked={lq}"], capture_output=True, text=True, env=ENV)
         assert r.returncode == 0, r.stderr[-2000:]
         nt = [x.split(",")[1:] for x in r.stdout.splitlines() if x.startswith("T,")]
-        py = run(bars, dataclasses.replace(GROW, trail_dd=600.0, skip_checks="", **PRE_G204, gap_go_locked_qty=lq), minutes=5).trades
+        py = run(bars, dataclasses.replace(GROW, trail_dd=600.0, skip_checks="", **PRE_G204, gap_go_locked_qty=lq),
+            minutes=5).trades
         assert len(nt) == len(py) >= 20
         for a, t in zip(nt, py, strict=True):
             assert (int(a[0]), int(a[1]), int(a[3])) == (t.direction, t.entry_bar, t.exit_bar), (a, t)
@@ -739,11 +783,13 @@ def test_v38_more_days(sim, sample_1m, tmp_path):  # noqa: F811
             "fill_min_room": 100.0}
     days = {}
     for on in (True, False):
-        r = subprocess.run([DOTNET, str(sim), str(path), "5", "Strategy=V38", "Mode=Custom", "TrailDD=600", "EarlyNoEntryChecks=", *PRE_G204_ARGS,
+        r = subprocess.run([DOTNET, str(sim), str(path), "5", "Strategy=V38", "Mode=Custom", "TrailDD=600",
+            "EarlyNoEntryChecks=", *PRE_G204_ARGS,
                             f"MoreDays={on}", "MoreDaysCushion=100"], capture_output=True, text=True, env=ENV)
         assert r.returncode == 0, r.stderr[-2000:]
         nt = [x.split(",")[1:] for x in r.stdout.splitlines() if x.startswith("T,")]
-        py = run(bars, dataclasses.replace(GROW, trail_dd=600.0, skip_checks="", **PRE_G204, **(fill if on else NO_FILL)), minutes=5).trades
+        py = run(bars, dataclasses.replace(GROW, trail_dd=600.0, skip_checks="", **PRE_G204,
+            **(fill if on else NO_FILL)), minutes=5).trades
         assert len(nt) == len(py) >= 20
         for a, t in zip(nt, py, strict=True):
             assert (int(a[0]), int(a[1]), int(a[3])) == (t.direction, t.entry_bar, t.exit_bar), (a, t)
@@ -766,11 +812,13 @@ def test_v38_giveback_brake(sim, sample_1m, tmp_path):  # noqa: F811
             f.write(f"{t:%Y-%m-%d %H:%M},{r.open!r},{r.high!r},{r.low!r},{r.close!r}\n")
     qtys = {}
     for gb in (0.9, 0.0):
-        r = subprocess.run([DOTNET, str(sim), str(path), "5", "Strategy=V38", "Mode=Custom", "TrailDD=600", "EarlyNoEntryChecks=", *PRE_G204_ARGS,
+        r = subprocess.run([DOTNET, str(sim), str(path), "5", "Strategy=V38", "Mode=Custom", "TrailDD=600",
+            "EarlyNoEntryChecks=", *PRE_G204_ARGS,
                             f"GivebackBrake={gb}"], capture_output=True, text=True, env=ENV)
         assert r.returncode == 0, r.stderr[-2000:]
         nt = [x.split(",")[1:] for x in r.stdout.splitlines() if x.startswith("T,")]
-        py = run(bars, dataclasses.replace(GROW, trail_dd=600.0, skip_checks="", **PRE_G204, giveback_brake=gb), minutes=5).trades
+        py = run(bars, dataclasses.replace(GROW, trail_dd=600.0, skip_checks="", **PRE_G204, giveback_brake=gb),
+            minutes=5).trades
         assert len(nt) == len(py) >= 20
         for a, t in zip(nt, py, strict=True):
             assert (int(a[0]), int(a[1]), int(a[3])) == (t.direction, t.entry_bar, t.exit_bar), (a, t)
@@ -792,7 +840,8 @@ def test_v38_gap_skip_braked(sim, sample_1m, tmp_path):  # noqa: F811
             f.write(f"{t:%Y-%m-%d %H:%M},{r.open!r},{r.high!r},{r.low!r},{r.close!r}\n")
     gaps = {}
     for on in (True, False):
-        r = subprocess.run([DOTNET, str(sim), str(path), "5", "Strategy=V38", "Mode=Custom", "TrailDD=600", "EarlyNoEntryChecks=", *PRE_G204_ARGS,
+        r = subprocess.run([DOTNET, str(sim), str(path), "5", "Strategy=V38", "Mode=Custom", "TrailDD=600",
+            "EarlyNoEntryChecks=", *PRE_G204_ARGS,
                             "GivebackBrake=0.9", f"GapSkipBraked={on}"], capture_output=True, text=True, env=ENV)
         assert r.returncode == 0, r.stderr[-2000:]
         nt = [x.split(",")[1:] for x in r.stdout.splitlines() if x.startswith("T,")]
@@ -849,7 +898,8 @@ def test_v38_fill_qty3(sim, sample_1m, tmp_path):  # noqa: F811
             f.write(f"{t:%Y-%m-%d %H:%M},{r.open!r},{r.high!r},{r.low!r},{r.close!r}\n")
     qtys = {}
     for q3 in (700.0, 0.0):
-        r = subprocess.run([DOTNET, str(sim), str(path), "5", "Strategy=V38", "Mode=Custom", "TrailDD=600", "EarlyNoEntryChecks=",
+        r = subprocess.run([DOTNET, str(sim), str(path), "5", "Strategy=V38", "Mode=Custom", "TrailDD=600",
+            "EarlyNoEntryChecks=",
                             *PRE_G204_ARGS, "MoreDaysCushion=100", f"MoreDaysQty3Room={q3}"], capture_output=True,
                            text=True, env=ENV)
         assert r.returncode == 0, r.stderr[-2000:]
@@ -903,11 +953,13 @@ def test_v38_after_loss_locked(sim, sample_1m, tmp_path):  # noqa: F811
             f.write(f"{t:%Y-%m-%d %H:%M},{r.open!r},{r.high!r},{r.low!r},{r.close!r}\n")
     nets = {}
     for usd, k in ((187.5, 1.0), (0.0, 0.0)):
-        r = subprocess.run([DOTNET, str(sim), str(path), "5", "Strategy=V38", "Mode=Custom", "TrailDD=600", "EarlyNoEntryChecks=", *PRE_G204_ARGS,
+        r = subprocess.run([DOTNET, str(sim), str(path), "5", "Strategy=V38", "Mode=Custom", "TrailDD=600",
+            "EarlyNoEntryChecks=", *PRE_G204_ARGS,
                             "AfterLossMaxLoss=250", f"AfterLossLocked={usd}"], capture_output=True, text=True, env=ENV)
         assert r.returncode == 0, r.stderr[-2000:]
         nt = [x.split(",")[1:] for x in r.stdout.splitlines() if x.startswith("T,")]
-        py = run(bars, dataclasses.replace(GROW, trail_dd=600.0, skip_checks="", **PRE_G204, after_loss_ml_mult5=250 / 187.5,
+        py = run(bars, dataclasses.replace(GROW, trail_dd=600.0, skip_checks="", **PRE_G204,
+            after_loss_ml_mult5=250 / 187.5,
                                                  after_loss_ml_locked=k), minutes=5).trades
         assert len(nt) == len(py) >= 20
         for a, t in zip(nt, py, strict=True):
@@ -920,8 +972,10 @@ def test_v38_after_loss_locked(sim, sample_1m, tmp_path):  # noqa: F811
 
 @pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
 def test_v38_early_no_entry_checks(sim, sample_1m, tmp_path):  # noqa: F811
-    """G125: no entries at the 13:00 and 14:30 checks until the floor has stopped. NinjaTrader's code and the model agree
-    trade for trade with it on (13:00,14:30) and off (blank, U58's default), it changes the trades, and before the floor stops no
+    """G125: no entries at the 13:00 and 14:30 checks until the floor has stopped. NinjaTrader's code and the model
+    agree
+    trade for trade with it on (13:00,14:30) and off (blank, U58's default), it changes the trades, and before the floor
+    stops no
     entry fills at 13:00 or 14:30."""
     bars = resample(sample_1m, "5min")
     path = tmp_path / "bars.csv"
@@ -959,7 +1013,8 @@ def test_v38_fast_steps(sim, sample_1m, tmp_path):  # noqa: F811
     got = {}
     for fs in (100.0, 0.0):
         r = subprocess.run([DOTNET, str(sim), str(path), "5", "Strategy=V38", "Mode=Custom", "ProfitStep=300",
-                            "MaxContracts=50", f"FastSteps={fs}", "FastStepsFrom=600"], capture_output=True, text=True, env=ENV)
+                            "MaxContracts=50", f"FastSteps={fs}", "FastStepsFrom=600"], capture_output=True, text=True,
+                                env=ENV)
         assert r.returncode == 0, r.stderr[-2000:]
         nt = [x.split(",")[1:] for x in r.stdout.splitlines() if x.startswith("T,")]
         py = run(bars, dataclasses.replace(GROW, profit_step=300.0, profit_step_fast=fs, profit_step_fast_from=600.0),
@@ -1004,7 +1059,8 @@ def test_v38_live_account_dashboard(sim, sample_1m, tmp_path):  # noqa: F811
     """Live, the dashboard tracks the account itself: its name, balance and net liquidation, today's realized and open
     P/L, the trades closed live, and the prop floor from the account's own balance (the higher of its starting balance
     and its balance at go-live, less the trailing drawdown, never above the start) with the room above it. With an
-    account $1,850 below its start (net liquidation $48,150 on a 50K: $150 of room, less than one contract's risk), the dashboard flags the
+    account $1,850 below its start (net liquidation $48,150 on a 50K: $150 of room, less than one contract's risk), the
+    dashboard flags the
     difference from the strategy's own count, and no trade risks more than the account's room: the trades shrink.
     With the room check off, live trades are the backtest's."""
     bars = resample(sample_1m, "5min")
@@ -1051,7 +1107,8 @@ def test_v38_live_without_account_values(sim, sample_1m, tmp_path):  # noqa: F81
     assert r.returncode == 0, r.stderr[-2000:]
     live = [x for x in r.stdout.splitlines() if x.startswith("T,")]
     assert live == hist
-    assert "Prop floor: waiting for the account's balance" in [x for x in r.stdout.splitlines() if x.startswith("D,")][0]
+    dash = [x for x in r.stdout.splitlines() if x.startswith("D,")]
+    assert "Prop floor: waiting for the account's balance" in dash[0]
 
 
 @pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
@@ -1084,12 +1141,15 @@ def test_v38_sprint(sim, sample_1m, tmp_path):  # noqa: F811
 
 # G256 k317 with G269's +$5,000 sprint target: the two-week Test sprint (G253's k61 before)
 SPRINT = {"daily_loss_limit": 2000.0, "early_daily_loss": 0.0, "max_losers": 3, "time_stop": 30, "range_pos_min": 0.7,
-          "trend_n": 0, "big_day_k": 0.0, "calm_k": 0.7, "take_profit": 0.75, "lock_at": 0.2, "skip_checks": "", "entry_k_regime": 0.0,
-          "sprint_qty": 4, "sprint_days": 10, "sprint_target": 5000.0, "sprint_gap_qty": 2, "gap_go_be": 0.0, "day_stop_profit": 1500.0, "lookback": 18,
+          "trend_n": 0, "big_day_k": 0.0, "calm_k": 0.7, "take_profit": 0.75, "lock_at": 0.2, "skip_checks": "",
+              "entry_k_regime": 0.0,
+          "sprint_qty": 4, "sprint_days": 10, "sprint_target": 5000.0, "sprint_gap_qty": 2, "gap_go_be": 0.0,
+              "day_stop_profit": 1500.0, "lookback": 18,
           "entry_k": 0.7, "squeeze_min": 0.0, "last_entry_end": 930, "gap_go_k": 0.5, "stop_buffer": 0.24,
           "lock_plus": 2.5, "day_cap_exit": True,  # U55: G289's day cap
           # U56: G321's k30, the streak pause, the big-day rule, the day guard, 1.5x on the jobs-report days
-          "streak_k": 4, "streak_skip": 2, "big_day_k": 1.5, "big_day_n": 10, "day_guard": 1200.0, "day_guard_grid": True,
+          "streak_k": 4, "streak_skip": 2, "big_day_k": 1.5, "big_day_n": 10,  # noqa: F601 (U56 overrides big_day_k 0)
+          "day_guard": 1200.0, "day_guard_grid": True,
           "news_dates": ",".join(pd.read_csv(Path(__file__).parent.parent / "research" / "nfp_dates.csv").date),
           "news_mult": 1.5,
           "day_lock_at": 800.0, "day_lock_keep": 300.0}  # U57: G329's day lock
@@ -1125,7 +1185,8 @@ def test_v38_test_sprint(sim, sample_1m, tmp_path):  # noqa: F811
 
 @pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
 def test_v38_test_sprint_day_guard(sim, sample_1m, tmp_path):  # noqa: F811
-    """U56: G321's day guard. With a $300 guard (so it fires on the sample), NinjaTrader's code and the model agree trade
+    """U56: G321's day guard. With a $300 guard (so it fires on the sample), NinjaTrader's code and the model agree
+    trade
     for trade, and the guard's exits are there."""
     bars = resample(sample_1m, "5min")
     path = tmp_path / "bars.csv"
@@ -1149,7 +1210,8 @@ def test_v38_test_sprint_day_guard(sim, sample_1m, tmp_path):  # noqa: F811
 
 @pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
 def test_v38_stop_placement_check(sim, sample_1m, tmp_path):  # noqa: F811
-    """docs/V2_STOPS.md (v3 Fix 2), on the funded strategy: with the platform reporting the stop order's state, every open
+    """docs/V2_STOPS.md (v3 Fix 2), on the funded strategy: with the platform reporting the stop order's state, every
+    open
     position (bot and gap trades) has a live stop at every bar close and the engine's stop is never tighter than it: no
     flag over the sample, a placement logged for every trade. When the broker cancels the bot's stop mid-trade, that
     bar is flagged."""

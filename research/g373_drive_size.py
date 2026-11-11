@@ -10,9 +10,10 @@ import os
 import sys
 from concurrent.futures import ProcessPoolExecutor
 
+import g250_test_week as G
 import numpy as np
 import pandas as pd
-import g250_test_week as G
+
 from mnqbot.noise import NoiseConfig, run
 
 VARIANTS = {"U48": {}}
@@ -37,7 +38,8 @@ def job(a):
     res = run(b, cfg, minutes=G.S.MIN[0])
     bt = b.index.tz_convert(G.NY)
     bd = np.array(bt.date)
-    days = sorted({d for d, m in zip(bt.date, bt.hour * 60 + bt.minute) if d >= s0.date() and 570 <= m < 960})
+    days = sorted({d for d, m in zip(bt.date, bt.hour * 60 + bt.minute,
+        strict=False) if d >= s0.date() and 570 <= m < 960})
     hi, lo = b.high.to_numpy(), b.low.to_numpy()
     adv, closed = np.zeros(len(b)), np.zeros(len(b))
     pnl = {d: 0.0 for d in days}

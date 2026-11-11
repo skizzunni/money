@@ -1,5 +1,6 @@
 """G332 (docs/NINJATRADER_V38.md): on U56, (as U57 with the day lock) entries confirmed: the last check also past the
-line (confirm), or after a loss on a side, the next entry that side only past the line by 0.1 or 0.25 noise (side_margin). G253's measure; also the near-frozen Tests (G284b).
+line (confirm), or after a loss on a side, the next entry that side only past the line by 0.1 or 0.25 noise
+(side_margin). G253's measure; also the near-frozen Tests (G284b).
 
     SESS=10 python research/g332_confirm.py <data dir> <MNQ 09-26> <MNQ 12-26> <U48 JS json>
 """
@@ -8,8 +9,8 @@ import os
 import sys
 from concurrent.futures import ProcessPoolExecutor
 
-import pandas as pd
 import g250_test_week as G
+import pandas as pd
 from g282_push import U53
 
 CAP = {"day_cap_exit": True}
@@ -41,7 +42,8 @@ def main() -> None:
     conf += [("index", d.strftime("%Y-%m-%d")) for d in pd.date_range("2019-01-07", "2026-08-31", freq="W-MON")]
     for label, starts in (("development (index 2011-18)", dev), ("unseen (NQ 2015-25 + index 2019-26)", conf)):
         with ProcessPoolExecutor(int(os.environ.get("PROCS", "4"))) as ex:
-            d = pd.DataFrame([r for r in ex.map(job, [(t, n, s) for t in VARIANTS for n, s in starts], chunksize=16) if r])
+            d = pd.DataFrame([r for r in ex.map(job, [(t, n, s) for t in VARIANTS for n, s in starts],
+                chunksize=16) if r])
         d["stuck"] = ~d.passed & ~d.failed & (d.room < 500)
         d["failed_or_stuck"] = d.failed | d.stuck
         print(label + ":\n" + d.groupby("tag").agg(weeks=("passed", "size"), passed=("passed", "mean"),

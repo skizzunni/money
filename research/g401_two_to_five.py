@@ -1,23 +1,25 @@
 """G401 (docs/NINJATRADER_V38.md): the user's ask, 2-5 contracts: U48 on the 50K starting at 2 MNQ with at most 5, or
 1 to 5, over 36 months; also trades a session;
-judged on months 1-36 with development (index starts 2011-2016) and unseen (index 2017-2023, NQ 2015-2022) halves. G391: U48 funded from fresh starts on the first Monday of every quarter, run
+judged on months 1-36 with development (index starts 2011-2016) and unseen (index 2017-2023, NQ 2015-2022) halves. G391:
+U48 funded from fresh starts on the first Monday of every quarter, run
 36 months: $ a session by month since the start, the share of starts lost (G372's intraday check), and the share of
 starts averaging $750 a session in that month.
 
     python research/g401_two_to_five.py <data dir> <MNQ 09-26> <MNQ 12-26> <U48 JS json>
 """
-import itertools
 import json
 import os
 import sys
 from concurrent.futures import ProcessPoolExecutor
 
+import g250_test_week as G
 import numpy as np
 import pandas as pd
-import g250_test_week as G
+
 from mnqbot.noise import NoiseConfig, run
 
-VARIANTS = {"50K as U48": {}, "2-5 MNQ": {"qty": 2, "max_loss_per_trade": 375.0, "size_up_to": 5}, "1-5 MNQ": {"size_up_to": 5}}
+VARIANTS = {"50K as U48": {}, "2-5 MNQ": {"qty": 2, "max_loss_per_trade": 375.0, "size_up_to": 5},
+    "1-5 MNQ": {"size_up_to": 5}}
 
 
 def job(a):
@@ -36,7 +38,8 @@ def job(a):
     res = run(b, cfg, minutes=G.S.MIN[0])
     bt = b.index.tz_convert(G.NY)
     bd = np.array(bt.date)
-    days = sorted({d for d, m in zip(bt.date, bt.hour * 60 + bt.minute) if d >= s0.date() and 570 <= m < 960})
+    days = sorted({d for d, m in zip(bt.date, bt.hour * 60 + bt.minute,
+        strict=False) if d >= s0.date() and 570 <= m < 960})
     hi, lo = b.high.to_numpy(), b.low.to_numpy()
     adv, closed = np.zeros(len(b)), np.zeros(len(b))
     pnl = {d: 0.0 for d in days}
@@ -60,7 +63,8 @@ def job(a):
         peak = max(peak, eod)
         month = (pd.Timestamp(d).year - s0.year) * 12 + pd.Timestamp(d).month - s0.month + 1
         if month <= 36:
-            rows.append({"tag": tag, "set": name, "start": start, "month": month, "pnl": 0.0 if lost else pnl[d], "n": 0 if lost else nt[d],
+            rows.append({"tag": tag, "set": name, "start": start, "month": month, "pnl": 0.0 if lost else pnl[d],
+                "n": 0 if lost else nt[d],
                          "lost": lost})
     return rows
 

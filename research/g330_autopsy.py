@@ -7,8 +7,8 @@ trade type (the bot or the 09:35 gap trade), by the day of the Test and by how t
 import json
 import sys
 
-import pandas as pd
 import g250_test_week as G
+import pandas as pd
 import t1_eval as T
 from g321b_confirm import U56
 
@@ -23,7 +23,7 @@ def trades_of(name, start):
     b = bars[(bars.index >= s0 - pd.Timedelta(days=150)) & (bars.index < s0 + pd.Timedelta(days=21))]
     extra = dict(U56)
     cfg = NoiseConfig(**{**G.S.V23, **T.REFERENCE, "daily_loss_limit": 900.0, "trail_dd": G.DD, "time_stop": 60,
-                         **G.BASE, "daily_loss_limit": 2000.0, "early_daily_loss": 0.0, **extra})
+                         **G.BASE, "daily_loss_limit": 2000.0, "early_daily_loss": 0.0, **extra})  # noqa: F601
     cfg.sprint_qty, cfg.sprint_days, cfg.sprint_target = 4, 10, extra.get("sprint_target", 3000.0)
     cfg.day_stop_profit = 1500.0
     cfg.tv_path, cfg.nt_execution, cfg.round_prices, cfg.target_on_fill_bar = False, True, True, True
@@ -47,7 +47,6 @@ def main() -> None:
             continue
         tr = trades_of("index", s)
         fd = r["fail day"]
-        tdays = sorted({t.exit_time.tz_convert(NY).date() for t in tr})
         bydate = {}
         for t in tr:
             d = t.exit_time.tz_convert(NY).date()
@@ -61,12 +60,14 @@ def main() -> None:
             rows.append({"start": s, "kind": "gap" if gap else "bot", "reason": t.reason, "pnl": t.pnl, "qty": t.qty,
                          "hour": t.entry_time.tz_convert(NY).hour, "dir": t.direction})
         worst = min(bydate.values()) if bydate else 0
-        days.append({"start": s, "fail day": fd, "worst day": round(worst), "losing days": sum(v < 0 for v in bydate.values()),
+        days.append({"start": s, "fail day": fd, "worst day": round(worst),
+            "losing days": sum(v < 0 for v in bydate.values()),
                      "net": round(sum(v for d, v in bydate.items() if not last or d <= last[-1]))})
     t = pd.DataFrame(rows)
     d = pd.DataFrame(days)
     print(f"failed Tests: {len(d)} of {len(dev)} development weeks")
-    print("\nby exit reason (the trades up to the failure):\n" + t.groupby("reason").pnl.agg(["count", "sum", "mean"]).round(0).sort_values("sum").to_string())
+    print("\nby exit reason (the trades up to the failure):\n" + t.groupby("reason").pnl.agg(["count", "sum",
+        "mean"]).round(0).sort_values("sum").to_string())
     print("\nbot vs gap trade:\n" + t.groupby("kind").pnl.agg(["count", "sum"]).round(0).to_string())
     print("\nby entry hour:\n" + t.groupby("hour").pnl.agg(["count", "sum", "mean"]).round(0).to_string())
     print("\nby side:\n" + t.groupby("dir").pnl.agg(["count", "sum", "mean"]).round(0).to_string())

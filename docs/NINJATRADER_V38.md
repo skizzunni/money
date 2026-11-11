@@ -24,8 +24,14 @@ add-on to install. It trades `pine/mnq_noise_momentum.pine` v3.8 (docs/CANDIDATE
    - Calculate: **On bar close** (the default); leave the other settings as they are;
    - **Place orders:** on, the strategy sends the orders (automated trading); off, it only alerts and you place each
      order by hand. Take Profit Trader's rules do not allow automated trading.
-5. Enable it. The dashboard (top right) shows the mode, the next check and the stop; the Output window logs every stop
-   it sends ("MnqNoiseV38 stop placed") and alerts **STOP CHECK FAILED** if a position is ever without a live stop.
+5. Enable it. The dashboard (top right) is **live**: once the strategy is running on live data it redraws on the ticks
+   (at most once a second, and at once when the position changes), not only at the 5-minute bar closes. Its first line
+   reads "LIVE, updated hh:mm:ss New York, last <price>"; it shows the account's balance, net liquidation, realized and
+   open P/L, the prop floor and the room above it, the strategy's P/L today, this week and this month, the next trade's
+   size, today's rules and the next entry check, and the open trade (side, size, entry, stop, target, its open P/L at the
+   last price and the points left to its stop, the lock and the time stop). A dashboard error never stops the trading
+   (it is printed once and the next bar redraws it). The Output window logs every stop it sends ("MnqNoiseV38 stop
+   placed") and alerts **STOP CHECK FAILED** if a position is ever without a live stop.
 
 **What it does:** U58. Entries at the half-hour checks (10:00-15:30 New York) when price closes outside the noise area
 (narrower on calm stretches), a stop with every entry ($187.50 a contract at most), the size from the profit so far and

@@ -45,11 +45,13 @@ def one(job):
     fed_more = extra.pop("fed_more", "")  # G314: Fed days for the no-shorts rule (the sets' own list is cleared)
     bars, _, skip = S.D[name]
     s0 = pd.Timestamp(start, tz=NY)
-    b = bars[(bars.index >= s0 - pd.Timedelta(days=150)) & (bars.index < s0 + pd.Timedelta(days=7 + 7 * ((SESS + 4) // 5)))]
+    b = bars[(bars.index >= s0 - pd.Timedelta(days=150))
+             & (bars.index < s0 + pd.Timedelta(days=7 + 7 * ((SESS + 4) // 5)))]
     cfg = NoiseConfig(**{**S.V23, **T.REFERENCE, "daily_loss_limit": 900.0, "trail_dd": DD, "time_stop": 60,
-                         **BASE, "daily_loss_limit": 2000.0, "early_daily_loss": 0.0, **extra})
+                         **BASE, "daily_loss_limit": 2000.0, "early_daily_loss": 0.0, **extra})  # noqa: F601
     if sq:
-        cfg.sprint_qty, cfg.sprint_days, cfg.sprint_target = sq, extra.get("sprint_days", SESS), extra.get("sprint_target", TARGET)  # G269 / G278
+        cfg.sprint_qty, cfg.sprint_days, cfg.sprint_target = sq, extra.get("sprint_days",
+            SESS), extra.get("sprint_target", TARGET)  # G269 / G278
     cfg.day_stop_profit = ds  # G251: no new entries once the day is up this much (0 = off)
     cfg.tv_path, cfg.nt_execution, cfg.round_prices, cfg.target_on_fill_bar = False, True, True, True
     if isinstance(skip, str):
@@ -61,7 +63,8 @@ def one(job):
     cfg.trail_from = start
     res = run(b, cfg, minutes=S.MIN[0])
     bt = b.index.tz_convert(NY)
-    days = sorted({d for d, m in zip(bt.date, bt.hour * 60 + bt.minute) if d >= s0.date() and 570 <= m < 960})[:SESS]
+    days = sorted({d for d, m in zip(bt.date, bt.hour * 60 + bt.minute,
+        strict=False) if d >= s0.date() and 570 <= m < 960})[:SESS]
     if len(days) < SESS:
         return None
     last = days[-1]
@@ -99,8 +102,10 @@ def one(job):
         if cum >= TARGET and best < 0.5 * cum and traded >= 3:
             passed, pass_day = True, days.index(d) + 1
             break
-    return {"set": name, "start": start, "sprint": sq, "day stop": ds, "passed": passed, "failed": failed, "pass day": pass_day,
-            "fail day": fail_day, "net": round(cum), "room": round(eod - min(peak - DD, 0.0))}  # G284b: left above the floor
+    return {"set": name, "start": start, "sprint": sq, "day stop": ds, "passed": passed, "failed": failed,
+        "pass day": pass_day,
+            # G284b: left above the floor
+            "fail day": fail_day, "net": round(cum), "room": round(eod - min(peak - DD, 0.0))}
 
 
 def main() -> None:

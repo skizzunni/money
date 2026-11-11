@@ -9,7 +9,8 @@ from concurrent.futures import ProcessPoolExecutor
 import g135_gap_screen as G
 import v24_scan as S
 
-G.VARIANTS = [{}, {"profit_step_fast": 750.0}, {"profit_step_fast": 500.0}, {"profit_step_fast": 750.0, "profit_step_fast_from": 20000.0}]
+G.VARIANTS = [{}, {"profit_step_fast": 750.0}, {"profit_step_fast": 500.0}, {"profit_step_fast": 750.0,
+    "profit_step_fast_from": 20000.0}]
 
 if __name__ == "__main__":
     S.init({}, *sys.argv[1:4])

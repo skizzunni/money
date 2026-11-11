@@ -40,11 +40,13 @@ class Leg:
 
 def noise_legs(b, qty, extra=None):
     cfg = NoiseConfig(**{**V.BASE, "qty": qty, **(extra or {})})
-    return [Leg(t.entry_bar, t.exit_bar, t.qty, t.direction, t.entry, t.exit, t.pnl, t.reason) for t in run(b, cfg, 5).trades]
+    return [Leg(t.entry_bar, t.exit_bar, t.qty, t.direction, t.entry, t.exit, t.pnl, t.reason) for t in run(b, cfg,
+        5).trades]
 
 
 def williams_legs(b, qty):
-    """combo_live's breakout at a fixed qty: per contract its points less $1.24 fees, one more tick a side (2 in all)."""
+    """combo_live's breakout at a fixed qty: per contract its points less $1.24 fees, one more tick a side (2 in
+    all)."""
     skip = [x for x in V.BASE["skip_dates"].split(",") if x]
     out = []
     for a, x, d, en, ex, _, _ in W.williams_legs(b, month_skip=True, skip_dates=skip):
@@ -56,7 +58,7 @@ def williams_legs(b, qty):
 def combine(b, legs, max_losers=4):
     """One position at a time (the first entry owns the account until flat); the day's 4-loser limit counts both."""
     day = np.asarray(b.index.tz_convert(V.NY).strftime("%Y-%m-%d"))
-    taken, busy, losers = [], -1, {}
+    taken, busy = [], -1
     for leg in sorted(legs, key=lambda x: (x.entry_bar, x.exit_bar)):
         d = day[leg.entry_bar]
         done = sum(1 for t in taken if day[t.exit_bar] == d and t.exit_bar < leg.entry_bar and t.pnl < 0)
@@ -164,8 +166,8 @@ def main() -> None:
     pd.set_option("display.max_columns", 30)
     tests = pd.DataFrame([r for r in rows if "G1_pass" in r])
     pro = pd.DataFrame([r for r in rows if "survived_12m" in r])
-    print("The Test, no time limit:\n" + tests.round(3).to_string() + "\n\nPRO, 12 months:\n" + pro.round(3).to_string(),
-          flush=True)
+    print("The Test, no time limit:\n" + tests.round(3).to_string()
+          + "\n\nPRO, 12 months:\n" + pro.round(3).to_string(), flush=True)
     tests.to_csv(Path(data) / "v3_tests.csv", index=False)
     pro.to_csv(Path(data) / "v3_pro.csv", index=False)
 

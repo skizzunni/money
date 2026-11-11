@@ -10,9 +10,8 @@ import itertools
 import math
 import sys
 
-import numpy as np
-import pandas as pd
 import other_markets as O
+import pandas as pd
 
 
 def main() -> None:

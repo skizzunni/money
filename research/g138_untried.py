@@ -9,7 +9,8 @@ from concurrent.futures import ProcessPoolExecutor
 import g135_gap_screen as G
 import v24_scan as S
 
-G.VARIANTS = [{"storm_k": 1.6}, {"storm_k": 2.0}, {"touch_entry": True}, {"limit_entry_frac": 0.5}, {"side_cooldown": 1}, {"streak_k": 3}, {"eq_n": 20}, {"confirm": True}]
+G.VARIANTS = [{"storm_k": 1.6}, {"storm_k": 2.0}, {"touch_entry": True}, {"limit_entry_frac": 0.5},
+    {"side_cooldown": 1}, {"streak_k": 3}, {"eq_n": 20}, {"confirm": True}]
 
 if __name__ == "__main__":
     S.init({}, *sys.argv[1:4])

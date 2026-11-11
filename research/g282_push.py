@@ -10,8 +10,8 @@ import os
 import sys
 from concurrent.futures import ProcessPoolExecutor
 
-import pandas as pd
 import g250_test_week as G
+import pandas as pd
 from g271_day_stop import K317
 
 U53 = {**K317, "sprint_target": 5000.0, "sprint_gap_qty": 2, "gap_go_be": 0.0}
@@ -19,7 +19,8 @@ VARIANTS = {"U53": {}}
 for f in (8, 9):
     for q in (6, 8):
         for m in (1000.0, 2000.0):
-            VARIANTS[f"from {f} at {q} if up ${m:,.0f}"] = {"sprint_push_from": f, "sprint_push_qty": q, "sprint_push_min": m}
+            VARIANTS[f"from {f} at {q} if up ${m:,.0f}"] = {"sprint_push_from": f, "sprint_push_qty": q,
+                "sprint_push_min": m}
 
 
 def job(a):
@@ -37,7 +38,8 @@ def main() -> None:
     conf += [("index", d.strftime("%Y-%m-%d")) for d in pd.date_range("2019-01-07", "2026-08-31", freq="W-MON")]
     for label, starts in (("development (index 2011-18)", dev), ("unseen (NQ 2015-25 + index 2019-26)", conf)):
         with ProcessPoolExecutor(int(os.environ.get("PROCS", "4"))) as ex:
-            d = pd.DataFrame([r for r in ex.map(job, [(t, n, s) for t in VARIANTS for n, s in starts], chunksize=16) if r])
+            d = pd.DataFrame([r for r in ex.map(job, [(t, n, s) for t in VARIANTS for n, s in starts],
+                chunksize=16) if r])
         print(label + ":\n" + d.groupby("tag").agg(weeks=("passed", "size"), passed=("passed", "mean"),
                                                   failed=("failed", "mean")).round(3).to_string(), flush=True)
 

@@ -1,23 +1,30 @@
 """G398 (docs/NINJATRADER_V38.md): G397's 150K-style pick (start 2 MNQ) tuned further: a cap of 100, the fast
 steps from $6,000, the day budget at $2,900;
-judged on months 1-36 with development (index starts 2011-2016) and unseen (index 2017-2023, NQ 2015-2022) halves. G391: U48 funded from fresh starts on the first Monday of every quarter, run
+judged on months 1-36 with development (index starts 2011-2016) and unseen (index 2017-2023, NQ 2015-2022) halves. G391:
+U48 funded from fresh starts on the first Monday of every quarter, run
 36 months: $ a session by month since the start, the share of starts lost (G372's intraday check), and the share of
 starts averaging $750 a session in that month.
 
     python research/g398_150k_more.py <data dir> <MNQ 09-26> <MNQ 12-26> <U48 JS json>
 """
-import itertools
 import json
 import os
 import sys
 from concurrent.futures import ProcessPoolExecutor
 
+import g250_test_week as G
 import numpy as np
 import pandas as pd
-import g250_test_week as G
+
 from mnqbot.noise import NoiseConfig, run
 
-VARIANTS = {"150K start 2 MNQ (G397)": {"trail_dd": 4500.0, "daily_loss_limit": 2700.0, "early_daily_loss": 2250.0, "qty": 2, "max_loss_per_trade": 375.0}, "+ cap 100": {"trail_dd": 4500.0, "daily_loss_limit": 2700.0, "early_daily_loss": 2250.0, "qty": 2, "max_loss_per_trade": 375.0, "size_up_to": 100}, "+ fast steps from $6,000": {"trail_dd": 4500.0, "daily_loss_limit": 2700.0, "early_daily_loss": 2250.0, "qty": 2, "max_loss_per_trade": 375.0, "profit_step_fast_from": 6000.0}, "+ day budget $2,900": {"trail_dd": 4500.0, "daily_loss_limit": 2900.0, "early_daily_loss": 2250.0, "qty": 2, "max_loss_per_trade": 375.0}}
+VARIANTS = {"150K start 2 MNQ (G397)": {"trail_dd": 4500.0, "daily_loss_limit": 2700.0, "early_daily_loss": 2250.0,
+    "qty": 2, "max_loss_per_trade": 375.0}, "+ cap 100": {"trail_dd": 4500.0, "daily_loss_limit": 2700.0,
+        "early_daily_loss": 2250.0, "qty": 2, "max_loss_per_trade": 375.0, "size_up_to": 100},
+            "+ fast steps from $6,000": {"trail_dd": 4500.0, "daily_loss_limit": 2700.0, "early_daily_loss": 2250.0,
+                "qty": 2, "max_loss_per_trade": 375.0, "profit_step_fast_from": 6000.0},
+                    "+ day budget $2,900": {"trail_dd": 4500.0, "daily_loss_limit": 2900.0, "early_daily_loss": 2250.0,
+                        "qty": 2, "max_loss_per_trade": 375.0}}
 
 
 def job(a):
@@ -36,7 +43,8 @@ def job(a):
     res = run(b, cfg, minutes=G.S.MIN[0])
     bt = b.index.tz_convert(G.NY)
     bd = np.array(bt.date)
-    days = sorted({d for d, m in zip(bt.date, bt.hour * 60 + bt.minute) if d >= s0.date() and 570 <= m < 960})
+    days = sorted({d for d, m in zip(bt.date, bt.hour * 60 + bt.minute,
+        strict=False) if d >= s0.date() and 570 <= m < 960})
     hi, lo = b.high.to_numpy(), b.low.to_numpy()
     adv, closed = np.zeros(len(b)), np.zeros(len(b))
     pnl = {d: 0.0 for d in days}

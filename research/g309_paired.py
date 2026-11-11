@@ -11,8 +11,10 @@ b = pd.read_csv("verification/noise_v2/g295_horizon.csv")
 m = a[a.sessions == 10].merge(b[b.sessions == 10], on=["set", "start"], suffixes=("_53", "_55"))
 print(f"starts {len(m)}: passed U53 {m.passed_53.mean():.3f} U55 {m.passed_55.mean():.3f}; "
       f"failed U53 {m.failed_53.mean():.3f} U55 {m.failed_55.mean():.3f}")
-print("passed by U55 only", int((m.passed_55 & ~m.passed_53).sum()), "by U53 only", int((~m.passed_55 & m.passed_53).sum()))
-print("failed by U55 only", int((m.failed_55 & ~m.failed_53).sum()), "by U53 only", int((~m.failed_55 & m.failed_53).sum()))
+print("passed by U55 only", int((m.passed_55 & ~m.passed_53).sum()), "by U53 only",
+    int((~m.passed_55 & m.passed_53).sum()))
+print("failed by U55 only", int((m.failed_55 & ~m.failed_53).sum()), "by U53 only",
+    int((~m.failed_55 & m.failed_53).sum()))
 m["q"] = pd.to_datetime(m.start).dt.to_period("Q").astype(str) + m.set
 groups = {q: x for q, x in m.groupby("q")}
 qs = list(groups)

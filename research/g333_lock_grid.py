@@ -1,4 +1,5 @@
-"""G333 (docs/NINJATRADER_V38.md): on U56, (as U57) the day lock's levels: at $600, $800 or $1,000, keeping $200, $300 or
+"""G333 (docs/NINJATRADER_V38.md): on U56, (as U57) the day lock's levels: at $600, $800 or $1,000, keeping $200, $300
+or
 $500 (6 variants around U57's $800 / $300). G253's measure; also the near-frozen Tests (G284b).
 
     SESS=10 python research/g333_lock_grid.py <data dir> <MNQ 09-26> <MNQ 12-26> <U48 JS json>
@@ -8,8 +9,8 @@ import os
 import sys
 from concurrent.futures import ProcessPoolExecutor
 
-import pandas as pd
 import g250_test_week as G
+import pandas as pd
 from g282_push import U53
 
 CAP = {"day_cap_exit": True}
@@ -21,7 +22,8 @@ VARIANTS["U56"] = (U56, 1500.0, 4)
 U57 = {**U56, "day_lock_at": 800.0, "day_lock_keep": 300.0}
 VARIANTS = {"U57": (U57, 1500.0, 4)}
 for at, keep in ((600.0, 200.0), (600.0, 300.0), (800.0, 200.0), (800.0, 500.0), (1000.0, 300.0), (1000.0, 500.0)):
-    VARIANTS[f"day lock at ${at:,.0f} keep ${keep:,.0f}"] = ({**U57, "day_lock_at": at, "day_lock_keep": keep}, 1500.0, 4)
+    VARIANTS[f"day lock at ${at:,.0f} keep ${keep:,.0f}"] = ({**U57, "day_lock_at": at, "day_lock_keep": keep}, 1500.0,
+        4)
 
 
 def job(a):
@@ -40,7 +42,8 @@ def main() -> None:
     conf += [("index", d.strftime("%Y-%m-%d")) for d in pd.date_range("2019-01-07", "2026-08-31", freq="W-MON")]
     for label, starts in (("development (index 2011-18)", dev), ("unseen (NQ 2015-25 + index 2019-26)", conf)):
         with ProcessPoolExecutor(int(os.environ.get("PROCS", "4"))) as ex:
-            d = pd.DataFrame([r for r in ex.map(job, [(t, n, s) for t in VARIANTS for n, s in starts], chunksize=16) if r])
+            d = pd.DataFrame([r for r in ex.map(job, [(t, n, s) for t in VARIANTS for n, s in starts],
+                chunksize=16) if r])
         d["stuck"] = ~d.passed & ~d.failed & (d.room < 500)
         d["failed_or_stuck"] = d.failed | d.stuck
         print(label + ":\n" + d.groupby("tag").agg(weeks=("passed", "size"), passed=("passed", "mean"),

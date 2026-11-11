@@ -8,8 +8,8 @@ import os
 import sys
 from concurrent.futures import ProcessPoolExecutor
 
-import pandas as pd
 import g261_test_search as G5
+import pandas as pd
 
 PICK = [250, 88, 178, 103, 290]
 G5.ROWS = "verification/noise_v2/g261b_rows.jsonl"

@@ -4,7 +4,6 @@
 """
 import sys
 
-import pandas as pd
 import t1_eval as T
 import v24_scan as S
 

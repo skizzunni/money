@@ -1,4 +1,5 @@
-"""G277 (docs/NINJATRADER_V38.md): the two-week Test search, 300 combinations around U53 (sprint to +$5,000, gap at 2 MNQ, no gap break-even).
+"""G277 (docs/NINJATRADER_V38.md): the two-week Test search, 300 combinations around U53 (sprint to +$5,000, gap at 2
+MNQ, no gap break-even).
 
 Stage 1 (development): 300 random combinations of the sprint size, the day stop and entry/exit settings, on the index's
 Monday starts 2011-2018. Stage 2 (confirmation): the 10 best by passes (failures at most 15%) on NQ 2015-25 and the
@@ -12,8 +13,8 @@ import random
 import sys
 from concurrent.futures import ProcessPoolExecutor
 
-import pandas as pd
 import g250_test_week as G
+import pandas as pd
 
 SPACE = {"sprint": [4], "day stop": [1000.0, 1100.0, 1200.0],
          "lookback": [16, 18, 20], "entry_k": [0.65, 0.7, 0.75], "range_pos_min": [0.65, 0.7, 0.75],
@@ -49,7 +50,7 @@ def run_saved(ex, jobs, stage):
             done[(r["stage"], r["k"], r["set"], r["start"])] = r
     todo = [j for j in jobs if (stage, j[0], j[1], j[2]) not in done]
     with open(ROWS, "a") as f:
-        for j, r in zip(todo, ex.map(job, todo, chunksize=16)):
+        for j, r in zip(todo, ex.map(job, todo, chunksize=16), strict=False):
             row = {"stage": stage, "k": j[0], "set": j[1], "start": j[2], **(r or {"skip": True})}
             done[(stage, j[0], j[1], j[2])] = row
             f.write(json.dumps(row, default=str) + "\n")

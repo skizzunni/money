@@ -1,6 +1,7 @@
 """G283 (docs/NINJATRADER_V38.md): U53's Test sprint sized from a fixed dollar risk on each trade's own stop
 (risk_per_trade $300 / $450 / $600, at most 6 or 8 MNQ) instead of a flat 4 MNQ (the gap trade stays at 2; the floor's
-and the day's room still cut it). Measured as G253 (10 sessions, TPT's Test rules) on its development weeks (the index 2011-18) and
+and the day's room still cut it). Measured as G253 (10 sessions, TPT's Test rules) on its development weeks (the index
+2011-18) and
 its unseen weeks (NQ 2015-25, the index 2019-26).
 
     SESS=10 python research/g283_risk_size.py <data dir> <MNQ 09-26> <MNQ 12-26> <U48 JS json>
@@ -10,8 +11,8 @@ import os
 import sys
 from concurrent.futures import ProcessPoolExecutor
 
-import pandas as pd
 import g250_test_week as G
+import pandas as pd
 from g271_day_stop import K317
 
 U53 = {**K317, "sprint_target": 5000.0, "sprint_gap_qty": 2, "gap_go_be": 0.0}
@@ -36,7 +37,8 @@ def main() -> None:
     conf += [("index", d.strftime("%Y-%m-%d")) for d in pd.date_range("2019-01-07", "2026-08-31", freq="W-MON")]
     for label, starts in (("development (index 2011-18)", dev), ("unseen (NQ 2015-25 + index 2019-26)", conf)):
         with ProcessPoolExecutor(int(os.environ.get("PROCS", "4"))) as ex:
-            d = pd.DataFrame([r for r in ex.map(job, [(t, n, s) for t in VARIANTS for n, s in starts], chunksize=16) if r])
+            d = pd.DataFrame([r for r in ex.map(job, [(t, n, s) for t in VARIANTS for n, s in starts],
+                chunksize=16) if r])
         print(label + ":\n" + d.groupby("tag").agg(weeks=("passed", "size"), passed=("passed", "mean"),
                                                   failed=("failed", "mean")).round(3).to_string(), flush=True)
 

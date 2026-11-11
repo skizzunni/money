@@ -8,8 +8,8 @@ import os
 import sys
 from concurrent.futures import ProcessPoolExecutor
 
-import pandas as pd
 import g250_test_week as G
+import pandas as pd
 from g343_gap_trade import U57
 
 VARIANTS = {"U57": (U57, 1500.0, 4)}
@@ -32,7 +32,8 @@ def job(a):
         return []
     s0 = pd.Timestamp(start, tz=G.NY)
     bt = box["b"].index.tz_convert(G.NY)
-    days = sorted({d for d, m in zip(bt.date, bt.hour * 60 + bt.minute) if d >= s0.date() and 570 <= m < 960})[:G.SESS]
+    days = sorted({d for d, m in zip(bt.date, bt.hour * 60 + bt.minute,
+        strict=False) if d >= s0.date() and 570 <= m < 960})[:G.SESS]
     return [{"tag": tag, "set": name, "start": start, "pnl": t.pnl, "qty": t.qty}
             for t in box["res"].trades if t.entry_time >= s0 and t.exit_time.tz_convert(G.NY).date() <= days[-1]]
 
@@ -50,7 +51,8 @@ def main() -> None:
         d = pd.DataFrame(rows)
         n_tests = len({(r["set"], r["start"]) for r in rows})
         out = d.groupby("tag").agg(trades=("pnl", "size"), win_rate=("pnl", lambda x: (x > 0).mean()),
-                                   avg_win=("pnl", lambda x: x[x > 0].mean()), avg_loss=("pnl", lambda x: x[x <= 0].mean()),
+                                   avg_win=("pnl", lambda x: x[x > 0].mean()), avg_loss=("pnl",
+                                       lambda x: x[x <= 0].mean()),
                                    avg_trade=("pnl", "mean"))
         out["trades_per_session"] = out.trades / (n_tests * G.SESS)
         print(label + f" ({n_tests} Tests):\n" + out.round(3).to_string(), flush=True)

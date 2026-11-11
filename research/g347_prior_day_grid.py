@@ -8,8 +8,8 @@ import os
 import sys
 from concurrent.futures import ProcessPoolExecutor
 
-import pandas as pd
 import g250_test_week as G
+import pandas as pd
 from g282_push import U53
 
 CAP = {"day_cap_exit": True}
@@ -22,7 +22,8 @@ U57 = {**U56, "day_lock_at": 800.0, "day_lock_keep": 300.0}
 VARIANTS = {"U57": (U57, 1500.0, 4)}
 for pm in (1.0, 1.25, 1.5):
     for im in (0.25, 0.5, 0.75):
-        VARIANTS[f"{round(4 * pm)} past, {round(4 * im)} inside"] = ({**U57, "pdhl_mult": pm, "pdhl_in_mult": im}, 1500.0, 4)
+        VARIANTS[f"{round(4 * pm)} past, {round(4 * im)} inside"] = ({**U57, "pdhl_mult": pm, "pdhl_in_mult": im},
+            1500.0, 4)
 
 
 def job(a):
@@ -41,7 +42,8 @@ def main() -> None:
     conf += [("index", d.strftime("%Y-%m-%d")) for d in pd.date_range("2019-01-07", "2026-08-31", freq="W-MON")]
     for label, starts in (("development (index 2011-18)", dev), ("unseen (NQ 2015-25 + index 2019-26)", conf)):
         with ProcessPoolExecutor(int(os.environ.get("PROCS", "4"))) as ex:
-            d = pd.DataFrame([r for r in ex.map(job, [(t, n, s) for t in VARIANTS for n, s in starts], chunksize=16) if r])
+            d = pd.DataFrame([r for r in ex.map(job, [(t, n, s) for t in VARIANTS for n, s in starts],
+                chunksize=16) if r])
         d["stuck"] = ~d.passed & ~d.failed & (d.room < 500)
         d["failed_or_stuck"] = d.failed | d.stuck
         print(label + ":\n" + d.groupby("tag").agg(weeks=("passed", "size"), passed=("passed", "mean"),

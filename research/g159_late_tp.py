@@ -10,7 +10,8 @@ import g135_gap_screen as G
 import v24_scan as S
 
 G.U33 = {**G.U33, "profit_step_fast": 750.0}  # U34
-G.VARIANTS = [{}, {"late_tp": 1.0, "late_tp_from": 900}, {"late_tp": 1.5, "late_tp_from": 900}, {"late_tp": 2.5, "late_tp_from": 810}]
+G.VARIANTS = [{}, {"late_tp": 1.0, "late_tp_from": 900}, {"late_tp": 1.5, "late_tp_from": 900}, {"late_tp": 2.5,
+    "late_tp_from": 810}]
 
 if __name__ == "__main__":
     S.init({}, *sys.argv[1:4])

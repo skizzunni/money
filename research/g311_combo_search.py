@@ -6,15 +6,14 @@ Stage 2 (confirmation): the 10 best by passes with failures at most U55's 5.9% o
 
     SESS=10 python research/g311_combo_search.py <data dir> <MNQ 09-26> <MNQ 12-26> <U48 JS json>
 """
+import itertools
 import json
 import os
 import sys
 from concurrent.futures import ProcessPoolExecutor
 
-import pandas as pd
 import g250_test_week as G
-
-import itertools
+import pandas as pd
 
 NFP = ",".join(pd.read_csv(os.path.join(os.path.dirname(os.path.abspath(__file__)), "nfp_dates.csv")).date)
 K317 = {"lookback": 18, "entry_k": 0.7, "range_pos_min": 0.7, "calm_k": 0.7, "take_profit": 0.75, "lock_at": 0.2,
@@ -29,7 +28,7 @@ RULES = {"streak": {"streak_k": 4, "streak_skip": 2},  # G297
 VARIANTS = []
 for sq in (4, 5):
     for on in itertools.product((0, 1), repeat=len(RULES)):
-        v = {"sprint": sq, "day stop": 1500.0, "rules": [r for r, b in zip(RULES, on) if b]}
+        v = {"sprint": sq, "day stop": 1500.0, "rules": [r for r, b in zip(RULES, on, strict=False) if b]}
         VARIANTS.append(v)
 
 
@@ -54,7 +53,7 @@ def run_saved(ex, jobs, stage):
             done[(r["stage"], r["k"], r["set"], r["start"])] = r
     todo = [j for j in jobs if (stage, j[0], j[1], j[2]) not in done]
     with open(ROWS, "a") as f:
-        for j, r in zip(todo, ex.map(job, todo, chunksize=16)):
+        for j, r in zip(todo, ex.map(job, todo, chunksize=16), strict=False):
             row = {"stage": stage, "k": j[0], "set": j[1], "start": j[2], **(r or {"skip": True})}
             done[(stage, j[0], j[1], j[2])] = row
             f.write(json.dumps(row, default=str) + "\n")
@@ -79,12 +78,14 @@ def main() -> None:
     conf += [("index", d.strftime("%Y-%m-%d")) for d in pd.date_range("2019-01-07", "2026-08-31", freq="W-MON")]
     with ProcessPoolExecutor(int(os.environ.get("PROCS", "4"))) as ex:
         s1 = score(run_saved(ex, [(k, n, s) for k in range(len(VARIANTS)) for n, s in dev], 1))
-        s1 = s1.join(pd.Series({k: json.dumps({"sprint": VARIANTS[k]["sprint"], "rules": VARIANTS[k]["rules"]}) for k in s1.index}, name="settings"))
+        s1 = s1.join(pd.Series({k: json.dumps({"sprint": VARIANTS[k]["sprint"],
+            "rules": VARIANTS[k]["rules"]}) for k in s1.index}, name="settings"))
         s1.to_csv("verification/noise_v2/g311_stage1.csv")
         top = s1[s1.failed <= 0.059].sort_values("passed", ascending=False).head(10)
         print("stage 1 best (index 2011-18):\n" + top.round(3).to_string(), flush=True)
         s2 = score(run_saved(ex, [(k, n, s) for k in top.index for n, s in conf], 2))
-    s2 = s2.join(pd.Series({k: json.dumps({"sprint": VARIANTS[k]["sprint"], "rules": VARIANTS[k]["rules"]}) for k in s2.index}, name="settings"))
+    s2 = s2.join(pd.Series({k: json.dumps({"sprint": VARIANTS[k]["sprint"],
+        "rules": VARIANTS[k]["rules"]}) for k in s2.index}, name="settings"))
     s2.to_csv("verification/noise_v2/g311_stage2.csv")
     print("stage 2 (NQ 2015-25 + index 2019-26):\n" + s2.sort_values("passed", ascending=False).round(3).to_string(),
           flush=True)

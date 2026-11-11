@@ -1,6 +1,7 @@
 """docs/V2_STOPS.md, Phase 4b: noise-only v2 against noise + Williams on one account, NQ 2015-2025 (5-minute).
 
-Noise: the v2 defaults at 2 MNQ (research/v2_stops_eval.py's data, closures and costs). Williams: research/combo_live.py's
+Noise: the v2 defaults at 2 MNQ (research/v2_stops_eval.py's data, closures and costs). Williams:
+research/combo_live.py's
 breakout (levels at the open +/- half of yesterday's range, first side only, stop a quarter of the range, $200 of risk
 a trade at 1-10 MNQ, out at the close), on the same 5-minute bars, with the plan's 2 ticks a side (one more than
 combo_live's). Shared: one position at a time (the first entry owns the account until flat) and one daily loss
@@ -29,7 +30,8 @@ LIMIT = -400.0
 
 def legs_noise(b):
     cfg = NoiseConfig(**{**V.BASE, **V.GATES["v2, limit -400, buffer 0.24, gap guard on"]})
-    return [(t.entry_bar, t.exit_bar, t.direction, t.entry, t.exit, t.pnl, t.qty, "noise") for t in run(b, cfg, 5).trades]
+    return [(t.entry_bar, t.exit_bar, t.direction, t.entry, t.exit, t.pnl, t.qty, "noise") for t in run(b, cfg,
+        5).trades]
 
 
 def legs_williams(b):

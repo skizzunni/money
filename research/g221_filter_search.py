@@ -1,4 +1,5 @@
-"""G221 (docs/NINJATRADER_V38.md): 30 random combinations of the entry filters around U44; G195's runner (the chart's execution on the window, NQ and the index).
+"""G221 (docs/NINJATRADER_V38.md): 30 random combinations of the entry filters around U44; G195's runner (the chart's
+execution on the window, NQ and the index).
 
     python research/g221_filter_search.py <data dir> <MNQ 09-26 file> <MNQ 12-26 file>
 """

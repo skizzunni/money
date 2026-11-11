@@ -992,6 +992,12 @@ namespace NinjaTrader.NinjaScript.Strategies
         int journaled;                   // the account's closed trades already written to the journal
         double realDayStart;
         int realDayTrades;
+        // the live dashboard: redrawn on the ticks (at most once a second of market time, and at once when the position
+        // changes), with the last price for the open trade's P/L; the bar-close redraw is unchanged
+        DateTime lastEndNy = DateTime.MinValue, liveDrawn = DateTime.MinValue, liveTimeNy = DateTime.MinValue;
+        double livePx = double.NaN;
+        int liveSide, liveQty;
+        bool dashErrorSaid;
         bool guardTripped;  // the loss guard closed out today: no new entries until tomorrow
         // progress, from the account's own fills: this week's and this month's P/L, the closed trades and winners, and
         // the first session the bot could trade (for the pace to the goal)
@@ -1307,6 +1313,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             TimeZoneInfo platform = NinjaTrader.Core.Globals.GeneralOptions.TimeZoneInfo ?? TimeZoneInfo.Local;
             DateTime endNy = TimeZoneInfo.ConvertTime(DateTime.SpecifyKind(Time[0], DateTimeKind.Unspecified), platform, newYork);
             DateTime start = endNy.AddMinutes(-minutes);
+            lastEndNy = endNy;
             if (firstBar.Length == 0)
                 firstBar = start.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
             int tMinDq = start.Hour * 60 + start.Minute;
@@ -1703,8 +1710,31 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         protected override void OnMarketData(MarketDataEventArgs marketDataUpdate)
         {
-            if (marketDataUpdate.MarketDataType == MarketDataType.Last && engine != null)
-                CheckLossGuard(marketDataUpdate.Price);
+            if (marketDataUpdate.MarketDataType != MarketDataType.Last || engine == null)
+                return;
+            CheckLossGuard(marketDataUpdate.Price);
+            if (State != State.Realtime || badChart || lastEndNy == DateTime.MinValue)
+                return;
+            livePx = marketDataUpdate.Price;
+            TimeZoneInfo platform = NinjaTrader.Core.Globals.GeneralOptions.TimeZoneInfo ?? TimeZoneInfo.Local;
+            DateTime nowNy = TimeZoneInfo.ConvertTime(DateTime.SpecifyKind(marketDataUpdate.Time, DateTimeKind.Unspecified), platform, newYork);
+            int side = Position.MarketPosition == MarketPosition.Long ? 1 : Position.MarketPosition == MarketPosition.Short ? -1 : 0;
+            if (side == liveSide && Position.Quantity == liveQty && (nowNy - liveDrawn).TotalSeconds < 1.0)
+                return;
+            liveSide = side;
+            liveQty = Position.Quantity;
+            liveDrawn = nowNy;
+            liveTimeNy = nowNy > lastEndNy ? nowNy : lastEndNy;
+            try
+            {
+                Dashboard(liveTimeNy);
+            }
+            catch (Exception e)  // the dashboard never stops the trading: say it once, the next bar close redraws it
+            {
+                if (!dashErrorSaid)
+                    Print("MnqNoiseV38: live dashboard error (trading continues): " + e.Message);
+                dashErrorSaid = true;
+            }
         }
 
         void Flatten(int real, string why)
@@ -1782,7 +1812,10 @@ namespace NinjaTrader.NinjaScript.Strategies
             string goal = Goal > 0 ? "Goal $" + Goal.ToString("0", CultureInfo.InvariantCulture) + ": $" +
                           sinceStart.ToString("0", CultureInfo.InvariantCulture) + " so far (" +
                           (100 * sinceStart / Goal).ToString("0.0", CultureInfo.InvariantCulture) + "%)\n" : "";
-            string txt = goal + LiveAccountLines() + "Strategy P/L (its fills, history and live): $" + cumReal.ToString("0.00", CultureInfo.InvariantCulture) +
+            DateTime shown = liveTimeNy > endNy ? liveTimeNy : endNy;
+            string upd = State != State.Realtime ? "" : "LIVE, updated " + shown.ToString("HH:mm:ss", CultureInfo.InvariantCulture) + " New York" +
+                         (double.IsNaN(livePx) ? "" : ", last " + livePx.ToString("0.00", CultureInfo.InvariantCulture)) + "\n";
+            string txt = upd + goal + LiveAccountLines() + "Strategy P/L (its fills, history and live): $" + cumReal.ToString("0.00", CultureInfo.InvariantCulture) +
                          ", today $" + (cumReal - realDayStart).ToString("0.00", CultureInfo.InvariantCulture) + "\n" +
                          "Next trade: " + engine.NextQty + " MNQ, room today $" + (double.IsNaN(engine.DayRoom) ? "-" : Math.Max(0, engine.DayRoom).ToString("0", CultureInfo.InvariantCulture)) + "\n" +
                          (setupWarnings.Count > 0 ? "SETUP WARNING (" + setupWarnings.Count + "): " + setupWarnings[0] + "\n" : "Setup: OK\n") +
@@ -1945,12 +1978,14 @@ namespace NinjaTrader.NinjaScript.Strategies
             double avg = Position.AveragePrice;
             if (engine.GapPos == real && engine.Position == 0)  // G60: the gap and go trade
                 return "Open trade: " + (real > 0 ? "LONG " : "SHORT ") + Position.Quantity + " MNQ @ " + avg.ToString("0.00", CultureInfo.InvariantCulture) +
-                       " (gap and go), stop " + engine.GapStop.ToString("0.00", CultureInfo.InvariantCulture) + ", " +
+                       " (gap and go), stop " + engine.GapStop.ToString("0.00", CultureInfo.InvariantCulture) +
+                       LiveTradeText(real, engine.GapStop) + ", " +
                        (engine.Bar + 1 - engine.GapBar) * BarsPeriod.Value + " min in, out at 09:55\n";
             double stop = engine.PeekStop(avg), tp = engine.PeekTarget(avg);
             string line = "Open trade: " + (real > 0 ? "LONG " : "SHORT ") + Position.Quantity + " MNQ @ " + avg.ToString("0.00", CultureInfo.InvariantCulture) +
                           (double.IsNaN(stop) ? "" : ", stop " + stop.ToString("0.00", CultureInfo.InvariantCulture)) +
                           (double.IsNaN(tp) ? "" : ", target " + tp.ToString("0.00", CultureInfo.InvariantCulture)) +
+                          LiveTradeText(real, stop) +
                           ", " + engine.MinutesInTrade + " min in, " + (engine.Locked ? "locked (can't lose)" : "lock not reached");
             if (engine.TimeStopMinutes > 0 && !engine.Locked)
             {
@@ -1958,6 +1993,16 @@ namespace NinjaTrader.NinjaScript.Strategies
                 line += left > 0 ? ", time stop in " + left + " min if losing" : ", time stop: out at the next bar if losing";
             }
             return line + "\n";
+        }
+
+        // live, on the ticks: the open trade's P/L at the last price and the points left to its stop
+        string LiveTradeText(int real, double stop)
+        {
+            if (State != State.Realtime || double.IsNaN(livePx))
+                return "";
+            double pl = Position.GetUnrealizedProfitLoss(PerformanceUnit.Currency, livePx);
+            return ", open $" + pl.ToString("0.00", CultureInfo.InvariantCulture) + " at " + livePx.ToString("0.00", CultureInfo.InvariantCulture) +
+                   (double.IsNaN(stop) ? "" : ", " + (real * (livePx - stop)).ToString("0.00", CultureInfo.InvariantCulture) + " pts to the stop");
         }
 
         #region Properties

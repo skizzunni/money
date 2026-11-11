@@ -12,8 +12,8 @@ import random
 import sys
 from concurrent.futures import ProcessPoolExecutor
 
-import pandas as pd
 import g250_test_week as G
+import pandas as pd
 
 SPACE = {"sprint": [3, 4, 5], "day stop": [1000.0, 1050.0, 1100.0, 1200.0],
          "lookback": [16, 18, 20, 22], "entry_k": [0.6, 0.65, 0.7, 0.75], "range_pos_min": [0.65, 0.7, 0.75],
@@ -48,7 +48,7 @@ def run_saved(ex, jobs, stage):
             done[(r["stage"], r["k"], r["set"], r["start"])] = r
     todo = [j for j in jobs if (stage, j[0], j[1], j[2]) not in done]
     with open(ROWS, "a") as f:
-        for j, r in zip(todo, ex.map(job, todo, chunksize=16)):
+        for j, r in zip(todo, ex.map(job, todo, chunksize=16), strict=False):
             row = {"stage": stage, "k": j[0], "set": j[1], "start": j[2], **(r or {"skip": True})}
             done[(stage, j[0], j[1], j[2])] = row
             f.write(json.dumps(row, default=str) + "\n")

@@ -101,7 +101,8 @@ class NoiseConfig:
     after_loss_qty_div: float = 1.0
     after_loss_ml_mult: float = 1.0  # its max loss x this (the same contracts, a wider stop)
     after_loss_ml_mult5: float = 0.0  # G165: on 5-minute bars, after_loss_ml_mult is this (0: off)
-    after_loss_ml_locked: float = 0.0  # research (G119): once the floor has stopped, after_loss_ml_mult is this (0: off)
+    # research (G119): once the floor has stopped, after_loss_ml_mult is this (0: off)
+    after_loss_ml_locked: float = 0.0
     # a second tier for two or more losers in a row (0: the same as after one loser), and the rule on the losing
     # trade's side only (another side: the normal size)
     after_loss2_qty_div: float = 0.0
@@ -112,7 +113,8 @@ class NoiseConfig:
     # this factor (the stops keep the area itself). late_tp / late_tp_from: entries from checks closing at or after
     # late_tp_from (minute of day) take late_tp noise units as their take-profit
     entry_k: float = 1.0
-    max_loss_frac: float = 1.0  # research (G338): the max-loss stop at this share of the max loss (the lock's trigger unchanged)
+    # research (G338): the max-loss stop at this share of the max loss (the lock's trigger unchanged)
+    max_loss_frac: float = 1.0
     entry_k_short: float = 0.0  # research (G337): the short side's entry width when it differs (0 = entry_k)
     # after a big session (its 09:30-16:00 range over big_day_k x the average of the last big_day_n sessions' ranges,
     # as a share of the open; that session included), no entries or heads-ups today in that session's direction (its
@@ -165,7 +167,8 @@ class NoiseConfig:
     dll_v2: float = 0.0
     lock_noise: float = 0.0
     gap_guard: bool = False
-    guard_reserve_pts: float = 0.0  # G133: the guard fires this many points per contract early (room for its own slippage)
+    # G133: the guard fires this many points per contract early (room for its own slippage)
+    guard_reserve_pts: float = 0.0
     guard_slip_pts: float = 0.0  # research: the day guard's fill this many points worse (a fast market)
     day_stop_profit: float = 0.0  # research (G127): no new entries today once today's closed P/L is at least this, $
     # research (G288): the day profit stop rises to day_stop_consistent x the profit since the start before today, when
@@ -177,11 +180,13 @@ class NoiseConfig:
     # research (G331): the chop pause. After red_days_pause sessions in a row closed with a loss (the bot's and the gap
     # trade's P/L), no trading the next session (0 = off)
     red_days_pause: int = 0
-    # research (G310): from day_stop_late_from (minute of day), no new entries once today's P/L is day_stop_late (0 = off)
+    # research (G310): from day_stop_late_from (minute of day), no new entries once today's P/L is day_stop_late (0 =
+    # off)
     day_stop_late_from: int = 0
     day_stop_late: float = 0.0
     # research (G294): the day lock. Once today's P/L with the open trade at its best price since entry (bar extremes,
-    # through the last bar) reaches day_lock_at, the stop goes no lower than the price where today's P/L is day_lock_keep
+    # through the last bar) reaches day_lock_at, the stop goes no lower than the price where today's P/L is
+    # day_lock_keep
     day_lock_at: float = 0.0
     day_lock_keep: float = 0.0
     skip_checks_early: bool = False  # research (G125): skip_checks only until the floor has stopped
@@ -285,13 +290,15 @@ class NoiseConfig:
     tom_no_shorts: bool = False
     tom_mult: float = 1.0
     day_up_mult: float = 1.0
-    # research (G420): after today's first winning trade (win_side_target: the first that reached its target), no entries
+    # research (G420): after today's first winning trade (win_side_target: the first that reached its target), no
+    # entries
     # on the other side for the rest of the session (off by default)
     # research (G422): entry lines at entry_k_regime noise instead of entry_k when the last calm_short sessions' average
     # range is below (regime_calm) or above (not regime_calm) the last calm_long sessions' (0 = off)
     entry_k_regime: float = 0.0
     tp_calm: float = 0.0  # research (G425): the take-profit on a calm stretch (entry_k_regime's test; 0 = off)
-    entry_k_wild: float = 0.0  # research (G423): the entry lines on a stretch that is not calm (regime_calm's test; 0 = off)
+    # research (G423): the entry lines on a stretch that is not calm (regime_calm's test; 0 = off)
+    entry_k_wild: float = 0.0
     regime_calm: bool = True
     win_side_only: bool = False
     win_side_target: bool = False
@@ -371,7 +378,8 @@ class NoiseConfig:
     # rescaled by month has a false gap at each month's first session (off for real prices)
     gap_go: bool = False
     gap_go_k: float = 0.5
-    gap_go_k_locked: float = 0.0  # research (G157): once the floor has stopped, the main gap trigger is this (0: gap_go_k)
+    # research (G157): once the floor has stopped, the main gap trigger is this (0: gap_go_k)
+    gap_go_k_locked: float = 0.0
     # G60 stage 3: gap trades only once the trailing floor has stopped at the start (the account's first $trail_dd
     # made), and each one's stop no farther than the bot's max loss a contract from the expected fill
     gap_go_after_lock: bool = False
@@ -383,24 +391,30 @@ class NoiseConfig:
     # research (G66): an opening drive. When the gap rule doesn't fire, a 09:30 bar whose body |close - open| is at
     # least gap_go_drive_k x the average of the last 14 sessions' 09:30 bodies takes the same trade its way (0 = off)
     gap_go_drive_k: float = 0.0
-    # research (G318): the opening drive as a filter. When 09:30-10:00 moves more than drive_filter_k x the average of the
+    # research (G318): the opening drive as a filter. When 09:30-10:00 moves more than drive_filter_k x the average of
+    # the
     # last calm_short sessions' ranges (a share of the open), no bot entries against that move today (0 = off)
     drive_filter_k: float = 0.0
-    # research (G373): size by the opening drive. When 09:30-10:00 moves more than drive_size_k x the average of the last
+    # research (G373): size by the opening drive. When 09:30-10:00 moves more than drive_size_k x the average of the
+    # last
     # calm_short sessions' ranges, entries with that move take drive_mult x the contracts, against it drive_against_mult
     drive_size_k: float = 0.0
     drive_mult: float = 1.0
     drive_against_mult: float = 1.0
     drive_none_mult: float = 1.0  # G374: with drive_size_k on, entries on a day without such a drive (and before 10:00)
-    drive_tp: float = -1.0  # research (G376): entries with the opening drive (drive_size_k) take this take-profit (0: none; <0: off)
-    drive_losers: int = 0  # research (G377): the day's loser limit on a day with an opening drive (drive_size_k; 0: off)
+    # research (G376): entries with the opening drive (drive_size_k) take this take-profit (0: none; <0: off)
+    drive_tp: float = -1.0
+    # research (G377): the day's loser limit on a day with an opening drive (drive_size_k; 0: off)
+    drive_losers: int = 0
     # research (G379): size by the volatility regime, the last calm_short sessions' average range over the last
     # calm_long's: q x that ratio (vol_pro) or its inverse, kept within [vol_lo, vol_hi] (vol_hi 0: off)
     vol_lo: float = 1.0
     vol_hi: float = 0.0
     vol_pro: bool = True
-    weekday_mult: str = ""  # research (G384): "d:m,..." Monday=0: entries on weekday d take m x the contracts (at least 1)
-    # research (G416): the session after a green (red) one, entries take after_green_mult (after_red_mult) x the contracts
+    # research (G384): "d:m,..." Monday=0: entries on weekday d take m x the contracts (at least 1)
+    weekday_mult: str = ""
+    # research (G416): the session after a green (red) one, entries take after_green_mult (after_red_mult) x the
+    # contracts
     # (at least 1; 1.0 = off). A flat session counts as neither
     after_green_mult: float = 1.0
     # research (G417): within the session, entries while today's closed P/L is above 0 take day_up_mult x the contracts,
@@ -409,7 +423,8 @@ class NoiseConfig:
     day_down_mult: float = 1.0
     day_up_from: float = 0.0  # research (G418): day_up_mult only while the account's closed profit is at least this
     after_red_mult: float = 1.0
-    check_mult: str = ""  # research (G385): "minute:m,..." entries from the check closing at that minute take m x (at least 1)
+    # research (G385): "minute:m,..." entries from the check closing at that minute take m x (at least 1)
+    check_mult: str = ""
     # research (G69): small gaps. A gap at least gap_go_small_k x the average (but under gap_go_k), the 09:30 bar
     # closing its way, takes the same trade at 1 contract (-1 = off). Drive and small-gap trades are always 1 contract
     gap_go_small_k: float = -1.0
@@ -417,7 +432,8 @@ class NoiseConfig:
     # stopped at the start (trail_cap)
     fill_skip_braked: bool = False  # research (G202): no fill-in (trend_small's shorts included) while braked
     gap_skip_braked: bool = False  # research (G191): no gap-slot trade while the giveback brake is on
-    gap_fill_early: bool = False  # research (G189): the gap-slot fill-ins (small gap, drive) also before the floor stops
+    # research (G189): the gap-slot fill-ins (small gap, drive) also before the floor stops
+    gap_fill_early: bool = False
     fill_after_lock: bool = False
     fill_min_room: float = 0.0  # G71: and only while the account is at least this far above the trailing floor
     fill_no_steps: bool = False  # G73: the fill-in trades' P/L doesn't count toward the contract steps
@@ -462,7 +478,8 @@ class NoiseConfig:
     # research (G298): after sprint_after_loss_n losing trades today, the sprint takes sprint_after_loss_qty (0 = off)
     sprint_after_loss_qty: int = 0
     sprint_after_loss_n: int = 1
-    # research (G308): the sprint's first bot trade of the day takes sprint_first_qty, later ones sprint_later_qty (0 = off)
+    # research (G308): the sprint's first bot trade of the day takes sprint_first_qty, later ones sprint_later_qty (0 =
+    # off)
     sprint_first_qty: int = 0
     # research (G335): near the finish. Once the profit since the start is at least sprint_near_from, the sprint takes
     # sprint_near_qty contracts (0 = off)
@@ -470,11 +487,13 @@ class NoiseConfig:
     sprint_near_qty: int = 0
     sprint_later_qty: int = 0
     sprint_hot_qty: int = 0
-    # research (G317): the sprint sized by volatility: sprint_qty x (the last calm_long sessions' average range / the last
+    # research (G317): the sprint sized by volatility: sprint_qty x (the last calm_long sessions' average range / the
+    # last
     # calm_short's), rounded, between sprint_vol_lo and sprint_vol_hi (0 = off)
     sprint_vol_lo: int = 0
     sprint_vol_hi: int = 0
-    # research (G286): the sprint stays on until the Test's pass rule is met (profit at least sprint_pass_target, the best
+    # research (G286): the sprint stays on until the Test's pass rule is met (profit at least sprint_pass_target, the
+    # best
     # day under half of it, at least 3 days with a trade), whatever sprint_target; from sprint_pass_target on it takes
     # sprint_pass_qty contracts (0 = sprint_qty)
     sprint_until_pass: bool = False
@@ -503,7 +522,8 @@ class NoiseConfig:
     # research (G361): new entries only when the high-low range since the last check is at most squeeze_k x the noise
     # (sigma) x the close: a breakout from a quiet half hour (0: off)
     squeeze_k: float = 0.0
-    # research (G362): the mirror, new entries only when that range is at least thrust_k x the noise x the close (0: off)
+    # research (G362): the mirror, new entries only when that range is at least thrust_k x the noise x the close (0:
+    # off)
     thrust_k: float = 0.0
     pdhl_mult: float = 1.0
     pdhl_in_mult: float = 1.0
@@ -795,7 +815,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
         """The contract steps for the profit so far (G142: faster above profit_step_fast_from)."""
         p = max(0.0, eq_curve[-1] - steps_off() - trail_base)
         if cfg.profit_step_fast > 0 and minutes == 5 and p > cfg.profit_step_fast_from:  # tested on 5-minute bars
-            return int(cfg.profit_step_fast_from // step_now()) + int((p - cfg.profit_step_fast_from) // cfg.profit_step_fast)
+            return (int(cfg.profit_step_fast_from // step_now())
+                    + int((p - cfg.profit_step_fast_from) // cfg.profit_step_fast))
         return int(p // step_now())
 
     def sprint_q() -> int:
@@ -845,7 +866,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
         """G286: is the Test's pass rule met (closed sessions and today so far)?"""
         if not sprint_eods:
             return False
-        days = [b - a for a, b in zip(sprint_eods, sprint_eods[1:])] + [eq_curve[-1] - sprint_eods[-1]]
+        days = [b - a for a, b in zip(sprint_eods, sprint_eods[1:], strict=False)] + [eq_curve[-1] - sprint_eods[-1]]
         p = eq_curve[-1] - trail_base
         return p >= cfg.sprint_pass_target and max(days) < 0.5 * p and sum(abs(x) > 1e-9 for x in days) >= 3
 
@@ -1244,8 +1265,10 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                         fl = min(fl, trail_base + cfg.trail_cap)
                     allow = min(allow, eq_curve[-1] - fl - cfg.guard_floor_buffer)
                 allow -= rest * q_trade * cfg.guard_reserve_pts * cfg.point_value
-                g_base = est_px if (cfg.dll_v2 > 0 and cfg.day_guard <= 0 and entry_bar == i) else entry_px  # v2: a bracket
-                gpx = g_base - pos * (allow - 2 * cfg.commission_per_side * q_trade) / (rest * q_trade * cfg.point_value)
+                # v2: a bracket
+                g_base = est_px if (cfg.dll_v2 > 0 and cfg.day_guard <= 0 and entry_bar == i) else entry_px
+                gpx = g_base - pos * (allow - 2 * cfg.commission_per_side * q_trade) / (
+                    rest * q_trade * cfg.point_value)
                 if cfg.nt_execution and cfg.day_guard_grid:  # G321b: a real stop sits on the tick grid
                     gpx = on_grid(pos, gpx)
                 if pos * (gpx - line) > 0:
@@ -1258,7 +1281,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                 gpx = on_grid(pos, entry_px - pos * allow / (rest * q_trade * cfg.point_value))
                 if pos * (gpx - line) > 0:
                     line, reason = gpx, "Floor guard"
-            if cfg.nt_execution and entry_bar != i and pos * (c[i - 1] - line) <= 0 and reason not in ("Day guard", "Floor guard"):
+            if cfg.nt_execution and entry_bar != i and pos * (c[i - 1] - line) <= 0 and reason not in ("Day guard",
+                "Floor guard"):
                 hit, price, reason = True, o[i] - pos * slip, "Stop passed"  # sent at the last close, filled now
             elif entry_bar == i:  # a stop attached to the entry can fill on the fill bar itself
                 hit = l[i] <= line if pos > 0 else h[i] >= line
@@ -1547,12 +1571,14 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                             q_n = max(1, round(q_next * float(cm[str(end)])))
                             ml_next, q_next = ml_next / q_next * q_n, q_n
                     if red_hist and (cfg.after_green_mult != 1.0 or cfg.after_red_mult != 1.0):  # G416
-                        pm = cfg.after_green_mult if red_hist[-1] > 0 else cfg.after_red_mult if red_hist[-1] < 0 else 1.0
+                        pm = (cfg.after_green_mult if red_hist[-1] > 0
+                              else cfg.after_red_mult if red_hist[-1] < 0 else 1.0)
                         q_n = max(1, round(q_next * pm))
                         ml_next, q_next = ml_next / q_next * q_n, q_n
                     if (cfg.day_up_mult != 1.0 or cfg.day_down_mult != 1.0) and day_pnl != 0:  # G417
                         up_ok = eq_curve[-1] - trail_base >= cfg.day_up_from  # G418
-                        q_n = max(1, round(q_next * ((cfg.day_up_mult if up_ok else 1.0) if day_pnl > 0 else cfg.day_down_mult)))
+                        q_n = max(1,
+                            round(q_next * ((cfg.day_up_mult if up_ok else 1.0) if day_pnl > 0 else cfg.day_down_mult)))
                         ml_next, q_next = ml_next / q_next * q_n, q_n
                     if cfg.weekday_mult:  # G384
                         wm = dict(x.split(":") for x in cfg.weekday_mult.split(","))

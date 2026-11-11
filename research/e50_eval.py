@@ -78,7 +78,8 @@ def streaks(p: np.ndarray) -> dict:
         run = run + 1 if x else 0
         best = max(best, run)
     after = int((loss[1:] & loss[:-1]).sum())
-    return {"longest losing run": best, "loss after a loss % of losses": round(100 * after / max(1, int(loss.sum())), 1)}
+    return {"longest losing run": best, "loss after a loss % of losses": round(100 * after / max(1, int(loss.sum())),
+        1)}
 
 
 def main() -> None:

@@ -15,7 +15,8 @@ U29 = {"gap_go": True, "gap_go_exit": 595, "gap_go_max_qty": 1, "gap_go_locked_q
 G.U33 = {}  # each variant below is a whole configuration
 U33 = {**U29, "size_up_to": 50, "after_loss_ml_locked": 1.0, "skip_checks": "780,870", "skip_checks_early": True}
 U34 = {**U33, "profit_step_fast": 750.0}
-G.VARIANTS = [{**U34, "slippage_ticks": 3}, {**U34, "commission_per_side": 1.0}, {**U34, "slippage_ticks": 2, "commission_per_side": 1.0}]
+G.VARIANTS = [{**U34, "slippage_ticks": 3}, {**U34, "commission_per_side": 1.0}, {**U34, "slippage_ticks": 2,
+    "commission_per_side": 1.0}]
 
 if __name__ == "__main__":
     S.init({}, *sys.argv[1:4])

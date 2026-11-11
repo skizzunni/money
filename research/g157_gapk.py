@@ -1,4 +1,5 @@
-"""G157 (docs/NINJATRADER_V38.md): a bigger gap for the main gap trade once the floor has stopped, on U34; G135's screen against U34.
+"""G157 (docs/NINJATRADER_V38.md): a bigger gap for the main gap trade once the floor has stopped, on U34; G135's screen
+against U34.
 
     python research/g157_gapk.py <data dir> <MNQ 09-26 file> <MNQ 12-26 file>
 """

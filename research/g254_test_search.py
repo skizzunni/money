@@ -12,11 +12,12 @@ import random
 import sys
 from concurrent.futures import ProcessPoolExecutor
 
-import pandas as pd
 import g250_test_week as G
+import pandas as pd
 
 SPACE = {"sprint": [3, 4, 5, 6], "day stop": [1000.0, 1100.0, 1200.0, 1300.0, 1450.0],
-         "lookback": [12, 14, 16, 18, 20], "entry_k": [0.7, 0.75, 0.8, 0.9, 1.0], "range_pos_min": [0.6, 0.65, 0.7, 0.75],
+         "lookback": [12, 14, 16, 18, 20], "entry_k": [0.7, 0.75, 0.8, 0.9, 1.0], "range_pos_min": [0.6, 0.65, 0.7,
+             0.75],
          "calm_k": [0.0, 0.6, 0.7, 0.8, 0.9], "take_profit": [0.75, 1.0, 1.25, 1.5], "lock_at": [0.2, 0.25, 0.33],
          "skip_checks": [""], "max_losers": [0, 2, 3], "time_stop": [30, 45, 60, 0],
          "trend_n": [0], "big_day_k": [0.0, 1.5]}
@@ -47,7 +48,7 @@ def run_saved(ex, jobs, stage):
             done[(r["stage"], r["k"], r["set"], r["start"])] = r
     todo = [j for j in jobs if (stage, j[0], j[1], j[2]) not in done]
     with open(ROWS, "a") as f:
-        for j, r in zip(todo, ex.map(job, todo, chunksize=16)):
+        for j, r in zip(todo, ex.map(job, todo, chunksize=16), strict=False):
             row = {"stage": stage, "k": j[0], "set": j[1], "start": j[2], **(r or {"skip": True})}
             done[(stage, j[0], j[1], j[2])] = row
             f.write(json.dumps(row, default=str) + "\n")

@@ -1,29 +1,31 @@
-"""G383 (docs/NINJATRADER_V38.md): 60 random combinations (seed 383; the first is U48) of the funded mode's levers, judged
+"""G383 (docs/NINJATRADER_V38.md): 60 random combinations (seed 383; the first is U48) of the funded mode's levers,
+judged
 by G372's 12-month measure. when 09:30-10:00 moves
 more than k x the average of the last sessions' ranges, entries with that move take a multiple of the contracts and
 entries against it another (`drive_size_k`, `drive_mult`, `drive_against_mult`). The measure of G372.
 
     python research/g383_funded_mix.py <data dir> <MNQ 09-26> <MNQ 12-26> <U48 JS json>
 """
-import itertools
 import json
 import os
 import sys
 from concurrent.futures import ProcessPoolExecutor
 
+import g250_test_week as G
 import numpy as np
 import pandas as pd
-import g250_test_week as G
+
 from mnqbot.noise import NoiseConfig, run
 
 VARIANTS = {"U48": {}}
-import random
+import random  # noqa: E402
 
 CHOICES = {"start": [None, {"qty": 2, "max_loss_per_trade": 375.0}],
            "step": [None, {"profit_step": 1000.0}],
            "fast": [None, {"profit_step_fast_from": 3000.0}],
            "vol": [None, {"vol_pro": False, "vol_lo": 0.5, "vol_hi": 1.5}],
-           "drive": [None, {"drive_size_k": 0.5, "drive_mult": 1.5, "drive_against_mult": 0.5, "drive_none_mult": 0.75}],
+           "drive": [None, {"drive_size_k": 0.5, "drive_mult": 1.5, "drive_against_mult": 0.5,
+               "drive_none_mult": 0.75}],
            "checks": [None, {"skip_checks": "", "last_entry_end": 930}],
            "tp": [None, {"take_profit": 2.5}],
            "time stop": [None, {"time_stop": 90}],
@@ -54,7 +56,8 @@ def job(a):
     res = run(b, cfg, minutes=G.S.MIN[0])
     bt = b.index.tz_convert(G.NY)
     bd = np.array(bt.date)
-    days = sorted({d for d, m in zip(bt.date, bt.hour * 60 + bt.minute) if d >= s0.date() and 570 <= m < 960})
+    days = sorted({d for d, m in zip(bt.date, bt.hour * 60 + bt.minute,
+        strict=False) if d >= s0.date() and 570 <= m < 960})
     hi, lo = b.high.to_numpy(), b.low.to_numpy()
     adv, closed = np.zeros(len(b)), np.zeros(len(b))
     pnl = {d: 0.0 for d in days}

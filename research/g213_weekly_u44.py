@@ -15,7 +15,8 @@ U44 = {"gap_go": True, "gap_go_exit": 595, "gap_go_max_qty": 1, "gap_go_locked_q
        "trend_small": True, "gap_go_drive_k": 0.6, "fill_after_lock": True, "fill_min_room": 2500.0,
        "size_slip_pts": 5.0, "fill_qty2_room": 4000.0, "giveback_brake": 0.5, "size_up_to": 75,
        "after_loss_ml_locked": 1.0, "skip_checks": "780,870", "skip_checks_early": True,
-       "profit_step_fast": 650.0, "profit_step_fast_from": 8000.0, "fill_qty3_room": 8000.0, "after_loss_ml_mult5": 1.0, "gap_skip_braked": True,
+       "profit_step_fast": 650.0, "profit_step_fast_from": 8000.0, "fill_qty3_room": 8000.0,
+           "after_loss_ml_mult5": 1.0, "gap_skip_braked": True,
        "max_losers": 3, "early_daily_loss": 750.0, "time_stop": 45, "range_pos_min": 0.7, "gap_go_k": 0.6}
 BANDS = [(-1e9, 10000), (10000, 30000), (30000, 75000), (75000, 1e12)]
 

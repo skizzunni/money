@@ -1,4 +1,5 @@
-"""G246 (docs/NINJATRADER_V38.md): G245 with the prior session's high and low as the levels and a 2:1 target. A measurement.
+"""G246 (docs/NINJATRADER_V38.md): G245 with the prior session's high and low as the levels and a 2:1 target. A
+measurement.
 
 5-minute RTH bars, 1 MNQ, $1.24 commission and a tick each way per round trip:
   levels: the prior RTH session's high (resistance) and low (support), each traded once a day;
@@ -94,5 +95,6 @@ for name, (bars, first, skip) in S.D.items():
     print(f"\n{name}: {len(df)} trades, net ${df.pnl.sum():,.0f} per MNQ, win {100 * (df.pnl > 0).mean():.1f}%, "
           f"years up {(yr > 0).sum()} of {len(yr)}; U47 days ${df[df.u47].pnl.sum():,.0f} ({int(df.u47.sum())}), "
           f"idle days ${idle.pnl.sum():,.0f} ({len(idle)}, years up {(yi > 0).sum()} of {len(yi)})")
-    print(pd.DataFrame({"net": yr, "U47 days": df[df.u47].groupby("y").pnl.sum().round(0), "idle days": yi}).to_string(),
+    print(pd.DataFrame({"net": yr, "U47 days": df[df.u47].groupby("y").pnl.sum().round(0),
+        "idle days": yi}).to_string(),
           flush=True)

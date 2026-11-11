@@ -10,9 +10,9 @@ import os
 import sys
 from concurrent.futures import ProcessPoolExecutor
 
-import numpy as np
-import pandas as pd
 import g250_test_week as G
+import pandas as pd
+
 from mnqbot.noise import NoiseConfig, run
 
 
@@ -31,7 +31,8 @@ def job(a):
     cfg.trail_from = start
     res = run(b, cfg, minutes=G.S.MIN[0])
     bt = b.index.tz_convert(G.NY)
-    days = sorted({d for d, m in zip(bt.date, bt.hour * 60 + bt.minute) if d >= s0.date() and 570 <= m < 960})
+    days = sorted({d for d, m in zip(bt.date, bt.hour * 60 + bt.minute,
+        strict=False) if d >= s0.date() and 570 <= m < 960})
     pnl = {d: 0.0 for d in days}
     for t in res.trades:
         d = t.exit_time.tz_convert(G.NY).date()

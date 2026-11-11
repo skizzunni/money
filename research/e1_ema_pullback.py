@@ -21,7 +21,8 @@ import h1_dip as H  # noqa: E402
 
 TICK, PV, FEE, LEVEL = H.TICK, H.PV, H.FEE, H.LEVEL
 RISK, TARGET_R = 625.0, 2.8
-WINDOWS = [("proxy", "2025-01-02", "2026-12-31"), ("nq", "2015-01-01", "2025-07-31"), ("index", "2011-01-01", "2026-09-30")]
+WINDOWS = [("proxy", "2025-01-02", "2026-12-31"), ("nq", "2015-01-01", "2025-07-31"), ("index", "2011-01-01",
+    "2026-09-30")]
 
 
 def ema(x: np.ndarray, n: int) -> np.ndarray:
@@ -88,7 +89,8 @@ def simulate(sess: list, start: str, end: str, scaled: bool) -> tuple[pd.DataFra
                     pos = None
                 else:
                     worst = lo[j] if d > 0 else h[j]
-                    marks.append((i, j, q * ((worst * f - entry) * d * PV - FEE), q * ((c[j] * f - entry) * d * PV - FEE)))
+                    marks.append((i, j, q * ((worst * f - entry) * d * PV - FEE),
+                        q * ((c[j] * f - entry) * d * PV - FEE)))
                     if not pos["be"] and ((h[j] * f >= entry + pos["r"]) if d > 0 else (lo[j] * f <= entry - pos["r"])):
                         pos["be"], pos["stop"] = True, entry
                     continue
@@ -131,7 +133,8 @@ def main() -> None:
              **H.stats(tf, book, n_sess / 252)}
         if len(tf):
             days_with = tf.day.nunique()
-            r.update({"days with a trade %": round(100 * days_with / n_sess, 1), "avg contracts": round(tf.qty.mean(), 1),
+            r.update({"days with a trade %": round(100 * days_with / n_sess, 1), "avg contracts": round(tf.qty.mean(),
+                1),
                       **{f"{k} %": round(100 * float((tf.reason == k).mean()), 1)
                          for k in ("target", "stop", "breakeven", "close")}})
         if name == "proxy":

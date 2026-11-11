@@ -5,14 +5,15 @@ The bot as it is (it sizes from the end-of-day floor). Per bar, the open trades'
 bar's high and low; "worst order" counts the bar's best mark before its worst (the floor rises first), "best order" the
 worst mark first. An account is lost when its marked balance reaches the floor.
 
-    START_FREQ=MS|MID VARIANT_TAG=<tag> VARIANT_JSON='{...}' python research/g248_pro_intraday.py <data dir> <MNQ 09-26> <MNQ 12-26>
+    START_FREQ=MS|MID VARIANT_TAG=<tag> VARIANT_JSON='{...}' python research/g248_pro_intraday.py <data dir> <MNQ 09-26>
+    <MNQ 12-26>
 """
 import sys
 
 sys.argv = sys.argv[:4] + ["json"]
+import g35_start_dates as G  # noqa: E402
 import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
-import g35_start_dates as G  # noqa: E402
 import t1_eval as T  # noqa: E402
 import v24_scan as S  # noqa: E402
 
@@ -84,8 +85,8 @@ def one(job):
 
 
 def main() -> None:
-    from concurrent.futures import ProcessPoolExecutor
     import os
+    from concurrent.futures import ProcessPoolExecutor
     S.init({}, *sys.argv[1:4])
     S.D = {k: (G.with_1600(b, S.MIN[0]), first, skip) for k, (b, first, skip) in S.D.items() if k != "win"}
     fq = os.environ.get("START_FREQ", "MS")

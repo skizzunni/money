@@ -119,7 +119,7 @@ namespace NinjaTrader.Cbi
 namespace NinjaTrader.Data
 {
     public enum MarketDataType { Ask, Bid, Last }
-    public class MarketDataEventArgs { public MarketDataType MarketDataType; public double Price; }  // a tick
+    public class MarketDataEventArgs { public MarketDataType MarketDataType; public double Price; public DateTime Time; }  // a tick
     public enum BarsPeriodType { Tick, Second, Minute, Day }
     public class BarsPeriod { public BarsPeriodType BarsPeriodType = BarsPeriodType.Minute; public int Value = 5; }
     public class TradingHours
@@ -856,13 +856,17 @@ namespace NinjaTrader.NinjaScript.Strategies
                     dayStartCum = SystemPerformance.AllTrades.TradesPerformance.Currency.CumProfit;
                 }
                 if (State == State.Realtime)  // live: the bar's ticks before its close (the open, the low, the high, the close)
-                    foreach (double tick in new[] { o[i], l[i], h[i], c[i] })
+                {
+                    double[] ticks = { o[i], l[i], h[i], c[i] };
+                    for (int k = 0; k < ticks.Length; k++)
                     {
                         NinjaTrader.Data.MarketDataEventArgs md = new NinjaTrader.Data.MarketDataEventArgs();
                         md.MarketDataType = NinjaTrader.Data.MarketDataType.Last;
-                        md.Price = tick;
+                        md.Price = ticks[k];
+                        md.Time = barEnds[i].AddSeconds(-15 * (ticks.Length - 1 - k));  // seconds apart, the close last
                         OnMarketData(md);
                     }
+                }
                 try
                 {
                     OnBarUpdate();

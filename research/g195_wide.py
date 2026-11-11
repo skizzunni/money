@@ -2,7 +2,8 @@
 
 G195 (ORDER=window): stage 1 every combination on the window (the chart's execution), stage 2 the 15 best on the window
 (no -$1,000 day, at least U41's net) on NQ and the index. G196 (ORDER=long, SEED=196): stage 1 on NQ and the index,
-stage 2 the 15 best there (both at least U41's, no -$1,000 day) on the window. The output lists both stages; stage 3 (NinjaTrader's execution and the 526
+stage 2 the 15 best there (both at least U41's, no -$1,000 day) on the window. The output lists both stages; stage 3
+(NinjaTrader's execution and the 526
 starts) is run separately for those passing stage 2.
 
     python research/g195_wide.py <data dir> <MNQ 09-26 file> <MNQ 12-26 file>

@@ -9,15 +9,16 @@ import os
 import sys
 from concurrent.futures import ProcessPoolExecutor
 
-import pandas as pd
 import g250_test_week as G
+import pandas as pd
 from g343_gap_trade import U57
 
 VARIANTS = {"U57": (U57, 1500.0, 4)}
 for la in (0.05, 0.1):
     for lp in (1.0, 2.5):
         for tp in (0.3, 0.75):
-            VARIANTS[f"lock at {la} / +{lp} pts / tp {tp}"] = ({**U57, "lock_at": la, "lock_plus": lp, "take_profit": tp},
+            VARIANTS[f"lock at {la} / +{lp} pts / tp {tp}"] = ({**U57, "lock_at": la, "lock_plus": lp,
+                "take_profit": tp},
                                                               1500.0, 4)
 _run = G.run
 
@@ -38,7 +39,8 @@ def job(a):
         return None
     s0 = pd.Timestamp(start, tz=G.NY)
     bt = box["b"].index.tz_convert(G.NY)
-    days = sorted({d for d, m in zip(bt.date, bt.hour * 60 + bt.minute) if d >= s0.date() and 570 <= m < 960})[:G.SESS]
+    days = sorted({d for d, m in zip(bt.date, bt.hour * 60 + bt.minute,
+        strict=False) if d >= s0.date() and 570 <= m < 960})[:G.SESS]
     tr = [t for t in box["res"].trades if t.entry_time >= s0 and t.exit_time.tz_convert(G.NY).date() <= days[-1]]
     return {"tag": tag, **r, "n": len(tr), "wins": sum(t.pnl > 0 for t in tr), "pnl": sum(t.pnl for t in tr),
             "days_traded": len({t.entry_time.tz_convert(G.NY).date() for t in tr})}
@@ -54,10 +56,12 @@ def main() -> None:
     pd.set_option("display.width", 250)
     for label, starts in (("development (index 2011-18)", dev), ("unseen (NQ 2015-25 + index 2019-26)", conf)):
         with ProcessPoolExecutor(int(os.environ.get("PROCS", "4"))) as ex:
-            d = pd.DataFrame([r for r in ex.map(job, [(t, n, s) for t in VARIANTS for n, s in starts], chunksize=16) if r])
+            d = pd.DataFrame([r for r in ex.map(job, [(t, n, s) for t in VARIANTS for n, s in starts],
+                chunksize=16) if r])
         d["stuck"] = ~d.passed & ~d.failed & (d.room < 500)
         g = d.groupby("tag")
-        out = g.agg(weeks=("passed", "size"), passed=("passed", "mean"), failed=("failed", "mean"), stuck=("stuck", "mean"))
+        out = g.agg(weeks=("passed", "size"), passed=("passed", "mean"), failed=("failed", "mean"), stuck=("stuck",
+            "mean"))
         out["win_rate"] = g.wins.sum() / g.n.sum()
         out["trades_per_session"] = g.n.sum() / (out.weeks * G.SESS)
         out["sessions_traded"] = g.days_traded.sum() / (out.weeks * G.SESS)

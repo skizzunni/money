@@ -19,7 +19,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import h1_dip as H  # noqa: E402
 
 TICK, PV, FEE, LEVEL = H.TICK, H.PV, H.FEE, H.LEVEL
-WINDOWS = [("proxy", "2025-01-02", "2026-12-31"), ("nq", "2015-01-01", "2025-07-31"), ("index", "2011-01-01", "2026-09-30")]
+WINDOWS = [("proxy", "2025-01-02", "2026-12-31"), ("nq", "2015-01-01", "2025-07-31"),
+           ("index", "2011-01-01", "2026-09-30")]
 
 
 def simulate(sess: list, start: str, end: str, scaled: bool) -> tuple[pd.DataFrame, dict]:
@@ -49,7 +50,8 @@ def simulate(sess: list, start: str, end: str, scaled: bool) -> tuple[pd.DataFra
                     out, reason = c[j] * f - d * TICK, "close"
                 if out is not None:
                     pnl = (out - entry) * d * PV - 2 * FEE
-                    rows.append({"day": day, "d": d, "reason": reason, "pnl": pnl, "gross": pnl + 2 * FEE + 2 * TICK * PV,
+                    rows.append({"day": day, "d": d, "reason": reason, "pnl": pnl,
+                                 "gross": pnl + 2 * FEE + 2 * TICK * PV,
                                  "i_exit": i, "j_exit": j, "sessions": 0})
                     pos = None
                 else:

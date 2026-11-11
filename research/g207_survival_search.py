@@ -1,4 +1,5 @@
-"""G207 / G217 (docs/NINJATRADER_V38.md): 40 random combinations of the survival settings around U42 (G207) or U44 (G217, seed 217), on the 263 starts on the
+"""G207 / G217 (docs/NINJATRADER_V38.md): 40 random combinations of the survival settings around U42 (G207) or U44
+(G217, seed 217), on the 263 starts on the
 1st. Writes one VARIANT_JSON per line (tag, json) for g35_start_dates.py.
 
     python research/g207_survival_search.py <U42 or U44 JS json file> [seed]
