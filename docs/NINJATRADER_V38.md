@@ -9157,3 +9157,7 @@ before: G8 (growth mode, 2026-10-31) and G382's "every check with entries to 15:
 with its calm-stretch lines. `research/g459_u58_last_1530.py`: U58 with `last_entry_end` 930. G423's rule against U58
 (the variant replaces U58 only if it makes at least 10% more $ a session on the fresh starts, at least U58's $ on
 unseen, loses no more fresh starts, and loses at most 5% on unseen and on development). Run once.
+
+**G459 result (2026-11-11): rejected; U58 keeps 15:00.** Entries to 15:30: fresh starts **$34.1 a session (−31%)**, 0 lost
+(U58 $49.2); development $48.9 (+17%) but **9.6% lost** (U58 0%); unseen $80.4 (U58 $80.5) at 4.9% lost (1.6%). The
+15:30 entries cost the recent starts a third and triple the losses elsewhere. `verification/noise_v2/g459_u58_last_1530.txt`.
