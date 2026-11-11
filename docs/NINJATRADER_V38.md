@@ -9211,3 +9211,18 @@ at least 10% above the 100K as U58; it passes only if on unseen (index 2017-2023
 10% more with at most 5% lost. **Test (reported; recommended for the 100K Test only if):** the pass rate within 2 points
 of the 100K as U58's 92.2% and the median trading days to pass at most 85% of its 189. A pass would be built as a 100K
 mode of `MnqNoiseV38.cs` with parity tests. Run once.
+
+**G462 result (2026-11-11): rejected, every variant; U58's sizing stays on the 100K.**
+
+| 100K-style | Test: passed / still open of 116 | Test: median days (middle half) | Funded dev. $ a session (lost) | Funded unseen $ a session (lost) |
+|---|---|---|---|---|
+| **U58 as it is** | **92.2% / 9** | 189 (135-277) | **$110.7 (8.7%)** | $205.0 (1.8%) |
+| start 2 MNQ | 79.3% / 24 | 129 (82-233) | $104.1 (17.4%) | $214.2 (8.8%) |
+| start 3 MNQ | 62.1% / 43 (0.9% failed) | 87 (57-219) | $75.1 (30.4%) | $155.0 (22.8%) |
+| +1 per $1,000 | 91.4% / 10 | 207 (130-295) | $106.0 (4.3%) | $214.8 (0%) |
+| 2 MNQ, +1 per $1,000 | 75.0% / 27 (1.7% failed) | 129 (78-246) | $82.1 (13.0%) | $218.3 (7.0%) |
+
+Funded: no variant makes 10% more on development (the best, +1 per $1,000, makes 4% less there, 5% more unseen).
+Test: a bigger start passes sooner when it passes (129 / 87 days against 189), but far fewer pass (79% / 62% against
+92%): the rest sit near the floor at a size the room no longer allows and never reach the target. Neither meets the
+registered Test rule. `verification/noise_v2/g462_100k_sizing.txt`.
