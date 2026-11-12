@@ -9829,3 +9829,12 @@ show more than 50.5% green traded days and fewer than 107 red days, net at least
 None reaches 53% green traded days; all make less on development and unseen (the trade after a loser is often the
 day's trend trade, and the nearer target cuts it). Doubling after a loser loses 22% of the development starts.
 Funded green days is unchanged; no simulator run. `verification/noise_v2/g488_recovery_trade.txt`.
+
+## G489: what the red days are made of, a measurement (registered 2026-11-12, before its run)
+
+Hourly round. G482-G488 changed exits, locks, filters, sizing and the trade after a loser; none moved Funded green days
+past about 53% green traded days at its money. Before the next idea, a measurement of its red days on G415's fresh
+starts (`research/g489_red_day_anatomy.py`): for each traded day, the trade count, whether the first trade lost and was
+in the 09:35 gap slot, whether the day's closed P/L was above $0 before it closed red, and the most points any trade was
+its way (its best excursion); for red and green days and by trade count. No setting changes: it only picks the next
+test's target. Run once.
