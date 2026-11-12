@@ -1,0 +1,25 @@
+fresh starts used: 16
+                            per_session  trades_per_session   lost  green_days  green_weeks  green_months  longest_losing_weeks  worst_month
+Funded green days (G481)         24.766               0.981  0.062       0.505        0.461         0.609                 3.500    -1328.656
+S1 lock 0.15, +1 point           34.786               1.687  0.062       0.411        0.444         0.609                 5.062    -1677.964
+S2 lock 0.10, +1 point           37.202               1.721  0.062       0.403        0.465         0.635                 4.500    -1873.402
+S3 S1 in Funded green days       17.953               1.200  0.188       0.461        0.424         0.625                 4.562    -1334.799
+U58 (brake 0.25)                 50.415               1.581  0.000       0.419        0.481         0.688                 3.750    -2019.452
+development (index 2011-18 starts):
+                            per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                                 
+U58 (brake 0.25)                 49.940      22.189        87.315     148.162  0.000
+S1 lock 0.15, +1 point           41.656      16.928        75.403     122.184  0.133
+S2 lock 0.10, +1 point           32.336      14.831        54.510      86.704  0.166
+Funded green days (G481)         24.668      15.656        40.489      59.249  0.000
+S3 S1 in Funded green days       23.273      13.002        38.954      54.343  0.064
+unseen (index 2019-25 + NQ 2015-24):
+                            per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                                 
+U58 (brake 0.25)                 84.873      44.184       128.290     147.470  0.016
+S1 lock 0.15, +1 point           63.162      34.427        91.334     111.494  0.061
+S2 lock 0.10, +1 point           58.726      33.939        82.203     111.463  0.095
+Funded green days (G481)         56.613      31.977        81.745      99.762  0.047
+S3 S1 in Funded green days       52.256      29.462        72.469      96.501  0.094
+
+[exited with code 0]

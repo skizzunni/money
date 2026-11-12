@@ -9698,3 +9698,10 @@ point (U58 0.35 / 2.5), S2 0.10 / 1, S3 S1 inside Funded green days. (G404 tried
 U48; G480 E4 with a 0.5 target.) **Rule:** the balanced rule (G473) for Funded growth; for Funded green days, at least
 G481's 50.5% green traded days and at least 25% more $ than G481 on each set with no more starts lost; then the
 simulator on the window. Run once.
+
+**G483 result (2026-11-12): rejected, all three; scratching makes fewer green days, not more.** Fresh starts (green
+traded days / $ a session / lost of 16): U58 41.9% / $50.4 / 0; Funded green days 50.5% / $24.8 / 1; S1 lock 0.15 +1
+41.1% / $34.8 / 1; S2 0.10 +1 40.3% / $37.2 / 1; S3 46.1% / $18.0 / 3. Development (U58 $49.9, 0%): S1 $41.7 at 13.3%
+lost, S2 $32.3 at 16.6%, S3 $23.3. Unseen (U58 $84.9, 1.6%): S1 $63.2 at 6.1%, S2 $58.7 at 9.5%, S3 $52.3 at 9.4%. A
+scratched trade frees the bot to take the next signal (1.69-1.72 trades a session against 1.58), and those extra trades
+lose: the days stay red and the trend days lose their winners. `verification/noise_v2/g483_scratch.txt`.
