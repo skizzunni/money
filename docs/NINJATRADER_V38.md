@@ -9409,3 +9409,17 @@ Candidates that meet the balanced rule on the numbers already recorded: on the 5
 is the higher average, 0.25. On the 100K funded mode, no brake (+3.7% / +10.0% / +7.6%, average +7.1%, worst month $20
 less deep). Every other recorded candidate since G423 falls short (at least one set lower, or more starts lost).
 The 50K pick is confirmed (or not) by the NinjaTrader run below; the 100K mode is not yet built. Run once.
+
+**G473 result (2026-11-12): the 50K takes the brake at 0.25 (U58 on the 5-minute chart); the 100K funded mode's brake
+goes off.**
+- **NinjaTrader confirmation (as registered):** the growth run on the 2025-26 window is identical at 0.45, 0.35 and
+  0.25 ($75,486.34 on 5-minute bars, 784 trades, worst day −$899.38; 30-minute $28,191.46): the brake never engages
+  on that window, so the check meets the rule (no less net, worst day above −$1,000) but cannot tell the settings
+  apart. The adoption rests on the three replay sets.
+- **The Test (a safety check added before building, reported here):** G429's no-deadline replay, 50K: 0.45 86.2%
+  passed / 16 frozen / median 124 days; 0.25 **87.1% / 15 / 122**; none failed.
+- **Built:** `MnqNoiseV38.cs` sets `GivebackBrake` 0.25 for Funded growth on the 5-minute chart (U58); the Test sprint,
+  the bigger accounts, Custom and the 30-minute chart keep 0.45. The NinjaTrader tests (55) pass, parity trade for
+  trade (the 50K model config `GROW` carries 0.25; the sprint, bigger-account and Custom configs 0.45).
+- **The 100K funded mode** (not built yet): U58 on the 100K's limits, +1 MNQ per $2,000 (G466), no brake (G473).
+`verification/noise_v2/g473_balanced_nt.txt`.

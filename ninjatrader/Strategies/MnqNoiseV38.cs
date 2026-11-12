@@ -1139,6 +1139,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                     RangePos = u58 ? 0 : Mode == "Funded growth" ? 0.7 : 0.65;  // G204 on the 50K: 0.7
                     if (Mode == "Funded growth" && !u58) MaxLosersPerDay = 3;  // G204
                     if (!u58) EarlyNoEntryChecks = "13:00,14:30";  // G125, as tested (U48 and the bigger accounts)
+                    if (u58) GivebackBrake = 0.25;  // G473: the balanced rule (G470: +2.5% / +19% / +5.5%, no start lost)
                     TrendSessions = Mode == "Funded growth" ? 45 : 50;  // G241 on the 50K
                     MaxContracts = Mode == "Funded growth" && minutes == 5 ? 60 : 15;  // G247: 60, Take Profit Trader's 50K limit (G212: 75; G106: 20, G120: 30, G121: 50)
                     // G40: a bigger account trades the 50K's size; its larger limits are cushion (a $2,000 / $3,000

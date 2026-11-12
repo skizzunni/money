@@ -27,6 +27,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tests"))
 
 K100 = {"trail_dd": 3000.0, "daily_loss_limit": 1800.0, "early_daily_loss": 1500.0}
 TEST = {"50K": (3000.0, 2000.0, {}), "100K": (6000.0, 3000.0, K100)}
+if os.environ.get("G473"):  # G473's Test check: the 50K with the brake at 0.25 (U58 0.45)
+    TEST = {"50K": (3000.0, 2000.0, {}), "50K, brake 0.25": (3000.0, 2000.0, {"giveback_brake": 0.25})}
 B: dict = {}
 
 

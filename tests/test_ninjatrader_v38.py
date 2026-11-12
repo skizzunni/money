@@ -35,7 +35,7 @@ GROW = NoiseConfig(**{**V21, "qty": 1, "lookback": 14, "max_loss_per_trade": 187
                       # G79: More trading days and the 2-point sizing allowance
                       "gap_go_small_k": 0.0, "trend_small": True, "gap_go_drive_k": 0.6, "fill_after_lock": True,
                       "fill_min_room": 2750.0, "size_slip_pts": 4.0, "fill_qty2_room": 5000.0,  # G243: 4 points
-                      "giveback_brake": 0.45,  # G243 (G99c: 0.5)
+                      "giveback_brake": 0.25,  # G473 (U58 on 5-minute bars; G243 0.45, G99c 0.5)
                       # G191: no gap-slot trade while the giveback brake is on
                       "gap_skip_braked": True,
                       # G204: at most three losers a day, a $750 day budget until the floor has stopped, a 45-minute
@@ -66,7 +66,8 @@ PRE_G204 = {"max_losers": 0, "early_daily_loss": 0.0, "range_pos_min": 0.65, "ga
 PRE_G204_ARGS = ["MaxLosersPerDay=0", "EarlyDayBudget=0", "RangePos=0.65", "GapTrigger=0.5", "TimeStop=60",
     "TrendSessions=50", "GapBreakEven=0"]
 # the bigger accounts' modes also keep G125's skipped checks and no calm entry width (U58 is the 50K's)
-BIG = {**PRE_G204, "skip_checks": "780,870", "entry_k_regime": 0.0}
+# G473: U58's 0.25 brake is the 50K's 5-minute chart; the bigger accounts keep 0.45
+BIG = {**PRE_G204, "skip_checks": "780,870", "entry_k_regime": 0.0, "giveback_brake": 0.45}
 GROW_ARGS = ["Mode=Funded growth"]
 
 
@@ -76,7 +77,8 @@ def grow_cfg(minutes: int) -> NoiseConfig:
     if minutes == 5:
         return GROW
     # the default; its settings are the tested ones above
-    return dataclasses.replace(GROW, max_losers=3, range_pos_min=0.7, skip_checks="780,870", entry_k_regime=0.0)
+    return dataclasses.replace(GROW, max_losers=3, range_pos_min=0.7, skip_checks="780,870", entry_k_regime=0.0,
+                               giveback_brake=0.45)
 # G72's fill-in trades off (NinjaTrader's More trading days needs gap and go on)
 NO_FILL = {"gap_go_small_k": -1.0, "trend_small": False, "gap_go_drive_k": 0.0, "fill_after_lock": False,
            "fill_min_room": 0.0}
@@ -1017,8 +1019,8 @@ def test_v38_fast_steps(sim, sample_1m, tmp_path):  # noqa: F811
                                 env=ENV)
         assert r.returncode == 0, r.stderr[-2000:]
         nt = [x.split(",")[1:] for x in r.stdout.splitlines() if x.startswith("T,")]
-        py = run(bars, dataclasses.replace(GROW, profit_step=300.0, profit_step_fast=fs, profit_step_fast_from=600.0),
-                 minutes=5).trades
+        py = run(bars, dataclasses.replace(GROW, profit_step=300.0, profit_step_fast=fs, profit_step_fast_from=600.0,
+                                           giveback_brake=0.45), minutes=5).trades  # Custom mode keeps 0.45 (G473)
         assert len(nt) == len(py) >= 20
         for a, t in zip(nt, py, strict=True):
             assert (int(a[0]), int(a[1]), int(a[3])) == (t.direction, t.entry_bar, t.exit_bar), (a, t)
@@ -1140,7 +1142,8 @@ def test_v38_sprint(sim, sample_1m, tmp_path):  # noqa: F811
 
 
 # G256 k317 with G269's +$5,000 sprint target: the two-week Test sprint (G253's k61 before)
-SPRINT = {"daily_loss_limit": 2000.0, "early_daily_loss": 0.0, "max_losers": 3, "time_stop": 30, "range_pos_min": 0.7,
+SPRINT = {"giveback_brake": 0.45,  # G473: the sprint keeps 0.45
+          "daily_loss_limit": 2000.0, "early_daily_loss": 0.0, "max_losers": 3, "time_stop": 30, "range_pos_min": 0.7,
           "trend_n": 0, "big_day_k": 0.0, "calm_k": 0.7, "take_profit": 0.75, "lock_at": 0.2, "skip_checks": "",
               "entry_k_regime": 0.0,
           "sprint_qty": 4, "sprint_days": 10, "sprint_target": 5000.0, "sprint_gap_qty": 2, "gap_go_be": 0.0,
