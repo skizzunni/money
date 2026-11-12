@@ -9446,3 +9446,16 @@ a 2-MNQ start. Measures: $ a session and starts lost on G415's fresh and G372's 
 starts' worst month. **Not a default change:** a variant would be offered as an opt-in Mode only if the user picks it
 knowing its loss rate; the balanced rule (G473) decides whether it could replace U58. Run once. (This text was meant
 for commit c110c9e, which carried only the runner; it is committed here after the run started and before any result.)
+
+**G475 result (2026-11-12), a measurement: more money only with many more lost accounts; none meets the balanced rule.**
+
+| 50K funded | fresh $ a session (lost of 16, worst month) | development (lost) | unseen (lost) |
+|---|---|---|---|
+| **U58 (brake 0.25)** | **$50.4** (0, −$2,019) | $49.9 (0%) | $84.9 (1.6%) |
+| A1: no brake, +1 per $1,000, $1,000 early budget | $63.6, +26% (2, −$2,115) | $56.3, +13% (6.6%) | $100.7, +19% (9.4%) |
+| A2: A1 + take-profit 2.5 | $75.2, +49% (3, −$2,620) | $46.4, −7% (6.4%) | $101.0, +19% (9.4%) |
+| A3: A1 + start 2 MNQ | $79.0, +57% (3, −$2,592) | $67.5, +35% (15.7%) | $81.6, −4% (28.2%) |
+
+(A lost start counts $0 a session from its loss on.) A1 makes 13-26% more on every set but loses about 1 account in 8
+on the recent starts and 1 in 11 unseen, against U58's 0 and 1 in 64. Offered to the user as an opt-in mode, not adopted.
+`verification/noise_v2/g475_aggressive.txt`.

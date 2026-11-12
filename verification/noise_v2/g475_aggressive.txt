@@ -1,0 +1,22 @@
+fresh starts used: 16
+                           per_session  trades_per_session   lost  green_days  green_weeks  green_months  longest_losing_weeks  worst_month
+A1 aggressive                   63.603               1.485  0.125       0.404        0.450         0.630                 3.812    -2115.461
+A2 = A1 + take-profit 2.5       75.168               1.404  0.188       0.404        0.431         0.594                 3.938    -2620.078
+A3 = A1 + start 2 MNQ           79.013               1.326  0.188       0.378        0.364         0.505                 3.500    -2591.804
+U58 (brake 0.25)                50.415               1.581  0.000       0.419        0.481         0.688                 3.750    -2019.452
+development (index 2011-18 starts):
+                           per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                                
+A3 = A1 + start 2 MNQ           67.475      41.240        72.094     110.013  0.157
+A1 aggressive                   56.299      25.978        92.734     130.622  0.066
+U58 (brake 0.25)                49.940      22.189        87.315     148.162  0.000
+A2 = A1 + take-profit 2.5       46.437      18.802        75.073     136.800  0.064
+unseen (index 2019-25 + NQ 2015-24):
+                           per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                                
+A2 = A1 + take-profit 2.5      101.047      44.449       155.952     178.996  0.094
+A1 aggressive                  100.674      50.285       145.404     174.914  0.094
+U58 (brake 0.25)                84.873      44.184       128.290     147.470  0.016
+A3 = A1 + start 2 MNQ           81.600      76.857       102.485     107.496  0.282
+
+[exited with code 0]
