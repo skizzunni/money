@@ -9360,3 +9360,9 @@ G174's checks on U38) was not re-checked on U58. `research/g470_u58_brake.py`: U
 G423's rule against U58 (the variant with the most $ a session on the fresh starts replaces U58 only if it makes at
 least 10% more there, at least U58's $ on unseen, loses no more fresh starts, and loses at most 5% on unseen and on
 development). Run once.
+
+**G470 result (2026-11-12): rejected by G423's rule; U58 keeps 0.45 on the 50K.** Fresh starts (U58 $49.2 a session, 0
+lost): brake 0.35 $50.5 (+3%), 0.25 $50.4 (+2%), both 0 lost, worst month −$1,945 / −$2,019 (U58 −$1,893). Development
+(U58 $42.0, 0%): $47.7 (+14%), **$49.9 (+19%)**, both 0%. Unseen (U58 $80.5, 1.6%): $82.1 (+2%), $84.9 (+5%), both 1.6%.
+A later brake is a little better on every set with no more starts lost, but on the fresh starts it is 2-3% better, far
+from the rule's 10%. Not adopted on the 50K. `verification/noise_v2/g470_u58_brake.txt`.
