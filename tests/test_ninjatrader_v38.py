@@ -438,7 +438,9 @@ def test_v38_startup_checks(sim, sample_1m, tmp_path):  # noqa: F811
     loose, warn, _ = go("Mode=  funded GROWTH ")
     assert loose == ok_trades and warn == [], "the mode is read whatever its case and spaces"
     _, warn, dash = go("Mode=Funded")
-    assert any("isn't Funded growth (50K, 100K, 150K, Apex 100K or Apex 150K), Evaluation or Custom" in x for x in warn)
+    expected = ("isn't Funded growth (50K, 100K, 100K U58, 150K, Apex 100K or Apex 150K), Funded aggressive, "
+                "Test sprint, Evaluation or Custom")
+    assert any(expected in x for x in warn)
     assert "SETUP WARNING (1)" in dash
     _, warn, _ = go("Mode=Funded growth", "SimInstrument=NQ 12-26")
     assert any("the bot was built and tested on MNQ" in x for x in warn)
@@ -739,6 +741,44 @@ def test_v38_bigger_accounts_agree(sim, sample_1m, minutes, mode, daily, trail, 
     printed = "\n".join(x for x in r.stdout.splitlines() if x.startswith(("P,", "D,")))
     assert f"${daily:.0f} a day" in printed, "the startup line shows the mode's daily budget"
     assert f"flat at -${daily / 1800 * 1900:.0f} today" in printed, "the loss guard follows the account"
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+@pytest.mark.parametrize(("mode", "extra"), [
+    ("Funded growth 100K U58", {"daily_loss_limit": 1800.0, "trail_dd": 3000.0, "early_daily_loss": 1500.0,
+                                "profit_step": 2000.0, "giveback_brake": 0.0}),
+    ("Funded aggressive", {"giveback_brake": 0.0, "profit_step": 1000.0, "early_daily_loss": 1000.0})])
+def test_v38_opt_in_modes(sim, sample_1m, mode, extra, tmp_path):  # noqa: F811
+    """G473 / G475: the 100K U58 mode (U58 on the 100K's limits, +1 MNQ per $2,000, no brake) and the Aggressive mode
+    (no brake, +1 per $1,000, a $1,000 early budget) run U58 with those settings: NinjaTrader's code and the model agree
+    trade for trade on 5-minute bars, the dashboard names the mode, and a 30-minute chart is warned off."""
+    bars = resample(sample_1m, "5min")
+    path = tmp_path / "bars.csv"
+    with path.open("w") as f:
+        for t, r in zip(bars.index, bars.itertuples(), strict=True):
+            f.write(f"{t:%Y-%m-%d %H:%M},{r.open!r},{r.high!r},{r.low!r},{r.close!r}\n")
+    r = subprocess.run([DOTNET, str(sim), str(path), "5", "Strategy=V38", f"Mode={mode}"], capture_output=True,
+                       text=True, env=ENV)
+    assert r.returncode == 0, r.stderr[-2000:]
+    nt = [x.split(",")[1:] for x in r.stdout.splitlines() if x.startswith("T,")]
+    py = run(bars, dataclasses.replace(GROW, **extra), minutes=5).trades
+    assert len(nt) == len(py) >= 20
+    for a, t in zip(nt, py, strict=True):
+        assert (int(a[0]), int(a[1]), int(a[3])) == (t.direction, t.entry_bar, t.exit_bar), (a, t)
+        assert float(a[2]) == t.entry and float(a[4]) == t.exit, (a, t)
+        assert math.isclose(float(a[6]), t.pnl, abs_tol=1e-6), (a, t)
+    base = run(bars, GROW, minutes=5).trades
+    assert [(t.qty, round(t.pnl, 6)) for t in py] != [(t.qty, round(t.pnl, 6)) for t in base], "the mode changes trades"
+    dash = [x for x in r.stdout.splitlines() if x.startswith("D,")][0]
+    assert f"MNQ Noise Momentum v3.8, {mode}" in dash
+    assert "tested on 5-minute bars only" not in r.stdout
+    bars30 = resample(sample_1m, "30min")
+    with path.open("w") as f:
+        for t, r30 in zip(bars30.index, bars30.itertuples(), strict=True):
+            f.write(f"{t:%Y-%m-%d %H:%M},{r30.open!r},{r30.high!r},{r30.low!r},{r30.close!r}\n")
+    r = subprocess.run([DOTNET, str(sim), str(path), "30", "Strategy=V38", f"Mode={mode}"], capture_output=True,
+                       text=True, env=ENV)
+    assert r.returncode == 0 and "tested on 5-minute bars only" in r.stdout
 
 
 @pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")

@@ -989,6 +989,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         readonly List<string> setupWarnings = new List<string>();  // the startup check's findings, for the dashboard
         int nTrades;
         string firstBar = "";
+        string modeShown = "";  // the mode as chosen (the 100K U58 and Aggressive modes run as Funded growth)
         int journaled;                   // the account's closed trades already written to the journal
         double realDayStart;
         int realDayTrades;
@@ -1114,6 +1115,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 string mc = System.Text.RegularExpressions.Regex.Replace(m, @"\s+", " ");
                 if (string.Equals(mc, "Funded growth", StringComparison.OrdinalIgnoreCase)) Mode = "Funded growth";
                 else if (string.Equals(mc, "Test sprint", StringComparison.OrdinalIgnoreCase)) Mode = "Test sprint";
+                else if (string.Equals(mc, "Funded growth 100K U58", StringComparison.OrdinalIgnoreCase)) Mode = "Funded growth 100K U58";
+                else if (string.Equals(mc, "Funded aggressive", StringComparison.OrdinalIgnoreCase)) Mode = "Funded aggressive";
                 else if (string.Equals(mc, "Funded growth 100K", StringComparison.OrdinalIgnoreCase)) Mode = "Funded growth 100K";
                 else if (string.Equals(mc, "Funded growth 150K", StringComparison.OrdinalIgnoreCase)) Mode = "Funded growth 150K";
                 else if (string.Equals(mc, "Funded growth Apex 100K", StringComparison.OrdinalIgnoreCase)) Mode = "Funded growth Apex 100K";
@@ -1122,11 +1125,17 @@ namespace NinjaTrader.NinjaScript.Strategies
                 else if (string.Equals(m, "Custom", StringComparison.OrdinalIgnoreCase)) Mode = "Custom";
                 else
                 {
-                    setupWarnings.Add("Mode \"" + Mode + "\" isn't Funded growth (50K, 100K, 150K, Apex 100K or Apex 150K), Evaluation or Custom: running the settings below as Custom");
+                    setupWarnings.Add("Mode \"" + Mode + "\" isn't Funded growth (50K, 100K, 100K U58, 150K, Apex 100K or Apex 150K), Funded aggressive, Test sprint, Evaluation or Custom: running the settings below as Custom");
                     Mode = "Custom";
                 }
                 bool sprintMode = Mode == "Test sprint";  // G253: the 50K's growth settings, then the two-week Test sprint's
-                if (sprintMode) Mode = "Funded growth";
+                string chosen = Mode;
+                // G466 / G473: the 100K as U58 (the 50K's 5-minute settings on the 100K's limits, +1 MNQ per $2,000, no
+                // brake); G475: the 50K's Aggressive mode (opt-in: more money and more lost accounts). Both run as Funded
+                // growth with the overrides below.
+                bool k100u58 = Mode == "Funded growth 100K U58", aggressive = Mode == "Funded aggressive";
+                if (sprintMode || k100u58 || aggressive) Mode = "Funded growth";
+                modeShown = k100u58 || aggressive ? chosen : Mode;
                 if (Mode.StartsWith("Funded growth"))  // the tested growth settings (docs/NINJATRADER_V38.md), whatever is set below
                 {
                     Contracts = 1; MaxLoss = 187.5; DailyLoss = 900; TrailDD = 2000;
@@ -1149,6 +1158,20 @@ namespace NinjaTrader.NinjaScript.Strategies
                     // G42: Apex's end-of-day accounts, a tighter day: a $1,500 / $2,000 daily loss, a $3,000 / $4,000 trail
                     if (Mode == "Funded growth Apex 100K") { DailyLoss = 1350; TrailDD = 3000; LossGuard = 1425; }
                     if (Mode == "Funded growth Apex 150K") { DailyLoss = 1800; TrailDD = 4000; LossGuard = 1900; }
+                }
+                if (k100u58 || aggressive)
+                {
+                    if (minutes != 5)
+                        setupWarnings.Add(modeShown + " was tested on 5-minute bars only: put it on a 5-minute chart");
+                    if (k100u58)  // the 100K's limits (G461, assumed: check your firm's) and G466 / G473's funded settings
+                    {
+                        DailyLoss = 1800; TrailDD = 3000; LossGuard = 1900; EarlyDayBudget = 1500;
+                        ProfitStep = 2000; GivebackBrake = 0;
+                    }
+                    else  // G475's A1: no brake, +1 MNQ per $1,000, a $1,000 day budget until the floor stops
+                    {
+                        GivebackBrake = 0; ProfitStep = 1000; EarlyDayBudget = 1000;
+                    }
                 }
                 if (sprintMode)  // G256 k317 + G269 + G273 + G275 + G289 + G321: the Test in two weeks (16.0% passed, 6.9% failed on unseen weeks; docs)
                 {
@@ -1249,7 +1272,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                                       ": the daily rule has no live backstop");
                 foreach (string w in setupWarnings)
                     Print("MnqNoiseV38 WARNING: " + w);
-                Print("MnqNoiseV38 (" + Mode + "): " + Instrument.FullName + ", " + minutes + " " + BarsPeriod.BarsPeriodType + ", " + Contracts +
+                Print("MnqNoiseV38 (" + modeShown + "): " + Instrument.FullName + ", " + minutes + " " + BarsPeriod.BarsPeriodType + ", " + Contracts +
                       " MNQ, max loss $" + MaxLoss + " a trade, $" + DailyLoss + " a day, take-profit " + TakeProfit +
                       (badChart ? "  -- use a minute chart whose length divides 30 (5 or 30)" : ""));
             }
@@ -1829,7 +1852,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                          (LossGuard > 0 ? "Loss guard: " + (guardTripped ? "TRIPPED, flat and done for today" :
                           "flat at -$" + LossGuard.ToString("0", CultureInfo.InvariantCulture) + " today, closed + open (live)") + "\n" : "") +
                          OpenTradeLine() +
-                         "MNQ Noise Momentum v3.8, " + Mode + (engine.TradeQty > 0 && engine.Position != 0 ? ", " + engine.TradeQty + " MNQ" : "") + "\n" +
+                         "MNQ Noise Momentum v3.8, " + modeShown + (engine.TradeQty > 0 && engine.Position != 0 ? ", " + engine.TradeQty + " MNQ" : "") + "\n" +
                          "Data from " + firstBar + " (results need data from 50 sessions before)\n" +
                          "Sessions of history: " + engine.SessionsLoaded + " / 14\n" +
                          (double.IsNaN(engine.TrailFloorRoom) ? "" : "Room above the trailing floor: $" + engine.TrailFloorRoom.ToString("0", CultureInfo.InvariantCulture) + "\n") +
@@ -2008,7 +2031,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         #region Properties
         [NinjaScriptProperty]
-        [Display(Name = "Mode: Test sprint (the default: the 50K Test in two weeks), Funded growth (50K, once passed), Funded growth 100K / 150K (Topstep), Funded growth Apex 100K / Apex 150K, Evaluation, or Custom", Order = 0, GroupName = "1. Size and risk")]
+        [Display(Name = "Mode: Test sprint (the default: the 50K Test in two weeks), Funded growth (50K, once passed), Funded aggressive (50K, opt-in: more money, more lost accounts), Funded growth 100K U58 (a 100K, 5-minute), Funded growth 100K / 150K (Topstep), Funded growth Apex 100K / Apex 150K, Evaluation, or Custom", Order = 0, GroupName = "1. Size and risk")]
         public string Mode { get; set; }
 
         [NinjaScriptProperty]

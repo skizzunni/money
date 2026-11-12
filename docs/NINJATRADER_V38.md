@@ -33,6 +33,19 @@ add-on to install. It trades `pine/mnq_noise_momentum.pine` v3.8 (docs/CANDIDATE
    (it is printed once and the next bar redraws it). The Output window logs every stop it sends ("MnqNoiseV38 stop
    placed") and alerts **STOP CHECK FAILED** if a position is ever without a live stop.
 
+**Other modes (opt-in, 5-minute chart only):**
+- **Funded aggressive** (50K): no giveback brake, +1 MNQ per $1,000 of profit, a $1,000 day budget until the floor
+  stops (G475's A1). It made 13-26% more a session but lost about 1 account in 8 on the recent starts and 1 in 11 on
+  unseen ones (Funded growth: 0 and 1 in 64). Only if a lost account is cheap to replace.
+- **Funded growth 100K U58** (a 100K): U58 on a $3,000 end-of-day trailing floor and a $1,800 day budget ($1,500 until
+  the floor stops), +1 MNQ per $2,000 of profit, no brake (G466 / G473). Those limits are assumed: check them against
+  your firm's and change Daily loss / Trailing drawdown if they differ.
+
+**Several accounts:** NinjaTrader runs a strategy per account. For each funded account, open its own 5-minute MNQ chart
+(or one chart with the strategy added once per account), add MnqNoiseV38 with that account selected under Account and
+its own Mode, and enable it. Each copy sizes and protects its own account; profits add up account by account. Check
+your firm's limit on accounts per person and its rules on automated trading first.
+
 **What it does:** U58. Entries at the half-hour checks (10:00-15:00 New York in Funded growth; the Test sprint to 15:30) when price closes outside the noise area
 (narrower on calm stretches), a stop with every entry ($187.50 a contract at most), the size from the profit so far and
 the room above the $2,000 floor, the 45-minute time stop, flat at 16:00. On the 2025-26 window, NinjaTrader's own
@@ -9502,3 +9515,13 @@ only with its measured cost. Run once.
 Only D2 doubles the trades, and it keeps about a sixth of the money and loses 1 account in 4 on the older and unseen
 starts. The bot's edge is its selectivity; its extra breakouts lose. Nothing adopted; nothing worth offering.
 `verification/noise_v2/g477_double_trades.txt`.
+
+## The opt-in modes built (2026-11-12)
+
+The user: "just keep implementing things". `MnqNoiseV38.cs` gains two opt-in Modes, both run as Funded growth's U58 on
+5-minute bars with overrides (a setup warning on any other chart): **Funded aggressive** (G475's A1: `GivebackBrake` 0,
+`ProfitStep` 1,000, `EarlyDayBudget` 1,000) and **Funded growth 100K U58** (G461's assumed 100K limits: `DailyLoss`
+1,800, `TrailDD` 3,000, `LossGuard` 1,900, `EarlyDayBudget` 1,500; G466's `ProfitStep` 2,000; G473's no brake). The
+default stays Test sprint / Funded growth, unchanged. Tests: `test_v38_opt_in_modes` (both modes agree with the model
+trade for trade, change the trades, name themselves on the dashboard, warn off a 30-minute chart); the NinjaTrader and
+release tests, 57 passed.
