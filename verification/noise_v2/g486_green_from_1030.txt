@@ -1,0 +1,25 @@
+fresh starts used: 16
+                          per_session  trades_per_session   lost  green_days  green_weeks  green_months  longest_losing_weeks  worst_month
+C1 U58 calm 0.8                48.904               1.393  0.000       0.425        0.487         0.719                 4.188    -1673.563
+Funded green days (G481)       24.766               0.981  0.062       0.505        0.461         0.609                 3.500    -1328.656
+G1 green stop from 10:30       13.419               0.877  0.062       0.536        0.484         0.630                 3.688    -1230.245
+G2 green stop from 10:00       11.665               0.787  0.062       0.550        0.486         0.625                 3.562    -1048.179
+U58 (Funded growth)            50.415               1.581  0.000       0.419        0.481         0.688                 3.750    -2019.452
+development (index 2011-18 starts):
+                          per_session  months_1_3  months_10_12  best_month  lost
+tag                                                                              
+C1 U58 calm 0.8                57.945      22.797       104.984     139.600  0.03
+U58 (Funded growth)            49.940      22.189        87.315     148.162  0.00
+Funded green days (G481)       24.668      15.656        40.489      59.249  0.00
+G1 green stop from 10:30       19.284      10.983        34.586      43.172  0.00
+G2 green stop from 10:00       13.719       8.922        26.818      32.300  0.00
+unseen (index 2019-25 + NQ 2015-24):
+                          per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                               
+U58 (Funded growth)            84.873      44.184       128.290     147.470  0.016
+C1 U58 calm 0.8                74.411      35.158       114.955     131.194  0.016
+Funded green days (G481)       56.613      31.977        81.745      99.762  0.047
+G1 green stop from 10:30       44.824      28.546        60.458      63.313  0.031
+G2 green stop from 10:00       31.091      22.647        41.518      54.580  0.029
+
+[exited with code 0]

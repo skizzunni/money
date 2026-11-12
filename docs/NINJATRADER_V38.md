@@ -9766,3 +9766,18 @@ starts are at least 52.5%, its $ a session at least 80% of G481's on each set, w
 both, the more green days; then the simulator on the 2025-26 window must show more green traded days than 50.5% and
 fewer red days than 107. **Rule, Funded growth:** the balanced rule (G473) for C1 against U58, then NinjaTrader's
 growth run on the window at least +$75,486 with a worst day no deeper than −$1,000. Run once.
+
+**G486 result (2026-11-12): rejected, all three.**
+
+| | green traded days (fresh) | fresh $ (lost of 16) | development (lost) | unseen (lost) |
+|---|---|---|---|---|
+| U58 (Funded growth) | 41.9% | $50.4 (0) | $49.9 (0%) | $84.9 (1.6%) |
+| C1 U58 calm 0.8 | 42.5% | $48.9 (0) | $57.9 (3.0%) | $74.4 (1.6%) |
+| Funded green days (G481, from 11:00) | 50.5% | $24.8 (1) | $24.7 (0%) | $56.6 (4.7%) |
+| G1 green stop from 10:30 | 53.6% | $13.4, −46% (1) | $19.3, −22% (0%) | $44.8, −21% (3.1%) |
+| G2 green stop from 10:00 | 55.0% | $11.7, −53% (1) | $13.7, −44% (0%) | $31.1, −45% (2.9%) |
+
+Each half hour earlier adds about 2-3 points of green days and costs a fifth to a half of the money (G2 is G480's E5:
+the first check is 10:00), so neither keeps 80%. C1 makes less on the fresh and unseen sets and loses more starts on
+development: it fails the balanced rule (U58 keeps 0.7). Nothing changes; no simulator run.
+`verification/noise_v2/g486_green_from_1030.txt`.
