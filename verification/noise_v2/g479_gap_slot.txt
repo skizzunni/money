@@ -1,0 +1,25 @@
+fresh starts used: 16
+                         per_session  trades_per_session  lost  green_days  green_weeks  green_months  longest_losing_weeks  worst_month
+U58 (brake 0.25)              50.415               1.581   0.0       0.419        0.481         0.688                 3.750    -2019.452
+V1 no small-gap fill-in       54.108               1.572   0.0       0.429        0.486         0.708                 3.812    -1792.957
+V2 no drive fill-in           35.809               1.445   0.0       0.419        0.467         0.651                 4.000    -2174.017
+V3 gap trigger 0.8            46.881               1.565   0.0       0.418        0.463         0.682                 4.500    -2107.379
+V4 no fill-ins                41.738               1.376   0.0       0.432        0.457         0.682                 3.938    -2128.063
+development (index 2011-18 starts):
+                         per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                              
+U58 (brake 0.25)              49.940      22.189        87.315     148.162  0.000
+V1 no small-gap fill-in       49.689      22.195        85.477     149.157  0.000
+V3 gap trigger 0.8            45.779      18.205        81.623     141.279  0.098
+V2 no drive fill-in           45.497      25.327        69.507     127.030  0.000
+V4 no fill-ins                44.019      25.541        66.296     123.192  0.000
+unseen (index 2019-25 + NQ 2015-24):
+                         per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                              
+V1 no small-gap fill-in       87.134      44.314       133.266     157.290  0.016
+V4 no fill-ins                84.875      45.755       120.095     145.155  0.016
+U58 (brake 0.25)              84.873      44.184       128.290     147.470  0.016
+V2 no drive fill-in           82.264      45.935       122.878     147.410  0.016
+V3 gap trigger 0.8            75.275      41.329       119.351     145.510  0.081
+
+[exited with code 0]

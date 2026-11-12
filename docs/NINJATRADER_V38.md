@@ -9572,3 +9572,21 @@ V1 no small-gap fill-in (`gap_go_small_k` −1; U58 0, any gap), V2 no opening-d
 0.6), V3 the gap trigger at 0.8 noise (U58 0.65), V4 = V1 + V2. **Rule:** the balanced rule (G473) adopts one into
 Funded growth; green days (G415's fresh starts) are reported, and a variant that adds at least 5 points of green days
 at no more than 10% of U58's $ on each set and no more starts lost is offered as an opt-in. Run once.
+
+**G479 result (2026-11-12): rejected; the gap slot is where the red shows, not why.** Fresh starts (U58 $50.4 a session,
+green days 41.9%): V1 no small-gap fill-in $54.1 (+7%), green 42.9%; V2 no drive fill-in $35.8, 41.9%; V3 trigger 0.8
+$46.9, 41.8%; V4 no fill-ins $41.7, 43.2%. Development (U58 $49.94, 0%): V1 $49.69 (−0.5%), V2 $45.5, V3 $45.8 at 9.8%
+lost, V4 $44.0. Unseen (U58 $84.9, 1.6%): V1 $87.1 (+2.7%), V2 $82.3, V3 $75.3 at 8.1%, V4 $84.9. V1 is a little better
+on two sets but not on development, and short of the balanced rule's 5%; none moves the green days more than 1.3 points
+(G457, no gap trade at all: +3.7 points at half the money). The red days are the breakout's ordinary losers.
+`verification/noise_v2/g479_gap_slot.txt`.
+
+## G480: exits for green days (registered 2026-11-12, before its run)
+
+The user wants most days green. U58 ends 41.9% of its traded days green on the fresh starts; its money comes from a
+few trend days with a 2.0-noise take-profit. `research/g480_green_exits.py`: U58 against E1-E3 take-profit 0.5 / 0.75
+/ 1.0 noise units, E4 0.5 with the lock at 0.15, E5 no new entries once the day is green (`day_stop_profit` $1), E6
+0.75 + E5, E7 E4 + E5. **Rule:** the balanced rule (G473) decides a default change. Otherwise, among the variants with
+green days at least 50% of traded days on the fresh starts and a positive $ a session on every set, the one with the
+most $ a session on unseen is built as an opt-in "Funded green days" mode, with its cost stated; if none reaches 50%,
+nothing is built and the closest is reported. Run once.
