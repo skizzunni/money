@@ -9525,3 +9525,10 @@ The user: "just keep implementing things". `MnqNoiseV38.cs` gains two opt-in Mod
 default stays Test sprint / Funded growth, unchanged. Tests: `test_v38_opt_in_modes` (both modes agree with the model
 trade for trade, change the trades, name themselves on the dashboard, warn off a 30-minute chart); the NinjaTrader and
 release tests, 57 passed.
+
+## G478: a contract per $1,250 on the 50K (registered 2026-11-12, before its run)
+
+Hourly round. G424 (old rule, brake 0.45): +1 per $1,200 made 19% more on the fresh starts and 2% less unseen. On the
+current U58 (brake 0.25): `research/g478_step_1250.py`, `profit_step` 1,250 against 1,500. The balanced rule (G473):
+at least as much $ a session on each of the three start sets, at least 5% more on their average, no more starts lost,
+the fresh starts' worst month at most $250 deeper; then NinjaTrader's growth run on the window at least as good. Run once.
