@@ -9553,3 +9553,10 @@ model's trades are what the bot would have taken; a "Model today" line shows the
 `test_v38_daily_tracking_log` (live in the simulator, Place orders off: no real trade, one row a session, the model's
 trades per day matching the model's, each day's P/L the change in the running total, a second run appending); the
 NinjaTrader and release tests, 59 passed. NinjaTrader must be open for anything to be written.
+
+**The MNQ Bot Dashboard refreshed (2026-11-12):** its journal is now the current bot's (U58 with the 0.25 brake,
+Funded growth, the NinjaTrader simulator on the 2025-26 stand-in window: 783 trades, +$75,486.34, 50.2% winners, the
+journal NinjaTrader writes), replacing U48's of 2026-11-03; the page's fixed text matches (up to 60 contracts, the
+45-minute time stop, tested win rate 50.2%, profit factor 1.91). The page's own check passed. The hourly round now
+refreshes it whenever the file the user runs changes, and attaches the user's live or daily journal once they send it.
+The full suite (before the daily log change): 706 passed; the NinjaTrader and release tests after it: 59 passed.
