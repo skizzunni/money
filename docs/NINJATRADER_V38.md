@@ -15,7 +15,7 @@ add-on to install. It trades `pine/mnq_noise_momentum.pine` v3.8 (docs/CANDIDATE
 
 1. Copy it into `Documents\NinjaTrader 8\bin\Custom\Strategies\` (replace the old one).
 2. **New → NinjaScript Editor**, press **F5**. It must report no errors (the repository compiles it as C# 5 with warnings
-   as errors, as NinjaTrader 8 does; 703 tests pass).
+   as errors, as NinjaTrader 8 does; 709 tests pass, 2026-11-12).
 3. Open a **5-minute MNQ chart** (the front month, e.g. MNQ 12-26), trading hours **CME US Index Futures ETH**, **Days to
    load 120** or more (the filters need about 60 sessions before they trade as tested).
 4. Add **MnqNoiseV38** to the chart with:
@@ -9923,3 +9923,9 @@ fewer on the fresh (0 against 1) and unseen (1.6% against 4.7%) sets. As registe
 so Funded green days is unchanged and the simulator check does not run. C2 has the most green days of any variant that
 makes money on every set, but makes less on development and unseen. Offered to the user as a choice.
 `verification/noise_v2/g492_green_combo.txt`.
+
+**Final check (2026-11-12, the user: "finalize and make sure it's all right with 0 errors").** On the file as it is
+(default Funded growth = U58, brake 0.25, 5-minute chart): the full suite **709 passed, 0 failed**; the NinjaTrader and
+release tests 60 passed (the strategy compiled as C# 5 with warnings as errors, as NinjaTrader 8 does, and run trade for
+trade against the model); the simulator rebuilt with 0 warnings, 0 errors; the lint clean. Nothing in the strategy file
+changed since G481 (G482-G492 left every mode as it was).
