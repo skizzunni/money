@@ -9885,3 +9885,16 @@ green days (G481), X1 the gap trade out at the 09:45 bar's open (`gap_go_exit` 5
 **Rule, green days:** as G490's (at least 53% green traded days on the fresh starts, at least 90% of G481's $ on each
 set, no more starts lost on any; the most green days). **Rule, Funded growth:** the balanced rule (G473). Then
 NinjaTrader's simulator on the 2025-26 window as in G490. Run once.
+
+**G491 result (2026-11-12): rejected, all three; the gap trade's last minutes carry its money.**
+
+| | green traded days (fresh) | fresh $ (lost of 16) | development (lost) | unseen (lost) |
+|---|---|---|---|---|
+| U58 (Funded growth) | 41.9% | $50.4 (0) | $49.9 (0%) | $84.9 (1.6%) |
+| U58 + X2 out 09:50 | 42.8% | $38.0 (0) | $44.9 (6.6%) | $74.7 (3.2%) |
+| Funded green days (G481) | 50.5% | $24.8 (1) | $24.7 (0%) | $56.6 (4.7%) |
+| X1 gap out 09:45 | 51.2% | $13.8 (1) | $25.1 (0%) | $45.0 (4.7%) |
+| X2 gap out 09:50 | 51.3% | $20.9 (1) | $18.1 (0%) | $49.6 (3.1%) |
+
+A sooner exit adds under 1 point of green days and costs 10-45% of the money: the gap trades that reach 09:55 make
+most of their move in its last minutes. Nothing changes; no simulator run. `verification/noise_v2/g491_gap_exit_green.txt`.

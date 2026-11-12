@@ -1,0 +1,25 @@
+fresh starts used: 16
+                          per_session  trades_per_session   lost  green_days  green_weeks  green_months  longest_losing_weeks  worst_month
+Funded green days (G481)       24.766               0.981  0.062       0.505        0.461         0.609                 3.500    -1328.656
+U58 (Funded growth)            50.415               1.581  0.000       0.419        0.481         0.688                 3.750    -2019.452
+U58 + X2 out 09:50             37.972               1.623  0.000       0.428        0.501         0.677                 4.250    -1886.557
+X1 gap out 09:45               13.844               0.970  0.062       0.512        0.445         0.589                 3.750    -1687.699
+X2 gap out 09:50               20.899               1.027  0.062       0.513        0.473         0.646                 4.125    -1319.340
+development (index 2011-18 starts):
+                          per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                               
+U58 (Funded growth)            49.940      22.189        87.315     148.162  0.000
+U58 + X2 out 09:50             44.866      18.219        72.877     108.320  0.066
+X1 gap out 09:45               25.057      12.714        42.385      54.849  0.000
+Funded green days (G481)       24.668      15.656        40.489      59.249  0.000
+X2 gap out 09:50               18.134      13.475        29.315      40.713  0.000
+unseen (index 2019-25 + NQ 2015-24):
+                          per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                               
+U58 (Funded growth)            84.873      44.184       128.290     147.470  0.016
+U58 + X2 out 09:50             74.706      37.358       110.281     145.728  0.032
+Funded green days (G481)       56.613      31.977        81.745      99.762  0.047
+X2 gap out 09:50               49.555      28.643        70.401      87.419  0.031
+X1 gap out 09:45               44.957      22.283        62.776      78.909  0.047
+
+[exited with code 0]
