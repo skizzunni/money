@@ -9543,3 +9543,13 @@ ground between Funded growth and Funded aggressive. `verification/noise_v2/g478_
 
 **Funded growth plus built (2026-11-12):** a third opt-in Mode, Funded growth's U58 with `ProfitStep` 1,250 (G478).
 `test_v38_opt_in_modes` covers it (trade for trade with the model); the NinjaTrader and release tests, 58 passed.
+
+**Daily tracking (2026-11-12):** the user wants the bot tracked every day, trading or not. Live, `MnqNoiseV38.cs` now
+writes `Documents\NinjaTrader 8\MnqNoiseV38_daily_<account>.csv`, one row a session after the 16:00 close (the model's
+16:00 exit counted): the mode, whether orders were placed, the account's balance / net liquidation / realized P/L, the
+strategy's real P/L and trades that day, the model's P/L and trades that day and its total, the prop floor and room,
+tomorrow's contracts. Rows append across restarts. With **Place orders off** the dashboard says TRACKING ONLY and the
+model's trades are what the bot would have taken; a "Model today" line shows the model's day in every state.
+`test_v38_daily_tracking_log` (live in the simulator, Place orders off: no real trade, one row a session, the model's
+trades per day matching the model's, each day's P/L the change in the running total, a second run appending); the
+NinjaTrader and release tests, 59 passed. NinjaTrader must be open for anything to be written.

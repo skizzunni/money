@@ -1029,6 +1029,10 @@ namespace NinjaTrader.NinjaScript.Strategies
         int milestoneDone;        // U8: the last milestone (multiples of MilestoneStep since the start) alerted or passed
         string realDay = "";
         string journalPath = "", liveJournalPath = "";
+        // the daily tracking log (live): a row per session, whether or not orders are placed (Place orders off = tracking)
+        string dailyPath = "", dailyDay = "";
+        double modelDayStart;
+        int modelTradesDayStart;
         double net, peak, maxDd, worstDay, dayNet;
         DateTime lastDay = DateTime.MinValue;
 
@@ -1258,10 +1262,13 @@ namespace NinjaTrader.NinjaScript.Strategies
                         File.Move(liveJournalPath, liveJournalPath.Replace(".csv", "_until_" + DateTime.Now.ToString("yyyyMMdd_HHmmss", CultureInfo.InvariantCulture) + ".csv"));
                     if (!File.Exists(liveJournalPath))
                         File.WriteAllText(liveJournalPath, JournalHeader);
+                    dailyPath = Path.Combine(dir, "MnqNoiseV38_daily_" + Safe(Account == null ? "none" : Account.Name) + ".csv");
+                    if (!File.Exists(dailyPath))
+                        File.WriteAllText(dailyPath, DailyHeader);
                 }
                 catch (Exception e)
                 {
-                    journalPath = liveJournalPath = "";
+                    journalPath = liveJournalPath = dailyPath = "";
                     Print("MnqNoiseV38: the journal can't be written (" + e.Message + ")");
                 }
                 if (badChart)
@@ -1365,6 +1372,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 realDay = start.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
                 realDayStart = cum;
                 realDayTrades = 0;
+                modelDayStart = net;
+                modelTradesDayStart = nTrades;
                 realDayWins = 0;
                 guardTripped = false;
                 string wk = start.Date.AddDays(-(((int)start.DayOfWeek + 6) % 7)).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
@@ -1406,6 +1415,11 @@ namespace NinjaTrader.NinjaScript.Strategies
             engine.OnBar(start, Open[0], High[0], Low[0], Close[0]);
             for (int k = before; k < engine.Trades.Count; k++)
                 Tally(start, engine.Trades[k].Pnl);
+            if (tMin >= V38Engine.RthClose && State == State.Realtime && dailyDay != realDay && realDay.Length > 0)
+            {
+                dailyDay = realDay;  // after this bar's model trades are counted: the 16:00 exit is in the day's row
+                DailyRow(cum);
+            }
             int real = Position.MarketPosition == MarketPosition.Long ? 1 : Position.MarketPosition == MarketPosition.Short ? -1 : 0;
             CheckLossGuard(Close[0]);
             if (guardTripped && real != 0)
@@ -1573,6 +1587,34 @@ namespace NinjaTrader.NinjaScript.Strategies
         const string JournalHeader = "kind,entry time,exit time,side,contracts,trades today,entry,exit,exit kind,P/L,day P/L,total P/L,room today,room above floor,next contracts,entry slip ticks,exit slip ticks\n";
 
         // a day's line: the same 15 columns as a trade's, with the date, the day's trades, its P/L and the total
+        const string DailyHeader = "date,mode,place orders,balance,net liquidation,account realized today,strategy P/L today," +
+                                   "strategy trades today,model P/L today,model trades today,model total P/L,prop floor,room above floor,next contracts\n";
+
+        // the daily tracking log: one row a session, live, written with the day's summary (tracking-only days included)
+        void DailyRow(double cum)
+        {
+            if (dailyPath.Length == 0)
+                return;
+            bool acct = AccountValuesOk();
+            string row = string.Join(",", new[] {
+                realDay, modeShown, PlaceOrders ? "on" : "off (tracking)",
+                acct ? F(Account.Get(AccountItem.CashValue, Currency.UsDollar)) : "",
+                acct ? F(Account.Get(AccountItem.NetLiquidation, Currency.UsDollar)) : "",
+                acct ? F(Account.Get(AccountItem.RealizedProfitLoss, Currency.UsDollar)) : "",
+                F(cum - realDayStart), realDayTrades.ToString(CultureInfo.InvariantCulture),
+                F(net - modelDayStart), (nTrades - modelTradesDayStart).ToString(CultureInfo.InvariantCulture), F(net),
+                !double.IsNaN(propHigh) && acct ? F(PropFloor()) : "", !double.IsNaN(propHigh) && acct ? F(PropRoom()) : "",
+                engine.NextQty.ToString(CultureInfo.InvariantCulture) });
+            try
+            {
+                File.AppendAllText(dailyPath, row + "\n");
+            }
+            catch (Exception e)
+            {
+                Print("MnqNoiseV38: the daily log can't be written (" + e.Message + ")");
+            }
+        }
+
         void JournalDay(double cum)
         {
             Journal(string.Join(",", new[] { "DAY", realDay, "", "", "", realDayTrades.ToString(CultureInfo.InvariantCulture),
@@ -1844,6 +1886,9 @@ namespace NinjaTrader.NinjaScript.Strategies
             DateTime shown = liveTimeNy > endNy ? liveTimeNy : endNy;
             string upd = State != State.Realtime ? "" : "LIVE, updated " + shown.ToString("HH:mm:ss", CultureInfo.InvariantCulture) + " New York" +
                          (double.IsNaN(livePx) ? "" : ", last " + livePx.ToString("0.00", CultureInfo.InvariantCulture)) + "\n";
+            if (!PlaceOrders)
+                upd += "TRACKING ONLY: Place orders is off, no orders are sent (the model's trades are what the bot would take)\n";
+            upd += "Model today: " + (nTrades - modelTradesDayStart) + " trades, $" + (net - modelDayStart).ToString("0.00", CultureInfo.InvariantCulture) + "\n";
             string txt = upd + goal + LiveAccountLines() + "Strategy P/L (its fills, history and live): $" + cumReal.ToString("0.00", CultureInfo.InvariantCulture) +
                          ", today $" + (cumReal - realDayStart).ToString("0.00", CultureInfo.InvariantCulture) + "\n" +
                          "Next trade: " + engine.NextQty + " MNQ, room today $" + (double.IsNaN(engine.DayRoom) ? "-" : Math.Max(0, engine.DayRoom).ToString("0", CultureInfo.InvariantCulture)) + "\n" +

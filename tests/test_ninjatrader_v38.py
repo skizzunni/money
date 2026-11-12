@@ -14,6 +14,7 @@ import math
 import subprocess
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 import pytest
 from test_ninjatrader import DOTNET, ENV, sim  # noqa: F401
@@ -780,6 +781,42 @@ def test_v38_opt_in_modes(sim, sample_1m, mode, extra, tmp_path):  # noqa: F811
     r = subprocess.run([DOTNET, str(sim), str(path), "30", "Strategy=V38", f"Mode={mode}"], capture_output=True,
                        text=True, env=ENV)
     assert r.returncode == 0 and "tested on 5-minute bars only" in r.stdout
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+def test_v38_daily_tracking_log(sim, sample_1m, tmp_path):  # noqa: F811
+    """Live, with Place orders off (tracking only): no order is sent, the dashboard says TRACKING ONLY and shows the
+    model's day, and MnqNoiseV38_daily_<account>.csv gets one row per live session with the model's trades and P/L (they
+    add up to the model's live trades); a second run appends, keeping the history."""
+    bars = resample(sample_1m, "5min")
+    path = tmp_path / "bars.csv"
+    with path.open("w") as f:
+        for t, r in zip(bars.index, bars.itertuples(), strict=True):
+            f.write(f"{t:%Y-%m-%d %H:%M},{r.open!r},{r.high!r},{r.low!r},{r.close!r}\n")
+    data = tmp_path / "nt8"
+    data.mkdir()
+    live = 1000
+    args = [DOTNET, str(sim), str(path), "5", "Strategy=V38", *GROW_ARGS, f"SimUserDataDir={data}",
+            f"SimRealtimeFrom={live}", "PlaceOrders=False"]
+    r = subprocess.run(args, capture_output=True, text=True, env=ENV)
+    assert r.returncode == 0, r.stderr[-2000:]
+    assert not [x for x in r.stdout.splitlines() if x.startswith("T,")], "tracking only: no real trades"
+    dash = [x for x in r.stdout.splitlines() if x.startswith("D,")][0]
+    assert "TRACKING ONLY" in dash and "Model today: " in dash
+    d = pd.read_csv(data / "MnqNoiseV38_daily_Sim101.csv")
+    assert len(d) >= 10 and d["date"].is_unique
+    assert (d["place orders"] == "off (tracking)").all() and (d["strategy trades today"] == 0).all()
+    model = run(bars, GROW, minutes=5).trades
+    by_day = pd.Series([t.exit_time.tz_convert("America/New_York").strftime("%Y-%m-%d") for t in model]).value_counts()
+    for row in d.itertuples():  # every logged session has the model's trades closed that day
+        assert row._10 == by_day.get(row.date, 0), (row.date, row._10, by_day.get(row.date, 0))
+    # live, the strategy's model is also sized to the account's room, so its $ can differ by a contract here and there
+    # from the offline model: the log's own numbers must add up (each day's P/L is the change in the running total)
+    steps = d["model total P/L"].diff().iloc[1:].to_numpy()
+    assert np.allclose(steps, d["model P/L today"].iloc[1:].to_numpy(), atol=0.02)
+    assert d["model trades today"].sum() > 0
+    r = subprocess.run(args, capture_output=True, text=True, env=ENV)
+    assert r.returncode == 0 and len(pd.read_csv(data / "MnqNoiseV38_daily_Sim101.csv")) == 2 * len(d)
 
 
 @pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
