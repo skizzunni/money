@@ -445,6 +445,7 @@ class NoiseConfig:
     # research (G77): once a bar closes with the gap trade up gap_go_be x its initial risk, its stop goes to the entry
     # plus a tick, from the next bar (0 = off)
     gap_go_be: float = 0.0
+    gap_go_be_plus: float = 0.0  # research (G490): that stop at the entry plus this many points instead (0: a tick)
     gap_slip_pts: float = 0.0  # G86: the gap trade's sizing counts this many points more slippage at its stop
     # research (G87): within protect_room of the trailing floor, no new trade on protect_dates (YYYY-MM-DD, comma
     # separated: the days after a shadow record of the bot closed below its recent average; research/shadow_gate.py)
@@ -1150,7 +1151,7 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                 elif cfg.gap_go_be > 0 and not gg.get("be"):
                     risk = abs(gg["px"] - gg["stop"])
                     if risk > 0 and gd * (c[i] - gg["px"]) >= cfg.gap_go_be * risk:
-                        gg["stop"], gg["be"] = gg["px"] + gd * cfg.tick, True
+                        gg["stop"], gg["be"] = gg["px"] + gd * (cfg.gap_go_be_plus or cfg.tick), True
 
         # market orders from the previous bar fill at this bar's open
         if pending is not None:

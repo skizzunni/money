@@ -9838,3 +9838,24 @@ starts (`research/g489_red_day_anatomy.py`): for each traded day, the trade coun
 in the 09:35 gap slot, whether the day's closed P/L was above $0 before it closed red, and the most points any trade was
 its way (its best excursion); for red and green days and by trade count. No setting changes: it only picks the next
 test's target. Run once.
+
+**G489 result (2026-11-12), a measurement.** Fresh starts, Funded green days: 2,131 traded days, 50.9% green. Of the
+1,047 red days: **94.5% start with a losing first trade, 68.9% with the 09:35 gap trade, 59.7% with the gap trade
+stopped** (on green days the gap trade is stopped first on 11.2%); 53.6% have one trade only; only 5.6% were green on
+closed trades before closing red (so day locks and stop-once-green can't fix many); in 41.2% a trade was 40+ points its
+way at some point. Green share by the day's trade count: 1 trade 51%, 2 59%, 3 57%, 4 34%, 5+ 0-25%. **The target:**
+the gap trade's stop sits at the 09:30 open (a wide risk), and it goes to break-even only once a bar closes 1.5x that
+risk its way, so gap trades that run and come back end at the full stop. `verification/noise_v2/g489_red_day_anatomy.txt`.
+
+## G490: protect the gap trade sooner, with a cushion (registered 2026-11-12, before its run)
+
+From G489. New in `mnqbot/noise.py` (off by default): `gap_go_be_plus`, the gap trade's break-even stop at the entry
+plus this many points instead of one tick. `research/g490_gap_green.py`: inside Funded green days (G481), B1 the gap
+stop to entry + 2.5 points once a bar closes 0.5x its risk its way (`gap_go_be` 0.5, now 1.5), B2 0.75x + 2.5, B3 0.5x +
+a tick; and U58 + B1 for Funded growth (G275 tested 0.75 / 1.0 on the sprint for passes only). Note: G489 measured the
+fresh starts, which pick the target here; development and unseen are untouched. **Rule, green days:** a variant replaces
+G481's settings if its green traded days on the fresh starts are at least 53%, its $ a session at least 90% of G481's
+on each set, with no more starts lost on any; of several, the most green days. **Rule, Funded growth:** the balanced
+rule (G473) for U58 + B1. Either is then built in the C# file (`GapGoBe` exists; the cushion is new) with a parity test
+and checked in NinjaTrader's simulator on the 2025-26 window (green days: more than 50.5% green, fewer than 107 red,
+net at least +$4,232; growth: at least +$75,486, worst day no deeper than −$1,000). Run once.

@@ -1,0 +1,13 @@
+traded days: 2131, green 50.9%
+red days: 1047
+  one trade only: 53.6%
+  first trade lost: 94.5%
+  first trade in the 09:35 gap slot: 68.9%
+  closed P/L above $0 before it closed red: 5.6%
+  no trade ever 10+ points its way: 15.7%
+  no trade ever 20+ points its way: 30.5%
+  a trade was 40+ points its way: 41.2%
+  first trade's exit: {'Gap stop': 0.597, 'Back inside': 0.205, 'Gap exit': 0.092, 'Stop passed': 0.039, 'Max loss': 0.027, 'Lock': 0.021, 'Time stop': 0.019}
+green days: 1084; one trade only 54.8%; first trade in the gap slot 54.5%; first trade lost 17.1%
+  first trade's exit: {'Gap exit': 0.434, 'Lock': 0.291, 'Gap stop': 0.112, '16:00 close': 0.061, 'Back inside': 0.051, 'Target': 0.036, 'Stop passed': 0.015, 'Max loss': 0.002}
+by trade count (share green): {1: {'mean': 0.514, 'size': 1155}, 2: {'mean': 0.591, 'size': 474}, 3: {'mean': 0.567, 'size': 282}, 4: {'mean': 0.337, 'size': 98}, 5: {'mean': 0.098, 'size': 51}, 6: {'mean': 0.25, 'size': 48}, 7: {'mean': 0.0, 'size': 20}, 8: {'mean': 0.0, 'size': 2}, 9: {'mean': 0.0, 'size': 1}}
