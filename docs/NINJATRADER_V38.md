@@ -9647,3 +9647,16 @@ before the opt-in modes) and ran the mode as Custom until rebuilt; the tests alw
 affected; the Funded growth journal on the dashboard is identical after the rebuild. The MNQ Bot Dashboard now shows
 this mode's journal (as the user asked), with the comparison in its subtitle.
 `verification/noise_v2/g481_nt_window_green_days.csv`.
+
+## G482: lock the green instead of stopping (registered 2026-11-12, before its run)
+
+The user: make green days significantly more profitable, with fewer red days. G481 stops new entries once the day is
+green (from 11:00) and so misses the afternoon trend legs (the simulator window: +$4,232 against +$75,486). The other
+way: keep trading, but once the day is up `day_lock_at`, every open trade's stop goes no lower than where today's P/L
+is `day_lock_keep`, so a green day cannot close red (G294's day lock; G380 tried it only at $800+ for money).
+`research/g482_green_lock.py`: U58 and G481's Funded green days against L1 lock at +$150 keeping $1, L2 +$300 keeping
+$1, L3 +$300 keeping $100, L4 L2 without the small-gap fill-in, L5 L2 + G481's stop once green from 13:00.
+**Rule:** a variant replaces G481 in Funded green days if its green traded days on the fresh starts are at least G481's
+50.5% and it makes at least 25% more $ a session than G481 on each of the three sets, with no more starts lost on any;
+of several, the most $ unseen. Then NinjaTrader's simulator on the window must show it at least 50% green traded days.
+The balanced rule (G473) separately decides a Funded growth change. Run once.
