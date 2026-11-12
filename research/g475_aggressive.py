@@ -1,4 +1,4 @@
-"""G475 (docs/NINJATRADER_V38.md): a measurement for the user, aggressive 50K funded variants of U58 (G473's brake 0.25):
+"""G475 (docs/NINJATRADER_V38.md): a measurement for the user, aggressive 50K funded variants of U58 (brake 0.25):
 A1 no brake, +1 MNQ per $1,000, a $1,000 early day budget; A2 A1 with the take-profit at 2.5; A3 A1 starting at 2 MNQ.
 G415's fresh starts, then G372's development / unseen starts (G386's runner).
 

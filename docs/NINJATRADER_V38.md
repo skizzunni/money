@@ -9436,3 +9436,13 @@ deeper; then NinjaTrader's growth run on the window at least as good. Run once.
 fresh starts $52.2 (+3.5%; worst month −$1,919, $100 shallower), development $49.94 (equal), unseen $88.2 (+3.9%), no
 start lost on any. Average +2.5%, short of the 5%. Between 0.25 and off the brake barely acts on the 50K.
 `verification/noise_v2/g474_u58_no_brake.txt`.
+
+## G475: aggressive 50K variants (a measurement for the user, registered 2026-11-12, before its results)
+
+The user: "loosen up, need it to make a lot more". Every lever tried one at a time added at most a few percent; this
+stacks the ones that leaned up, to show the user the trade-off. `research/g475_aggressive.py`: U58 (brake 0.25) against
+A1 = no brake + a contract per $1,000 + a $1,000 day budget until the floor stops; A2 = A1 + take-profit 2.5; A3 = A1 +
+a 2-MNQ start. Measures: $ a session and starts lost on G415's fresh and G372's development / unseen starts, the fresh
+starts' worst month. **Not a default change:** a variant would be offered as an opt-in Mode only if the user picks it
+knowing its loss rate; the balanced rule (G473) decides whether it could replace U58. Run once. (This text was meant
+for commit c110c9e, which carried only the runner; it is committed here after the run started and before any result.)
