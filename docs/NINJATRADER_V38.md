@@ -9459,3 +9459,12 @@ for commit c110c9e, which carried only the runner; it is committed here after th
 (A lost start counts $0 a session from its loss on.) A1 makes 13-26% more on every set but loses about 1 account in 8
 on the recent starts and 1 in 11 unseen, against U58's 0 and 1 in 64. Offered to the user as an opt-in mode, not adopted.
 `verification/noise_v2/g475_aggressive.txt`.
+
+## G476: more trades on the 50K (registered 2026-11-12, before its run)
+
+The user: "i need it to enter more trades." U58 takes about 1.6 trades a session. `research/g476_more_trades.py`: U58
+(brake 0.25) against T1 = entry checks every 15 minutes (`check_step` 15; tried on U44, k317 and U57, not on U58),
+T2 = the 0.8 entry lines every day (`entry_k` 0.8; U58 uses them only on calm stretches), T3 = both. Trades a session
+are reported with the $ and losses. **Rule:** the balanced rule (G473); a variant that passes is built into
+`MnqNoiseV38.cs` (T1 needs the 15-minute grid there). Otherwise the one with the most trades is offered as an opt-in
+with its cost. Run once.
