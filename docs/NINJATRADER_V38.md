@@ -9859,3 +9859,19 @@ on each set, with no more starts lost on any; of several, the most green days. *
 rule (G473) for U58 + B1. Either is then built in the C# file (`GapGoBe` exists; the cushion is new) with a parity test
 and checked in NinjaTrader's simulator on the 2025-26 window (green days: more than 50.5% green, fewer than 107 red,
 net at least +$4,232; growth: at least +$75,486, worst day no deeper than −$1,000). Run once.
+
+**G490 result (2026-11-12): rejected, all four; B2 comes closest.**
+
+| | green traded days (fresh) | fresh $ (lost of 16) | development (lost) | unseen (lost) |
+|---|---|---|---|---|
+| U58 (Funded growth) | 41.9% | $50.4 (0) | $49.9 (0%) | $84.9 (1.6%) |
+| U58 + B1 | 44.8% | $42.0 (0) | $50.1 (6.4%) | $83.4 (1.6%) |
+| Funded green days (G481) | 50.5% | $24.8 (1) | $24.7 (0%) | $56.6 (4.7%) |
+| B1 gap to +2.5 at 0.5x risk | 53.6% | $21.3, −14% (2) | $22.3, −10% (0%) | $54.7, −3% (6.2%) |
+| B2 gap to +2.5 at 0.75x | 52.4% | $24.5, −1% (1) | $24.6, −0% (0%) | $59.0, +4% (4.7%) |
+| B3 gap to +1 tick at 0.5x | 50.1% | $20.1 (2) | $26.2 (0%) | $55.4 (4.6%) |
+
+Protecting the gap trade sooner does turn some red days green (B1 +3.1 points, B2 +1.9) but cuts gap trades that would
+have run, and a stop a tick past the entry (B3) ends red after fees. B1 makes too little and loses more starts; B2
+keeps the money but misses the 53% bar; U58 + B1 makes less on two sets and loses 6.4% of development starts.
+Nothing changes; no simulator run. `gap_go_be_plus` stays in the model, off. `verification/noise_v2/g490_gap_green.txt`.
