@@ -9680,3 +9680,10 @@ shallower). Its NinjaTrader build (a +$300 day lock keeping $1 and no small-gap 
 5-minute bars, plus a guard so a negative `FillSmallK` turns the fill-in off as in the model) is saved as
 `verification/noise_v2/g482_l4_pending.patch`: the simulator run that must confirm it on the 2025-26 window waits on an
 approval in this session, so the file the user runs is unchanged until that run passes. `verification/noise_v2/g482_green_lock.txt`.
+
+**G482 L4 in NinjaTrader's simulator (2026-11-12): rejected.** On the 2025-26 window Funded growth with L4 makes
+**+$57,186.35** (744 trades, 312 traded days, 124 green / 188 red, 39.7%) against Funded growth's **+$75,486.34** (783
+trades, 39.1% green): −24%, so it fails the balanced rule's NinjaTrader check. The +$300 lock closes trend trades on
+the window's biggest days early (the replay sets' gain was mostly on the fresh starts). The file the user runs stays
+as it is; the patch stays in `verification/noise_v2/g482_l4_pending.patch` for the record; the simulator binary is
+rebuilt from the unchanged file.
