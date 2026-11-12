@@ -9960,3 +9960,15 @@ the 09:30 open toward the 09:30 bar's close: S1 0.25, S2 0.5 (G111 tested it on 
 file). **Rule:** as G490's (at least 53% green traded days on the fresh starts, at least 90% of G481's $ on each set,
 no more starts lost on any; the most green days); then built in the C# file with a parity test and checked in the
 simulator on the 2025-26 window (more than 50.5% green, fewer than 107 red, net at least +$4,232). Run once.
+
+**G494 result (2026-11-12): rejected, both; fewer green days.**
+
+| | green traded days (fresh) | fresh $ (lost of 16) | development (lost) | unseen (lost) |
+|---|---|---|---|---|
+| Funded green days (G481) | 50.5% | $24.8 (1) | $24.7 (0%) | $56.6 (4.7%) |
+| S1 gap stop 0.25 nearer | 48.5% | $19.4 (2) | $27.1 (0%) | $61.5 (4.6%) |
+| S2 gap stop 0.5 nearer | 46.8% | $15.1 (1) | $25.0 (3.2%) | $73.1, +29% (3.1%) |
+
+A nearer gap stop is hit more often, so more days start red (as expected, the opposite of the aim). S2 makes much more
+on unseen (+29%) and a little more on development, but less on the fresh starts; not this rule's aim, noted for a
+Funded growth test. Nothing changes; no simulator run. `verification/noise_v2/g494_gap_stop_nearer.txt`.
