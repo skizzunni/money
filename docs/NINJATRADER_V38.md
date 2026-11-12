@@ -9816,3 +9816,16 @@ days if its green traded days on the fresh starts are at least 53%, its $ a sess
 set, with no more starts lost on any; of several, the most green days. Then it is built in the C# file (the after-loss
 take-profit and contracts are not there yet) with a parity test, and NinjaTrader's simulator on the 2025-26 window must
 show more than 50.5% green traded days and fewer than 107 red days, net at least +$4,232. Run once.
+
+**G488 result (2026-11-12): rejected, all three.**
+
+| | green traded days (fresh) | fresh $ (lost of 16) | development (lost) | unseen (lost) |
+|---|---|---|---|---|
+| Funded green days (G481) | 50.5% | $24.8 (1) | $24.7 (0%) | $56.6 (4.7%) |
+| R1 after a loser target 0.75 | 52.9% | $33.4 (0) | $17.7, −28% (0%) | $47.0, −17% (6.5%) |
+| R2 after a loser target 1.0 | 52.8% | $33.0 (0) | $17.8, −28% (6.7%) | $52.6, −7% (3.2%) |
+| R3 R1, twice the contracts | 51.7% | $41.7 (0) | $13.6, −45% (22.4%) | $51.1, −10% (3.2%) |
+
+None reaches 53% green traded days; all make less on development and unseen (the trade after a loser is often the
+day's trend trade, and the nearer target cuts it). Doubling after a loser loses 22% of the development starts.
+Funded green days is unchanged; no simulator run. `verification/noise_v2/g488_recovery_trade.txt`.

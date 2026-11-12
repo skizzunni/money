@@ -1,0 +1,22 @@
+fresh starts used: 16
+                                per_session  trades_per_session   lost  green_days  green_weeks  green_months  longest_losing_weeks  worst_month
+Funded green days (G481)             24.766               0.981  0.062       0.505        0.461         0.609                 3.500    -1328.656
+R1 after a loser target 0.75         33.446               1.123  0.000       0.529        0.522         0.677                 3.438    -1454.671
+R2 after a loser target 1.0          33.008               1.084  0.000       0.528        0.508         0.635                 3.688    -1387.737
+R3 R1 with twice the contracts       41.686               1.177  0.000       0.517        0.522         0.672                 3.562    -1483.519
+development (index 2011-18 starts):
+                                per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                                     
+Funded green days (G481)             24.668      15.656        40.489      59.249  0.000
+R2 after a loser target 1.0          17.752      13.813        28.224      39.148  0.067
+R1 after a loser target 0.75         17.720      13.046        24.530      34.212  0.000
+R3 R1 with twice the contracts       13.584      10.760        20.972      38.064  0.224
+unseen (index 2019-25 + NQ 2015-24):
+                                per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                                     
+Funded green days (G481)             56.613      31.977        81.745      99.762  0.047
+R2 after a loser target 1.0          52.555      30.324        72.642      78.591  0.032
+R3 R1 with twice the contracts       51.117      23.414        70.390      86.506  0.032
+R1 after a loser target 0.75         47.040      27.594        63.570      73.007  0.065
+
+[exited with code 0]
