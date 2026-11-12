@@ -9714,3 +9714,16 @@ small-gap fill-in (G479 V1), P3 both. **Rule:** replaces G481's settings in Fund
 on the fresh starts are at least 50% and it makes at least 10% more $ a session than G481 on each of the three sets with
 no more starts lost on any; then NinjaTrader's simulator on the window must show at least 50% green traded days and
 more net than G481's +$4,232. Run once.
+
+**G484 result (2026-11-12): rejected by its rule (more starts lost); P3 is +21-31% money at 51% green.**
+
+| | green traded days (fresh) | fresh $ (lost of 16) | development (lost) | unseen (lost) |
+|---|---|---|---|---|
+| Funded green days (G481) | 50.5% | $24.8 (1) | $24.7 (0%) | $56.6 (4.7%) |
+| P1 +1 per $1,250 | 50.3% | $33.2, +34% (2) | $31.9, +29% (3.4%) | $66.1, +17% (7.9%) |
+| P2 no small-gap fill-in | 50.9% | $25.5, +3% (1) | $25.3, +3% (0%) | $57.9, +2% (3.1%) |
+| P3 both | 51.2% | $32.0, +29% (2) | $32.4, +31% (3.4%) | $68.7, +21% (6.3%) |
+
+P3 keeps most traded days green and makes 21-31% more on every set, but loses one more start on each set, so it fails
+"no more starts lost"; P2 alone is too small (+2-3%). Funded green days unchanged. Offered to the user as a choice.
+`verification/noise_v2/g484_green_days_more_money.txt`.

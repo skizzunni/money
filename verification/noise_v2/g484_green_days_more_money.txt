@@ -1,0 +1,22 @@
+fresh starts used: 16
+                          per_session  trades_per_session   lost  green_days  green_weeks  green_months  longest_losing_weeks  worst_month
+Funded green days (G481)       24.766               0.981  0.062       0.505        0.461         0.609                 3.500    -1328.656
+P1 +1 per $1,250               33.190               0.984  0.125       0.503        0.468         0.604                 3.500    -1442.860
+P2 no small-gap fill-in        25.507               0.966  0.062       0.509        0.465         0.609                 3.500    -1398.454
+P3 both                        31.991               0.957  0.125       0.512        0.468         0.589                 3.438    -1432.960
+development (index 2011-18 starts):
+                          per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                               
+P3 both                        32.410      15.431        59.905      99.619  0.034
+P1 +1 per $1,250               31.885      15.431        60.360      98.809  0.034
+P2 no small-gap fill-in        25.294      15.656        41.806      59.027  0.000
+Funded green days (G481)       24.668      15.656        40.489      59.249  0.000
+unseen (index 2019-25 + NQ 2015-24):
+                          per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                               
+P3 both                        68.732      32.697        97.583     112.777  0.063
+P1 +1 per $1,250               66.067      32.782        94.232     116.792  0.079
+P2 no small-gap fill-in        57.934      31.634        83.128     101.771  0.031
+Funded green days (G481)       56.613      31.977        81.745      99.762  0.047
+
+[exited with code 0]
