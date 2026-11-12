@@ -9804,3 +9804,15 @@ and a net above +$4,232. Run once.
 The lock adds 1-2 points of green days and helps on the fresh starts, but makes less on development and unseen (it
 closes trend trades on days that would have gone on), as G482's lock did in the simulator. Funded green days is
 unchanged; no simulator run. `verification/noise_v2/g487_green_days_lock.txt`.
+
+## G488: a recovery trade after a loser (registered 2026-11-12, before its run)
+
+Hourly round. The red days are days whose losses are never made back. In Funded green days (G481) the trade after a
+losing trade today takes a nearer take-profit, so it more often wins and turns the day: `research/g488_recovery_trade.py`,
+R1 `after_loss_tp` 0.75, R2 1.0 noise units (U58 2.0), R3 R1 with twice the contracts (`after_loss_qty_div` 0.5,
+still sized within the day's budget and the trailing floor). (v2.3 tested `after_loss_tp` on the old fixed-size bot
+for money; never with growth sizing or for green days.) **Rule:** a variant replaces G481's settings in Funded green
+days if its green traded days on the fresh starts are at least 53%, its $ a session at least 90% of G481's on each
+set, with no more starts lost on any; of several, the most green days. Then it is built in the C# file (the after-loss
+take-profit and contracts are not there yet) with a parity test, and NinjaTrader's simulator on the 2025-26 window must
+show more than 50.5% green traded days and fewer than 107 red days, net at least +$4,232. Run once.
