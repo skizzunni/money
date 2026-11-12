@@ -9352,3 +9352,11 @@ sets and no more starts lost on any). Run once.
 on the fresh starts is $337 deeper. The 100K funded mode is now: U58 on the 100K's limits, +1 MNQ per $2,000 (G466),
 brake 0.35 (G469). The brake applies only once the floor has stopped, so the Test is unchanged. Not yet built into
 `MnqNoiseV38.cs` (it waits for the user's 100K rules). `verification/noise_v2/g469_100k_brake.txt`.
+
+## G470: the giveback brake on the 50K (registered 2026-11-12, before its run)
+
+G469: on the 100K a later brake (0.35, U58 0.45) made 7-20% more with no start lost. On the 50K the brake (G99, 0.45 from
+G174's checks on U38) was not re-checked on U58. `research/g470_u58_brake.py`: U58 with `giveback_brake` 0.35 and 0.25.
+G423's rule against U58 (the variant with the most $ a session on the fresh starts replaces U58 only if it makes at
+least 10% more there, at least U58's $ on unseen, loses no more fresh starts, and loses at most 5% on unseen and on
+development). Run once.
