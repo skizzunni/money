@@ -9781,3 +9781,14 @@ Each half hour earlier adds about 2-3 points of green days and costs a fifth to 
 the first check is 10:00), so neither keeps 80%. C1 makes less on the fresh and unseen sets and loses more starts on
 development: it fails the balanced rule (U58 keeps 0.7). Nothing changes; no simulator run.
 `verification/noise_v2/g486_green_from_1030.txt`.
+
+## G487: Funded green days with the day lock (registered 2026-11-12, before its run)
+
+Hourly round. G482 tried the day lock on U58 and with the green stop from 13:00 (L5), never with Funded green days'
+11:00 stop. Before 11:00 Funded green days trades as U58 does, and a morning that is up can still close red; the lock
+keeps it green while a trend trade runs. `research/g487_green_days_lock.py`: Funded green days (G481) with K1
+`day_lock_at` $300 / `day_lock_keep` $1, K2 $150 / $1 (`DayLockAt` / `DayLockKeep` exist in the C# file).
+**Rule:** a variant replaces G481's settings in Funded green days if its green traded days on the fresh starts are at
+least 50.5%, its $ a session at least 10% more than G481's on each set, with no more starts lost on any; of both, the
+most $ unseen. Then NinjaTrader's simulator on the 2025-26 window (rebuilt) must show at least 50.5% green traded days
+and a net above +$4,232. Run once.
