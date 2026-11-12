@@ -9705,3 +9705,12 @@ traded days / $ a session / lost of 16): U58 41.9% / $50.4 / 0; Funded green day
 lost, S2 $32.3 at 16.6%, S3 $23.3. Unseen (U58 $84.9, 1.6%): S1 $63.2 at 6.1%, S2 $58.7 at 9.5%, S3 $52.3 at 9.4%. A
 scratched trade frees the bot to take the next signal (1.69-1.72 trades a session against 1.58), and those extra trades
 lose: the days stay red and the trend days lose their winners. `verification/noise_v2/g483_scratch.txt`.
+
+## G484: Funded green days with more money (registered 2026-11-12, before its run)
+
+Hourly round. Funded green days (G481: from 11:00 no new entries once the day is green) keeps its green rule; its size
+and its gap slot change: `research/g484_green_days_more_money.py`, P1 +1 MNQ per $1,250 (G478: +14% on U58), P2 no
+small-gap fill-in (G479 V1), P3 both. **Rule:** replaces G481's settings in Funded green days if its green traded days
+on the fresh starts are at least 50% and it makes at least 10% more $ a session than G481 on each of the three sets with
+no more starts lost on any; then NinjaTrader's simulator on the window must show at least 50% green traded days and
+more net than G481's +$4,232. Run once.
