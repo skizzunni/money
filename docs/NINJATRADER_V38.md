@@ -9423,3 +9423,11 @@ goes off.**
   trade (the 50K model config `GROW` carries 0.25; the sprint, bigger-account and Custom configs 0.45).
 - **The 100K funded mode** (not built yet): U58 on the 100K's limits, +1 MNQ per $2,000 (G466), no brake (G473).
 `verification/noise_v2/g473_balanced_nt.txt`.
+
+## G474: the 50K with no giveback brake (registered 2026-11-12, before its run)
+
+G470 / G473: on the 50K a later brake was better (0.25 adopted); on the 100K none at all was (G471 / G473). G155 found
+the brake saved accounts on U34. `research/g474_u58_no_brake.py`: U58 with the brake at 0.25 against `giveback_brake` 0
+(off). The balanced rule (G473): at least as much $ a session on each of G415's fresh and G372's development / unseen
+starts, at least 5% more on their average, no more starts lost on any, the fresh starts' worst month at most $250
+deeper; then NinjaTrader's growth run on the window at least as good. Run once.
