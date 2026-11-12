@@ -9754,3 +9754,15 @@ None reaches 53% green traded days, so Funded green days is unchanged and the si
 these filters skip end red about as often as the days they keep: a day's chance of ending green is not visible in its
 calm stretch, its gap or its opening drive. (D1 makes 2-17% more with fewer starts lost on two sets, one more on
 development; not this rule's aim.) `verification/noise_v2/g485_green_day_filters.txt`.
+
+## G486: stop once green from 10:30 or 10:00; and U58 with calm 0.8 (registered 2026-11-12, before its run)
+
+Hourly round. Stopping once green all day (G480 E5) made 55% of traded days green at a third of the money; from 11:00
+(G481) 50.5% at half to two thirds; the times between were never run. `research/g486_green_from_1030.py`: inside Funded
+green days, G1 from 10:30 (`day_stop_late_from` 630) and G2 from 10:00 (600); and, for Funded growth, C1 U58 with
+`calm_k` 0.8 (G485's D1 made more with fewer starts lost on two sets inside Funded green days; G426 ran U58 only at 0
+and 0.6). **Rule, green days:** G1 or G2 replaces 11:00 in Funded green days if its green traded days on the fresh
+starts are at least 52.5%, its $ a session at least 80% of G481's on each set, with no more starts lost on any; of
+both, the more green days; then the simulator on the 2025-26 window must show more green traded days than 50.5% and
+fewer red days than 107. **Rule, Funded growth:** the balanced rule (G473) for C1 against U58, then NinjaTrader's
+growth run on the window at least +$75,486 with a worst day no deeper than −$1,000. Run once.
