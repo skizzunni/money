@@ -9687,3 +9687,14 @@ trades, 39.1% green): −24%, so it fails the balanced rule's NinjaTrader check.
 the window's biggest days early (the replay sets' gain was mostly on the fresh starts). The file the user runs stays
 as it is; the patch stays in `verification/noise_v2/g482_l4_pending.patch` for the record; the simulator binary is
 rebuilt from the unchanged file.
+
+## G483: scratch instead of lose (registered 2026-11-12, before its run)
+
+The user wants about 50 red of ~216 traded days. G482: the red days are days that never turn green; some of them had a
+trade that went a little the right way first and then hit its stop. Here the lock (stop to entry + `lock_plus` once a
+trade is up `lock_at` x its max loss) arms sooner with a cushion that just covers the fees, so such a trade ends about
+flat-to-green: `research/g483_scratch.py`, U58 and Funded green days (G481) against S1 `lock_at` 0.15 / `lock_plus` 1
+point (U58 0.35 / 2.5), S2 0.10 / 1, S3 S1 inside Funded green days. (G404 tried sooner locks with the +2.5 cushion on
+U48; G480 E4 with a 0.5 target.) **Rule:** the balanced rule (G473) for Funded growth; for Funded green days, at least
+G481's 50.5% green traded days and at least 25% more $ than G481 on each set with no more starts lost; then the
+simulator on the window. Run once.
