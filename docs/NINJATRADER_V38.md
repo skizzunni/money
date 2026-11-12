@@ -9532,3 +9532,9 @@ Hourly round. G424 (old rule, brake 0.45): +1 per $1,200 made 19% more on the fr
 current U58 (brake 0.25): `research/g478_step_1250.py`, `profit_step` 1,250 against 1,500. The balanced rule (G473):
 at least as much $ a session on each of the three start sets, at least 5% more on their average, no more starts lost,
 the fresh starts' worst month at most $250 deeper; then NinjaTrader's growth run on the window at least as good. Run once.
+
+**G478 result (2026-11-12): rejected by the balanced rule (one more start lost on two sets); +14% more money.** +1 per
+$1,250 against U58 (brake 0.25): fresh starts **$57.6 (+14.3%)**, 0 lost, worst month −$2,223 ($204 deeper);
+development **$55.7 (+11.5%)** at 3.2% lost (U58 0%); unseen **$98.5 (+16.0%)** at 3.2% (1.6%). Average +14%, but one
+more start lost on each of development (1 of 31) and unseen (1 of 63), so it fails "no more starts lost". A middle
+ground between Funded growth and Funded aggressive. `verification/noise_v2/g478_step_1250.txt`.
