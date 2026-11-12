@@ -9468,3 +9468,16 @@ T2 = the 0.8 entry lines every day (`entry_k` 0.8; U58 uses them only on calm st
 are reported with the $ and losses. **Rule:** the balanced rule (G473); a variant that passes is built into
 `MnqNoiseV38.cs` (T1 needs the 15-minute grid there). Otherwise the one with the most trades is offered as an opt-in
 with its cost. Run once.
+
+**G476 result (2026-11-12): rejected, all three; extra entries cost money and accounts.**
+
+| 50K funded | trades a session (fresh) | fresh $ a session (lost of 16) | development (lost) | unseen (lost) |
+|---|---|---|---|---|
+| **U58 (brake 0.25)** | 1.58 | **$50.4** (0) | $49.9 (0%) | **$84.9** (1.6%) |
+| T1 checks every 15 min | **1.78 (+13%)** | $42.7, −15% (0) | $53.9, +8% (10.1%) | $55.4, −35% (14.4%) |
+| T2 0.8 lines every day | 1.61 (+2%) | $40.0, −21% (0) | $52.8, +6% (3.2%) | $78.8, −7% (4.7%) |
+| T3 both | 1.81 (+14%) | $24.0, −52% (1) | $50.2, 0% (10.1%) | $40.8, −52% (12.6%) |
+
+The added 15-minute entries are mostly false breakouts; with them the account loses 1 in 7 unseen starts. None meets
+the balanced rule, and none is offered: the cheapest extra trades (T1) cost a third of the unseen money.
+`verification/noise_v2/g476_more_trades.txt`.

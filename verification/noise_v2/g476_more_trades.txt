@@ -1,0 +1,22 @@
+fresh starts used: 16
+                        per_session  trades_per_session   lost  green_days  green_weeks  green_months  longest_losing_weeks  worst_month
+T1 checks every 15 min       42.661               1.784  0.000       0.391        0.469         0.583                 4.188    -1921.018
+T2 0.8 lines every day       40.047               1.608  0.000       0.405        0.469         0.620                 3.562    -1582.530
+T3 both                      23.953               1.809  0.062       0.385        0.453         0.536                 3.688    -1833.027
+U58 (brake 0.25)             50.415               1.581  0.000       0.419        0.481         0.688                 3.750    -2019.452
+development (index 2011-18 starts):
+                        per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                             
+T1 checks every 15 min       53.878      25.106        75.346     136.251  0.101
+T2 0.8 lines every day       52.758      21.632        95.221     142.193  0.032
+T3 both                      50.150      20.751        86.051     144.130  0.101
+U58 (brake 0.25)             49.940      22.189        87.315     148.162  0.000
+unseen (index 2019-25 + NQ 2015-24):
+                        per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                             
+U58 (brake 0.25)             84.873      44.184       128.290     147.470  0.016
+T2 0.8 lines every day       78.821      43.453       128.911     146.946  0.047
+T1 checks every 15 min       55.365      39.869        62.868      93.940  0.144
+T3 both                      40.841      36.524        57.995     107.045  0.126
+
+[exited with code 0]
