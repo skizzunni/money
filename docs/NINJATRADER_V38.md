@@ -34,6 +34,8 @@ add-on to install. It trades `pine/mnq_noise_momentum.pine` v3.8 (docs/CANDIDATE
    placed") and alerts **STOP CHECK FAILED** if a position is ever without a live stop.
 
 **Other modes (opt-in, 5-minute chart only):**
+- **Funded green days** (50K): Funded growth that stops for the day as soon as the day is green (G480 E5). About 55%
+  of traded days green instead of 42%, but only a quarter to a third of the money.
 - **Funded growth plus** (50K): Funded growth with +1 MNQ per $1,250 of profit (G478). It made 11-16% more a session on
   every set; it lost 1 more account on two of the three sets (3.2% against 0% and 1.6%). The middle ground.
 - **Funded aggressive** (50K): no giveback brake, +1 MNQ per $1,000 of profit, a $1,000 day budget until the floor
@@ -9590,3 +9592,23 @@ few trend days with a 2.0-noise take-profit. `research/g480_green_exits.py`: U58
 green days at least 50% of traded days on the fresh starts and a positive $ a session on every set, the one with the
 most $ a session on unseen is built as an opt-in "Funded green days" mode, with its cost stated; if none reaches 50%,
 nothing is built and the closest is reported. Run once.
+
+**G480 result (2026-11-12): most days green costs about two thirds of the money; built as the opt-in "Funded green
+days".**
+
+| | green traded days (fresh) | fresh $ a session (lost of 16) | development (lost) | unseen (lost) |
+|---|---|---|---|---|
+| **U58 (brake 0.25)** | 41.9% | **$50.4** (0) | **$49.9** (0%) | **$84.9** (1.6%) |
+| E1 target 0.5 | 44.3% | $23.4 (1) | $31.4 (0%) | $38.4 (7.9%) |
+| E2 target 0.75 | 42.3% | $38.3 (0) | $39.3 (3.4%) | $56.0 (6.3%) |
+| E3 target 1.0 | 41.3% | $50.0 (0) | $39.1 (0%) | $64.7 (3.2%) |
+| E4 target 0.5, lock 0.15 | 44.6% | $29.4 (0) | $19.8 (3.2%) | $26.5 (5.8%) |
+| **E5 stop once green** | **55.0%** | $11.7 (1) | $13.7 (0%) | $31.1 (2.9%) |
+| E6 0.75 + stop once green | 58.5% | $15.0 (0) | $7.5 (6.7%) | $18.5 (0%) |
+| E7 E4 + stop once green | 60.2% | $14.6 (0) | $4.3 (3.4%) | $12.8 (3.2%) |
+
+A nearer target alone barely moves the green days (breakouts that reach 0.5 noise mostly reach 2.0 as well); only
+stopping for the day once it is green does. Of the three variants above 50% that make money on every set, E5 makes the
+most unseen, so per the rule it is built: **Funded green days** = Funded growth with `DayProfitStop` $1 (no new entries
+once today's closed P/L is above $0). It keeps 23-37% of U58's money. `test_v38_opt_in_modes` covers it (trade for
+trade with the model); the NinjaTrader and release tests, 60 passed. `verification/noise_v2/g480_green_exits.txt`.

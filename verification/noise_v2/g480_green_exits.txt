@@ -1,0 +1,34 @@
+fresh starts used: 16
+                                  per_session  trades_per_session   lost  green_days  green_weeks  green_months  longest_losing_weeks  worst_month
+E1 target 0.5                          23.426               1.914  0.062       0.443        0.491         0.661                 3.750    -1208.872
+E2 target 0.75                         38.293               1.904  0.000       0.423        0.492         0.693                 4.000    -1555.995
+E3 target 1.0                          49.999               1.844  0.000       0.413        0.479         0.714                 3.812    -1833.816
+E4 target 0.5, lock 0.15               29.391               2.098  0.000       0.446        0.471         0.589                 4.562    -1230.464
+E5 stop once green                     11.665               0.787  0.062       0.550        0.486         0.625                 3.562    -1048.179
+E6 target 0.75 + stop once green       15.030               0.839  0.000       0.585        0.564         0.740                 3.438    -1004.064
+E7 E4 + stop once green                14.642               0.888  0.000       0.602        0.558         0.714                 3.500     -417.461
+U58 (brake 0.25)                       50.415               1.581  0.000       0.419        0.481         0.688                 3.750    -2019.452
+development (index 2011-18 starts):
+                                  per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                                       
+U58 (brake 0.25)                       49.940      22.189        87.315     148.162  0.000
+E2 target 0.75                         39.311      16.432        64.887     118.927  0.034
+E3 target 1.0                          39.102      18.264        62.030     121.378  0.000
+E1 target 0.5                          31.393      11.645        52.662      76.711  0.000
+E4 target 0.5, lock 0.15               19.768      11.294        32.269      51.262  0.032
+E5 stop once green                     13.719       8.922        26.818      32.300  0.000
+E6 target 0.75 + stop once green        7.460       6.012         7.534      16.568  0.067
+E7 E4 + stop once green                 4.347       3.027         6.908      13.290  0.034
+unseen (index 2019-25 + NQ 2015-24):
+                                  per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                                       
+U58 (brake 0.25)                       84.873      44.184       128.290     147.470  0.016
+E3 target 1.0                          64.735      31.478        94.517     131.611  0.032
+E2 target 0.75                         56.012      29.665        83.552     107.737  0.063
+E1 target 0.5                          38.376      26.206        48.023      86.266  0.079
+E5 stop once green                     31.091      22.647        41.518      54.580  0.029
+E4 target 0.5, lock 0.15               26.504      19.584        35.129      53.130  0.058
+E6 target 0.75 + stop once green       18.496      14.291        25.070      38.793  0.000
+E7 E4 + stop once green                12.837      10.086        18.098      20.970  0.032
+
+[exited with code 0]

@@ -1122,6 +1122,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 else if (string.Equals(mc, "Funded growth 100K U58", StringComparison.OrdinalIgnoreCase)) Mode = "Funded growth 100K U58";
                 else if (string.Equals(mc, "Funded aggressive", StringComparison.OrdinalIgnoreCase)) Mode = "Funded aggressive";
                 else if (string.Equals(mc, "Funded growth plus", StringComparison.OrdinalIgnoreCase)) Mode = "Funded growth plus";
+                else if (string.Equals(mc, "Funded green days", StringComparison.OrdinalIgnoreCase)) Mode = "Funded green days";
                 else if (string.Equals(mc, "Funded growth 100K", StringComparison.OrdinalIgnoreCase)) Mode = "Funded growth 100K";
                 else if (string.Equals(mc, "Funded growth 150K", StringComparison.OrdinalIgnoreCase)) Mode = "Funded growth 150K";
                 else if (string.Equals(mc, "Funded growth Apex 100K", StringComparison.OrdinalIgnoreCase)) Mode = "Funded growth Apex 100K";
@@ -1130,7 +1131,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 else if (string.Equals(m, "Custom", StringComparison.OrdinalIgnoreCase)) Mode = "Custom";
                 else
                 {
-                    setupWarnings.Add("Mode \"" + Mode + "\" isn't Funded growth (50K, plus, 100K, 100K U58, 150K, Apex 100K or Apex 150K), Funded aggressive, Test sprint, Evaluation or Custom: running the settings below as Custom");
+                    setupWarnings.Add("Mode \"" + Mode + "\" isn't Funded growth (50K, plus, 100K, 100K U58, 150K, Apex 100K or Apex 150K), Funded aggressive, Funded green days, Test sprint, Evaluation or Custom: running the settings below as Custom");
                     Mode = "Custom";
                 }
                 bool sprintMode = Mode == "Test sprint";  // G253: the 50K's growth settings, then the two-week Test sprint's
@@ -1141,8 +1142,9 @@ namespace NinjaTrader.NinjaScript.Strategies
                 // G478: Funded growth plus, the middle ground (+1 MNQ per $1,250)
                 bool k100u58 = Mode == "Funded growth 100K U58", aggressive = Mode == "Funded aggressive";
                 bool plus = Mode == "Funded growth plus";
-                if (sprintMode || k100u58 || aggressive || plus) Mode = "Funded growth";
-                modeShown = k100u58 || aggressive || plus ? chosen : Mode;
+                bool greenDays = Mode == "Funded green days";  // G480 E5: no new entries once the day is green
+                if (sprintMode || k100u58 || aggressive || plus || greenDays) Mode = "Funded growth";
+                modeShown = k100u58 || aggressive || plus || greenDays ? chosen : Mode;
                 if (Mode.StartsWith("Funded growth"))  // the tested growth settings (docs/NINJATRADER_V38.md), whatever is set below
                 {
                     Contracts = 1; MaxLoss = 187.5; DailyLoss = 900; TrailDD = 2000;
@@ -1166,7 +1168,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                     if (Mode == "Funded growth Apex 100K") { DailyLoss = 1350; TrailDD = 3000; LossGuard = 1425; }
                     if (Mode == "Funded growth Apex 150K") { DailyLoss = 1800; TrailDD = 4000; LossGuard = 1900; }
                 }
-                if (k100u58 || aggressive || plus)
+                if (k100u58 || aggressive || plus || greenDays)
                 {
                     if (minutes != 5)
                         setupWarnings.Add(modeShown + " was tested on 5-minute bars only: put it on a 5-minute chart");
@@ -1177,6 +1179,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                     }
                     else if (plus)  // G478: +1 MNQ per $1,250 (the brake as Funded growth's, 0.25)
                         ProfitStep = 1250;
+                    else if (greenDays)  // G480 E5: no new entries once today's closed P/L is above $0
+                        DayProfitStop = 1;
                     else  // G475's A1: no brake, +1 MNQ per $1,000, a $1,000 day budget until the floor stops
                     {
                         GivebackBrake = 0; ProfitStep = 1000; EarlyDayBudget = 1000;
@@ -2081,7 +2085,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         #region Properties
         [NinjaScriptProperty]
-        [Display(Name = "Mode: Test sprint (the default: the 50K Test in two weeks), Funded growth (50K, once passed), Funded growth plus (50K, opt-in: +14% money, a few more lost accounts), Funded aggressive (50K, opt-in: more money, more lost accounts), Funded growth 100K U58 (a 100K, 5-minute), Funded growth 100K / 150K (Topstep), Funded growth Apex 100K / Apex 150K, Evaluation, or Custom", Order = 0, GroupName = "1. Size and risk")]
+        [Display(Name = "Mode: Test sprint (the default: the 50K Test in two weeks), Funded growth (50K, once passed), Funded growth plus (50K, opt-in: +14% money, a few more lost accounts), Funded green days (50K, opt-in: most days green, about a third of the money), Funded aggressive (50K, opt-in: more money, more lost accounts), Funded growth 100K U58 (a 100K, 5-minute), Funded growth 100K / 150K (Topstep), Funded growth Apex 100K / Apex 150K, Evaluation, or Custom", Order = 0, GroupName = "1. Size and risk")]
         public string Mode { get; set; }
 
         [NinjaScriptProperty]

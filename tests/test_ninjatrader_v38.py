@@ -440,7 +440,7 @@ def test_v38_startup_checks(sim, sample_1m, tmp_path):  # noqa: F811
     assert loose == ok_trades and warn == [], "the mode is read whatever its case and spaces"
     _, warn, dash = go("Mode=Funded")
     expected = ("isn't Funded growth (50K, plus, 100K, 100K U58, 150K, Apex 100K or Apex 150K), Funded aggressive, "
-                "Test sprint, Evaluation or Custom")
+                "Funded green days, Test sprint, Evaluation or Custom")
     assert any(expected in x for x in warn)
     assert "SETUP WARNING (1)" in dash
     _, warn, _ = go("Mode=Funded growth", "SimInstrument=NQ 12-26")
@@ -749,7 +749,8 @@ def test_v38_bigger_accounts_agree(sim, sample_1m, minutes, mode, daily, trail, 
     ("Funded growth 100K U58", {"daily_loss_limit": 1800.0, "trail_dd": 3000.0, "early_daily_loss": 1500.0,
                                 "profit_step": 2000.0, "giveback_brake": 0.0}),
     ("Funded aggressive", {"giveback_brake": 0.0, "profit_step": 1000.0, "early_daily_loss": 1000.0}),
-    ("Funded growth plus", {"profit_step": 1250.0})])
+    ("Funded growth plus", {"profit_step": 1250.0}),
+    ("Funded green days", {"day_stop_profit": 1.0})])
 def test_v38_opt_in_modes(sim, sample_1m, mode, extra, tmp_path):  # noqa: F811
     """G473 / G475: the 100K U58 mode (U58 on the 100K's limits, +1 MNQ per $2,000, no brake) and the Aggressive mode
     (no brake, +1 per $1,000, a $1,000 early budget) run U58 with those settings: NinjaTrader's code and the model agree
