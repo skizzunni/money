@@ -9388,3 +9388,8 @@ $250-350 a session in year three, where the cap may bind; a 100K account usually
 against the user's firm). `research/g462_100k_sizing.py` with `G472=1` (G397's starts) and
 `research/g472_100k_cap_fresh.py` (G415's fresh starts): the cap at 60, 90 and 120. G468's rule (a cap replaces 60 only
 with at least 5% more $ a session on all three start sets and no more starts lost on any). Run once.
+
+**G472 result (2026-11-12): rejected, both; the 100K funded mode keeps the cap at 60.** Development (cap 60 $146.8, 0%
+lost): cap 90 $139.4 (−5%), 120 $134.1 (−9%); unseen ($239.4): $231.6 (−3%), $224.5 (−6%); fresh starts (12 months):
+identical ($34.9; the cap never binds in the first year). Where the cap binds (years two and three) the bigger
+positions give back more than they add. `verification/noise_v2/g472_100k_cap.txt`.
