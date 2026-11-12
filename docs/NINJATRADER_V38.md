@@ -9612,3 +9612,12 @@ stopping for the day once it is green does. Of the three variants above 50% that
 most unseen, so per the rule it is built: **Funded green days** = Funded growth with `DayProfitStop` $1 (no new entries
 once today's closed P/L is above $0). It keeps 23-37% of U58's money. `test_v38_opt_in_modes` covers it (trade for
 trade with the model); the NinjaTrader and release tests, 60 passed. `verification/noise_v2/g480_green_exits.txt`.
+
+## G481: stop once green, from a time of day (registered 2026-11-12, before its run)
+
+Hourly round, from G480: stopping once the day is green made 55% of traded days green but cut the money to a third,
+because the trend days that pay start green and keep going. A middle ground: the morning trades as usual, and from
+11:00, 12:00 or 13:00 no new entries once today's P/L is above $0 (`day_stop_late_from` / `day_stop_late` $1; G310 tried
+13:00 at $500 on the sprint). `research/g481_late_green_stop.py`. **Rule:** the balanced rule (G473) for a default
+change; else G480's opt-in rule (green days at least 50% on the fresh starts, positive on every set, the most $ unseen),
+which would replace E5 in "Funded green days" only if it makes more on all three sets. Run once.
