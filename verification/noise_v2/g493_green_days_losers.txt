@@ -1,0 +1,19 @@
+fresh starts used: 16
+                          per_session  trades_per_session   lost  green_days  green_weeks  green_months  longest_losing_weeks  worst_month
+Funded green days (G481)       24.766               0.981  0.062       0.505        0.461         0.609                 3.500    -1328.656
+M1 2 losers a day              23.549               0.973  0.062       0.503        0.473         0.594                 3.625    -1397.457
+M2 3 losers a day              25.040               1.028  0.062       0.504        0.475         0.604                 3.500    -1584.230
+development (index 2011-18 starts):
+                          per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                               
+M1 2 losers a day              26.379      14.360        44.651      70.364  0.034
+M2 3 losers a day              26.003      15.546        41.035      59.882  0.034
+Funded green days (G481)       24.668      15.656        40.489      59.249  0.000
+unseen (index 2019-25 + NQ 2015-24):
+                          per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                               
+Funded green days (G481)       56.613      31.977        81.745      99.762  0.047
+M2 3 losers a day              55.047      30.392        79.245      84.455  0.062
+M1 2 losers a day              52.795      29.620        75.596      93.550  0.065
+
+[exited with code 0]

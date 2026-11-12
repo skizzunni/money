@@ -9939,3 +9939,14 @@ loss. U58 has no loser limit (G421); in Funded green days a limit may keep the m
 traded days on the fresh starts are at least G481's 50.5%, its $ a session at least 10% more than G481's on each set,
 with no more starts lost on any; of both, the most $ unseen. Then the simulator on the 2025-26 window: at least 50.5%
 green traded days and a net above +$4,232. Run once.
+
+**G493 result (2026-11-12): rejected, both; no effect.**
+
+| | green traded days (fresh) | fresh $ (lost of 16) | development (lost) | unseen (lost) |
+|---|---|---|---|---|
+| Funded green days (G481) | 50.5% | $24.8 (1) | $24.7 (0%) | $56.6 (4.7%) |
+| M1 2 losers a day | 50.3% | $23.5 (1) | $26.4 (3.4%) | $52.8 (6.5%) |
+| M2 3 losers a day | 50.4% | $25.0 (1) | $26.0 (3.4%) | $55.0 (6.2%) |
+
+Within a few % either way, with more starts lost on two sets: the 11:00 green stop and the day budget already end most
+long losing days. Funded green days unchanged; no simulator run. `verification/noise_v2/g493_green_days_losers.txt`.
