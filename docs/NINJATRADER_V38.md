@@ -9660,3 +9660,23 @@ $1, L3 +$300 keeping $100, L4 L2 without the small-gap fill-in, L5 L2 + G481's s
 50.5% and it makes at least 25% more $ a session than G481 on each of the three sets, with no more starts lost on any;
 of several, the most $ unseen. Then NinjaTrader's simulator on the window must show it at least 50% green traded days.
 The balanced rule (G473) separately decides a Funded growth change. Run once.
+
+**G482 result (2026-11-12): no lock makes most days green; L4 improves Funded growth (pending NinjaTrader's check).**
+
+| | green traded days (fresh) | fresh $ a session (lost of 16, worst month) | development (lost) | unseen (lost) |
+|---|---|---|---|---|
+| U58 (brake 0.25) | 41.9% | $50.4 (0, −$2,019) | $49.94 (0%) | $84.87 (1.6%) |
+| Funded green days (G481) | 50.5% | $24.8 (1, −$1,329) | $24.7 (0%) | $56.6 (4.7%) |
+| L1 lock +$150 keep $1 | 43.4% | $52.2 (1) | $43.4 (0%) | $82.3 (3.1%) |
+| L2 lock +$300 keep $1 | 42.8% | $60.4 (0) | $50.47 (0%) | $83.55 (1.6%) |
+| L3 lock +$300 keep $100 | 43.5% | $55.6 (0) | $49.0 (3.4%) | $76.8 (4.8%) |
+| **L4 = L2, no small-gap fill-in** | 43.6% | **$61.9 (0, −$1,977)** | **$50.35 (0%)** | **$85.65 (1.6%)** |
+| L5 L2 + stop once green from 13:00 | 47.4% | $47.1 (2) | $37.6 (0%) | $55.9 (6.2%) |
+
+Green days: no variant reaches G481's 50.5%, so Funded green days is unchanged. A green-day lock keeps the trend days
+(more money) but barely changes how many days are green: the red days are days that never turn green. **L4 meets the
+balanced rule for Funded growth** (+22.8% / +0.8% / +0.9%, average +8.2%, no more starts lost, worst month $42
+shallower). Its NinjaTrader build (a +$300 day lock keeping $1 and no small-gap fill-in, in plain Funded growth on
+5-minute bars, plus a guard so a negative `FillSmallK` turns the fill-in off as in the model) is saved as
+`verification/noise_v2/g482_l4_pending.patch`: the simulator run that must confirm it on the 2025-26 window waits on an
+approval in this session, so the file the user runs is unchanged until that run passes. `verification/noise_v2/g482_green_lock.txt`.

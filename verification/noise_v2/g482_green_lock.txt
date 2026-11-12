@@ -1,0 +1,31 @@
+fresh starts used: 16
+                                    per_session  trades_per_session   lost  green_days  green_weeks  green_months  longest_losing_weeks  worst_month
+Funded green days (G481)                 24.766               0.981  0.062       0.505        0.461         0.609                 3.500    -1328.656
+L1 lock +$150 keep $1                    52.183               1.568  0.062       0.434        0.442         0.661                 4.312    -2077.575
+L2 lock +$300 keep $1                    60.431               1.649  0.000       0.428        0.475         0.677                 3.875    -2014.446
+L3 lock +$300 keep $100                  55.645               1.648  0.000       0.435        0.490         0.719                 3.938    -1698.601
+L4 L2, no small-gap fill-in              61.894               1.613  0.000       0.436        0.477         0.724                 3.875    -1977.366
+L5 L2 + stop once green from 13:00       47.063               1.243  0.125       0.474        0.447         0.599                 4.312    -1393.813
+U58 (brake 0.25)                         50.415               1.581  0.000       0.419        0.481         0.688                 3.750    -2019.452
+development (index 2011-18 starts):
+                                    per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                                         
+L2 lock +$300 keep $1                    50.467      19.990        92.753     124.153  0.000
+L4 L2, no small-gap fill-in              50.345      24.958        88.141     117.561  0.000
+U58 (brake 0.25)                         49.940      22.189        87.315     148.162  0.000
+L3 lock +$300 keep $100                  48.951      21.152        84.657     117.435  0.034
+L1 lock +$150 keep $1                    43.445      20.470        72.568     105.552  0.000
+L5 L2 + stop once green from 13:00       37.603      15.964        70.491      94.780  0.000
+Funded green days (G481)                 24.668      15.656        40.489      59.249  0.000
+unseen (index 2019-25 + NQ 2015-24):
+                                    per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                                         
+L4 L2, no small-gap fill-in              85.652      40.556       128.303     147.231  0.016
+U58 (brake 0.25)                         84.873      44.184       128.290     147.470  0.016
+L2 lock +$300 keep $1                    83.554      40.130       123.354     135.905  0.016
+L1 lock +$150 keep $1                    82.282      37.412       135.170     152.161  0.031
+L3 lock +$300 keep $100                  76.840      36.695       108.955     138.127  0.048
+Funded green days (G481)                 56.613      31.977        81.745      99.762  0.047
+L5 L2 + stop once green from 13:00       55.922      28.634        81.200      87.176  0.062
+
+[exited with code 0]

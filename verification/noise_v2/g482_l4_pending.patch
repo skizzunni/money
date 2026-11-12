@@ -1,0 +1,28 @@
+diff --git a/ninjatrader/Strategies/MnqNoiseV38.cs b/ninjatrader/Strategies/MnqNoiseV38.cs
+index d70f718..f52a4cb 100644
+--- a/ninjatrader/Strategies/MnqNoiseV38.cs
++++ b/ninjatrader/Strategies/MnqNoiseV38.cs
+@@ -913,7 +913,7 @@ namespace NinjaTrader.NinjaScript.Strategies
+                 int d = gap > 0 ? 1 : -1;
+                 double body = c - dayOpen;
+                 bool fire = Math.Abs(gap) >= s.GapGoK * avg && d * body > 0, one = false;
+-                if (!fire && s.MoreDays && Math.Abs(gap) >= s.FillSmallK * avg && d * body > 0 && FillOk())
++                if (!fire && s.MoreDays && s.FillSmallK >= 0 && Math.Abs(gap) >= s.FillSmallK * avg && d * body > 0 && FillOk())
+                     fire = one = true;  // G72: a small gap
+                 if (!fire && s.MoreDays && driveHist.Count >= 10 && body != 0 && FillOk())
+                 {
+@@ -1245,8 +1245,12 @@ namespace NinjaTrader.NinjaScript.Strategies
+                 st.StreakSkip = 2;
+                 st.NewsDates = sprintMode ? JobsReportDays : "";  // G321: 1.5x on the jobs-report days
+                 st.NewsMult = sprintMode ? 1.5 : 1.0;
+-                st.DayLockAt = sprintMode ? 800 : 0;  // G329: the day lock, $800 keeping $300
+-                st.DayLockKeep = 300;
++                // G482 (L4): plain Funded growth on 5-minute bars locks a green day at +$300 (keeping $1) and takes no
++                // small-gap fill-in; the Test sprint and the opt-in modes keep their measured settings
++                bool l4 = Mode == "Funded growth" && minutes == 5 && !sprintMode && !k100u58 && !aggressive && !plus && !greenDays;
++                st.DayLockAt = sprintMode ? 800 : l4 ? 300 : 0;  // G329: the day lock, $800 keeping $300
++                st.DayLockKeep = l4 ? 1 : 300;
++                if (l4) st.FillSmallK = -1;  // G482: no small-gap fill-in
+                 st.Lookback = NoiseSessions; st.EntryK = EntryWidth; st.DayStopProfit = DayProfitStop;  // G253
+                 st.DayStopLateFrom = greenLateFrom; st.DayStopLate = greenLate;  // G481: Funded green days
+                 st.EntryKCalm = (Mode == "Funded growth" && !sprintMode && minutes == 5) || Mode == "Custom" ? CalmEntryWidth : 0;  // G422 (U58)
