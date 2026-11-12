@@ -9431,3 +9431,8 @@ the brake saved accounts on U34. `research/g474_u58_no_brake.py`: U58 with the b
 (off). The balanced rule (G473): at least as much $ a session on each of G415's fresh and G372's development / unseen
 starts, at least 5% more on their average, no more starts lost on any, the fresh starts' worst month at most $250
 deeper; then NinjaTrader's growth run on the window at least as good. Run once.
+
+**G474 result (2026-11-12): rejected by the balanced rule; the 50K keeps the brake at 0.25.** No brake against 0.25:
+fresh starts $52.2 (+3.5%; worst month −$1,919, $100 shallower), development $49.94 (equal), unseen $88.2 (+3.9%), no
+start lost on any. Average +2.5%, short of the 5%. Between 0.25 and off the brake barely acts on the 50K.
+`verification/noise_v2/g474_u58_no_brake.txt`.
