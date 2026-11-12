@@ -9792,3 +9792,15 @@ keeps it green while a trend trade runs. `research/g487_green_days_lock.py`: Fun
 least 50.5%, its $ a session at least 10% more than G481's on each set, with no more starts lost on any; of both, the
 most $ unseen. Then NinjaTrader's simulator on the 2025-26 window (rebuilt) must show at least 50.5% green traded days
 and a net above +$4,232. Run once.
+
+**G487 result (2026-11-12): rejected, both.**
+
+| | green traded days (fresh) | fresh $ (lost of 16) | development (lost) | unseen (lost) |
+|---|---|---|---|---|
+| Funded green days (G481) | 50.5% | $24.8 (1) | $24.7 (0%) | $56.6 (4.7%) |
+| K1 + lock +$300 keep $1 | 51.9% | $30.6, +24% (3) | $20.9, −15% (0%) | $52.9, −7% (6.0%) |
+| K2 + lock +$150 keep $1 | 52.9% | $35.5, +43% (1) | $19.4, −21% (3.2%) | $53.4, −6% (3.1%) |
+
+The lock adds 1-2 points of green days and helps on the fresh starts, but makes less on development and unseen (it
+closes trend trades on days that would have gone on), as G482's lock did in the simulator. Funded green days is
+unchanged; no simulator run. `verification/noise_v2/g487_green_days_lock.txt`.

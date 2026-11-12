@@ -1,0 +1,17 @@
+fresh starts used: 16
+                          per_session  trades_per_session   lost  green_days  green_weeks  green_months  longest_losing_weeks  worst_month
+Funded green days (G481)       24.766               0.981  0.062       0.505        0.461         0.609                 3.500    -1328.656
+K1 + lock +$300 keep $1        30.638               0.954  0.188       0.519        0.448         0.589                 3.812     -981.960
+K2 + lock +$150 keep $1        35.462               1.058  0.062       0.529        0.486         0.656                 4.188    -1056.316
+development (index 2011-18 starts):
+                          per_session  months_1_3  months_10_12  best_month  lost
+tag                                                                              
+Funded green days (G481)       24.668      15.656        40.489      59.249  0.00
+K1 + lock +$300 keep $1        20.859      14.414        39.813      48.537  0.00
+K2 + lock +$150 keep $1        19.426      14.344        29.626      42.801  0.03
+unseen (index 2019-25 + NQ 2015-24):
+                          per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                               
+Funded green days (G481)       56.613      31.977        81.745      99.762  0.047
+K2 + lock +$150 keep $1        53.436      29.046        76.341      94.361  0.031
+K1 + lock +$300 keep $1        52.855      28.684        76.978      89.473  0.060
