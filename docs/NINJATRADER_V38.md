@@ -9366,3 +9366,11 @@ lost): brake 0.35 $50.5 (+3%), 0.25 $50.4 (+2%), both 0 lost, worst month −$1,
 (U58 $42.0, 0%): $47.7 (+14%), **$49.9 (+19%)**, both 0%. Unseen (U58 $80.5, 1.6%): $82.1 (+2%), $84.9 (+5%), both 1.6%.
 A later brake is a little better on every set with no more starts lost, but on the fresh starts it is 2-3% better, far
 from the rule's 10%. Not adopted on the 50K. `verification/noise_v2/g470_u58_brake.txt`.
+
+## G471: the 100K funded mode's brake below 0.35 (registered 2026-11-12, before its run)
+
+G469: on the 100K the brake ran 0.55 < 0.45 < 0.35 in $ a session; G470 on the 50K had 0.25 close to 0.35. Is 0.35 the
+end of the trend? `research/g462_100k_sizing.py` with `G471=1` (G397's starts) and `research/g471_100k_brake_fresh.py`
+(G415's fresh starts): the 100K funded mode ($2,000 steps, brake 0.35) against the brake at 0.25 and off (0; G155 found
+the brake saves accounts on U34). G468's rule (replaces 0.35 only with at least 5% more $ a session on all three start
+sets and no more starts lost on any). Run once.
