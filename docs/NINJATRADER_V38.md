@@ -9929,3 +9929,13 @@ makes money on every set, but makes less on development and unseen. Offered to t
 release tests 60 passed (the strategy compiled as C# 5 with warnings as errors, as NinjaTrader 8 does, and run trade for
 trade against the model); the simulator rebuilt with 0 warnings, 0 errors; the lint clean. Nothing in the strategy file
 changed since G481 (G482-G492 left every mode as it was).
+
+## G493: a loser limit in Funded green days (registered 2026-11-12, before its run)
+
+Hourly round. G489: days with 4 or more trades end green 0-34% of the time, so their later trades mostly deepen the
+loss. U58 has no loser limit (G421); in Funded green days a limit may keep the money those days lose.
+`research/g493_green_days_losers.py`: M1 no new entries after 2 losing trades today (`max_losers` 2), M2 after 3
+(`MaxLosers` exists in the C# file). **Rule:** a variant replaces G481's settings in Funded green days if its green
+traded days on the fresh starts are at least G481's 50.5%, its $ a session at least 10% more than G481's on each set,
+with no more starts lost on any; of both, the most $ unseen. Then the simulator on the 2025-26 window: at least 50.5%
+green traded days and a net above +$4,232. Run once.
