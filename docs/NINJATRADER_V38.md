@@ -9481,3 +9481,11 @@ with its cost. Run once.
 The added 15-minute entries are mostly false breakouts; with them the account loses 1 in 7 unseen starts. None meets
 the balanced rule, and none is offered: the cheapest extra trades (T1) cost a third of the unseen money.
 `verification/noise_v2/g476_more_trades.txt`.
+
+## G477: twice the trades (a measurement for the user, registered 2026-11-12, before its run)
+
+The user: "i need 100% more trades" (U58: about 1.6 a session). `research/g477_double_trades.py`: U58 (brake 0.25)
+against D1 = entry lines at 0.6 noise every day, no calm-day skip, no trend filter; D2 = D1 + 15-minute checks; D3 =
+D1 + 10-minute checks. Reported: trades a session, $ a session and starts lost on G415's fresh and G372's development /
+unseen starts. The balanced rule (G473) decides adoption; a variant at about twice the trades is offered as an opt-in
+only with its measured cost. Run once.
