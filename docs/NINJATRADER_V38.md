@@ -9637,3 +9637,13 @@ E5 (unseen losses 4.7% against E5's 2.9%). It keeps half to two thirds of U58's 
 / `DayStopLate` in `MnqNoiseV38.cs` (the model's G310 rule), "Funded green days" = 11:00 and $1;
 `test_v38_opt_in_modes` (trade for trade with `day_stop_late_from` 660, `day_stop_late` 1); the NinjaTrader and release
 tests pass. `verification/noise_v2/g481_late_green_stop.txt`.
+
+**G481 in NinjaTrader's simulator (2026-11-12), the 2025-26 window:** Funded green days 393 trades, **216 traded days:
+109 green, 107 red (50.5%)**, net **+$4,232** (Funded growth on the same window: 783 trades, 330 traded days 39.1%
+green, +$75,486). The green days hold up; on this window the money falls far more (−94%) than on the replay sets
+(−34% to −51%): the window's money came mostly from afternoon trend legs on days already green by 11:00 (the
++$33,412 day of 2026-09-21 among them). Note: the simulator binary in `ninjatrader/tests/Sim/bin` was stale (built
+before the opt-in modes) and ran the mode as Custom until rebuilt; the tests always build their own copy and were not
+affected; the Funded growth journal on the dashboard is identical after the rebuild. The MNQ Bot Dashboard now shows
+this mode's journal (as the user asked), with the comparison in its subtitle.
+`verification/noise_v2/g481_nt_window_green_days.csv`.
