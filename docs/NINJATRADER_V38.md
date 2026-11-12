@@ -9374,3 +9374,9 @@ end of the trend? `research/g462_100k_sizing.py` with `G471=1` (G397's starts) a
 (G415's fresh starts): the 100K funded mode ($2,000 steps, brake 0.35) against the brake at 0.25 and off (0; G155 found
 the brake saves accounts on U34). G468's rule (replaces 0.35 only with at least 5% more $ a session on all three start
 sets and no more starts lost on any). Run once.
+
+**G471 result (2026-11-12): rejected by G468's rule; the 100K funded mode keeps brake 0.35.** Development (0.35 $146.8,
+0% lost): 0.25 $152.4 (+4%), off $161.5 (+10%); unseen ($239.4, 0%): $256.3 (+7%), $257.7 (+8%); fresh starts ($34.9,
+worst month −$2,086): $35.3 (+1%, −$2,123), $36.2 (+4%, −$2,066). No start lost by any. The brake costs a little on the
+100K at every level, but the fresh-start gain of having none (+4%) is short of the 5% the rule asks on all three sets.
+`verification/noise_v2/g471_100k_brake_low.txt`.
