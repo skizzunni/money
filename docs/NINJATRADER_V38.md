@@ -9393,3 +9393,19 @@ with at least 5% more $ a session on all three start sets and no more starts los
 lost): cap 90 $139.4 (−5%), 120 $134.1 (−9%); unseen ($239.4): $231.6 (−3%), $224.5 (−6%); fresh starts (12 months):
 identical ($34.9; the cap never binds in the first year). Where the cap binds (years two and three) the bigger
 positions give back more than they add. `verification/noise_v2/g472_100k_cap.txt`.
+
+## G473: a balanced adoption rule, applied to the changes already measured (registered 2026-11-12, before its run)
+
+The user: "the strategy is too strict. make it more balanced." G423's rule (at least 10% more on the fresh starts) has
+rejected changes that were better on every set with no more starts lost (G470's later brake on the 50K, G471's brake
+off on the 100K). **The balanced rule, from now on:** a change is adopted when, against the current setting, it makes
+at least as much $ a session on each of the three start sets (G415's fresh starts, G372's or G397's development and
+unseen), at least 5% more on their average, loses no more starts on any set, and its worst month on the fresh starts is
+at most $250 deeper. **Applied to the measured candidates** (their numbers were seen, so each pick must also be confirmed
+on a measure not used to pick it): NinjaTrader's own growth run on the 2025-26 window (`research/v38_ninjatrader_run.py
+grow`, `GIVEBACK=`), which must make at least the current setting's net with a worst day no deeper than −$1,000.
+Candidates that meet the balanced rule on the numbers already recorded: on the 50K, the brake at 0.25 (+2.5% / +19.0% /
++5.5%, average +9.0%, worst month $127 deeper) and 0.35 (+2.7% / +13.6% / +2.0%, average +6.1%, $52 deeper); the pick
+is the higher average, 0.25. On the 100K funded mode, no brake (+3.7% / +10.0% / +7.6%, average +7.1%, worst month $20
+less deep). Every other recorded candidate since G423 falls short (at least one set lower, or more starts lost).
+The 50K pick is confirmed (or not) by the NinjaTrader run below; the 100K mode is not yet built. Run once.
