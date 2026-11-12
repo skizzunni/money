@@ -9739,3 +9739,18 @@ if its green traded days on the fresh starts are at least 53%, its $ a session i
 the three sets, and it loses no more starts on any; of several, the most green days. Then NinjaTrader's simulator on
 the 2025-26 window must show more than 50.5% green traded days, fewer than 107 red days and a net of at least +$4,232
 (a D3/D4 win is built in the C# file first). The balanced rule (G473) does not apply (no Funded growth variant). Run once.
+
+**G485 result (2026-11-12): rejected, all four; no day filter moves the green days (49-51%).**
+
+| | green traded days (fresh) | fresh $ (lost of 16) | development (lost) | unseen (lost) |
+|---|---|---|---|---|
+| Funded green days (G481) | 50.5% | $24.8 (1) | $24.7 (0%) | $56.6 (4.7%) |
+| D1 calm 0.8 | 50.7% | $26.2 (0) | $28.8 (3.2%) | $58.0 (1.6%) |
+| D2 calm 0.9 | 49.3% | $26.8 (0) | $30.9 (0%) | $47.6 (1.6%) |
+| D3 not against a 0.5% gap | 50.1% | $24.3 (1) | $25.3 (0%) | $52.9 (4.7%) |
+| D4 not against the drive | 50.1% | $23.8 (2) | $25.2 (0%) | $56.6 (7.7%) |
+
+None reaches 53% green traded days, so Funded green days is unchanged and the simulator check does not run. The days
+these filters skip end red about as often as the days they keep: a day's chance of ending green is not visible in its
+calm stretch, its gap or its opening drive. (D1 makes 2-17% more with fewer starts lost on two sets, one more on
+development; not this rule's aim.) `verification/noise_v2/g485_green_day_filters.txt`.
