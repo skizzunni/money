@@ -9489,3 +9489,16 @@ against D1 = entry lines at 0.6 noise every day, no calm-day skip, no trend filt
 D1 + 10-minute checks. Reported: trades a session, $ a session and starts lost on G415's fresh and G372's development /
 unseen starts. The balanced rule (G473) decides adoption; a variant at about twice the trades is offered as an opt-in
 only with its measured cost. Run once.
+
+**G477 result (2026-11-12), a measurement: twice the trades costs most of the money and a quarter of the accounts.**
+
+| 50K funded | trades a session (fresh) | fresh $ a session (lost of 16) | development (lost) | unseen (lost) |
+|---|---|---|---|---|
+| **U58 (brake 0.25)** | 1.58 | **$50.4** (0) | **$49.9** (0%) | **$84.9** (1.6%) |
+| D1 loose entries | 2.19 (+39%) | $17.6, −65% (1) | $22.6, −55% (29.4%) | $49.9, −41% (9.4%) |
+| D2 = D1 + 15-min checks | **3.20 (+102%)** | $8.3, −84% (3) | $32.7, −34% (23.0%) | $18.5, −78% (28.3%) |
+| D3 = D1 + 10-min checks | 2.76 (+74%) | $25.1, −50% (6) | $8.4, −83% (42.4%) | $27.0, −68% (26.7%) |
+
+Only D2 doubles the trades, and it keeps about a sixth of the money and loses 1 account in 4 on the older and unseen
+starts. The bot's edge is its selectivity; its extra breakouts lose. Nothing adopted; nothing worth offering.
+`verification/noise_v2/g477_double_trades.txt`.

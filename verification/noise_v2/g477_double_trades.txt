@@ -1,0 +1,22 @@
+fresh starts used: 16
+                         per_session  trades_per_session   lost  green_days  green_weeks  green_months  longest_losing_weeks  worst_month
+D1 loose entries              17.590               2.190  0.062       0.330        0.388         0.464                 4.750    -1585.718
+D2 = D1 + 15-min checks        8.293               3.200  0.188       0.316        0.416         0.438                 4.750    -1656.690
+D3 = D1 + 10-min checks       25.091               2.755  0.375       0.291        0.280         0.354                 4.062    -1597.237
+U58 (brake 0.25)              50.415               1.581  0.000       0.419        0.481         0.688                 3.750    -2019.452
+development (index 2011-18 starts):
+                         per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                              
+U58 (brake 0.25)              49.940      22.189        87.315     148.162  0.000
+D2 = D1 + 15-min checks       32.739      17.918        59.383     106.449  0.230
+D1 loose entries              22.577      22.361        25.541      53.668  0.294
+D3 = D1 + 10-min checks        8.399      15.865         3.890      34.733  0.424
+unseen (index 2019-25 + NQ 2015-24):
+                         per_session  months_1_3  months_10_12  best_month   lost
+tag                                                                              
+U58 (brake 0.25)              84.873      44.184       128.290     147.470  0.016
+D1 loose entries              49.916      43.440        50.632      68.745  0.094
+D3 = D1 + 10-min checks       27.049      44.755        12.599      70.946  0.267
+D2 = D1 + 15-min checks       18.512      31.050        14.865      49.437  0.283
+
+[exited with code 0]
