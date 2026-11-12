@@ -9727,3 +9727,15 @@ more net than G481's +$4,232. Run once.
 P3 keeps most traded days green and makes 21-31% more on every set, but loses one more start on each set, so it fails
 "no more starts lost"; P2 alone is too small (+2-3%). Funded green days unchanged. Offered to the user as a choice.
 `verification/noise_v2/g484_green_days_more_money.txt`.
+
+## G485: skip the days that end red (registered 2026-11-12, before its run)
+
+Hourly round. G482-G484: the red days are days that never turn green, and no exit, lock or sizing change moved Funded
+green days much past 51%. The other way is not to trade those days: a day filter inside Funded green days (G481).
+`research/g485_green_day_filters.py`: D1 `calm_k` 0.8 and D2 0.9 (no entries after a calmer stretch; U58 has 0.7),
+D3 `gap_block` 0.005 (no entries against a 0.5%+ opening gap), D4 `drive_filter_k` 0.25 (no entries against the
+09:30-10:00 drive; G318 tested it for passes only). **Rule:** a variant replaces G481's settings in Funded green days
+if its green traded days on the fresh starts are at least 53%, its $ a session is at least 90% of G481's on each of
+the three sets, and it loses no more starts on any; of several, the most green days. Then NinjaTrader's simulator on
+the 2025-26 window must show more than 50.5% green traded days, fewer than 107 red days and a net of at least +$4,232
+(a D3/D4 win is built in the C# file first). The balanced rule (G473) does not apply (no Funded growth variant). Run once.
