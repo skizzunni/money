@@ -9950,3 +9950,13 @@ green traded days and a net above +$4,232. Run once.
 
 Within a few % either way, with more starts lost on two sets: the 11:00 green stop and the day budget already end most
 long losing days. Funded green days unchanged; no simulator run. `verification/noise_v2/g493_green_days_losers.txt`.
+
+## G494: the gap trade's stop nearer (registered 2026-11-12, before its run)
+
+Hourly round, from G489-G491: the gap trade's stop at the 09:30 open is where most red days start. A nearer stop loses
+less when hit (a smaller red day, or one a later trade can make back) at the cost of being hit more often.
+`research/g494_gap_stop_nearer.py`: inside Funded green days (G481), the gap stop `gap_go_stop_frac` of the way from
+the 09:30 open toward the 09:30 bar's close: S1 0.25, S2 0.5 (G111 tested it on an early bot for money; not in the C#
+file). **Rule:** as G490's (at least 53% green traded days on the fresh starts, at least 90% of G481's $ on each set,
+no more starts lost on any; the most green days); then built in the C# file with a parity test and checked in the
+simulator on the 2025-26 window (more than 50.5% green, fewer than 107 red, net at least +$4,232). Run once.
