@@ -9898,3 +9898,14 @@ NinjaTrader's simulator on the 2025-26 window as in G490. Run once.
 
 A sooner exit adds under 1 point of green days and costs 10-45% of the money: the gap trades that reach 09:55 make
 most of their move in its last minutes. Nothing changes; no simulator run. `verification/noise_v2/g491_gap_exit_green.txt`.
+
+## G492: the small green-day gains together (registered 2026-11-12, before its run)
+
+Hourly round. Each of G485 D1 (`calm_k` 0.8: +0.2 points, more $), G487 K2 (day lock +$150 / $1: +2.4 points, more $
+fresh, less elsewhere) and G490 B2 (gap stop to entry + 2.5 points at 0.75x risk: +1.9 points, the same $) moved
+Funded green days a little; together they may add up. `research/g492_green_combo.py`: C1 B2 + D1, C2 C1 + K2. These
+were picked on the same three sets, so NinjaTrader's 2025-26 window is the check that was not used to pick them.
+**Rule:** a variant replaces G481's settings in Funded green days if its green traded days on the fresh starts are at
+least 53%, its $ a session at least G481's on each set, with no more starts lost on any; of both, the most green days.
+Then it is built in the C# file (the gap cushion is new) and the simulator on the window must show more than 50.5% green
+traded days, fewer than 107 red days and a net of at least +$4,232. Run once.
