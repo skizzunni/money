@@ -9909,3 +9909,17 @@ were picked on the same three sets, so NinjaTrader's 2025-26 window is the check
 least 53%, its $ a session at least G481's on each set, with no more starts lost on any; of both, the most green days.
 Then it is built in the C# file (the gap cushion is new) and the simulator on the window must show more than 50.5% green
 traded days, fewer than 107 red days and a net of at least +$4,232. Run once.
+
+**G492 result (2026-11-12): rejected by its rule, narrowly; C1 is the best Funded green days variant so far.**
+
+| | green traded days (fresh) | fresh $ (lost of 16) | development (lost) | unseen (lost) |
+|---|---|---|---|---|
+| Funded green days (G481) | 50.5% | $24.8 (1) | $24.7 (0%) | $56.6 (4.7%) |
+| **C1 gap +2.5 at 0.75x + calm 0.8** | **53.2%** | **$27.5, +11% (0)** | **$28.7, +16% (3.2%)** | **$58.1, +3% (1.6%)** |
+| C2 C1 + day lock $150 | 55.3% | $33.3, +35% (0) | $21.1, −15% (0%) | $52.1, −8% (1.6%) |
+
+C1 meets every part of the rule but one: it loses one development start (3.2%) where G481 loses none, while it loses
+fewer on the fresh (0 against 1) and unseen (1.6% against 4.7%) sets. As registered, "no more starts lost on any" fails,
+so Funded green days is unchanged and the simulator check does not run. C2 has the most green days of any variant that
+makes money on every set, but makes less on development and unseen. Offered to the user as a choice.
+`verification/noise_v2/g492_green_combo.txt`.
