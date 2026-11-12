@@ -34,6 +34,8 @@ add-on to install. It trades `pine/mnq_noise_momentum.pine` v3.8 (docs/CANDIDATE
    placed") and alerts **STOP CHECK FAILED** if a position is ever without a live stop.
 
 **Other modes (opt-in, 5-minute chart only):**
+- **Funded growth plus** (50K): Funded growth with +1 MNQ per $1,250 of profit (G478). It made 11-16% more a session on
+  every set; it lost 1 more account on two of the three sets (3.2% against 0% and 1.6%). The middle ground.
 - **Funded aggressive** (50K): no giveback brake, +1 MNQ per $1,000 of profit, a $1,000 day budget until the floor
   stops (G475's A1). It made 13-26% more a session but lost about 1 account in 8 on the recent starts and 1 in 11 on
   unseen ones (Funded growth: 0 and 1 in 64). Only if a lost account is cheap to replace.
@@ -9538,3 +9540,6 @@ $1,250 against U58 (brake 0.25): fresh starts **$57.6 (+14.3%)**, 0 lost, worst 
 development **$55.7 (+11.5%)** at 3.2% lost (U58 0%); unseen **$98.5 (+16.0%)** at 3.2% (1.6%). Average +14%, but one
 more start lost on each of development (1 of 31) and unseen (1 of 63), so it fails "no more starts lost". A middle
 ground between Funded growth and Funded aggressive. `verification/noise_v2/g478_step_1250.txt`.
+
+**Funded growth plus built (2026-11-12):** a third opt-in Mode, Funded growth's U58 with `ProfitStep` 1,250 (G478).
+`test_v38_opt_in_modes` covers it (trade for trade with the model); the NinjaTrader and release tests, 58 passed.
