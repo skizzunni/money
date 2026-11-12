@@ -9875,3 +9875,13 @@ Protecting the gap trade sooner does turn some red days green (B1 +3.1 points, B
 have run, and a stop a tick past the entry (B3) ends red after fees. B1 makes too little and loses more starts; B2
 keeps the money but misses the 53% bar; U58 + B1 makes less on two sets and loses 6.4% of development starts.
 Nothing changes; no simulator run. `gap_go_be_plus` stays in the model, off. `verification/noise_v2/g490_gap_green.txt`.
+
+## G491: the gap trade out sooner (registered 2026-11-12, before its run)
+
+From G489 / G490: most red days start with a stopped gap trade, and gap trades that reach their 09:55 exit win about
+80% of the time (G479). A shorter hold leaves less time for the stop. `research/g491_gap_exit_green.py`: inside Funded
+green days (G481), X1 the gap trade out at the 09:45 bar's open (`gap_go_exit` 585; now 595), X2 09:50 (590); and U58
++ X2 for Funded growth (G276 tested 09:45 on the old sprint for passes only; `GapGoExit` exists in the C# file).
+**Rule, green days:** as G490's (at least 53% green traded days on the fresh starts, at least 90% of G481's $ on each
+set, no more starts lost on any; the most green days). **Rule, Funded growth:** the balanced rule (G473). Then
+NinjaTrader's simulator on the 2025-26 window as in G490. Run once.
