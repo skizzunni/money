@@ -107,6 +107,9 @@ namespace NinjaTrader.NinjaScript.Strategies
         public int SprintGapQty = 0;  // G273: the gap trade's size during the sprint (0 = SprintQty)
         // G253: a wider area for new entries only (entry_k), and no new entries once the day is up DayStopProfit
         public double EntryK = 1.0, DayStopProfit = 0;
+        // G310 / G481: from DayStopLateFrom (minute of day) no new entries once today's P/L is at least DayStopLate (0 = off)
+        public int DayStopLateFrom = 0;
+        public double DayStopLate = 0;
         // G422 (U58): on a calm stretch (the last CalmShort sessions' average range below the last CalmLong's), the entry
         // lines at EntryKCalm x the noise area (0 = off)
         public double EntryKCalm = 0;
@@ -514,6 +517,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (s.MaxLosers > 0 && losersToday >= s.MaxLosers) { Note = "after " + s.MaxLosers + " losing trades today"; return false; }  // G204
             if (guardToday) { Note = "the day guard closed a trade today"; return false; }  // G321
             if (s.DayStopProfit > 0 && DayPnl >= s.DayStopProfit) { Note = "today's profit stop"; return false; }  // G253
+            if (s.DayStopLate > 0 && end >= s.DayStopLateFrom && DayPnl >= s.DayStopLate) { Note = "the day is green: done for today"; return false; }  // G481
             if (Protected()) { Note = "near the floor, shadow below its average"; return false; }
             if (s.LastEntryEnd > 0 && end > s.LastEntryEnd) { Note = "after the last entry check"; return false; }
             if (EarlySkip(end)) { Note = "no entry at this check until the floor has stopped"; return false; }
@@ -989,7 +993,9 @@ namespace NinjaTrader.NinjaScript.Strategies
         readonly List<string> setupWarnings = new List<string>();  // the startup check's findings, for the dashboard
         int nTrades;
         string firstBar = "";
-        string modeShown = "";  // the mode as chosen (the 100K U58 and Aggressive modes run as Funded growth)
+        string modeShown = "";
+        int greenLateFrom;  // G481: Funded green days' stop once green from 11:00
+        double greenLate;  // the mode as chosen (the 100K U58 and Aggressive modes run as Funded growth)
         int journaled;                   // the account's closed trades already written to the journal
         double realDayStart;
         int realDayTrades;
@@ -1142,7 +1148,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 // G478: Funded growth plus, the middle ground (+1 MNQ per $1,250)
                 bool k100u58 = Mode == "Funded growth 100K U58", aggressive = Mode == "Funded aggressive";
                 bool plus = Mode == "Funded growth plus";
-                bool greenDays = Mode == "Funded green days";  // G480 E5: no new entries once the day is green
+                bool greenDays = Mode == "Funded green days";  // G481: no new entries once the day is green, from 11:00
+                greenLateFrom = 0; greenLate = 0;
                 if (sprintMode || k100u58 || aggressive || plus || greenDays) Mode = "Funded growth";
                 modeShown = k100u58 || aggressive || plus || greenDays ? chosen : Mode;
                 if (Mode.StartsWith("Funded growth"))  // the tested growth settings (docs/NINJATRADER_V38.md), whatever is set below
@@ -1179,8 +1186,10 @@ namespace NinjaTrader.NinjaScript.Strategies
                     }
                     else if (plus)  // G478: +1 MNQ per $1,250 (the brake as Funded growth's, 0.25)
                         ProfitStep = 1250;
-                    else if (greenDays)  // G480 E5: no new entries once today's closed P/L is above $0
-                        DayProfitStop = 1;
+                    else if (greenDays)  // G481: from 11:00, no new entries once today's P/L is above $0
+                    {
+                        greenLateFrom = 660; greenLate = 1;
+                    }
                     else  // G475's A1: no brake, +1 MNQ per $1,000, a $1,000 day budget until the floor stops
                     {
                         GivebackBrake = 0; ProfitStep = 1000; EarlyDayBudget = 1000;
@@ -1239,6 +1248,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 st.DayLockAt = sprintMode ? 800 : 0;  // G329: the day lock, $800 keeping $300
                 st.DayLockKeep = 300;
                 st.Lookback = NoiseSessions; st.EntryK = EntryWidth; st.DayStopProfit = DayProfitStop;  // G253
+                st.DayStopLateFrom = greenLateFrom; st.DayStopLate = greenLate;  // G481: Funded green days
                 st.EntryKCalm = (Mode == "Funded growth" && !sprintMode && minutes == 5) || Mode == "Custom" ? CalmEntryWidth : 0;  // G422 (U58)
                 st.SizeSlipPts = Mode != "Evaluation" ? SizeSlip : 0;  // G79: the Funded growth modes and Custom
                 st.ProtectRoom = Mode != "Evaluation" ? NearFloorGate : 0;  // G87

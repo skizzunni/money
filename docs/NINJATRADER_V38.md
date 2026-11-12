@@ -34,8 +34,8 @@ add-on to install. It trades `pine/mnq_noise_momentum.pine` v3.8 (docs/CANDIDATE
    placed") and alerts **STOP CHECK FAILED** if a position is ever without a live stop.
 
 **Other modes (opt-in, 5-minute chart only):**
-- **Funded green days** (50K): Funded growth that stops for the day as soon as the day is green (G480 E5). About 55%
-  of traded days green instead of 42%, but only a quarter to a third of the money.
+- **Funded green days** (50K): Funded growth that, from 11:00, stops for the day as soon as the day is green (G481).
+  About 50% of traded days green instead of 42%, at half to two thirds of the money.
 - **Funded growth plus** (50K): Funded growth with +1 MNQ per $1,250 of profit (G478). It made 11-16% more a session on
   every set; it lost 1 more account on two of the three sets (3.2% against 0% and 1.6%). The middle ground.
 - **Funded aggressive** (50K): no giveback brake, +1 MNQ per $1,000 of profit, a $1,000 day budget until the floor
@@ -9621,3 +9621,19 @@ because the trend days that pay start green and keep going. A middle ground: the
 13:00 at $500 on the sprint). `research/g481_late_green_stop.py`. **Rule:** the balanced rule (G473) for a default
 change; else G480's opt-in rule (green days at least 50% on the fresh starts, positive on every set, the most $ unseen),
 which would replace E5 in "Funded green days" only if it makes more on all three sets. Run once.
+
+**G481 result (2026-11-12): "Funded green days" now stops once green from 11:00 (replaces G480's E5).**
+
+| | green traded days (fresh) | fresh $ a session (lost of 16) | development (lost) | unseen (lost) |
+|---|---|---|---|---|
+| U58 (brake 0.25) | 41.9% | $50.4 (0) | $49.9 (0%) | $84.9 (1.6%) |
+| G480 E5, stop once green all day | 55.0% | $11.7 (1) | $13.7 (0%) | $31.1 (2.9%) |
+| **stop once green from 11:00** | **50.5%** | **$24.8** (1) | **$24.7** (0%) | **$56.6** (4.7%) |
+| from 12:00 | 48.0% | $33.4 (1) | $33.6 (9.9%) | $60.5 (1.5%) |
+| from 13:00 | 46.2% | $36.1 (1) | $32.1 (3.2%) | $58.8 (3.1%) |
+
+From 11:00 is the only one at 50% or more; it makes about twice E5 on every set, so per the registered rule it replaces
+E5 (unseen losses 4.7% against E5's 2.9%). It keeps half to two thirds of U58's money. Built: `V38Settings.DayStopLateFrom`
+/ `DayStopLate` in `MnqNoiseV38.cs` (the model's G310 rule), "Funded green days" = 11:00 and $1;
+`test_v38_opt_in_modes` (trade for trade with `day_stop_late_from` 660, `day_stop_late` 1); the NinjaTrader and release
+tests pass. `verification/noise_v2/g481_late_green_stop.txt`.
