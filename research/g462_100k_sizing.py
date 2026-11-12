@@ -3,7 +3,7 @@ $1,500 until the floor stops): as it is (1 MNQ, +1 per $1,500), starting at 2 or
 and +1 per $1,000. G463 (G463=1): the early day budget at $1,000 or $2,000. G464 (G464=1): gap cap 15 / 20.
 G465 (G465=1): +1 per $2,000, or at most half the room a trade. G467 (G467=1): 2 gap contracts early.
 G468 (G468=1): steps $1,750 / $2,500. G469 (G469=1): brake 0.35 / 0.55.
-G471 (G471=1): brake 0.25 / off.
+G471 (G471=1): brake 0.25 / off. G472 (G472=1): cap 90 / 120.
 
   funded: G397's measure (months 1-36; development = index starts 2011-2016, unseen = index 2017-2023 + NQ 2015-2022).
   test:   G461's no-deadline Test (+$6,000 over $3,000, an assumed target), 116 starts.
@@ -30,6 +30,10 @@ K100 = {"trail_dd": 3000.0, "daily_loss_limit": 1800.0, "early_daily_loss": 1500
 SIZING = {"100K U58": {}, "start 2 MNQ": {"qty": 2, "max_loss_per_trade": 375.0},
           "start 3 MNQ": {"qty": 3, "max_loss_per_trade": 562.5}, "+1 per $1,000": {"profit_step": 1000.0},
           "start 2 MNQ, +1 per $1,000": {"qty": 2, "max_loss_per_trade": 375.0, "profit_step": 1000.0}}
+if os.environ.get("G472"):  # G472: the 100K funded mode's contract cap (U58 60, the 50K firm's)
+    F100 = {"profit_step": 2000.0, "giveback_brake": 0.35}
+    SIZING = {"100K funded (cap 60)": F100, "cap 90": {**F100, "size_up_to": 90},
+              "cap 120": {**F100, "size_up_to": 120}}
 if os.environ.get("G471"):  # G471: the 100K funded mode's brake below G469's 0.35
     SIZING = {"100K funded (brake 0.35)": {"profit_step": 2000.0, "giveback_brake": 0.35},
               "brake 0.25": {"profit_step": 2000.0, "giveback_brake": 0.25},

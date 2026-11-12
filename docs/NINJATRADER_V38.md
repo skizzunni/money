@@ -9380,3 +9380,11 @@ sets and no more starts lost on any). Run once.
 worst month −$2,086): $35.3 (+1%, −$2,123), $36.2 (+4%, −$2,066). No start lost by any. The brake costs a little on the
 100K at every level, but the fresh-start gain of having none (+4%) is short of the 5% the rule asks on all three sets.
 `verification/noise_v2/g471_100k_brake_low.txt`.
+
+## G472: the 100K funded mode's contract cap (registered 2026-11-12, before its run)
+
+U58 caps a trade at `size_up_to` 60 MNQ (G247: the 50K firm's). The 100K funded mode ($2,000 steps, brake 0.35) grows to
+$250-350 a session in year three, where the cap may bind; a 100K account usually allows more contracts (to be checked
+against the user's firm). `research/g462_100k_sizing.py` with `G472=1` (G397's starts) and
+`research/g472_100k_cap_fresh.py` (G415's fresh starts): the cap at 60, 90 and 120. G468's rule (a cap replaces 60 only
+with at least 5% more $ a session on all three start sets and no more starts lost on any). Run once.
