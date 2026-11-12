@@ -9560,3 +9560,15 @@ journal NinjaTrader writes), replacing U48's of 2026-11-03; the page's fixed tex
 45-minute time stop, tested win rate 50.2%, profit factor 1.91). The page's own check passed. The hourly round now
 refreshes it whenever the file the user runs changes, and attaches the user's live or daily journal once they send it.
 The full suite (before the daily log change): 706 passed; the NinjaTrader and release tests after it: 59 passed.
+
+## G479: the gap slot, the source of the red days (registered 2026-11-12, before its run)
+
+The user: "if that much red exists, something is wrong with the strategy, find out what it is and fix it". On the
+current bot's journal (U58, brake 0.25, 2025-26 window, 783 trades; looked at before this registration): **170 of the
+201 red days start with a 09:40 entry and 106 have only 09:40 entries.** Those entries (the gap trade and its
+small-gap and opening-drive fill-ins) reach the 09:55 exit 117 times (80% winners, +$42,855) and are stopped 154
+times (all losers, −$33,711): +$9,144 in all against +$66,342 for the rest. `research/g479_gap_slot.py`: U58 against
+V1 no small-gap fill-in (`gap_go_small_k` −1; U58 0, any gap), V2 no opening-drive fill-in (`gap_go_drive_k` 0; U58
+0.6), V3 the gap trigger at 0.8 noise (U58 0.65), V4 = V1 + V2. **Rule:** the balanced rule (G473) adopts one into
+Funded growth; green days (G415's fresh starts) are reported, and a variant that adds at least 5 points of green days
+at no more than 10% of U58's $ on each set and no more starts lost is offered as an opt-in. Run once.
