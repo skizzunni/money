@@ -9972,3 +9972,7 @@ simulator on the 2025-26 window (more than 50.5% green, fewer than 107 red, net 
 A nearer gap stop is hit more often, so more days start red (as expected, the opposite of the aim). S2 makes much more
 on unseen (+29%) and a little more on development, but less on the fresh starts; not this rule's aim, noted for a
 Funded growth test. Nothing changes; no simulator run. `verification/noise_v2/g494_gap_stop_nearer.txt`.
+
+**Go-live (2026-11-13): the user starts the bot.** The strategy file is unchanged since the final check (709 tests
+passed; sha256 of `ninjatrader/Strategies/MnqNoiseV38.cs` begins `ac3165b930f992fd`). The hourly rounds go on, and the
+file changes only when a test passes its registered rule; the user is told before any change.
