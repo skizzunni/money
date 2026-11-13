@@ -10500,3 +10500,12 @@ exits (−$17 / −$19.50) and one full stop (−94.25 points, −$188.50). **+$
 estimated $1.24 a round trip), a green day.** Stop-order fills: 0-5 ticks past the stop price, 1.4 ticks on average
 (the tests assume 1; G509: 2 ticks would cost 15-25%); worth watching over the coming weeks. The MNQ Bot Dashboard's
 journal now shows this live day (one account; the other matched within $0.50).
+
+## G517: a bigger lock cushion (registered 2026-11-13, before its run)
+
+From the first live day: 6 of 10 trades ended at the lock (the stop at the entry + 2.5 points, +$3.76 net each).
+A bigger cushion banks more on those, but a trade that only just reaches the lock trigger may come back through it.
+`research/g517_growth_lock_plus.py`: Funded growth (G511) against K1 the lock at the entry + 5 points, K2 + 10 points
+(`lock_plus`; G220's search varied it on U44 only). **Rule:** as G512's (on each set the share at +$25,000 in 12 months
+and the median at least the current mode's, no more starts lost; the highest unseen share; then the simulator's fresh
+2026-01-02 start at least +$11,073). Run once.
