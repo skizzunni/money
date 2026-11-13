@@ -10165,3 +10165,13 @@ first year on 50-63% of starts.**
 Plus is the best on every set for the pair: about half the recent and development starts, and 5 in 8 unseen, reach
 +$25,000 combined within 12 months (U58: 3 in 8 to 6 in 10). A lost start loses both accounts (the same trades).
 Recommended to the user: Funded growth plus on both accounts. `verification/noise_v2/g502_two_accounts.txt`.
+
+## G503: bigger trades with the trend (registered 2026-11-13, before its run)
+
+Hourly round toward +$25,000 (G495's measure). U58 already keeps shorts out while the price is above its 45-session
+average (`trend_n` 45); a trade on the trend's side never takes more size. `trend_with_mult` (in mnqbot/noise.py, never
+run in a recorded test): a trade with the trend takes that many times the contracts, the same stop in points, still cut
+to the day's budget and the room above the floor. `research/g503_trend_with_size.py`: Funded growth plus against W1
+1.5x, W2 2x. **Rule:** as G496's (on each set the share at +$25,000 in 12 months and the median at least plus's, no more
+starts lost; the highest unseen share); then built (not in the C# file) and NinjaTrader's simulator on a fresh
+2026-01-02 start at least plus's +$8,698. Run once.
