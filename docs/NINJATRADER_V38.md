@@ -10320,3 +10320,18 @@ With a tick worse on every fill, plus's lead over U58 shrinks to the unseen set 
 U58 holds up better on development. Fill quality matters as much as the mode: the user's live fills (the daily log's
 slippage column, `F(inSlip)` / `F(outSlip)`) should be checked against 1 tick after the first weeks.
 `verification/noise_v2/g509_worse_fills.txt`.
+
+## Where the $25,000 search stands (2026-11-13, after G495-G509)
+
+**What works, measured:** (1) a single 50K reaches +$25,000 within 24 months on 81-93% of the development / unseen
+starts, typically in month 12-15; Funded growth (U58) gets there on the most starts with the fewest lost (G508). (2) The
+user's two accounts on Funded growth plus reach +$25,000 together within 12 months on 50-63% of starts (G502), the best
+pair (G505). (3) Fills matter as much as the mode: a tick worse on every fill costs 15-25% and most of plus's edge
+(G509), so the live fills decide between plus and Funded growth.
+
+**What did not beat them** (each pre-registered, run once): bigger day budgets and faster steps (G496), the gap stop
+halfway and calm 0.8 (G497), sprint starts (G498-G500, G504: more starts at $25K on recent data, more accounts lost),
+faster steps once the floor stops (G501), bigger trades with the trend (G503), sooner and bigger fill-ins (G506-G507:
+more starts at $25K, lower medians). Before these, G445-G494 covered exits, locks, filters, the gap trade, the loser
+limit and timing. Untested levers with this strategy are now few; further gains are more likely from the live fills
+(G509) and from more accounts than from new settings.
