@@ -10306,3 +10306,17 @@ lost. (The recent fresh starts, 2023-25, mostly lack 24 months of data and are n
 Before the user leans on G502 / G508 (plus or Funded growth on both accounts), a robustness check: live fills can be
 worse than the 1 tick of slippage every test assumes. `research/g509_worse_fills.py`: G495's measure for U58 and Funded
 growth plus, each at 1 and 2 ticks of slippage on every market fill. A measurement; no setting changes. Run once.
+
+**G509 result (2026-11-13), a measurement: a tick worse on every fill costs 15-25% of the money; plus is hit harder.**
+
+| first 12 months | fresh: reach $25K / median / lost / $ a session | development | unseen |
+|---|---|---|---|
+| U58, 1 tick | 12.5% / $7,306 / 0% / $50.4 | 16.1% / $10,150 / 0% / $49.9 | 39.1% / $16,099 / 1.6% / $84.9 |
+| U58, 2 ticks | 6.2% / $7,278 / 0% / $42.9 | 12.9% / $9,118 / 6.5% / $44.5 | 37.5% / $14,199 / 3.1% / $74.4 |
+| plus, 1 tick | 18.8% / $14,067 / 0% / $57.6 | 25.8% / $13,880 / 3.2% / $55.7 | 48.4% / $23,279 / 3.1% / $98.5 |
+| plus, 2 ticks | 18.8% / $9,216 / 6.2% / $47.1 | 9.7% / $6,247 / 3.2% / $42.3 | 42.2% / $16,303 / 6.2% / $80.1 |
+
+With a tick worse on every fill, plus's lead over U58 shrinks to the unseen set (and plus loses more accounts);
+U58 holds up better on development. Fill quality matters as much as the mode: the user's live fills (the daily log's
+slippage column, `F(inSlip)` / `F(outSlip)`) should be checked against 1 tick after the first weeks.
+`verification/noise_v2/g509_worse_fills.txt`.

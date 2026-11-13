@@ -1,0 +1,23 @@
+fresh starts used: 16
+                        starts  reach_25k  median_12m   p25_12m  best_12m   lost  per_session
+tag                                                                                          
+Funded growth plus          16      0.188   14066.678  4797.775  31352.58  0.000       57.639
+plus, 2 ticks slippage      16      0.188    9216.300  4133.525  30218.04  0.062       47.105
+U58 (Funded growth)         16      0.125    7305.637  5044.866  33082.68  0.000       50.415
+U58, 2 ticks slippage       16      0.062    7278.233  6297.360  31588.38  0.000       42.873
+development (index 2011-18 starts):
+                        starts  reach_25k  median_12m  p25_12m  best_12m   lost  per_session
+tag                                                                                         
+Funded growth plus          31      0.258    13880.44  4158.70  39828.72  0.032       55.692
+U58 (Funded growth)         31      0.161    10150.42  3303.57  44279.76  0.000       49.940
+U58, 2 ticks slippage       31      0.129     9118.38  2414.83  36718.66  0.065       44.482
+plus, 2 ticks slippage      31      0.097     6246.56  2341.21  36629.64  0.032       42.300
+unseen (index 2019-25 + NQ 2015-24):
+                        starts  reach_25k  median_12m   p25_12m  best_12m   lost  per_session
+tag                                                                                          
+Funded growth plus          64      0.484    23279.04  7984.065  61327.60  0.031       98.490
+plus, 2 ticks slippage      64      0.422    16302.55  3712.500  55644.36  0.062       80.055
+U58 (Funded growth)         64      0.391    16098.50  5175.595  59179.50  0.016       84.873
+U58, 2 ticks slippage       64      0.375    14198.79  5027.325  56286.14  0.031       74.416
+
+[exited with code 0]
