@@ -1,0 +1,20 @@
+fresh starts used: 16
+                   starts  pair_reach_25k  pair_median   pair_p25  one_lost  both_lost
+plus + plus          16.0           0.500    28133.355   9595.550     0.000        0.0
+plus + H1            16.0           0.500    26019.398  11073.156     0.000        0.0
+plus + L3            16.0           0.625    30396.701  19644.734     0.062        0.0
+plus + aggressive    16.0           0.500    28126.188  12842.310     0.125        0.0
+development (index 2011-18 starts):
+                   starts  pair_reach_25k  pair_median  pair_p25  one_lost  both_lost
+plus + plus          31.0           0.516     27760.88   8317.40     0.032      0.032
+plus + H1            31.0           0.419     20262.94   8000.12     0.129      0.032
+plus + L3            31.0           0.419     20511.08   7796.73     0.129      0.032
+plus + aggressive    31.0           0.516     26067.72   7400.88     0.065      0.032
+unseen (index 2019-25 + NQ 2015-24):
+                   starts  pair_reach_25k  pair_median   pair_p25  one_lost  both_lost
+plus + plus          64.0           0.625     46558.08  15968.130     0.031      0.031
+plus + H1            64.0           0.641     50828.69  14638.370     0.078      0.016
+plus + L3            64.0           0.625     42463.08  16650.970     0.062      0.016
+plus + aggressive    64.0           0.641     49878.04  15002.225     0.094      0.031
+
+[exited with code 0]

@@ -10216,3 +10216,17 @@ risk (a lost bold account leaves the plus account trading). `research/g505_mixed
 accounts' 12-month nets (each up to its own loss): plus + plus (G502), plus + H1 (G504), plus + L3 (G499), plus + Funded
 aggressive. Reported: the share of starts with the pair at +$25,000, the pair's median and lower quartile, the share
 with one account lost and with both lost. A measurement: no setting changes (H1 / L3 are not in the C# file). Run once.
+
+**G505 result (2026-11-13), a measurement: plus on both accounts stays the best pair.**
+
+| two accounts, first 12 months | fresh: pair at $25K / pair median / one lost | development | unseen |
+|---|---|---|---|
+| **plus + plus** | **50.0% / $28,133 / 0%** | **51.6% / $27,761 / 3.2%** | 62.5% / $46,558 / 3.1% |
+| plus + H1 | 50.0% / $26,019 / 0% | 41.9% / $20,263 / 12.9% | 64.1% / $50,829 / 7.8% |
+| plus + L3 | 62.5% / $30,397 / 6.2% | 41.9% / $20,511 / 12.9% | 62.5% / $42,463 / 6.2% |
+| plus + Funded aggressive | 50.0% / $28,126 / 12.5% | 51.6% / $26,068 / 6.5% | 64.1% / $49,878 / 9.4% |
+
+Mixing in a bolder account adds at most a point or two on one set and loses more accounts; plus + L3 is better on the
+recent starts (62.5%) but worse on development. Plus on both accounts: about half the recent and development starts and
+5 in 8 unseen at +$25,000 together in a year, median about $28,000 (recent, development) to $46,600 (unseen).
+`verification/noise_v2/g505_mixed_pair.txt`.
