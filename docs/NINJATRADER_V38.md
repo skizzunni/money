@@ -10264,3 +10264,17 @@ $6,500, E3 $3,500 / $8,000. **Rule:** as G496's (on each set the share at +$25,0
 plus's, no more starts lost; the highest unseen share); F2 itself was already measured and is reported only. Then
 NinjaTrader's simulator on a fresh 2026-01-02 start at least plus's +$8,698 (the fill-in steps are settings in the C#
 file). Run once.
+
+**G507 result (2026-11-13): rejected, all; the fill-in gain is real but small, and costs the median.**
+
+| first 12 months | fresh: reach $25K / median / lost | development | unseen |
+|---|---|---|---|
+| **Funded growth plus** | 18.8% / **$14,067** / 0% | 25.8% / **$13,880** / 3.2% | 48.4% / $23,279 / 3.1% |
+| F2 $3,500 / $6,000 | 31.2% / $12,749 / 0% | 32.3% / $10,528 / 6.5% | 51.6% / $25,977 / 3.1% |
+| E1 $3,000 / $5,000 | 31.2% / $11,166 / 0% | 25.8% / $10,393 / 3.2% | 48.4% / $22,161 / 3.1% |
+| E2 $4,000 / $6,500 | 18.8% / $12,734 / 0% | 29.0% / $10,708 / 3.2% | 48.4% / $23,925 / 3.1% |
+| E3 $3,500 / $8,000 | 25.0% / $13,148 / 0% | 25.8% / $11,005 / 6.5% | 50.0% / $24,550 / 3.1% |
+
+Every neighbour reaches $25K at least as often as plus with no more starts lost on fresh and unseen, so the direction
+holds; but every one has a lower median on the fresh and development starts (bigger fill-ins help the good years and
+hurt the middle ones), so none passes. Plus stays. `verification/noise_v2/g507_fill_ins_neighbours.txt`.
