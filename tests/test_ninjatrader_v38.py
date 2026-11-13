@@ -58,8 +58,12 @@ GROW = NoiseConfig(**{**V21, "qty": 1, "lookback": 14, "max_loss_per_trade": 187
                       # G165 / G167 / G168: the after-loss max loss as every trade's ($187.50) on 5-minute bars
                       "after_loss_ml_mult5": 1.0,
                       # G422 (U58): every check, no range filter, no loser limit, entry lines at 0.8 on a calm stretch
-                      "max_losers": 0, "range_pos_min": 0.0, "skip_checks": "", "entry_k_regime": 0.8},  # noqa: F601
+                      "max_losers": 0, "range_pos_min": 0.0, "skip_checks": "", "entry_k_regime": 0.8,  # noqa: F601
+                      # G511: Funded growth's fill-ins at 2 MNQ from $4,000 above the floor, 3 from $6,500
+                      "fill_qty2_room": 4000.0, "fill_qty3_room": 6500.0},  # noqa: F601
                    nt_execution=True, round_prices=True, target_on_fill_bar=True)
+# the other modes (and Custom, and the 30-minute chart) keep G241's fill-in steps
+PRE_G511 = {"fill_qty2_room": 5000.0, "fill_qty3_room": 8000.0}
 # the bigger accounts' modes keep the settings from before G204
 PRE_G204 = {"max_losers": 0, "early_daily_loss": 0.0, "range_pos_min": 0.65, "gap_go_k": 0.5, "time_stop": 60,
     "trend_n": 50,
@@ -68,7 +72,7 @@ PRE_G204_ARGS = ["MaxLosersPerDay=0", "EarlyDayBudget=0", "RangePos=0.65", "GapT
     "TrendSessions=50", "GapBreakEven=0"]
 # the bigger accounts' modes also keep G125's skipped checks and no calm entry width (U58 is the 50K's)
 # G473: U58's 0.25 brake is the 50K's 5-minute chart; the bigger accounts keep 0.45
-BIG = {**PRE_G204, "skip_checks": "780,870", "entry_k_regime": 0.0, "giveback_brake": 0.45}
+BIG = {**PRE_G204, "skip_checks": "780,870", "entry_k_regime": 0.0, "giveback_brake": 0.45, **PRE_G511}
 GROW_ARGS = ["Mode=Funded growth"]
 
 
@@ -79,7 +83,7 @@ def grow_cfg(minutes: int) -> NoiseConfig:
         return GROW
     # the default; its settings are the tested ones above
     return dataclasses.replace(GROW, max_losers=3, range_pos_min=0.7, skip_checks="780,870", entry_k_regime=0.0,
-                               giveback_brake=0.45)
+                               giveback_brake=0.45, **PRE_G511)
 # G72's fill-in trades off (NinjaTrader's More trading days needs gap and go on)
 NO_FILL = {"gap_go_small_k": -1.0, "trend_small": False, "gap_go_drive_k": 0.0, "fill_after_lock": False,
            "fill_min_room": 0.0}
@@ -764,7 +768,7 @@ def test_v38_opt_in_modes(sim, sample_1m, mode, extra, tmp_path):  # noqa: F811
                        text=True, env=ENV)
     assert r.returncode == 0, r.stderr[-2000:]
     nt = [x.split(",")[1:] for x in r.stdout.splitlines() if x.startswith("T,")]
-    py = run(bars, dataclasses.replace(GROW, **extra), minutes=5).trades
+    py = run(bars, dataclasses.replace(GROW, **PRE_G511, **extra), minutes=5).trades
     assert len(nt) == len(py) >= 20
     for a, t in zip(nt, py, strict=True):
         assert (int(a[0]), int(a[1]), int(a[3])) == (t.direction, t.entry_bar, t.exit_bar), (a, t)

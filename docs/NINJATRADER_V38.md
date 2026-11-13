@@ -10367,3 +10367,21 @@ against U58 + F2 (fill-ins at 2 MNQ from $3,500 above the floor, 3 from $6,000) 
 a variant replaces U58's fill-in steps in Funded growth if on each set its share at +$25,000 in 12 months and its
 median are at least U58's and it loses no more starts; of both, the highest unseen share; then NinjaTrader's simulator
 on a fresh 2026-01-02 start at least U58's +$9,847 (the fill-in steps are settings in the C# file). Run once.
+
+**G511 result (2026-11-13): passes; Funded growth takes E2's fill-in steps ($4,000 / $6,500).**
+
+| first 12 months | fresh: reach $25K / median / lost | development | unseen |
+|---|---|---|---|
+| U58 (Funded growth, $5,000 / $8,000) | 12.5% / $7,306 / 0% | 16.1% / $10,150 / 0% | 39.1% / $16,099 / 1.6% |
+| U58 + F2 $3,500 / $6,000 | 18.8% / $7,764 / 0% | 19.4% / $9,704 / 0% | 39.1% / $16,234 / 1.6% |
+| **U58 + E2 $4,000 / $6,500** | **18.8% / $7,558 / 0%** | **19.4% / $10,587 / 0%** | **40.6% / $16,741 / 1.6%** |
+
+E2 meets every part of the rule: more starts at +$25,000 on all three sets, a higher median on all three, no more starts
+lost (F2 fails on the development median). **NinjaTrader's simulator, a fresh start 2026-01-02 to 2026-10-16:
++$11,073.43** against Funded growth's +$9,847.46 (+12.4%; 247 trades, worst day −$825 on both): passes. An extra check
+not in the rule, reported: on the 2025-26 window started 2025-01-02, +$73,378.78 against +$75,486.34 (−2.8%, worst day
+−$899 against −$922). **Built:** `MnqNoiseV38.cs` sets More trading days' 2-MNQ room to $4,000 and 3-MNQ room to $6,500
+in Funded growth on the 5-minute chart (not the Test sprint, the opt-in modes, the bigger accounts, Custom or the
+30-minute chart, which keep $5,000 / $8,000); the model's `GROW` carries them and the other modes' configs `PRE_G511`.
+The NinjaTrader and release tests, 60 passed; the simulator rebuilt (0 warnings, 0 errors) runs the new default.
+`verification/noise_v2/g511_growth_fill_ins.txt`.

@@ -1092,8 +1092,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 MoreDays = true;  // G79: on by default (with SizeSlip 2)
                 MoreDaysCushion = 2750;  // G241 (G71: 3000, G181: 2500)
                 SizeSlip = 4;  // G243 (G79: 2, G97: 3, G106: 4, G170: 5)
-                MoreDaysQty2Room = 5000;  // G241 (G97: 6000, G212: 4000)
-                MoreDaysQty3Room = 8000;  // G212 (G210: 9000)
+                MoreDaysQty2Room = 5000;  // G241 (G97: 6000, G212: 4000); Funded growth 4000 (G511)
+                MoreDaysQty3Room = 8000;  // G212 (G210: 9000); Funded growth 6500 (G511)
                 GivebackBrake = 0.45;  // G243 (G99c: 0.5)
                 GapSkipBraked = true;  // G191
                 MaxLosersPerDay = 0;  // G422 (U58): no limit (G204: 3; the Test sprint 3)
@@ -1194,6 +1194,12 @@ namespace NinjaTrader.NinjaScript.Strategies
                     {
                         GivebackBrake = 0; ProfitStep = 1000; EarlyDayBudget = 1000;
                     }
+                }
+                else if (!sprintMode && Mode == "Funded growth" && minutes == 5)
+                {
+                    // G511: Funded growth's fill-ins at 2 MNQ from $4,000 above the floor, 3 from $6,500 (G241: $5,000 /
+                    // $8,000): more starts at +$25,000 in a year on every set, medians and lost starts no worse
+                    MoreDaysQty2Room = 4000; MoreDaysQty3Room = 6500;
                 }
                 if (sprintMode)  // G256 k317 + G269 + G273 + G275 + G289 + G321: the Test in two weeks (16.0% passed, 6.9% failed on unseen weeks; docs)
                 {
