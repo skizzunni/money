@@ -9976,3 +9976,16 @@ Funded growth test. Nothing changes; no simulator run. `verification/noise_v2/g4
 **Go-live (2026-11-13): the user starts the bot.** The strategy file is unchanged since the final check (709 tests
 passed; sha256 of `ninjatrader/Strategies/MnqNoiseV38.cs` begins `ac3165b930f992fd`). The hourly rounds go on, and the
 file changes only when a test passes its registered rule; the user is told before any change.
+
+## G495: how often a fresh 50K reaches +$25,000 in a year, a measurement (registered 2026-11-13, before its run)
+
+The user ran NinjaTrader's Strategy Analyzer on 2026-01-01 to 11-11 and got +$5,581, and wants +$25,000. Two findings
+before this test: (1) their backtest had "Trailing drawdown and contract steps from date" at 2026-11-12, after its end,
+so it never added a contract (the simulator reproduces it: +$5,241 to 2026-10-16); (2) with that date at 2026-01-02 the
+same file makes +$9,847 on the simulator (Funded growth plus +$8,698, Funded aggressive +$9,698, Funded green days
++$2,729), and a 50K started 2025-01-02 made +$69,975 in 2026 alone (already sized up). The user's goal, stated as a
+measure: **the share of fresh 50K starts at +$25,000 net within their first 12 months.** `research/g495_reach_25k.py`
+on G415's fresh and G372's development / unseen starts: U58, P (+1 per $1,250), A1 (Funded aggressive), A1 + a $1,500
+day budget once the floor stops, A1 + a contract per $750, A1 + faster steps (+1 per $400 from $5,000). Reported: that
+share, the 12-month median and lower quartile, the best, and the share lost. A measurement: it picks what the next
+round builds and confirms; no setting changes here. Run once.
