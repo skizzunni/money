@@ -1,0 +1,20 @@
+fresh starts used: 16
+                      starts  reach_25k  median_12m   p25_12m  best_12m  lost  per_session
+tag                                                                                       
+P1 per $1,400             16      0.250    9326.960  5773.790  35583.86   0.0       55.644
+Funded growth (G511)      16      0.188    7557.660  4915.125  31897.74   0.0       53.114
+P2 per $1,350             16      0.188    9353.742  3670.575  31802.68   0.0       51.257
+development (index 2011-18 starts):
+                      starts  reach_25k  median_12m  p25_12m  best_12m   lost  per_session
+tag                                                                                       
+P2 per $1,350             31      0.258    11053.78  3256.51  44046.68  0.032       55.939
+P1 per $1,400             31      0.226    11116.68  3136.96  43930.88  0.032       55.260
+Funded growth (G511)      31      0.194    10586.92  3357.42  55670.46  0.000       53.526
+unseen (index 2019-25 + NQ 2015-24):
+                      starts  reach_25k  median_12m   p25_12m  best_12m   lost  per_session
+tag                                                                                        
+P1 per $1,400             64      0.438    20507.83  6710.690  60525.00  0.016       90.976
+P2 per $1,350             64      0.438    22002.93  6343.665  61927.62  0.016       91.633
+Funded growth (G511)      64      0.406    16740.83  5446.620  59912.56  0.016       87.590
+
+[exited with code 0]

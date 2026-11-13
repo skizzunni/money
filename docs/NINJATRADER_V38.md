@@ -10431,3 +10431,15 @@ share and median but lost one more development start. Between the two: `research
 (G511) against P1 a contract per $1,400, P2 per $1,350 (`profit_step`; ProfitStep in the C# file). **Rule:** as G512's
 (on each set the share at +$25,000 in 12 months and the median at least the current mode's, no more starts lost; the
 highest unseen share; then the simulator's fresh 2026-01-02 start at least +$11,073). Run once.
+
+**G514 result (2026-11-13): rejected by one development start; both reach $25K more often with higher medians.**
+
+| first 12 months | fresh: reach $25K / median / lost | development | unseen |
+|---|---|---|---|
+| Funded growth (G511, $1,500) | 18.8% / $7,558 / 0% | 19.4% / $10,587 / **0%** | 40.6% / $16,741 / 1.6% |
+| P1 per $1,400 | **25.0% / $9,327** / 0% | **22.6% / $11,117** / 3.2% | **43.8% / $20,508** / 1.6% |
+| P2 per $1,350 | 18.8% / $9,354 / 0% | 25.8% / $11,054 / 3.2% | 43.8% / $22,003 / 1.6% |
+
+Every step below $1,500 tried with G511's fill-ins ($1,400, $1,350, plus's $1,250) loses the same one development start
+(1 of 31) and is otherwise better on every set. As registered ("no more starts lost") both fail; Funded growth keeps
+$1,500. Reported to the user: P1 is a near-miss trade-off. `verification/noise_v2/g514_growth_step.txt`.
