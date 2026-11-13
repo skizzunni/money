@@ -10122,3 +10122,13 @@ C# file) and NinjaTrader's simulator on a fresh 2026-01-02 start at least plus's
 
 A stronger defence takes back most of the sprint's gain before it takes back its losses; none keeps plus's loss rate
 and median on all three sets. Nothing changes; no simulator run. `verification/noise_v2/g500_sprint_defence.txt`.
+
+## G501: careful steps until the floor stops, faster after (registered 2026-11-13, before its run)
+
+Hourly round toward +$25,000 (G495's measure). G496-G500: more size early loses accounts; once the trailing floor has
+stopped (+$2,000) the account has a cushion. `research/g501_locked_steps.py`: Funded growth plus ($1,250 a contract
+throughout) against a contract per `profit_step` until the floor stops, then per `profit_step_locked` (G104, tested on
+U28 only): N1 $1,500 then $1,000, N2 $1,500 then $750, N3 $1,250 then $750. **Rule:** as G496's (on each set the share
+at +$25,000 in 12 months and the median at least plus's, no more starts lost; the highest unseen share); then built
+(`profit_step_locked` is not in the C# file) and NinjaTrader's simulator on a fresh 2026-01-02 start at least plus's
++$8,698. Run once.
