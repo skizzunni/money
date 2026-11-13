@@ -10443,3 +10443,16 @@ highest unseen share; then the simulator's fresh 2026-01-02 start at least +$11,
 Every step below $1,500 tried with G511's fill-ins ($1,400, $1,350, plus's $1,250) loses the same one development start
 (1 of 31) and is otherwise better on every set. As registered ("no more starts lost") both fail; Funded growth keeps
 $1,500. Reported to the user: P1 is a near-miss trade-off. `verification/noise_v2/g514_growth_step.txt`.
+
+Note (2026-11-13): G514's report to the user suggested setting "Add a contract per $ of profit" to 1400 by hand; in
+Funded growth the strategy sets that value itself (1500), so a hand edit has no effect there. Corrected to the user.
+
+## G515: G514's $1,400 step with the gentle start (registered 2026-11-13, before its run)
+
+G514's P1 (a contract per $1,400) beat Funded growth on every set's share and median but lost one more development
+start. The gentle start (`steps_after_lock`, StepsAfterLock in the C# file: no contract steps until the trailing floor
+has stopped) guards exactly the early phase where a fresh account is lost (G222 found no help on U44, an older bot).
+`research/g515_step_1400_gentle.py`: Funded growth (G511) against P1 (reported again), Q1 P1 + the gentle start, Q2 the
+gentle start alone. **Rule:** as G512's (on each set the share at +$25,000 in 12 months and the median at least the
+current mode's, no more starts lost; the highest unseen share; then the simulator's fresh 2026-01-02 start at least
++$11,073). Run once.
