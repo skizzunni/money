@@ -1,0 +1,23 @@
+fresh starts used: 16
+                    starts  reach_25k  median_12m   p25_12m   best_12m   lost  per_session
+tag                                                                                       
+L3 limit 0.2 back       16      0.312   12365.955  5720.032  42083.842  0.000       61.124
+Funded growth plus      16      0.188   14066.678  4797.775  31352.580  0.000       57.639
+L2 limit 0.1 back       16      0.188    9242.977  1873.165  33811.330  0.188       44.476
+L1 limit 0.05 back      16      0.000    2532.139  1414.966  22646.767  0.062       19.132
+development (index 2011-18 starts):
+                    starts  reach_25k  median_12m   p25_12m   best_12m   lost  per_session
+tag                                                                                       
+Funded growth plus      31      0.258   13880.440  4158.700  39828.720  0.032       55.692
+L1 limit 0.05 back      31      0.032    1848.838   718.736  28203.823  0.065       15.254
+L2 limit 0.1 back       31      0.000    2244.372  1012.577  19370.767  0.032       14.804
+L3 limit 0.2 back       31      0.000    1225.557  -195.692  16769.680  0.194        9.330
+unseen (index 2019-25 + NQ 2015-24):
+                    starts  reach_25k  median_12m   p25_12m   best_12m   lost  per_session
+tag                                                                                       
+Funded growth plus      64      0.484   23279.040  7984.065  61327.600  0.031       98.490
+L3 limit 0.2 back       64      0.219    7738.392  1193.217  62290.201  0.078       48.510
+L2 limit 0.1 back       64      0.172    3750.414   455.399  69123.407  0.172       37.503
+L1 limit 0.05 back      64      0.094    3472.521  1221.446  43193.827  0.078       34.631
+
+[exited with code 0]

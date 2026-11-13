@@ -10346,3 +10346,15 @@ check's close back to the line (`limit_entry_frac`), working until the next chec
 share at +$25,000 in 12 months and the median at least plus's, no more starts lost; the highest unseen share); then
 built (limit entries are not in the C# file) with a parity test and NinjaTrader's simulator on a fresh 2026-01-02 start
 at least plus's +$8,698. Run once.
+
+**G510 result (2026-11-13): rejected, all three; much worse.**
+
+| first 12 months | fresh: reach $25K / median / lost | development | unseen |
+|---|---|---|---|
+| **Funded growth plus** | 18.8% / $14,067 / 0% | **25.8% / $13,880 / 3.2%** | **48.4% / $23,279 / 3.1%** |
+| L1 limit 0.05 back | 0% / $2,532 / 6.2% | 3.2% / $1,849 / 6.5% | 9.4% / $3,473 / 7.8% |
+| L2 limit 0.1 back | 18.8% / $9,243 / 18.8% | 0% / $2,244 / 3.2% | 17.2% / $3,750 / 17.2% |
+| L3 limit 0.2 back | 31.2% / $12,366 / 0% | 0% / $1,226 / 19.4% | 21.9% / $7,738 / 7.8% |
+
+Even a limit 5% of the way back misses the breakouts that pay (they run without looking back) and fills the ones that
+fail: market entries stay. Nothing changes. `verification/noise_v2/g510_small_limit_entry.txt`.
