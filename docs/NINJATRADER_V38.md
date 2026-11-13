@@ -10152,3 +10152,16 @@ The user runs two 50K accounts on the same signals, started together; their comb
 the pair reaches +$25,000 when one account reaches +$12,500. `research/g502_two_accounts.py`: G495's table with that
 goal (the column "reach_25k" there means one account at +$12,500) for U58, Funded growth plus and Funded aggressive.
 A measurement: it states the pair's odds; no setting changes. Run once.
+
+**G502 result (2026-11-13), a measurement: with two accounts, Funded growth plus reaches +$25,000 together within the
+first year on 50-63% of starts.**
+
+| two 50K accounts, first 12 months | fresh: pair at $25K / one account's median / lost | development | unseen |
+|---|---|---|---|
+| U58 (Funded growth, what the user runs) | 37.5% / $7,306 / 0% | 45.2% / $10,150 / 0% | 57.8% / $16,099 / 1.6% |
+| **Funded growth plus** | **50.0% / $14,067 / 0%** | **51.6% / $13,880 / 3.2%** | **62.5% / $23,279 / 3.1%** |
+| Funded aggressive | 37.5% / $11,023 / 12.5% | 48.4% / $12,187 / 6.5% | 60.9% / $24,745 / 9.4% |
+
+Plus is the best on every set for the pair: about half the recent and development starts, and 5 in 8 unseen, reach
++$25,000 combined within 12 months (U58: 3 in 8 to 6 in 10). A lost start loses both accounts (the same trades).
+Recommended to the user: Funded growth plus on both accounts. `verification/noise_v2/g502_two_accounts.txt`.

@@ -1,0 +1,20 @@
+fresh starts used: 16
+                     starts  reach_25k  median_12m   p25_12m   best_12m   lost  per_session
+tag                                                                                        
+Funded growth plus       16      0.500   14066.678  4797.775  31352.580  0.000       57.639
+Funded aggressive        16      0.375   11022.501  7670.310  39366.329  0.125       63.603
+U58 (Funded growth)      16      0.375    7305.637  5044.866  33082.680  0.000       50.415
+development (index 2011-18 starts):
+                     starts  reach_25k  median_12m  p25_12m  best_12m   lost  per_session
+tag                                                                                      
+Funded growth plus       31      0.516    13880.44  4158.70  39828.72  0.032       55.692
+Funded aggressive        31      0.484    12187.28  2711.12  37242.54  0.065       56.299
+U58 (Funded growth)      31      0.452    10150.42  3303.57  44279.76  0.000       49.940
+unseen (index 2019-25 + NQ 2015-24):
+                     starts  reach_25k  median_12m   p25_12m  best_12m   lost  per_session
+tag                                                                                       
+Funded growth plus       64      0.625    23279.04  7984.065  61327.60  0.031       98.490
+Funded aggressive        64      0.609    24745.38  7670.310  67839.24  0.094      100.674
+U58 (Funded growth)      64      0.578    16098.50  5175.595  59179.50  0.016       84.873
+
+[exited with code 0]
