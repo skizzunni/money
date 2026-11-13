@@ -10029,3 +10029,13 @@ loses no more starts; of several, the highest share on unseen. Then NinjaTrader'
 
 A bigger day budget or faster steps add bigger losing days as well as bigger winning ones; on the recent starts they
 reach $25K less often. Nothing changes; no simulator run. `verification/noise_v2/g496_plus_to_25k.txt`.
+
+## G497: Funded growth plus with the gap stop halfway and calm 0.8 (registered 2026-11-13, before its run)
+
+Hourly round toward the user's +$25,000 (G495's measure). Two changes made more money in the green-days rounds: the
+gap trade's stop halfway from the 09:30 open toward the 09:30 bar's close (G494 S2: +29% unseen inside Funded green
+days) and `calm_k` 0.8 (G485 D1, G492 C1). `research/g497_plus_gap_stop.py`: Funded growth plus against R1 the gap
+stop halfway (`gap_go_stop_frac` 0.5), R2 `calm_k` 0.8, R3 both. **Rule:** as G496's (on each set the share at
++$25,000 in 12 months and the median at least plus's, no more starts lost; the highest unseen share), then built (the
+gap stop fraction is new in the C# file) and NinjaTrader's simulator on a fresh 2026-01-02 start must make at least
+plus's +$8,698. Run once.
