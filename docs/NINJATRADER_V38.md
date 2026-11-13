@@ -10109,3 +10109,16 @@ the gap trade at 1 MNQ during the sprint (`sprint_gap_qty` 1; a gap trade's stop
 $1,800 of room, M3 both. **Rule:** as G496's against plus (on each set the share at +$25,000 in 12 months and the
 median at least plus's, no more starts lost; the highest unseen share); then built (the low-room defence is new in the
 C# file) and NinjaTrader's simulator on a fresh 2026-01-02 start at least plus's +$8,698. Run once.
+
+**G500 result (2026-11-13): rejected, all three.**
+
+| first 12 months | fresh: reach $25K / median / lost | development | unseen |
+|---|---|---|---|
+| Funded growth plus | 18.8% / $14,067 / 0% | 25.8% / $13,880 / 3.2% | 48.4% / $23,279 / 3.1% |
+| L3 (G499) | 50.0% / $22,679 / 6.2% | 32.3% / $10,217 / 12.9% | 48.4% / $19,945 / 4.7% |
+| M1 L3 + gap 1 MNQ in the sprint | 37.5% / $16,886 / 6.2% | 32.3% / $9,476 / 9.7% | 45.3% / $19,408 / 4.7% |
+| M2 L3, 1 MNQ under $1,800 | 43.8% / $13,663 / 0% | 29.0% / $9,370 / 9.7% | 48.4% / $19,716 / 6.2% |
+| M3 both | 25.0% / $7,073 / 6.2% | 25.8% / $10,200 / 3.2% | 42.2% / $16,858 / 4.7% |
+
+A stronger defence takes back most of the sprint's gain before it takes back its losses; none keeps plus's loss rate
+and median on all three sets. Nothing changes; no simulator run. `verification/noise_v2/g500_sprint_defence.txt`.

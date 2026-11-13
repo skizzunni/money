@@ -1,0 +1,26 @@
+fresh starts used: 16
+                                 starts  reach_25k  median_12m   p25_12m   best_12m   lost  per_session
+tag                                                                                                    
+L3 (G499)                            16      0.500   22678.883  8273.530  43094.840  0.062       80.459
+M2 L3, 1 MNQ under $1,800            16      0.438   13662.710  3266.245  53832.716  0.000       75.136
+M1 L3 + gap 1 MNQ in the sprint      16      0.375   16886.058  2642.085  53824.151  0.062       74.983
+M3 both                              16      0.250    7072.800  2864.865  53798.594  0.062       57.729
+Funded growth plus                   16      0.188   14066.678  4797.775  31352.580  0.000       57.639
+development (index 2011-18 starts):
+                                 starts  reach_25k  median_12m  p25_12m  best_12m   lost  per_session
+tag                                                                                                  
+L3 (G499)                            31      0.323    10216.70  2181.48  47023.60  0.129       60.518
+M1 L3 + gap 1 MNQ in the sprint      31      0.323     9475.58  2101.85  50231.02  0.097       61.461
+M2 L3, 1 MNQ under $1,800            31      0.290     9370.10  2642.22  43813.52  0.097       51.566
+Funded growth plus                   31      0.258    13880.44  4158.70  39828.72  0.032       55.692
+M3 both                              31      0.258    10200.40  2953.84  44912.54  0.032       55.108
+unseen (index 2019-25 + NQ 2015-24):
+                                 starts  reach_25k  median_12m   p25_12m  best_12m   lost  per_session
+tag                                                                                                   
+Funded growth plus                   64      0.484    23279.04  7984.065   61327.6  0.031       98.490
+L3 (G499)                            64      0.484    19944.82  6591.375   67501.8  0.047       99.583
+M2 L3, 1 MNQ under $1,800            64      0.484    19715.60  5713.330   67501.8  0.062       96.617
+M1 L3 + gap 1 MNQ in the sprint      64      0.453    19408.48  6472.665   67501.8  0.047       91.187
+M3 both                              64      0.422    16858.46  4921.670   67501.8  0.047       88.889
+
+[exited with code 0]
