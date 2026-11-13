@@ -1,0 +1,20 @@
+fresh starts used: 16
+                      starts  reach_25k  median_12m   p25_12m  best_12m  lost  per_session
+tag                                                                                       
+K1 lock + 5 points        16      0.312   12145.832  4774.642  38397.72   0.0       60.284
+Funded growth (G511)      16      0.188    7557.660  4915.125  31897.74   0.0       53.114
+K2 lock + 10 points       16      0.125   11980.327  7307.035  35198.70   0.0       51.827
+development (index 2011-18 starts):
+                      starts  reach_25k  median_12m  p25_12m  best_12m  lost  per_session
+tag                                                                                      
+K1 lock + 5 points        31      0.226    10042.86  3221.14  39308.72   0.0       53.921
+Funded growth (G511)      31      0.194    10586.92  3357.42  55670.46   0.0       53.526
+K2 lock + 10 points       31      0.129     8297.34  3433.06  34166.64   0.0       43.983
+unseen (index 2019-25 + NQ 2015-24):
+                      starts  reach_25k  median_12m   p25_12m  best_12m   lost  per_session
+tag                                                                                        
+Funded growth (G511)      64      0.406    16740.83  5446.620  59912.56  0.016       87.590
+K1 lock + 5 points        64      0.359    13466.72  2684.865  52519.68  0.031       72.887
+K2 lock + 10 points       64      0.250    13774.21  3797.750  61233.22  0.062       65.064
+
+[exited with code 0]

@@ -10509,3 +10509,14 @@ A bigger cushion banks more on those, but a trade that only just reaches the loc
 (`lock_plus`; G220's search varied it on U44 only). **Rule:** as G512's (on each set the share at +$25,000 in 12 months
 and the median at least the current mode's, no more starts lost; the highest unseen share; then the simulator's fresh
 2026-01-02 start at least +$11,073). Run once.
+
+**G517 result (2026-11-14): rejected, both; Funded growth keeps the lock at the entry + 2.5.**
+
+| first 12 months | fresh: reach $25K / median / lost | development | unseen |
+|---|---|---|---|
+| **Funded growth (G511, + 2.5)** | 18.8% / $7,558 / 0% | 19.4% / **$10,587** / 0% | **40.6% / $16,741 / 1.6%** |
+| K1 lock + 5 points | 31.2% / $12,146 / 0% | 22.6% / $10,043 / 0% | 35.9% / $13,467 / 3.1% |
+| K2 lock + 10 points | 12.5% / $11,980 / 0% | 12.9% / $8,297 / 0% | 25.0% / $13,774 / 6.2% |
+
+K1 helps on the recent starts but makes less on development and unseen and loses more unseen starts: more locked
+trades come back through a stop that sits further from the price. Nothing changes. `verification/noise_v2/g517_growth_lock_plus.txt`.
