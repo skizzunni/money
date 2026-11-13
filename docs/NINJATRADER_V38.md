@@ -10076,3 +10076,12 @@ The sprint trades the first weeks at 3-4 MNQ against a $2,000 floor: when they g
 sooner (more starts reach $25K on the fresh and development sets), when they go badly the account is gone (1 in 8 to
 1 in 10 lost, against plus's 0-3%). It makes less on unseen. Nothing changes; no simulator run. Reported to the user
 as a trade-off. `verification/noise_v2/g498_plus_sprint_start.txt`.
+
+## G499: a sprint start with a defence (registered 2026-11-13, before its run)
+
+From G498: a sprint start reaches $25K more often on the recent and development starts but loses 1 in 8-10 accounts.
+Here the sprint is smaller, or drops to 1 MNQ while the room above the trailing floor is under $1,500 (G284's
+`sprint_low_room` / `sprint_low_qty`). `research/g499_plus_safe_sprint.py`: Funded growth plus against L1 2 MNQ for 20
+sessions, L2 3 MNQ for 20 with 1 MNQ under $1,500 of room, L3 4 MNQ for 10 with the same. **Rule:** as G496's (on each
+set the share at +$25,000 in 12 months and the median at least plus's, no more starts lost; the highest unseen share),
+then NinjaTrader's simulator on a fresh 2026-01-02 start at least plus's +$8,698. Run once.
