@@ -9989,3 +9989,21 @@ on G415's fresh and G372's development / unseen starts: U58, P (+1 per $1,250), 
 day budget once the floor stops, A1 + a contract per $750, A1 + faster steps (+1 per $400 from $5,000). Reported: that
 share, the 12-month median and lower quartile, the best, and the share lost. A measurement: it picks what the next
 round builds and confirms; no setting changes here. Run once.
+
+**G495 result (2026-11-13), a measurement: a fresh 50K reaches +$25,000 in a year on 13-52% of starts; Funded growth
+plus is the best balance.**
+
+| 50K, first 12 months | fresh (16): reach $25K / median / lost | development (31) | unseen (64) |
+|---|---|---|---|
+| U58 (Funded growth) | 12.5% / $7,306 / 0% | 16.1% / $10,150 / 0% | 39.1% / $16,099 / 1.6% |
+| **P +1 per $1,250 (Funded growth plus)** | **18.8% / $14,067 / 0%** | **25.8% / $13,880 / 3.2%** | **48.4% / $23,279 / 3.1%** |
+| A1 (Funded aggressive) | 25.0% / $11,023 / 12.5% | 22.6% / $12,187 / 6.5% | 48.4% / $24,745 / 9.4% |
+| A1 + $1,500 day once locked | 12.5% / $9,508 / 6.2% | 22.6% / $7,459 / 12.9% | 51.6% / $32,463 / 6.2% |
+| A1 + 1 per $750 | 37.5% / $12,416 / 12.5% | 22.6% / $4,864 / 19.4% | 46.9% / $21,134 / 17.2% |
+| A1 + 1 per $400 from $5,000 | 31.2% / $8,642 / 12.5% | 19.4% / $13,812 / 6.5% | 48.4% / $22,034 / 9.4% |
+
+Funded growth plus has the highest median on the fresh and development starts, about as often reaches $25K as the
+aggressive variants, and loses the fewest accounts after U58 (0-3.2%). The recent starts (fresh, 2023-25) are the
+hardest: a single account reaches $25K in a year on 1 in 5 of them. **Two accounts** trade the same signals, so their
+combined net is twice one's: with Funded growth plus on both, the median combined first year is about $28,000 (fresh
+and development) to $46,000 (unseen). `verification/noise_v2/g495_reach_25k.txt`.
