@@ -10469,3 +10469,13 @@ current mode's, no more starts lost; the highest unseen share; then the simulato
 Q1 loses no more starts and reaches $25K at least as often on every set, but its development median is $2,944 lower
 (the gentle start holds the size down through the first months). Funded growth unchanged.
 `verification/noise_v2/g515_step_1400_gentle.txt`.
+
+## G516: the smaller step only once the floor has stopped (registered 2026-11-13, before its run)
+
+G514: a contract per $1,400 beat Funded growth everywhere but lost one more development start; G515: holding all steps
+until the floor stops cost the development median. Here Funded growth (G511) keeps $1,500 until the trailing floor has
+stopped and then steps per R1 $1,400 or R2 $1,300 (`profit_step_locked`, G104; G501 tried $1,000 / $750 after $1,500,
+which lost many starts). `research/g516_step_after_floor.py`. **Rule:** as G512's (on each set the share at +$25,000 in
+12 months and the median at least the current mode's, no more starts lost; the highest unseen share); then built (the
+locked step is not in the C# file) with a parity test and the simulator's fresh 2026-01-02 start at least +$11,073.
+Run once.
