@@ -10085,3 +10085,18 @@ Here the sprint is smaller, or drops to 1 MNQ while the room above the trailing 
 sessions, L2 3 MNQ for 20 with 1 MNQ under $1,500 of room, L3 4 MNQ for 10 with the same. **Rule:** as G496's (on each
 set the share at +$25,000 in 12 months and the median at least plus's, no more starts lost; the highest unseen share),
 then NinjaTrader's simulator on a fresh 2026-01-02 start at least plus's +$8,698. Run once.
+
+**G499 result (2026-11-13): rejected by its rule (more accounts lost, lower medians on development / unseen); L3 is
+the best result yet on the recent starts.**
+
+| first 12 months | fresh: reach $25K / median / lost | development | unseen |
+|---|---|---|---|
+| **Funded growth plus** | 18.8% / $14,067 / 0% | 25.8% / $13,880 / 3.2% | 48.4% / $23,279 / 3.1% |
+| L1 2 MNQ x 20 | 37.5% / $14,445 / 6.2% | 25.8% / $10,577 / 12.9% | 46.9% / $20,200 / 4.7% |
+| L2 3 MNQ x 20, 1 under $1,500 | 37.5% / $14,443 / 0% | 29.0% / $10,216 / 9.7% | 46.9% / $19,243 / 6.2% |
+| **L3 4 MNQ x 10, 1 under $1,500** | **50.0% / $22,679 / 6.2%** | 32.3% / $10,217 / 12.9% | 48.4% / $19,945 / 4.7% |
+
+The defence cuts the losses on the recent and unseen starts (L3: 1 of 16 and 4.7%, against G498 K2's 12.5% and 10.9%)
+and L3 reaches $25K on half of the recent starts (plus: 1 in 5), but on development it still loses 1 in 8 and every
+variant's median is below plus's on development and unseen. Nothing changes; no simulator run. Reported to the user
+as the trade-off. `verification/noise_v2/g499_plus_safe_sprint.txt`.
