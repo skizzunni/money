@@ -10186,3 +10186,13 @@ starts lost; the highest unseen share); then built (not in the C# file) and Ninj
 
 The trend's side is not a safer side for size: the bigger trades lose 1 account in 5 or worse. Nothing changes.
 `verification/noise_v2/g503_trend_with_size.txt`.
+
+## G504: a sprint that sizes up only once ahead (registered 2026-11-13, before its run)
+
+From G498-G500: a sprint start reaches $25K more often but its early losses at 3-4 MNQ lose accounts. Here the sprint
+starts small and sizes up only once the account is ahead (G282's push, from the first session): the first 20 sessions
+(until +$3,000) at `sprint_qty`, at `sprint_push_qty` while the profit since the start is at least `sprint_push_min`,
+and 1 MNQ while under $1,500 above the floor. `research/g504_house_money_sprint.py`: Funded growth plus against H1 2 MNQ,
+4 once +$500; H2 1 MNQ, 3 once +$500; H3 2 MNQ, 4 once +$1,000. **Rule:** as G496's (on each set the share at +$25,000
+in 12 months and the median at least plus's, no more starts lost; the highest unseen share); then built and
+NinjaTrader's simulator on a fresh 2026-01-02 start at least plus's +$8,698. Run once.
