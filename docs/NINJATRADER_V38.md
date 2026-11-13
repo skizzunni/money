@@ -10385,3 +10385,12 @@ in Funded growth on the 5-minute chart (not the Test sprint, the opt-in modes, t
 30-minute chart, which keep $5,000 / $8,000); the model's `GROW` carries them and the other modes' configs `PRE_G511`.
 The NinjaTrader and release tests, 60 passed; the simulator rebuilt (0 warnings, 0 errors) runs the new default.
 `verification/noise_v2/g511_growth_fill_ins.txt`.
+
+## G512: Funded growth's fast steps sooner or smaller (registered 2026-11-13, before its run)
+
+Hourly round toward +$25,000, now on Funded growth with G511's fill-in steps. Above $9,000 of profit it adds a contract
+per $650 (G243, set on the old measures). `research/g512_growth_fast_steps.py`: S1 per $650 above $7,000, S2 per $500
+above $9,000 (`profit_step_fast_from` / `profit_step_fast`; both settings in the C# file). **Rule:** a variant replaces
+Funded growth's setting if on each set its share at +$25,000 in 12 months and its median are at least the current
+mode's and it loses no more starts; of both, the highest unseen share; then NinjaTrader's simulator on a fresh
+2026-01-02 start at least the current +$11,073. Run once.
