@@ -10335,3 +10335,14 @@ faster steps once the floor stops (G501), bigger trades with the trend (G503), s
 more starts at $25K, lower medians). Before these, G445-G494 covered exits, locks, filters, the gap trade, the loser
 limit and timing. Untested levers with this strategy are now few; further gains are more likely from the live fills
 (G509) and from more accounts than from new settings.
+
+## G510: entries as a small limit instead of at the market (registered 2026-11-13, before its run)
+
+From G509: a tick of slippage on every fill costs 15-25%. The bot enters at the market after each check; a limit a
+little back toward the line pays no entry slippage and fills on most breakouts' first wobble, but misses the ones
+that never look back. Earlier tests used a limit halfway back (0.5; missed the best breakouts). `research/
+g510_small_limit_entry.py`: Funded growth plus against L1 / L2 / L3 a limit 0.05 / 0.1 / 0.2 of the way from the
+check's close back to the line (`limit_entry_frac`), working until the next check. **Rule:** as G496's (on each set the
+share at +$25,000 in 12 months and the median at least plus's, no more starts lost; the highest unseen share); then
+built (limit entries are not in the C# file) with a parity test and NinjaTrader's simulator on a fresh 2026-01-02 start
+at least plus's +$8,698. Run once.
