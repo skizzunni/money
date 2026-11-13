@@ -10278,3 +10278,11 @@ file). Run once.
 Every neighbour reaches $25K at least as often as plus with no more starts lost on fresh and unseen, so the direction
 holds; but every one has a lower median on the fresh and development starts (bigger fill-ins help the good years and
 hurt the middle ones), so none passes. Plus stays. `verification/noise_v2/g507_fill_ins_neighbours.txt`.
+
+## G508: how long to +$25,000, a measurement (registered 2026-11-13, before its run)
+
+G495-G507 measured the first 12 months. The user's goal has no deadline stated, so: how long does a fresh 50K take to
+reach +$25,000? `research/g508_time_to_25k.py` on G372's development / unseen starts that have 24 months of data: per
+start the first month whose cumulative net is at +$25,000; the share there by 12, 18 and 24 months, the median month
+among those that get there, and the share lost within 24 months. U58, Funded growth plus, Funded aggressive. A
+measurement; no setting changes. Run once.
