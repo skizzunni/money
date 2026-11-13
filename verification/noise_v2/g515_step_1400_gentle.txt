@@ -1,0 +1,23 @@
+fresh starts used: 16
+                       starts  reach_25k  median_12m   p25_12m  best_12m  lost  per_session
+tag                                                                                        
+P1 per $1,400 (G514)       16      0.250     9326.96  5773.790  35583.86   0.0       55.644
+Funded growth (G511)       16      0.188     7557.66  4915.125  31897.74   0.0       53.114
+Q1 P1 + gentle start       16      0.188     8898.29  5664.310  33825.22   0.0       50.920
+Q2 gentle start alone      16      0.125     8097.74  2972.965  33915.48   0.0       47.146
+development (index 2011-18 starts):
+                       starts  reach_25k  median_12m  p25_12m  best_12m   lost  per_session
+tag                                                                                        
+Q2 gentle start alone      31      0.258     7995.38  2335.90  55640.02  0.032       52.993
+Q1 P1 + gentle start       31      0.258     7642.66  3005.72  43922.68  0.000       51.848
+P1 per $1,400 (G514)       31      0.226    11116.68  3136.96  43930.88  0.032       55.260
+Funded growth (G511)       31      0.194    10586.92  3357.42  55670.46  0.000       53.526
+unseen (index 2019-25 + NQ 2015-24):
+                       starts  reach_25k  median_12m   p25_12m  best_12m   lost  per_session
+tag                                                                                         
+P1 per $1,400 (G514)       64      0.438    20507.83  6710.690  60525.00  0.016       90.976
+Q1 P1 + gentle start       64      0.422    20281.33  6557.260  60525.00  0.016       91.776
+Funded growth (G511)       64      0.406    16740.83  5446.620  59912.56  0.016       87.590
+Q2 gentle start alone      64      0.391    18477.37  6077.565  58779.88  0.016       83.959
+
+[exited with code 0]

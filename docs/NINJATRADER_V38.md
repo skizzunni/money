@@ -10456,3 +10456,16 @@ has stopped) guards exactly the early phase where a fresh account is lost (G222 
 gentle start alone. **Rule:** as G512's (on each set the share at +$25,000 in 12 months and the median at least the
 current mode's, no more starts lost; the highest unseen share; then the simulator's fresh 2026-01-02 start at least
 +$11,073). Run once.
+
+**G515 result (2026-11-13): rejected; the gentle start removes P1's lost start but cuts the development median.**
+
+| first 12 months | fresh: reach $25K / median / lost | development | unseen |
+|---|---|---|---|
+| **Funded growth (G511)** | 18.8% / $7,558 / 0% | 19.4% / **$10,587** / 0% | 40.6% / $16,741 / 1.6% |
+| P1 per $1,400 (G514) | 25.0% / $9,327 / 0% | 22.6% / $11,117 / 3.2% | 43.8% / $20,508 / 1.6% |
+| Q1 P1 + gentle start | 18.8% / $8,898 / 0% | 25.8% / $7,643 / 0% | 42.2% / $20,281 / 1.6% |
+| Q2 gentle start alone | 12.5% / $8,098 / 0% | 25.8% / $7,995 / 3.2% | 39.1% / $18,477 / 1.6% |
+
+Q1 loses no more starts and reaches $25K at least as often on every set, but its development median is $2,944 lower
+(the gentle start holds the size down through the first months). Funded growth unchanged.
+`verification/noise_v2/g515_step_1400_gentle.txt`.
