@@ -10007,3 +10007,12 @@ aggressive variants, and loses the fewest accounts after U58 (0-3.2%). The recen
 hardest: a single account reaches $25K in a year on 1 in 5 of them. **Two accounts** trade the same signals, so their
 combined net is twice one's: with Funded growth plus on both, the median combined first year is about $28,000 (fresh
 and development) to $46,000 (unseen). `verification/noise_v2/g495_reach_25k.txt`.
+
+## G496: Funded growth plus toward +$25,000 a year (registered 2026-11-13, before its run)
+
+From G495. `research/g496_plus_to_25k.py`: Funded growth plus (U58, brake 0.25, +1 MNQ per $1,250) against Q1 + a
+$1,500 day budget once the floor stops (now $900), Q2 + $1,250, Q3 + faster steps (+1 per $400 from $5,000; now $650
+from $9,000), Q4 no giveback brake. G495's measure. **Rule:** a variant replaces Funded growth plus's settings if, on
+each of the three sets, its share of starts at +$25,000 in 12 months and its 12-month median are at least plus's and it
+loses no more starts; of several, the highest share on unseen. Then NinjaTrader's simulator, a fresh start on
+2026-01-02 (to 2026-10-16), must make at least plus's +$8,698. Run once.
