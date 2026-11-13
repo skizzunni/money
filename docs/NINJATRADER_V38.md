@@ -10145,3 +10145,10 @@ at +$25,000 in 12 months and the median at least plus's, no more starts lost; th
 Once the floor stops, the cushion is only the profit above it: faster steps put bigger sizes on that cushion, and a
 losing stretch at those sizes takes the account back down to the stopped floor. Nothing changes; no simulator run.
 `verification/noise_v2/g501_locked_steps.txt`.
+
+## G502: two accounts toward +$25,000 together, a measurement (registered 2026-11-13, before its run)
+
+The user runs two 50K accounts on the same signals, started together; their combined net is twice one account's, so
+the pair reaches +$25,000 when one account reaches +$12,500. `research/g502_two_accounts.py`: G495's table with that
+goal (the column "reach_25k" there means one account at +$12,500) for U58, Funded growth plus and Funded aggressive.
+A measurement: it states the pair's odds; no setting changes. Run once.
