@@ -1,0 +1,23 @@
+fresh starts used: 16
+                                     starts  reach_25k  median_12m   p25_12m  best_12m  lost  per_session
+tag                                                                                                      
+F2 2 MNQ from $3,500, 3 from $6,000      16      0.312   12748.684  4232.483  32154.48   0.0       58.649
+F1 fill-ins from $2,000                  16      0.188   10456.103  5727.454  31376.94   0.0       57.237
+Funded growth plus                       16      0.188   14066.678  4797.775  31352.58   0.0       57.639
+F3 both                                  16      0.125   11219.496  5729.185  31979.00   0.0       57.790
+development (index 2011-18 starts):
+                                     starts  reach_25k  median_12m  p25_12m  best_12m   lost  per_session
+tag                                                                                                      
+F2 2 MNQ from $3,500, 3 from $6,000      31      0.323    10527.82  3530.12  43295.80  0.065       57.947
+F3 both                                  31      0.258    12291.36  2053.03  62436.44  0.097       60.338
+Funded growth plus                       31      0.258    13880.44  4158.70  39828.72  0.032       55.692
+F1 fill-ins from $2,000                  31      0.226    10922.06  2460.35  45355.86  0.097       54.491
+unseen (index 2019-25 + NQ 2015-24):
+                                     starts  reach_25k  median_12m   p25_12m  best_12m   lost  per_session
+tag                                                                                                       
+F2 2 MNQ from $3,500, 3 from $6,000      64      0.516    25977.48  6574.225  62039.80  0.031      101.671
+Funded growth plus                       64      0.484    23279.04  7984.065  61327.60  0.031       98.490
+F1 fill-ins from $2,000                  64      0.469    22650.04  7970.075  59943.54  0.031       96.562
+F3 both                                  64      0.453    23551.83  7101.750  60698.16  0.047      100.429
+
+[exited with code 0]

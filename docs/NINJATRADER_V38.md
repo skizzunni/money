@@ -10239,3 +10239,18 @@ G107, G121; set on the old measures). `research/g506_fill_ins_sooner.py`: Funded
 $2,000, F2 2 MNQ from $3,500 and 3 from $6,000, F3 both (all are settings in the C# file). **Rule:** as G496's (on each
 set the share at +$25,000 in 12 months and the median at least plus's, no more starts lost; the highest unseen share);
 then NinjaTrader's simulator on a fresh 2026-01-02 start at least plus's +$8,698. Run once.
+
+**G506 result (2026-11-13): rejected by its rule; F2 reaches $25K more often on all three sets, but with lower medians
+on two and one more development start lost.**
+
+| first 12 months | fresh: reach $25K / median / lost | development | unseen |
+|---|---|---|---|
+| Funded growth plus | 18.8% / $14,067 / 0% | 25.8% / $13,880 / 3.2% | 48.4% / $23,279 / 3.1% |
+| F1 fill-ins from $2,000 | 18.8% / $10,456 / 0% | 22.6% / $10,922 / 9.7% | 46.9% / $22,650 / 3.1% |
+| **F2 2 MNQ from $3,500, 3 from $6,000** | **31.2%** / $12,749 / 0% | **32.3%** / $10,528 / 6.5% | **51.6% / $25,977** / 3.1% |
+| F3 both | 12.5% / $11,219 / 0% | 25.8% / $12,291 / 9.7% | 45.3% / $23,552 / 4.7% |
+
+F2 is the first change to raise the share at +$25,000 on every set while losing no more starts on the fresh and unseen
+sets; it fails the registered rule on the fresh and development medians and one development start (2 of 31 against 1).
+Nothing changes; no simulator run. Next round: F2 alone at its neighbours, to see whether it holds.
+`verification/noise_v2/g506_fill_ins_sooner.txt`.
