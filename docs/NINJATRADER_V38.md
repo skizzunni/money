@@ -10405,3 +10405,11 @@ mode's and it loses no more starts; of both, the highest unseen share; then Ninj
 
 S1 reaches $25K more often on every set with no more starts lost, but its fresh median is $390 lower, so it fails as
 registered; S2 reaches it less often on development. Funded growth unchanged. `verification/noise_v2/g512_growth_fast_steps.txt`.
+
+## G513: where Funded growth's fill-ins start (registered 2026-11-13, before its run)
+
+Hourly round toward +$25,000. G511 moved the fill-ins' 2- and 3-MNQ steps; their start (1 MNQ from $2,750 above the
+floor, G241's "More trading days" cushion) was set on the old measures. `research/g513_growth_fill_start.py`: Funded
+growth (G511) against C1 from $2,250, C2 from $3,250 (`fill_min_room`; the C# file's MoreDaysCushion). **Rule:** as
+G512's (on each set the share at +$25,000 in 12 months and the median at least the current mode's, no more starts
+lost; the highest unseen share; then the simulator's fresh 2026-01-02 start at least +$11,073). Run once.
