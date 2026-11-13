@@ -10358,3 +10358,12 @@ at least plus's +$8,698. Run once.
 
 Even a limit 5% of the way back misses the breakouts that pay (they run without looking back) and fills the ones that
 fail: market entries stay. Nothing changes. `verification/noise_v2/g510_small_limit_entry.txt`.
+
+## G511: the bigger fill-ins in Funded growth (registered 2026-11-13, before its run)
+
+G506-G507: bigger fill-ins sooner raised the share at +$25,000 inside plus on every set but lowered plus's medians.
+The user runs Funded growth (U58), which G508 found the surest over 24 months. `research/g511_growth_fill_ins.py`: U58
+against U58 + F2 (fill-ins at 2 MNQ from $3,500 above the floor, 3 from $6,000) and U58 + E2 ($4,000 / $6,500). **Rule:**
+a variant replaces U58's fill-in steps in Funded growth if on each set its share at +$25,000 in 12 months and its
+median are at least U58's and it loses no more starts; of both, the highest unseen share; then NinjaTrader's simulator
+on a fresh 2026-01-02 start at least U58's +$9,847 (the fill-in steps are settings in the C# file). Run once.
