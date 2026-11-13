@@ -10061,3 +10061,18 @@ Tests (G250-G290), never on a funded account's first year. `research/g498_plus_s
 against K1 3 MNQ for 10 sessions, K2 4 MNQ for 10, K3 3 MNQ for 20. **Rule:** as G496's (on each set the share at
 +$25,000 in 12 months and the median at least plus's, no more starts lost; the highest unseen share), then NinjaTrader's
 simulator on a fresh 2026-01-02 start must make at least plus's +$8,698 (the sprint exists in the C# file). Run once.
+
+**G498 result (2026-11-13): rejected by its rule (more accounts lost, less on unseen); a sprint start reaches $25K
+more often on the recent and development starts.**
+
+| first 12 months | fresh: reach $25K / median / lost | development | unseen |
+|---|---|---|---|
+| **Funded growth plus** | 18.8% / $14,067 / 0% | 25.8% / $13,880 / 3.2% | **48.4% / $23,279 / 3.1%** |
+| K1 3 MNQ x 10 sessions | 31.2% / $13,465 / 12.5% | 35.5% / $9,937 / 12.9% | 40.6% / $15,394 / 7.8% |
+| K2 4 MNQ x 10 sessions | 37.5% / $11,630 / 12.5% | 38.7% / $10,207 / 9.7% | 45.3% / $20,523 / 10.9% |
+| K3 3 MNQ x 20 sessions | 31.2% / $14,905 / 6.2% | 29.0% / $9,921 / 9.7% | 45.3% / $19,338 / 12.5% |
+
+The sprint trades the first weeks at 3-4 MNQ against a $2,000 floor: when they go well the account is sized up months
+sooner (more starts reach $25K on the fresh and development sets), when they go badly the account is gone (1 in 8 to
+1 in 10 lost, against plus's 0-3%). It makes less on unseen. Nothing changes; no simulator run. Reported to the user
+as a trade-off. `verification/noise_v2/g498_plus_sprint_start.txt`.
