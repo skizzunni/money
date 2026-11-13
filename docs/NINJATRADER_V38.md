@@ -10491,3 +10491,12 @@ Run once.
 R2 is better than Funded growth on every set's share and median, but loses the same one development start (1 of 31)
 as G514: that start is lost after its floor has stopped, at the bigger size, so holding the steps until the floor stops
 does not save it. As registered, rejected; Funded growth unchanged. `verification/noise_v2/g516_step_after_floor.txt`.
+
+## First live day (2026-11-13), from the user's NinjaTrader order export
+
+Both Take Profit Trader 50K accounts, Funded growth, 1 MNQ: the same **10 shorts** on each (10:00 to 15:00 checks):
+one take-profit (+271.5 points, +$543), six trades closed by the lock at the entry +2.5 or near it, two "stop passed"
+exits (−$17 / −$19.50) and one full stop (−94.25 points, −$188.50). **+$344 gross per account (about +$331.60 after an
+estimated $1.24 a round trip), a green day.** Stop-order fills: 0-5 ticks past the stop price, 1.4 ticks on average
+(the tests assume 1; G509: 2 ticks would cost 15-25%); worth watching over the coming weeks. The MNQ Bot Dashboard's
+journal now shows this live day (one account; the other matched within $0.50).
