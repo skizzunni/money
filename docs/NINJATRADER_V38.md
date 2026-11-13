@@ -10230,3 +10230,12 @@ Mixing in a bolder account adds at most a point or two on one set and loses more
 recent starts (62.5%) but worse on development. Plus on both accounts: about half the recent and development starts and
 5 in 8 unseen at +$25,000 together in a year, median about $28,000 (recent, development) to $46,600 (unseen).
 `verification/noise_v2/g505_mixed_pair.txt`.
+
+## G506: the fill-in trades sooner and bigger (registered 2026-11-13, before its run)
+
+Hourly round toward +$25,000 (G495's measure). The "More trading days" fill-ins (1-MNQ small-gap, opening-drive and
+against-trend trades) start once the account is $2,750 above its floor, at 2 MNQ from $5,000 and 3 from $8,000 (G96,
+G107, G121; set on the old measures). `research/g506_fill_ins_sooner.py`: Funded growth plus against F1 fill-ins from
+$2,000, F2 2 MNQ from $3,500 and 3 from $6,000, F3 both (all are settings in the C# file). **Rule:** as G496's (on each
+set the share at +$25,000 in 12 months and the median at least plus's, no more starts lost; the highest unseen share);
+then NinjaTrader's simulator on a fresh 2026-01-02 start at least plus's +$8,698. Run once.
