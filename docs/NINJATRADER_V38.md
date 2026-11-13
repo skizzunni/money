@@ -10051,3 +10051,13 @@ plus's +$8,698. Run once.
 
 Neither change carries over to plus's sizing: each reaches $25K less often on at least two sets and loses more
 accounts. Nothing changes; no simulator run. `verification/noise_v2/g497_plus_gap_stop.txt`.
+
+## G498: Funded growth plus with a sprint start (registered 2026-11-13, before its run)
+
+Hourly round toward the user's +$25,000 (G495's measure). A fresh 50K grows slowly until its trailing floor stops
+(+$2,000), because every trade is sized to the room above it. The Test sprint's rule (`sprint_qty` contracts for the
+first `sprint_days` sessions until +$3,000, cut to the day's budget and the room above the floor) was tested for passing
+Tests (G250-G290), never on a funded account's first year. `research/g498_plus_sprint_start.py`: Funded growth plus
+against K1 3 MNQ for 10 sessions, K2 4 MNQ for 10, K3 3 MNQ for 20. **Rule:** as G496's (on each set the share at
++$25,000 in 12 months and the median at least plus's, no more starts lost; the highest unseen share), then NinjaTrader's
+simulator on a fresh 2026-01-02 start must make at least plus's +$8,698 (the sprint exists in the C# file). Run once.
