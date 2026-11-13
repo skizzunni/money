@@ -10423,3 +10423,11 @@ lost; the highest unseen share; then the simulator's fresh 2026-01-02 start at l
 | C2 from $3,250 | 18.8% / $9,266 / 0% | 16.1% / $8,295 / 0% | 37.5% / $18,635 / 1.6% |
 
 Either way the share at +$25,000 falls on at least one set. Nothing changes. `verification/noise_v2/g513_growth_fill_start.txt`.
+
+## G514: Funded growth's contract step between growth and plus (registered 2026-11-13, before its run)
+
+Hourly round toward +$25,000. With G511's fill-ins, plus's $1,250 step (G507 E2) beat Funded growth on every set's
+share and median but lost one more development start. Between the two: `research/g514_growth_step.py`, Funded growth
+(G511) against P1 a contract per $1,400, P2 per $1,350 (`profit_step`; ProfitStep in the C# file). **Rule:** as G512's
+(on each set the share at +$25,000 in 12 months and the median at least the current mode's, no more starts lost; the
+highest unseen share; then the simulator's fresh 2026-01-02 start at least +$11,073). Run once.
