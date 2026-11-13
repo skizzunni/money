@@ -10300,3 +10300,9 @@ Given two years, most accounts get there in every mode; the faster modes get the
 the way, and over 24 months Funded growth (U58, what the user runs) reaches +$25,000 on the most starts with the fewest
 lost. (The recent fresh starts, 2023-25, mostly lack 24 months of data and are not in this table.)
 `verification/noise_v2/g508_time_to_25k.txt`.
+
+## G509: the $25K odds with worse fills, a measurement (registered 2026-11-13, before its run)
+
+Before the user leans on G502 / G508 (plus or Funded growth on both accounts), a robustness check: live fills can be
+worse than the 1 tick of slippage every test assumes. `research/g509_worse_fills.py`: G495's measure for U58 and Funded
+growth plus, each at 1 and 2 ticks of slippage on every market fill. A measurement; no setting changes. Run once.
