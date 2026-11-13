@@ -10100,3 +10100,12 @@ The defence cuts the losses on the recent and unseen starts (L3: 1 of 16 and 4.7
 and L3 reaches $25K on half of the recent starts (plus: 1 in 5), but on development it still loses 1 in 8 and every
 variant's median is below plus's on development and unseen. Nothing changes; no simulator run. Reported to the user
 as the trade-off. `verification/noise_v2/g499_plus_safe_sprint.txt`.
+
+## G500: G499's sprint with a stronger defence (registered 2026-11-13, before its run)
+
+From G499: L3 (4 MNQ for the first 10 sessions, 1 MNQ while under $1,500 above the floor) reaches $25K on half the
+recent starts but loses 1 in 8 development starts. `research/g500_sprint_defence.py`: plus and L3 against M1 L3 with
+the gap trade at 1 MNQ during the sprint (`sprint_gap_qty` 1; a gap trade's stop is the widest), M2 L3 at 1 MNQ under
+$1,800 of room, M3 both. **Rule:** as G496's against plus (on each set the share at +$25,000 in 12 months and the
+median at least plus's, no more starts lost; the highest unseen share); then built (the low-room defence is new in the
+C# file) and NinjaTrader's simulator on a fresh 2026-01-02 start at least plus's +$8,698. Run once.
