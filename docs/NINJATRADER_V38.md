@@ -10208,3 +10208,11 @@ NinjaTrader's simulator on a fresh 2026-01-02 start at least plus's +$8,698. Run
 
 H1 reaches $25K more often on the recent starts with none lost there, but loses 1 in 8 development starts; sizing up
 "once ahead" does not stop a later losing run at the bigger size. Nothing changes. `verification/noise_v2/g504_house_money_sprint.txt`.
+
+## G505: the two accounts in different modes, a measurement (registered 2026-11-13, before its run)
+
+The user's two accounts need not run the same mode: one in Funded growth plus and one in a bolder start splits the
+risk (a lost bold account leaves the plus account trading). `research/g505_mixed_pair.py`, per start the sum of the two
+accounts' 12-month nets (each up to its own loss): plus + plus (G502), plus + H1 (G504), plus + L3 (G499), plus + Funded
+aggressive. Reported: the share of starts with the pair at +$25,000, the pair's median and lower quartile, the share
+with one account lost and with both lost. A measurement: no setting changes (H1 / L3 are not in the C# file). Run once.
