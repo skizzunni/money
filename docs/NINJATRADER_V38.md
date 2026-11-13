@@ -10132,3 +10132,16 @@ U28 only): N1 $1,500 then $1,000, N2 $1,500 then $750, N3 $1,250 then $750. **Ru
 at +$25,000 in 12 months and the median at least plus's, no more starts lost; the highest unseen share); then built
 (`profit_step_locked` is not in the C# file) and NinjaTrader's simulator on a fresh 2026-01-02 start at least plus's
 +$8,698. Run once.
+
+**G501 result (2026-11-13): rejected, all three; worse.**
+
+| first 12 months | fresh: reach $25K / median / lost | development | unseen |
+|---|---|---|---|
+| **Funded growth plus** | 18.8% / $14,067 / 0% | **25.8% / $13,880 / 3.2%** | **48.4% / $23,279 / 3.1%** |
+| N1 $1,500 then $1,000 | 25.0% / $9,243 / 6.2% | 16.1% / $7,436 / 12.9% | 45.3% / $18,812 / 4.7% |
+| N2 $1,500 then $750 | 18.8% / $7,461 / 12.5% | 16.1% / $4,073 / 19.4% | 35.9% / $9,255 / 12.5% |
+| N3 $1,250 then $750 | 25.0% / $7,538 / 12.5% | 19.4% / $8,352 / 9.7% | 40.6% / $12,263 / 15.6% |
+
+Once the floor stops, the cushion is only the profit above it: faster steps put bigger sizes on that cushion, and a
+losing stretch at those sizes takes the account back down to the stopped floor. Nothing changes; no simulator run.
+`verification/noise_v2/g501_locked_steps.txt`.
