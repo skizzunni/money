@@ -10039,3 +10039,15 @@ stop halfway (`gap_go_stop_frac` 0.5), R2 `calm_k` 0.8, R3 both. **Rule:** as G4
 +$25,000 in 12 months and the median at least plus's, no more starts lost; the highest unseen share), then built (the
 gap stop fraction is new in the C# file) and NinjaTrader's simulator on a fresh 2026-01-02 start must make at least
 plus's +$8,698. Run once.
+
+**G497 result (2026-11-13): rejected, all three; Funded growth plus stays.**
+
+| first 12 months | fresh: reach $25K / median / lost | development | unseen |
+|---|---|---|---|
+| **Funded growth plus** | **18.8% / $14,067 / 0%** | **25.8% / $13,880 / 3.2%** | **48.4% / $23,279 / 3.1%** |
+| R1 gap stop halfway | 6.2% / $7,205 / 6.2% | 16.1% / $6,964 / 9.7% | 42.2% / $20,282 / 6.2% |
+| R2 calm 0.8 | 25.0% / $11,782 / 0% | 22.6% / $12,579 / 9.7% | 40.6% / $15,090 / 6.2% |
+| R3 both | 0% / $3,924 / 6.2% | 29.0% / $10,454 / 3.2% | 39.1% / $13,368 / 4.7% |
+
+Neither change carries over to plus's sizing: each reaches $25K less often on at least two sets and loses more
+accounts. Nothing changes; no simulator run. `verification/noise_v2/g497_plus_gap_stop.txt`.

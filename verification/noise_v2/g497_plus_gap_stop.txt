@@ -1,0 +1,23 @@
+fresh starts used: 16
+                     starts  reach_25k  median_12m   p25_12m  best_12m   lost  per_session
+tag                                                                                       
+R2 calm 0.8              16      0.250   11782.273  4463.545  34508.22  0.000       56.433
+Funded growth plus       16      0.188   14066.678  4797.775  31352.58  0.000       57.639
+R1 gap stop halfway      16      0.062    7205.189  3478.143  25322.88  0.062       35.626
+R3 both                  16      0.000    3924.222  2131.789  23520.02  0.062       24.109
+development (index 2011-18 starts):
+                     starts  reach_25k  median_12m  p25_12m  best_12m   lost  per_session
+tag                                                                                      
+R3 both                  31      0.290    10454.40  4069.92  66190.46  0.032       65.841
+Funded growth plus       31      0.258    13880.44  4158.70  39828.72  0.032       55.692
+R2 calm 0.8              31      0.226    12579.04  3795.31  40531.84  0.097       60.213
+R1 gap stop halfway      31      0.161     6964.22  1938.28  60243.04  0.097       52.189
+unseen (index 2019-25 + NQ 2015-24):
+                     starts  reach_25k  median_12m   p25_12m  best_12m   lost  per_session
+tag                                                                                       
+Funded growth plus       64      0.484    23279.04  7984.065  61327.60  0.031       98.490
+R1 gap stop halfway      64      0.422    20281.55  6509.230  85077.62  0.062      104.405
+R2 calm 0.8              64      0.406    15089.70  5366.355  74752.78  0.062       83.560
+R3 both                  64      0.391    13368.45  4293.345  76968.90  0.047       91.740
+
+[exited with code 0]
