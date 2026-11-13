@@ -10286,3 +10286,17 @@ reach +$25,000? `research/g508_time_to_25k.py` on G372's development / unseen st
 start the first month whose cumulative net is at +$25,000; the share there by 12, 18 and 24 months, the median month
 among those that get there, and the share lost within 24 months. U58, Funded growth plus, Funded aggressive. A
 measurement; no setting changes. Run once.
+
+**G508 result (2026-11-13), a measurement: one 50K account reaches +$25,000 within 24 months on 81-93% of starts,
+typically in 12-15 months.**
+
+| one 50K account | development (31): by 12 / 18 / 24 months, median month, lost | unseen (56) |
+|---|---|---|
+| U58 (Funded growth) | 16% / 58% / **87%**, month 15, **0%** lost | 46% / 75% / **93%**, month 12.5, **1.8%** lost |
+| Funded growth plus | 26% / 65% / 81%, month 15, 6.5% lost | 55% / 79% / 89%, month 12, 3.6% lost |
+| Funded aggressive | 23% / 71% / 81%, month 15, 9.7% lost | 59% / 79% / 91%, month 11, 7.1% lost |
+
+Given two years, most accounts get there in every mode; the faster modes get there a little sooner and lose more on
+the way, and over 24 months Funded growth (U58, what the user runs) reaches +$25,000 on the most starts with the fewest
+lost. (The recent fresh starts, 2023-25, mostly lack 24 months of data and are not in this table.)
+`verification/noise_v2/g508_time_to_25k.txt`.
