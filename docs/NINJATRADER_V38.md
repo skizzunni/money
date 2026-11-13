@@ -10254,3 +10254,13 @@ F2 is the first change to raise the share at +$25,000 on every set while losing 
 sets; it fails the registered rule on the fresh and development medians and one development start (2 of 31 against 1).
 Nothing changes; no simulator run. Next round: F2 alone at its neighbours, to see whether it holds.
 `verification/noise_v2/g506_fill_ins_sooner.txt`.
+
+## G507: G506's F2 and its neighbours (registered 2026-11-13, before its run)
+
+G506's F2 (fill-ins at 2 MNQ from $3,500 above the floor, 3 from $6,000) reached $25K more often on all three sets but
+failed on two medians and one development start. Before building anything, its neighbours show whether the gain is a
+steady slope or one lucky setting. `research/g507_fill_ins_neighbours.py`: plus, F2, E1 $3,000 / $5,000, E2 $4,000 /
+$6,500, E3 $3,500 / $8,000. **Rule:** as G496's (on each set the share at +$25,000 in 12 months and the median at least
+plus's, no more starts lost; the highest unseen share); F2 itself was already measured and is reported only. Then
+NinjaTrader's simulator on a fresh 2026-01-02 start at least plus's +$8,698 (the fill-in steps are settings in the C#
+file). Run once.
