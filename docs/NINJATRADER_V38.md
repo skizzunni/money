@@ -10394,3 +10394,14 @@ above $9,000 (`profit_step_fast_from` / `profit_step_fast`; both settings in the
 Funded growth's setting if on each set its share at +$25,000 in 12 months and its median are at least the current
 mode's and it loses no more starts; of both, the highest unseen share; then NinjaTrader's simulator on a fresh
 2026-01-02 start at least the current +$11,073. Run once.
+
+**G512 result (2026-11-13): rejected, both (narrowly for S1).**
+
+| first 12 months | fresh: reach $25K / median / lost | development | unseen |
+|---|---|---|---|
+| **Funded growth (G511)** | 18.8% / **$7,558** / 0% | 19.4% / $10,587 / 0% | 40.6% / $16,741 / 1.6% |
+| S1 $650 above $7,000 | 25.0% / $7,168 / 0% | 22.6% / $10,594 / 0% | 42.2% / $17,294 / 1.6% |
+| S2 $500 above $9,000 | 18.8% / $7,506 / 0% | 16.1% / $10,597 / 0% | 40.6% / $17,775 / 1.6% |
+
+S1 reaches $25K more often on every set with no more starts lost, but its fresh median is $390 lower, so it fails as
+registered; S2 reaches it less often on development. Funded growth unchanged. `verification/noise_v2/g512_growth_fast_steps.txt`.
