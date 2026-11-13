@@ -10016,3 +10016,16 @@ from $9,000), Q4 no giveback brake. G495's measure. **Rule:** a variant replaces
 each of the three sets, its share of starts at +$25,000 in 12 months and its 12-month median are at least plus's and it
 loses no more starts; of several, the highest share on unseen. Then NinjaTrader's simulator, a fresh start on
 2026-01-02 (to 2026-10-16), must make at least plus's +$8,698. Run once.
+
+**G496 result (2026-11-13): rejected, all four; Funded growth plus stays as it is.**
+
+| first 12 months | fresh: reach $25K / median / lost | development | unseen |
+|---|---|---|---|
+| **Funded growth plus** | **18.8% / $14,067 / 0%** | **25.8% / $13,880 / 3.2%** | 48.4% / $23,279 / 3.1% |
+| Q1 + $1,500 day once locked | 12.5% / $8,750 / 0% | 25.8% / $8,923 / 3.2% | 46.9% / $13,626 / 3.1% |
+| Q2 + $1,250 day once locked | 12.5% / $12,346 / 0% | 22.6% / $11,067 / 3.2% | 50.0% / $25,925 / 4.7% |
+| Q3 + 1 per $400 from $5,000 | 12.5% / $8,743 / 0% | 22.6% / $10,782 / 3.2% | 45.3% / $23,299 / 3.1% |
+| Q4 no brake | 12.5% / $14,067 / 0% | 25.8% / $13,880 / 6.5% | 46.9% / $23,279 / 3.1% |
+
+A bigger day budget or faster steps add bigger losing days as well as bigger winning ones; on the recent starts they
+reach $25K less often. Nothing changes; no simulator run. `verification/noise_v2/g496_plus_to_25k.txt`.

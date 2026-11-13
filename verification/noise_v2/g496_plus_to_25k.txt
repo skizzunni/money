@@ -1,0 +1,24 @@
+fresh starts used: 16
+                             starts  reach_25k  median_12m   p25_12m   best_12m  lost  per_session
+tag                                                                                               
+Funded growth plus               16      0.188   14066.678  4797.775  31352.580   0.0       57.639
+Q1 + $1,500 day once locked      16      0.125    8749.580  3980.364  38958.700   0.0       44.331
+Q2 + $1,250 day once locked      16      0.125   12345.755  4081.697  36371.240   0.0       50.323
+Q3 + 1 per $400 from $5,000      16      0.125    8742.860  4021.570  28001.473   0.0       46.217
+Q4 no brake                      16      0.125   14066.678  4797.775  31352.580   0.0       57.845
+development (index 2011-18 starts):
+                             starts  reach_25k  median_12m  p25_12m  best_12m   lost  per_session
+tag                                                                                              
+Funded growth plus               31      0.258    13880.44  4158.70  39828.72  0.032       55.692
+Q1 + $1,500 day once locked      31      0.258     8922.78  3069.90  46633.48  0.032       57.715
+Q4 no brake                      31      0.258    13880.44  4087.57  39828.72  0.065       55.744
+Q2 + $1,250 day once locked      31      0.226    11066.88  3506.63  42816.16  0.032       53.494
+Q3 + 1 per $400 from $5,000      31      0.226    10781.76  3761.76  46879.96  0.032       52.593
+unseen (index 2019-25 + NQ 2015-24):
+                             starts  reach_25k  median_12m   p25_12m  best_12m   lost  per_session
+tag                                                                                               
+Q2 + $1,250 day once locked      64      0.500    25924.65  5209.115  77513.26  0.047      105.030
+Funded growth plus               64      0.484    23279.04  7984.065  61327.60  0.031       98.490
+Q1 + $1,500 day once locked      64      0.469    13626.26  5342.455  90653.58  0.031      104.541
+Q4 no brake                      64      0.469    23279.04  8335.905  61327.60  0.031       98.668
+Q3 + 1 per $400 from $5,000      64      0.453    23298.93  4624.570  67431.92  0.031       95.390
