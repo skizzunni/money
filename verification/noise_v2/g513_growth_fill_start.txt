@@ -1,0 +1,20 @@
+fresh starts used: 16
+                         starts  reach_25k  median_12m   p25_12m  best_12m  lost  per_session
+tag                                                                                          
+C2 fill-ins from $3,250      16      0.188     9266.46  6648.370  32529.88   0.0       54.268
+Funded growth (G511)         16      0.188     7557.66  4915.125  31897.74   0.0       53.114
+C1 fill-ins from $2,250      16      0.062     7843.84  3830.800  31792.04   0.0       43.765
+development (index 2011-18 starts):
+                         starts  reach_25k  median_12m  p25_12m  best_12m   lost  per_session
+tag                                                                                          
+C1 fill-ins from $2,250      31      0.194    10477.78  4327.01  64422.74  0.032       57.785
+Funded growth (G511)         31      0.194    10586.92  3357.42  55670.46  0.000       53.526
+C2 fill-ins from $3,250      31      0.161     8295.20  3361.67  55670.46  0.000       47.419
+unseen (index 2019-25 + NQ 2015-24):
+                         starts  reach_25k  median_12m  p25_12m  best_12m   lost  per_session
+tag                                                                                          
+Funded growth (G511)         64      0.406    16740.83  5446.62  59912.56  0.016       87.590
+C1 fill-ins from $2,250      64      0.391    19410.20  5018.16  59912.56  0.016       88.109
+C2 fill-ins from $3,250      64      0.375    18634.65  6648.37  60008.76  0.016       85.103
+
+[exited with code 0]

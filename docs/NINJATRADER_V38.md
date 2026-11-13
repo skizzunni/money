@@ -10413,3 +10413,13 @@ floor, G241's "More trading days" cushion) was set on the old measures. `researc
 growth (G511) against C1 from $2,250, C2 from $3,250 (`fill_min_room`; the C# file's MoreDaysCushion). **Rule:** as
 G512's (on each set the share at +$25,000 in 12 months and the median at least the current mode's, no more starts
 lost; the highest unseen share; then the simulator's fresh 2026-01-02 start at least +$11,073). Run once.
+
+**G513 result (2026-11-13): rejected, both; Funded growth keeps $2,750.**
+
+| first 12 months | fresh: reach $25K / median / lost | development | unseen |
+|---|---|---|---|
+| **Funded growth (G511, $2,750)** | **18.8%** / $7,558 / 0% | **19.4% / $10,587 / 0%** | **40.6%** / $16,741 / 1.6% |
+| C1 from $2,250 | 6.2% / $7,844 / 0% | 19.4% / $10,478 / 3.2% | 39.1% / $19,410 / 1.6% |
+| C2 from $3,250 | 18.8% / $9,266 / 0% | 16.1% / $8,295 / 0% | 37.5% / $18,635 / 1.6% |
+
+Either way the share at +$25,000 falls on at least one set. Nothing changes. `verification/noise_v2/g513_growth_fill_start.txt`.
