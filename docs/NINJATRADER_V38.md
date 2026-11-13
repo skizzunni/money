@@ -10479,3 +10479,15 @@ which lost many starts). `research/g516_step_after_floor.py`. **Rule:** as G512'
 12 months and the median at least the current mode's, no more starts lost; the highest unseen share); then built (the
 locked step is not in the C# file) with a parity test and the simulator's fresh 2026-01-02 start at least +$11,073.
 Run once.
+
+**G516 result (2026-11-13): rejected, both; the same development start is lost.**
+
+| first 12 months | fresh: reach $25K / median / lost | development | unseen |
+|---|---|---|---|
+| **Funded growth (G511)** | 18.8% / $7,558 / 0% | 19.4% / $10,587 / **0%** | 40.6% / $16,741 / 1.6% |
+| R1 $1,500 then $1,400 | 25.0% / $8,514 / 0% | 19.4% / $10,201 / 3.2% | 40.6% / $18,816 / 1.6% |
+| R2 $1,500 then $1,300 | **31.2% / $10,327** / 0% | **25.8% / $11,050** / 3.2% | **43.8% / $19,707** / 1.6% |
+
+R2 is better than Funded growth on every set's share and median, but loses the same one development start (1 of 31)
+as G514: that start is lost after its floor has stopped, at the bigger size, so holding the steps until the floor stops
+does not save it. As registered, rejected; Funded growth unchanged. `verification/noise_v2/g516_step_after_floor.txt`.
