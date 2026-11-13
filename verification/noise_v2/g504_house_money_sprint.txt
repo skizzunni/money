@@ -1,0 +1,23 @@
+fresh starts used: 16
+                          starts  reach_25k  median_12m   p25_12m  best_12m   lost  per_session
+tag                                                                                            
+H1 2 MNQ, 4 once +$500        16      0.312   12236.210  6266.696  42740.70  0.000       65.830
+H3 2 MNQ, 4 once +$1,000      16      0.312   12251.470  4266.344  37152.16  0.125       61.437
+Funded growth plus            16      0.188   14066.678  4797.775  31352.58  0.000       57.639
+H2 1 MNQ, 3 once +$500        16      0.188   11057.790  4797.775  31341.36  0.062       55.195
+development (index 2011-18 starts):
+                          starts  reach_25k  median_12m  p25_12m  best_12m   lost  per_session
+tag                                                                                           
+H3 2 MNQ, 4 once +$1,000      31      0.290     9360.62  3167.05  47308.02  0.129       58.767
+Funded growth plus            31      0.258    13880.44  4158.70  39828.72  0.032       55.692
+H1 2 MNQ, 4 once +$500        31      0.258     9360.62  3166.88  45763.16  0.129       56.411
+H2 1 MNQ, 3 once +$500        31      0.258    10579.66  4158.70  44857.42  0.032       56.811
+unseen (index 2019-25 + NQ 2015-24):
+                          starts  reach_25k  median_12m   p25_12m  best_12m   lost  per_session
+tag                                                                                            
+Funded growth plus            64      0.484    23279.04  7984.065  61327.60  0.031       98.490
+H2 1 MNQ, 3 once +$500        64      0.484    22471.95  5202.155  61997.14  0.047       95.459
+H1 2 MNQ, 4 once +$500        64      0.469    21978.32  4837.300  67475.74  0.062       97.066
+H3 2 MNQ, 4 once +$1,000      64      0.469    20818.91  4391.340  67475.74  0.062       97.810
+
+[exited with code 0]

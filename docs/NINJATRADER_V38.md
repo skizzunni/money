@@ -10196,3 +10196,15 @@ and 1 MNQ while under $1,500 above the floor. `research/g504_house_money_sprint.
 4 once +$500; H2 1 MNQ, 3 once +$500; H3 2 MNQ, 4 once +$1,000. **Rule:** as G496's (on each set the share at +$25,000
 in 12 months and the median at least plus's, no more starts lost; the highest unseen share); then built and
 NinjaTrader's simulator on a fresh 2026-01-02 start at least plus's +$8,698. Run once.
+
+**G504 result (2026-11-13): rejected, all three.**
+
+| first 12 months | fresh: reach $25K / median / lost | development | unseen |
+|---|---|---|---|
+| **Funded growth plus** | 18.8% / $14,067 / 0% | 25.8% / $13,880 / 3.2% | **48.4% / $23,279 / 3.1%** |
+| H1 2 MNQ, 4 once +$500 | 31.2% / $12,236 / 0% | 25.8% / $9,361 / 12.9% | 46.9% / $21,978 / 6.2% |
+| H2 1 MNQ, 3 once +$500 | 18.8% / $11,058 / 6.2% | 25.8% / $10,580 / 3.2% | 48.4% / $22,472 / 4.7% |
+| H3 2 MNQ, 4 once +$1,000 | 31.2% / $12,251 / 12.5% | 29.0% / $9,361 / 12.9% | 46.9% / $20,819 / 6.2% |
+
+H1 reaches $25K more often on the recent starts with none lost there, but loses 1 in 8 development starts; sizing up
+"once ahead" does not stop a later losing run at the bigger size. Nothing changes. `verification/noise_v2/g504_house_money_sprint.txt`.
