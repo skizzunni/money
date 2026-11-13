@@ -10175,3 +10175,14 @@ to the day's budget and the room above the floor. `research/g503_trend_with_size
 1.5x, W2 2x. **Rule:** as G496's (on each set the share at +$25,000 in 12 months and the median at least plus's, no more
 starts lost; the highest unseen share); then built (not in the C# file) and NinjaTrader's simulator on a fresh
 2026-01-02 start at least plus's +$8,698. Run once.
+
+**G503 result (2026-11-13): rejected, both; far more accounts lost.**
+
+| first 12 months | fresh: reach $25K / median / lost | development | unseen |
+|---|---|---|---|
+| **Funded growth plus** | 18.8% / $14,067 / 0% | 25.8% / $13,880 / 3.2% | **48.4% / $23,279 / 3.1%** |
+| W1 1.5x with the trend | 31.2% / $9,305 / 18.8% | 32.3% / $15,996 / 16.1% | 42.2% / $17,603 / 18.8% |
+| W2 2x with the trend | 25.0% / $3,523 / 37.5% | 25.8% / $1,189 / 22.6% | 39.1% / $5,235 / 28.1% |
+
+The trend's side is not a safer side for size: the bigger trades lose 1 account in 5 or worse. Nothing changes.
+`verification/noise_v2/g503_trend_with_size.txt`.

@@ -1,0 +1,20 @@
+fresh starts used: 16
+                        starts  reach_25k  median_12m   p25_12m   best_12m   lost  per_session
+tag                                                                                           
+W1 1.5x with the trend      16      0.312    9304.550  1662.750  58251.601  0.188       64.908
+W2 2x with the trend        16      0.250    3522.840   182.830  54167.770  0.375       44.837
+Funded growth plus          16      0.188   14066.678  4797.775  31352.580  0.000       57.639
+development (index 2011-18 starts):
+                        starts  reach_25k  median_12m  p25_12m  best_12m   lost  per_session
+tag                                                                                         
+W1 1.5x with the trend      31      0.323    15995.72   -31.46  62038.12  0.161       59.934
+Funded growth plus          31      0.258    13880.44  4158.70  39828.72  0.032       55.692
+W2 2x with the trend        31      0.258     1188.98  -262.71  76594.24  0.194       54.010
+unseen (index 2019-25 + NQ 2015-24):
+                        starts  reach_25k  median_12m   p25_12m  best_12m   lost  per_session
+tag                                                                                          
+Funded growth plus          64      0.484    23279.04  7984.065  61327.60  0.031       98.490
+W1 1.5x with the trend      64      0.422    17603.00    97.140  64109.84  0.188       90.343
+W2 2x with the trend        64      0.391     5235.30   159.770  70228.48  0.281       74.488
+
+[exited with code 0]
