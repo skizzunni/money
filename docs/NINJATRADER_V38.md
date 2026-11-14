@@ -10520,3 +10520,11 @@ and the median at least the current mode's, no more starts lost; the highest uns
 
 K1 helps on the recent starts but makes less on development and unseen and loses more unseen starts: more locked
 trades come back through a stop that sits further from the price. Nothing changes. `verification/noise_v2/g517_growth_lock_plus.txt`.
+
+## G518: Funded growth's take-profit, on the $25K measure (registered 2026-11-14, before its run)
+
+G450 kept U58's 2.0-noise take-profit against 1.5 / 2.5 by $ a session, before G511's fill-ins and the $25K measure.
+The first live day's one winner was the take-profit (+271.5 points). `research/g518_growth_target.py`: Funded growth
+(G511) against T1 1.75 and T2 2.25 (`take_profit`; TakeProfit in the C# file). **Rule:** as G512's (on each set the share
+at +$25,000 in 12 months and the median at least the current mode's, no more starts lost; the highest unseen share;
+then the simulator's fresh 2026-01-02 start at least +$11,073). Run once.
