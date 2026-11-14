@@ -10528,3 +10528,14 @@ The first live day's one winner was the take-profit (+271.5 points). `research/g
 (G511) against T1 1.75 and T2 2.25 (`take_profit`; TakeProfit in the C# file). **Rule:** as G512's (on each set the share
 at +$25,000 in 12 months and the median at least the current mode's, no more starts lost; the highest unseen share;
 then the simulator's fresh 2026-01-02 start at least +$11,073). Run once.
+
+**G518 result (2026-11-14): rejected, both; Funded growth keeps the 2.0 take-profit.**
+
+| first 12 months | fresh: reach $25K / median / lost | development | unseen |
+|---|---|---|---|
+| **Funded growth (G511, 2.0)** | 18.8% / $7,558 / 0% | **19.4% / $10,587 / 0%** | **40.6% / $16,741** / 1.6% |
+| T1 target 1.75 | 6.2% / $10,310 / 0% | 12.9% / $5,725 / 3.2% | 34.4% / $13,878 / 1.6% |
+| T2 target 2.25 | 25.0% / $10,547 / 0% | 9.7% / $7,347 / 6.5% | 40.6% / $15,335 / 1.6% |
+
+2.0 stays the best on development and unseen; both neighbours lose development starts. Nothing changes.
+`verification/noise_v2/g518_growth_target.txt`.
