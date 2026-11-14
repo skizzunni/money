@@ -10539,3 +10539,11 @@ then the simulator's fresh 2026-01-02 start at least +$11,073). Run once.
 
 2.0 stays the best on development and unseen; both neighbours lose development starts. Nothing changes.
 `verification/noise_v2/g518_growth_target.txt`.
+
+## G519: Funded growth's time stop, on the $25K measure (registered 2026-11-14, before its run)
+
+G446 kept U58's 45-minute time stop (a losing trade not yet locked is closed 45 minutes after its fill) by $ a session,
+before G511 and the $25K measure. `research/g519_growth_time_stop.py`: Funded growth (G511) against S1 35 and S2 60
+minutes (`time_stop`; TimeStop in the C# file). **Rule:** as G512's (on each set the share at +$25,000 in 12 months and
+the median at least the current mode's, no more starts lost; the highest unseen share; then the simulator's fresh
+2026-01-02 start at least +$11,073). Run once.
