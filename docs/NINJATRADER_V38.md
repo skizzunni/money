@@ -10547,3 +10547,14 @@ before G511 and the $25K measure. `research/g519_growth_time_stop.py`: Funded gr
 minutes (`time_stop`; TimeStop in the C# file). **Rule:** as G512's (on each set the share at +$25,000 in 12 months and
 the median at least the current mode's, no more starts lost; the highest unseen share; then the simulator's fresh
 2026-01-02 start at least +$11,073). Run once.
+
+**G519 result (2026-11-14): rejected, both; Funded growth keeps 45 minutes.**
+
+| first 12 months | fresh: reach $25K / median / lost | development | unseen |
+|---|---|---|---|
+| **Funded growth (G511, 45)** | 18.8% / $7,558 / **0%** | **19.4% / $10,587 / 0%** | 40.6% / $16,741 / **1.6%** |
+| S1 time stop 35 | 6.2% / $8,309 / 0% | 12.9% / $7,393 / 0% | 40.6% / $15,305 / 1.6% |
+| S2 time stop 60 | 18.8% / $12,675 / 6.2% | 19.4% / $8,005 / 6.5% | 40.6% / $20,545 / 3.1% |
+
+35 minutes cuts trades that would have turned; 60 lets losers run into lost accounts. Nothing changes.
+`verification/noise_v2/g519_growth_time_stop.txt`.

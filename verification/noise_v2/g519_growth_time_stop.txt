@@ -1,0 +1,20 @@
+fresh starts used: 16
+                      starts  reach_25k  median_12m   p25_12m  best_12m   lost  per_session
+tag                                                                                        
+Funded growth (G511)      16      0.188     7557.66  4915.125  31897.74  0.000       53.114
+S2 time stop 60           16      0.188    12675.03  3534.790  29617.28  0.062       54.725
+S1 time stop 35           16      0.062     8308.85  4962.130  26504.94  0.000       41.051
+development (index 2011-18 starts):
+                      starts  reach_25k  median_12m  p25_12m  best_12m   lost  per_session
+tag                                                                                       
+Funded growth (G511)      31      0.194    10586.92  3357.42  55670.46  0.000       53.526
+S2 time stop 60           31      0.194     8004.66  2875.15  68845.74  0.065       54.141
+S1 time stop 35           31      0.129     7392.84  2645.41  61927.78  0.000       46.723
+unseen (index 2019-25 + NQ 2015-24):
+                      starts  reach_25k  median_12m   p25_12m  best_12m   lost  per_session
+tag                                                                                        
+Funded growth (G511)      64      0.406    16740.83  5446.620  59912.56  0.016       87.590
+S1 time stop 35           64      0.406    15304.66  6734.880  62807.56  0.016       88.354
+S2 time stop 60           64      0.406    20545.44  6273.065  65698.30  0.031       94.158
+
+[exited with code 0]
