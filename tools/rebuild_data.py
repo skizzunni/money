@@ -1,6 +1,9 @@
 """Rebuild the research data folder that the G-series runs read (docs/DATA_REBUILD.md).
 
-    python tools/rebuild_data.py <data dir> [<MNQ_09-26.Last.txt> <MNQ_12-26.Last.txt>]
+    [INDEX_MIRROR=1] python tools/rebuild_data.py <data dir> [<MNQ_09-26.Last.txt> <MNQ_12-26.Last.txt>]
+
+Without the MNQ files it writes them from tests/data's committed series. INDEX_MIRROR=1 uses the Hugging Face HistData
+mirror when no HistData NSXUSD zips are in histdata_raw/ (close to the original, not identical, ends 2025-03-21).
 
 The folder is not in the repository (data/*.csv and the pickles are too big, and the user's exports are theirs). This
 script makes it again in a fresh container:
@@ -17,6 +20,7 @@ from __future__ import annotations
 
 import dataclasses
 import json
+import os
 import subprocess
 import sys
 import urllib.request
@@ -69,6 +73,42 @@ def index(d: Path) -> bool:
     return True
 
 
+def mnq(d: Path) -> tuple[str, str]:
+    """The two MNQ exports, rewritten from tests/data's traded series (6/28-10/16/2026, SEP26 back-adjusted): both
+    files hold the whole series, so mnq_bars.traded_series (a zero roll difference) gives it back bar for bar."""
+    import pandas as pd
+    sep, dec = d / "MNQ_09-26.Last.txt", d / "MNQ_12-26.Last.txt"
+    if not (sep.exists() and dec.exists()):
+        s = pd.read_csv(ROOT / "tests/data/mnq_traded_eth_2026-06-28_2026-10-16.csv.gz", header=None,
+                        names=["t", "open", "high", "low", "close"])
+        end = (pd.to_datetime(s.t).dt.tz_localize("America/New_York") + pd.Timedelta(minutes=1)).dt.tz_convert("UTC")
+        out = pd.DataFrame({"t": end.dt.strftime("%Y%m%d %H%M%S"),
+                            **{k: s[k].map("{:.2f}".format) for k in ("open", "high", "low", "close")}, "v": 0})
+        for f in (sep, dec):
+            out.to_csv(f, sep=";", header=False, index=False)
+    return str(sep), str(dec)
+
+
+def mirror(d: Path) -> None:
+    """Fallback for the index: Hugging Face's HistData mirror (elthariel/histdata_fx_1m, NSXUSD to 2025-03-21) as
+    HistData CSVs (its UTC back to HistData's EST clock). Not identical to the original files (docs/DATA_REBUILD.md)."""
+    import pandas as pd
+    out = d / "histdata_raw" / "hf_mirror"
+    if out.exists() or list((d / "histdata_raw").glob("*/DAT_ASCII_NSXUSD_M1_*.csv")):
+        return
+    out.mkdir(parents=True)
+    pq = d / "nsxusd_mirror.parquet"
+    if not pq.exists():
+        urllib.request.urlretrieve(
+            "https://huggingface.co/datasets/elthariel/histdata_fx_1m/resolve/main/nsxusd/ticks.parquet", pq)
+    x = pd.read_parquet(pq)
+    t = x.ts.dt.tz_convert(None) - pd.Timedelta(hours=5)
+    x["s"] = t.dt.strftime("%Y%m%d %H%M%S")
+    for y, g in x.groupby(t.dt.year):
+        g[["s", "open", "high", "low", "close", "volume"]].to_csv(out / f"DAT_ASCII_NSXUSD_M1_{y}.csv", sep=";",
+                                                                   header=False, index=False)
+
+
 def proxy(d: Path, sep: str, dec: str) -> None:
     if not (d / "proxy_5m.pkl").exists():
         subprocess.run([sys.executable, str(ROOT / "research" / "v24_proxy.py"), str(d), sep, dec], check=True)
@@ -95,10 +135,17 @@ def main() -> None:
     d.mkdir(parents=True, exist_ok=True)
     nq(d)
     base(d)
+    sep, dec = (sys.argv[2], sys.argv[3]) if len(sys.argv) >= 4 else mnq(d)
+    if os.environ.get("INDEX_MIRROR") == "1":
+        mirror(d)
     have_index = index(d)
-    if len(sys.argv) >= 4 and have_index:
-        proxy(d, sys.argv[2], sys.argv[3])
-        a = f"{d} {sys.argv[2]} {sys.argv[3]} {d / 'u48_JS.json'}"
+    if have_index:
+        try:
+            proxy(d, sep, dec)
+        except (IndexError, ValueError, subprocess.CalledProcessError) as e:  # the index must reach 2026-06-30
+            print("stand-in not built (the index files stop before 2026-07):", e)
+            return
+        a = f"{d} {sep} {dec} {d / 'u48_JS.json'}"
         print("\ncheck (must match verification/noise_v2/g519_growth_time_stop.txt):\n"
               f"  cd research && PROCS=4 python g519_growth_time_stop.py {a} fresh && "
               f"PROCS=4 python g519_growth_time_stop.py {a} unseen")
