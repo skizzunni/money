@@ -1025,6 +1025,10 @@ namespace NinjaTrader.NinjaScript.Strategies
         double scPx = double.NaN, scPendTicks = double.NaN, scPendPx = double.NaN;
         int scLive = -1, scPlaced, scFlags;
         bool scFlatten;
+        // 2026-11-17 live: the platform cancelled a position's stop (and its OCO target) and nothing put one back for 12
+        // minutes. When the stop is cancelled or rejected (not filled) while the position is still open 2 seconds later,
+        // the position is closed at market on the next tick ("No stop"); the bar-close check closes it too.
+        DateTime scGoneUtc = DateTime.MinValue;
         double entrySlipSum, exitSlipSum;
         int entrySlipN, exitSlipN;
         int realDayWins;          // today's winners, for the day's summary
@@ -1580,6 +1584,8 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (double.IsNaN(scPx) || scLive == 0)
             {
                 ScFlag("the open " + side + " has no live stop order" + (scLive == 0 ? " (the platform cancelled or rejected it)" : ""));
+                if (State == State.Realtime)
+                    Flatten(real, "No stop");  // never hold a live position without a stop
                 return;
             }
             if (engine.Position == real)
@@ -1599,9 +1605,31 @@ namespace NinjaTrader.NinjaScript.Strategies
                 return;
             if (orderState == OrderState.Accepted || orderState == OrderState.Working ||
                 orderState == OrderState.ChangePending || orderState == OrderState.ChangeSubmitted)
+            {
                 scLive = 1;
+                scGoneUtc = DateTime.MinValue;
+            }
             else if (orderState == OrderState.Cancelled || orderState == OrderState.Rejected || orderState == OrderState.Filled)
+            {
                 scLive = 0;
+                // a fill closes the position; a cancel or reject may leave it open (checked on the ticks after 2 s, so
+                // a target fill's OCO cancel, which closes the position at the same time, never triggers it)
+                scGoneUtc = orderState == OrderState.Filled ? DateTime.MinValue : DateTime.UtcNow;
+            }
+        }
+
+        // the live no-stop guard: the position still open 2 seconds after its stop was cancelled or rejected
+        void CheckNoStop()
+        {
+            if (!PlaceOrders || State != State.Realtime || scLive != 0 || scFlatten || scGoneUtc == DateTime.MinValue ||
+                (DateTime.UtcNow - scGoneUtc).TotalSeconds < 2.0)
+                return;
+            int real = Position.MarketPosition == MarketPosition.Long ? 1 : Position.MarketPosition == MarketPosition.Short ? -1 : 0;
+            scGoneUtc = DateTime.MinValue;  // once per cancel
+            if (real == 0)
+                return;
+            ScFlag("the open " + (real > 0 ? "long" : "short") + "'s stop was cancelled or rejected by the platform: closed at market");
+            Flatten(real, "No stop");
         }
 
         const string JournalHeader = "kind,entry time,exit time,side,contracts,trades today,entry,exit,exit kind,P/L,day P/L,total P/L,room today,room above floor,next contracts,entry slip ticks,exit slip ticks\n";
@@ -1804,6 +1832,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (marketDataUpdate.MarketDataType != MarketDataType.Last || engine == null)
                 return;
             CheckLossGuard(marketDataUpdate.Price);
+            CheckNoStop();
             if (State != State.Realtime || badChart || lastEndNy == DateTime.MinValue)
                 return;
             livePx = marketDataUpdate.Price;

@@ -10558,3 +10558,23 @@ the median at least the current mode's, no more starts lost; the highest unseen 
 
 35 minutes cuts trades that would have turned; 60 lets losers run into lost accounts. Nothing changes.
 `verification/noise_v2/g519_growth_time_stop.txt`.
+
+## Fix (2026-11-17): a live position whose stop the platform cancels is closed at market
+
+**Found live (2026-11-17, account …276):** at 11:58:03 the platform cancelled the 11:30 short's stop and, through its
+OCO, its target (nothing in the strategy cancels orders; the other account's identical orders stayed live). Managed
+`SetStopLoss` only changes a live order, so the re-prices at the next closes did nothing, and the check at the bar close
+only printed and alerted "STOP CHECK FAILED". The short ran without a stop for 12 minutes, until the model's own lock
+exit sent "Model flat" at 12:10 (it happened to close 5.5 points better than the other account's stop). On that account
+the 11:00 and 13:00 trades' stops also show a blank Strategy column in the order grid: orders rebuilt from the broker's
+feed, the sign of a connection or broker-side resync. Check NinjaTrader's Log tab for that account around 11:02, 11:58
+and 13:05.
+
+**Change (MnqNoiseV38.cs):** when the position's "Stop loss" is Cancelled or Rejected (not Filled), the strategy closes
+the position at market ("No stop") on the first tick 2 seconds later (the grace keeps a take-profit fill, whose OCO cancels
+the stop as the position closes, from triggering it), and the bar-close check now closes a live position that has no
+stop instead of only alerting. Backtests are unchanged (live only). The flag is still printed and alerted.
+
+**Tests:** `tests/test_ninjatrader_v38.py::test_v38_live_position_without_stop_is_closed`: live in the simulator, the
+broker cancels a trade's stop two bars in: that trade closes "No stop" at the next open, the flag is printed, the earlier
+trades are unchanged.

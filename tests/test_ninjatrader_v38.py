@@ -1321,3 +1321,34 @@ def test_v38_stop_placement_check(sim, sample_1m, tmp_path):  # noqa: F811
     assert r.returncode == 0, r.stderr[-2000:]
     flags = [x for x in r.stdout.splitlines() if x.startswith("P,") and "STOP CHECK FAILED" in x]
     assert flags and "no live stop order" in flags[0] and "cancelled or rejected" in flags[0], flags
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+def test_v38_live_position_without_stop_is_closed(sim, sample_1m, tmp_path):  # noqa: F811
+    """2026-11-17 live: the platform cancelled a position's stop and its OCO target, and the position ran without a stop
+    for 12 minutes until the model's own exit. Live, a cancelled stop now closes the position at market ("No stop") from
+    that bar's close at the latest (on the ticks 2 seconds after the cancel when they come), flagged; the trades before
+    it are unchanged; in a backtest nothing changes (the flag only)."""
+    bars = resample(sample_1m, "5min")
+    path = tmp_path / "bars.csv"
+    with path.open("w") as f:
+        for t, r in zip(bars.index, bars.itertuples(), strict=True):
+            f.write(f"{t:%Y-%m-%d %H:%M},{r.open!r},{r.high!r},{r.low!r},{r.close!r}\n")
+    live = 1000
+    base = [DOTNET, str(sim), str(path), "5", "Strategy=V38", *GROW_ARGS, "SimStopUpdates=True",
+            f"SimRealtimeFrom={live}"]
+
+    def go(*extra):
+        r = subprocess.run([*base, *extra], capture_output=True, text=True, env=ENV)
+        assert r.returncode == 0, r.stderr[-2000:]
+        return [x.split(",")[1:] for x in r.stdout.splitlines() if x.startswith("T,")], r.stdout
+
+    clean, out = go()
+    assert "STOP CHECK FAILED" not in out
+    trade = next(t for t in clean if int(t[1]) > live and int(t[3]) - int(t[1]) >= 4 and t[5] != "No stop")
+    at = int(trade[1]) + 2
+    cut, out = go(f"SimCancelStopsAt={at}")
+    hit = next(t for t in cut if t[1] == trade[1])
+    assert hit[5] == "No stop" and int(hit[3]) == at + 1, hit  # sent at that close, filled at the next open
+    assert "STOP CHECK FAILED" in out
+    assert [t for t in cut if int(t[3]) < int(trade[1])] == [t for t in clean if int(t[3]) < int(trade[1])]
