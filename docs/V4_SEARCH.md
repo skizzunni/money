@@ -83,3 +83,6 @@ drawdown $998 ($1,567); NQ $82,705 ($75,417), the index $92,257 ($93,279).
 
 **Not the strategy:** the live Nov 13 trades came from a history gap on the user's chart (docs/NINJATRADER_V38.md,
 2026-11-18): with the full history Funded growth takes 1 trade that day, not 10.
+
+**Update (G520, docs/NINJATRADER_V38.md): "Funded growth v4" removed.** On fresh 50K accounts over 12 months it lost
+29% of the development starts and 14% of the unseen ones (Funded growth 3% / 2%). Pine v4.1 stays a chart strategy.

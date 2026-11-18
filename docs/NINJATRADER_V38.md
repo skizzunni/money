@@ -34,9 +34,6 @@ add-on to install. It trades `pine/mnq_noise_momentum.pine` v3.8 (docs/CANDIDATE
    placed") and alerts **STOP CHECK FAILED** if a position is ever without a live stop.
 
 **Other modes (opt-in, 5-minute chart only):**
-- **Funded growth v4** (50K, 2026-11-18, docs/V4_SEARCH.md): Funded growth with the lock later (1.25 max losses),
-  the stop 0.5 noise units out, entry lines 0.9 and $250 a trade. On Aug 21 - Nov 17 2026 with the account rules:
-  +$2,209 (Funded growth +$495); per period on 2011-2025 it made more in most and less on the unseen Jul-Aug 2026.
 - **Funded green days** (50K): Funded growth that, from 11:00, stops for the day as soon as the day is green (G481).
   About 50% of traded days green instead of 42%, at half to two thirds of the money.
 - **Funded growth plus** (50K): Funded growth with +1 MNQ per $1,250 of profit (G478). It made 11-16% more a session on
@@ -10595,3 +10592,21 @@ on these dates"). Going live with 2 or more missing in the last 90 days: no new 
 the history is missing sessions", on by default), the warning first on the dashboard, printed and alerted, with what to
 do (Reload All Historical Data, then disable and enable). Backtests are unchanged.
 `tests/test_ninjatrader_v38.py::test_v38_history_gap_blocks_new_entries`.
+
+## G520 (2026-11-18): v4.1's rules on the funded account: rejected, the mode removed
+
+The Pine v4.1 rules (docs/V4_SEARCH.md) as a NinjaTrader mode ("Funded growth v4", added and removed the same day) on
+G495's measure, the rebuilt data (docs/DATA_REBUILD.md; the unseen set without the index's 2025-26 starts, 58 of 64):
+`research/g520_v41_reach_25k.py`, `research/g520b_v41_parts.py`.
+
+| first 12 months | development: reach $25K / median / lost | unseen: reach $25K / median / lost |
+|---|---|---|
+| **Funded growth** | 16.1% / $10,386 / 3.2% | **41.4% / $19,977 / 1.7%** |
+| v4.1 (lock 0.75, stop 0.5, entry 0.9, $250, 3 losers) | 16.1% / $3,031 / **29.0%** | 19.0% / $5,698 / **13.8%** |
+| lock 0.75 + 3 losers only | 32.3% / $14,402 / 0% | 29.3% / $10,799 / 5.2% |
+| + stop 0.5 | 22.6% / $5,551 / 3.2% | 25.9% / $8,335 / 12.1% |
+| + entry 0.9 | 16.1% / $12,750 / 0% | 29.3% / $12,770 / 17.2% |
+| + $250 a trade | 16.1% / $8,301 / 16.1% | 24.1% / $6,004 / 10.3% |
+
+On a $2,000 trailing floor the wider stop and the $250 loss lose accounts; nothing beats Funded growth on the unseen
+starts. Funded growth stays; the mode is removed from MnqNoiseV38.cs. Pine v4.1 is for a chart without account limits.
