@@ -34,6 +34,10 @@ add-on to install. It trades `pine/mnq_noise_momentum.pine` v3.8 (docs/CANDIDATE
    placed") and alerts **STOP CHECK FAILED** if a position is ever without a live stop.
 
 **Other modes (opt-in, 5-minute chart only):**
+- **Funded high win** (50K, 2026-11-18, G523): Funded growth locking at 0.20 max losses (0.35). On Aug 21 - Nov 17 2026
+  with the account rules: 110 trades (96), 55.5% winners (49%), 38% green days (32%), +$1,008 (+$495), worst day -$364
+  (-$507). Over fresh 12-month starts it reaches +$25,000 less often (unseen 19% against 41%; median $9,770 against
+  $19,977) and lost 2 of 58 unseen starts (Funded growth 1 of 58).
 - **Funded green days** (50K): Funded growth that, from 11:00, stops for the day as soon as the day is green (G481).
   About 50% of traded days green instead of 42%, at half to two thirds of the money.
 - **Funded growth plus** (50K): Funded growth with +1 MNQ per $1,250 of profit (G478). It made 11-16% more a session on
@@ -10657,3 +10661,7 @@ The user: a higher share of winning trades without losing the account. Funded gr
 
 Each step adds 1-3 points of winners (all of them +$3 locked trades) and costs a quarter to a half of the 12-month
 median. Earlier fades for 80%+ winners lost money (G367 / G368). Funded growth stays.
+
+**G523 follow-up (2026-11-18): built as the opt-in mode "Funded high win"** at the user's request (more winning trades,
+account kept): the lock at 0.20 with G511's fill-ins; NinjaTrader's code and the model agree trade for trade
+(`test_v38_opt_in_modes`). Funded growth stays the default.
