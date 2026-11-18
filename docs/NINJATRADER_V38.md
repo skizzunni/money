@@ -10672,3 +10672,16 @@ account kept): the lock at 0.20 with G511's fill-ins; NinjaTrader's code and the
 +$25,000, median $14,402, none lost) but on the unseen starts loses 5.2% (Funded growth 1.7%) and reaches +$25,000 on
 29.3% (41.4%). With the gentle start, a $600 early day budget or a 0.35 brake: unseen lost 5.2% / 10.3% / 8.6% / 10.3%,
 reached 27.6-31.0%. None loses as few accounts as Funded growth. Funded growth stays.
+
+## G525 (2026-11-18): a wide search for more profit at no more accounts lost: nothing adopted
+
+`research/g525_wide_profit.py`: 48 random combinations of the contract step (1,250-1,750), the lock (0.30-0.75), losers a
+day (0 / 3 / 4), the take-profit (1.75-2.25), the time stop (40-60) and the brake (0.20-0.35) on G495's measure (rebuilt
+data, as G520). Rule: lost no more than Funded growth on both sets and a higher 12-month median on both.
+
+One combination passes: Funded growth with the 60-minute time stop and nothing else changed (development median $10,840
+against $10,386, none lost; unseen $20,635 against $19,977, 1.7% lost as Funded growth), but it reaches +$25,000 less
+often (12.9% / 36.2% against 16.1% / 41.4%), and G519 measured the same change on the original data with more accounts
+lost (6.2% / 6.5% / 3.1% against 0% / 0% / 1.6%). A 3-4% median edge on data that is not the original is noise: not
+adopted. No other combination loses as few accounts with a higher median on both sets. Funded growth stays.
+`verification/noise_v2/g525_wide_profit.txt`.
