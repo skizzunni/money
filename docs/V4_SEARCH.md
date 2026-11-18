@@ -86,3 +86,11 @@ drawdown $998 ($1,567); NQ $82,705 ($75,417), the index $92,257 ($93,279).
 
 **Update (G520, docs/NINJATRADER_V38.md): "Funded growth v4" removed.** On fresh 50K accounts over 12 months it lost
 29% of the development starts and 14% of the unseen ones (Funded growth 3% / 2%). Pine v4.1 stays a chart strategy.
+
+## v4.2 (2026-11-18): $150 a contract, 7 MNQ
+
+After Nov 17's 15:00 short lost $1,258.70 at 5 MNQ on the user's chart: the max loss per contract at $150 (v4.1 $250).
+At 5 MNQ on W: $10,253 (v4.1 $10,910), 55 trades (50), green days 54% (46%), worst trade -$769 (-$1,259), Nov 17
+-$759 (-$1,259); NQ -12%, the index -4%. The user's TradingView showed v4.1 at about 1.7x the model ($18,492 against
+$10,910), so the default is 7 MNQ ($1,050 a trade) to reach about $25,000 there: the script itself on W makes
+$14,355, 55 trades, 54% green days, worst day -$1,111, worst drawdown $3,218. Not for a prop account (G520).

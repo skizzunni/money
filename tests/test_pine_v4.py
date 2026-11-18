@@ -22,12 +22,13 @@ V4_PINE = ROOT / "pine" / "mnq_noise_v4.pine"
 V4 = {**V21, "lookback": 14, "trail_from": "", "tv_path": False, "lock_at": 1.25, "stop_buffer": 0.5,
       "max_loss_per_trade": 1250.0, "time_stop": 45, "trend_n": 45, "qty": 5, "daily_loss_limit": 0.0, "trail_dd": 0.0}
 V4.update(lock_at=0.75, max_losers=3)  # v4.1: the lock at 0.75, 3 losers a day
+V4.update(qty=7, max_loss_per_trade=1050.0)  # v4.2: 7 MNQ at $150 each
 
 
 def test_v4_defaults_in_the_script():
     src = V4_PINE.read_text()
-    for pattern in (r'strategy\("MNQ Noise-Area Momentum v4\.1"', r'preset = input\.string\("Custom"',
-                    r'fundQty  = input\.int\(5,', r'maxLossIn = input\.float\(1250,',
+    for pattern in (r'strategy\("MNQ Noise-Area Momentum v4\.2"', r'preset = input\.string\("Custom"',
+                    r'fundQty  = input\.int\(7,', r'maxLossIn = input\.float\(1050,',
                     r'dailyLimitIn = input\.float\(0,',
                     r'trailDDIn = input\.float\(0,', r'trendN = input\.int\(45,', r'stopBuf = input\.float\(0\.5,',
                     r'lockAt = input\.float\(0\.75,',
@@ -52,4 +53,4 @@ def test_v4_script_matches_the_model_on_the_users_bars():
         assert (a["entry_bar"], a["exit_bar"], a["dir"]) == (t.entry_bar, t.exit_bar, t.direction), (a, t)
         assert round(a["entry"], 6) == round(t.entry, 6) and round(a["exit"], 6) == round(t.exit, 6), (a, t)
         assert abs(a["pnl"] - t.pnl) < 1e-6, (a, t)
-    assert max(t.qty for t in py) == 5 and any(t.reason == "Time stop" for t in py)
+    assert max(t.qty for t in py) == 7 and any(t.reason == "Time stop" for t in py)

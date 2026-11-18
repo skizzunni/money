@@ -15,6 +15,11 @@
 // Noise area for each half-hour mark = the day's open (and previous close) plus/minus the
 // average distance price has moved from the 09:30 open by that time over the last 14 sessions.
 //
+// v4.2, 2026-11-18: $150 max loss per contract (v4.1: $250) at 7 MNQ ($1,050 a trade). At 5 MNQ the $150 stop made
+// 55 trades and 54% green days on Aug 21 - Nov 17 2026 (v4.1 50 / 46%) for 6% less, its worst trade -$769 (v4.1 -$1,259,
+// Nov 17's 15:00 short); 7 MNQ to reach about $25,000 on the user's TradingView chart of that window ($14,355 in the
+// Python model, worst trade -$1,076, worst drawdown $3,218). Fewer contracts: smaller swings, less profit.
+// NOT for the Take Profit Trader 50K (G520: these rules lose funded accounts; NinjaTrader keeps Funded growth).
 // v4.1, 2026-11-18: smoother. The lock at 0.75 max losses (v4.0: 1.25) and no new entries after 3 losing trades in a day.
 // On Aug 21 - Nov 17 2026 at 5 MNQ: +$10,910, 50 trades, 46% of days green (v4.0 42%), worst drawdown $2,512 -> $2,076;
 // the worst day on NQ 2015-2025 / the index 2011-2025 -$4,966 / -$7,485 -> -$3,841 / -$4,566, green days up there too.
@@ -184,7 +189,7 @@
 // max loss after the fill bar are checked once per bar, so a 30-minute chart sees them later than a trader would.
 // The rules are the same as the Python reference in mnqbot/noise.py.
 // ------------------------------------------------------------------
-strategy("MNQ Noise-Area Momentum v4.1", shorttitle = "Noise-Mom v4", overlay = true,
+strategy("MNQ Noise-Area Momentum v4.2", shorttitle = "Noise-Mom v4", overlay = true,
      initial_capital = 50000, currency = currency.USD,
      default_qty_type = strategy.fixed, default_qty_value = 1, pyramiding = 0,
      commission_type = strategy.commission.cash_per_contract, commission_value = 0.62,
@@ -208,11 +213,11 @@ lookback = input.int(14, "Sessions in the noise average", minval = 2, maxval = 6
 funded   = input.bool(true, "FUNDED ACCOUNT (tick for the funded contracts; untick for the evaluation's)", group = grpT,
      tooltip = "Unticked: the evaluation's contracts below (1 to start since v3.0; more as profit builds, see \"Add a contract per $ of profit\"). Ticked: the funded account's (1). Same rules and the same max loss per trade; the stop and the lock scale with the contracts. At 10 MNQ and $350 (a $35 stop a contract) about 25-30% of historical $50K evaluations passed; at 3 MNQ ($117 a contract) about 45-55%, because the stop has room and four losers no longer eat the $2,000 drawdown. Once funded, tick it.")
 account  = funded ? "Funded" : "Evaluation"
-evalQty  = input.int(5, "Contracts in an evaluation", minval = 1, maxval = 60, group = grpT)
-fundQty  = input.int(5, "Contracts on a funded account", minval = 1, maxval = 60, group = grpT,
+evalQty  = input.int(7, "Contracts in an evaluation", minval = 1, maxval = 60, group = grpT)
+fundQty  = input.int(7, "Contracts on a funded account", minval = 1, maxval = 60, group = grpT,
      tooltip = "Every figure in docs/RESULTS.md is per contract. What matters is the max loss per contract (the dashboard shows it): $350 over 10 contracts is $35 a contract, a 17.5-point stop; over 3 it is $117, 58 points. See docs/RESULTS.md, rounds thirteen, twenty-seven, thirty-two and thirty-seven.")
 qtyIn = account == "Evaluation" ? evalQty : fundQty
-maxLossIn = input.float(1250, "Max loss per trade, $ (all contracts, 0 = off)", minval = 0, step = 10, group = grpT,
+maxLossIn = input.float(1050, "Max loss per trade, $ (all contracts, 0 = off)", minval = 0, step = 10, group = grpT,
      tooltip = "A second stop this many dollars from the entry fill, for the whole position, live from the fill like a bracket order; whichever of it and the line stop is closer is used. Spread over many contracts it gets tight: $350 over 10 contracts is a $35 stop each, which normal 5-minute moves hit, and on 2023-2026 it made about $6 a day per contract against about $20 at $117 each. On 16 years, caps of $100-$200 per contract raised profit per day in every period and cut the worst losing stretch. Fees, slippage and a gap through the stop can add to the loss.")
 afterQtyIn = input.int(0, "After a losing trade: contracts (0 = the same)", minval = 0, maxval = 60, group = grpT,
      tooltip = "The trade after a losing trade uses this many contracts and the max loss below, so its stop sits further away (v2.8: the same 4 MNQ and $1,000, 125 points, against 93.75 for 4 MNQ and $750; v2.6 was 9 MNQ and $1,500 against 10 and $750). A winner, or the next trade, goes back to the normal size. Ordinary noise stopped many re-entries after a loss; the wider stop turned some of them into winners: back-to-back losers 36% against 42% of losers on the user's MNQ window, 51% against 57% on NQ futures 2015-2025 (docs/RESULTS.md, v2.1). It risks up to $1,000 on that trade, and never more than what is left of the day's loss limit.")
@@ -763,7 +768,7 @@ if showDash and (barstate.islastconfirmedhistory or barstate.isrealtime)
     closed = strategy.closedtrades
     todayPnlDash = strategy.netprofit - dayStartNet
     wins = strategy.wintrades
-    table.cell(dash, 0, 0, "MNQ Noise Momentum v3.8: " + (growth ? preset : account) + ", " + str.tostring(qBase) + " MNQ", text_color = color.white, text_size = size.small)
+    table.cell(dash, 0, 0, "MNQ Noise Momentum v4.2: " + (growth ? preset : account) + ", " + str.tostring(qBase) + " MNQ", text_color = color.white, text_size = size.small)
     table.cell(dash, 1, 0, status, text_color = statusColor, text_size = size.small)
     table.cell(dash, 0, 1, "Sessions of history", text_color = color.silver, text_size = size.small)
     table.cell(dash, 1, 1, str.tostring(math.min(filled, lookback)) + " / " + str.tostring(lookback), text_color = color.white, text_size = size.small)
