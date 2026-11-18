@@ -10610,3 +10610,18 @@ G495's measure, the rebuilt data (docs/DATA_REBUILD.md; the unseen set without t
 
 On a $2,000 trailing floor the wider stop and the $250 loss lose accounts; nothing beats Funded growth on the unseen
 starts. Funded growth stays; the mode is removed from MnqNoiseV38.cs. Pine v4.1 is for a chart without account limits.
+
+## G521 (2026-11-18): Pine v4.3's $150 a trade on the funded account: rejected
+
+The user asked for the NinjaTrader strategy to do what Pine v4.3 does without losing the account, with more trades and
+mostly winners. `research/g521_150_funded.py`, G495's measure on the rebuilt data (as G520):
+
+| first 12 months | development: reach $25K / median / lost | unseen: reach $25K / median / lost |
+|---|---|---|
+| **Funded growth** | 16.1% / $10,386 / 3.2% | **41.4% / $19,977 / 1.7%** |
+| E $150 a trade | 9.7% / $7,438 / 6.5% | 27.6% / $13,529 / 6.9% |
+| F $150 + lock 0.75 + 3 losers | 19.4% / $9,053 / 3.2% | 31.0% / $11,027 / 5.2% |
+| G $150 + 3 losers | 16.1% / $11,528 / 0% | 22.4% / $9,449 / 12.1% |
+| H $150 + lock 0.25 (more winners) | 12.9% / $7,047 / 12.9% | 22.4% / $10,266 / 5.2% |
+
+Every variant reaches +$25,000 less often on the unseen starts and loses 3-7x as many accounts. Funded growth stays.
