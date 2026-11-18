@@ -10642,3 +10642,18 @@ trailing floor, G495's measure (`research/g522_pine_rules_funded.py`):
 
 At any size that could make the chart's money, 1 account in 4 to 1 in 2 is lost within a year. The chart's Aug-Nov
 2026 is one of its good stretches. Funded growth stays on the funded accounts.
+
+## G523 (2026-11-18): an earlier lock for more winning trades: rejected
+
+The user: a higher share of winning trades without losing the account. Funded growth with only the lock earlier
+(`research/g523_earlier_lock.py`, G495's measure; winners from the raw runs on W / NQ / the index):
+
+| lock at | winners W / NQ / IX | development: reach $25K / median / lost | unseen: reach $25K / median / lost |
+|---|---|---|---|
+| **0.35 (Funded growth)** | 49.5% / 52.7% / 52.3% | 16.1% / $10,386 / 3.2% | **41.4% / $19,977 / 1.7%** |
+| 0.30 | 50.0% / 54.2% / 54.0% | 22.6% / $7,956 / 3.2% | 34.5% / $15,307 / 1.7% |
+| 0.25 | 51.5% / 55.1% / 54.9% | 9.7% / $3,782 / 12.9% | 27.6% / $11,146 / 0% |
+| 0.20 | 55.5% / 55.3% / 55.4% | 12.9% / $7,808 / 3.2% | 19.0% / $9,770 / 3.4% |
+
+Each step adds 1-3 points of winners (all of them +$3 locked trades) and costs a quarter to a half of the 12-month
+median. Earlier fades for 80%+ winners lost money (G367 / G368). Funded growth stays.
