@@ -10685,3 +10685,25 @@ often (12.9% / 36.2% against 16.1% / 41.4%), and G519 measured the same change o
 lost (6.2% / 6.5% / 3.1% against 0% / 0% / 1.6%). A 3-4% median edge on data that is not the original is noise: not
 adopted. No other combination loses as few accounts with a higher median on both sets. Funded growth stays.
 `verification/noise_v2/g525_wide_profit.txt`.
+
+## G526 and an every-day breakout (2026-11-18): trading every day loses: nothing adopted
+
+The user (Nov 18, when the bot took no trade): "loosen up, need it to trade every day", MNQ or ES or gold. Nov 18 had
+no signal: the model on the day's full data takes 0 trades in Funded growth and in Funded high win (MNQ stayed inside
+the noise area, 26,990-27,320). The trades on account ...276 that day (ES, NQ, 5-10 MNQ, DAY orders, no strategy name)
+were manual: about -$152 before fees.
+
+**Looser Funded growth** (`research/g526_more_days.py`, G495's measure): days traded on NQ 53% (Funded growth) to 56-60%
+with the entry lines at 0.8 / 0.7 / 0.6 or the day filters off; winners fall (53% -> 43-50%); unseen: reach +$25,000
+27.6-34.5% (41.4%), median $7,446-15,563 ($19,977), lost 3.4-8.6% (1.7%). `verification/noise_v2/g526_more_days.txt`.
+
+**An opening-range breakout, one trade every session** (`research/orb_every_day.py`: the range of the first 5 / 15 / 30
+minutes, the first 1-minute close past it, the stop at the range's far side or middle with a cap, a target of 0.5-2R
+or none; 1 micro; MNQ on NQ 2015-2025, MES on ES Nov 2020 - Jul 2024 from Hugging Face): it trades 98-100% of sessions
+and the 0.5R target wins 60-69% of trades, but no rule makes money on NQ over 2015-2025 except one at $1.29 a day
+(15-minute range, the middle stop capped at 80 points: 7 of 11 years up, profit factor 1.03, and 28% of fresh 50K
+accounts lost within a year); on ES the best makes $3.55 a day (profit factor 1.12, 3.7 years). Gold, silver, crude
+and the euro failed earlier (docs/RESULTS.md, round sixty-eight). `verification/noise_v2/orb_every_day.csv`.
+
+Trading every session buys a high share of winners only with small targets, and those make about nothing after costs
+while losing many more accounts. Funded growth stays.
