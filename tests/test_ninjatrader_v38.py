@@ -1356,3 +1356,35 @@ def test_v38_live_position_without_stop_is_closed(sim, sample_1m, tmp_path):  # 
     assert hit[5] == "No stop" and int(hit[3]) == at + 1, hit  # sent at that close, filled at the next open
     assert "STOP CHECK FAILED" in out
     assert [t for t in cut if int(t[3]) < int(trade[1])] == [t for t in clean if int(t[3]) < int(trade[1])]
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+def test_v38_history_gap_blocks_new_entries(sim, sample_1m, tmp_path):  # noqa: F811
+    """2026-11-17 live: the chart's history was missing Oct 19 - Nov 6 and the bot traded on narrow noise lines. Going
+    live with whole sessions missing in the last 90 days (2 or more weekdays not in the no-trade dates): no new entries,
+    the warning printed and on the dashboard; with the guard off, or with the history complete, it trades as before."""
+    bars = resample(sample_1m, "5min")
+    day = pd.Series(bars.index.date, index=bars.index)
+    days = sorted(set(day))
+    hole = set(days[-25:-10])  # 15 sessions, as on the user's chart
+    cut = bars[~day.isin(hole).to_numpy()]
+    live = int((pd.Series(cut.index.date) >= days[-10]).to_numpy().argmax()) + 1  # live from the session after the hole
+
+    def go(b, *extra):
+        path = tmp_path / "bars.csv"
+        with path.open("w") as f:
+            for t, r in zip(b.index, b.itertuples(), strict=True):
+                f.write(f"{t:%Y-%m-%d %H:%M},{r.open!r},{r.high!r},{r.low!r},{r.close!r}\n")
+        r = subprocess.run([DOTNET, str(sim), str(path), "5", "Strategy=V38", *GROW_ARGS, f"SimRealtimeFrom={live}",
+                            *extra], capture_output=True, text=True, env=ENV)
+        assert r.returncode == 0, r.stderr[-2000:]
+        return [x.split(",")[1:] for x in r.stdout.splitlines() if x.startswith("T,")], r.stdout
+
+    blocked, out = go(cut)
+    assert "NO NEW TRADES: the chart's history is missing 15 sessions" in out
+    assert not [t for t in blocked if int(t[1]) > live], "no entry sent once live"
+    allowed, out = go(cut, "BlockOnDataGap=False")
+    assert "the chart's history is missing 15 sessions" in out and "NO NEW TRADES" not in out
+    assert [t for t in allowed if int(t[1]) > live], "with the guard off it trades"
+    _, out = go(bars)
+    assert "history is missing" not in out

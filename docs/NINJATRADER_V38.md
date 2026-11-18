@@ -10581,3 +10581,17 @@ stop instead of only alerting. Backtests are unchanged (live only). The flag is 
 **Tests:** `tests/test_ninjatrader_v38.py::test_v38_live_position_without_stop_is_closed`: live in the simulator, the
 broker cancels a trade's stop two bars in: that trade closes "No stop" at the next open, the flag is printed, the earlier
 trades are unchanged.
+
+## Fix (2026-11-18): no new trades on a chart whose history is missing sessions
+
+**Found:** the user's NinjaTrader export of MNQ 12-26 (1-minute, to Nov 17) has no bars from Oct 19 to Nov 6 2026 (15
+sessions). The model on that data reproduces the live Nov 13 trades one for one (10 shorts, the take-profit at
+27,816.00 against the live 27,816.50, the same locks and stop); on the complete history (the gap filled from Yahoo, which
+matches the export bar for bar elsewhere) it takes 1 trade that day. Without Nov 4-5's big moves the 14-session noise
+was about 30% too small: entry lines too close, targets too near, more trades.
+
+**Change (MnqNoiseV38.cs):** the data check also lists whole weekdays missing between two sessions (not in "Don't trade
+on these dates"). Going live with 2 or more missing in the last 90 days: no new entries (new setting "No new trades when
+the history is missing sessions", on by default), the warning first on the dashboard, printed and alerted, with what to
+do (Reload All Historical Data, then disable and enable). Backtests are unchanged.
+`tests/test_ninjatrader_v38.py::test_v38_history_gap_blocks_new_entries`.

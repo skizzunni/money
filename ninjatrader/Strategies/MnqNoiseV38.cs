@@ -1014,6 +1014,12 @@ namespace NinjaTrader.NinjaScript.Strategies
         int weekTrades, weekWins;  // U14: this week's closed trades and winners
         // U17: the data check: sessions (09:30-16:00, not on the no-trade list) and those with bars missing
         string dqDay = "", dqFirstThin = "";
+        // 2026-11-17: the live chart's history was missing Oct 19 - Nov 6 2026 (15 sessions) and the bot traded on it: the
+        // noise lines and targets came out too narrow (it took 10 trades on Nov 13 where the full history gives 1). Whole
+        // weekdays missing between two sessions (not in "Don't trade on these dates") are listed; live, 2 or more in the last
+        // 90 days stop new entries (BlockOnDataGap) until the history is reloaded.
+        readonly List<string> dqMissing = new List<string>();
+        bool historyGap;
         int dqBars, dqSessions, dqThin, dqBeforeStart;
         DateTime paceFrom = DateTime.MinValue, lastSession = DateTime.MinValue;
         // fill quality: the price each order was planned at (the close when the entry or a market exit was sent, the
@@ -1077,6 +1083,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 SkipDates = SkipDefault;
                 FedDates = FedDefault;
                 PlaceOrders = true;
+                BlockOnDataGap = true;
                 Mode = "Test sprint";  // G253 / G256: the default, the Test in two weeks (Funded growth once passed)
                 Goal = 50000;
                 AfterLossMaxLoss = 187.5;  // G168 (Funded growth sets it by the chart: 187.5 on 5-minute, 250 otherwise)
@@ -1338,6 +1345,16 @@ namespace NinjaTrader.NinjaScript.Strategies
                     setupWarnings.Add(dqw);
                     Print("MnqNoiseV38 WARNING: " + dqw);
                 }
+                string gap = RecentGap();
+                if (gap.Length > 0)
+                {
+                    historyGap = BlockOnDataGap;
+                    string gw = (historyGap ? "NO NEW TRADES: " : "") + "the chart's history is missing " + gap +
+                                ", so the noise lines, targets and filters are wrong. Right-click the chart > Reload All Historical Data " +
+                                "(or Tools > Historical Data: download MNQ 1 Minute for those dates), then disable and enable the strategy";
+                    setupWarnings.Insert(0, gw);
+                    Print("MnqNoiseV38 WARNING: " + gw);
+                }
                 if (PropStartBalance > 0 && TrailDD > 0 && Account != null)  // the prop account's floor from its own balance
                 {
                     double bal = Math.Max(0, Account.Get(AccountItem.CashValue, Currency.UsDollar));
@@ -1389,7 +1406,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (tMinDq >= V38Engine.RthOpen && tMinDq < V38Engine.RthClose)
             {
                 string d = start.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
-                if (d != dqDay) { FinishDataDay(); dqDay = d; dqBars = 0; }
+                if (d != dqDay) { FinishDataDay(); CountMissing(dqDay, d); dqDay = d; dqBars = 0; }
                 dqBars++;
             }
             // the account's own numbers for the risk limits: its closed P/L, and today's from the 09:30 bar
@@ -1478,7 +1495,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 if (real > 0) ExitLong("Gap exit", GapLongName);
                 else ExitShort("Gap exit", GapShortName);
             }
-            else if (real == 0 && engine.GapNewEntry != 0 && PlaceOrders && !guardTripped)
+            else if (real == 0 && engine.GapNewEntry != 0 && PlaceOrders && !guardTripped && !historyGap)
             {
                 // G60: gap and go, a market entry with its stop at the 09:30 open attached first
                 string name = engine.GapNewEntry > 0 ? GapLongName : GapShortName;
@@ -1492,7 +1509,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 Say("entry", (engine.GapNewEntry > 0 ? "BUY " : "SELL ") + engine.GapNewQty + " MNQ at market (gap and go), stop " +
                     engine.GapNewStop.ToString("0.00", CultureInfo.InvariantCulture) + ", out at 09:55");
             }
-            else if (real == 0 && engine.NewEntry != 0 && PlaceOrders && !guardTripped)
+            else if (real == 0 && engine.NewEntry != 0 && PlaceOrders && !guardTripped && !historyGap)
             {
                 // the bracket first, in ticks from the fill, so it is attached the moment the entry fills
                 string name = engine.NewEntry > 0 ? LongName : ShortName;
@@ -2007,6 +2024,33 @@ namespace NinjaTrader.NinjaScript.Strategies
             }
         }
 
+        void CountMissing(string prev, string next)
+        {
+            DateTime a, b;
+            if (prev.Length == 0 || !DateTime.TryParseExact(prev, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out a) ||
+                !DateTime.TryParseExact(next, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out b))
+                return;
+            for (DateTime x = a.AddDays(1); x < b; x = x.AddDays(1))
+            {
+                string k = x.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+                if (x.DayOfWeek != DayOfWeek.Saturday && x.DayOfWeek != DayOfWeek.Sunday && !(SkipDates ?? "").Contains(k))
+                    dqMissing.Add(k);
+            }
+        }
+
+        // the whole sessions missing in the 90 days before the last session, as "N sessions (first, last)", or ""
+        string RecentGap()
+        {
+            DateTime last;
+            if (dqDay.Length == 0 || !DateTime.TryParseExact(dqDay, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out last))
+                return "";
+            string from = last.AddDays(-90).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+            List<string> recent = dqMissing.FindAll(x => string.CompareOrdinal(x, from) >= 0);
+            if (recent.Count < 2)
+                return "";
+            return recent.Count + " sessions (" + recent[0] + (recent.Count > 1 ? " to " + recent[recent.Count - 1] : "") + ")";
+        }
+
         // U17: what is wrong with the price data, or "" when it is as the bot was tested on
         string DataWarning()
         {
@@ -2440,6 +2484,10 @@ namespace NinjaTrader.NinjaScript.Strategies
         [Range(0, 10000000)]
         [Display(Name = "Profit goal for the dashboard, $ (0 = hide)", Order = 2, GroupName = "4. Orders")]
         public double Goal { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "No new trades when the history is missing sessions (reload it first)", Order = 3, GroupName = "4. Orders")]
+        public bool BlockOnDataGap { get; set; }
         #endregion
     }
 }
