@@ -15,6 +15,9 @@
 // Noise area for each half-hour mark = the day's open (and previous close) plus/minus the
 // average distance price has moved from the 09:30 open by that time over the last 14 sessions.
 //
+// v4.1, 2026-11-18: smoother. The lock at 0.75 max losses (v4.0: 1.25) and no new entries after 3 losing trades in a day.
+// On Aug 21 - Nov 17 2026 at 5 MNQ: +$10,910, 50 trades, 46% of days green (v4.0 42%), worst drawdown $2,512 -> $2,076;
+// the worst day on NQ 2015-2025 / the index 2011-2025 -$4,966 / -$7,485 -> -$3,841 / -$4,566, green days up there too.
 // v4.0, 2026-11-18: trades indefinitely (no evaluation stop, no trailing drawdown, no daily cap) at 5 MNQ, with the
 // settings that held up best in the 2026-11-17 search (docs/V4_SEARCH.md): the lock later (at 1.25 max losses, so a
 // trade has room to reach the take-profit or the 16:00 close instead of closing at +2.5 points), the stop 0.5 noise
@@ -181,7 +184,7 @@
 // max loss after the fill bar are checked once per bar, so a 30-minute chart sees them later than a trader would.
 // The rules are the same as the Python reference in mnqbot/noise.py.
 // ------------------------------------------------------------------
-strategy("MNQ Noise-Area Momentum v4.0", shorttitle = "Noise-Mom v4", overlay = true,
+strategy("MNQ Noise-Area Momentum v4.1", shorttitle = "Noise-Mom v4", overlay = true,
      initial_capital = 50000, currency = currency.USD,
      default_qty_type = strategy.fixed, default_qty_value = 1, pyramiding = 0,
      commission_type = strategy.commission.cash_per_contract, commission_value = 0.62,
@@ -258,13 +261,13 @@ stopBuf = input.float(0.5, "Stop distance past the line, in noise units", minval
      tooltip = "0 puts the stop exactly on the line. 0.24 is how far price typically overshoots the line before resuming, measured on 2011-2018; it cut whipsaw stop-outs and raised profit per day on every later period. See docs/RESULTS.md.")
 tpUnits = input.float(2.0, "Take profit, noise units from the entry (0 = off)", minval = 0, maxval = 10, step = 0.1, group = grpT,
      tooltip = "A limit order this many noise units past your fill (1.5 x the current noise x the fill price), working from the bar after the fill; with the resting stop only. Chosen walk-forward, each year from the years before only: over 2015-2026 it raised profit per day from $24.66 to $25.77 per contract, the t-stat from 4.71 to 5.39, cut the worst losing stretch from $5,178 to $4,185, and raised the $50K pass rate at 2 MNQ in 2023-2026 from 42% to 68%. See docs/RESULTS.md, round twenty-six.")
-lockAt = input.float(1.25, "Lock a small win: trigger, in max losses (0 = off)", minval = 0, maxval = 10, step = 0.05, group = grpT,
+lockAt = input.float(0.75, "Lock a small win: trigger, in max losses (0 = off)", minval = 0, maxval = 10, step = 0.05, group = grpT,
      tooltip = "Once a trade has been this far in profit (1 = as far as the max loss: 17.5 points with $350 on 10 MNQ), the stop moves to the entry plus the points below, so the trade can't turn into a loser. Like Tradovate's Auto Breakeven: set the trigger and the offset in your bracket (70 and +10 ticks at the defaults). Tested at $35 a contract on 1-minute data, 2011-2026 index and 2015-2025 NQ futures: winners from about 14% to 48%, the same money, a higher t-stat (docs/RESULTS.md, round thirty-seven). On a 5-minute chart the lock moves one bar after the trigger is touched, so the chart's backtest shows fewer winners than the broker gets: over 16 years at 10 MNQ and $350, about 40% on this chart against about 49% with Tradovate's Auto Breakeven (docs/RESULTS.md).")
 lockPlus = input.float(2.5, "Lock: stop to the entry plus, points", minval = 0, maxval = 50, step = 0.25, group = grpT,
      tooltip = "2.5 points is $5 a contract, more than the round-trip fees and a tick of slippage, so a locked trade closes as a small winner.")
 tightenOnly = input.bool(true, "Stop only ever tightens", group = grpT,
      tooltip = "In a trade the stop never moves back toward the price: when the noise line steps back (it does in about 3 of 10 half-hour steps), the stop stays where it was. Adopted in the NinjaTrader strategy in round one hundred and thirty-nine: more net in all four test periods with a slightly smaller drawdown. Webhook orders always use it.")
-maxLosers = input.int(0, "Max losing trades a day (0 = no limit)", minval = 0, maxval = 20, group = grpT,
+maxLosers = input.int(3, "Max losing trades a day (0 = no limit)", minval = 0, maxval = 20, group = grpT,
      tooltip = "After this many losing trades in a day, no new entries until tomorrow (an open trade runs on as usual). Tested before running at 10 MNQ and $350 with the lock, on 1-minute data: on 2011-2018, 2019-2022, 2023-2026 and NQ futures 2015-2025 it made more per day, with a higher t-stat and a smaller worst losing stretch (31% smaller on NQ futures). 1 or 2 losers cut the profit by a third or more: the winner often comes after a few stop-outs. See docs/RESULTS.md, round thirty-eight.")
 timeStopIn = input.int(45, "Time stop: close a losing trade not yet locked this many minutes after its fill (0 = off)", minval = 0, maxval = 390, group = grpT,
      tooltip = "At a bar close this many minutes or more after the fill, a trade that is losing and has not reached the lock is closed at market (it fills at the next bar's open). 60 in funded growth mode: tested before running in docs/NINJATRADER_V38.md (G6), more net on all three 5-minute sets with the floor never touched. Not tested in the evaluation, so 0 (off) there.")

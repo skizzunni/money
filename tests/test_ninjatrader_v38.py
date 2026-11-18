@@ -757,7 +757,8 @@ def test_v38_bigger_accounts_agree(sim, sample_1m, minutes, mode, daily, trail, 
     ("Funded green days", {"day_stop_late_from": 660, "day_stop_late": 1.0}),
     # v4 (docs/V4_SEARCH.md): the lock at 1.25 max losses, the stop 0.5 noise units out, entry lines 0.9, $250 a trade,
     # with G511's fill-ins as Funded growth
-    ("Funded growth v4", {"lock_at": 1.25, "stop_buffer": 0.5, "entry_k": 0.9, "max_loss_per_trade": 250.0,
+    ("Funded growth v4", {"lock_at": 0.75, "max_losers": 3, "stop_buffer": 0.5, "entry_k": 0.9,
+                          "max_loss_per_trade": 250.0,
                           "fill_qty2_room": 4000.0, "fill_qty3_room": 6500.0})])
 def test_v38_opt_in_modes(sim, sample_1m, mode, extra, tmp_path):  # noqa: F811
     """G473 / G475: the 100K U58 mode (U58 on the 100K's limits, +1 MNQ per $2,000, no brake) and the Aggressive mode

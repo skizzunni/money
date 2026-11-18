@@ -58,3 +58,28 @@ trailing drawdown. At 1 MNQ the same rules made $2,274 (drawdown $502).
 four settings. NinjaTrader's code and the model agree trade for trade (`test_v38_opt_in_modes`). On W with the account
 rules on: +$2,209 (today's Funded growth +$495), lowest point $467 under the start, drawdown $1,799 (close to the
 floor). Not yet measured on G495's +$25,000 starts (needs the index's 2025-26 data). Funded growth stays the default.
+
+## v4.1 (2026-11-18): smoother, more green days
+
+The user asked for more green days and more trades at the same profit, and no repeat of Nov 17. Three more searches
+on Pine v4.0 (5 MNQ), each scored on W, NQ and the index and on Nov 13 / 16 / 17
+(`verification/v4_search/g2_focused_288.jsonl`, `g3_streaks_140.jsonl`, `g4_excursions_50.jsonl`):
+
+- 15-minute checks, the last entry 15:30, daily loss caps, stopping once green late: more trades or green days only at
+  14-65% less profit on history (15-minute checks: worst history day -$13,179).
+- Skipping a side after losers in a row, or pausing after a losing streak: no more green days.
+- Taking half off at 0.5 R (with a trail): 100 trades and 50% green days on W, but a third less on history.
+- **Kept:** the lock at 0.75 max losses (more trades end green) and no new entries after 3 losers a day (halves the
+  worst history days at almost no cost).
+
+| 5 MNQ | W | trades | green days | W drawdown | NQ (green, worst day) | index (green, worst day) |
+|---|---|---|---|---|---|---|
+| v4.0 | $11,369 | 46 | 42% | $2,512 | $327,731 (43%, -$4,966) | $375,883 (42%, -$7,485) |
+| **v4.1** | **$10,910** | **50** | **46%** | **$2,076** | $304,657 (45%, -$3,841) | $372,149 (44%, -$4,566) |
+
+The Pine script itself gives $10,910 / 50 trades on W (`research/v4_search/pine_w.py`). NinjaTrader's "Funded growth
+v4" takes the same two changes: on W with the account rules +$2,981 (Funded growth +$1,300), green days 35% (32%),
+drawdown $998 ($1,567); NQ $82,705 ($75,417), the index $92,257 ($93,279).
+
+**Not the strategy:** the live Nov 13 trades came from a history gap on the user's chart (docs/NINJATRADER_V38.md,
+2026-11-18): with the full history Funded growth takes 1 trade that day, not 10.

@@ -1207,7 +1207,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                     }
                     else if (v4)  // v4: Funded growth (U58, G511's fill-ins) with #29's exits and $250 a trade
                     {
-                        MaxLoss = 250; AfterLossMaxLoss = 250; LockAt = 1.25; StopBuffer = 0.5; EntryWidth = 0.9;
+                        MaxLoss = 250; AfterLossMaxLoss = 250; LockAt = 0.75; StopBuffer = 0.5; EntryWidth = 0.9;  // v4.1: lock 0.75
+                        MaxLosersPerDay = 3;  // v4.1: no new entries after 3 losers a day
                         MoreDaysQty2Room = 4000; MoreDaysQty3Room = 6500;
                     }
                     else  // G475's A1: no brake, +1 MNQ per $1,000, a $1,000 day budget until the floor stops
