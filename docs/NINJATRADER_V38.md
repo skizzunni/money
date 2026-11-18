@@ -10625,3 +10625,20 @@ mostly winners. `research/g521_150_funded.py`, G495's measure on the rebuilt dat
 | H $150 + lock 0.25 (more winners) | 12.9% / $7,047 / 12.9% | 22.4% / $10,266 / 5.2% |
 
 Every variant reaches +$25,000 less often on the unseen starts and loses 3-7x as many accounts. Funded growth stays.
+
+## G522 (2026-11-18): Pine v4.3's rules on the funded account: rejected
+
+The user asked NinjaTrader to do what Pine v4.3 does on the chart. Pine v4.3's rules exactly (v3.8's engine, the lock
+0.75, the stop 0.5 out, a 45-minute time stop, 3 losers a day, $150 a contract) at a fixed size on the 50K's $2,000
+trailing floor, G495's measure (`research/g522_pine_rules_funded.py`):
+
+| first 12 months | development: reach $25K / median / lost | unseen: reach $25K / median / lost |
+|---|---|---|
+| **Funded growth** | 16.1% / $10,386 / 3.2% | **41.4% / $19,977 / 1.7%** |
+| Pine v4.3 at 2 MNQ | 0% / $4,403 / 29.0% | 1.7% / $6,432 / 22.4% |
+| Pine v4.3 at 3 MNQ | 3.2% / $265 / 41.9% | 15.5% / $5,273 / 32.8% |
+| Pine v4.3 at 3 MNQ, $900 a day | 6.5% / $484 / 35.5% | 12.1% / $4,662 / 32.8% |
+| Pine v4.3 at 4 MNQ | 12.9% / $559 / 45.2% | 24.1% / $594 / 48.3% |
+
+At any size that could make the chart's money, 1 account in 4 to 1 in 2 is lost within a year. The chart's Aug-Nov
+2026 is one of its good stretches. Funded growth stays on the funded accounts.
