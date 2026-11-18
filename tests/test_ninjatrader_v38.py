@@ -443,7 +443,7 @@ def test_v38_startup_checks(sim, sample_1m, tmp_path):  # noqa: F811
     loose, warn, _ = go("Mode=  funded GROWTH ")
     assert loose == ok_trades and warn == [], "the mode is read whatever its case and spaces"
     _, warn, dash = go("Mode=Funded")
-    expected = ("isn't Funded growth (50K, plus, 100K, 100K U58, 150K, Apex 100K or Apex 150K), Funded aggressive, "
+    expected = ("isn't Funded growth (50K, plus, v4, 100K, 100K U58, 150K, Apex 100K or Apex 150K), Funded aggressive, "
                 "Funded green days, Test sprint, Evaluation or Custom")
     assert any(expected in x for x in warn)
     assert "SETUP WARNING (1)" in dash
@@ -754,7 +754,11 @@ def test_v38_bigger_accounts_agree(sim, sample_1m, minutes, mode, daily, trail, 
                                 "profit_step": 2000.0, "giveback_brake": 0.0}),
     ("Funded aggressive", {"giveback_brake": 0.0, "profit_step": 1000.0, "early_daily_loss": 1000.0}),
     ("Funded growth plus", {"profit_step": 1250.0}),
-    ("Funded green days", {"day_stop_late_from": 660, "day_stop_late": 1.0})])
+    ("Funded green days", {"day_stop_late_from": 660, "day_stop_late": 1.0}),
+    # v4 (docs/V4_SEARCH.md): the lock at 1.25 max losses, the stop 0.5 noise units out, entry lines 0.9, $250 a trade,
+    # with G511's fill-ins as Funded growth
+    ("Funded growth v4", {"lock_at": 1.25, "stop_buffer": 0.5, "entry_k": 0.9, "max_loss_per_trade": 250.0,
+                          "fill_qty2_room": 4000.0, "fill_qty3_room": 6500.0})])
 def test_v38_opt_in_modes(sim, sample_1m, mode, extra, tmp_path):  # noqa: F811
     """G473 / G475: the 100K U58 mode (U58 on the 100K's limits, +1 MNQ per $2,000, no brake) and the Aggressive mode
     (no brake, +1 per $1,000, a $1,000 early budget) run U58 with those settings: NinjaTrader's code and the model agree
@@ -768,7 +772,7 @@ def test_v38_opt_in_modes(sim, sample_1m, mode, extra, tmp_path):  # noqa: F811
                        text=True, env=ENV)
     assert r.returncode == 0, r.stderr[-2000:]
     nt = [x.split(",")[1:] for x in r.stdout.splitlines() if x.startswith("T,")]
-    py = run(bars, dataclasses.replace(GROW, **PRE_G511, **extra), minutes=5).trades
+    py = run(bars, dataclasses.replace(GROW, **{**PRE_G511, **extra}), minutes=5).trades
     assert len(nt) == len(py) >= 20
     for a, t in zip(nt, py, strict=True):
         assert (int(a[0]), int(a[1]), int(a[3])) == (t.direction, t.entry_bar, t.exit_bar), (a, t)
