@@ -1,6 +1,6 @@
-"""G522 (docs/NINJATRADER_V38.md): Pine v4.3's rules exactly (v3.8's engine: no gap trade, fill-ins or brake; lock
-at 0.75, the stop 0.5 noise units out, a 45-minute time stop, the trend over 45 sessions, 3 losers a day, $150 a contract)
-at a fixed 2 / 3 / 4 MNQ on the 50K's $2,000 trailing floor, against Funded growth, on G495's measure.
+"""G522 (docs/NINJATRADER_V38.md): Pine v4.3's rules exactly (v3.8's engine: no gap trade, fill-ins or brake;
+the lock at 0.75, the stop 0.5 noise units out, a 45-minute time stop, the trend over 45 sessions, 3 losers a day,
+$150 a contract) at a fixed 2 / 3 / 4 MNQ on the 50K's $2,000 trailing floor, against Funded growth, on G495's measure.
 
     python research/g522_pine_rules_funded.py <data dir> <MNQ 09-26> <MNQ 12-26> <U48 JS json> fresh|unseen
 """
