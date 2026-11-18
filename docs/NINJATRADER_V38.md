@@ -10665,3 +10665,10 @@ median. Earlier fades for 80%+ winners lost money (G367 / G368). Funded growth s
 **G523 follow-up (2026-11-18): built as the opt-in mode "Funded high win"** at the user's request (more winning trades,
 account kept): the lock at 0.20 with G511's fill-ins; NinjaTrader's code and the model agree trade for trade
 (`test_v38_opt_in_modes`). Funded growth stays the default.
+
+## G524 (2026-11-18): G520's "lock 0.75 + 3 losers" with more early protection: rejected
+
+`research/g524_protected_lock.py`, G495's measure. A (lock 0.75 + 3 losers) makes more on development (32.3% at
++$25,000, median $14,402, none lost) but on the unseen starts loses 5.2% (Funded growth 1.7%) and reaches +$25,000 on
+29.3% (41.4%). With the gentle start, a $600 early day budget or a 0.35 brake: unseen lost 5.2% / 10.3% / 8.6% / 10.3%,
+reached 27.6-31.0%. None loses as few accounts as Funded growth. Funded growth stays.
