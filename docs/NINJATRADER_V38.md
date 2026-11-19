@@ -10732,3 +10732,12 @@ $19,977; P2 and P3 lost 3.4% (1.7%). P1 lost none but made 29% less. Funded grow
 For more green days (the user: "grow every day"). The larger day locks ($800 / $300, $1,500 / $750) were rejected earlier.
 `research/g529_small_day_lock.py`: Funded growth with L1 a lock at +$300 keeping +$100, L2 +$500 keeping +$200, L3 +$400
 keeping $0 (`day_lock_at` / `day_lock_keep`). G495's measure. **Pass:** as G527. Run once.
+
+**G529 result (2026-11-19): rejected, all three.** Unseen medians $11,456 / $13,276 / $15,483 (L1 / L2 / L3) against
+$19,977; L1 lost 12.1%, L2 3.4%. Funded growth unchanged.
+
+## G530: stop once green, from other times (registered 2026-11-19, before its run)
+
+For more green days. Funded green days (G481) stops new entries from 11:00 once the day is up. `research/g530_green_stop.py`:
+D0 that mode on G495's measure, D1 from 10:30, D2 from 12:00, D3 from 13:00, D4 once up $150 from 12:00. **Pass:** as G527.
+Run once.
