@@ -10745,3 +10745,8 @@ Run once.
 **G530 result (2026-11-19): rejected, all five.** Stopping once green halves the 12-month median on every start time
 (unseen $6,069-10,775 against $19,977) and loses 3.4-8.6% of unseen starts (1.7%). The opt-in mode Funded green days
 (D0) measures $8,385 / 3.4% lost on this measure: it buys green days with half the money. Funded growth unchanged.
+
+## G531: two checks in a row (registered 2026-11-19, before its run)
+
+For more winners: enter only when the previous half-hour check today also closed past the same line (`confirm`).
+`research/g531_confirm.py`: C1 alone, C2 with the lock at 0.30, C3 with entry lines at 0.9. **Pass:** as G527. Run once.
