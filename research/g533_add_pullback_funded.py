@@ -1,4 +1,4 @@
-# ruff: noqa: E402, E501, I001
+# ruff: noqa: E402, E501, E401, I001
 """G533 (docs/NINJATRADER_V38.md): Funded growth plus the trend pullback (research/patterns.py `trendpb`, mornings, 3R,
 the one extra setup that held on held-out history) at 1 MNQ risking at most $187.50, on one 50K account.
 
