@@ -10753,3 +10753,8 @@ For more winners: enter only when the previous half-hour check today also closed
 
 **G531 result (2026-11-19): rejected, all three.** Unseen medians $4,758-6,518 against $19,977; lost 6.9-13.8% (1.7%).
 Waiting for a second check misses the breakouts that pay. Funded growth unchanged.
+
+## G532: the max loss from the market's noise (registered 2026-11-19, before its run)
+
+`research/g532_noise_stop.py`: Funded growth with the max loss a contract at V1 0.4, V2 0.6, V3 0.8 x the check's noise
+x the price (`cap_sigma`) instead of $187.50. **Pass:** as G527. Run once.
