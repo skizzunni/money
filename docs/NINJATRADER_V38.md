@@ -10761,3 +10761,10 @@ x the price (`cap_sigma`) instead of $187.50. **Pass:** as G527. Run once.
 
 **G532 result (2026-11-19): rejected, all three.** Unseen medians $10,725-13,714 against $19,977; lost 6.9-19.0% (1.7%).
 A noise-sized stop is wider than $187.50 on wild days, which is where the floor is hit. Funded growth unchanged.
+
+## G533 (2026-11-19): Funded growth plus the trend pullback on one account: rejected
+
+`research/g533_add_pullback_funded.py` (a screen: daily P/L added, the floor on the sum): the pullback (`trendpb`, mornings,
+3R, 1 MNQ at most $187.50) adds about 30 trades a year at 25-26% winners. Funded growth alone / with it: development
+lost 0% / 12.5%, median $11,399 / $12,225; unseen lost 0% / 8.5%, median $13,202 / $13,138 (this screen's floor count
+differs from G495's). More accounts lost for no more money. Funded growth unchanged.
