@@ -10707,3 +10707,10 @@ and the euro failed earlier (docs/RESULTS.md, round sixty-eight). `verification/
 
 Trading every session buys a high share of winners only with small targets, and those make about nothing after costs
 while losing many more accounts. Funded growth stays.
+
+## G527: Funded growth without its weakest checks (registered 2026-11-19, before its run)
+
+The user's chart showed the 11:00 and 15:00 entries losing more often than winning, and on 2011-2025 Pine v4.1 without
+11:00 made more with more green days. `research/g527_skip_checks.py`: Funded growth with S1 no 11:00 check, S2 no
+11:00 or 11:30, S3 no 15:00, S4 no 11:00 or 15:00 (`skip_checks`). G495's measure on the rebuilt data. **Pass:** no
+more accounts lost than Funded growth on both sets (3.2% / 1.7%) and a higher 12-month median on both. Run once.
