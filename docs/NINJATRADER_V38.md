@@ -10750,3 +10750,6 @@ Run once.
 
 For more winners: enter only when the previous half-hour check today also closed past the same line (`confirm`).
 `research/g531_confirm.py`: C1 alone, C2 with the lock at 0.30, C3 with entry lines at 0.9. **Pass:** as G527. Run once.
+
+**G531 result (2026-11-19): rejected, all three.** Unseen medians $4,758-6,518 against $19,977; lost 6.9-13.8% (1.7%).
+Waiting for a second check misses the breakouts that pay. Funded growth unchanged.
