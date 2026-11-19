@@ -10723,3 +10723,12 @@ more accounts lost than Funded growth on both sets (3.2% / 1.7%) and a higher 12
 Trades on the user's chart reached about 3.6x as far in their favour as against before closing; some of that is given
 back. `research/g528_half_off.py`: Funded growth taking half the position off at P1 1.0, P2 1.5, P3 2.0 R (`partial_at`,
 R = the max loss a contract; the rest keeps every exit). G495's measure. **Pass:** as G527. Run once.
+
+**G528 result (2026-11-19): rejected, all three.** Unseen medians $14,161 / $15,501 / $19,124 (P1 / P2 / P3) against
+$19,977; P2 and P3 lost 3.4% (1.7%). P1 lost none but made 29% less. Funded growth unchanged.
+
+## G529: a small day lock (registered 2026-11-19, before its run)
+
+For more green days (the user: "grow every day"). The larger day locks ($800 / $300, $1,500 / $750) were rejected earlier.
+`research/g529_small_day_lock.py`: Funded growth with L1 a lock at +$300 keeping +$100, L2 +$500 keeping +$200, L3 +$400
+keeping $0 (`day_lock_at` / `day_lock_keep`). G495's measure. **Pass:** as G527. Run once.
