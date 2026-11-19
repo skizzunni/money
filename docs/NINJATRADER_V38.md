@@ -10741,3 +10741,7 @@ $19,977; L1 lost 12.1%, L2 3.4%. Funded growth unchanged.
 For more green days. Funded green days (G481) stops new entries from 11:00 once the day is up. `research/g530_green_stop.py`:
 D0 that mode on G495's measure, D1 from 10:30, D2 from 12:00, D3 from 13:00, D4 once up $150 from 12:00. **Pass:** as G527.
 Run once.
+
+**G530 result (2026-11-19): rejected, all five.** Stopping once green halves the 12-month median on every start time
+(unseen $6,069-10,775 against $19,977) and loses 3.4-8.6% of unseen starts (1.7%). The opt-in mode Funded green days
+(D0) measures $8,385 / 3.4% lost on this measure: it buys green days with half the money. Funded growth unchanged.
