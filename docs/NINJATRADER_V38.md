@@ -10768,3 +10768,16 @@ A noise-sized stop is wider than $187.50 on wild days, which is where the floor 
 3R, 1 MNQ at most $187.50) adds about 30 trades a year at 25-26% winners. Funded growth alone / with it: development
 lost 0% / 12.5%, median $11,399 / $12,225; unseen lost 0% / 8.5%, median $13,202 / $13,138 (this screen's floor count
 differs from G495's). More accounts lost for no more money. Funded growth unchanged.
+
+## The TikTok "one trade a day at 09:45" plan (2026-11-19): tested, loses
+
+The user sent a TikTok (an MNQ Topstep 50K calendar: "91%, 10 of 11 days green, one trade a day 09:45 ET, through Nov 16":
++$1,402 days on Combine 1/2, one -$1,698 day that ended Combine 1 on its second day, then +$160 a day funded; +$5,506 in
+11 days). `research/one_trade_0945.py`: every session at 09:45, 1 micro with or against the 09:30-09:45 move, a fixed
+target (MNQ 10-80 points, MES 2.5-20) and a stop 1, 2 or 4 times it; NQ 2015-2025 and ES Nov 2020 - Jul 2024.
+
+Win rates of 73-79% are easy (a small target, a wide stop), but over 10 years on NQ 23 of 24 rules lose money or make
+under $3.10 a day per contract; the one better rule (with, 80-point target, 320-point stop: 73% winners, +$7.27 a day,
+profit factor 1.07) loses 82% of fresh 50K accounts within a year. On ES no rule makes more than $0.22 a day. The video's
+11 days, with its lost Combine, fits this profile: many small wins and an occasional loss as large as several of them.
+Nothing adopted. `verification/noise_v2/one_trade_0945.csv`.
