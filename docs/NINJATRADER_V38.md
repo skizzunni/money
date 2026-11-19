@@ -10714,3 +10714,12 @@ The user's chart showed the 11:00 and 15:00 entries losing more often than winni
 11:00 made more with more green days. `research/g527_skip_checks.py`: Funded growth with S1 no 11:00 check, S2 no
 11:00 or 11:30, S3 no 15:00, S4 no 11:00 or 15:00 (`skip_checks`). G495's measure on the rebuilt data. **Pass:** no
 more accounts lost than Funded growth on both sets (3.2% / 1.7%) and a higher 12-month median on both. Run once.
+
+**G527 result (2026-11-19): rejected, all four.** Lost, development / unseen: S1 9.7% / 3.4%, S2 16.1% / 6.9%, S3 12.9% /
+3.4%, S4 12.9% / 1.7% (Funded growth 3.2% / 1.7%); unseen medians $12,444-19,861 ($19,977). Funded growth unchanged.
+
+## G528: half off at a profit (registered 2026-11-19, before its run)
+
+Trades on the user's chart reached about 3.6x as far in their favour as against before closing; some of that is given
+back. `research/g528_half_off.py`: Funded growth taking half the position off at P1 1.0, P2 1.5, P3 2.0 R (`partial_at`,
+R = the max loss a contract; the rest keeps every exit). G495's measure. **Pass:** as G527. Run once.
