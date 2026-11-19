@@ -10758,3 +10758,6 @@ Waiting for a second check misses the breakouts that pay. Funded growth unchange
 
 `research/g532_noise_stop.py`: Funded growth with the max loss a contract at V1 0.4, V2 0.6, V3 0.8 x the check's noise
 x the price (`cap_sigma`) instead of $187.50. **Pass:** as G527. Run once.
+
+**G532 result (2026-11-19): rejected, all three.** Unseen medians $10,725-13,714 against $19,977; lost 6.9-19.0% (1.7%).
+A noise-sized stop is wider than $187.50 on wild days, which is where the floor is hit. Funded growth unchanged.
