@@ -10781,3 +10781,11 @@ under $3.10 a day per contract; the one better rule (with, 80-point target, 320-
 profit factor 1.07) loses 82% of fresh 50K accounts within a year. On ES no rule makes more than $0.22 a day. The video's
 11 days, with its lost Combine, fits this profile: many small wins and an occasional loss as large as several of them.
 Nothing adopted. `verification/noise_v2/one_trade_0945.csv`.
+
+## G534: the gap trade (registered 2026-11-20, before its run)
+
+Live Nov 20: the bot's gap trade (short at 09:35, stop at the 09:30 open 161 points away) lost $322.50 a account; the
+model's Nov 19 gap trade lost $290 (the bot did not run that day). A gap stop at the open is not capped at $187.50.
+G60 stage 3 and G191(a) found the cap lost more accounts (on U29 / U40). `research/g534_gap_trade.py` on G495's measure:
+N1 no gap trade, N2 the stop capped at $187.50 a contract (`gap_go_cap`), N3 the stop half way up the 09:30 bar
+(`gap_go_stop_frac` 0.5; G111 rejected it on U29). **Pass:** as G527. Run once.
