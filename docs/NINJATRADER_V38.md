@@ -10789,3 +10789,23 @@ model's Nov 19 gap trade lost $290 (the bot did not run that day). A gap stop at
 G60 stage 3 and G191(a) found the cap lost more accounts (on U29 / U40). `research/g534_gap_trade.py` on G495's measure:
 N1 no gap trade, N2 the stop capped at $187.50 a contract (`gap_go_cap`), N3 the stop half way up the 09:30 bar
 (`gap_go_stop_frac` 0.5; G111 rejected it on U29). **Pass:** as G527. Run once.
+
+**G534 result (2026-11-20): N2 adopted (U59).** G495's measure, development / unseen:
+
+| first 12 months | development: reach $25K / median / lost | unseen: reach $25K / median / lost |
+|---|---|---|
+| Funded growth (U58 + G511) | 16.1% / $10,386 / 3.2% | 41.4% / $19,977 / 1.7% |
+| N1 no gap trade | 0% / $5,358 / 0% | 19.0% / $9,733 / 10.3% |
+| **N2 gap stop capped at $187.50** | **16.1% / $10,417 / 0%** | **41.4% / $18,692 / 1.7%** |
+| N3 gap stop half way up the 09:30 bar | 19.4% / $6,391 / 3.2% | 39.7% / $17,050 / 1.7% |
+
+N2 reaches +$25,000 exactly as often on both sets and loses fewer development accounts (none against 1) and as few
+unseen ones; its unseen median is 6% lower. It removes the losses the user saw live: on Aug 21 - Nov 19 2026 with the
+account rules the worst gap stop goes from -$290 to -$194 and the net from +$127 to +$806 (Yahoo after Oct 16). The gap
+trade itself stays (N1 halves the money). Adopted at the user's demand ("fix the strategy") as the smallest change that
+caps the oversized loss with no measured cost in accounts; the strict median rule is not met on unseen (-6%).
+
+**U59 (2026-11-20): the gap trade's stop no farther than the max loss a contract (G534).** MnqNoiseV38.cs: the setting
+"Gap trade: stop no farther than the max loss (G534)" (`GapStopCap`), on by default; it acts in every mode but
+Evaluation and the Test sprint. The Python reference (`gap_go_cap`) and NinjaTrader's code agree trade for trade
+(tests/test_ninjatrader_v38.py, 60 passed).

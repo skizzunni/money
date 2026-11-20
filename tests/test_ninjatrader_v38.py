@@ -60,7 +60,9 @@ GROW = NoiseConfig(**{**V21, "qty": 1, "lookback": 14, "max_loss_per_trade": 187
                       # G422 (U58): every check, no range filter, no loser limit, entry lines at 0.8 on a calm stretch
                       "max_losers": 0, "range_pos_min": 0.0, "skip_checks": "", "entry_k_regime": 0.8,  # noqa: F601
                       # G511: Funded growth's fill-ins at 2 MNQ from $4,000 above the floor, 3 from $6,500
-                      "fill_qty2_room": 4000.0, "fill_qty3_room": 6500.0},  # noqa: F601
+                      "fill_qty2_room": 4000.0, "fill_qty3_room": 6500.0,  # noqa: F601
+                      # G534: the gap trade's stop no farther than the max loss a contract
+                      "gap_go_cap": True},
                    nt_execution=True, round_prices=True, target_on_fill_bar=True)
 # the other modes (and Custom, and the 30-minute chart) keep G241's fill-in steps
 PRE_G511 = {"fill_qty2_room": 5000.0, "fill_qty3_room": 8000.0}
@@ -1105,7 +1107,8 @@ def test_v38_fast_steps(sim, sample_1m, tmp_path):  # noqa: F811
         assert r.returncode == 0, r.stderr[-2000:]
         nt = [x.split(",")[1:] for x in r.stdout.splitlines() if x.startswith("T,")]
         py = run(bars, dataclasses.replace(GROW, profit_step=300.0, profit_step_fast=fs, profit_step_fast_from=600.0,
-                                           giveback_brake=0.45), minutes=5).trades  # Custom mode keeps 0.45 (G473)
+                                           giveback_brake=0.45, **PRE_G511),  # Custom: 0.45, G241's fill-ins
+                 minutes=5).trades
         assert len(nt) == len(py) >= 20
         for a, t in zip(nt, py, strict=True):
             assert (int(a[0]), int(a[1]), int(a[3])) == (t.direction, t.entry_bar, t.exit_bar), (a, t)
@@ -1228,6 +1231,7 @@ def test_v38_sprint(sim, sample_1m, tmp_path):  # noqa: F811
 
 # G256 k317 with G269's +$5,000 sprint target: the two-week Test sprint (G253's k61 before)
 SPRINT = {"giveback_brake": 0.45,  # G473: the sprint keeps 0.45
+          "gap_go_cap": False,  # G534: the sprint's gap stop stays at the open
           "daily_loss_limit": 2000.0, "early_daily_loss": 0.0, "max_losers": 3, "time_stop": 30, "range_pos_min": 0.7,
           "trend_n": 0, "big_day_k": 0.0, "calm_k": 0.7, "take_profit": 0.75, "lock_at": 0.2, "skip_checks": "",
               "entry_k_regime": 0.0,

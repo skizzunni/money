@@ -94,6 +94,9 @@ namespace NinjaTrader.NinjaScript.Strategies
         public double GivebackBrake = 0;
         // G191: no gap-slot trade (the gap trade, its small-gap and drive fill-ins) while the giveback brake is on
         public bool GapSkipBraked = false;
+        // G534 (2026-11-20): the gap trade's stop no farther than MaxLoss a contract from the expected fill (the 09:30
+        // open otherwise: Nov 19-20 2026 the open was 145-161 points away, $290-322 a contract)
+        public bool GapCap = false;
         // G119: once the floor has stopped at the start, the trade after a loser risks this instead (0 = AfterLossMaxLoss)
         public double AfterLossLockedMaxLoss = 0;
         // G125: no new entry at these checks (the check bar's end, minutes after midnight, e.g. ",780,870,") until the
@@ -927,13 +930,19 @@ namespace NinjaTrader.NinjaScript.Strategies
                 if (fire && s.GapSkipBraked && Braked()) fire = false;  // G191
                 if (fire)
                 {
+                    double gStop = dayOpen;
+                    if (s.GapCap && s.MaxLoss > 0)  // G534: no farther than the max loss a contract from the expected fill
+                    {
+                        double cap = c + d * slip - d * s.MaxLoss / s.Qty / s.PointValue;
+                        gStop = d > 0 ? Math.Max(gStop, cap) : Math.Min(gStop, cap);
+                    }
                     int q = s.Qty;
                     if (s.ProfitStep > 0 && !double.IsNaN(trailBase))
                     {
                         q += NSteps();
                         if (s.MaxContracts > 0) q = Math.Min(q, s.MaxContracts);
                     }
-                    double perC = Math.Abs(c + d * slip - dayOpen) * s.PointValue + 2 * s.CommissionPerSide + 2 * slip * s.PointValue;
+                    double perC = Math.Abs(c + d * slip - gStop) * s.PointValue + 2 * s.CommissionPerSide + 2 * slip * s.PointValue;
                     double room = MoneyRoom();
                     int fitQ = double.IsInfinity(room) ? int.MaxValue : (int)Math.Floor(room / perC + 1e-9);
                     q = Math.Min(q, fitQ);
@@ -951,8 +960,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                         q = Math.Min(s.SprintGapQty > 0 ? s.SprintGapQty : s.SprintQty, fitQ);  // G273
                     if (q >= 1)
                     {
-                        gapPending = true; gapPendingDir = d; gapPendingQty = q; gapPendingStop = dayOpen;
-                        GapNewEntry = d; GapNewQty = q; GapNewStop = dayOpen;
+                        gapPending = true; gapPendingDir = d; gapPendingQty = q; gapPendingStop = gStop;
+                        GapNewEntry = d; GapNewQty = q; GapNewStop = gStop;
                     }
                 }
             }
@@ -1107,6 +1116,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 MoreDaysQty3Room = 8000;  // G212 (G210: 9000); Funded growth 6500 (G511)
                 GivebackBrake = 0.45;  // G243 (G99c: 0.5)
                 GapSkipBraked = true;  // G191
+                GapStopCap = true;  // G534
                 MaxLosersPerDay = 0;  // G422 (U58): no limit (G204: 3; the Test sprint 3)
                 EarlyDayBudget = 750;  // G204
                 GapTrigger = 0.65;  // G242 (G60: 0.5, G204: 0.6)
@@ -1250,6 +1260,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 st.FillQty3Room = MoreDaysQty3Room;  // G210
                 st.GivebackBrake = Mode != "Evaluation" ? GivebackBrake : 0;  // G99
                 st.GapSkipBraked = Mode != "Evaluation" && GapSkipBraked;  // G191
+                st.GapCap = Mode != "Evaluation" && !sprintMode && GapStopCap;  // G534
                 bool g204 = Mode == "Funded growth" || Mode == "Custom";  // G204: tested on the 50K
                 st.MaxLosers = g204 ? MaxLosersPerDay : 0;
                 st.EarlyDailyLoss = g204 ? EarlyDayBudget : 0;
@@ -2309,6 +2320,10 @@ namespace NinjaTrader.NinjaScript.Strategies
         [NinjaScriptProperty]
         [Display(Name = "Giveback brake: no gap trade while the brake is on", Order = 29, GroupName = "1. Size and risk")]
         public bool GapSkipBraked { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Gap trade: stop no farther than the max loss (G534)", Order = 30, GroupName = "1. Size and risk")]
+        public bool GapStopCap { get; set; }
 
         [NinjaScriptProperty]
         [Range(0, 20)]
