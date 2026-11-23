@@ -10889,3 +10889,9 @@ the profit steps). `research/g537_smaller_after_loss.py`: A1 at most 1, A2 at mo
 **G537 result (2026-11-23): rejected, both.** A2 (at most 2): development median $8,940 (live $9,572), unseen $13,089
 ($12,946), lost as live. A1 (1): development $6,951, unseen $14,201, one more unseen start lost (3.4%). Smaller trades
 after a loss also shrink the recoveries that follow (the next winner is the one at reduced size). Live setup unchanged.
+
+## G538: no gap trade on exhausted gaps (registered 2026-11-23, before its run)
+
+**Evidence:** the live setup's 09:35 gap trades by the gap against the 14-session average gap: up to 2x they make $5-50
+a trade on NQ and $10-33 on the index; over 3x NQ -$35 (28 trades) and the index $1 (28); 2-3x $25 / $4. `mnqbot/noise.py`
+gains `gap_go_max_k`. `research/g538_big_gaps.py`: X3 no gap trade over 3x, X2 over 2x. **Pass:** as G536. Run once.
