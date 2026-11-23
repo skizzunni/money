@@ -10895,3 +10895,8 @@ after a loss also shrink the recoveries that follow (the next winner is the one 
 **Evidence:** the live setup's 09:35 gap trades by the gap against the 14-session average gap: up to 2x they make $5-50
 a trade on NQ and $10-33 on the index; over 3x NQ -$35 (28 trades) and the index $1 (28); 2-3x $25 / $4. `mnqbot/noise.py`
 gains `gap_go_max_k`. `research/g538_big_gaps.py`: X3 no gap trade over 3x, X2 over 2x. **Pass:** as G536. Run once.
+
+**G538 result (2026-11-23): rejected, both.** X3: development median $10,343 (live $9,572) but one start lost (3.2%,
+live none); unseen $12,708 ($12,946). X2: development $10,433, lost 3.2%; unseen $12,173, lost 3.4% (1.7%). Skipping the
+big gaps raises the development median 8-9% and the average day, but it loses a start on each set: the few big-gap days
+that do run are the ones that carry an account. Live setup unchanged.
