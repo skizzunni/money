@@ -10846,3 +10846,17 @@ loses no more than Funded growth (3.2% / 1.7%), median $9,483 / $12,910 ($10,386
 
 **Built (2026-11-23): "Most contracts (your cap, 0 = the mode's)" (`ContractsCap`)** caps any mode's contracts; at 3 it
 is the safe way to trade 3. NinjaTrader's code and the model agree trade for trade (`test_v38_contracts_cap`).
+
+## The "Clean Noise-Band Momentum (Prop Version)" spec (2026-11-23): tested as written, rejected for the 50K
+
+The user pasted a spec (the paper's noise band, entries at 10:00-15:00 checks only when also past the session VWAP and
+optionally the 20-session average, the band (or the tighter of the band and VWAP) as a trailing stop moved at the checks,
+a hard stop of $150-250, flat at 15:55, 1 MNQ, "remove everything else"). `research/clean_noise_band.py` codes it as
+written, with 2 ticks of slippage on every stop (16 variants; `verification/noise_v2/clean_noise_band.csv`):
+
+- NQ 2015-2025, 1 MNQ: $35,619-57,307 net, profit factor 1.30-1.36, 21-25% winners (the spec says 38-45%), 8-10 of
+  11 years up, worst drawdown $3,428-6,934, worst day -$759 to -$1,066.
+- ES 2020-2024: profit factor 1.11-1.18; the user's MNQ Sep-Nov 2026 (27-33 trades): 1.6-3.0.
+- **Fresh 50K accounts, 12 months, the $2,000 floor: 26-36% lost** (median $2,151-4,009); Funded growth 1.7-3.2%
+  lost, median $10,386-19,977. The edge per trade is real, but its drawdowns are larger than the 50K's $2,000 room;
+  Funded growth's lock, day budget and sizing from the room are what keep the account. Nothing built.
