@@ -37,6 +37,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             public DateTime Date;
             public double Close;
             public int Bars;
+            public double Gap = double.NaN;  // today's 09:30 open less the prior complete session's close
             public readonly Dictionary<int, double> Moves = new Dictionary<int, double>();
         }
 
@@ -44,8 +45,8 @@ namespace NinjaTrader.NinjaScript.Strategies
         readonly List<Day> hist = new List<Day>();
         Day today;
         double dayOpen, prevClose, sma, vwapNum, vwapDen, dayCumStart, hardRef, stop, entryPx;
-        int pos, tradesToday, qty;
-        bool ready, exitSent, beDone, early, exiting, gapWarned;
+        int pos, tradesToday, qty, gapPos;
+        bool ready, beDone, early, exiting, gapWarned, noisePending, gapPending, gapToday;
         readonly Dictionary<int, double> sigma = new Dictionary<int, double>();
 
         protected override void OnStateChange()
@@ -79,6 +80,11 @@ namespace NinjaTrader.NinjaScript.Strategies
                 VwapStop = true;
                 PlaceOrders = true;
                 BlockOnDataGap = true;
+                TakeProfitAt = 2.5;
+                GapLeg = true;
+                GapFrom = 4500;
+                GapK = 1.0;
+                GapCap = 50;
             }
             else if (State == State.DataLoaded)
             {
@@ -130,6 +136,8 @@ namespace NinjaTrader.NinjaScript.Strategies
             today = new Day();
             today.Date = date;
             dayOpen = Open[0];
+            if (hist.Count > 0) today.Gap = dayOpen - hist[hist.Count - 1].Close;
+            gapToday = false;
             vwapNum = vwapDen = 0;
             tradesToday = 0;
             dayCumStart = CumProfit;
@@ -167,6 +175,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             double prof = Profit();
             qty = Contracts(prof);
             early = EarlyMaxTrades > 0 && prof < EarlyCushion;  // decided at the day's start
+            gapToday = GapLeg && prof >= GapFrom;  // the gap leg only once the account has its cushion
         }
 
         protected override void OnBarUpdate()
@@ -194,13 +203,17 @@ namespace NinjaTrader.NinjaScript.Strategies
                 pos = 0;
             if (mp == 0)
                 exiting = false;
-            if (pos == 0 && mp != 0 && !exitSent)  // the entry filled at this bar's open
+            if (gapPos != 0 && mp == 0)
+                gapPos = 0;
+            if (noisePending && mp != 0 && pos == 0)  // the band entry filled at this bar's open
             {
                 pos = mp;
                 entryPx = Position.AveragePrice;
                 beDone = false;
             }
-            exitSent = false;
+            if (gapPending && mp != 0 && gapPos == 0)  // the gap entry filled
+                gapPos = mp;
+            noisePending = gapPending = false;
             if (!ready)
                 return;
             double tick = TickSize, pv = Instrument.MasterInstrument.PointValue;
@@ -210,6 +223,13 @@ namespace NinjaTrader.NinjaScript.Strategies
                 Exit("Session end");
                 return;
             }
+            if (gapPos != 0 && mm >= 590)  // the gap trade: out at the 09:55 open
+            {
+                Exit("Gap exit");
+                return;
+            }
+            if (mm == 570 && gapToday && mp == 0 && PlaceOrders)
+                GapEntry(tick);
             if (pos != 0 && BreakEvenAt > 0 && !beDone && pos * (Close[0] - entryPx) >= BreakEvenAt * HardStop / pv)
             {
                 double be = Instrument.MasterInstrument.RoundToTickSize(entryPx + pos * tick);
@@ -255,18 +275,49 @@ namespace NinjaTrader.NinjaScript.Strategies
             stop = Instrument.MasterInstrument.RoundToTickSize(want > 0 ? Math.Max(bl, hp) : Math.Min(bs, hp));
             string name = want > 0 ? "Long" : "Short";
             SetStopLoss(name, CalculationMode.Price, stop, false);
+            if (TakeProfitAt > 0)
+                SetProfitTarget(name, CalculationMode.Ticks, Math.Max(1, Math.Round(TakeProfitAt * HardStop / pv / tick)));
+            noisePending = true;
             if (want > 0) EnterLong(qty, name); else EnterShort(qty, name);
             tradesToday++;
             Print(Time[0] + "  Clean band: " + (want > 0 ? "long " : "short ") + qty + " MNQ, stop " + stop.ToString("F2", CultureInfo.InvariantCulture));
         }
 
+        // gap and go (research/zoo/strats.py gap_go): a gap of GapK x the last 14 sessions' average |gap| whose 09:30 bar
+        // closes the gap's way; in at 09:35, the stop at the 09:30 open but no farther than GapCap points; out at 09:55
+        void GapEntry(double tick)
+        {
+            if (hist.Count < 15 || double.IsNaN(today.Gap))
+                return;
+            double sum = 0;
+            for (int j = hist.Count - 14; j < hist.Count; j++)
+            {
+                if (double.IsNaN(hist[j].Gap)) return;
+                sum += Math.Abs(hist[j].Gap);
+            }
+            double gap = today.Gap, avg = sum / 14;
+            int side = gap > 0 ? 1 : -1;
+            if (Math.Abs(gap) < GapK * avg || side * (Close[0] - dayOpen) <= 0)
+                return;
+            double e = Close[0] + side * tick;
+            double dist = Math.Min(Math.Max(Math.Abs(e - dayOpen), 4 * tick), GapCap);
+            string name = side > 0 ? "GapLong" : "GapShort";
+            SetStopLoss(name, CalculationMode.Price, e - side * dist, false);
+            if (side > 0) EnterLong(qty, name); else EnterShort(qty, name);
+            gapPending = true;
+            Print(Time[0] + "  Clean band: gap trade " + (side > 0 ? "long " : "short ") + qty + " MNQ, stop " +
+                  (e - side * dist).ToString("F2", CultureInfo.InvariantCulture));
+        }
+
         void Exit(string why)
         {
-            int d = pos != 0 ? pos : Position.MarketPosition == MarketPosition.Long ? 1 : -1;
-            if (d > 0) ExitLong(why, "Long"); else ExitShort(why, "Short");
-            exitSent = true;
+            int d = Position.MarketPosition == MarketPosition.Long ? 1 : Position.MarketPosition == MarketPosition.Short ? -1 : pos;
+            bool gapLeg = gapPos != 0 && pos == 0;
+            string from = gapLeg ? (d > 0 ? "GapLong" : "GapShort") : (d > 0 ? "Long" : "Short");
+            if (d > 0) ExitLong(why, from); else ExitShort(why, from);
             exiting = true;
             pos = 0;
+            gapPos = 0;
         }
 
         // a position must never be without its stop: if the broker cancels or rejects it, out at market (live 2026-11-17)
@@ -316,6 +367,30 @@ namespace NinjaTrader.NinjaScript.Strategies
         [Range(0, 10000)]
         [Display(Name = "Day stop: no new entry once the day is down $ (0 = off)", Order = 3, GroupName = "2. Risk")]
         public double DayStop { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, 20)]
+        [Display(Name = "Take profit at this many hard stops (0 = off)", Order = 4, GroupName = "2. Risk")]
+        public double TakeProfitAt { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Gap trade (09:35-09:55)", Order = 1, GroupName = "5. Gap trade")]
+        public bool GapLeg { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, 100000)]
+        [Display(Name = "Gap trade only from this profit $", Order = 2, GroupName = "5. Gap trade")]
+        public double GapFrom { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, 10)]
+        [Display(Name = "Gap at least this many 14-session average gaps", Order = 3, GroupName = "5. Gap trade")]
+        public double GapK { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(1, 1000)]
+        [Display(Name = "Gap stop at most this many points", Order = 4, GroupName = "5. Gap trade")]
+        public double GapCap { get; set; }
 
         [NinjaScriptProperty]
         [Range(1, 3)]

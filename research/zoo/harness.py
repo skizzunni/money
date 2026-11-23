@@ -144,7 +144,8 @@ def trades_of(strat, days: list, sym: str, **p) -> pd.DataFrame:
 
 
 def account(t: pd.DataFrame, all_days: list, qty_fn=lambda prof: 1, day_stop: float = 0.0, start_every: str = "M",
-            early_max: int = 0, early_cushion: float = 0.0, eq_n: int = 0, eq_min: float = 0.0, steps: tuple = ()):
+            early_max: int = 0, early_cushion: float = 0.0, eq_n: int = 0, eq_min: float = 0.0, steps: tuple = (),
+            extra: pd.DataFrame | None = None, extra_from: float = 0.0):
     """Fresh 50K starts (every month), 12 months each. day_stop: no more trades once the day is down this much ($, at
     the sizes taken). early_max: at most this many trades a day while the profit is under early_cushion. eq_n / eq_min:
     sit a day out when the strategy's own 1-contract P/L over the last eq_n sessions (taken or not) is below eq_min.
@@ -152,6 +153,7 @@ def account(t: pd.DataFrame, all_days: list, qty_fn=lambda prof: 1, day_stop: fl
     Returns per-start (lost, profit, green days, traded days)."""
     days = [r["d"] for r in all_days]
     byday = {d: g.usd.to_numpy() for d, g in t.groupby("d")}
+    exday = {d: g.usd.to_numpy() for d, g in extra.groupby("d")} if extra is not None else {}  # a second leg, first in the day
     hyp = np.array([byday[d].sum() if d in byday else 0.0 for d in days])
     idx = pd.Series(range(len(days)), index=pd.to_datetime(days))
     starts = sorted({x.to_period(start_every).start_time for x in idx.index})
@@ -169,6 +171,8 @@ def account(t: pd.DataFrame, all_days: list, qty_fn=lambda prof: 1, day_stop: fl
             g = byday.get(d)
             if g is not None and eq_n and j >= eq_n and hyp[j - eq_n:j].sum() < eq_min:
                 g = None
+            if extra is not None and d in exday and bal - 50000.0 >= extra_from:
+                g = np.concatenate([exday[d], g]) if g is not None else exday[d]
             if g is not None:
                 prof = bal - 50000.0
                 q = qty_fn(prof)

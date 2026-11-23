@@ -42,30 +42,44 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    Read: the survival comes from keeping each trade's risk small, not from a lucky fit, and the risk settings should
    not be loosened.
 
+8. **More money without more risk** (`verification/zoo/stage4_target_and_gap_leg.txt`): a take-profit at 2.5 hard
+   stops lifts the win rate (24% to 28%) and the weak starts (25th percentile $2,090 to $3,454); the gap-and-go leg
+   (09:35 to 09:55, stop at the 09:30 open, at most 50 points) switched on only once the account is $4,500 up (the floor
+   has stopped trailing by then) lifts the median to $8,772. **Every neighbour** (target 2.0-3.0, gap from $4,000-6,000,
+   break-even 0.3-0.5, hard stop $175-225) also loses no start: the target makes the risk settings less fragile, not
+   more. Caveat: gap and go loses on ES (PF 0.69, 70 trades) while it holds on NQ dev / unseen (1.95 / 1.76) and the live
+   MNQ months (2.34); it is one switch ("Gap trade") and never runs before the cushion. The gap trade exits at 09:55
+   (not 10:00) so it is never closing on the bar the band's 10:00 entry fills.
+
 ## The result (the shipped defaults, research numbers, 2 ticks of stop slippage, $0.62 a side)
 
-| set | trades | win | PF | net (1 MNQ) | 50K starts lost | median 12 months |
-|---|---|---|---|---|---|---|
-| dev NQ 2015-19 | 913 | 20% | 1.57 | $19,531 | 0 of 49 | $4,546 |
-| unseen NQ 2020-25 | 1,051 | 21% | 1.50 | $23,952 | 0 of 55 | $7,236 |
-| unseen ES 2020-24 | 325 | 22% | 1.17 | $994 | | |
-| live MNQ Jun 29 - Nov 20 2026 | 50 | 24% | 4.24 | $4,852 | | |
+| set | band trades | win | PF | band net (1 MNQ) | gap trades (PF, net) | 50K starts lost | median 12 months |
+|---|---|---|---|---|---|---|---|
+| dev NQ 2015-19 | 1,004 | 21% | 1.44 | $17,649 | 224 (1.95, $6,799) | 0 of 49 | $4,211 |
+| unseen NQ 2020-25 | 1,216 | 22% | 1.45 | $26,340 | 270 (1.76, $8,713) | 0 of 55 | $10,838 |
+| unseen ES 2020-24 | 325 | 22% | 1.17 | $994 | 70 (0.69, -$379) | | |
+| live MNQ Jun 29 - Nov 20 2026 | 65 | 28% | 3.34 | $4,935 | 16 (2.34, $1,101) | | |
 
-Pooled 104 starts: none lost, median +$6,652, 25th percentile +$2,090, worst -$322 (never near the floor), 28% reach
-+$10,000 in 12 months, none +$25,000. Live by month (1 MNQ): Jul -$138, Aug +$725, Sep +$848, Oct +$1,374, Nov (to the
-20th) +$2,043; Nov 13 +$243, Nov 16 -$102, Nov 17 -$297, Nov 19 -$2, Nov 20 +$1,835.
+(The accounts' numbers use the gap leg only from +$4,500 and the contract steps; the trade columns are 1 contract, every
+gap trade. ES's band uses the MNQ $ stop in points, a cross-check only.)
 
-**What it is not:** a high win-rate strategy. About 1 trade in 4 wins and about 1 traded day in 3 is green; the
-winners (held to 15:55 on trend days) are 4-6x the losers. It trades on about a third of the sessions. With the user's
-3-contract cap the edge supports roughly $5-10K a year on a 50K, not $25K; starting at 3 contracts loses about half of
-fresh accounts.
+Pooled 104 starts: **none lost**, median **+$8,772**, 25th percentile +$3,235, 10th +$1,441, worst -$20 (never near
+the floor), 43% reach +$10,000 and 12.5% +$15,000 in 12 months, none +$25,000; green on 38% of traded days. Live band by
+month (1 MNQ): Jul -$138, Aug +$745, Sep +$824, Oct +$2,086, Nov (to the 20th) +$1,418; Nov 13 +$236, Nov 16 -$102,
+Nov 17 -$297, Nov 19 -$2, Nov 20 +$1,295 (the 2.5x target took the trend day's first leg).
+
+**What it is not:** a high win-rate strategy. About 1 trade in 4 wins and about 3 traded days in 8 are green; the
+winners (the 2.5x target or the 15:55 close on trend days) are 4-6x the losers, which the band and break-even keep small. It trades on about a third of the sessions. With the user's
+3-contract cap the edge supports roughly $4-11K a year on a 50K (median $8.8K), not $25K; starting at 3 contracts
+loses about half of fresh accounts.
 
 ## Running it
 
 NinjaTrader 8: copy `ninjatrader/Strategies/MnqCleanBand.cs` to Documents\NinjaTrader 8\bin\Custom\Strategies, compile
 (F5 in the NinjaScript editor), add it to an **MNQ 5-minute** chart (CME US Index Futures ETH or RTH, at least 30 days
 loaded), account = the funded account, Enabled. Defaults: trend 20 sessions, hard stop $200 a contract, break-even at
-0.4, last entry 14:00 (840), up to 9 trades a day, day stop $600, at most 3 contracts (2 from +$2,000, 3 from +$4,500 over
+0.4, take profit at 2.5 hard stops, last entry 14:00 (840), up to 9 trades a day, day stop $600, the gap trade from
++$4,500, at most 3 contracts (2 from +$2,000, 3 from +$4,500 over
 the $50,000 start balance; live it sizes from the account's balance). The Output window prints the settings at start
 and every entry.
 

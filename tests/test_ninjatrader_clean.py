@@ -22,7 +22,8 @@ sys.path.insert(0, str(ROOT / "research"))
 import harness as H  # noqa: E402
 import strats as S  # noqa: E402
 
-DEFAULTS = dict(vwap=True, trend=20, hard=200.0, vwap_stop=True, k=1.0, be_r=0.4, max_trades=9, last=840)
+DEFAULTS = dict(vwap=True, trend=20, hard=200.0, vwap_stop=True, k=1.0, be_r=0.4, max_trades=9, last=840, tp_r=2.5)
+GAP = dict(k=1.0, exit_m=590, r=0.0, cap=50.0)
 
 
 def fixture_days() -> list:
@@ -75,10 +76,14 @@ def run_nt(sim, path: Path, **props) -> list:  # noqa: F811
     return [x.split(",")[1:] for x in r.stdout.splitlines() if x.startswith("T,")]
 
 
-def py_trades(days: list, idx: list, day_stop: float = 0.0, steps=None, **p) -> list:
-    """The reference trades as (direction, entry bar, entry, exit, contracts), with the account rules the C# applies."""
+def py_trades(days: list, idx: list, day_stop: float = 0.0, steps=None, gap_from: float | None = 4500.0,
+              start: float = 0.0, **p) -> list:
+    """The reference trades as (direction, entry bar, entry, exit, contracts), with the account rules the C# applies:
+    contracts by the profit at the day's start, the gap leg (first in the day) once the profit reaches gap_from, the day
+    stop across both."""
     pos_of = {v: i for i, v in enumerate(idx)}
-    out, cum = [], 0.0
+    cfg = {**DEFAULTS, **p}
+    out, cum = [], start
     for i in range(len(days)):
         q = 1
         if steps:
@@ -86,7 +91,11 @@ def py_trades(days: list, idx: list, day_stop: float = 0.0, steps=None, **p) -> 
                 if cum >= lim:
                     q = qq
         day = 0.0
-        for side, eb, epx, xpx, _why, _xb in S.noise(days, i, 0.25, stop_slip=1, nt=True, **{**DEFAULTS, **p}):
+        legs = []
+        if gap_from is not None and cum >= gap_from and i >= max(21, cfg["trend"] + 1):
+            legs += S.gap_go(days, i, 0.25, **GAP)
+        legs += S.noise(days, i, 0.25, stop_slip=1, nt=True, **cfg)
+        for side, eb, epx, xpx, _why, *_ in legs:
             if day_stop and day <= -day_stop:
                 break
             pnl = (xpx - epx) * side * 2.0 * q  # the stand-in books no commission
@@ -122,7 +131,7 @@ def test_clean_band_defaults_with_account_rules(sim, tmp_path):  # noqa: F811
     path = tmp_path / "bars.csv"
     idx = write_bars(days, path)
     nt = run_nt(sim, path, StartProfit=1500)
-    ref = py_trades(days, idx, day_stop=600.0, steps=((0, 1), (2000 - 1500, 2), (4500 - 1500, 3)))
+    ref = py_trades(days, idx, day_stop=600.0, steps=((0, 1), (2000, 2), (4500, 3)), start=1500.0)
     got = [(int(t[0]), int(t[1]), round(float(t[2]), 6), round(float(t[4]), 6)) for t in nt]
     qty = [int(x) for x in _qty(sim, path, StartProfit=1500)]
     assert got == [(s, b, e, x) for s, b, e, x, _q in ref]
@@ -138,6 +147,21 @@ def _qty(sim, path, **props):  # noqa: F811
     args = [DOTNET, str(sim), str(path), "5", "Strategy=Clean", *[f"{k}={v}" for k, v in props.items()]]
     r = subprocess.run(args, capture_output=True, text=True, env=ENV)
     return [x.split(",")[2] for x in r.stdout.splitlines() if x.startswith("TN,")]
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+def test_clean_band_gap_leg(sim, tmp_path):  # noqa: F811
+    """The gap leg (on from the first day here) and the take-profit, trade for trade."""
+    days = fixture_days()
+    path = tmp_path / "bars.csv"
+    idx = write_bars(days, path)
+    nt = run_nt(sim, path, MaxContracts=1, DayStop=0, GapFrom=0, StartProfit=100000)
+    ref = py_trades(days, idx, gap_from=0.0, start=100000.0)
+    got = [(int(t[0]), int(t[1]), round(float(t[2]), 6), round(float(t[4]), 6)) for t in nt]
+    assert got == [(s, b, e, x) for s, b, e, x, _q in ref]
+    names = {x[5] for x in nt}
+    assert sum(idx[int(t[1])][1] == 1 for t in nt) >= 5  # gap entries at 09:35
+    assert "Profit target" in names
 
 
 def _run_all(sim, path, **props):  # noqa: F811

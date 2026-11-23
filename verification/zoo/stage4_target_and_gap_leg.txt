@@ -1,0 +1,12 @@
+tp 0.0 gap_from None be 0.4 hard 200.0 gapexit 590: lost 0.000 median 6652 p25 2090 green 0.354 {'live': 4852, 'win': np.float64(0.24)}
+tp 2.5 gap_from None be 0.4 hard 200.0 gapexit 590: lost 0.000 median 6850 p25 3454 green 0.372 {'live': 4935, 'win': np.float64(0.277)}
+tp 2.5 gap_from 4500.0 be 0.4 hard 200.0 gapexit 590: lost 0.000 median 8772 p25 3235 green 0.377 {'es_gap_pf': np.float64(0.69), 'live': 6036, 'win': np.float64(0.277)}
+tp 2.5 gap_from 4500.0 be 0.4 hard 200.0 gapexit 595: lost 0.000 median 8999 p25 3167 green 0.376 {'es_gap_pf': np.float64(0.65), 'live': 6139, 'win': np.float64(0.277)}
+tp 2.0 gap_from 4500.0 be 0.4 hard 200.0 gapexit 590: lost 0.000 median 8580 p25 2280 green 0.379 {'es_gap_pf': np.float64(0.69), 'live': 6338, 'win': np.float64(0.31)}
+tp 3.0 gap_from 4500.0 be 0.4 hard 200.0 gapexit 590: lost 0.000 median 8240 p25 2646 green 0.371 {'es_gap_pf': np.float64(0.69), 'live': 5496, 'win': np.float64(0.246)}
+tp 2.5 gap_from 4000.0 be 0.4 hard 200.0 gapexit 590: lost 0.000 median 8608 p25 3454 green 0.377 {'es_gap_pf': np.float64(0.69), 'live': 6036, 'win': np.float64(0.277)}
+tp 2.5 gap_from 6000.0 be 0.4 hard 200.0 gapexit 590: lost 0.000 median 7342 p25 3454 green 0.376 {'es_gap_pf': np.float64(0.69), 'live': 6036, 'win': np.float64(0.277)}
+tp 2.5 gap_from 4500.0 be 0.3 hard 200.0 gapexit 590: lost 0.000 median 5686 p25 2391 green 0.368 {'es_gap_pf': np.float64(0.69), 'live': 5998, 'win': np.float64(0.25)}
+tp 2.5 gap_from 4500.0 be 0.5 hard 200.0 gapexit 590: lost 0.000 median 8907 p25 3445 green 0.385 {'es_gap_pf': np.float64(0.69), 'live': 5978, 'win': np.float64(0.297)}
+tp 2.5 gap_from 4500.0 be 0.4 hard 175.0 gapexit 590: lost 0.000 median 9134 p25 2992 green 0.383 {'es_gap_pf': np.float64(0.69), 'live': 6240, 'win': np.float64(0.294)}
+tp 2.5 gap_from 4500.0 be 0.4 hard 225.0 gapexit 590: lost 0.000 median 9131 p25 2452 green 0.376 {'es_gap_pf': np.float64(0.69), 'live': 6855, 'win': np.float64(0.286)}

@@ -1,0 +1,9 @@
+dev band trades 1004 win 0.209 pf 1.44 net 17649 | gap trades 224 gap net 6799 gap pf 1.95
+    dev starts 49 lost 0.0 median 4211
+unseen_nq band trades 1216 win 0.22 pf 1.45 net 26340 | gap trades 270 gap net 8713 gap pf 1.76
+    unseen_nq starts 55 lost 0.0 median 10838
+unseen_es band trades 325 win 0.222 pf 1.17 net 994 | gap trades 70 gap net -379 gap pf 0.69
+live band trades 65 win 0.277 pf 3.34 net 4935 | gap trades 16 gap net 1101 gap pf 2.34
+   live by month (band, 1 MNQ): {Period('2026-07', 'M'): -138.0, Period('2026-08', 'M'): 745.0, Period('2026-09', 'M'): 824.0, Period('2026-10', 'M'): 2086.0, Period('2026-11', 'M'): 1418.0}
+   last days: {datetime.date(2026, 11, 13): 236.0, datetime.date(2026, 11, 16): -102.0, datetime.date(2026, 11, 17): -297.0, datetime.date(2026, 11, 19): -2.0, datetime.date(2026, 11, 20): 1295.0}
+POOLED 104 lost 0.0 median 8772 p25 3235 p10 1441 worst -20 best 17703 reach10k 0.433 reach15k 0.125 reach25k 0.0 green days 0.377
