@@ -68,6 +68,20 @@ the floor), 43% reach +$10,000 and 12.5% +$15,000 in 12 months, none +$25,000; g
 month (1 MNQ): Jul -$138, Aug +$745, Sep +$824, Oct +$2,086, Nov (to the 20th) +$1,418; Nov 13 +$236, Nov 16 -$102,
 Nov 17 -$297, Nov 19 -$2, Nov 20 +$1,295 (the 2.5x target took the trend day's first leg).
 
+By year, 1 contract (band / gap leg): 2015 $2,869 / $1,158, 2016 $3,709 / $2,802, 2017 $1,098 / $895, 2018 $6,486 /
+$64, 2019 $3,486 / $1,880, 2020 $3,352 / $1,505, 2021 $6,702 / $1,104, 2022 $6,670 / $3,844, 2023 $5,160 / $449, 2024
+$4,370 / $1,521, 2025 H1 $85 / $290, 2026 Jun 29 - Nov 20 $4,935 / $1,101: every year up for both. (No data here for
+Jul 2025 - Jun 2026.)
+
+**How sure is "none lost"?** (`verification/zoo/walkforward_dev_only.txt`) The protections were picked on dev and
+unseen NQ together, so the 0 of 104 is partly in-sample. A walk-forward that picks on 2015-19 only: of the 294 settings
+in the stage-4 grid that lose no 2015-19 start, the average loses 5.7% of the 2020-25 starts and 47% lose none; picking
+by the safest dev neighbourhood does no better (5.3%). The 2015-19 data cannot see the 2020 regime coming. What the
+grid does show is where the losses come from: the $250 hard stop, the late break-even (0.75) and entries to 14:30;
+every setting at $200 or less with break-even at 0.3-0.5 and a target of 2-3 hard stops loses none on either. Expect a
+small chance (a few percent) of losing a fresh account in a year like 2020, almost all of it in its first months, before
+the $2,000 cushion that brings the second contract; never loosen the risk settings.
+
 **What it is not:** a high win-rate strategy. About 1 trade in 4 wins and about 3 traded days in 8 are green; the
 winners (the 2.5x target or the 15:55 close on trend days) are 4-6x the losers, which the band and break-even keep small. It trades on about a third of the sessions. With the user's
 3-contract cap the edge supports roughly $4-11K a year on a 50K (median $8.8K), not $25K; starting at 3 contracts
