@@ -1,3 +1,4 @@
+# ruff: noqa: E501
 """A bias + Fibonacci pullback strategy (the user, 2026-11-23: "identify a bias, figure out where the market is trending,
 find a point to enter; Fibonacci", in the style of the RyzensTrades channel), on NQ 2015-2025 (MNQ) and ES 2020-2024 (MES).
 
@@ -46,6 +47,10 @@ def day_trade(s, bias: int, leg: float, ent: float, sl: float, tp: float, tick: 
                     continue
                 level = top - ent * size if side > 0 else bot + ent * size
                 stop = top - sl * size - tick if side > 0 else bot + sl * size + tick
+                # the setup is dead once price has traded through its stop since the swing (fixed 2026-11-23: before,
+                # an entry far past the stop counted the "stop" above the fill as a win)
+                if (side > 0 and lo[hi_t:k].min() <= stop) or (side < 0 and h[lo_t:k].max() >= stop):
+                    continue
                 target = bot + tp * size if side > 0 else top - tp * size
                 hit = lo[k] <= level - tick if side > 0 else h[k] >= level + tick
                 if not hit:
@@ -55,8 +60,8 @@ def day_trade(s, bias: int, leg: float, ent: float, sl: float, tp: float, tick: 
                     if (side > 0 and lo[j] <= stop) or (side < 0 and h[j] >= stop):
                         px = (min(o[j], stop) if side > 0 else max(o[j], stop)) if j > k else stop
                         return d, side, (px - side * tick - fill) * side
-                    if (side > 0 and h[j] >= target + tick) or (side < 0 and lo[j] <= target - tick):
-                        return d, side, (target - fill) * side
+                    if j > k and ((side > 0 and h[j] >= target + tick) or (side < 0 and lo[j] <= target - tick)):
+                        return d, side, (target - fill) * side  # never on the fill minute (its order is unknown)
                     if mm[j] >= 959:
                         return d, side, (c[j] - side * tick - fill) * side
                 return d, side, (c[-1] - side * tick - fill) * side
@@ -67,6 +72,9 @@ def day_trade(s, bias: int, leg: float, ent: float, sl: float, tp: float, tick: 
     return None
 
 
+GRID = [("sma20", "none"), (0.003, 0.005), (0.5, 0.618, 0.705), (0.786, 1.0), (1.0, 1.272)]
+
+
 def study(name, ss, sym, legs):
     tick, pv = SPEC[sym]
     closes = pd.Series([s[5][-1] for s in ss])
@@ -74,7 +82,7 @@ def study(name, ss, sym, legs):
     prev = closes.shift(1)
     bias_sma = np.where(prev > sma, 1, np.where(prev < sma, -1, 0))
     rows = []
-    for b, lg, ent, sl, tp in itertools.product(("sma20", "none"), legs, (0.5, 0.618, 0.705), (0.786, 1.0), (1.0, 1.272)):
+    for b, lg, ent, sl, tp in itertools.product(*GRID):
         if sl <= ent:
             continue
         tr = []
@@ -88,11 +96,11 @@ def study(name, ss, sym, legs):
             continue
         t = pd.DataFrame(tr, columns=["d", "side", "pts"])
         t["usd"] = t.pts * pv - 2 * FEE
-        daily = t.groupby("d").usd.sum()
+        daily = t.groupby("d").usd.sum().reindex([x[0] for x in ss], fill_value=0.0)  # every session
         eq = daily.cumsum()
         yr = t.groupby(pd.to_datetime(t.d).dt.year).usd.sum()
         rows.append({"set": name, "bias": b, "leg": lg, "entry": ent, "stop": sl, "target": tp,
-                     "days_traded": round(len(t) / len(ss), 3), "win": round((t.usd > 0).mean(), 3),
+                     "days_traded": round(len(tr) / len(ss), 3), "win": round((t.usd > 0).mean(), 3),
                      "net": round(t.usd.sum()), "per_trade": round(t.usd.mean(), 2),
                      "pf": round(t.usd[t.usd > 0].sum() / max(1e-9, -t.usd[t.usd < 0].sum()), 2),
                      "dd": round((eq.cummax().clip(lower=0) - eq).max()), "worst_day": round(daily.min()),

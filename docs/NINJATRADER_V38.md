@@ -10809,3 +10809,20 @@ caps the oversized loss with no measured cost in accounts; the strict median rul
 "Gap trade: stop no farther than the max loss (G534)" (`GapStopCap`), on by default; it acts in every mode but
 Evaluation and the Test sprint. The Python reference (`gap_go_cap`) and NinjaTrader's code agree trade for trade
 (tests/test_ninjatrader_v38.py, 60 passed).
+
+## A bias + Fibonacci pullback strategy (2026-11-23): rejected after a bug fix
+
+The user: "identify a bias, figure out where the market is trending, find a point to enter; Fibonacci", in the style of
+a YouTube channel (its pages could not be read: YouTube served an empty shell). `research/fib_pullback.py`: one trade a
+day on 1-minute bars; the leg from the day's low to its high so far (or high to low), at least 0.3% / 0.5% of the price;
+a limit at the 0.5 / 0.618 / 0.705 retracement from 10:00 to 14:30; the stop at 0.786 or the swing; the target the swing
+(1.0) or 1.272; with a 20-day bias or none; NQ 2015-2025 (MNQ) and ES 2020-2024 (MES).
+
+**A bug made it look excellent and was found before anything was built.** The first run showed $114,120 per MNQ over
+2015-2025 (profit factor 3.79, every year up, no fresh 50K account lost). A NinjaTrader-faithful re-implementation
+(`research/fib_reference.py`) broke even, and tracing one day (2019-01-03) showed why: after price had fallen through
+the whole zone and past the 0.786 stop, the research code still "bought" at the market far below the stop and booked
+the stop above its fill as a +155-point win. With the rule every real order follows (a setup is dead once price trades
+through its stop since the swing), both engines agree: entry 0.5 -$26,381 (profit factor 0.86), 0.618 -$8,320 / -$8,641
+(0.93), 0.705 -$165 (1.00); 2-5 of 11 years up. Nothing built. The buggy table is kept as
+`verification/noise_v2/fib_pullback_BUGGY_before_fix.csv`.
