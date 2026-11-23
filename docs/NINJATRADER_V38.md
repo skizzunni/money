@@ -10873,3 +10873,7 @@ and a higher 12-month median on both.
 **Evidence:** the live setup's entries by check (raw runs): every check makes money on NQ 2015-2025 and on the index
 2011-2025 except 13:00: NQ -$1,891 (224 trades, -$8 a trade), index -$142 (306, $0). `research/g536_no_1300.py`: R1 no
 entries at the 13:00 check (`skip_checks` "780"). **Pass:** as above. Run once.
+
+**G536 result (2026-11-23): rejected (mixed).** Development: reach +$25K 9.7% (live 6.5%), median $9,259 ($9,572), lost
+3.2% (0%); unseen: 15.5% (13.8%), $13,139 ($12,946), lost 0% (1.7%). One account more lost on development and one fewer
+on unseen; the medians move 1-3% either way. The 13:00 entries are a small leak, not a lever. Live setup unchanged.
