@@ -17,7 +17,7 @@ import strats as S  # noqa: E402
 
 def grid(**kw):
     keys = list(kw)
-    return [dict(zip(keys, v)) for v in itertools.product(*kw.values())]
+    return [dict(zip(keys, v, strict=True)) for v in itertools.product(*kw.values())]
 
 
 GRIDS = {

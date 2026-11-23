@@ -192,7 +192,8 @@ namespace NinjaTrader.NinjaScript
         public double TickSize { get { return Instrument.MasterInstrument.TickSize; } }
         public Series<DateTime> Time = new Series<DateTime>();
         public Series<double> Open = new Series<double>(), High = new Series<double>(), Low = new Series<double>(),
-            Close = new Series<double>();
+            Close = new Series<double>(), Volume = new Series<double>();
+        public IList<double> SimVolumes;  // tests: each bar's volume (Program.cs: an optional sixth column; else 1)
         public Series<double>[] Values = new Series<double>[0];
         public readonly List<string> Printed = new List<string>();
         internal int ThrowAt = -1;  // tests: the dashboard call throws on this bar (a runtime error inside OnBarUpdate)
@@ -717,7 +718,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                     State = State.Realtime; OnStateChange();
                 }
                 Time.Add(barEnds[i]); Open.Add(o[i]); High.Add(h[i]); Low.Add(l[i]); Close.Add(c[i]);
-                CurrentBar = Time.Current = Open.Current = High.Current = Low.Current = Close.Current = i;
+                Volume.Add(SimVolumes != null ? SimVolumes[i] : 1);
+                CurrentBar = Time.Current = Open.Current = High.Current = Low.Current = Close.Current = Volume.Current = i;
                 foreach (Series<double> v in Values) v.Current = i;
                 DateTime nyStart = TimeZoneInfo.ConvertTime(barEnds[i], NinjaTrader.Core.Globals.GeneralOptions.TimeZoneInfo, ny)
                     .AddMinutes(-BarsPeriod.Value);

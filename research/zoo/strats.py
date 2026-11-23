@@ -41,12 +41,16 @@ def _moves(days, j):
 
 
 def noise(days, i, tick, vwap=True, trend=0, hard=250.0, vwap_stop=False, pv=2.0, k=1.0, last=900, max_trades=9,
-          be_r=0.0):
+          be_r=0.0, stop_slip=2, nt=True):
     """The user's Clean Noise-Band spec (research/clean_noise_band.py): checks 10:00-15:00, the band (k x sigma) past
     max/min(open, prior close), the session VWAP agreeing, the band as a stop moved at the checks, a hard stop $hard a
-    contract, out 15:55. trend: also the close past the `trend`-session average of closes. be_r: the stop to entry +
-    a tick once a bar closes be_r x the hard stop in profit."""
-    if i < 21:
+    contract, out at 15:55. trend: also the close past the `trend`-session average of closes. be_r: the stop to entry +
+    a tick once a bar closes be_r x the hard stop in profit. Returns (side, entry bar, entry, exit, why, exit bar).
+    nt (as NinjaTrader executes it, research/zoo NinjaTrader parity): the hard stop measured from the expected fill
+    (the signal close + a tick) and set with the entry; a check whose new stop is at or past the close exits at the next
+    bar's open (a stop there would be rejected); the 15:55 exit at the open of the bar starting 15:55; stop fills
+    stop_slip ticks worse."""
+    if i < max(21, trend + 1):
         return []
     d = days[i]
     o, h, lo, c, mm = d["o"], d["h"], d["l"], d["c"], d["mm"]
@@ -56,42 +60,57 @@ def noise(days, i, tick, vwap=True, trend=0, hard=250.0, vwap_stop=False, pv=2.0
     sma = np.mean([prev(days, i, "c", j) for j in range(1, trend + 1)]) if trend else np.nan
     vw = _vwap(d)
     out = []
-    pos, entry, stop, hard_px, pend, pend_stop, ebar = 0, 0.0, np.nan, np.nan, 0, np.nan, 0
+    pos, entry, stop, pend, pend_stop, ebar, exit_next, hard_ref = 0, 0.0, np.nan, 0, np.nan, 0, False, 0.0
     be_pts = be_r * hard / pv
     for b in range(len(o)):
         end = mm[b] + 5
+        if pos and exit_next:  # a market exit sent at the last bar's close
+            out.append((pos, ebar, entry, o[b] - pos * tick, "exit", b - 1))
+            pos, exit_next = 0, False
         if pend and pos == 0:
             pos, entry, ebar = pend, o[b] + pend * tick, b
-            hard_px = entry - pos * hard / pv
             stop = pend_stop
             pend = 0
+        if pos and nt and mm[b] >= 955:
+            out.append((pos, ebar, entry, o[b] - pos * tick, "time", b - 1))
+            pos = 0
         if pos:
-            lvl = max(stop, hard_px) if pos > 0 else min(stop, hard_px)
-            if (pos > 0 and lo[b] <= lvl) or (pos < 0 and h[b] >= lvl):
-                px = (min(o[b], lvl) if pos > 0 else max(o[b], lvl)) if b > ebar else lvl
-                out.append((pos, ebar, entry, px - pos * 2 * tick, "stop"))
+            if (pos > 0 and lo[b] <= stop) or (pos < 0 and h[b] >= stop):
+                px = (min(o[b], stop) if pos > 0 else max(o[b], stop)) if b > ebar else stop
+                out.append((pos, ebar, entry, px - pos * stop_slip * tick, "stop", b))
                 pos = 0
             elif be_r and pos * (c[b] - entry) >= be_pts:
-                hard_px = max(hard_px, entry + tick) if pos > 0 else min(hard_px, entry - tick)
+                stop = max(stop, entry + tick) if pos > 0 else min(stop, entry - tick)
         if end in sig and not np.isnan(sig[end]):
             s = sig[end] * k
             up, dn = up_ref * (1 + s), dn_ref * (1 - s)
             bl, bs = (max(up, vw[b]), min(dn, vw[b])) if vwap_stop else (up, dn)
-            if pos > 0:
-                stop = bl
-            elif pos < 0:
-                stop = bs
-            elif end <= last and len(out) < max_trades:
+            if pos:
+                hard_px = hard_ref - pos * hard / pv
+                band = bl if pos > 0 else bs
+                new = max(band, hard_px) if pos > 0 else min(band, hard_px)
+                if nt:  # NinjaTrader: the stop is only ever tightened
+                    new = max(new, stop) if pos > 0 else min(new, stop)
+                if pos * (c[b] - new) <= 0:
+                    exit_next = True
+                else:
+                    stop = new
+            elif end <= last and len(out) < max_trades and mm[b] < 950:
                 want = 1 if c[b] > up else -1 if c[b] < dn else 0
                 if want and vwap and want * (c[b] - vw[b]) <= 0:
                     want = 0
                 if want and trend and want * (c[b] - sma) <= 0:
                     want = 0
                 if want:
-                    pend, pend_stop = want, (bl if want > 0 else bs)
-        if mm[b] >= 955 and pos:
-            out.append((pos, ebar, entry, c[b] - pos * tick, "time"))
+                    hard_ref = c[b] + want * tick
+                    band = bl if want > 0 else bs
+                    hp = hard_ref - want * hard / pv
+                    pend, pend_stop = want, (max(band, hp) if want > 0 else min(band, hp))
+        if not nt and mm[b] >= 955 and pos:
+            out.append((pos, ebar, entry, c[b] - pos * tick, "time", b))
             pos = 0
+    if pos:
+        out.append((pos, ebar, entry, c[-1] - pos * tick, "time", len(o) - 1))
     return out
 
 
@@ -148,10 +167,10 @@ def gap_go(days, i, tick, k=0.5, n=14, exit_m=955, r=0.0, cap=100.0):
     side = 1 if gap > 0 else -1
     if abs(gap) < k * avg or side * (d["c"][0] - d["o"][0]) <= 0:
         return []
-    e = d["o"][1] + side * tick
+    e = d["c"][0] + side * tick  # the expected fill: the signal close + a tick (NinjaTrader sets the stop with the entry)
     dist = min(max(abs(e - d["o"][0]), 4 * tick), cap)
-    px, x, _, why = walk(d, 1, side, e - side * dist, e + side * r * dist if r else np.nan, exit_m, tick)
-    return [(side, 1, px, x, why)]
+    px, x, xb, why = walk(d, 1, side, e - side * dist, e + side * r * dist if r else np.nan, exit_m, tick, at_open=True)
+    return [(side, 1, px, x, why, xb)]
 
 
 def vwap_rev(days, i, tick, k=2.0, ks=3.5, first=600, last=900, exit_m=955, max_trades=2, trend_only=False):
@@ -175,7 +194,6 @@ def vwap_rev(days, i, tick, k=2.0, ks=3.5, first=600, last=900, exit_m=955, max_
         if side and trend_only and side * (c[b] - d["o"][0]) < 0:
             side = 0
         if side:
-            e = d["o"][b + 1] + side * tick
             st = vw[b] - side * ks * sd
             px, x, xb, why = walk(d, b + 1, side, st, vw[b], exit_m, tick)
             if side * (px - st) > 0:
@@ -363,3 +381,41 @@ def squeeze(days, i, tick, n=20, kb=2.0, stop_pts=40.0, first=600, last=900, exi
                 px, x, _, why = walk(d, b + 1, side, e - side * stop_pts, np.nan, exit_m, tick)
                 return [(side, b + 1, px, x, why)]
     return []
+
+
+def merge(trades):
+    """One position at a time: trades sorted by entry bar, one starting while an earlier one is open is dropped."""
+    kept, busy_to = [], -1
+    for t in sorted(trades, key=lambda t: t[1]):
+        if t[1] <= busy_to:
+            continue
+        kept.append(t)
+        busy_to = t[5] if len(t) > 5 else 10**9
+    return kept
+
+
+def combo(days, i, tick, legs=(), **_):
+    """Several strategies on one account: each leg (function name, params); a leg's trade is skipped when it would
+    overlap an earlier-starting trade of another leg (one position at a time), legs in the order given win ties."""
+    out = []
+    for name, p in legs:
+        for t in globals()[name](days, i, tick, **p) or []:
+            out.append(t)
+    out.sort(key=lambda t: t[1])
+    kept, busy_to = [], -1
+    for t in out:
+        if t[1] <= busy_to:
+            continue
+        kept.append(t)
+        busy_to = t[5] if len(t) > 5 else _exit_bar(days[i], t)
+    return kept
+
+
+def _exit_bar(day, t):
+    """The bar a trade closed on, found from its exit price path (the first bar from entry that trades its exit)."""
+    side, b, _, x, _ = t
+    for k in range(b, len(day["c"])):
+        if day["l"][k] - 1 <= x <= day["h"][k] + 1:
+            if k > b or True:
+                return k
+    return len(day["c"]) - 1

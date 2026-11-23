@@ -6,7 +6,7 @@ Sets (5-minute regular-hours bars, 09:30-16:00 New York, the bar's start time):
   * dev:    NQ 2015-2019 (research/v4_search's 1-minute history, rescaled month by month; a day's prices are on one
             scale, and prior-day levels are carried over in today's scale by the ratio of the two scales);
   * unseen: NQ 2020 - mid 2025 and ES 2020-2024 (MES, $5 a point);
-  * live:   the user's MNQ Sep 2026 - Nov 17 (NinjaTrader export) and Nov 18-21 (Yahoo 5-minute bars).
+  * live:   the user's MNQ Sep 2026 - Nov 17 (NinjaTrader export) with the days it lacks (Oct 27 - Nov 12, Nov 18-20) from Yahoo's 5-minute bars.
 A strategy is a function (days, i, **params) -> trades for day i, each (side, entry bar, entry px, exit px, why); the
 bench applies slippage, $0.62 a side, the contract's point value, then the account test: a fresh 50K started on the first
 session of every month, 12 months, the floor trailing the highest end-of-day balance by $2,000 and stopping at $50,000;
@@ -63,8 +63,8 @@ def build(ddir: str) -> None:
     mnq, _ = M.traded_series(sep, dec)
     live = rth5(mnq)
     y = pd.read_pickle(os.path.join(ddir, "yahoo_mnq_5m.pkl"))
-    last = live[-1]["d"]
-    live += [r for r in rth5(y) if r["d"] > last]
+    have = {r["d"] for r in live}
+    live = sorted(live + [r for r in rth5(y) if r["d"] not in have and r["d"] >= live[0]["d"]], key=lambda r: r["d"])
     sets = {"dev": ([r for r in nd if r["d"].year <= 2019], "MNQ"),
             "unseen_nq": ([r for r in nd if r["d"].year >= 2020], "MNQ"),
             "unseen_es": (rth5(es), "MES"),
@@ -88,7 +88,7 @@ def prev(days: list, i: int, k: str, j: int = 1):
 
 
 def walk(day: dict, i: int, side: int, stop: float, target: float = np.nan, exit_m: int = 955, tick: float = 0.25,
-         be_at: float = np.nan, trail: float = np.nan, slip: int = 1, entry: float | None = None):
+         be_at: float = np.nan, trail: float = np.nan, slip: int = 1, entry: float | None = None, at_open: bool = False):
     """Enter at bar i's open (or `entry`, a limit fill), stop / target resting, out at the close of the first bar starting
     at or after exit_m. be_at: once a bar closes this many points in profit, the stop to entry + a tick; trail: the stop
     this many points behind the best close. The stop first in a bar reaching both; a target never on the fill bar.
@@ -103,6 +103,8 @@ def walk(day: dict, i: int, side: int, stop: float, target: float = np.nan, exit
         if k > i and not np.isnan(target) and ((side > 0 and h[k] >= target + tick) or (side < 0 and lo[k] <= target - tick)):
             return px, target, k, "target"
         if mm[k] >= exit_m:
+            if at_open and k + 1 < len(o):  # a market exit sent at this bar's close fills at the next open
+                return px, o[k + 1] - side * slip * tick, k, "time"
             return px, c[k] - side * slip * tick, k, "time"
         if not np.isnan(be_at) and side * (c[k] - px) >= be_at:
             st = max(st, px + tick) if side > 0 else min(st, px - tick)
@@ -115,33 +117,48 @@ def trades_of(strat, days: list, sym: str, **p) -> pd.DataFrame:
     tick, pv = SPEC[sym]
     rows = []
     for i in range(len(days)):
-        for side, ib, epx, xpx, why in strat(days, i, tick=tick, **p) or []:
+        for tr in strat(days, i, tick=tick, **p) or []:
+            side, ib, epx, xpx, why = tr[:5]
             pts = (xpx - epx) * side
             rows.append((days[i]["d"], side, ib, pts, pts * pv - 2 * FEE, why))
     return pd.DataFrame(rows, columns=["d", "side", "bar", "pts", "usd", "why"])
 
 
-def account(t: pd.DataFrame, all_days: list, qty_fn=lambda prof: 1, day_stop: float = 0.0, start_every: str = "M"):
+def account(t: pd.DataFrame, all_days: list, qty_fn=lambda prof: 1, day_stop: float = 0.0, start_every: str = "M",
+            early_max: int = 0, early_cushion: float = 0.0, eq_n: int = 0, eq_min: float = 0.0, steps: tuple = ()):
     """Fresh 50K starts (every month), 12 months each. day_stop: no more trades once the day is down this much ($, at
-    the sizes taken). Returns per-start (lost, profit, green days, traded days)."""
+    the sizes taken). early_max: at most this many trades a day while the profit is under early_cushion. eq_n / eq_min:
+    sit a day out when the strategy's own 1-contract P/L over the last eq_n sessions (taken or not) is below eq_min.
+    steps: contracts by profit, e.g. ((0, 1), (1500, 2), (3500, 3)) (overrides qty_fn).
+    Returns per-start (lost, profit, green days, traded days)."""
     days = [r["d"] for r in all_days]
-    byday = {d: g for d, g in t.groupby("d")}
+    byday = {d: g.usd.to_numpy() for d, g in t.groupby("d")}
+    hyp = np.array([byday[d].sum() if d in byday else 0.0 for d in days])
     idx = pd.Series(range(len(days)), index=pd.to_datetime(days))
     starts = sorted({x.to_period(start_every).start_time for x in idx.index})
     res = []
     for s0 in starts:
         end = s0 + pd.DateOffset(months=12)
-        seg = [days[j] for j in idx[(idx.index >= s0) & (idx.index < end)].to_numpy()]
+        seg = idx[(idx.index >= s0) & (idx.index < end)].to_numpy()
         if len(seg) < 200 or (idx.index[-1] < end - pd.DateOffset(days=10)):
             continue
         bal, high, lost, green, traded = 50000.0, 50000.0, False, 0, 0
-        for d in seg:
+        for j in seg:
+            d = days[j]
             floor = min(high - 2000.0, 50000.0)
             day_pl = 0.0
             g = byday.get(d)
+            if g is not None and eq_n and j >= eq_n and hyp[j - eq_n:j].sum() < eq_min:
+                g = None
             if g is not None:
-                q = qty_fn(bal - 50000.0)
-                for usd in g.usd.to_numpy():
+                prof = bal - 50000.0
+                q = qty_fn(prof)
+                for lim, qq in steps:
+                    if prof >= lim:
+                        q = qq
+                if early_max and prof < early_cushion:
+                    g = g[:early_max]
+                for usd in g:
                     if day_stop and day_pl <= -day_stop:
                         break
                     day_pl += usd * q

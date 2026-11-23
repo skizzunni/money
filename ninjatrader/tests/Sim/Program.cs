@@ -20,7 +20,8 @@ static class Program
         TimeZoneInfo ny = TimeZoneInfo.FindSystemTimeZoneById("America/New_York");
         NinjaTrader.Core.Globals.GeneralOptions.TimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Europe/London");
         List<DateTime> t = new List<DateTime>();
-        List<double> o = new List<double>(), h = new List<double>(), l = new List<double>(), c = new List<double>();
+        List<double> o = new List<double>(), h = new List<double>(), l = new List<double>(), c = new List<double>(),
+            v = new List<double>();
         foreach (string line in File.ReadLines(args[0]))
         {
             string[] p = line.Split(',');
@@ -29,6 +30,7 @@ static class Program
             t.Add(TimeZoneInfo.ConvertTime(start.AddMinutes(minutes), ny, NinjaTrader.Core.Globals.GeneralOptions.TimeZoneInfo));
             o.Add(double.Parse(p[1], CultureInfo.InvariantCulture)); h.Add(double.Parse(p[2], CultureInfo.InvariantCulture));
             l.Add(double.Parse(p[3], CultureInfo.InvariantCulture)); c.Add(double.Parse(p[4], CultureInfo.InvariantCulture));
+            v.Add(p.Length > 5 ? double.Parse(p[5], CultureInfo.InvariantCulture) : 1);
         }
         // "Strategy=Runner" picks the rejected runner (Strategies/MnqMomentumRunner.cs), "Strategy=C" candidate C
         // (Strategies/MnqMomentumC.cs); otherwise B
