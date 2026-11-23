@@ -1390,3 +1390,26 @@ def test_v38_history_gap_blocks_new_entries(sim, sample_1m, tmp_path):  # noqa: 
     assert [t for t in allowed if int(t[1]) > live], "with the guard off it trades"
     _, out = go(bars)
     assert "history is missing" not in out
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+def test_v38_contracts_cap(sim, sample_1m, tmp_path):  # noqa: F811
+    """G535: "Most contracts (your cap)" at 3 caps Funded growth's size at 3 (it still starts at 1 and steps up with
+    the profit); NinjaTrader's code and the model (size_up_to 3) agree trade for trade, with steps fast enough to reach
+    3."""
+    bars = resample(sample_1m, "5min")
+    path = tmp_path / "bars.csv"
+    with path.open("w") as f:
+        for t, r in zip(bars.index, bars.itertuples(), strict=True):
+            f.write(f"{t:%Y-%m-%d %H:%M},{r.open!r},{r.high!r},{r.low!r},{r.close!r}\n")
+    r = subprocess.run([DOTNET, str(sim), str(path), "5", "Strategy=V38", "Mode=Custom", "ProfitStep=300",
+                        "ContractsCap=3"], capture_output=True, text=True, env=ENV)
+    assert r.returncode == 0, r.stderr[-2000:]
+    nt = [x.split(",")[1:] for x in r.stdout.splitlines() if x.startswith("T,")]
+    py = run(bars, dataclasses.replace(GROW, profit_step=300.0, giveback_brake=0.45, size_up_to=3, **PRE_G511),
+             minutes=5).trades
+    assert len(nt) == len(py) >= 20
+    for a, t in zip(nt, py, strict=True):
+        assert (int(a[0]), int(a[1]), int(a[3])) == (t.direction, t.entry_bar, t.exit_bar), (a, t)
+        assert math.isclose(float(a[6]), t.pnl, abs_tol=1e-6), (a, t)
+    assert max(t.qty for t in py) == 3

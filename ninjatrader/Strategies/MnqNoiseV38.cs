@@ -1117,6 +1117,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 GivebackBrake = 0.45;  // G243 (G99c: 0.5)
                 GapSkipBraked = true;  // G191
                 GapStopCap = true;  // G534
+                ContractsCap = 0;  // G535: none (the mode's limit)
                 MaxLosersPerDay = 0;  // G422 (U58): no limit (G204: 3; the Test sprint 3)
                 EarlyDayBudget = 750;  // G204
                 GapTrigger = 0.65;  // G242 (G60: 0.5, G204: 0.6)
@@ -1249,6 +1250,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 st.BigDayK = BigDayK; st.CalmK = CalmK; st.RangePosMin = RangePos; st.TrendN = TrendSessions;
                 st.FedNoShorts = FedNoShorts; st.SkipDates = SkipDates; st.FedDates = FedDates;
                 st.AfterLossMaxLoss = AfterLossMaxLoss; st.TrailDD = TrailDD; st.TrailFrom = TrailFrom ?? "";
+                if (ContractsCap > 0)  // G535: the user's own cap on contracts, over any mode's (3: the safe way to trade 3)
+                    MaxContracts = MaxContracts > 0 ? Math.Min(MaxContracts, ContractsCap) : ContractsCap;
                 st.ProfitStep = ProfitStep; st.MaxContracts = MaxContracts; st.SizeByOwnStop = SizeByOwnStop;
                 st.TimeStop = TimeStop;
                 st.StepsAfterLock = StepsAfterLock;
@@ -2324,6 +2327,11 @@ namespace NinjaTrader.NinjaScript.Strategies
         [NinjaScriptProperty]
         [Display(Name = "Gap trade: stop no farther than the max loss (G534)", Order = 30, GroupName = "1. Size and risk")]
         public bool GapStopCap { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, 60)]
+        [Display(Name = "Most contracts (your cap, 0 = the mode's): 3 = start at 1, up to 3 as profit builds (G535)", Order = 31, GroupName = "1. Size and risk")]
+        public int ContractsCap { get; set; }
 
         [NinjaScriptProperty]
         [Range(0, 20)]

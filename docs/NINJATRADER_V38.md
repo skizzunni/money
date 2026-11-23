@@ -10826,3 +10826,23 @@ the stop above its fill as a +155-point win. With the rule every real order foll
 through its stop since the swing), both engines agree: entry 0.5 -$26,381 (profit factor 0.86), 0.618 -$8,320 / -$8,641
 (0.93), 0.705 -$165 (1.00); 2-5 of 11 years up. Nothing built. The buggy table is kept as
 `verification/noise_v2/fib_pullback_BUGGY_before_fix.csv`.
+
+## The bias + Fibonacci search (2026-11-23): rejected
+
+`research/fib_bias_search.py`: the fixed Fibonacci pullback with a bias (none / the 20-day trend / the day's direction
+against its open / both), leg 0.3-0.8%, entry 0.5-0.705, stop 0.786 or the swing, target 0.9 / 1.0 / 1.272 of the leg,
+entries to 12:00 or 14:30 (432 rules). Chosen on NQ 2015-2019; the ten best there, elsewhere: NQ 2020-2025 profit factor
+0.99-1.26, ES 2020-2024 0.55-1.27 (most under 1), the user's MNQ Jun-Oct 2026 0.00-0.98 (every one lost).
+`verification/noise_v2/fib_bias_search.csv`. Nothing built.
+
+## G535 (2026-11-23): a fixed 3 MNQ, and a cap at 3
+
+The user will trade 3 contracts from now on. `research/g535_three_contracts.py` (G495's measure): Funded growth at a
+fixed 3 MNQ from the start loses 23-40% of fresh 50K accounts in a year whatever the loss per trade ($562.50 / $375),
+the day budget ($600) or the losers a day (2): development lost 22.6-35.5%, unseen 24.1-39.7% (Funded growth 3.2% /
+1.7%). `research/g535b_up_to_three.py`: Funded growth capped at 3 MNQ (starting at 1, +1 per $1,500 of profit, then 3)
+loses no more than Funded growth (3.2% / 1.7%), median $9,483 / $12,910 ($10,386 / $19,977 uncapped), +$25,000 in a year
+6.5% / 17.2%.
+
+**Built (2026-11-23): "Most contracts (your cap, 0 = the mode's)" (`ContractsCap`)** caps any mode's contracts; at 3 it
+is the safe way to trade 3. NinjaTrader's code and the model agree trade for trade (`test_v38_contracts_cap`).
