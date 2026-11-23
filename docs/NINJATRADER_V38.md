@@ -10928,3 +10928,9 @@ The time stops that lose sit mostly below the lock (0.2-0.35R first; lower lock 
 `research/g540_lock_trail.py` on G495's measure: T40 the stop also 40 points behind the best price since the entry once
 the lock has armed (`trail_points` 40, decided at a bar's close, never loosening), T60 at 60 points. **Pass:** no more
 accounts lost than LIVE on both sets and a higher 12-month median on both. Run once.
+
+**G540 result (2026-11-23): rejected, both, clearly.** T40: development median $8,314 (live $9,572), 3.2% lost (none);
+unseen $6,630 ($12,946), 13.8% lost (1.7%). T60: development $7,564, none lost; unseen $7,311, 5.2% lost. The trailing
+stop does lift the development reach (T40 12.9% against 6.5%) but on unseen it halves the median: the money is in the
+few trades that run to the target or the 16:00 close, and they pull back 40-60 points on the way. The near-zero locks
+are the price of keeping those. Live setup unchanged.
