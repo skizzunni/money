@@ -1,4 +1,4 @@
-# ruff: noqa: E501, B023
+# ruff: noqa: E501
 """The user's "Clean Noise-Band Momentum (Prop Version)" spec (2026-11-23), coded as written, against Funded growth.
 
 5-minute regular-hours bars (09:30-16:00 New York, the bar's start), 1 contract:
@@ -61,7 +61,7 @@ def simulate(days: list, sym: str, vwap_entry: bool, trend: bool, vwap_stop: boo
             typ = (h + lo + c) / 3
             cum_v = np.cumsum(v)
             vwap = np.where(cum_v > 0, np.cumsum(typ * v) / np.maximum(cum_v, 1e-9), np.nan)
-            pos, entry, stop, hard_px = 0, 0.0, np.nan, np.nan
+            pos, entry, stop, hard_px, stop_next = 0, 0.0, np.nan, np.nan, np.nan
             pending = 0
             for i in range(len(o)):
                 end = mm[i] + 5  # this bar closes at `end`
