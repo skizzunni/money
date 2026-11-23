@@ -253,3 +253,16 @@ def test_clean_band_oco_cancel_does_not_exit_twice(sim, tmp_path, live):  # noqa
     assert tw == tp
     assert any(",Profit target," in x for x in tw) and any(",Gap exit," in x or ",Session end," in x for x in tw)
     assert [x for x in worst if x.startswith("O,") and "Exit" in x] == [x for x in plain if x.startswith("O,") and "Exit" in x]
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+def test_clean_band_dashboard_says_if_it_is_ready(sim, tmp_path):  # noqa: F811
+    days = synthetic_days()
+    path = tmp_path / "bars.csv"
+    write_bars(days, path)
+    d = [x for x in _run_all(sim, path) if x.startswith("D,")]
+    assert d and "Setup: OK" in d[0] and "MNQ a trade" in d[0]
+    short = tmp_path / "short.csv"
+    write_bars(days[:12], short)
+    d2 = [x for x in _run_all(sim, short) if x.startswith("D,")]
+    assert d2 and "NOT READY: 11 complete sessions loaded, needs 21" in d2[0]

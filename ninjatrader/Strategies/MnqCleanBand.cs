@@ -24,6 +24,7 @@ using System.Globalization;
 using NinjaTrader.Cbi;
 using NinjaTrader.Data;
 using NinjaTrader.NinjaScript;
+using NinjaTrader.NinjaScript.DrawingTools;
 #endregion
 
 namespace NinjaTrader.NinjaScript.Strategies
@@ -196,6 +197,29 @@ namespace NinjaTrader.NinjaScript.Strategies
                 return;
             Bar();
             CheckNoStop(true);
+            if (State == State.Realtime || CurrentBar >= Bars.Count - 2)
+                Dashboard();
+        }
+
+        // the chart's top-right corner: is it ready, how big, today's P/L
+        void Dashboard()
+        {
+            string setup;
+            if (BarsPeriod.BarsPeriodType != BarsPeriodType.Minute || BarsPeriod.Value != 5)
+                setup = "WRONG CHART: use a 5-minute MNQ chart";
+            else if (hist.Count < Math.Max(21, TrendDays + 1))
+                setup = "NOT READY: " + hist.Count + " complete sessions loaded, needs " + Math.Max(21, TrendDays + 1) +
+                        " - set the chart's Days to load to 40 or more";
+            else if (!ready)
+                setup = "NO TRADING: the chart's history has a hole - reload the historical data";
+            else
+                setup = "OK";
+            string txt = "MNQ Clean Noise-Band | Setup: " + setup +
+                         " | " + qty + " MNQ a trade, gap trade " + (gapToday ? "on" : "off") +
+                         " | today $" + (CumProfit - dayCumStart).ToString("F0", CultureInfo.InvariantCulture) +
+                         (DayStop > 0 && CumProfit - dayCumStart <= -DayStop ? " (day stop: done for today)" : "") +
+                         " | trades today " + tradesToday + " | profit over start $" + Profit().ToString("F0", CultureInfo.InvariantCulture);
+            Draw.TextFixed(this, "clean_dash", txt, TextPosition.TopRight);
         }
 
         void Bar()

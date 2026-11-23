@@ -101,15 +101,26 @@ bar (NinjaTrader's bracket works from the fill bar).
 
 ## Running it
 
-NinjaTrader 8: copy `ninjatrader/Strategies/MnqCleanBand.cs` to Documents\NinjaTrader 8\bin\Custom\Strategies, compile
-(F5 in the NinjaScript editor), add it to an **MNQ 5-minute** chart (CME US Index Futures ETH or RTH, at least 30 days
-loaded), account = the funded account, Enabled. Defaults: trend 20 sessions, hard stop $200 a contract, break-even at
-0.4, take profit at 2.5 hard stops, last entry 14:00 (840), up to 9 trades a day, day stop $600, the gap trade from
-+$4,500, at most 3 contracts (2 from +$2,000, 3 from +$4,500 over
-the $50,000 start balance; live it sizes from the account's balance). The Output window prints the settings at start
-and every entry.
+NinjaTrader 8, on each funded account:
+
+1. **Disable MnqNoiseV38 (and any other strategy) on the account first.** Two strategies on one account fight over
+   the position.
+2. Copy `ninjatrader/Strategies/MnqCleanBand.cs` to Documents\NinjaTrader 8\bin\Custom\Strategies and compile (F5
+   in the NinjaScript editor, or open and close the editor).
+3. Open an **MNQ 5-minute** chart (the front month; CME US Index Futures ETH or RTH) with **Days to load: 40** or more
+   (Data Series window). It needs 21 complete sessions to start.
+4. Strategies tab, add **MnqCleanBand**, account = the funded account, keep the defaults, **Enabled**. The chart's
+   top-right corner must say **Setup: OK**. The Output window prints the settings and every order.
+
+Defaults: trend 20 sessions, hard stop $200 a contract, break-even at 0.4, take profit at 2.5 hard stops, last entry
+14:00 (840), up to 9 trades a day, day stop $600, the gap trade from +$4,500, at most 3 contracts (2 from +$2,000, 3 from
++$4,500 over the $50,000 start balance; live it sizes from the account's net liquidation). An account below $50,000
+trades 1 contract and no gap trade until it is back above.
 
 Live safety (tests/test_ninjatrader_clean.py): a stop the broker cancels or rejects while the position is open closes it
 at market ("No stop"); no entries while the chart's last 14 sessions span more than 23 days (a hole in the history, as
 NinjaTrader's Oct 19 - Nov 6 2026 gap; the Output window says to reload the data); NinjaTrader's exit on session close
-as a backstop (half days, e.g. Nov 27 2026, close at 13:15 before the 15:55 exit).
+as a backstop (half days, e.g. Nov 27 2026, close at 13:15 before the 15:55 exit). The no-stop exit waits out the
+race where a target's OCO cancel of the stop arrives before the position shows flat (closes at the bar's close, or live
+2 s later, only if still open and no stop is back), so a target never closes twice. The chart shows Setup: OK / NOT READY
+(too few sessions loaded) / NO TRADING (a hole), the size, the gap leg and today's P/L.
