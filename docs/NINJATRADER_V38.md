@@ -10860,3 +10860,16 @@ written, with 2 ticks of slippage on every stop (16 variants; `verification/nois
 - **Fresh 50K accounts, 12 months, the $2,000 floor: 26-36% lost** (median $2,151-4,009); Funded growth 1.7-3.2%
   lost, median $10,386-19,977. The edge per trade is real, but its drawdowns are larger than the 50K's $2,000 room;
   Funded growth's lock, day budget and sizing from the room are what keep the account. Nothing built.
+
+## The 15-minute rounds (from 2026-11-23)
+
+The user: "keep thinking every 15 mins and come up with an improvement ... backed up with reason". Each round: a loss
+analysis of the live setup (Funded growth + U59's gap cap + the cap at 3 contracts, G535), one change aimed at what it
+shows, registered here before its run, G495's measure. **Pass:** no more accounts lost than the live setup on both sets
+and a higher 12-month median on both.
+
+## G536: no 13:00 check (registered 2026-11-23, before its run)
+
+**Evidence:** the live setup's entries by check (raw runs): every check makes money on NQ 2015-2025 and on the index
+2011-2025 except 13:00: NQ -$1,891 (224 trades, -$8 a trade), index -$142 (306, $0). `research/g536_no_1300.py`: R1 no
+entries at the 13:00 check (`skip_checks` "780"). **Pass:** as above. Run once.
