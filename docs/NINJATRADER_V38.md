@@ -10877,3 +10877,11 @@ entries at the 13:00 check (`skip_checks` "780"). **Pass:** as above. Run once.
 **G536 result (2026-11-23): rejected (mixed).** Development: reach +$25K 9.7% (live 6.5%), median $9,259 ($9,572), lost
 3.2% (0%); unseen: 15.5% (13.8%), $13,139 ($12,946), lost 0% (1.7%). One account more lost on development and one fewer
 on unseen; the medians move 1-3% either way. The 13:00 entries are a small leak, not a lever. Live setup unchanged.
+
+## G537: smaller after a loss (registered 2026-11-23, before its run)
+
+**Evidence:** the live setup's trade right after a losing trade makes half as much as the others, on both histories:
+NQ $13 a trade (1,093) against $26 (1,332), the index $14 (1,435) against $26 (1,721), for the same risk. (Splits by the
+10/45/100-day trend showed nothing; note the research histories are rescaled month by month, so multi-day trends on them
+are distorted.) `mnqbot/noise.py` gains `after_loss_qty_cap` (after a loss, until a winner, at most N contracts, after
+the profit steps). `research/g537_smaller_after_loss.py`: A1 at most 1, A2 at most 2. **Pass:** as G536. Run once.

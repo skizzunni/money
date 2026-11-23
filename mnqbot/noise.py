@@ -99,6 +99,8 @@ class NoiseConfig:
     # max loss, so a wider stop); after_loss_lock sets its lock trigger (in its own max losses); after_loss_hourly takes
     # it only at a check on the hour
     after_loss_qty_div: float = 1.0
+    # research (G537): after a losing trade (until a winner), at most this many contracts, after the profit steps (0 = off)
+    after_loss_qty_cap: int = 0
     after_loss_ml_mult: float = 1.0  # its max loss x this (the same contracts, a wider stop)
     after_loss_ml_mult5: float = 0.0  # G165: on 5-minute bars, after_loss_ml_mult is this (0: off)
     # research (G119): once the floor has stopped, after_loss_ml_mult is this (0: off)
@@ -1563,6 +1565,8 @@ def run(bars: pd.DataFrame, cfg: NoiseConfig | None = None, minutes: int | None 
                         if cfg.size_up_to > 0:
                             q_up = min(q_up, cfg.size_up_to)
                         ml_next, q_next = ml_next / q_next * q_up, q_up
+                    if cfg.after_loss_qty_cap > 0 and after_loss and q_next > cfg.after_loss_qty_cap:  # G537
+                        ml_next, q_next = ml_next / q_next * cfg.after_loss_qty_cap, cfg.after_loss_qty_cap
                     if sprint_on():  # G103: the sprint's size (the day's and the floor's room still cut it below)
                         ml_next, q_next = ml_next / q_next * sprint_q(), sprint_q()
                     if cfg.news_mult != 1.0 and t.strftime("%Y-%m-%d") in news_set:  # G62: the jobs-report days
