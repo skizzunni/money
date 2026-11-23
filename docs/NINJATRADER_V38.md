@@ -10911,3 +10911,9 @@ and found nothing consistent: entries by range used, signal-bar size, entry half
 day; Back-inside exits by bars held (the grace was tested). `research/g539_gap_protect.py` on G495's measure: P75 the gap
 stop to entry + 2.5 points once a bar closes 0.75x its risk its way (`gap_go_be` 0.75, `gap_go_be_plus` 2.5), P100 at 1.0x.
 **Pass:** no more accounts lost than LIVE on both sets and a higher 12-month median on both. Run once.
+
+**G539 result (2026-11-23): rejected, both.** The live setup already moves the gap stop to entry + a tick at 1.5x risk
+(G242, `gap_go_be` 1.5), so G539 tested moving it sooner. P100: development median $9,216 (live $9,572), none lost;
+unseen $13,036 ($12,946) but 3.4% lost (live 1.7%). P75: development $8,913, none lost; unseen $13,422, 3.4% lost. Moving
+the stop sooner saves some gap stops but stops out gap trades that dip and then run, and one more unseen start is lost.
+Live setup unchanged. Log: scratchpad g539.txt (not in the repo).
