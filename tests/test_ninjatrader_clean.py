@@ -173,27 +173,33 @@ def _run_all(sim, path, **props):  # noqa: F811
 
 @pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
 @pytest.mark.parametrize("how", ["SimCancelStopsAt", "RejectStopsAt"])
-def test_clean_band_never_without_a_stop(sim, tmp_path, how):  # noqa: F811
-    """A stop the broker cancels or rejects while the position is open: out at market at the next bar's open."""
+@pytest.mark.parametrize("live", [False, True])
+def test_clean_band_never_without_a_stop(sim, tmp_path, how, live):  # noqa: F811
+    """A stop the broker cancels or rejects while the position is open: out at market at that bar's close (filled at
+    the next open), in a backtest and live; with every stop update reported and nothing cancelled, never a "No stop"
+    (a target's OCO cancel of the stop does not close anything twice)."""
     days = synthetic_days()
     path = tmp_path / "bars.csv"
     write_bars(days, path)
-    out = _run_all(sim, path, MaxContracts=1, DayStop=0)
+    extra = {"SimRealtimeFrom": 30 * 78} if live else {}
+    out = _run_all(sim, path, MaxContracts=1, DayStop=0, SimStopUpdates=True, **extra)
     trades = [x.split(",")[1:] for x in out if x.startswith("T,")]
+    assert not any(t[5] == "No stop" for t in trades)
     moves = [int(x.split(",")[1]) for x in out if x.startswith("O,") and ",SetStopLoss," in x]
     pick = None
     for t in trades:
         eb, xb = int(t[1]), int(t[3])
-        inside = [b for b in moves if eb <= b < xb - 1]
+        inside = [b for b in moves if eb <= b < xb - 1 and (not live or b > 30 * 78)]
         if inside:
             pick = (eb, inside[0])
             break
     assert pick, "no stop move inside a trade"
-    out2 = _run_all(sim, path, MaxContracts=1, DayStop=0, SimStopUpdates=True, **{how: pick[1]})
+    out2 = _run_all(sim, path, MaxContracts=1, DayStop=0, SimStopUpdates=True, **extra, **{how: pick[1]})
     t2 = [x.split(",")[1:] for x in out2 if x.startswith("T,")]
     hit = [t for t in t2 if int(t[1]) == pick[0]]
     assert hit and hit[0][5] == "No stop" and int(hit[0][3]) == pick[1] + 1
     assert any("closing it at market" in x for x in out2)
+    assert [t for t in t2 if int(t[3]) < pick[0]] == [t for t in trades if int(t[3]) < pick[0]]
 
 
 @pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
@@ -229,3 +235,21 @@ def test_clean_band_sizes_from_the_account_when_live(sim, tmp_path):  # noqa: F8
     assert after and set(after) == {3}
     assert any(x.startswith("P,") and "Clean band live: profit over the start balance $6000, 3 MNQ" in x for x in out)
     assert idx  # the bars were written
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+@pytest.mark.parametrize("live", [False, True])
+def test_clean_band_oco_cancel_does_not_exit_twice(sim, tmp_path, live):  # noqa: F811
+    """Targets and market exits whose stop cancel arrives before the position shows flat: the same trades, no "No stop",
+    no extra order."""
+    days = synthetic_days()
+    path = tmp_path / "bars.csv"
+    write_bars(days, path)
+    extra = {"SimRealtimeFrom": 30 * 78} if live else {}
+    plain = _run_all(sim, path, MaxContracts=1, DayStop=0, SimStopUpdates=True, StartProfit=100000, **extra)
+    worst = _run_all(sim, path, MaxContracts=1, DayStop=0, SimStopUpdates=True, StartProfit=100000, SimOcoCancelFirst=True, **extra)
+    tp = [x for x in plain if x.startswith("T,")]
+    tw = [x for x in worst if x.startswith("T,")]
+    assert tw == tp
+    assert any(",Profit target," in x for x in tw) and any(",Gap exit," in x or ",Session end," in x for x in tw)
+    assert [x for x in worst if x.startswith("O,") and "Exit" in x] == [x for x in plain if x.startswith("O,") and "Exit" in x]

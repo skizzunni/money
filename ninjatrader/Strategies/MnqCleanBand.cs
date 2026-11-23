@@ -46,7 +46,8 @@ namespace NinjaTrader.NinjaScript.Strategies
         Day today;
         double dayOpen, prevClose, sma, vwapNum, vwapDen, dayCumStart, hardRef, stop, entryPx;
         int pos, tradesToday, qty, gapPos;
-        bool ready, beDone, early, exiting, gapWarned, noisePending, gapPending, gapToday;
+        bool ready, beDone, early, exiting, gapWarned, noisePending, gapPending, gapToday, stopGone;
+        DateTime stopGoneUtc = DateTime.MinValue;
         readonly Dictionary<int, double> sigma = new Dictionary<int, double>();
 
         protected override void OnStateChange()
@@ -193,6 +194,12 @@ namespace NinjaTrader.NinjaScript.Strategies
         {
             if (BarsPeriod.BarsPeriodType != BarsPeriodType.Minute || BarsPeriod.Value != 5)
                 return;
+            Bar();
+            CheckNoStop(true);
+        }
+
+        void Bar()
+        {
             DateTime t = ToNy(Time[0]).AddMinutes(-5);  // the bar's start, New York
             int mm = t.Hour * 60 + t.Minute;
             if (mm < 570 || mm >= 960)
@@ -331,16 +338,49 @@ namespace NinjaTrader.NinjaScript.Strategies
             gapPos = 0;
         }
 
-        // a position must never be without its stop: if the broker cancels or rejects it, out at market (live 2026-11-17)
+        // a position must never be without its stop: if the broker cancels or rejects it, out at market (live 2026-11-17).
+        // The cancel of a stop whose target just filled can reach here before the position shows flat, so the position is
+        // closed at this bar's close, or live on the first tick 2 seconds after the cancel, if it is still open then and
+        // no stop has come back (V38's rule, MnqNoiseV38.cs CheckNoStop).
         protected override void OnOrderUpdate(Order order, double limitPrice, double stopPrice, int quantity, int filled,
                                               double averageFillPrice, OrderState orderState, DateTime time, ErrorCode error,
                                               string comment)
         {
-            if (order == null || order.Name != "Stop loss" || (orderState != OrderState.Cancelled && orderState != OrderState.Rejected))
+            if (order == null || order.Name != "Stop loss")
+                return;
+            if (orderState == OrderState.Accepted || orderState == OrderState.Working || orderState == OrderState.Filled)
+            {
+                stopGone = false;  // a stop is back (or it did its job)
+                return;
+            }
+            if (orderState != OrderState.Cancelled && orderState != OrderState.Rejected)
                 return;
             if (Position.MarketPosition == MarketPosition.Flat || exiting)
                 return;
-            Print(time + "  Clean band: the stop was " + orderState + " (" + comment + ") with the position open - closing it at market");
+            stopGone = true;
+            stopGoneUtc = DateTime.UtcNow;
+            Print(time + "  Clean band: the stop was " + orderState + " (" + comment + ") with the position open");
+        }
+
+        protected override void OnMarketData(NinjaTrader.Data.MarketDataEventArgs marketDataUpdate)
+        {
+            if (State == State.Realtime)
+                CheckNoStop(false);
+        }
+
+        void CheckNoStop(bool atClose)
+        {
+            if (!stopGone)
+                return;
+            if (Position.MarketPosition == MarketPosition.Flat || exiting)
+            {
+                stopGone = false;
+                return;
+            }
+            if (!atClose && (DateTime.UtcNow - stopGoneUtc).TotalSeconds < 2.0)
+                return;
+            stopGone = false;
+            Print(Time[0] + "  Clean band: no stop on the open position - closing it at market");
             Exit("No stop");
         }
 

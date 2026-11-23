@@ -636,8 +636,14 @@ namespace NinjaTrader.NinjaScript.Strategies
             }
         }
 
+        // tests: when a lot closes by anything but its stop, the broker's OCO cancel of that stop is reported first, while
+        // the position still shows open (the worst order of events live)
+        public bool SimOcoCancelFirst { get; set; }
+
         void CloseLot(Lot lot, int i, double price, string why)
         {
+            if (SimOcoCancelFirst && why != "Stop loss" && !double.IsNaN(lot.Stop))
+                StopUpdate(lot, OrderState.Cancelled);
             Record(lot, i, price, why, SimSplitFills ? 2 : 1);
             lots.Remove(lot);
             Position.Quantity -= lot.Qty;
