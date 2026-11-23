@@ -10917,3 +10917,14 @@ stop to entry + 2.5 points once a bar closes 0.75x its risk its way (`gap_go_be`
 unseen $13,036 ($12,946) but 3.4% lost (live 1.7%). P75: development $8,913, none lost; unseen $13,422, 3.4% lost. Moving
 the stop sooner saves some gap stops but stops out gap trades that dip and then run, and one more unseen start is lost.
 Live setup unchanged. Log: scratchpad g539.txt (not in the repo).
+
+## G540: trail the stop once the lock has armed (registered 2026-11-23, before its run)
+
+15-minute round 5. The live setup's exits by how far the trade first went its way (1 MNQ, no floor): the Lock exits
+(stop at entry + 2.5 points after 0.35R) net +$4,029 over 1,236 NQ trades and +$4,515 over 1,637 index trades, about +$3
+each, yet 876 / 1,157 of them had first run 0.5R or more (291 / 386 past 1R). A trailing stop after the lock would keep
+part of those runs; G260 tested `trail_points` only on the eval sprint (k317, take profit 0.75), never on Funded growth.
+The time stops that lose sit mostly below the lock (0.2-0.35R first; lower lock levels are G511's "Funded high win").
+`research/g540_lock_trail.py` on G495's measure: T40 the stop also 40 points behind the best price since the entry once
+the lock has armed (`trail_points` 40, decided at a bar's close, never loosening), T60 at 60 points. **Pass:** no more
+accounts lost than LIVE on both sets and a higher 12-month median on both. Run once.
