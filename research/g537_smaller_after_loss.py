@@ -1,5 +1,5 @@
-"""G537 (docs/NINJATRADER_V38.md): the live setup trading smaller after a losing trade (until a winner): the trade after a
-loss makes half as much as the others on NQ 2015-2025 ($13 against $26, 1,093 trades) and the index ($14 against $26,
+"""G537 (docs/NINJATRADER_V38.md): the live setup trading smaller after a losing trade (until a winner): the trade after
+a loss makes half as much as the others on NQ 2015-2025 ($13 against $26, 1,093 trades) and the index ($14 against $26,
 1,435), for the same risk. On G495's measure.
 
     python research/g537_smaller_after_loss.py <data dir> <MNQ 09-26> <MNQ 12-26> <U48 JS json> fresh|unseen

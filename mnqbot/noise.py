@@ -99,7 +99,7 @@ class NoiseConfig:
     # max loss, so a wider stop); after_loss_lock sets its lock trigger (in its own max losses); after_loss_hourly takes
     # it only at a check on the hour
     after_loss_qty_div: float = 1.0
-    # research (G537): after a losing trade (until a winner), at most this many contracts, after the profit steps (0 = off)
+    # research (G537): after a losing trade (until a winner), at most this many contracts after the steps (0 = off)
     after_loss_qty_cap: int = 0
     after_loss_ml_mult: float = 1.0  # its max loss x this (the same contracts, a wider stop)
     after_loss_ml_mult5: float = 0.0  # G165: on 5-minute bars, after_loss_ml_mult is this (0: off)

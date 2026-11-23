@@ -10885,3 +10885,7 @@ NQ $13 a trade (1,093) against $26 (1,332), the index $14 (1,435) against $26 (1
 10/45/100-day trend showed nothing; note the research histories are rescaled month by month, so multi-day trends on them
 are distorted.) `mnqbot/noise.py` gains `after_loss_qty_cap` (after a loss, until a winner, at most N contracts, after
 the profit steps). `research/g537_smaller_after_loss.py`: A1 at most 1, A2 at most 2. **Pass:** as G536. Run once.
+
+**G537 result (2026-11-23): rejected, both.** A2 (at most 2): development median $8,940 (live $9,572), unseen $13,089
+($12,946), lost as live. A1 (1): development $6,951, unseen $14,201, one more unseen start lost (3.4%). Smaller trades
+after a loss also shrink the recoveries that follow (the next winner is the one at reduced size). Live setup unchanged.
