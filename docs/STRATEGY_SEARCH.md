@@ -82,6 +82,11 @@ every setting at $200 or less with break-even at 0.3-0.5 and a target of 2-3 har
 small chance (a few percent) of losing a fresh account in a year like 2020, almost all of it in its first months, before
 the $2,000 cushion that brings the second contract; never loosen the risk settings.
 
+**Fewer trades while the account is new does not help** (`verification/zoo/early_trade_limit.txt`): at most 1-3
+trades a day until +$1,000 / +$2,000, on the shipped setting and on the walk-forward's riskier picks, loses as many or
+more starts (the shipped one: up to 20%) and halves the median. The cushion comes from the trend-day winners; cutting
+trades delays it. Not used.
+
 **What it is not:** a high win-rate strategy. About 1 trade in 4 wins and about 3 traded days in 8 are green; the
 winners (the 2.5x target or the 15:55 close on trend days) are 4-6x the losers, which the band and break-even keep small. It trades on about a third of the sessions. With the user's
 3-contract cap the edge supports roughly $4-11K a year on a 50K (median $8.8K), not $25K; starting at 3 contracts
