@@ -49,7 +49,7 @@ def _tick(x, tick):
 
 
 def noise(days, i, tick, vwap=True, trend=0, hard=250.0, vwap_stop=False, pv=2.0, k=1.0, last=900, max_trades=9,
-          be_r=0.0, stop_slip=2, nt=True, tp_r=0.0):
+          be_r=0.0, stop_slip=2, nt=True, tp_r=0.0, tp_fill_bar=True):
     """The user's Clean Noise-Band spec (research/clean_noise_band.py): checks 10:00-15:00, the band (k x sigma) past
     max/min(open, prior close), the session VWAP agreeing, the band as a stop moved at the checks, a hard stop $hard a
     contract, out at 15:55. trend: also the close past the `trend`-session average of closes. be_r: the stop to entry +
@@ -88,7 +88,8 @@ def noise(days, i, tick, vwap=True, trend=0, hard=250.0, vwap_stop=False, pv=2.0
                 px = (min(o[b], stop) if pos > 0 else max(o[b], stop)) if b > ebar else stop
                 out.append((pos, ebar, entry, px - pos * stop_slip * tick, "stop", b))
                 pos = 0
-            elif tp_r and pos * ((h[b] if pos > 0 else lo[b]) - tgt) >= tick:  # a take-profit limit (from the fill bar, as NinjaTrader)
+            elif tp_r and (tp_fill_bar or b > ebar) and pos * ((h[b] if pos > 0 else lo[b]) - tgt) >= tick:
+                # a take-profit limit: from the fill bar in NinjaTrader (set with the entry), from the next in Pine
                 out.append((pos, ebar, entry, tgt, "target", b))
                 pos = 0
             elif be_r and pos * (c[b] - entry) >= be_pts:

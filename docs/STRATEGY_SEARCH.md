@@ -92,6 +92,13 @@ winners (the 2.5x target or the 15:55 close on trend days) are 4-6x the losers, 
 3-contract cap the edge supports roughly $4-11K a year on a 50K (median $8.8K), not $25K; starting at 3 contracts
 loses about half of fresh accounts.
 
+## TradingView
+
+`pine/mnq_clean_band.pine` is the same strategy for a TradingView MNQ 5-minute chart (add it, Strategy Tester for the
+results). `tests/test_pine_clean.py` holds it to the same Python reference trade for trade on the Pine interpreter, with
+one difference by design: Pine sets the take-profit from the fill price after the fill bar, so it works from the next
+bar (NinjaTrader's bracket works from the fill bar).
+
 ## Running it
 
 NinjaTrader 8: copy `ninjatrader/Strategies/MnqCleanBand.cs` to Documents\NinjaTrader 8\bin\Custom\Strategies, compile

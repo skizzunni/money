@@ -1,0 +1,207 @@
+//@version=6
+// MNQ Clean Noise-Band (2026-11-23): the user's "Clean Noise-Band Momentum (Prop Version)" spec with the fixes that keep a
+// 50K account with the $2,000 trailing floor (docs/STRATEGY_SEARCH.md). The same rules as
+// ninjatrader/Strategies/MnqCleanBand.cs; research/zoo/strats.py is the reference both are tested against.
+// 5-minute MNQ chart. Every half hour from 10:00 to the last entry check (14:00):
+//   * noise area: sigma = the mean over the last 14 complete sessions of |close at that time / the 09:30 open - 1|;
+//     upper = max(open, prior close) x (1 + sigma), lower = min(...) x (1 - sigma);
+//   * flat: LONG when the close is above upper, above VWAP and above the 20-session average of closes; SHORT mirrored;
+//   * stop: the tighter of the band (or VWAP) and $200 a contract from the expected fill; moved at each check, never
+//     looser; back at or past it: out at market. Break-even once up 0.4 x $200; take profit at 2.5 x $200; out at 15:55;
+//   * no new entry once the day is down $600; 1 / 2 / 3 contracts from +$2,000 / +$4,500;
+//   * gap trade (once +$4,500 up): a gap of 1x the 14-session average whose 09:30 bar closes its way, in at 09:35, the
+//     stop at the 09:30 open (at most 50 points), out at 09:55.
+strategy("MNQ Clean Noise-Band", overlay = true, default_qty_type = strategy.fixed, default_qty_value = 1, pyramiding = 0,
+     commission_type = strategy.commission.cash_per_contract, commission_value = 0.62, slippage = 1)
+
+const string TZ = "America/New_York"
+const int NCH = 11   // the checks 10:00, 10:30, ..., 15:00
+
+trendDays = input.int(20, "Trend filter: sessions in the average of closes (0 = off)", minval = 0, maxval = 100)
+hardStop = input.float(200, "Hard stop, $ a contract", minval = 1)
+beAt = input.float(0.4, "Break-even once up this many hard stops (0 = off)", minval = 0, step = 0.1)
+tpAt = input.float(2.5, "Take profit at this many hard stops (0 = off)", minval = 0, step = 0.1)
+lastEntry = input.int(840, "Last entry check, minutes from midnight New York (840 = 14:00)", minval = 600, maxval = 900)
+maxTrades = input.int(9, "Most trades a day", minval = 1, maxval = 20)
+vwapStop = input.bool(true, "The stop is also never looser than VWAP")
+dayStop = input.float(600, "Day stop: no new entry once the day is down $ (0 = off)", minval = 0)
+maxQty = input.int(3, "Most contracts", minval = 1, maxval = 3)
+step2 = input.float(2000, "2 contracts from this profit $", minval = 0)
+step3 = input.float(4500, "3 contracts from this profit $", minval = 0)
+startProfit = input.float(0, "Profit already made at the start $")
+gapLeg = input.bool(true, "Gap trade (09:35-09:55)")
+gapFrom = input.float(4500, "Gap trade only from this profit $")
+gapK = input.float(1.0, "Gap at least this many 14-session average gaps", minval = 0, step = 0.1)
+gapCap = input.float(50, "Gap stop at most this many points", minval = 1)
+blockHole = input.bool(true, "No trading when the chart's history has a hole")
+
+pv = syminfo.pointvalue
+tk = syminfo.mintick
+tMin = hour(time, TZ) * 60 + minute(time, TZ)
+endMin = tMin + 5
+inRth = tMin >= 570 and tMin < 960
+isCheck = inRth and endMin >= 600 and endMin <= 900 and (endMin - 600) % 30 == 0
+dayNum = int(math.floor((time - 18000000) / 86400000))   // the New York session's day (any RTH bar)
+
+var hCloses = array.new_float(0)
+var hDays = array.new_float(0)
+var hGaps = array.new_float(0)
+var hMoves = array.new_float(0)   // NCH a session
+var tMoves = array.new_float(NCH, na)
+var sig = array.new_float(NCH, na)
+var int tBars = 0
+var float tClose = na
+var int tDay = -1
+var float dayOpen = na
+var float tGap = na
+var float vNum = 0.0
+var float vDen = 0.0
+var bool ready = false
+var float prevC = na
+var float sma = na
+var int qty = 1
+var bool gapToday = false
+var float dayStartNet = 0.0
+var int tradesToday = 0
+var float hardRef = na
+var float stopPx = na
+var float tgtPx = na
+var float entryPx = na
+var bool beDone = false
+var int leg = 0   // the open or pending position: 1 the band, 2 the gap trade
+
+if inRth and dayNum != tDay
+    if tDay >= 0 and tBars >= 76   // only complete sessions count
+        array.push(hCloses, tClose)
+        array.push(hDays, tDay)
+        array.push(hGaps, tGap)
+        for k = 0 to NCH - 1
+            array.push(hMoves, array.get(tMoves, k))
+        if array.size(hCloses) > 60
+            array.shift(hCloses)
+            array.shift(hDays)
+            array.shift(hGaps)
+            for k = 0 to NCH - 1
+                array.shift(hMoves)
+    nH = array.size(hCloses)
+    tDay := dayNum
+    tBars := 0
+    dayOpen := open
+    tGap := nH > 0 ? open - array.get(hCloses, nH - 1) : na
+    for k = 0 to NCH - 1
+        array.set(tMoves, k, na)
+    vNum := 0.0
+    vDen := 0.0
+    tradesToday := 0
+    dayStartNet := strategy.netprofit
+    gapToday := false
+    ready := nH >= math.max(21, trendDays + 1)
+    if ready and blockHole and dayNum - array.get(hDays, nH - 14) > 23
+        ready := false
+    if ready
+        prevC := array.get(hCloses, nH - 1)
+        float s = 0.0
+        if trendDays > 0
+            for j = nH - trendDays to nH - 1
+                s += array.get(hCloses, j)
+        sma := trendDays > 0 ? s / trendDays : na
+        for k = 0 to NCH - 1
+            float m = 0.0
+            bool all = true
+            for j = nH - 14 to nH - 1
+                v = array.get(hMoves, j * NCH + k)
+                if na(v)
+                    all := false
+                else
+                    m += v
+            array.set(sig, k, all ? m / 14 : na)
+        prof = startProfit + strategy.netprofit
+        qty := math.min(prof >= step3 ? 3 : prof >= step2 ? 2 : 1, maxQty)
+        gapToday := gapLeg and prof >= gapFrom
+
+float vwapNow = na
+if inRth
+    tBars += 1
+    vol = volume > 0 ? volume : 1.0
+    vNum += (high + low + close) / 3 * vol
+    vDen += vol
+    vwapNow := vNum / vDen
+    if isCheck
+        array.set(tMoves, int((endMin - 600) / 30), math.abs(close / dayOpen - 1))
+    tClose := close
+
+pos = strategy.position_size > 0 ? 1 : strategy.position_size < 0 ? -1 : 0
+if pos == 0
+    entryPx := na
+if pos != 0 and leg == 1 and na(entryPx)   // the band entry filled at this bar's open
+    entryPx := strategy.position_avg_price
+    beDone := false
+    tgtPx := tpAt > 0 ? strategy.position_avg_price + pos * math.round(tpAt * hardStop / pv / tk) * tk : na
+bandId = pos > 0 ? "Long" : "Short"
+
+if inRth and ready
+    if pos != 0 and leg == 1 and tMin >= 950
+        strategy.close(bandId, comment = "Session end")
+    else if pos != 0 and leg == 2 and tMin >= 590
+        strategy.close(pos > 0 ? "GapLong" : "GapShort", comment = "Gap exit")
+    else
+        if tMin == 570 and gapToday and pos == 0 and array.size(hGaps) >= 15 and not na(tGap)
+            float gs = 0.0
+            bool gOk = true
+            nG = array.size(hGaps)
+            for j = nG - 14 to nG - 1
+                gv = array.get(hGaps, j)
+                if na(gv)
+                    gOk := false
+                else
+                    gs += math.abs(gv)
+            side = tGap > 0 ? 1 : -1
+            if gOk and math.abs(tGap) >= gapK * gs / 14 and side * (close - dayOpen) > 0
+                e = close + side * tk
+                dist = math.min(math.max(math.abs(e - dayOpen), 4 * tk), gapCap)
+                gid = side > 0 ? "GapLong" : "GapShort"
+                strategy.entry(gid, side > 0 ? strategy.long : strategy.short, qty)
+                strategy.exit(gid + " stop", gid, stop = e - side * dist, comment = "Stop loss")
+                leg := 2
+        if pos != 0 and leg == 1 and beAt > 0 and not beDone and pos * (close - entryPx) >= beAt * hardStop / pv
+            be = math.round_to_mintick(entryPx + pos * tk)
+            if pos * (be - stopPx) > 0
+                stopPx := be
+            beDone := true
+        k = int((endMin - 600) / 30)
+        sg = isCheck ? array.get(sig, k) : na
+        if not na(sg)
+            up = math.max(dayOpen, prevC) * (1 + sg)
+            dn = math.min(dayOpen, prevC) * (1 - sg)
+            bl = vwapStop ? math.max(up, vwapNow) : up
+            bs = vwapStop ? math.min(dn, vwapNow) : dn
+            if pos != 0 and leg == 1
+                hardPx = hardRef - pos * hardStop / pv
+                nw = math.round_to_mintick(pos > 0 ? math.max(bl, hardPx) : math.min(bs, hardPx))
+                nw := pos > 0 ? math.max(nw, stopPx) : math.min(nw, stopPx)
+                if pos * (close - nw) <= 0
+                    strategy.close(bandId, comment = "Back inside")
+                else
+                    stopPx := nw
+            else if pos == 0 and endMin <= lastEntry and tMin < 950 and tradesToday < maxTrades and (dayStop <= 0 or strategy.netprofit - dayStartNet > -dayStop)
+                want = close > up ? 1 : close < dn ? -1 : 0
+                if want != 0 and want * (close - vwapNow) <= 0
+                    want := 0
+                if want != 0 and trendDays > 0 and want * (close - sma) <= 0
+                    want := 0
+                if want != 0
+                    hardRef := close + want * tk
+                    hp = hardRef - want * hardStop / pv
+                    stopPx := math.round_to_mintick(want > 0 ? math.max(bl, hp) : math.min(bs, hp))
+                    tgtPx := na
+                    nid = want > 0 ? "Long" : "Short"
+                    strategy.entry(nid, want > 0 ? strategy.long : strategy.short, qty)
+                    strategy.exit(nid + " exit", nid, stop = stopPx, comment = "Stop loss")
+                    tradesToday += 1
+                    leg := 1
+                    entryPx := na
+    if pos != 0 and leg == 1 and strategy.position_size != 0
+        strategy.exit(bandId + " exit", bandId, stop = stopPx, limit = tgtPx, comment_loss = "Stop loss", comment_profit = "Profit target")
+
+plot(isCheck and not na(array.get(sig, int((endMin - 600) / 30))) ? math.max(dayOpen, prevC) * (1 + array.get(sig, int((endMin - 600) / 30))) : na, "Upper band", color.teal)
+plot(isCheck and not na(array.get(sig, int((endMin - 600) / 30))) ? math.min(dayOpen, prevC) * (1 - array.get(sig, int((endMin - 600) / 30))) : na, "Lower band", color.maroon)

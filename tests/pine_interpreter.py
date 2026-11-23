@@ -517,7 +517,10 @@ class PineRuntime:
             "dayofmonth": part("day"),
             "input": Namespace("input", int=self._input, float=self._input, bool=self._input,
                                string=self._input, session=self._input),
-            "math": Namespace("math", max=nmax, min=nmin, floor=floor, ceil=ceil, abs=abs),
+            "math": Namespace("math", max=nmax, min=nmin, floor=floor, ceil=ceil, abs=abs,
+                              round=lambda x: NA if is_na(x) else float(math.floor(x + 0.5)),
+                              round_to_mintick=lambda x: NA if is_na(x)
+                              else float(round(x / self.mintick) * self.mintick)),
             "str": Namespace("str", tostring=tostring, upper=str.upper, lower=str.lower, startswith=str.startswith,
                              contains=lambda source, sub: sub in source, format_time=format_time,
                              split=lambda source, sep: source.split(sep), trim=str.strip),
