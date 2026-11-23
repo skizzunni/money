@@ -26,7 +26,7 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
 | a fixed 3 from day one | none / $600 | 43-56% | -$165 to $7,445 |
 | 2, then 3 from +$1,500 or +$3,000 | | 20-39% | |
 | 1, 2 from +$1,000, 3 from +$2,500 | | 13-14% | $7,177-7,999 |
-| **1, 2 from +$2,000, 3 from +$4,500** | **$600** | **0%** | **$6,426** |
+| **1, 2 from +$2,000, 3 from +$4,500** | **$600** | **0%** | **$6,426** (break-even 0.5), **$6,652** (0.4, shipped) |
 
 6. **NinjaTrader-exact rules and parity**: the reference was switched to what NinjaTrader executes (the hard stop from
    the expected fill, set with the entry; a moved stop at or past the price exits at market; the 15:55 exit at the next
@@ -34,17 +34,25 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    `tests/test_ninjatrader_clean.py` holds it to the Python reference trade for trade (entry bar, entry and exit price,
    contracts) on seeded synthetic sessions and, with `ZOO_DATA`, on the user's live months.
 
+7. **Is it a knife edge?** (`verification/zoo/robustness_neighbours.txt`, `robustness_safe_region.txt`) Every setting
+   moved one step: the profit holds everywhere (ES PF 1.07-1.21, live 3.6-4.9), but survival does not on one side: a
+   wider hard stop ($225-250), a later break-even (0.6-0.75) or entries to 14:30 bring back 5-11% lost starts. At the
+   $200 hard stop every break-even 0.3-0.5 with the last entry at 13:30 or 14:00 loses none, so the shipped
+   break-even is **0.4**, the middle of that safe region (its neighbours: 0-4.8% lost; around 0.5: up to 9.6%).
+   Read: the survival comes from keeping each trade's risk small, not from a lucky fit, and the risk settings should
+   not be loosened.
+
 ## The result (the shipped defaults, research numbers, 2 ticks of stop slippage, $0.62 a side)
 
 | set | trades | win | PF | net (1 MNQ) | 50K starts lost | median 12 months |
 |---|---|---|---|---|---|---|
-| dev NQ 2015-19 | 887 | 21% | 1.57 | $19,962 | 0 of 49 | $5,043 |
-| unseen NQ 2020-25 | 1,023 | 23% | 1.52 | $25,297 | 0 of 55 | $7,659 |
+| dev NQ 2015-19 | 913 | 20% | 1.57 | $19,531 | 0 of 49 | $4,546 |
+| unseen NQ 2020-25 | 1,051 | 21% | 1.50 | $23,952 | 0 of 55 | $7,236 |
 | unseen ES 2020-24 | 325 | 22% | 1.17 | $994 | | |
-| live MNQ Jun 29 - Nov 20 2026 | 49 | 27% | 4.29 | $4,873 | | |
+| live MNQ Jun 29 - Nov 20 2026 | 50 | 24% | 4.24 | $4,852 | | |
 
-Pooled 104 starts: none lost, median +$6,426, 25th percentile +$2,303, worst +-$400 (never near the floor), 31% reach
-+$10,000 in 12 months, none +$25,000. Live by month (1 MNQ): Jul -$138, Aug +$747, Sep +$848, Oct +$1,374, Nov (to the
+Pooled 104 starts: none lost, median +$6,652, 25th percentile +$2,090, worst -$322 (never near the floor), 28% reach
++$10,000 in 12 months, none +$25,000. Live by month (1 MNQ): Jul -$138, Aug +$725, Sep +$848, Oct +$1,374, Nov (to the
 20th) +$2,043; Nov 13 +$243, Nov 16 -$102, Nov 17 -$297, Nov 19 -$2, Nov 20 +$1,835.
 
 **What it is not:** a high win-rate strategy. About 1 trade in 4 wins and about 1 traded day in 3 is green; the
@@ -57,6 +65,11 @@ fresh accounts.
 NinjaTrader 8: copy `ninjatrader/Strategies/MnqCleanBand.cs` to Documents\NinjaTrader 8\bin\Custom\Strategies, compile
 (F5 in the NinjaScript editor), add it to an **MNQ 5-minute** chart (CME US Index Futures ETH or RTH, at least 30 days
 loaded), account = the funded account, Enabled. Defaults: trend 20 sessions, hard stop $200 a contract, break-even at
-0.5, last entry 14:00 (840), up to 9 trades a day, day stop $600, at most 3 contracts (2 from +$2,000, 3 from +$4,500 over
+0.4, last entry 14:00 (840), up to 9 trades a day, day stop $600, at most 3 contracts (2 from +$2,000, 3 from +$4,500 over
 the $50,000 start balance; live it sizes from the account's balance). The Output window prints the settings at start
 and every entry.
+
+Live safety (tests/test_ninjatrader_clean.py): a stop the broker cancels or rejects while the position is open closes it
+at market ("No stop"); no entries while the chart's last 14 sessions span more than 23 days (a hole in the history, as
+NinjaTrader's Oct 19 - Nov 6 2026 gap; the Output window says to reload the data); NinjaTrader's exit on session close
+as a backstop (half days, e.g. Nov 27 2026, close at 13:15 before the 15:55 exit).

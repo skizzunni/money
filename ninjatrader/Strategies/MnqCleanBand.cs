@@ -45,7 +45,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         Day today;
         double dayOpen, prevClose, sma, vwapNum, vwapDen, dayCumStart, hardRef, stop, entryPx;
         int pos, tradesToday, qty;
-        bool ready, exitSent, beDone, early;
+        bool ready, exitSent, beDone, early, exiting, gapWarned;
         readonly Dictionary<int, double> sigma = new Dictionary<int, double>();
 
         protected override void OnStateChange()
@@ -57,13 +57,14 @@ namespace NinjaTrader.NinjaScript.Strategies
                 Calculate = Calculate.OnBarClose;
                 EntriesPerDirection = 1;
                 EntryHandling = EntryHandling.UniqueEntries;
-                IsExitOnSessionCloseStrategy = false;
+                IsExitOnSessionCloseStrategy = true;  // a backstop: half days close before the 15:55 exit
+                ExitOnSessionCloseSeconds = 60;
                 BarsRequiredToTrade = 0;
                 StartBehavior = StartBehavior.WaitUntilFlat;
                 RealtimeErrorHandling = RealtimeErrorHandling.StopCancelCloseIgnoreRejects;
                 TrendDays = 20;
                 HardStop = 200;
-                BreakEvenAt = 0.5;
+                BreakEvenAt = 0.4;
                 LastEntry = 840;
                 MaxTradesPerDay = 9;
                 DayStop = 600;
@@ -77,6 +78,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 UseAccountBalanceLive = true;
                 VwapStop = true;
                 PlaceOrders = true;
+                BlockOnDataGap = true;
             }
             else if (State == State.DataLoaded)
             {
@@ -134,6 +136,18 @@ namespace NinjaTrader.NinjaScript.Strategies
             ready = hist.Count >= Math.Max(21, TrendDays + 1);
             sigma.Clear();
             if (!ready) return;
+            // the chart's history must be whole: 14 sessions span at most 23 calendar days (holidays included). A hole
+            // (NinjaTrader's Oct 19 - Nov 6 2026 gap) would compute the noise area from stale days.
+            double span = (date - hist[hist.Count - 14].Date).TotalDays;
+            if (BlockOnDataGap && span > 23)
+            {
+                ready = false;
+                if (!gapWarned)
+                    Print(Time[0] + "  Clean band: NO TRADING - the chart's history has a hole (the last 14 sessions span " + span +
+                          " days). Reload the historical data (Tools > Historical Data, or right-click the chart > Reload All Historical Data).");
+                gapWarned = true;
+                return;
+            }
             prevClose = hist[hist.Count - 1].Close;
             double s = 0;
             for (int j = 1; j <= TrendDays; j++) s += hist[hist.Count - j].Close;
@@ -178,6 +192,8 @@ namespace NinjaTrader.NinjaScript.Strategies
             int mp = Position.MarketPosition == MarketPosition.Long ? 1 : Position.MarketPosition == MarketPosition.Short ? -1 : 0;
             if (pos != 0 && mp == 0)  // stopped out (or the exit filled)
                 pos = 0;
+            if (mp == 0)
+                exiting = false;
             if (pos == 0 && mp != 0 && !exitSent)  // the entry filled at this bar's open
             {
                 pos = mp;
@@ -246,9 +262,24 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         void Exit(string why)
         {
-            if (pos > 0) ExitLong(why, "Long"); else ExitShort(why, "Short");
+            int d = pos != 0 ? pos : Position.MarketPosition == MarketPosition.Long ? 1 : -1;
+            if (d > 0) ExitLong(why, "Long"); else ExitShort(why, "Short");
             exitSent = true;
+            exiting = true;
             pos = 0;
+        }
+
+        // a position must never be without its stop: if the broker cancels or rejects it, out at market (live 2026-11-17)
+        protected override void OnOrderUpdate(Order order, double limitPrice, double stopPrice, int quantity, int filled,
+                                              double averageFillPrice, OrderState orderState, DateTime time, ErrorCode error,
+                                              string comment)
+        {
+            if (order == null || order.Name != "Stop loss" || (orderState != OrderState.Cancelled && orderState != OrderState.Rejected))
+                return;
+            if (Position.MarketPosition == MarketPosition.Flat || exiting)
+                return;
+            Print(time + "  Clean band: the stop was " + orderState + " (" + comment + ") with the position open - closing it at market");
+            Exit("No stop");
         }
 
         #region Properties
@@ -328,6 +359,10 @@ namespace NinjaTrader.NinjaScript.Strategies
         [NinjaScriptProperty]
         [Display(Name = "Place orders", Order = 4, GroupName = "4. Account")]
         public bool PlaceOrders { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "No trading when the chart's history has a hole", Order = 5, GroupName = "4. Account")]
+        public bool BlockOnDataGap { get; set; }
         #endregion
     }
 }

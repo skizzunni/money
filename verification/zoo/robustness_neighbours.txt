@@ -1,0 +1,20 @@
+base               lost 0.000  median    6426  PF ES 1.17  PF live 4.29
+trend=15           lost 0.048  median    7422  PF ES 1.16  PF live 3.83
+trend=25           lost 0.010  median    5564  PF ES 1.13  PF live 4.46
+trend=30           lost 0.010  median    5987  PF ES 1.21  PF live 4.49
+hard=175.0         lost 0.010  median    6836  PF ES 1.17  PF live 4.31
+hard=225.0         lost 0.087  median    6866  PF ES 1.18  PF live 3.64
+hard=250.0         lost 0.106  median    7050  PF ES 1.18  PF live 3.56
+be_r=0.4           lost 0.000  median    6652  PF ES 1.17  PF live 4.24
+be_r=0.6           lost 0.096  median    7121  PF ES 1.18  PF live 3.59
+be_r=0.75          lost 0.106  median    6572  PF ES 1.18  PF live 3.59
+last=810           lost 0.000  median    6063  PF ES 1.07  PF live 4.43
+last=870           lost 0.115  median    6972  PF ES 1.1  PF live 3.64
+k=0.9              lost 0.067  median    6068  PF ES 1.19  PF live 4.08
+k=1.1              lost 0.019  median    4994  PF ES 1.18  PF live 4.88
+max_trades=3       lost 0.000  median    5225  PF ES 1.21  PF live 4.46
+max_trades=5       lost 0.000  median    6416  PF ES 1.18  PF live 4.29
+daystop=400        lost 0.000  median    5530  PF ES 1.17  PF live 4.29
+daystop=800        lost 0.000  median    6361  PF ES 1.17  PF live 4.29
+steps 1800/4000    lost 0.000  median    6415  PF ES 1.17  PF live 4.29
+steps 2500/5000    lost 0.010  median    5816  PF ES 1.17  PF live 4.29

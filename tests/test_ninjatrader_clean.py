@@ -22,7 +22,7 @@ sys.path.insert(0, str(ROOT / "research"))
 import harness as H  # noqa: E402
 import strats as S  # noqa: E402
 
-DEFAULTS = dict(vwap=True, trend=20, hard=200.0, vwap_stop=True, k=1.0, be_r=0.5, max_trades=9, last=840)
+DEFAULTS = dict(vwap=True, trend=20, hard=200.0, vwap_stop=True, k=1.0, be_r=0.4, max_trades=9, last=840)
 
 
 def fixture_days() -> list:
@@ -138,3 +138,51 @@ def _qty(sim, path, **props):  # noqa: F811
     args = [DOTNET, str(sim), str(path), "5", "Strategy=Clean", *[f"{k}={v}" for k, v in props.items()]]
     r = subprocess.run(args, capture_output=True, text=True, env=ENV)
     return [x.split(",")[2] for x in r.stdout.splitlines() if x.startswith("TN,")]
+
+
+def _run_all(sim, path, **props):  # noqa: F811
+    args = [DOTNET, str(sim), str(path), "5", "Strategy=Clean", *[f"{k}={v}" for k, v in props.items()]]
+    r = subprocess.run(args, capture_output=True, text=True, env=ENV)
+    assert r.returncode == 0, r.stdout[-3000:] + r.stderr[-3000:]
+    return r.stdout.splitlines()
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+@pytest.mark.parametrize("how", ["SimCancelStopsAt", "RejectStopsAt"])
+def test_clean_band_never_without_a_stop(sim, tmp_path, how):  # noqa: F811
+    """A stop the broker cancels or rejects while the position is open: out at market at the next bar's open."""
+    days = synthetic_days()
+    path = tmp_path / "bars.csv"
+    write_bars(days, path)
+    out = _run_all(sim, path, MaxContracts=1, DayStop=0)
+    trades = [x.split(",")[1:] for x in out if x.startswith("T,")]
+    moves = [int(x.split(",")[1]) for x in out if x.startswith("O,") and ",SetStopLoss," in x]
+    pick = None
+    for t in trades:
+        eb, xb = int(t[1]), int(t[3])
+        inside = [b for b in moves if eb <= b < xb - 1]
+        if inside:
+            pick = (eb, inside[0])
+            break
+    assert pick, "no stop move inside a trade"
+    out2 = _run_all(sim, path, MaxContracts=1, DayStop=0, SimStopUpdates=True, **{how: pick[1]})
+    t2 = [x.split(",")[1:] for x in out2 if x.startswith("T,")]
+    hit = [t for t in t2 if int(t[1]) == pick[0]]
+    assert hit and hit[0][5] == "No stop" and int(hit[0][3]) == pick[1] + 1
+    assert any("closing it at market" in x for x in out2)
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+def test_clean_band_no_trading_on_a_history_hole(sim, tmp_path):  # noqa: F811
+    """Six sessions missing from the chart's history: no entries until the hole is out of the 14-session window."""
+    days = synthetic_days()
+    holed = days[:60] + days[66:]
+    path = tmp_path / "bars.csv"
+    idx = write_bars(holed, path)
+    out = _run_all(sim, path, MaxContracts=1, DayStop=0)
+    entries = {idx[int(x.split(",")[2])][0] for x in out if x.startswith("T,")}
+    assert not any(60 <= d < 60 + 12 for d in entries)  # the window that holds the hole
+    assert any(d >= 75 for d in entries)  # trading again once it has passed
+    assert any("NO TRADING" in x for x in out)
+    out_off = _run_all(sim, path, MaxContracts=1, DayStop=0, BlockOnDataGap=False)
+    assert any(60 <= idx[int(x.split(",")[2])][0] < 72 for x in out_off if x.startswith("T,"))
