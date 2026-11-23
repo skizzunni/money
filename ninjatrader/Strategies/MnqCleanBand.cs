@@ -86,6 +86,17 @@ namespace NinjaTrader.NinjaScript.Strategies
                 GapK = 1.0;
                 GapCap = 50;
             }
+            else if (State == State.Realtime && today != null)
+            {
+                // enabled mid-session: today's size and gap leg came from the replay of the loaded history, not from the
+                // account; size them from the account's balance now
+                double prof = Profit();
+                qty = Contracts(prof);
+                early = EarlyMaxTrades > 0 && prof < EarlyCushion;
+                gapToday = GapLeg && prof >= GapFrom && ready;
+                Print("Clean band live: profit over the start balance $" + prof.ToString("F0", CultureInfo.InvariantCulture) + ", " + qty +
+                      " MNQ a trade, gap trade " + (gapToday ? "on" : "off") + (ready ? "" : " - NOT READY (history)"));
+            }
             else if (State == State.DataLoaded)
             {
                 newYork = NewYork();

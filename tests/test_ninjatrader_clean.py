@@ -210,3 +210,22 @@ def test_clean_band_no_trading_on_a_history_hole(sim, tmp_path):  # noqa: F811
     assert any("NO TRADING" in x for x in out)
     out_off = _run_all(sim, path, MaxContracts=1, DayStop=0, BlockOnDataGap=False)
     assert any(60 <= idx[int(x.split(",")[2])][0] < 72 for x in out_off if x.startswith("T,"))
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+def test_clean_band_sizes_from_the_account_when_live(sim, tmp_path):  # noqa: F811
+    """Enabled mid-session: from the switch to real time the size comes from the account (here $56,000: 3 MNQ), not
+    from the replayed history's profit."""
+    days = synthetic_days()
+    path = tmp_path / "bars.csv"
+    idx = write_bars(days, path)
+    base = _run_all(sim, path, DayStop=0)
+    first = [x.split(",")[1:] for x in base if x.startswith("T,")]
+    start = int(first[len(first) // 2][1]) - 3  # a few bars before a mid-history entry
+    out = _run_all(sim, path, DayStop=0, SimRealtimeFrom=start, SimNetLiq=56000)
+    tn = [x.split(",")[1:] for x in out if x.startswith("TN,")]
+    tt = [x.split(",")[1:] for x in out if x.startswith("T,")]
+    after = [int(q[1]) for q, t in zip(tn, tt, strict=True) if int(t[1]) > start]
+    assert after and set(after) == {3}
+    assert any(x.startswith("P,") and "Clean band live: profit over the start balance $6000, 3 MNQ" in x for x in out)
+    assert idx  # the bars were written
