@@ -51,6 +51,25 @@ def rth5(df: pd.DataFrame, scale: pd.Series | None = None) -> list[dict]:
     return out
 
 
+def despike(days: list, frac: float = 0.01) -> list:
+    """Yahoo's free bars carry the odd bad print (2026-10-30 15:00: an open 1,278 points off the market, back the same
+    bar): a bar whose open is more than `frac` from the last close gets that close as its open, and its high / low are
+    cut back to its open / close when they sit more than `frac` beyond both."""
+    for d in days:
+        for key in ("o", "h", "l", "c"):
+            d[key] = d[key].copy()
+        o, h, lo, c = d["o"], d["h"], d["l"], d["c"]
+        for k in range(1, len(o)):
+            if abs(o[k] / c[k - 1] - 1) > frac:
+                o[k] = c[k - 1]
+            top, bot = max(o[k], c[k]), min(o[k], c[k])
+            if h[k] > top * (1 + frac):
+                h[k] = top
+            if lo[k] < bot * (1 - frac):
+                lo[k] = bot
+    return days
+
+
 def build(ddir: str) -> None:
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
     import mnq_bars as M
@@ -64,7 +83,7 @@ def build(ddir: str) -> None:
     live = rth5(mnq)
     y = pd.read_pickle(os.path.join(ddir, "yahoo_mnq_5m.pkl"))
     have = {r["d"] for r in live}
-    live = sorted(live + [r for r in rth5(y) if r["d"] not in have and r["d"] >= live[0]["d"]], key=lambda r: r["d"])
+    live = sorted(live + [r for r in despike(rth5(y)) if r["d"] not in have and r["d"] >= live[0]["d"]], key=lambda r: r["d"])
     sets = {"dev": ([r for r in nd if r["d"].year <= 2019], "MNQ"),
             "unseen_nq": ([r for r in nd if r["d"].year >= 2020], "MNQ"),
             "unseen_es": (rth5(es), "MES"),

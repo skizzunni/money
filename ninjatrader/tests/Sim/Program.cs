@@ -38,16 +38,18 @@ static class Program
         bool candD = Array.IndexOf(args, "Strategy=D") >= 0;  // candidates D / E (Strategies/MnqCandidateD.cs)
         bool fomc = Array.IndexOf(args, "Strategy=FOMC") >= 0;  // the pre-FOMC drift (Strategies/MnqFomcDrift.cs)
         bool v38 = Array.IndexOf(args, "Strategy=V38") >= 0;  // v3.8, the 50K evaluation (Strategies/MnqNoiseV38.cs)
+        bool clean = Array.IndexOf(args, "Strategy=Clean") >= 0;  // the Clean Noise-Band (Strategies/MnqCleanBand.cs)
         Strategy s = runner ? (Strategy)new MnqMomentumRunner() : cand ? (Strategy)new MnqMomentumC() :
                      candD ? (Strategy)new MnqCandidateD() : fomc ? (Strategy)new MnqFomcDrift() :
-                     v38 ? (Strategy)new MnqNoiseV38() : new MnqNoiseMomentum();
+                     v38 ? (Strategy)new MnqNoiseV38() : clean ? (Strategy)new MnqCleanBand() : new MnqNoiseMomentum();
+        s.SimVolumes = v;
         s.BarsPeriod.Value = minutes;
         s.Run(t, o, h, l, c, delegate (Strategy x)
         {
             for (int a = 2; a < args.Length; a++)
             {
                 if (args[a] == "Strategy=Runner" || args[a] == "Strategy=C" || args[a] == "Strategy=D" || args[a] == "Strategy=FOMC" ||
-                    args[a] == "Strategy=V38" || args[a] == "DashHistory") continue;
+                    args[a] == "Strategy=V38" || args[a] == "Strategy=Clean" || args[a] == "DashHistory") continue;
                 string[] kv = args[a].Split(new[] { '=' }, 2);
                 PropertyInfo pi = s.GetType().GetProperty(kv[0]);  // the strategy's, or the stand-in's
                 if (pi == null) throw new ArgumentException("unknown property " + kv[0]);

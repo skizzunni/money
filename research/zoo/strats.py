@@ -10,13 +10,20 @@ from harness import prev, walk
 _cache: dict = {}
 
 
+def _cached(key, obj, make):
+    """A per-object cache that keeps the object alive and checks it, so a reused id() never serves stale values."""
+    hit = _cache.get(key)
+    if hit is None or hit[0] is not obj:
+        hit = _cache[key] = (obj, make())
+    return hit[1]
+
+
 def _vwap(day):
-    key = ("vwap", id(day))
-    if key not in _cache:
+    def make():
         typ = (day["h"] + day["l"] + day["c"]) / 3
         v = np.where(day["v"] > 0, day["v"], 1.0)
-        _cache[key] = np.cumsum(typ * v) / np.cumsum(v)
-    return _cache[key]
+        return np.cumsum(typ * v) / np.cumsum(v)
+    return _cached(("vwap", id(day)), day, make)
 
 
 def _bar_at(day, minute):
@@ -29,15 +36,16 @@ CHECKS = list(range(600, 901, 30))
 
 
 def _moves(days, j):
-    key = ("mv", id(days), j)
-    if key not in _cache:
-        d = days[j]
-        out = {}
-        for k, m in enumerate(d["mm"]):
-            if m + 5 in CHECKS:
-                out[m + 5] = abs(d["c"][k] / d["o"][0] - 1)
-        _cache[key] = out
-    return _cache[key]
+    d = days[j]
+
+    def make():
+        return {m + 5: abs(d["c"][k] / d["o"][0] - 1) for k, m in enumerate(d["mm"]) if m + 5 in CHECKS}
+    return _cached(("mv", id(d)), d, make)
+
+
+def _tick(x, tick):
+    """A price on the tick grid, as NinjaTrader's RoundToTickSize (round half to even)."""
+    return float(np.round(x / tick) * tick)
 
 
 def noise(days, i, tick, vwap=True, trend=0, hard=250.0, vwap_stop=False, pv=2.0, k=1.0, last=900, max_trades=9,
@@ -80,7 +88,7 @@ def noise(days, i, tick, vwap=True, trend=0, hard=250.0, vwap_stop=False, pv=2.0
                 out.append((pos, ebar, entry, px - pos * stop_slip * tick, "stop", b))
                 pos = 0
             elif be_r and pos * (c[b] - entry) >= be_pts:
-                stop = max(stop, entry + tick) if pos > 0 else min(stop, entry - tick)
+                stop = max(stop, _tick(entry + pos * tick, tick)) if pos > 0 else min(stop, _tick(entry + pos * tick, tick))
         if end in sig and not np.isnan(sig[end]):
             s = sig[end] * k
             up, dn = up_ref * (1 + s), dn_ref * (1 - s)
@@ -89,7 +97,8 @@ def noise(days, i, tick, vwap=True, trend=0, hard=250.0, vwap_stop=False, pv=2.0
                 hard_px = hard_ref - pos * hard / pv
                 band = bl if pos > 0 else bs
                 new = max(band, hard_px) if pos > 0 else min(band, hard_px)
-                if nt:  # NinjaTrader: the stop is only ever tightened
+                if nt:
+                    new = _tick(new, tick)  # NinjaTrader: the stop is only ever tightened
                     new = max(new, stop) if pos > 0 else min(new, stop)
                 if pos * (c[b] - new) <= 0:
                     exit_next = True
@@ -106,6 +115,8 @@ def noise(days, i, tick, vwap=True, trend=0, hard=250.0, vwap_stop=False, pv=2.0
                     band = bl if want > 0 else bs
                     hp = hard_ref - want * hard / pv
                     pend, pend_stop = want, (max(band, hp) if want > 0 else min(band, hp))
+                    if nt:
+                        pend_stop = _tick(pend_stop, tick)
         if not nt and mm[b] >= 955 and pos:
             out.append((pos, ebar, entry, c[b] - pos * tick, "time", b))
             pos = 0
