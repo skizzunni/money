@@ -10900,3 +10900,14 @@ gains `gap_go_max_k`. `research/g538_big_gaps.py`: X3 no gap trade over 3x, X2 o
 live none); unseen $12,708 ($12,946). X2: development $10,433, lost 3.2%; unseen $12,173, lost 3.4% (1.7%). Skipping the
 big gaps raises the development median 8-9% and the average day, but it loses a start on each set: the few big-gap days
 that do run are the ones that carry an account. Live setup unchanged.
+
+## G539: protect the gap trade once it is well in profit (registered 2026-11-23, before its run)
+
+15-minute round 4. Of the live setup's gap stops (U59 cap, 1 MNQ, no floor), those that first ran 40+ points the trade's
+way give back NQ −$8,224 (102 trades) and the index −$7,313 (110): about 30% of all gap-stop losses. Almost every
+winning gap exit had also run 40+ points, so a later move to break even should keep them. G490 tested this at 0.5x risk on
+U58 before U59 capped the gap stop; with the cap the risk is smaller, so the move comes sooner in points. Searched first
+and found nothing consistent: entries by range used, signal-bar size, entry half hour (13:00 is G536), trade number of the
+day; Back-inside exits by bars held (the grace was tested). `research/g539_gap_protect.py` on G495's measure: P75 the gap
+stop to entry + 2.5 points once a bar closes 0.75x its risk its way (`gap_go_be` 0.75, `gap_go_be_plus` 2.5), P100 at 1.0x.
+**Pass:** no more accounts lost than LIVE on both sets and a higher 12-month median on both. Run once.
