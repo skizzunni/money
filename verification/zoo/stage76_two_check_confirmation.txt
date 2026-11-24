@@ -1,0 +1,10 @@
+Stage 76 (2026-11-24, a research round): a band entry only when the close was past the band (the same way) at the
+previous half-hour check too (strats.noise confirm2, research/zoo/two_check_confirm.py). Fresh 50K starts by period,
+the TradingView window:
+
+shipped:                    2015-19 lost 0.0% med $13,639 p25 $5,256 237 tr/yr | 2020-25 lost 0.0% med $18,453 p25 $15,085 262 tr/yr | TV $+9,921 52tr PF 4.43
+two checks running:         2015-19 lost 0.0% med $10,394 p25 $5,633 170 tr/yr | 2020-25 lost 1.8% med $12,976 p25 $8,071 189 tr/yr | TV $+7,312 42tr PF 4.26
+
+Verdict: rejected. Waiting a half hour for confirmation gives up the first part of the move and the breaks that do not
+sit past the band for two closes: 1.8% of 2020-25 starts lost, the median -$3,245 / -$5,477. (Sigma from the 09:35
+open, the other candidate: section 45 showed the edge sits at the shipped check times and reference; not run.)
