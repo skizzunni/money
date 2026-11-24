@@ -1,0 +1,40 @@
+all off at the target (now): lost 0.0% median $14,315 p25 $8,244 p75 $18,486
+     dev       PF 1.47 best trade $  499 avg win $ 276 net/yr(1) $ 5,280
+     unseen_nq PF 1.49 best trade $  499 avg win $ 317 net/yr(1) $ 6,499
+     unseen_es PF 1.22 best trade $  458 avg win $  97 net/yr(1) $   449
+     live      PF 3.88 best trade $  499 avg win $ 392 net/yr(1) $12,913
+67% off at 2.5x, rest runs, stop break-even: lost 1.0% median $13,899 p25 $7,894 p75 $17,210
+     dev       PF 1.53 best trade $  912 avg win $ 273 net/yr(1) $ 5,107
+     unseen_nq PF 1.56 best trade $  926 avg win $ 304 net/yr(1) $ 6,200
+     unseen_es PF 1.22 best trade $  458 avg win $  97 net/yr(1) $   449
+     live      PF 4.54 best trade $  940 avg win $ 418 net/yr(1) $10,510
+50% off at 2.5x, rest runs, stop break-even: lost 1.0% median $13,533 p25 $8,082 p75 $17,666
+     dev       PF 1.55 best trade $ 1125 avg win $ 277 net/yr(1) $ 5,240
+     unseen_nq PF 1.56 best trade $ 1147 avg win $ 303 net/yr(1) $ 6,152
+     unseen_es PF 1.22 best trade $  458 avg win $  97 net/yr(1) $   449
+     live      PF 4.73 best trade $ 1167 avg win $ 436 net/yr(1) $11,067
+33% off at 2.5x, rest runs, stop break-even: lost 1.9% median $13,584 p25 $7,701 p75 $18,221
+     dev       PF 1.57 best trade $ 1337 avg win $ 280 net/yr(1) $ 5,374
+     unseen_nq PF 1.55 best trade $ 1367 avg win $ 302 net/yr(1) $ 6,105
+     unseen_es PF 1.22 best trade $  458 avg win $  97 net/yr(1) $   449
+     live      PF 4.92 best trade $ 1394 avg win $ 454 net/yr(1) $11,625
+50% off at 2.5x, rest runs, stop locks 50% of the target: lost 1.9% median $13,534 p25 $8,400 p75 $17,743
+     dev       PF 1.49 best trade $ 1125 avg win $ 276 net/yr(1) $ 4,956
+     unseen_nq PF 1.52 best trade $ 1147 avg win $ 310 net/yr(1) $ 6,111
+     unseen_es PF 1.22 best trade $  458 avg win $  97 net/yr(1) $   449
+     live      PF 5.10 best trade $  747 avg win $ 407 net/yr(1) $12,137
+50% off at 2.5x, rest runs, stop locks 40% of the target: lost 1.0% median $13,343 p25 $8,149 p75 $17,471
+     dev       PF 1.49 best trade $ 1125 avg win $ 273 net/yr(1) $ 4,922
+     unseen_nq PF 1.52 best trade $ 1147 avg win $ 306 net/yr(1) $ 6,035
+     unseen_es PF 1.22 best trade $  458 avg win $  97 net/yr(1) $   449
+     live      PF 5.04 best trade $  747 avg win $ 402 net/yr(1) $11,955
+50% off at 2.0x, rest runs, stop break-even: lost 0.0% median $13,397 p25 $7,872 p75 $16,311
+     dev       PF 1.52 best trade $ 1075 avg win $ 262 net/yr(1) $ 5,026
+     unseen_nq PF 1.54 best trade $ 1097 avg win $ 291 net/yr(1) $ 5,945
+     unseen_es PF 1.22 best trade $  458 avg win $  97 net/yr(1) $   449
+     live      PF 4.53 best trade $ 1117 avg win $ 387 net/yr(1) $10,462
+no target at all: lost 3.8% median $10,744 p25 $6,359 p75 $19,130
+     dev       PF 1.61 best trade $ 1750 avg win $ 294 net/yr(1) $ 5,633
+     unseen_nq PF 1.54 best trade $ 1794 avg win $ 318 net/yr(1) $ 6,012
+     unseen_es PF 1.22 best trade $  458 avg win $  97 net/yr(1) $   449
+     live      PF 5.29 best trade $ 1835 avg win $ 529 net/yr(1) $12,708

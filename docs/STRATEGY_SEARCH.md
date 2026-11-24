@@ -169,6 +169,14 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    1.17 to 1.22, live 2.85 to 3.88; live Nov 9-19 +$164 to +$580 at 1 MNQ. Every setting from 50% to 20% loses none.
    Shipped (`RangePos` 0.65, NinjaTrader and Pine trade for trade).
 
+21. **Letting winners run** (2026-11-24, the user: "profitable trades should go up higher";
+   `noise(tp_frac, runner_lock)`, `verification/zoo/stage15_runners.txt`). Part off at the 2.5x target, the rest on the
+   band / break-even stop (or a lock): the best trade doubles or triples ($499 to $1,125-1,794 at 1 MNQ) and the PF
+   rises (dev 1.47 to 1.53-1.61), but the median does not (half off: $13,533; a third off: $13,584; no target: $10,744
+   against $14,315), live per year falls ($12,913 to $10,462-12,708), and 1-3.8% of starts are lost: after the target
+   the move more often turns back than runs. All off at the target stays. Growth comes from the contract steps (1 / 2 /
+   3 as profit builds), capped at the user's 3.
+
 ## The result (the shipped defaults, research numbers, 2 ticks of stop slippage, $0.62 a side)
 
 | set | band trades | win | PF | band net (1 MNQ) | gap trades (PF, net) | 50K starts lost | median 12 months |

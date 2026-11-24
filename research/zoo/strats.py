@@ -49,7 +49,8 @@ def _tick(x, tick):
 
 
 def noise(days, i, tick, vwap=True, trend=0, hard=250.0, vwap_stop=False, pv=2.0, k=1.0, last=900, max_trades=9,
-          be_r=0.0, stop_slip=2, nt=True, tp_r=0.0, tp_fill_bar=True, step=30, range_pos=0.0):
+          be_r=0.0, stop_slip=2, nt=True, tp_r=0.0, tp_fill_bar=True, step=30, range_pos=0.0, tp_frac=1.0,
+          runner_lock=0.0):
     """The user's Clean Noise-Band spec (research/clean_noise_band.py): checks 10:00-15:00, the band (k x sigma) past
     max/min(open, prior close), the session VWAP agreeing, the band as a stop moved at the checks, a hard stop $hard a
     contract, out at 15:55. trend: also the close past the `trend`-session average of closes. be_r: the stop to entry +
@@ -70,26 +71,35 @@ def noise(days, i, tick, vwap=True, trend=0, hard=250.0, vwap_stop=False, pv=2.0
     vw = _vwap(d)
     out = []
     pos, entry, stop, pend, pend_stop, ebar, exit_next, hard_ref = 0, 0.0, np.nan, 0, np.nan, 0, False, 0.0
+    banked = None  # research (tp_frac < 1): the part taken at the target; the rest runs on the band / break-even stop
+
+    def done(x):  # the trade's exit price as one position: the banked part at the target, the rest at x
+        return x if banked is None else entry + tp_frac * (banked - entry) + (1 - tp_frac) * (x - entry)
     be_pts = be_r * hard / pv
     for b in range(len(o)):
         end = mm[b] + 5
         if pos and exit_next:  # a market exit sent at the last bar's close
-            out.append((pos, ebar, entry, o[b] - pos * tick, "exit", b - 1))
-            pos, exit_next = 0, False
+            out.append((pos, ebar, entry, done(o[b] - pos * tick), "exit", b - 1))
+            pos, exit_next, banked = 0, False, None
         if pend and pos == 0:
             pos, entry, ebar = pend, o[b] + pend * tick, b
             stop = pend_stop
+            banked = None
             tgt = _tick(entry + pos * tp_r * hard / pv, tick) if tp_r else np.nan
             pend = 0
         if pos and nt and mm[b] >= 955:
-            out.append((pos, ebar, entry, o[b] - pos * tick, "time", b - 1))
+            out.append((pos, ebar, entry, done(o[b] - pos * tick), "time", b - 1))
             pos = 0
         if pos:
             if (pos > 0 and lo[b] <= stop) or (pos < 0 and h[b] >= stop):
                 px = (min(o[b], stop) if pos > 0 else max(o[b], stop)) if (b > ebar or nt) else stop
-                out.append((pos, ebar, entry, px - pos * stop_slip * tick, "stop", b))
+                out.append((pos, ebar, entry, done(px - pos * stop_slip * tick), "stop", b))
                 pos = 0
-            elif tp_r and (tp_fill_bar or b > ebar) and pos * ((h[b] if pos > 0 else lo[b]) - tgt) >= tick:
+            elif tp_r and banked is None and tp_frac < 1 and (tp_fill_bar or b > ebar) and pos * ((h[b] if pos > 0 else lo[b]) - tgt) >= tick:
+                banked = tgt  # part off at the target; the runner's stop to at least entry + runner_lock x the target distance
+                lock = _tick(entry + runner_lock * (tgt - entry), tick)
+                stop = max(stop, lock) if pos > 0 else min(stop, lock)
+            elif tp_r and tp_frac >= 1 and (tp_fill_bar or b > ebar) and pos * ((h[b] if pos > 0 else lo[b]) - tgt) >= tick:
                 # a take-profit limit: from the fill bar in NinjaTrader (set with the entry), from the next in Pine
                 out.append((pos, ebar, entry, tgt, "target", b))
                 pos = 0
@@ -135,7 +145,7 @@ def noise(days, i, tick, vwap=True, trend=0, hard=250.0, vwap_stop=False, pv=2.0
             out.append((pos, ebar, entry, c[b] - pos * tick, "time", b))
             pos = 0
     if pos:
-        out.append((pos, ebar, entry, c[-1] - pos * tick, "time", len(o) - 1))
+        out.append((pos, ebar, entry, done(c[-1] - pos * tick), "time", len(o) - 1))
     return out
 
 
