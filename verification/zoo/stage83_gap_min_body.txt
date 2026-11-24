@@ -1,0 +1,9 @@
+Stage 83 (2026-11-24, a research round): the gap trade's minimum 09:30 body (3% of the 14-day average range) again,
+with sections 61 and 87 in. Fresh 50K starts by period, the TradingView window:
+
+3% (shipped): 2015-19 lost 0.0% med $14,028 p25 $5,324 | 2020-25 lost 0.0% med $18,980 p25 $15,811 | TV $+10,063 50tr PF 4.66
+2%:           2015-19 lost 0.0% med $13,898 p25 $5,339 | 2020-25 lost 0.0% med $18,782 p25 $15,631 | TV $+10,055 51tr PF 4.65
+4%:           2015-19 lost 0.0% med $13,659 p25 $5,356 | 2020-25 lost 0.0% med $18,432 p25 $15,534 | TV $+10,063 50tr PF 4.66
+
+Verdict: 3% stays: both neighbours lower both medians; their 25th percentiles move by $50 or less on 2015-19 and are
+lower on 2020-25.
