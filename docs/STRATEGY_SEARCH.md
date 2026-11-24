@@ -584,6 +584,10 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
 64. **The hard stop again, with 61 in** (2026-11-24, a research round; `verification/zoo/stage58_hard_stop_with_ladder.txt`).
    $175: median $15,624, the window +$8,294; $225: 3.8% of starts lost. $200 stays.
 
+65. **The move cap and the range rule again, with 61 in** (2026-11-24, a research round;
+   `verification/zoo/stage59_move_cap_range_with_ladder.txt`). Cap 1.0 / 1.2 and range 0.6 / 0.7: every one lower on
+   the median and the 25th percentile (range 0.7: the window +$179, the rest lower). 1.1 and 0.65 stay.
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-33; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |
