@@ -50,7 +50,7 @@ def _tick(x, tick):
 
 def noise(days, i, tick, vwap=True, trend=0, hard=250.0, vwap_stop=False, pv=2.0, k=1.0, last=900, max_trades=9,
           be_r=0.0, stop_slip=2, nt=True, tp_r=0.0, tp_fill_bar=True, step=30, range_pos=0.0, tp_frac=1.0,
-          runner_lock=0.0, max_move=0.0, be_plus=0.0, counter_k=0.0, after_target="", move_free="", min_stretch=0.0, stretch_gap=False, move_ref="open", hard_vol=0.0, hard_lo=0.0, hard_hi=1e9, max_losses=0, strong_at=0.0, strong_tp=0.0, stale=0, band_ref="both", be_on="close", exit_at=955, trend_ema=False, check_off=0, strong_last=0, be_skip_strong=0.0, vwap_after_be=False, band_stop_at=0.0, bar_pos=0.0, bar_n=1, lad_r=0.0, lad_lock=0.0, late_at=0, late_tp=0.0, extra_checks=(), trend_gap_k=0.0, sig_n=14, vwap_until=0, limit_in=False):
+          runner_lock=0.0, max_move=0.0, be_plus=0.0, counter_k=0.0, after_target="", move_free="", min_stretch=0.0, stretch_gap=False, move_ref="open", hard_vol=0.0, hard_lo=0.0, hard_hi=1e9, max_losses=0, strong_at=0.0, strong_tp=0.0, stale=0, band_ref="both", be_on="close", exit_at=955, trend_ema=False, check_off=0, strong_last=0, be_skip_strong=0.0, vwap_after_be=False, band_stop_at=0.0, bar_pos=0.0, bar_n=1, lad_r=0.0, lad_lock=0.0, late_at=0, late_tp=0.0, extra_checks=(), trend_gap_k=0.0, sig_n=14, vwap_until=0, limit_in=False, slope_n=0, slope_mode=""):
     """The user's Clean Noise-Band spec (research/clean_noise_band.py): checks 10:00-15:00, the band (k x sigma) past
     max/min(open, prior close), the session VWAP agreeing, the band as a stop moved at the checks, a hard stop $hard a
     contract, out at 15:55. trend: also the close past the `trend`-session average of closes. be_r: the stop to entry +
@@ -74,6 +74,8 @@ def noise(days, i, tick, vwap=True, trend=0, hard=250.0, vwap_stop=False, pv=2.0
     elif band_ref == "half":
         up_ref, dn_ref = (o[0] + up_ref) / 2, (o[0] + dn_ref) / 2
     sma = np.mean([prev(days, i, "c", j) for j in range(1, trend + 1)]) if trend else np.nan
+    # research (2026-11-24): the trend's slope, today's average less the one slope_n sessions earlier
+    sma_then = np.mean([prev(days, i, "c", j) for j in range(1 + slope_n, trend + 1 + slope_n)]) if trend and slope_n else np.nan
     if trend and trend_ema:  # research (2026-11-24): an exponential average of the prior closes instead (alpha 2/(n+1))
         a_ = 2.0 / (trend + 1)
         sma = prev(days, i, "c", min(i, 3 * trend))
@@ -158,7 +160,9 @@ def noise(days, i, tick, vwap=True, trend=0, hard=250.0, vwap_stop=False, pv=2.0
                 want = 1 if c[b] > up else -1 if c[b] < dn else 0
                 if want and vwap and want * (c[b] - vw[b]) <= 0:
                     want = 0
-                if want and trend and want * (c[b] - sma) <= 0:
+                if want and trend and slope_n and slope_mode and want * (sma - sma_then) <= 0:
+                    want = 0  # research: against the slope ("and": both; "only": the slope replaces the close test)
+                if want and trend and slope_mode != "only" and want * (c[b] - sma) <= 0:
                     # research (2026-11-24): against the trend only past a band counter_k x as wide (0: never), or
                     # (trend_gap_k) on a day that gapped the trade's way by trend_gap_k x the 14-session average gap
                     far = up_ref * (1 + sig[end] * counter_k) if want > 0 else dn_ref * (1 - sig[end] * counter_k)

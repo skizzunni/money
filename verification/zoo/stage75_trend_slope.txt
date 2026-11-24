@@ -1,0 +1,13 @@
+Stage 75 (2026-11-24, a research round): the trend's slope (strats.noise slope_n / slope_mode, research/zoo/trend_slope.py)
+
+The 20-session average's slope (today's average less the one slope_n sessions earlier) as a filter: "and" with the
+shipped close-past-the-average test, or "only" in its place. Fresh 50K starts by period, the TradingView window:
+shipped:             2015-19 lost 0.0% med $13,639 p25 $5,256 237 tr/yr | 2020-25 lost 0.0% med $18,453 p25 $15,085 262 tr/yr | TV $+9,921 52tr PF 4.43
+slope 3 and close:   2015-19 lost 0.0% med $8,075  p25 $4,235 177 tr/yr | 2020-25 lost 0.0% med $15,314 p25 $11,478 217 tr/yr | TV $+2,913 44tr PF 3.32
+slope 5 and close:   2015-19 lost 0.0% med $8,753  p25 $3,861 178 tr/yr | 2020-25 lost 0.0% med $14,431 p25 $10,232 210 tr/yr | TV $+2,676 41tr PF 3.07
+slope 10 and close:  2015-19 lost 0.0% med $9,643  p25 $3,864 175 tr/yr | 2020-25 lost 0.0% med $10,289 p25 $4,644 192 tr/yr | TV $+2,676 41tr PF 3.07
+slope 5 only:        2015-19 lost 0.0% med $9,592  p25 $4,529 197 tr/yr | 2020-25 lost 5.5% med $11,395 p25 $7,460 230 tr/yr | TV $+2,689 47tr PF 2.68
+
+Verdict: rejected. The slope lags: it removes the first breaks of a new move, which pay. Every setting lowers every
+gate; the slope alone loses 5.5% of 2020-25 starts. (The first 4 ready days of each set reach before the set's start,
+as in stage 66; immaterial at these margins.)

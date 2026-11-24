@@ -665,6 +665,11 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    days (6x+): 2 trades on 2015-19 and 9 on 2020-25 with opposite results: no size rule. 3-6x loses in both but on 23
    trades in all (section 43's after-the-fact bucket). Nothing to change.
 
+81. **The trend's slope** (2026-11-24, a research round; `noise` slope_n / slope_mode,
+   `verification/zoo/stage75_trend_slope.txt`). The 20-session average rising / falling over 3-10 sessions, with or
+   instead of the close past it: median $8,075-15,314 against $13,639 / $18,453 and the window about +$2,700 against
+   +$9,921; alone, 5.5% of 2020-25 starts lost. The slope lags the first breaks of a move. Rejected.
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-33; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |
