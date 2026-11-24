@@ -27,6 +27,7 @@ vwapStop = input.bool(true, "The stop is also never looser than VWAP")
 vwapEntry = input.bool(false, "Entries also need the close on VWAP's side")
 dayStop = input.float(600, "Day stop: no new entry once the day is down $ (0 = off)", minval = 0)
 maxQty = input.int(3, "Most contracts", minval = 1, maxval = 3)
+fixedQty = input.int(0, "Fixed contracts (0 = the profit steps; any other number trades that many from the start)", minval = 0, maxval = 50)
 step2 = input.float(2000, "2 contracts from this profit $", minval = 0)
 step3 = input.float(4500, "3 contracts from this profit $", minval = 0)
 startProfit = input.float(0, "Profit already made at the start $")
@@ -117,7 +118,7 @@ if inRth and dayNum != tDay
                     m += v
             array.set(sig, k, all ? m / 14 : na)
         prof = startProfit + strategy.netprofit
-        qty := math.min(prof >= step3 ? 3 : prof >= step2 ? 2 : 1, maxQty)
+        qty := fixedQty > 0 ? fixedQty : math.min(prof >= step3 ? 3 : prof >= step2 ? 2 : 1, maxQty)
         gapToday := gapLeg and prof >= gapFrom
 
 float vwapNow = na

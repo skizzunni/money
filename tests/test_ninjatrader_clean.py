@@ -266,3 +266,16 @@ def test_clean_band_dashboard_says_if_it_is_ready(sim, tmp_path):  # noqa: F811
     write_bars(days[:12], short)
     d2 = [x for x in _run_all(sim, short) if x.startswith("D,")]
     assert d2 and "NOT READY: 11 complete sessions loaded, needs 21" in d2[0]
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+def test_clean_band_fixed_contracts(sim, tmp_path):  # noqa: F811
+    """FixedContracts: that many on every trade from the start, whatever the profit (the same trades)."""
+    days = synthetic_days()
+    path = tmp_path / "bars.csv"
+    write_bars(days, path)
+    q = _qty(sim, path, FixedContracts=3, DayStop=0)
+    assert q and set(q) == {"3"}
+    one = [x.split(",")[1:6] for x in _run_all(sim, path, MaxContracts=1, DayStop=0) if x.startswith("T,")]
+    three = [x.split(",")[1:6] for x in _run_all(sim, path, FixedContracts=3, DayStop=0) if x.startswith("T,")]
+    assert one == three

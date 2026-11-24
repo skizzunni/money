@@ -72,6 +72,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 MaxTradesPerDay = 9;
                 DayStop = 600;
                 MaxContracts = 3;
+                FixedContracts = 0;
                 Step2At = 2000;
                 Step3At = 4500;
                 EarlyMaxTrades = 0;
@@ -136,6 +137,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         int Contracts(double profit)
         {
+            if (FixedContracts > 0)
+                return FixedContracts;
             int q = 1;
             if (profit >= Step2At) q = 2;
             if (profit >= Step3At) q = 3;
@@ -479,6 +482,11 @@ namespace NinjaTrader.NinjaScript.Strategies
         [Range(1, 3)]
         [Display(Name = "Most contracts", Order = 1, GroupName = "3. Size")]
         public int MaxContracts { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, 50)]
+        [Display(Name = "Fixed contracts (0 = the profit steps; any other number trades that many from the start)", Order = 6, GroupName = "3. Size")]
+        public int FixedContracts { get; set; }
 
         [NinjaScriptProperty]
         [Range(0, 100000)]

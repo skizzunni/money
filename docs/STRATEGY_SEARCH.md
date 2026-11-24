@@ -72,6 +72,15 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    20-session trend filter 0 of 32 either. His risk (2-5% of the account a trade) would end a 50K with a $2,000 floor in
    one or two losers. Not used.
 
+11. **"The old one made $20K, this one $2K"** (2026-11-24, the user's TradingView Strategy Tester: +$2,212, 25 trades,
+   PF 3.61). Both Pine scripts on the same MNQ bars (Jun 29 - Nov 23 2026, the Pine interpreter): the old v4.3 at its
+   default **8 MNQ** $22,445 (max drawdown $3,859, worst day -$3,630); at 3 MNQ $8,417. The new one: fixed 3 MNQ
+   $16,622 (drawdown $1,522, worst day -$868), fixed 8 $22,298, its default steps (1 MNQ until +$2,000) $8,765. The gap
+   is the contract count, not the rules. From a fresh 50K (the bench, 104 starts): the steps lose none (median $9,913);
+   2 then 3 from +$2,000 lose 28.8%; a fixed 3 39-41% (median $11-13K); a fixed 8 63.5%. New setting "Fixed
+   contracts" (NinjaTrader `FixedContracts`, Pine input; 0 = the steps). An account already up trades 3 by the steps
+   once it is +$4,500 (sized from its balance live).
+
 ## The result (the shipped defaults, research numbers, 2 ticks of stop slippage, $0.62 a side)
 
 | set | band trades | win | PF | band net (1 MNQ) | gap trades (PF, net) | 50K starts lost | median 12 months |
