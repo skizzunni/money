@@ -177,6 +177,15 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    the move more often turns back than runs. All off at the target stays. Growth comes from the contract steps (1 / 2 /
    3 as profit builds), capped at the user's 3.
 
+22. **No chasing a day that has already run** (2026-11-24; `verification/zoo/stage16_day_move_cap.txt`). The band's
+   trades by how far the day had already moved their way (from the open, in units of the last 14 sessions' average
+   range): the weakest group on every set is beyond 1.1x (PF dev 1.11, unseen NQ 0.91, live 1.77, against 1.3-1.9 /
+   1.4-1.9 / 4.2-5.0 below); trade number, time of day, the previous trade's result and the weekday flip between sets.
+   Rule: no entry once the day has moved more than 1.1x its usual range the trade's way (`max_move` 1.1). 104 starts:
+   none lost, median $14,288 (from $14,315), 25th percentile $9,373 (from $8,244); PF dev 1.54, unseen NQ 1.59, ES
+   1.27, live 4.51 (from 1.47 / 1.49 / 1.22 / 3.88); about 8% fewer trades. 1.0x and 1.3x also lose none. Shipped
+   (`MaxMove` 1.1; NinjaTrader and Pine trade for trade).
+
 ## The result (the shipped defaults, research numbers, 2 ticks of stop slippage, $0.62 a side)
 
 | set | band trades | win | PF | band net (1 MNQ) | gap trades (PF, net) | 50K starts lost | median 12 months |

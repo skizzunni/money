@@ -38,14 +38,15 @@ namespace NinjaTrader.NinjaScript.Strategies
             public DateTime Date;
             public double Close;
             public int Bars;
-            public double Gap = double.NaN;  // today's 09:30 open less the prior complete session's close
+            public double Gap = double.NaN;
+            public double Range;  // the session's high - low (09:30-16:00)  // today's 09:30 open less the prior complete session's close
             public readonly Dictionary<int, double> Moves = new Dictionary<int, double>();
         }
 
         TimeZoneInfo newYork;
         readonly List<Day> hist = new List<Day>();
         Day today;
-        double dayOpen, prevClose, sma, vwapNum, vwapDen, dayCumStart, hardRef, stop, entryPx, dayHigh, dayLow;
+        double dayOpen, prevClose, sma, vwapNum, vwapDen, dayCumStart, hardRef, stop, entryPx, dayHigh, dayLow, avgRange;
         int pos, tradesToday, qty, gapPos;
         bool ready, beDone, early, exiting, gapWarned, noisePending, gapPending, gapToday, stopGone;
         DateTime stopGoneUtc = DateTime.MinValue;
@@ -87,7 +88,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 UseAccountBalanceLive = true;
                 VwapStop = true;
                 VwapEntry = false;
-                RangePos = 0.65;  // 2026-11-24: without the VWAP entry filter, more per start and no more lost (docs/STRATEGY_SEARCH.md, 9)
+                RangePos = 0.65;
+                MaxMove = 1.1;  // 2026-11-24: without the VWAP entry filter, more per start and no more lost (docs/STRATEGY_SEARCH.md, 9)
                 PlaceOrders = true;
                 BlockOnDataGap = true;
                 TakeProfitAt = 2.5;
@@ -159,7 +161,10 @@ namespace NinjaTrader.NinjaScript.Strategies
         void NewDay(DateTime date)
         {
             if (today != null && today.Bars >= 76)
-                hist.Add(today);  // only complete sessions count, as research/zoo's day sets
+            {
+                today.Range = dayHigh - dayLow;
+                hist.Add(today);
+            }  // only complete sessions count, as research/zoo's day sets
             if (hist.Count > 60) hist.RemoveAt(0);
             today = new Day();
             today.Date = date;
@@ -190,6 +195,9 @@ namespace NinjaTrader.NinjaScript.Strategies
             double s = 0;
             for (int j = 1; j <= TrendDays; j++) s += hist[hist.Count - j].Close;
             sma = TrendDays > 0 ? s / TrendDays : double.NaN;
+            double rs = 0;
+            for (int j = hist.Count - 14; j < hist.Count; j++) rs += hist[j].Range;
+            avgRange = rs / 14;
             foreach (int t in Checks)
             {
                 double sum = 0;
@@ -355,6 +363,8 @@ namespace NinjaTrader.NinjaScript.Strategies
             int want = Close[0] > up ? 1 : Close[0] < dn ? -1 : 0;
             if (want != 0 && VwapEntry && want * (Close[0] - vwap) <= 0) want = 0;
             if (want != 0 && TrendDays > 0 && want * (Close[0] - sma) <= 0) want = 0;
+            if (want != 0 && MaxMove > 0 && want * (Close[0] - dayOpen) > MaxMove * avgRange)
+                want = 0;  // the day has already run past its usual range its way (docs/STRATEGY_SEARCH.md, 22)
             if (want != 0 && RangePos > 0)  // the close still near the day's extreme its way (docs/STRATEGY_SEARCH.md, 20)
             {
                 double posR = dayHigh > dayLow ? (Close[0] - dayLow) / (dayHigh - dayLow) : 0.5;
@@ -489,6 +499,11 @@ namespace NinjaTrader.NinjaScript.Strategies
         [Range(0, 1)]
         [Display(Name = "Entry close at least this far up the day's range (long; short mirrored; 0 = off)", Order = 6, GroupName = "1. Entries")]
         public double RangePos { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, 10)]
+        [Display(Name = "No entry once the day has moved this many usual ranges its way (0 = off)", Order = 7, GroupName = "1. Entries")]
+        public double MaxMove { get; set; }
 
         [NinjaScriptProperty]
         [Range(1, 2000)]

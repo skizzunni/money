@@ -29,6 +29,7 @@ lastEntry = input.int(840, "Last entry check, minutes from midnight New York (84
 maxTrades = input.int(9, "Most trades a day", minval = 1, maxval = 20)
 vwapStop = input.bool(true, "The stop is also never looser than VWAP")
 vwapEntry = input.bool(false, "Entries also need the close on VWAP's side")
+maxMove = input.float(1.1, "No entry once the day has moved this many usual ranges its way (0 = off)", minval = 0, step = 0.1)
 rangePos = input.float(0.65, "Entry close at least this far up the day's range (long; short mirrored; 0 = off)", minval = 0, maxval = 1, step = 0.05)
 dayStop = input.float(600, "Day stop: no new entry once the day is down $ (0 = off)", minval = 0)
 maxQty = input.int(3, "Most contracts", minval = 1, maxval = 3)
@@ -57,6 +58,8 @@ dayNum = int(math.floor((time - 18000000) / 86400000))   // the New York session
 var hCloses = array.new_float(0)
 var hDays = array.new_float(0)
 var hGaps = array.new_float(0)
+var hRanges = array.new_float(0)
+var float avgRange = na
 var hMoves = array.new_float(0)   // NCH a session
 var tMoves = array.new_float(NCH, na)
 var sig = array.new_float(NCH, na)
@@ -105,12 +108,14 @@ if inRth and dayNum != tDay
         array.push(hCloses, tClose)
         array.push(hDays, tDay)
         array.push(hGaps, tGap)
+        array.push(hRanges, dHi - dLo)
         for k = 0 to NCH - 1
             array.push(hMoves, array.get(tMoves, k))
         if array.size(hCloses) > 60
             array.shift(hCloses)
             array.shift(hDays)
             array.shift(hGaps)
+            array.shift(hRanges)
             for k = 0 to NCH - 1
                 array.shift(hMoves)
     nH = array.size(hCloses)
@@ -137,6 +142,10 @@ if inRth and dayNum != tDay
             for j = nH - trendDays to nH - 1
                 s += array.get(hCloses, j)
         sma := trendDays > 0 ? s / trendDays : na
+        float rsum = 0.0
+        for j = nH - 14 to nH - 1
+            rsum += array.get(hRanges, j)
+        avgRange := rsum / 14
         for k = 0 to NCH - 1
             float m = 0.0
             bool all = true
@@ -229,6 +238,8 @@ if inRth and ready
                 if want != 0 and vwapEntry and want * (close - vwapNow) <= 0
                     want := 0
                 if want != 0 and trendDays > 0 and want * (close - sma) <= 0
+                    want := 0
+                if want != 0 and maxMove > 0 and want * (close - dayOpen) > maxMove * avgRange
                     want := 0
                 posR = dHi > dLo ? (close - dLo) / (dHi - dLo) : 0.5
                 if want != 0 and rangePos > 0 and ((want > 0 and posR < rangePos) or (want < 0 and posR > 1 - rangePos))
