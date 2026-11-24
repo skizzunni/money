@@ -22,5 +22,6 @@
     <Compile Include="../../Strategies/MnqFomcDrift.cs" />
     <Compile Include="../../Strategies/MnqNoiseV38.cs" />
     <Compile Include="../../Strategies/MnqCleanBand.cs" />
+    <Compile Include="../../Strategies/MgcOvernightCarry.cs" />
   </ItemGroup>
 </Project>

@@ -353,6 +353,23 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    08:20 open, out 13:30 or 16:00): PF 1.31-1.46 / 1.23-1.32, 59-71% of years up, but 15% winners and $200-500 a contract
    a year. Crude: nothing above PF 1.15 on both halves with enough trades.
 
+37. **MGC Overnight Carry: a second strategy for more trades** (2026-11-24, the user: "keep working, I need more
+   trades"; `ninjatrader/Strategies/MgcOvernightCarry.cs`, `pine/mgc_overnight_carry.pine`, `mk_search.carry`,
+   `tests/test_ninjatrader_gold.py`, `tests/test_pine_gold.py`, `verification/zoo/stage31_mnq_plus_gold.txt`). The one
+   gold pattern of section 36's search, built for NinjaTrader: gold's move from the prior session's 13:25 close to the
+   08:20 open at least 1.5x its 14-session average, the 08:20-08:35 bars closing its way: in at 08:35 its way, the stop a
+   tick past the 08:20 open, out at 13:30; sized like MNQ (1 / 2 / 3 from +$0 / 2,000 / 3,500); its own chart and
+   strategy beside MnqCleanBand on the same account. Gold alone (5-minute bars, as NinjaTrader trades it): about 20
+   trades a year, PF 1.29 (2009-17) / 1.54 (2018 - Mar 2025), 65% of years up, the worst trade -$348 a contract. With
+   MNQ on one 50K (100 starts 2015 - Mar 2025, gold with no day stop of its own, MNQ's $600 as shipped): **0 lost,
+   median $16,727 to $17,090, 25th percentile $11,524 to $11,584, trades a year 217 to 235**; every neighbour (1.25 /
+   1.75x, 10 / 20 minutes, out 13:00 / 14:00) loses none. Stress (2009 - Mar 2025, about 4,000 sessions, 316 trades):
+   NinjaTrader and the reference trade for trade, sizes too; Pine on the last 500 sessions. Two fixes it found: a
+   holiday's early close (Feb 19 2018, Jan 12 2024) left no 13:25 bar, so the trade now goes out on the next trading
+   day's first bar (live, NinjaTrader's exit on session close comes first); and a gap in the bars before 13:30 (Feb 21
+   2011) exits on the first bar from 13:25 on. No live gold months here (the data ends Mar 2025): check it in
+   TradingView on MGC1! before trusting it.
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-33; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |
@@ -413,6 +430,11 @@ NinjaTrader 8, on each funded account (both the same way):
    TRADING: right-click the chart > Reload All Historical Data.
 6. Leave NinjaTrader running through the session (09:30-16:00 New York); the strategy is flat by 15:55 every day.
 7. **Before Monday Nov 30** install this version: the older one would block that day (the holiday guard, section 27).
+8. **Gold (optional, section 37):** copy `ninjatrader/Strategies/MgcOvernightCarry.cs` to the same folder, F5. Open an
+   **MGC** 5-minute chart (front month, e.g. MGC 02-27; trading hours **CME/COMEX metals ETH**, the overnight session
+   is needed), Days to load **30**. Right-click > Strategies > **MgcOvernightCarry** > the same funded account,
+   defaults, Enabled. The top-right corner says OK once 14 complete sessions are loaded. It trades at most once a day
+   (08:35 to 13:30) and sizes from the same account balance as MNQ.
 
 Defaults: trend 20 sessions; hard stop $200 a contract; take profit 2.5 hard stops; break-even at 0.4 to entry + 2
 points; last entry 14:00 (840); at most 9 trades a day; day stop $600; range rule 0.65; move cap 1.1; the gap trade

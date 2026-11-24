@@ -412,7 +412,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         public double GetCurrentBid() { return Close[0]; }
         public double GetCurrentAsk() { return Close[0]; }
 
-        static readonly string[] Entries = { "Long", "Short", "W Long", "W Short", "Long half", "Short half", "FOMC drift", "GapLong", "GapShort" };
+        static readonly string[] Entries = { "Long", "Short", "W Long", "W Short", "Long half", "Short half", "FOMC drift", "GapLong", "GapShort", "CarryLong", "CarryShort" };
         void Check(string signal)
         {
             if (Array.IndexOf(Entries, signal) < 0)

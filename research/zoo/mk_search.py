@@ -158,3 +158,60 @@ def pdhl(days, i, sp, avg, until=240, buf=0.1, target="mid", exit_m=None):
             r = sim(d, k + 1, 1, d["l"][ks:k + 1].min() - sp["tick"], mid if target == "mid" else np.nan, exit_m or sp["last"], sp["tick"])
             return [r] if r is not None else []
     return []
+
+
+def five_min(days):
+    """research (2026-11-24): the minute days as 5-minute bars (minutes from 18:00, the bar's start), as a 5-minute
+    chart shows them, for MgcOvernightCarry's reference."""
+    out = []
+    for d in days:
+        k5 = d["mm"] // 5
+        u, first = np.unique(k5, return_index=True)
+        last = np.r_[first[1:] - 1, len(k5) - 1]
+        out.append({"d": d["d"], "mm": u * 5, "o": d["o"][first], "c": d["c"][last],
+                    "h": np.maximum.reduceat(d["h"], first), "l": np.minimum.reduceat(d["l"], first)})
+    return out
+
+
+def carry(days, i, tick=0.1, k=1.5, open_m=860, confirm=15, settle=1170, exit_m=1170, n=14):
+    """Gold's overnight move carried on (MgcOvernightCarry.cs, 2026-11-24), on 5-minute bars: the move = the 08:20 bar's
+    open less the prior session's 13:25 bar close; at least k x the last n sessions' average |move| and the bars from
+    08:20 to 08:20 + confirm closing its way (the last one's close against the 08:20 open): a market order at that
+    close, filled at the next bar's open + a tick; the stop a tick past the 08:20 open, set with the entry; out at the
+    open of the bar starting at exit_m (13:30). A stop fills at the bar's open when it opens through, a tick worse.
+    Returns [(side, entry bar, entry, exit, why, exit bar)]."""
+    def move(j):
+        d, p = days[j], days[j - 1]
+        ko, kp = at(d, open_m), at(p, settle - 5)
+        if ko is None or kp is None or d["mm"][ko] != open_m or p["mm"][kp] != settle - 5:
+            return np.nan
+        return d["o"][ko] - p["c"][kp]
+    if i < n + 1:
+        return []
+    mv = move(i)
+    ref = [abs(m) for m in (move(j) for j in range(i - n, i)) if m == m]
+    if mv != mv or len(ref) < n or abs(mv) < k * np.mean(ref):
+        return []
+    d = days[i]
+    ko, kc = at(d, open_m), at(d, open_m + confirm)
+    if kc is None or d["mm"][kc] != open_m + confirm:
+        return []
+    side = 1 if mv > 0 else -1
+    if side * (d["c"][kc - 1] - d["o"][ko]) <= 0:
+        return []
+    stop = np.round((d["o"][ko] - side * tick) / tick) * tick  # as NinjaTrader's RoundToTickSize
+    e = d["o"][kc] + side * tick
+    # as NinjaTrader acts (on a bar's close): the exit at the close of the first bar from exit_m - 5 on, filled at the
+    # next open; a session that ends first (a holiday's early close): at the close of the next day's first bar
+    nx = days[i + 1] if i + 1 < len(days) else None
+    seq = [(d, b) for b in range(kc, len(d["o"]))] + ([(nx, b) for b in range(min(2, len(nx["o"])))] if nx else [])
+    trig = next((j for j, (dd, b) in enumerate(seq) if dd is not d or dd["mm"][b] >= exit_m - 5), None)
+    if trig is None or trig + 1 >= len(seq):
+        return []
+    for j in range(trig + 1):
+        dd, b = seq[j]
+        if (side > 0 and dd["l"][b] <= stop) or (side < 0 and dd["h"][b] >= stop):
+            x = (min(dd["o"][b], stop) if side > 0 else max(dd["o"][b], stop)) - side * tick
+            return [(side, kc, e, x, "stop", b)]
+    dd, b = seq[trig + 1]
+    return [(side, kc, e, dd["o"][b] - side * tick, "time" if dd is d else "session", b - 1)]

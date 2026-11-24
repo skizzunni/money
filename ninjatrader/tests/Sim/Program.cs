@@ -39,9 +39,18 @@ static class Program
         bool fomc = Array.IndexOf(args, "Strategy=FOMC") >= 0;  // the pre-FOMC drift (Strategies/MnqFomcDrift.cs)
         bool v38 = Array.IndexOf(args, "Strategy=V38") >= 0;  // v3.8, the 50K evaluation (Strategies/MnqNoiseV38.cs)
         bool clean = Array.IndexOf(args, "Strategy=Clean") >= 0;  // the Clean Noise-Band (Strategies/MnqCleanBand.cs)
+        bool gold = Array.IndexOf(args, "Strategy=Gold") >= 0;  // MGC Overnight Carry (Strategies/MgcOvernightCarry.cs)
         Strategy s = runner ? (Strategy)new MnqMomentumRunner() : cand ? (Strategy)new MnqMomentumC() :
                      candD ? (Strategy)new MnqCandidateD() : fomc ? (Strategy)new MnqFomcDrift() :
-                     v38 ? (Strategy)new MnqNoiseV38() : clean ? (Strategy)new MnqCleanBand() : new MnqNoiseMomentum();
+                     v38 ? (Strategy)new MnqNoiseV38() : clean ? (Strategy)new MnqCleanBand() :
+                     gold ? (Strategy)new MgcOvernightCarry() : new MnqNoiseMomentum();
+        if (gold)  // MGC: a 0.1 tick, $10 a point
+        {
+            s.Instrument.MasterInstrument.TickSize = 0.1;
+            s.Instrument.MasterInstrument.PointValue = 10.0;
+            s.Instrument.FullName = "MGC 02-27";
+            s.Position.PointValue = 10.0;
+        }
         s.SimVolumes = v;
         s.BarsPeriod.Value = minutes;
         s.Run(t, o, h, l, c, delegate (Strategy x)
@@ -49,7 +58,7 @@ static class Program
             for (int a = 2; a < args.Length; a++)
             {
                 if (args[a] == "Strategy=Runner" || args[a] == "Strategy=C" || args[a] == "Strategy=D" || args[a] == "Strategy=FOMC" ||
-                    args[a] == "Strategy=V38" || args[a] == "Strategy=Clean" || args[a] == "DashHistory") continue;
+                    args[a] == "Strategy=V38" || args[a] == "Strategy=Clean" || args[a] == "Strategy=Gold" || args[a] == "DashHistory") continue;
                 string[] kv = args[a].Split(new[] { '=' }, 2);
                 PropertyInfo pi = s.GetType().GetProperty(kv[0]);  // the strategy's, or the stand-in's
                 if (pi == null) throw new ArgumentException("unknown property " + kv[0]);
@@ -64,7 +73,7 @@ static class Program
         foreach (string x in s.OrderLog)
             Console.WriteLine("O," + x);
         string d;
-        if (Draw.Texts.TryGetValue(runner ? "runner_dash" : cand ? "c_dash" : v38 ? "v38_dash" : clean ? "clean_dash" : "mnq_dash", out d))
+        if (Draw.Texts.TryGetValue(runner ? "runner_dash" : cand ? "c_dash" : v38 ? "v38_dash" : clean ? "clean_dash" : gold ? "gold_dash" : "mnq_dash", out d))
             Console.WriteLine("D," + d.Replace("\n", " | "));
         foreach (string x in s.Printed)
             Console.WriteLine("P," + x);
