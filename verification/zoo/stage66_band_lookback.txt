@@ -1,0 +1,12 @@
+Stage 66 (2026-11-24, a research round): the noise area's lookback, 14 sessions, at 10 / 20 / 30 (strats.noise sig_n,
+research/zoo/sigma_window.py). Fresh 50K starts by period, the TradingView window:
+
+shipped (14): 2015-19 lost 0.0% med $13,639 p25 $5,256 237 tr/yr | 2020-25 lost 0.0% med $18,453 p25 $15,085 262 tr/yr | TV $+9,921 52tr PF 4.43
+10 sessions:  2015-19 lost 0.0% med $14,276 p25 $5,724 237 tr/yr | 2020-25 lost 0.0% med $17,627 p25 $14,224 266 tr/yr | TV $+10,082 54tr PF 4.80
+20 sessions:  2015-19 lost 0.0% med $14,273 p25 $6,425 235 tr/yr | 2020-25 lost 1.8% med $17,747 p25 $13,629 265 tr/yr | TV $+9,860 46tr PF 4.33
+30 sessions:  2015-19 lost 0.0% med $14,048 p25 $6,201 230 tr/yr | 2020-25 lost 5.5% med $15,613 p25 $10,832 266 tr/yr | TV $+10,816 50tr PF 4.97
+
+Verdict: 14 stays. Every other window is better on 2015-19 but lower on 2020-25 (10: -$826 median, -$861 25th
+percentile; 20 and 30 lose 1.8% / 5.5% of starts). Caveat: with 30 sessions the first 9 ready days of each set reach
+before the set's first day (a Python negative index); it touches a handful of days and cannot account for 5.5% lost.
+The extra contract's stretch (band_stretch) kept its 14 sessions in every run.

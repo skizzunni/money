@@ -621,6 +621,10 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    average gap the break's way: 1.5x better in both periods but the window -$413 (PF 3.88), and 1.0x / 2.0x lower in one
    period each. A lone peak: not shipped.
 
+72. **The noise area's lookback** (2026-11-24, a research round; `noise` sig_n,
+   `verification/zoo/stage66_band_lookback.txt`). 10 / 20 / 30 sessions instead of 14: each better on 2015-19 and lower
+   on 2020-25 (10: median $17,627 against $18,453; 20 and 30 lose 1.8% / 5.5% of 2020-25 starts). 14 stays.
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-33; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |

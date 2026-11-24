@@ -50,7 +50,7 @@ def _tick(x, tick):
 
 def noise(days, i, tick, vwap=True, trend=0, hard=250.0, vwap_stop=False, pv=2.0, k=1.0, last=900, max_trades=9,
           be_r=0.0, stop_slip=2, nt=True, tp_r=0.0, tp_fill_bar=True, step=30, range_pos=0.0, tp_frac=1.0,
-          runner_lock=0.0, max_move=0.0, be_plus=0.0, counter_k=0.0, after_target="", move_free="", min_stretch=0.0, stretch_gap=False, move_ref="open", hard_vol=0.0, hard_lo=0.0, hard_hi=1e9, max_losses=0, strong_at=0.0, strong_tp=0.0, stale=0, band_ref="both", be_on="close", exit_at=955, trend_ema=False, check_off=0, strong_last=0, be_skip_strong=0.0, vwap_after_be=False, band_stop_at=0.0, bar_pos=0.0, bar_n=1, lad_r=0.0, lad_lock=0.0, late_at=0, late_tp=0.0, extra_checks=(), trend_gap_k=0.0):
+          runner_lock=0.0, max_move=0.0, be_plus=0.0, counter_k=0.0, after_target="", move_free="", min_stretch=0.0, stretch_gap=False, move_ref="open", hard_vol=0.0, hard_lo=0.0, hard_hi=1e9, max_losses=0, strong_at=0.0, strong_tp=0.0, stale=0, band_ref="both", be_on="close", exit_at=955, trend_ema=False, check_off=0, strong_last=0, be_skip_strong=0.0, vwap_after_be=False, band_stop_at=0.0, bar_pos=0.0, bar_n=1, lad_r=0.0, lad_lock=0.0, late_at=0, late_tp=0.0, extra_checks=(), trend_gap_k=0.0, sig_n=14):
     """The user's Clean Noise-Band spec (research/clean_noise_band.py): checks 10:00-15:00, the band (k x sigma) past
     max/min(open, prior close), the session VWAP agreeing, the band as a stop moved at the checks, a hard stop $hard a
     contract, out at 15:55. trend: also the close past the `trend`-session average of closes. be_r: the stop to entry +
@@ -65,7 +65,8 @@ def noise(days, i, tick, vwap=True, trend=0, hard=250.0, vwap_stop=False, pv=2.0
     o, h, lo, c, mm = d["o"], d["h"], d["l"], d["c"], d["mm"]
     checks = list(range(600 + check_off, 901, step))  # research (2026-11-24): every `step` minutes from 10:00 + check_off
     checks = sorted(set(checks) | set(extra_checks))  # research (2026-11-24): extra check times (bar ends, minutes)
-    sig = {t: np.mean([_moves(days, j).get(t, np.nan) for j in range(i - 14, i)]) for t in checks}
+    # research (2026-11-24): sig_n sessions in the noise area's average (14 shipped)
+    sig = {t: np.mean([_moves(days, j).get(t, np.nan) for j in range(i - sig_n, i)]) for t in checks}
     pc = prev(days, i, "c")
     up_ref, dn_ref = max(o[0], pc), min(o[0], pc)
     if band_ref == "open":  # research (2026-11-24): the band from the open alone, or half way to the prior close
