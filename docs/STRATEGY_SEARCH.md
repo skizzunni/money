@@ -675,6 +675,10 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    before too: 1.8% of 2020-25 starts lost, medians $10,394 / $12,976 against $13,639 / $18,453, the window +$7,312.
    Rejected.
 
+83. **The guard's level with 61 in** (2026-11-24, a research round; `verification/zoo/stage77_guard_level_with_61.txt`).
+   Shuffled years: a $2,000 guard blows 0.4-1.0 points fewer accounts in 5 of 6 cases for about 8% less median; $1,250
+   blows more everywhere. $1,500 stays; $2,000 is the user's risk choice (`CushionGuard`), not an improvement.
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-33; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |
