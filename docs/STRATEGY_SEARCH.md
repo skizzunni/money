@@ -679,6 +679,10 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    Shuffled years: a $2,000 guard blows 0.4-1.0 points fewer accounts in 5 of 6 cases for about 8% less median; $1,250
    blows more everywhere. $1,500 stays; $2,000 is the user's risk choice (`CushionGuard`), not an improvement.
 
+84. **A hysteresis band on the size steps** (2026-11-24, a research round; `verification/zoo/stage78_step_hysteresis.txt`).
+   Stepping down only below +$1,500 / +$3,000 (up at +$2,000 / +$3,500): medians $48-292 higher but more accounts
+   blown in all six shuffled-year cases (fresh 2020-25: 5.7% against 5.0%). Rejected: the steps stay symmetric.
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-33; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |
