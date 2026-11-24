@@ -708,6 +708,10 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    The wild-open skip at 1.5 / 2.0x and the stop step at 1.25 / 1.75R: each lowers at least one period's median. 1.75x
    and 1.5R / 0.5R stay.
 
+91. **A walk-forward of 87** (2026-11-24, a research round; `verification/zoo/stage85_walkforward_87.txt`). Picked on
+   2015-19 alone (median, or median + 25th percentile), the minimum gap is 0.6x, the shipped value, and it beats 0.5x on
+   2020-25 ($18,980 / $15,811 against $18,453 / $15,085). Section 87 holds out of sample.
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |

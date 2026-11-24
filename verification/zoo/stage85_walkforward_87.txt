@@ -1,0 +1,15 @@
+Stage 85 (2026-11-24, a research round): a walk-forward of section 87 (the gap trade's minimum gap), as stage 62 did for
+61: pick the minimum on 2015-19 starts only, score the pick on the 2020-25 starts it never saw.
+
+k 0.4:   2015-19 med $13,787 p25 $5,205 | 2020-25 med $18,114 p25 $15,278
+k 0.5:   2015-19 med $13,639 p25 $5,256 | 2020-25 med $18,453 p25 $15,085   (the earlier default)
+k 0.55:  2015-19 med $13,838 p25 $5,324 | 2020-25 med $18,519 p25 $15,322
+k 0.6:   2015-19 med $14,028 p25 $5,324 | 2020-25 med $18,980 p25 $15,811   (shipped)
+k 0.7:   2015-19 med $13,533 p25 $5,371 | 2020-25 med $18,167 p25 $15,278
+k 0.8:   2015-19 med $12,803 p25 $4,909 | 2020-25 med $17,912 p25 $15,373
+
+Picked on 2015-19's median, or median + 25th percentile: 0.6 -> 2020-25 med $18,980 p25 $15,811 (0.5: $18,453 / $15,085).
+Picked on 2015-19's 25th percentile alone: 0.7 -> 2020-25 med $18,167 p25 $15,278 (25th percentile still above 0.5's).
+
+Verdict: section 87 passes the walk-forward: the older period alone picks the shipped 0.6, and it is better on the newer
+period's median and 25th percentile. (Unlike 61, whose pick depended on the measure, stage 62.)
