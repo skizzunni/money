@@ -461,6 +461,13 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    not the ones that run), median $16,482 against $17,366. MNQ's day stop with the open trade counted: no different (it
    enters only flat, so nothing is open when it decides). None used.
 
+48. **Gold's stop idea on MNQ** (2026-11-24, a research round; `gap_go` stop_at, `noise` band_stop_at,
+   `verification/zoo/stage42_mnq_stops_part_way.txt`). The gap trade's stop 25-75% of the way from the 09:30 open to the
+   signal close: median $15,141-16,377 against $16,582 (the 30-point cap already sets most of those stops); the band
+   trade's stop 25 / 40 / 60% of the way from the band (or hard) stop to the signal close: median $13,737 / $11,311 /
+   $9,865, 5.8% lost at 60%. What helps gold (a wide first move, the stop at its start) does not carry over. Gold
+   confirmed by the overnight VWAP: not testable (the gold history has no volume). None used.
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-33; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |

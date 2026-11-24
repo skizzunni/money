@@ -50,7 +50,7 @@ def _tick(x, tick):
 
 def noise(days, i, tick, vwap=True, trend=0, hard=250.0, vwap_stop=False, pv=2.0, k=1.0, last=900, max_trades=9,
           be_r=0.0, stop_slip=2, nt=True, tp_r=0.0, tp_fill_bar=True, step=30, range_pos=0.0, tp_frac=1.0,
-          runner_lock=0.0, max_move=0.0, be_plus=0.0, counter_k=0.0, after_target="", move_free="", min_stretch=0.0, stretch_gap=False, move_ref="open", hard_vol=0.0, hard_lo=0.0, hard_hi=1e9, max_losses=0, strong_at=0.0, strong_tp=0.0, stale=0, band_ref="both", be_on="close", exit_at=955, trend_ema=False, check_off=0, strong_last=0, be_skip_strong=0.0, vwap_after_be=False):
+          runner_lock=0.0, max_move=0.0, be_plus=0.0, counter_k=0.0, after_target="", move_free="", min_stretch=0.0, stretch_gap=False, move_ref="open", hard_vol=0.0, hard_lo=0.0, hard_hi=1e9, max_losses=0, strong_at=0.0, strong_tp=0.0, stale=0, band_ref="both", be_on="close", exit_at=955, trend_ema=False, check_off=0, strong_last=0, be_skip_strong=0.0, vwap_after_be=False, band_stop_at=0.0):
     """The user's Clean Noise-Band spec (research/clean_noise_band.py): checks 10:00-15:00, the band (k x sigma) past
     max/min(open, prior close), the session VWAP agreeing, the band as a stop moved at the checks, a hard stop $hard a
     contract, out at 15:55. trend: also the close past the `trend`-session average of closes. be_r: the stop to entry +
@@ -195,6 +195,8 @@ def noise(days, i, tick, vwap=True, trend=0, hard=250.0, vwap_stop=False, pv=2.0
                     if want * (hard_ref - pend_stop) <= 0:  # VWAP on the wrong side of the fill (no VWAP entry filter):
                         raw = up if want > 0 else dn       # the band alone (a stop past the price would be rejected)
                         pend_stop = max(raw, hp) if want > 0 else min(raw, hp)
+                    if band_stop_at:  # research (2026-11-24): the stop part of the way from it to the signal close
+                        pend_stop = pend_stop + band_stop_at * (c[b] - pend_stop)
                     if nt:
                         pend_stop = _tick(pend_stop, tick)
         if not nt and mm[b] >= 955 and pos:
@@ -246,7 +248,7 @@ def gap_fade(days, i, tick, k=1.0, stop_mult=1.0, exit_m=715, n=20, fill=1.0):
     return [(side, 1, px, x, why)]
 
 
-def gap_go(days, i, tick, k=0.5, n=14, exit_m=955, r=0.0, cap=100.0, min_body=0.0, against_yday=False):
+def gap_go(days, i, tick, k=0.5, n=14, exit_m=955, r=0.0, cap=100.0, min_body=0.0, against_yday=False, stop_at=0.0):
     """Gap and go: a gap over k x the average with the 09:30 bar closing the gap's way; in at 09:35, stop at the 09:30
     open (at most cap points), target r x risk."""
     if i < n + 1:
@@ -265,7 +267,8 @@ def gap_go(days, i, tick, k=0.5, n=14, exit_m=955, r=0.0, cap=100.0, min_body=0.
     if against_yday and side * (pc - prev(days, i, "o")) > 0:  # research: only gaps against yesterday's direction
         return []
     e = d["c"][0] + side * tick  # the expected fill: the signal close + a tick (NinjaTrader sets the stop with the entry)
-    dist = min(max(abs(e - d["o"][0]), 4 * tick), cap)
+    ref = d["o"][0] + stop_at * (d["c"][0] - d["o"][0])  # research (2026-11-24): the stop part of the way to the close
+    dist = min(max(abs(e - ref), 4 * tick), cap)
     px, x, xb, why = walk(d, 1, side, e - side * dist, e + side * r * dist if r else np.nan, exit_m, tick, at_open=True)
     return [(side, 1, px, x, why, xb)]
 
