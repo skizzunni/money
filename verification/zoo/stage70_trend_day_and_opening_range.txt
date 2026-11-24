@@ -1,0 +1,22 @@
+Stage 70 (2026-11-24, a research round): the shipped trades split by yesterday's trend day and by the first half hour's
+range (both known at entry), then one more contract after a wild first half hour
+
+Splits (trades, PF, $ a trade; 1 MNQ): yesterday a trend day = closed in the top / bottom 20% of its range; the first
+half hour = the 09:30-10:00 range against its 14-session average (band trades only):
+                                      dev 2015-19            unseen NQ 2020-25       live
+same way as yesterday's trend day     355  1.33  $12.7       437  1.43  $19.6        18  9.76  $166.1
+against yesterday's trend day         220  1.31  $12.5       369  1.62  $28.1        12  5.54  $118.2
+yesterday no trend day                596  1.96  $30.8       617  1.79  $34.0        43  1.88  $32.9
+first half hour quiet (<0.7x)         124  1.37  $10.3       130  1.75  $34.7         1
+first half hour normal                543  1.38  $13.7       708  1.48  $21.4        41  4.11  $86.1
+first half hour wild (>1.4x)          206  1.96  $42.2       253  2.00  $46.6        11  8.49  $168.1
+gap trades                            298  1.88  $27.6       332  1.63  $25.4        20  1.30  $13.5
+
+No bucket weak in both periods (every PF 1.31 or more): nothing to skip. The wild first half hour is strong in all three,
+so one more band contract on those days (at most 3), fresh 50K starts by period:
+shipped:          2015-19 lost 0.0% med $13,639 p25 $5,256 | 2020-25 lost 0.0% med $18,453 p25 $15,085
++1 from 1.4x:     2015-19 lost 0.0% med $14,825 p25 $5,998 | 2020-25 lost 0.0% med $18,432 p25 $15,041
++1 from 1.75x:    2015-19 lost 0.0% med $13,877 p25 $6,209 | 2020-25 lost 0.0% med $18,432 p25 $15,144
++1 from 2.0x:     2015-19 lost 0.0% med $13,877 p25 $5,331 | 2020-25 lost 0.0% med $18,427 p25 $15,155
+
+Verdict: not shipped. 2015-19 gains, 2020-25 is flat (-$21 to +$70) at every threshold: extra size for one period.
