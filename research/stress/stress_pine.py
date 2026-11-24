@@ -1,3 +1,4 @@
+# ruff: noqa
 import sys, pickle, warnings, time; warnings.filterwarnings('ignore'); sys.path.insert(0, 'tests')
 import numpy as np, pandas as pd
 import test_ninjatrader_clean as T

@@ -1,3 +1,4 @@
+# ruff: noqa
 import sys, copy, pathlib, tempfile, warnings
 warnings.filterwarnings('ignore'); sys.path.insert(0, 'tests')
 import numpy as np

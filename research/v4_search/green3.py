@@ -15,7 +15,7 @@ from test_pine_v4 import V4
 from mnqbot.noise import NoiseConfig
 
 G = {"side_run_k": [0, 2, 3, 4], "side_run_skip": [1, 2, 4], "streak_k": [0, 3, 4, 5], "streak_skip": [1, 2], "max_losers": [0, 3]}
-V = [dict(zip(G, v)) for v in itertools.product(*G.values()) if (v[0] or v[1] == 1) and (v[2] or v[3] == 1)]
+V = [dict(zip(G, v, strict=True)) for v in itertools.product(*G.values()) if (v[0] or v[1] == 1) and (v[2] or v[3] == 1)]
 DAYS = ("2026-11-13", "2026-11-16", "2026-11-17")
 
 def cfg_of(v):

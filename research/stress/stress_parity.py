@@ -1,3 +1,4 @@
+# ruff: noqa
 """Stress: MnqCleanBand.cs on the NinjaTrader stand-in against the Python reference, trade for trade, on years of NQ."""
 import sys, pickle, warnings, time, pathlib, tempfile
 warnings.filterwarnings('ignore')

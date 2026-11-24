@@ -15,7 +15,7 @@ from test_pine_v4 import V4
 from mnqbot.noise import NoiseConfig
 
 G = {"partial_at": [0.0, 0.5, 0.75, 1.0, 1.5], "trail_points": [0.0, 20.0, 40.0, 60.0, 100.0], "lock_at": [0.75, 1.25]}
-V = [dict(zip(G, v)) for v in itertools.product(*G.values())]
+V = [dict(zip(G, v, strict=True)) for v in itertools.product(*G.values())]
 DAYS = ("2026-11-13", "2026-11-16", "2026-11-17")
 
 def cfg_of(v):

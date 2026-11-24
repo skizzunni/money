@@ -16,7 +16,7 @@ from mnqbot.noise import NoiseConfig
 
 G = {"check_step": [30, 15], "daily_loss_limit": [0.0, 600.0, 900.0, 1250.0], "max_losers": [0, 2, 3],
      "day_stop_late_from": [0, 720, 780], "partial_at": [0.0, 1.0], "last_entry_end": [900, 930]}
-V = [dict(zip(G, v)) for v in itertools.product(*G.values())]
+V = [dict(zip(G, v, strict=True)) for v in itertools.product(*G.values())]
 DAYS = ("2026-11-13", "2026-11-16", "2026-11-17")
 
 def cfg_of(v):
