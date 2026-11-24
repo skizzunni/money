@@ -551,6 +551,11 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    4 of 12 years down $400-480, about +$125 a year a contract. Not shipped: too small and uneven for a new live order
    rule; re-check with live data.
 
+59. **Another target for later entries** (2026-11-24, a research round; `noise` late_at / late_tp,
+   `verification/zoo/stage53_late_target.txt`). 1.5 / 2.0 / 3.0R for band entries after 11:00-13:00: median
+   $15,411-16,484 against $16,582 and the TradingView window $7,824-9,496 against $9,796. Rejected: afternoon breaks
+   reach 2.5R often enough before 15:55.
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-33; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |

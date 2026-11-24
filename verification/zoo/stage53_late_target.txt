@@ -1,0 +1,16 @@
+Stage 53 (2026-11-24, a research round): another target for later band entries (strats.noise late_at / late_tp)
+
+Band entries whose check ends after late_at take late_tp x the $200 hard stop as the target instead of 2.5. bench.py
+(104 fresh 50K starts, dev + unseen NQ; the TradingView window):
+
+shipped (2.5R all day): lost 0.0% median $16,582 p25 $11,321 | TV $+9,796 PF 4.25 | dev PF 1.60 $5,119/yr | unseen_nq PF 1.59 $6,971/yr
+2.0R after 11:00:       lost 0.0% median $15,828 p25 $11,637 | TV $+8,124 PF 3.69 | dev PF 1.61 $5,263/yr | unseen_nq PF 1.56 $6,737/yr
+2.0R after 11:30:       lost 0.0% median $16,190 p25 $11,153 | TV $+8,524 PF 3.83 | dev PF 1.59 $5,081/yr | unseen_nq PF 1.58 $6,874/yr
+2.0R after 12:00:       lost 0.0% median $16,484 p25 $11,673 | TV $+8,524 PF 3.83 | dev PF 1.60 $5,175/yr | unseen_nq PF 1.59 $6,949/yr
+1.5R after 12:00:       lost 0.0% median $16,131 p25 $11,354 | TV $+7,824 PF 3.59 | dev PF 1.59 $5,051/yr | unseen_nq PF 1.56 $6,686/yr
+3.0R after 12:00:       lost 0.0% median $15,411 p25 $10,976 | TV $+8,667 PF 3.81 | dev PF 1.61 $5,219/yr | unseen_nq PF 1.59 $6,886/yr
+2.0R after 13:00:       lost 0.0% median $16,476 p25 $11,213 | TV $+9,496 PF 4.15 | dev PF 1.61 $5,220/yr | unseen_nq PF 1.59 $6,963/yr
+
+Rejected: every setting lowers the median and the TradingView window ($300-1,970). Afternoon breaks reach 2.5R often
+enough before 15:55. The other candidate, a stop measured from the band, is the shipped rule already (the stop is the
+tighter of the band and $200 from the fill).
