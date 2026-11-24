@@ -698,6 +698,9 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    12 years up, about $54 a year a contract. One setting's default, no new code: shipped (`GapK` 0.6, Pine "Gap at
    least").
 
+88. **The gap stop cap again** (2026-11-24, a research round; `verification/zoo/stage82_gap_stop_cap.txt`). 25 points:
+   medians and the window up, both 25th percentiles down; 35: mixed. 30 points stays.
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-33; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |

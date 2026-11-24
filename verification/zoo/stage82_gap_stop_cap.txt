@@ -1,0 +1,9 @@
+Stage 82 (2026-11-24, a research round): the gap trade's stop cap (30 points) again, with sections 61 and 87 in.
+Fresh 50K starts by period, the TradingView window:
+
+30 points (shipped): 2015-19 lost 0.0% med $14,028 p25 $5,324 | 2020-25 lost 0.0% med $18,980 p25 $15,811 | TV $+10,063 50tr PF 4.66
+25 points:           2015-19 lost 0.0% med $14,068 p25 $5,116 | 2020-25 lost 0.0% med $19,175 p25 $15,312 | TV $+10,193 50tr PF 4.89
+35 points:           2015-19 lost 0.0% med $13,618 p25 $6,470 | 2020-25 lost 0.0% med $18,931 p25 $15,515 | TV $+9,933 50tr PF 4.45
+
+Verdict: 30 points stays. 25 lifts the medians and the window but lowers both 25th percentiles ($208 / $499); 35 lifts
+2015-19's 25th percentile but is lower on the rest. Neither beats 30 on every gate.
