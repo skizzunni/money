@@ -9,8 +9,8 @@
 //   * stop: the tighter of the band (or VWAP) and $200 a contract from the expected fill; moved at each check, never
 //     looser; back at or past it: out at market. Break-even once up 0.4 x $200; take profit at 2.5 x $200; out at 15:55;
 //   * no new entry once the day is down $600; 1 / 2 / 3 contracts from +$2,000 / +$4,500;
-//   * gap trade (once +$4,500 up): a gap of 1x the 14-session average whose 09:30 bar closes its way, in at 09:35, the
-//     stop at the 09:30 open (at most 50 points), out at 09:55.
+//   * gap trade: a gap of 0.5x the 14-session average whose 09:30 bar closes its way, in at 09:35, the stop at the
+//     09:30 open (at most 30 points), out at 09:55.
 strategy("MNQ Clean Noise-Band", overlay = true, default_qty_type = strategy.fixed, default_qty_value = 1, pyramiding = 0,
      commission_type = strategy.commission.cash_per_contract, commission_value = 0.62, slippage = 1)
 
@@ -32,9 +32,9 @@ step2 = input.float(2000, "2 contracts from this profit $", minval = 0)
 step3 = input.float(4500, "3 contracts from this profit $", minval = 0)
 startProfit = input.float(0, "Profit already made at the start $")
 gapLeg = input.bool(true, "Gap trade (09:35-09:55)")
-gapFrom = input.float(4500, "Gap trade only from this profit $")
-gapK = input.float(1.0, "Gap at least this many 14-session average gaps", minval = 0, step = 0.1)
-gapCap = input.float(50, "Gap stop at most this many points", minval = 1)
+gapFrom = input.float(0, "Gap trade only from this profit $ (0 = always)")
+gapK = input.float(0.5, "Gap at least this many 14-session average gaps", minval = 0, step = 0.1)
+gapCap = input.float(30, "Gap stop at most this many points", minval = 1)
 blockHole = input.bool(true, "No trading when the chart's history has a hole")
 newsDays = input.bool(true, "News days (needs extended hours: the 08:30 volume)")
 newsBig = input.float(6, "Big news: a contract more from this 08:30 volume spike (x)", minval = 1)
@@ -140,7 +140,7 @@ if inRth and dayNum != tDay
             array.set(sig, k, all ? m / 14 : na)
         prof = startProfit + strategy.netprofit
         qty := fixedQty > 0 ? fixedQty : math.min(prof >= step3 ? 3 : prof >= step2 ? 2 : 1, maxQty)
-        gapToday := gapLeg and prof >= gapFrom
+        gapToday := gapLeg and (gapFrom <= 0 or prof >= gapFrom)
         spike := preDay == dayNum and preBars == 2 and preVol > 0 and not na(atVol) ? atVol / (preVol / 2) : na
         newsSkip := false
         if newsDays and not na(spike)

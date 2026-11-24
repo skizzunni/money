@@ -23,7 +23,7 @@ import harness as H  # noqa: E402
 import strats as S  # noqa: E402
 
 DEFAULTS = dict(vwap=False, trend=20, hard=200.0, vwap_stop=True, k=1.0, be_r=0.4, max_trades=9, last=840, tp_r=2.5)
-GAP = dict(k=1.0, exit_m=590, r=0.0, cap=50.0)
+GAP = dict(k=0.5, exit_m=590, r=0.0, cap=30.0)
 
 
 def fixture_days() -> list:
@@ -76,7 +76,7 @@ def run_nt(sim, path: Path, **props) -> list:  # noqa: F811
     return [x.split(",")[1:] for x in r.stdout.splitlines() if x.startswith("T,")]
 
 
-def py_trades(days: list, idx: list, day_stop: float = 0.0, steps=None, gap_from: float | None = 4500.0,
+def py_trades(days: list, idx: list, day_stop: float = 0.0, steps=None, gap_from: float | None = 0.0,
               start: float = 0.0, **p) -> list:
     """The reference trades as (direction, entry bar, entry, exit, contracts), with the account rules the C# applies:
     contracts by the profit at the day's start, the gap leg (first in the day) once the profit reaches gap_from, the day
@@ -92,7 +92,7 @@ def py_trades(days: list, idx: list, day_stop: float = 0.0, steps=None, gap_from
                     q = qq
         day = 0.0
         legs = []
-        if gap_from is not None and cum >= gap_from and i >= max(21, cfg["trend"] + 1):
+        if gap_from is not None and (gap_from <= 0 or cum >= gap_from) and i >= max(21, cfg["trend"] + 1):
             legs += S.gap_go(days, i, 0.25, **GAP)
         legs += S.noise(days, i, 0.25, stop_slip=1, nt=True, **cfg)
         for side, eb, epx, xpx, _why, *_ in legs:
@@ -155,8 +155,8 @@ def test_clean_band_gap_leg(sim, tmp_path):  # noqa: F811
     days = fixture_days()
     path = tmp_path / "bars.csv"
     idx = write_bars(days, path)
-    nt = run_nt(sim, path, MaxContracts=1, DayStop=0, GapFrom=0, StartProfit=100000)
-    ref = py_trades(days, idx, gap_from=0.0, start=100000.0)
+    nt = run_nt(sim, path, MaxContracts=1, DayStop=0)
+    ref = py_trades(days, idx)
     got = [(int(t[0]), int(t[1]), round(float(t[2]), 6), round(float(t[4]), 6)) for t in nt]
     assert got == [(s, b, e, x) for s, b, e, x, _q in ref]
     names = {x[5] for x in nt}
@@ -322,7 +322,7 @@ def test_clean_band_news_days(sim, tmp_path):  # noqa: F811
             continue
         if spikes[i] >= 6:
             q = min(q + 1, 3)
-        legs = (S.gap_go(days, i, 0.25, **GAP) if cum >= 4500 and i >= 21 else []) + S.noise(days, i, 0.25, stop_slip=1, nt=True, **DEFAULTS)
+        legs = (S.gap_go(days, i, 0.25, **GAP) if i >= 21 else []) + S.noise(days, i, 0.25, stop_slip=1, nt=True, **DEFAULTS)
         for side, eb, epx, xpx, _w, *_ in legs:
             day += ((xpx - epx) * side * 2.0 - 2 * 0.62) * q
             ref.append((side, pos_of[(i, eb)], round(epx, 6), round(xpx, 6), q))

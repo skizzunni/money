@@ -31,8 +31,8 @@ def bars_of(days: list) -> tuple[pd.DataFrame, list]:
 @pytest.mark.parametrize("inputs,kw", [
     ({"Most contracts": 1, "Day stop: no new entry once the day is down $ (0 = off)": 0}, {}),
     ({}, {"day_stop": 600.0, "steps": ((0, 1), (2000, 2), (4500, 3))}),
-    ({"Most contracts": 1, "Day stop: no new entry once the day is down $ (0 = off)": 0, "Gap trade only from this profit $": 0,
-      "Profit already made at the start $": 100000}, {"gap_from": 0.0, "start": 100000.0}),
+    ({"Most contracts": 1, "Day stop: no new entry once the day is down $ (0 = off)": 0, "Gap trade only from this profit $ (0 = always)": 0,
+      "Profit already made at the start $": 100000}, {"start": 100000.0}),
 ])
 def test_pine_clean_band_matches_python(inputs, kw):
     pytest.importorskip("pynescript", reason="pip install pynescript to check the .pine files")
@@ -79,7 +79,7 @@ def test_pine_clean_band_news_days():
             continue
         if spikes[i] >= 6:
             q = min(q + 1, 3)
-        legs = (S.gap_go(days, i, 0.25, **GAP) if cum >= 4500 and i >= 21 else []) + S.noise(days, i, 0.25, stop_slip=1, nt=True, tp_fill_bar=False, **DEFAULTS)
+        legs = (S.gap_go(days, i, 0.25, **GAP) if i >= 21 else []) + S.noise(days, i, 0.25, stop_slip=1, nt=True, tp_fill_bar=False, **DEFAULTS)
         day = 0.0
         for side, eb, epx, xpx, _w, *_ in legs:
             day += ((xpx - epx) * side * 2.0 - 2 * 0.62) * q

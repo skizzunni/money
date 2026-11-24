@@ -91,9 +91,9 @@ namespace NinjaTrader.NinjaScript.Strategies
                 BlockOnDataGap = true;
                 TakeProfitAt = 2.5;
                 GapLeg = true;
-                GapFrom = 4500;
-                GapK = 1.0;
-                GapCap = 50;
+                GapFrom = 0;  // 2026-11-24: from day one with the news-day rule: 0 of 104 starts lost, more days (docs 19)
+                GapK = 0.5;
+                GapCap = 30;
                 NewsDays = true;
                 NewsBigAt = 6;
                 NewsSkipFrom = 2;
@@ -106,7 +106,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 double prof = Profit();
                 qty = Contracts(prof);
                 early = EarlyMaxTrades > 0 && prof < EarlyCushion;
-                gapToday = GapLeg && prof >= GapFrom && ready;
+                gapToday = GapLeg && (GapFrom <= 0 || prof >= GapFrom) && ready;
                 ApplyNews();
                 Print("Clean band live: profit over the start balance $" + prof.ToString("F0", CultureInfo.InvariantCulture) + ", " + qty +
                       " MNQ a trade, gap trade " + (gapToday ? "on" : "off") + (ready ? "" : " - NOT READY (history)"));
@@ -202,7 +202,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             double prof = Profit();
             qty = Contracts(prof);
             early = EarlyMaxTrades > 0 && prof < EarlyCushion;  // decided at the day's start
-            gapToday = GapLeg && prof >= GapFrom;  // the gap leg only once the account has its cushion
+            gapToday = GapLeg && (GapFrom <= 0 || prof >= GapFrom);  // GapFrom 0: always; else once the account has that cushion
             newsSpike = preDate == date && preBars == 2 && preVol > 0 && !double.IsNaN(atVol) ? atVol / (preVol / 2) : double.NaN;
             ApplyNews();
         }
@@ -520,7 +520,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         [NinjaScriptProperty]
         [Range(0, 100000)]
-        [Display(Name = "Gap trade only from this profit $", Order = 2, GroupName = "5. Gap trade")]
+        [Display(Name = "Gap trade only from this profit $ (0 = always)", Order = 2, GroupName = "5. Gap trade")]
         public double GapFrom { get; set; }
 
         [NinjaScriptProperty]

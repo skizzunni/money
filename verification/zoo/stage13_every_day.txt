@@ -1,0 +1,35 @@
+now: band (+gap from +$4.5K): 50K lost 1.0%  median $9,660  p25 $4,308
+     dev       days traded  35%  trades/day 0.8  PF 1.41  red days 64%  net/yr(1 MNQ) $3,508
+     unseen_nq days traded  35%  trades/day 0.9  PF 1.48  red days 60%  net/yr(1 MNQ) $5,319
+     unseen_es days traded  37%  trades/day 0.7  PF 1.17  red days 67%  net/yr(1 MNQ) $591
+     live      days traded  21%  trades/day 0.7  PF 2.85  red days 45%  net/yr(1 MNQ) $11,091
+band + gap: 50K lost 6.7%  median $12,332  p25 $7,058
+     dev       days traded  45%  trades/day 1.0  PF 1.49  red days 61%  net/yr(1 MNQ) $4,882
+     unseen_nq days traded  46%  trades/day 1.1  PF 1.53  red days 60%  net/yr(1 MNQ) $6,926
+     unseen_es days traded  44%  trades/day 0.9  PF 1.09  red days 68%  net/yr(1 MNQ) $383
+     live      days traded  30%  trades/day 0.8  PF 2.72  red days 58%  net/yr(1 MNQ) $13,758
+band + gap + news fade: 50K lost 10.6%  median $13,587  p25 $5,748
+     dev       days traded  49%  trades/day 1.1  PF 1.48  red days 59%  net/yr(1 MNQ) $5,354
+     unseen_nq days traded  53%  trades/day 1.2  PF 1.45  red days 55%  net/yr(1 MNQ) $7,548
+     unseen_es days traded  51%  trades/day 1.0  PF 1.14  red days 61%  net/yr(1 MNQ) $687
+     live      days traded  32%  trades/day 0.9  PF 2.55  red days 58%  net/yr(1 MNQ) $13,634
+band + gap(0.5x) + news fade: 50K lost 10.6%  median $14,087  p25 $6,729
+     dev       days traded  56%  trades/day 1.2  PF 1.45  red days 61%  net/yr(1 MNQ) $5,448
+     unseen_nq days traded  58%  trades/day 1.3  PF 1.43  red days 57%  net/yr(1 MNQ) $7,655
+     unseen_es days traded  57%  trades/day 1.1  PF 1.13  red days 61%  net/yr(1 MNQ) $638
+     live      days traded  40%  trades/day 1.0  PF 2.57  red days 57%  net/yr(1 MNQ) $14,976
+band + gap + news + ORB15: 50K lost 43.3%  median $5,973  p25 $-455
+     dev       days traded  99%  trades/day 1.6  PF 1.28  red days 70%  net/yr(1 MNQ) $6,100
+     unseen_nq days traded 100%  trades/day 1.8  PF 1.24  red days 71%  net/yr(1 MNQ) $6,899
+     unseen_es days traded 100%  trades/day 1.5  PF 1.11  red days 66%  net/yr(1 MNQ) $1,152
+     live      days traded  99%  trades/day 1.6  PF 1.46  red days 75%  net/yr(1 MNQ) $10,678
+band + gap + news + ORB15 2R: 50K lost 34.6%  median $4,039  p25 $-125
+     dev       days traded  99%  trades/day 1.9  PF 1.20  red days 60%  net/yr(1 MNQ) $4,392
+     unseen_nq days traded 100%  trades/day 2.0  PF 1.21  red days 60%  net/yr(1 MNQ) $5,867
+     unseen_es days traded 100%  trades/day 1.6  PF 1.06  red days 60%  net/yr(1 MNQ) $652
+     live      days traded  99%  trades/day 1.7  PF 1.54  red days 64%  net/yr(1 MNQ) $11,348
+band + ORB15: 50K lost 46.2%  median $2,241  p25 $-572
+     dev       days traded  99%  trades/day 1.4  PF 1.23  red days 75%  net/yr(1 MNQ) $4,640
+     unseen_nq days traded 100%  trades/day 1.5  PF 1.21  red days 78%  net/yr(1 MNQ) $5,120
+     unseen_es days traded 100%  trades/day 1.2  PF 1.06  red days 69%  net/yr(1 MNQ) $620
+     live      days traded  99%  trades/day 1.5  PF 1.37  red days 77%  net/yr(1 MNQ) $7,801

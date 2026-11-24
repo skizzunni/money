@@ -149,9 +149,9 @@ def orb(days, i, tick, n=30, stop="far", r=0.0, cap=80.0, last=900, exit_m=955, 
             e = d["o"][b + 1] + side * tick
             ref = (lw if side > 0 else hi) if stop == "far" else (hi + lw) / 2
             dist = min(max(abs(e - ref), 4 * tick), cap)
-            px, x, _, why = walk(d, b + 1, side, e - side * dist, e + side * r * dist if r else np.nan, exit_m, tick,
-                                 be_at=be * dist if be else np.nan)
-            return [(side, b + 1, px, x, why)]
+            px, x, xb, why = walk(d, b + 1, side, e - side * dist, e + side * r * dist if r else np.nan, exit_m, tick,
+                                  be_at=be * dist if be else np.nan)
+            return [(side, b + 1, px, x, why, xb)]
     return []
 
 
@@ -736,3 +736,12 @@ def tjr(days, i, tick, levels="sess+pd", cont="eq", stop_at="retrace", tgt="liq1
                     return [(side, r + 1, px, x, why, xb)]
         return []
     return []
+
+
+
+def everyday(days, i, tick, legs=(), **_):
+    """Several legs on one account, one position at a time (S.merge: the earlier entry first)."""
+    out = []
+    for name, p in legs:
+        out += globals()[name](days, i, tick, **p) or []
+    return merge(out)

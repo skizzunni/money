@@ -150,6 +150,15 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    hard stop) turns some full losses into scratches (full losses 19% to 16%) but lowers the median ($12,418 to
    $9,342-10,205), and entries to 14:30 lose 3.8-4.8% of starts: the shipped 0.4 and 14:00 stay.
 
+19. **More trading days** (2026-11-24, the user: "I cannot do 73 days of no trade"; `verification/zoo/stage13_*`).
+   Trading every day costs accounts: adding the 15-minute opening-range breakout (the best every-day family, PF
+   1.13-1.17) to the band, gap and news fade trades 99-100% of days but 70-78% of them red and loses 35-46% of 50K
+   starts. With the news-day rule on, the gap trade from day one does not: gap at least 0.5x the 14-session average,
+   its stop at most 30 points (it was 1x and 50 points, from +$4,500): **0 of 104 starts lost, median $13,711 (from
+   $12,418), 25th percentile $7,471 (from $6,878), days traded 45% on unseen NQ (from 35-40%), 36% live**; every gap
+   size tried with the 30-point stop (0.3 / 0.5 / 1x) loses none, the 50-point stop with smaller gaps 1.9-2.9%.
+   Shipped: `GapFrom` 0 (= always), `GapK` 0.5, `GapCap` 30; NinjaTrader and Pine trade for trade (20 tests).
+
 ## The result (the shipped defaults, research numbers, 2 ticks of stop slippage, $0.62 a side)
 
 | set | band trades | win | PF | band net (1 MNQ) | gap trades (PF, net) | 50K starts lost | median 12 months |

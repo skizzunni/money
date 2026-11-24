@@ -1,0 +1,12 @@
+band + gap from day one (gap >= 1.0x avg, stop <= 50 pts), mild-news skip: lost 0.0%  median $13,722  p25 $8,417  |  unseen_nq: days traded  40%  red days 59%  |  live: days traded  28%  red days 62%
+band + gap from day one (gap >= 1.0x avg, stop <= 50 pts), no skip: lost 6.7%  median $12,332  p25 $7,058  |  unseen_nq: days traded  46%  red days 60%  |  live: days traded  30%  red days 58%
+band + gap from day one (gap >= 1.0x avg, stop <= 30 pts), mild-news skip: lost 0.0%  median $12,627  p25 $7,502  |  unseen_nq: days traded  40%  red days 61%  |  live: days traded  28%  red days 62%
+band + gap from day one (gap >= 1.0x avg, stop <= 30 pts), no skip: lost 2.9%  median $11,609  p25 $6,935  |  unseen_nq: days traded  46%  red days 62%  |  live: days traded  30%  red days 58%
+band + gap from day one (gap >= 0.5x avg, stop <= 50 pts), mild-news skip: lost 1.9%  median $14,280  p25 $7,000  |  unseen_nq: days traded  45%  red days 61%  |  live: days traded  36%  red days 59%
+band + gap from day one (gap >= 0.5x avg, stop <= 50 pts), no skip: lost 4.8%  median $12,170  p25 $6,434  |  unseen_nq: days traded  52%  red days 62%  |  live: days traded  38%  red days 57%
+band + gap from day one (gap >= 0.5x avg, stop <= 30 pts), mild-news skip: lost 0.0%  median $13,711  p25 $7,471  |  unseen_nq: days traded  45%  red days 63%  |  live: days traded  36%  red days 68%
+band + gap from day one (gap >= 0.5x avg, stop <= 30 pts), no skip: lost 4.8%  median $11,931  p25 $6,364  |  unseen_nq: days traded  52%  red days 65%  |  live: days traded  38%  red days 65%
+band + gap from day one (gap >= 0.3x avg, stop <= 50 pts), mild-news skip: lost 2.9%  median $14,343  p25 $7,925  |  unseen_nq: days traded  48%  red days 62%  |  live: days traded  39%  red days 63%
+band + gap from day one (gap >= 0.3x avg, stop <= 50 pts), no skip: lost 5.8%  median $13,194  p25 $6,417  |  unseen_nq: days traded  55%  red days 62%  |  live: days traded  44%  red days 61%
+band + gap from day one (gap >= 0.3x avg, stop <= 30 pts), mild-news skip: lost 0.0%  median $14,772  p25 $9,166  |  unseen_nq: days traded  48%  red days 65%  |  live: days traded  39%  red days 71%
+band + gap from day one (gap >= 0.3x avg, stop <= 30 pts), no skip: lost 3.8%  median $13,143  p25 $6,369  |  unseen_nq: days traded  55%  red days 66%  |  live: days traded  44%  red days 67%
