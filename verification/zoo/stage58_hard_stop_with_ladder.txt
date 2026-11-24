@@ -1,0 +1,9 @@
+Stage 58 (2026-11-24, a research round): the hard stop again, with section 61's stop step and wild-open skip in
+
+bench.py (104 fresh 50K starts, dev + unseen NQ; the TradingView window):
+$200 (shipped): lost 0.0% median $16,931 p25 $12,040 | TV $+9,921 52tr PF 4.43 | dev 1.62 $5,176 | unseen_nq 1.63 $7,349 | live 3.57 $14,112
+$175:           lost 0.0% median $15,624 p25 $9,578  | TV $+8,294 53tr PF 4.07 | dev 1.55 $4,935 | unseen_nq 1.59 $7,035 | live 3.37 $12,687
+$225:           lost 3.8% median $16,233 p25 $10,673 | TV $+9,408 50tr PF 4.18 | dev 1.68 $5,722 | unseen_nq 1.66 $7,452 | live 3.43 $13,484
+
+Verdict: $200 stays. $175 is lower on every gate; $225 loses 3.8% of starts (as before the stop step, section 32).
+The risk settings are still at their edge: never loosen them.

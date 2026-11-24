@@ -581,6 +581,9 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
 63. **Break-even again, with 61 in** (2026-11-24, a research round; `verification/zoo/stage57_break_even_with_ladder.txt`).
    0.3R: median $14,917, 25th percentile $8,803; 0.5R: 3.8% of starts lost. 0.4R stays.
 
+64. **The hard stop again, with 61 in** (2026-11-24, a research round; `verification/zoo/stage58_hard_stop_with_ladder.txt`).
+   $175: median $15,624, the window +$8,294; $225: 3.8% of starts lost. $200 stays.
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-33; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |
