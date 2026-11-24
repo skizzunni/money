@@ -468,6 +468,21 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    $9,865, 5.8% lost at 60%. What helps gold (a wide first move, the stop at its start) does not carry over. Gold
    confirmed by the overnight VWAP: not testable (the gold history has no volume). None used.
 
+49. **Live-readiness: slippage and shuffled years** (2026-11-24, a research round; `research/stress/montecarlo.py`,
+   `verification/zoo/stage43_slippage_montecarlo.txt`; the shipped MNQ + gold with the cushion guard).
+   - Slippage: 1 / 2 / 3 / 5 extra ticks a side on every trade: PF dev 1.56 / 1.53 / 1.49 / 1.42, unseen NQ 1.56 /
+     1.53 / 1.50 / 1.45, live 3.27 / 3.20 / 3.12 / 2.98 (ES under 1 from 2 ticks); fresh 50K starts still 0 lost, median
+     $15,506 / $14,882 / $14,211 / $12,445; from $48,806 / $48,998: 3.6-4.5% / 1.8-2.7% lost up to 3 ticks, 8.9% / 4.5%
+     at 5. The edge holds through realistic fills.
+   - **Shuffled years** (2,000 runs of 252 days drawn at random from 2020 - Mar 2025, MNQ + gold, the guard): a fresh 50K
+     is lost in **6.3%** of years (median +$16,632, the worst 10% +$1,868); from $48,806 **18.9%**, from $48,998
+     **14.5%**. The 0 of 104 calendar starts is the history as it happened; drawn in any order, losing days can come
+     before the cushion does. That is the realistic risk (the walk-forward of section 7 said 5.7%).
+   - Against it, in the same 2,000 runs: the guard from $2,000 / $2,500 / $3,000 (and a 15% day stop) 5.7% / 4.7% / 4.1%
+     fresh, 17.8% / 17.1% / 16.8% from $48,806, at $1,500-4,000 of median; only gold (no MNQ) while guarded: 1 MGC
+     0.0-0.1% lost but the account barely moves (median +$165), 3 MGC 19-30% lost. Nothing removes the risk without
+     removing the profit: none used.
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-33; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |

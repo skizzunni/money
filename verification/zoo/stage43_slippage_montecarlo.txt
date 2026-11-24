@@ -1,0 +1,21 @@
+shipped, 0 extra ticks of slippage a side: $50,000: lost 0.0% med $16,251 p25 $11,745 | $48,806: lost 4.5% med $3,102 p25 $2,064 | $48,998: lost 0.9% med $3,468 p25 $2,349 | $49,500: lost 0.0% med $3,822 p25 $2,394
+shipped, 1 extra ticks of slippage a side: $50,000: lost 0.0% med $15,506 p25 $10,903 | $48,806: lost 3.6% med $3,054 p25 $2,001 | $48,998: lost 1.8% med $3,118 p25 $2,167 | $49,500: lost 0.0% med $3,765 p25 $2,371
+shipped, 2 extra ticks of slippage a side: $50,000: lost 0.0% med $14,882 p25 $9,837 | $48,806: lost 3.6% med $2,879 p25 $2,039 | $48,998: lost 1.8% med $2,978 p25 $2,061 | $49,500: lost 0.0% med $3,514 p25 $2,140
+shipped, 3 extra ticks of slippage a side: $50,000: lost 0.0% med $14,211 p25 $9,156 | $48,806: lost 4.5% med $2,748 p25 $1,711 | $48,998: lost 2.7% med $2,741 p25 $1,774 | $49,500: lost 0.0% med $3,200 p25 $1,930
+shipped, 5 extra ticks of slippage a side: $50,000: lost 0.0% med $12,445 p25 $7,057 | $48,806: lost 8.9% med $2,391 p25 $1,094 | $48,998: lost 4.5% med $2,457 p25 $1,257 | $49,500: lost 0.0% med $2,518 p25 $1,608
+start $50,000: blown 6.3% of 2,000 shuffled years | 12-month result median $16,632, worst 10% $1,868 | lowest balance median $49,747, worst 5% $48,644
+start $48,806: blown 18.9% of 2,000 shuffled years | 12-month result median $12,811, worst 10% $-832 | lowest balance median $48,561, worst 5% $48,034
+start $48,998: blown 14.5% of 2,000 shuffled years | 12-month result median $14,351, worst 10% $-706 | lowest balance median $48,763, worst 5% $48,047
+shipped: guard under $1,500, day stop 25% of the cushion: $50,000: blown 6.3% med $16,632 | $48,806: blown 18.9% med $12,811 | $48,998: blown 14.5% med $14,351
+guard under $2,000: $50,000: blown 5.7% med $15,173 | $48,806: blown 17.8% med $11,489 | $48,998: blown 13.5% med $12,811
+guard under $2,500: $50,000: blown 4.7% med $13,721 | $48,806: blown 17.1% med $10,078 | $48,998: blown 12.8% med $11,523
+guard under $2,000, day stop 15%: $50,000: blown 5.5% med $14,881 | $48,806: blown 17.8% med $11,297 | $48,998: blown 13.9% med $12,397
+guard under $1,500, day stop 15%: $50,000: blown 6.6% med $16,331 | $48,806: blown 18.9% med $12,571 | $48,998: blown 14.3% med $13,845
+guard under $3,000, day stop 15%: $50,000: blown 4.1% med $12,657 | $48,806: blown 16.8% med $9,046 | $48,998: blown 12.7% med $10,386
+day stop $400 always + guard: $50,000: blown 6.3% med $16,632 | $48,806: blown 18.9% med $12,811 | $48,998: blown 14.5% med $14,351
+shipped: $50,000: blown 6.3% med $16,632 | $48,806: blown 18.9% med $12,811 | $48,998: blown 14.5% med $14,351
+guarded: gold only (1 MGC), no MNQ: $50,000: blown 0.0% med $1,188 | $48,806: blown 0.1% med $165 | $48,998: blown 0.0% med $164
+guarded: gold only (3 MGC), no MNQ: $50,000: blown 3.6% med $3,156 | $48,806: blown 29.8% med $202 | $48,998: blown 19.3% med $574
+guarded: MNQ 1 + gold 1: $50,000: blown 6.7% med $16,652 | $48,806: blown 19.7% med $13,007 | $48,998: blown 14.8% med $14,342
+guard under $2,000: gold only (3 MGC): $50,000: blown 0.8% med $689 | $48,806: blown 29.1% med $240 | $48,998: blown 18.4% med $603
+guard under $1,000: gold only (3 MGC): $50,000: blown 10.3% med $14,107 | $48,806: blown 33.2% med $697 | $48,998: blown 21.1% med $1,658
