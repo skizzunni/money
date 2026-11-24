@@ -414,6 +414,13 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    but median -$1,002 and 25th percentile -$790; 10:10 / 10:15 lower everywhere). Re-entries after a target were
    section 25.
 
+42. **Gold's size** (2026-11-24, a research round; `verification/zoo/stage36_gold_sizing.txt`; with the cushion guard).
+   With the 60% stop a gold trade risks about $12 a contract (half between $7 and $23, at most $178). Sized to $100-250
+   of risk a step but at most 3 MGC: no change (median $16,282 against $16,251, the 25th percentile lower); a contract
+   more on big-news days: no change. Above the user's 3-contract rule (not used; the user's to decide): at most 5 MGC
+   ($100 a step) median $16,510 / 25th percentile $12,240, at most 10 MGC median $18,132 / 25th percentile $11,421;
+   accounts started near the floor unchanged (4.5% / 0.9% lost).
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-33; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |

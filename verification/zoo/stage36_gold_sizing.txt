@@ -1,0 +1,12 @@
+gold risk a contract: median $12, 25-75% $7-23, max $178
+gold sized like MNQ (now): $50,000: lost 0.0% med $16,251 p25 $11,745 | $48,806: lost 4.5% med $3,102 p25 $2,064 | $48,998: lost 0.9% med $3,468 p25 $2,349
+gold sized like MNQ (now), +1 on big-news days: $50,000: lost 0.0% med $16,249 p25 $11,760 | $48,806: lost 4.5% med $3,122 p25 $2,064 | $48,998: lost 0.9% med $3,468 p25 $2,349
+gold sized to $100 of risk a step: $50,000: lost 0.0% med $16,282 p25 $11,430 | $48,806: lost 4.5% med $3,104 p25 $2,023 | $48,998: lost 0.9% med $3,271 p25 $2,344
+gold sized to $150 of risk a step: $50,000: lost 0.0% med $16,282 p25 $11,499 | $48,806: lost 4.5% med $3,104 p25 $2,023 | $48,998: lost 0.9% med $3,253 p25 $2,344
+gold sized to $200 of risk a step: $50,000: lost 0.0% med $16,282 p25 $11,548 | $48,806: lost 4.5% med $3,104 p25 $2,023 | $48,998: lost 0.9% med $3,274 p25 $2,344
+gold sized to $250 of risk a step: $50,000: lost 0.0% med $16,282 p25 $11,548 | $48,806: lost 4.5% med $3,121 p25 $2,023 | $48,998: lost 0.9% med $3,274 p25 $2,344
+gold sized like MNQ, at most 3 (now): $50,000: lost 0.0% med $16,251 p25 $11,745 | $48,806: lost 4.5% med $3,102 p25 $2,064 | $48,998: lost 0.9% med $3,468 p25 $2,349
+gold sized to $50 of risk a step, at most 5 MGC: $50,000: lost 0.0% med $16,401 p25 $12,158 | $48,806: lost 4.5% med $3,068 p25 $2,035 | $48,998: lost 0.9% med $3,392 p25 $2,221
+gold sized to $100 of risk a step, at most 5 MGC: $50,000: lost 0.0% med $16,510 p25 $12,240 | $48,806: lost 4.5% med $3,069 p25 $1,956 | $48,998: lost 0.9% med $3,305 p25 $2,160
+gold sized to $50 of risk a step, at most 10 MGC: $50,000: lost 0.0% med $17,503 p25 $11,988 | $48,806: lost 4.5% med $3,035 p25 $2,035 | $48,998: lost 0.9% med $3,276 p25 $2,147
+gold sized to $100 of risk a step, at most 10 MGC: $50,000: lost 0.0% med $18,132 p25 $11,421 | $48,806: lost 4.5% med $3,049 p25 $1,914 | $48,998: lost 0.9% med $3,176 p25 $2,231
