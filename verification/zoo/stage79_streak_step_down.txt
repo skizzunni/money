@@ -1,0 +1,11 @@
+Stage 79 (2026-11-24, a research round): one contract fewer after two losing traded days in a row (back after a green
+day). Shuffled days cannot test a streak rule (they remove the order of days), so this runs on the real sequence: the
+fresh 50K starts by period (harness.account with the rule as the day's size; the two previous traded days' results are
+known at the day's start).
+
+shipped:                                   2015-19 lost 0.0% med $13,639 p25 $5,256 | 2020-25 lost 0.0% med $18,453 p25 $15,085
+one contract fewer after two losing days:  2015-19 lost 0.0% med $12,126 p25 $4,035 | 2020-25 lost 0.0% med $15,471 p25 $12,025
+
+Verdict: rejected. Losing streaks do not predict the next day here: the strategy often recovers right after them, and
+the smaller size misses it (median -$1,513 / -$2,982, 25th percentile -$1,221 / -$3,060). The guard's day-stop share
+(the other candidate) was tested in section 38 (0.25 shipped) and the guard's level in 83.

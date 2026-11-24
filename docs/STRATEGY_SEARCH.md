@@ -683,6 +683,10 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    Stepping down only below +$1,500 / +$3,000 (up at +$2,000 / +$3,500): medians $48-292 higher but more accounts
    blown in all six shuffled-year cases (fresh 2020-25: 5.7% against 5.0%). Rejected: the steps stay symmetric.
 
+85. **A contract fewer after two losing days** (2026-11-24, a research round; `verification/zoo/stage79_streak_step_down.txt`;
+   on the real sequence, since shuffled days have no streaks). Medians $12,126 / $15,471 against $13,639 / $18,453 and
+   the 25th percentiles $1,221 / $3,060 lower: the strategy recovers right after its losing runs. Rejected.
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-33; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |
