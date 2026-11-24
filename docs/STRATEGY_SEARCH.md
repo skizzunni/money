@@ -421,6 +421,15 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    ($100 a step) median $16,510 / 25th percentile $12,240, at most 10 MGC median $18,132 / 25th percentile $11,421;
    accounts started near the floor unchanged (4.5% / 0.9% lost).
 
+43. **An exponential trend, gold on news days** (2026-11-24, a research round; `noise` trend_ema,
+   `verification/zoo/stage37_ema_trend.txt`). The trend filter as an exponential average of the prior closes: EMA 20 every
+   set's 1-contract net up (dev $5,119 to $5,407, ES $679 to $974, live $13,572 to $14,162) and the window +$123, but the
+   104 starts' median $16,582 to $16,059 and 25th percentile $11,321 to $10,785; EMA 15 median $16,129, the window lower;
+   EMA 30 25th percentile $6,459. Not used. Gold by the day's 08:30 news spike (NQ's, 2015 - Mar 2025): mild days (2-3x)
+   PF 3.30 on 2015-19 but 0.71 on 2020-25, so no skip; 3-6x days lost in both (PF 0.00 / 0.34) but on 23 trades, a
+   bucket picked after the fact: noted, not used. The range rule with the overnight session: not testable here (the NQ
+   history is regular hours only).
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-33; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |

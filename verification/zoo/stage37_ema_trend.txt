@@ -1,0 +1,4 @@
+now (20-day average): lost 0.0% median $16,582 p25 $11,321 | TV $+9,796 53tr PF 4.25 dd $670 | dev: PF 1.60 240/yr $5,119 | unseen_nq: PF 1.59 265/yr $6,971 | unseen_es: PF 1.17 224/yr $679 | live: PF 3.34 179/yr $13,572
+EMA 20: lost 0.0% median $16,059 p25 $10,785 | TV $+9,919 52tr PF 4.43 dd $670 | dev: PF 1.61 247/yr $5,407 | unseen_nq: PF 1.58 272/yr $7,007 | unseen_es: PF 1.24 231/yr $974 | live: PF 3.57 179/yr $14,162
+EMA 15: lost 0.0% median $16,129 p25 $11,374 | TV $+9,630 56tr PF 4.02 dd $670 | dev: PF 1.59 253/yr $5,416 | unseen_nq: PF 1.51 283/yr $6,491 | unseen_es: PF 1.24 237/yr $993 | live: PF 3.58 189/yr $14,841
+EMA 30: lost 0.0% median $14,745 p25 $6,459 | TV $+9,919 52tr PF 4.43 dd $670 | dev: PF 1.49 241/yr $4,367 | unseen_nq: PF 1.53 261/yr $6,223 | unseen_es: PF 1.17 220/yr $668 | live: PF 3.35 165/yr $12,190
