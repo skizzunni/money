@@ -22,20 +22,23 @@ def _stretch(d, t, k):
     return np.array([np.nan if r.bar <= 1 else S.band_stretch(d, idx[r.d], r.side, r.bar, k) for r in t.itertuples()])
 
 
-def _news(d):
+NEWS = (2.0, 3.0, 6.0)  # no trading from / to, one more contract from (08:30 volume spike)
+
+
+def _news(d, nw=NEWS):
     sp = {x["d"]: x["news"][0] for x in d}
 
     def f(day, q):
         v = sp.get(day, np.nan)
         if np.isnan(v):
             return q
-        if 2 <= v < 3:
+        if nw[0] <= v < nw[1]:
             return 0
-        return min(q + 1, 3) if v >= 6 else q
+        return min(q + 1, 3) if v >= nw[2] else q
     return f
 
 
-def tv(d, t, start="2026-08-27", steps=STEPS, day_stop=600.0):
+def tv(d, t, start="2026-08-27", steps=STEPS, day_stop=600.0, nw=NEWS):
     t = t.copy()
     t["d"] = pd.to_datetime(t.d)
     cum, n, w, gw, gl, peak, dd = 0.0, 0, 0, 0.0, 0.0, 0.0, 0.0
@@ -49,9 +52,9 @@ def tv(d, t, start="2026-08-27", steps=STEPS, day_stop=600.0):
             if cum >= lim:
                 q = qq
         if not np.isnan(sp):
-            if 2 <= sp < 3:
+            if nw[0] <= sp < nw[1]:
                 continue
-            if sp >= 6:
+            if sp >= nw[2]:
                 q = min(q + 1, 3)
         dp = 0.0
         for r in t[t.d == day].itertuples():
@@ -67,7 +70,7 @@ def tv(d, t, start="2026-08-27", steps=STEPS, day_stop=600.0):
 
 
 def run(band: dict | None = None, gap: dict | None = None, add_at: float = 1.5, legs_fn=None, steps=STEPS,
-        day_stop: float = 600.0, add2_at: float = 0.0, news: bool = True) -> dict:
+        day_stop: float = 600.0, add2_at: float = 0.0, news: bool = True, nw=NEWS) -> dict:
     sets = pickle.load(open(PK, "rb"))
     b, g = {**BAND, **(band or {})}, {**GAP, **(gap or {})}
     pool, out = [], {}
@@ -81,9 +84,9 @@ def run(band: dict | None = None, gap: dict | None = None, add_at: float = 1.5, 
         out[n] = dict(win=(u > 0).mean(), pf=u[u > 0].sum() / max(1e-9, -u[u < 0].sum()), per_yr=len(t) / yrs,
                       net_yr=u.sum() / yrs)
         if n in ("dev", "unseen_nq"):
-            pool += H.account(t, d, steps=steps, day_stop=day_stop, day_qty=_news(d) if news else None)
+            pool += H.account(t, d, steps=steps, day_stop=day_stop, day_qty=_news(d, nw) if news else None)
         if n == "live":
-            out["tv"] = tv(d, t, steps=steps, day_stop=day_stop)
+            out["tv"] = tv(d, t, steps=steps, day_stop=day_stop, nw=nw)
     prof = np.array([x[1] for x in pool])
     out["acct"] = dict(lost=np.mean([x[0] for x in pool]), median=np.median(prof), p25=np.percentile(prof, 25))
     return out

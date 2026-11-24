@@ -302,6 +302,10 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    (1-2: median down, ES negative; 3-4: no change); the VWAP stop off (3.8% lost), the VWAP entry filter on (lower);
    at most 6 trades a day (+$24 median, the window +$111: within noise, as in 27). The news-day rule is still worth
    $2,700 of median. The news fade at the open stays out (its live months were negative, section 14).
+   The news thresholds again: skip 2-2.5x / 2-3.5x (median -$900 / -$2,800), no skip (2.9% lost; the window +$11,609),
+   one more contract from 4x / 5x (median +$225-235, but the 25th percentile and the window's PF lower), from 8x
+   (lower): 2-3x and 6x stay. A warning from it: skipping from 1.75x cuts the window to +$2,644, so live days sit
+   near the 2x line; the rule's skip days in the window are the reason it stays at 2x.
 
 ## The result (the shipped defaults, research numbers, 2 ticks of stop slippage, $0.62 a side)
 

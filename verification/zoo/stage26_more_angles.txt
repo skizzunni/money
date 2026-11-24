@@ -19,3 +19,11 @@ time stop 4 checks: lost 0.0% median $16,615 p25 $11,164 | TV $+9,796 53tr PF 4.
 VWAP stop off: lost 3.8% median $16,106 p25 $10,272 | TV $+9,910 51tr PF 4.41 dd $670 | dev: PF 1.60 235/yr $5,174 | unseen_nq: PF 1.59 262/yr $7,033 | unseen_es: PF 1.14 220/yr $572 | live: PF 2.89 174/yr $12,672
 VWAP entry filter on: lost 0.0% median $16,109 p25 $11,101 | TV $+9,796 53tr PF 4.25 dd $670 | dev: PF 1.59 240/yr $5,019 | unseen_nq: PF 1.58 265/yr $6,837 | unseen_es: PF 1.17 224/yr $679 | live: PF 3.34 179/yr $13,572
 max 6 trades: lost 0.0% median $16,606 p25 $11,321 | TV $+9,907 52tr PF 4.41 dd $670 | dev: PF 1.61 239/yr $5,151 | unseen_nq: PF 1.60 264/yr $7,046 | unseen_es: PF 1.17 223/yr $687 | live: PF 3.39 177/yr $13,661
+now: skip 2-3x, +1 from 6x: lost 0.0% median $16,582 p25 $11,321 | TV $+9,796 53tr PF 4.25 dd $670
+skip 2-2.5x: lost 0.0% median $15,651 p25 $11,250 | TV $+9,796 53tr PF 4.25 dd $670
+skip 1.75-3x: lost 0.0% median $15,575 p25 $9,552 | TV $+2,644 43tr PF 2.47 dd $323
+skip 2-3.5x: lost 0.0% median $13,804 p25 $9,907 | TV $+9,921 52tr PF 4.43 dd $670
+no skip: lost 2.9% median $14,914 p25 $9,788 | TV $+11,609 59tr PF 4.14 dd $670
++1 from 4x: lost 0.0% median $16,807 p25 $11,082 | TV $+9,951 53tr PF 3.96 dd $670
++1 from 5x: lost 0.0% median $16,817 p25 $11,225 | TV $+10,001 53tr PF 4.02 dd $670
++1 from 8x: lost 0.0% median $15,677 p25 $11,063 | TV $+9,796 53tr PF 4.25 dd $670
