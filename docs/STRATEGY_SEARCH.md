@@ -544,6 +544,13 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    $16,582, the window +$2,949-8,634. Rejected: the weak-closing breaks still pay. The most trades a day (27, 33) and a
    break-even for the gap trade (it has none: its stop stays at the 09:30 open) need nothing new.
 
+58. **A second stop step** (2026-11-24, a research round; `noise` lad_r / lad_lock,
+   `verification/zoo/stage52_stop_ladder.txt`). Once a band trade closes 1.25-1.75R up, the stop to entry + 0.3-0.6R:
+   the pooled starts better (1.5R / +0.5R: median $16,939, 25th percentile $11,898; none lost; the window unchanged)
+   and 2020-25 shuffled years blown 5.6% against 6.3% fresh, but 2015-19 flat to worse ($48,998 7.5% against 7.2%),
+   4 of 12 years down $400-480, about +$125 a year a contract. Not shipped: too small and uneven for a new live order
+   rule; re-check with live data.
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-33; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |

@@ -1,0 +1,37 @@
+Stage 52 (2026-11-24, a research round): a second stop step (strats.noise lad_r / lad_lock)
+
+On top of the shipped break-even (a close 0.4R up: the stop to entry + 2 points), once a band trade's bar closes lad_r
+x the $200 hard stop up, the stop to entry + lad_lock x it (before the 2.5R target). bench.py (104 fresh 50K starts,
+dev + unseen NQ; the TradingView window):
+
+shipped:                lost 0.0% median $16,582 p25 $11,321 | TV $+9,796 | dev PF 1.60 $5,119/yr | unseen_nq PF 1.59 $6,971/yr
+ladder 1.0R -> +0.25R:  lost 0.0% median $16,022 p25 $10,303 | TV $+9,796 | dev PF 1.59 $5,140/yr | unseen_nq PF 1.58 $6,859/yr
+ladder 1.25R -> +0.4R:  lost 0.0% median $16,708 p25 $12,145 | TV $+9,796 | dev PF 1.57 $5,015/yr | unseen_nq PF 1.62 $7,398/yr
+ladder 1.25R -> +0.5R:  lost 0.0% median $16,939 p25 $11,507 | TV $+9,796 | dev PF 1.57 $4,989/yr | unseen_nq PF 1.62 $7,408/yr
+ladder 1.5R -> +0.3R:   lost 0.0% median $17,091 p25 $11,878 | TV $+9,796 | dev PF 1.59 $5,102/yr | unseen_nq PF 1.60 $7,076/yr
+ladder 1.5R -> +0.4R:   lost 0.0% median $16,535 p25 $12,123 | TV $+9,796 | dev PF 1.59 $5,089/yr | unseen_nq PF 1.61 $7,229/yr
+ladder 1.5R -> +0.5R:   lost 0.0% median $16,939 p25 $11,898 | TV $+9,796 | dev PF 1.59 $5,095/yr | unseen_nq PF 1.61 $7,240/yr
+ladder 1.5R -> +0.6R:   lost 0.0% median $16,568 p25 $11,404 | TV $+9,796 | dev PF 1.58 $4,953/yr | unseen_nq PF 1.61 $7,255/yr
+ladder 1.5R -> +0.75R:  lost 0.0% median $15,478 p25 $10,455 | TV $+9,796 | dev PF 1.57 $4,889/yr | unseen_nq PF 1.60 $7,177/yr
+ladder 1.75R -> +0.5R:  lost 0.0% median $17,037 p25 $11,766 | TV $+9,796 | dev PF 1.59 $5,123/yr | unseen_nq PF 1.60 $7,124/yr
+ladder 1.75R -> +0.6R:  lost 0.0% median $16,931 p25 $11,925 | TV $+9,796 | dev PF 1.59 $5,099/yr | unseen_nq PF 1.60 $7,081/yr
+ladder 2.0R -> +0.75R:  lost 0.0% median $16,345 p25 $11,475 | TV $+9,796 | dev PF 1.62 $5,265/yr | unseen_nq PF 1.60 $7,079/yr
+ladder 2.0R -> +1.0R:   lost 0.0% median $16,178 p25 $10,751 | TV $+8,893 | dev PF 1.60 $5,132/yr | unseen_nq PF 1.60 $7,146/yr
+
+Shuffled days (montecarlo.py with the ladder; 2,000 years; the guard without the strong-only tier; the same draws),
+blown / median from $50,000, $48,806, $48,998:
+2020-25 shipped:    6.3% $16,632 | 18.9% $12,811 | 14.5% $14,351
+2020-25 1.5 / 0.5:  5.6% $17,365 | 17.8% $13,678 | 13.2% $14,949
+2020-25 1.5 / 0.4:  5.8% $17,442 | 18.2% $13,671 | 13.5% $15,063
+2015-19 shipped:    2.7% $11,641 | 11.5% $8,964  | 7.2% $9,644
+2015-19 1.5 / 0.5:  2.5% $11,551 | 11.2% $8,851  | 7.5% $9,443
+2015-19 1.5 / 0.4:  2.5% $11,461 | 11.8% $8,691  | 7.5% $9,323
+
+By year, 1 contract, all trades (shipped / ladder 1.5 / 0.5): 2015 3543 / 3076, 2016 6251 / 6550, 2017 2038 / 1637,
+2018 7140 / 7611, 2019 6360 / 6340, 2020 5398 / 6169, 2021 8777 / 9172, 2022 11240 / 10762, 2023 6074 / 6432,
+2024 5933 / 6247, 2025 H1 395 / 491, 2026 5601 / 5699: 8 of 12 years up, +$1,437 in all (about $125 a year).
+
+Verdict: not shipped. The neighbourhood (1.25-1.75R, +0.3-0.6R) is better than shipped on the pooled starts and on
+2020-25 shuffled years, but 2015-19 is flat to worse (medians $90-270 lower, $48,998 blown 7.5% against 7.2%), four
+years in twelve lose $400-480, and the gain is about $125 a year a contract. Not enough to add an order rule to the
+live bot. Kept as research (default off) to re-check as live data comes in.
