@@ -88,6 +88,14 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    traded day; live Jun 29 - Nov 23 2026 0.82 a session: none on 73 of 104 days, 1 on 12, 2 on 3, 3 on 7, 4 on 5,
    5-8 on 4.
 
+13. **A trade for the no-signal days: fading stretches inside the noise area** (2026-11-24, the user: "majority days no
+   trade is unacceptable"; `band_fade`, `verification/zoo/stage7_inside_band_fade.txt`). Inside the band (the market's
+   own noise), a close k standard deviations from VWAP fades back to VWAP, the stop at the band edge: 48 variants (k 1.5 /
+   2 / 2.5, to 12:00 or 15:00, 1 or 3 trades, VWAP or half way, with or without stopping after a breakout). It trades
+   10-62% of days, but **0 of 48 make money on both dev and unseen NQ**; the dev-best lose $3,654-21,238 on unseen NQ
+   and lose on ES (PF 0.29-0.73); the live months are positive for some (PF up to 1.68, 35-42 days), too few to trust
+   against 10 years. Not used. The no-trade days are the strategy declining trades with no edge.
+
 ## The result (the shipped defaults, research numbers, 2 ticks of stop slippage, $0.62 a side)
 
 | set | band trades | win | PF | band net (1 MNQ) | gap trades (PF, net) | 50K starts lost | median 12 months |

@@ -439,3 +439,70 @@ def _exit_bar(day, t):
             if k > b or True:
                 return k
     return len(day["c"]) - 1
+
+
+def band_fade(days, i, tick, k_sd=2.0, first=600, last=900, max_trades=2, hard=200.0, pv=2.0, no_break=True,
+              tgt="vwap", stop_slip=2):
+    """Inside the noise area, fade stretches back to VWAP (2026-11-24, for the days the breakout does not trade): at a
+    5-minute close between `first` and `last`, with price inside today's band (sigma at that minute over the last 14
+    sessions) and k_sd standard deviations of (close - VWAP) away from VWAP, enter toward VWAP at the next open; the stop
+    at the band edge past the close (at most `hard` $ a contract); the target VWAP at the signal ("half": half way);
+    out at 15:55. no_break: no fades once a close has left the band today (a trend day)."""
+    if i < 21:
+        return []
+    d = days[i]
+    o, h, lo, c, mm = d["o"], d["h"], d["l"], d["c"], d["mm"]
+    pc = prev(days, i, "c")
+    up_ref, dn_ref = max(o[0], pc), min(o[0], pc)
+    vw = _vwap(d)
+    dev = c - vw
+    out, b, broke = [], 0, False
+    n = len(c)
+    while b < n - 1 and len(out) < max_trades:
+        end = mm[b] + 5
+        if end < first:
+            b += 1
+            continue
+        if end > last:
+            break
+        sg = np.mean([_moves(days, j).get(end, np.nan) for j in range(i - 14, i)])
+        if np.isnan(sg):
+            b += 1
+            continue
+        up, dn = up_ref * (1 + sg), dn_ref * (1 - sg)
+        if c[b] > up or c[b] < dn:
+            broke = True
+        if broke and no_break:
+            break
+        sd = np.sqrt(np.mean(dev[: b + 1] ** 2))
+        z = dev[b] / sd if sd > 0 else 0.0
+        side = -1 if z > k_sd else 1 if z < -k_sd else 0
+        if not side:
+            b += 1
+            continue
+        e_exp = c[b] + side * tick
+        edge = dn if side > 0 else up
+        st = max(edge, e_exp - hard / pv) if side > 0 else min(edge, e_exp + hard / pv)
+        st = _tick(st, tick)
+        target = vw[b] if tgt == "vwap" else (c[b] + vw[b]) / 2
+        target = _tick(target, tick)
+        if side * (target - e_exp) <= 2 * tick or side * (e_exp - st) <= 2 * tick:
+            b += 1
+            continue
+        e = o[b + 1] + side * tick
+        x = xb = None
+        for q in range(b + 1, n):
+            if (side > 0 and lo[q] <= st) or (side < 0 and h[q] >= st):
+                x, why, xb = (min(o[q], st) if side > 0 else max(o[q], st)) - side * stop_slip * tick, "stop", q
+                break
+            if side * ((h[q] if side > 0 else lo[q]) - target) >= tick:
+                x, why, xb = target, "target", q
+                break
+            if mm[q] >= 955:
+                x, why, xb = o[q] - side * tick, "time", q - 1
+                break
+        if x is None:
+            x, why, xb = c[-1] - side * tick, "time", n - 1
+        out.append((side, b + 1, e, x, why, xb))
+        b = xb + 1
+    return out
