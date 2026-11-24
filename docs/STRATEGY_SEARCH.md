@@ -397,6 +397,12 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    (`StopAt` 0.6 with the shipped 1.5x / 15 / 13:30: all 0 lost). Shipped: `StopAt` 0.6 (NinjaTrader, Pine); tests
    trade for trade on 2009 - Mar 2025 gold.
 
+40. **MNQ's exit details** (2026-11-24, a research round; `noise` be_on / exit_at,
+   `verification/zoo/stage34_mnq_exit_details.txt`). Break-even on a bar's high / low instead of its close (still moved at
+   the bar's close): 2.9-3.8% of starts lost at 0.4 / 0.5 / 0.6 (it scratches trades that would have run). Out at 15:30 /
+   15:40 / 15:45 instead of 15:55: median $16,708 / $16,171 / $16,506 against $16,582, 25th percentile $11,576 / $10,388 /
+   $10,987 against $11,321, ES lower in all three: up then down then down, no edge. None used.
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-33; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |
