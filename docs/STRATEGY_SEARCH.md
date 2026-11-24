@@ -605,6 +605,12 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    on 2020-25; picked on its 25th percentile, no rules. Kept, as a judgment call; `LadderAt` 0 and `GapMaxBar` 0 go
    back to the earlier rules.
 
+69. **61's two halves by period** (2026-11-24, a research round; `verification/zoo/stage63_61_halves.txt`). The skip
+   alone: 2015-19 $14,007 / $5,407, 2020-25 $17,224 / $14,111 (median / 25th percentile); the step alone: $13,269 /
+   $4,994, $18,476 / $14,987; the pair: $13,639 / $5,256, $18,453 / $15,085; neither: $13,058 / $5,802, $17,530 /
+   $14,215. Neither half alone beats the pair; the pair stays. A fixed-point wild-open threshold is not stationary
+   (NQ 4,000 to 21,000): the ratio stays.
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-33; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |
