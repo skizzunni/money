@@ -81,6 +81,13 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    contracts" (NinjaTrader `FixedContracts`, Pine input; 0 = the steps). An account already up trades 3 by the steps
    once it is +$4,500 (sized from its balance live).
 
+12. **More trades from the same signal: checks every 15 / 10 / 5 minutes** (`verification/zoo/stage6_check_every.txt`,
+   `noise(step=...)`). More trades a traded day (2.4 to 3.0 / 3.4 / 4.1 on unseen NQ) but a lower profit factor
+   (1.48 to 1.33 / 1.26 / 1.18; ES 1.17 to 1.04 / 0.99 / 0.82) and lost starts (0% to 13.5% / 15.4% / 26.9%). The
+   half-hour checks stay. Trades a day (shipped): NQ 2015-25 about 1.0-1.1 a session, on 45% of sessions, 2.3-2.4 a
+   traded day; live Jun 29 - Nov 23 2026 0.82 a session: none on 73 of 104 days, 1 on 12, 2 on 3, 3 on 7, 4 on 5,
+   5-8 on 4.
+
 ## The result (the shipped defaults, research numbers, 2 ticks of stop slippage, $0.62 a side)
 
 | set | band trades | win | PF | band net (1 MNQ) | gap trades (PF, net) | 50K starts lost | median 12 months |

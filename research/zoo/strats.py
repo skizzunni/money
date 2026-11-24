@@ -38,8 +38,8 @@ CHECKS = list(range(600, 901, 30))
 def _moves(days, j):
     d = days[j]
 
-    def make():
-        return {m + 5: abs(d["c"][k] / d["o"][0] - 1) for k, m in enumerate(d["mm"]) if m + 5 in CHECKS}
+    def make():  # |close / open - 1| at every 5-minute bar's close from 10:00 to 15:00
+        return {m + 5: abs(d["c"][k] / d["o"][0] - 1) for k, m in enumerate(d["mm"]) if 600 <= m + 5 <= 900}
     return _cached(("mv", id(d)), d, make)
 
 
@@ -49,7 +49,7 @@ def _tick(x, tick):
 
 
 def noise(days, i, tick, vwap=True, trend=0, hard=250.0, vwap_stop=False, pv=2.0, k=1.0, last=900, max_trades=9,
-          be_r=0.0, stop_slip=2, nt=True, tp_r=0.0, tp_fill_bar=True):
+          be_r=0.0, stop_slip=2, nt=True, tp_r=0.0, tp_fill_bar=True, step=30):
     """The user's Clean Noise-Band spec (research/clean_noise_band.py): checks 10:00-15:00, the band (k x sigma) past
     max/min(open, prior close), the session VWAP agreeing, the band as a stop moved at the checks, a hard stop $hard a
     contract, out at 15:55. trend: also the close past the `trend`-session average of closes. be_r: the stop to entry +
@@ -62,7 +62,8 @@ def noise(days, i, tick, vwap=True, trend=0, hard=250.0, vwap_stop=False, pv=2.0
         return []
     d = days[i]
     o, h, lo, c, mm = d["o"], d["h"], d["l"], d["c"], d["mm"]
-    sig = {t: np.mean([_moves(days, j).get(t, np.nan) for j in range(i - 14, i)]) for t in CHECKS}
+    checks = list(range(600, 901, step))  # research (2026-11-24): checks every `step` minutes (30: the paper's)
+    sig = {t: np.mean([_moves(days, j).get(t, np.nan) for j in range(i - 14, i)]) for t in checks}
     pc = prev(days, i, "c")
     up_ref, dn_ref = max(o[0], pc), min(o[0], pc)
     sma = np.mean([prev(days, i, "c", j) for j in range(1, trend + 1)]) if trend else np.nan
