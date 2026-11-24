@@ -1,0 +1,37 @@
+now (no forcing): lost 0.0% median $16,582 p25 $11,321 | TV $+9,796 dd $670 max quiet 6 traded 37%
+    dev: max 9 quiet, traded 42%, backup 0 PF 0.00 $0 | unseen_nq: max 13 quiet, traded 42%, backup 0 PF 0.00 $0 | unseen_es: max 9 quiet, traded 44%, backup 0 PF 0.00 $0 | live: max 6 quiet, traded 36%, backup 0 PF 0.00 $0
+due after 2, last half hour stop 30: lost 0.0% median $16,205 p25 $11,228 | TV $+9,721 dd $670 max quiet 2 traded 50%
+    dev: max 3 quiet, traded 52%, backup 108 PF 1.23 $737 | unseen_nq: max 2 quiet, traded 52%, backup 120 PF 0.98 $-109 | unseen_es: max 2 quiet, traded 54%, backup 38 PF 0.50 $-308 | live: max 2 quiet, traded 49%, backup 11 PF 0.82 $-59
+due after 2, last half hour stop 50: lost 0.0% median $16,100 p25 $11,406 | TV $+9,673 dd $670 max quiet 2 traded 50%
+    dev: max 3 quiet, traded 52%, backup 108 PF 1.19 $671 | unseen_nq: max 2 quiet, traded 52%, backup 120 PF 1.05 $279 | unseen_es: max 2 quiet, traded 54%, backup 38 PF 0.50 $-308 | live: max 2 quiet, traded 49%, backup 11 PF 0.84 $-52
+due after 2, last half hour from prior close stop 30: lost 0.0% median $16,062 p25 $11,293 | TV $+9,869 dd $670 max quiet 2 traded 50%
+    dev: max 2 quiet, traded 52%, backup 109 PF 1.11 $360 | unseen_nq: max 2 quiet, traded 52%, backup 120 PF 0.73 $-1,349 | unseen_es: max 2 quiet, traded 54%, backup 38 PF 0.96 $-18 | live: max 2 quiet, traded 49%, backup 11 PF 1.72 $136
+due after 2, looser band then last half hour: lost 0.0% median $15,902 p25 $10,568 | TV $+9,799 dd $670 max quiet 2 traded 50%
+    dev: max 3 quiet, traded 52%, backup 108 PF 1.18 $610 | unseen_nq: max 2 quiet, traded 52%, backup 120 PF 1.03 $119 | unseen_es: max 2 quiet, traded 54%, backup 38 PF 0.74 $-145 | live: max 2 quiet, traded 49%, backup 11 PF 1.08 $19
+due after 2, band 0.5 sigma then last half hour: lost 2.9% median $15,258 p25 $9,239 | TV $+9,561 dd $670 max quiet 2 traded 50%
+    dev: max 3 quiet, traded 52%, backup 108 PF 0.80 $-671 | unseen_nq: max 2 quiet, traded 52%, backup 120 PF 0.53 $-2,549 | unseen_es: max 2 quiet, traded 54%, backup 38 PF 0.42 $-342 | live: max 2 quiet, traded 49%, backup 11 PF 0.45 $-218
+due after 3, last half hour stop 30: lost 0.0% median $16,245 p25 $10,928 | TV $+11,064 dd $670 max quiet 3 traded 44%
+    dev: max 3 quiet, traded 48%, backup 63 PF 0.67 $-811 | unseen_nq: max 4 quiet, traded 47%, backup 61 PF 1.66 $1,432 | unseen_es: max 3 quiet, traded 49%, backup 19 PF 0.58 $-194 | live: max 3 quiet, traded 42%, backup 4 PF 0.18 $-102
+due after 2, 15:30 backup stop 40: lost 0.0% median $16,142 p25 $10,812 | TV $+9,676 dd $670 max quiet 2 traded 50%
+    dev: max 2 quiet, traded 52%, backup 109 PF 1.25 $840 | unseen_nq: max 2 quiet, traded 52%, backup 120 PF 1.10 $550 | unseen_es: max 2 quiet, traded 54%, backup 38 PF 0.50 $-312 | live: max 2 quiet, traded 49%, backup 11 PF 0.68 $-123
+due after 2, 15:30 backup stop 50: lost 0.0% median $16,097 p25 $11,405 | TV $+9,670 dd $670 max quiet 2 traded 50%
+    dev: max 2 quiet, traded 52%, backup 109 PF 1.19 $674 | unseen_nq: max 2 quiet, traded 52%, backup 120 PF 1.05 $262 | unseen_es: max 2 quiet, traded 54%, backup 38 PF 0.50 $-312 | live: max 2 quiet, traded 49%, backup 11 PF 0.83 $-55
+due after 2, 15:30 backup stop 60: lost 0.0% median $16,279 p25 $11,406 | TV $+9,786 dd $670 max quiet 2 traded 50%
+    dev: max 2 quiet, traded 52%, backup 109 PF 1.24 $846 | unseen_nq: max 2 quiet, traded 52%, backup 120 PF 1.14 $797 | unseen_es: max 2 quiet, traded 54%, backup 38 PF 0.50 $-312 | live: max 2 quiet, traded 49%, backup 11 PF 1.25 $61
+due after 2, 15:30 backup stop 70: lost 0.0% median $16,344 p25 $10,711 | TV $+9,766 dd $670 max quiet 2 traded 50%
+    dev: max 2 quiet, traded 52%, backup 109 PF 1.17 $632 | unseen_nq: max 2 quiet, traded 52%, backup 120 PF 1.16 $915 | unseen_es: max 2 quiet, traded 54%, backup 38 PF 0.50 $-312 | live: max 2 quiet, traded 49%, backup 11 PF 1.16 $41
+due after 2, 15:30 backup stop 60, backup at the day size: lost 0.0% median $16,279 p25 $11,406 | TV $+9,786 dd $670 max quiet 2 traded 50%
+    dev: max 2 quiet, traded 52%, backup 109 PF 1.24 $846 | unseen_nq: max 2 quiet, traded 52%, backup 120 PF 1.14 $797 | unseen_es: max 2 quiet, traded 54%, backup 38 PF 0.50 $-312 | live: max 2 quiet, traded 49%, backup 11 PF 1.25 $61
+now: lost 0.0% median $16,582 p25 $11,321 | TV $+9,796 53tr PF 4.25 dd $670 | dev: PF 1.60 240/yr $5,119 | unseen_nq: PF 1.59 265/yr $6,971 | unseen_es: PF 1.17 224/yr $679 | live: PF 3.34 179/yr $13,572
++ opening drive 15m top .7 mid stop cap 60: lost 13.5% median $10,944 p25 $5,022 | TV $+5,568 66tr PF 2.01 dd $1,491 | dev: PF 1.45 287/yr $5,818 | unseen_nq: PF 1.38 320/yr $6,794 | unseen_es: PF 1.01 284/yr $34 | live: PF 1.98 257/yr $13,861
++ opening drive 15m top .7 mid stop cap 40: lost 12.5% median $9,213 p25 $3,381 | TV $+6,083 66tr PF 2.22 dd $1,406 | dev: PF 1.42 294/yr $5,196 | unseen_nq: PF 1.35 328/yr $5,927 | unseen_es: PF 1.01 284/yr $34 | live: PF 2.13 257/yr $13,801
++ opening drive 15m top .8 mid stop cap 60: lost 8.7% median $13,890 p25 $8,036 | TV $+6,160 62tr PF 2.25 dd $1,271 | dev: PF 1.47 269/yr $5,594 | unseen_nq: PF 1.45 298/yr $7,361 | unseen_es: PF 1.02 262/yr $104 | live: PF 1.96 240/yr $12,336
++ opening drive 15m, out 11:00: lost 9.6% median $13,071 p25 $5,214 | TV $+5,152 69tr PF 2.07 dd $1,270 | dev: PF 1.43 308/yr $5,431 | unseen_nq: PF 1.36 338/yr $6,582 | unseen_es: PF 0.98 295/yr $-103 | live: PF 1.80 269/yr $11,234
++ 5m opening range breakout, mid stop cap 40: lost 41.3% median $1,846 p25 $-136 | TV $+6,014 89tr PF 2.13 dd $1,091 | dev: PF 1.26 402/yr $5,460 | unseen_nq: PF 1.25 435/yr $6,313 | unseen_es: PF 0.92 385/yr $-771 | live: PF 1.65 368/yr $13,743
+now (no drive): lost 0.0% median $16,582 p25 $11,321 days traded/yr 106 | TV $+9,796 days traded 23 dd $670
+opening drive from +$3,500: lost 0.0% median $15,073 p25 $7,824 days traded/yr 126 | TV $+8,166 days traded 25 dd $1,663
+opening drive from +$5,000: lost 0.0% median $15,261 p25 $9,205 days traded/yr 124 | TV $+8,769 days traded 25 dd $1,333
+opening drive from +$7,500: lost 0.0% median $14,115 p25 $10,093 days traded/yr 121 | TV $+9,796 days traded 23 dd $670
+opening drive from +$10,000: lost 0.0% median $14,575 p25 $9,738 days traded/yr 117 | TV $+9,796 days traded 23 dd $670
++ opening drive 10m, out 09:55: lost 1.0% median $15,555 p25 $10,382 | TV $+8,279 70tr PF 2.90 dd $1,021 | dev: PF 1.48 323/yr $5,607 | unseen_nq: PF 1.40 350/yr $6,377 | unseen_es: PF 1.05 302/yr $273 | live: PF 2.41 274/yr $14,647
++ opening drive 15m, out 09:55: lost 0.0% median $14,322 p25 $8,590 | TV $+6,048 70tr PF 2.24 dd $1,406 | dev: PF 1.43 333/yr $4,981 | unseen_nq: PF 1.39 360/yr $6,375 | unseen_es: PF 1.05 312/yr $276 | live: PF 2.30 279/yr $13,776

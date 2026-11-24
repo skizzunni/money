@@ -310,6 +310,21 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    12's gap down and rally): the TradingView window +$14,807 (PF 5.17, 62 trades) but **17.3% of starts lost** and the
    25th percentile $2,282; half way: 3.8% lost. The prior close in the band is what keeps the account through 2015-25.
 
+34. **More traded days** (2026-11-24, the user: "max 2-3 days no trading", then "not forced trades: more days traded and
+   more profit"; `zoo/force.py`, `strats.backup_trade`, `verification/zoo/stage27_more_days.txt`). With the shipped
+   rules 37% of the TradingView window's sessions trade (the longest run without a trade 6; 2015-25: 42%, up to 13).
+   - A forced trade after 2 quiet sessions (the mild-news skip off that day; if nothing by 15:30 a 1-contract last
+     half hour trade the day's way, a 40-70 point stop): 0 of 104 lost, the longest run 2 everywhere, 50% of sessions
+     traded, but no more money (median $16,097-16,344, the window +$9,670-9,786; the backups PF 1.1-1.25 on NQ, 0.5
+     on ES). Built and taken back: the user asked for real signals, not forced trades.
+   - The best other setup of stage 1, the opening drive (the first 15 minutes closing in the top or bottom 30% of
+     their range past the prior close, in at 09:45, the stop the range's middle; PF 1.43 / 1.23 / 1.33): with the
+     band from day one 8.7-13.5% of starts lost; from a cushion (+$3,500 / 5,000 / 7,500 / 10,000) none lost and about
+     20 more traded days a year, but median $14,115-15,261 and the window +$8,166-9,796 (its trades hold the account
+     when the band's better ones come); out at 09:55 instead: 0-1% lost, median $14,322-15,555, the window lower. The
+     5-minute opening range breakout: 41% lost. (Research fix: `drive` now returns its exit bar for `merge`.)
+   None used: every way found to trade more days costs profit or accounts on this data.
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-33; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |

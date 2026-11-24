@@ -438,8 +438,8 @@ def drive(days, i, tick, n=30, top=0.8, stop="low", exit_m=955, r=0.0, cap=100.0
     if stop == "mid":
         ref = (hi + lw) / 2
     dist = min(max(abs(e - ref), 4 * tick), cap)
-    px, x, _, why = walk(d, k + 1, side, e - side * dist, e + side * r * dist if r else np.nan, exit_m, tick)
-    return [(side, k + 1, px, x, why)]
+    px, x, xb, why = walk(d, k + 1, side, e - side * dist, e + side * r * dist if r else np.nan, exit_m, tick)
+    return [(side, k + 1, px, x, why, xb)]  # the exit bar too (2026-11-24): S.merge frees the account after it
 
 
 def squeeze(days, i, tick, n=20, kb=2.0, stop_pts=40.0, first=600, last=900, exit_m=955):
@@ -818,3 +818,22 @@ def band_stretch(days, i, side, eb, k=1.0):
     ref = max(d["o"][0], pc) if side > 0 else min(d["o"][0], pc)
     edge = ref * (1 + sg) if side > 0 else ref * (1 - sg)
     return side * (d["c"][b] - edge) / (sg * ref)
+
+
+def backup_trade(days, i, tick, stop_pts=50.0, enter=930, exit_m=950):
+    """research (2026-11-24, the user: "max 2-3 days no trading"): the must-trade day's backup, the last half hour's
+    momentum (Gao et al.): at the close of the bar before `enter` (15:25-15:30) the day's way (that close against the
+    open; a tie: against the prior close, then the 20-session average), a market order filled at `enter`'s open; the
+    stop stop_pts from the expected fill (the close + a tick), set with the entry; out at the open after the bar starting
+    at exit_m (15:55), as MnqCleanBand.cs executes it."""
+    d = days[i]
+    ks, ke = _bar_at(d, enter - 5), _bar_at(d, enter)
+    if ks is None or ke is None or ke != ks + 1:
+        return []
+    c = d["c"][ks]
+    pc = prev(days, i, "c")
+    sma = np.mean([prev(days, i, "c", j) for j in range(1, 21)])
+    side = int(np.sign(c - d["o"][0]) or np.sign(c - pc) or np.sign(c - sma) or 1)
+    stop = _tick(c + side * tick - side * stop_pts, tick)
+    px, x, xb, why = walk(d, ke, side, stop, np.nan, exit_m, tick, at_open=True)
+    return [(side, ke, px, x, why, xb)]
