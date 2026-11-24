@@ -1,0 +1,22 @@
+Stress tests of the shipped MnqCleanBand (2026-11-24; research/stress/, run from the repo root with ZOO_DATA set).
+
+1. NinjaTrader (the stand-in) against the Python reference, trade for trade (entry bar, entry, exit, contracts), raw NQ prices:
+dev        1 contract    : 1247 sessions, NinjaTrader 1070 trades, reference 1070, identical True, errors 0
+dev        account rules : 1247 sessions, NinjaTrader 1070 trades, reference 1070, identical True, errors 0
+unseen_nq  1 contract    : 1367 sessions, NinjaTrader 1249 trades, reference 1249, identical True, errors 0
+unseen_nq  account rules : 1367 sessions, NinjaTrader 1235 trades, reference 1235, identical True, errors 0
+live       1 contract    : 104 sessions, NinjaTrader 73 trades, reference 73, identical True, errors 0
+live       account rules : 104 sessions, NinjaTrader 73 trades, reference 73, identical True, errors 0
+
+2. Pine (the interpreter) against the same reference:
+NQ 2024 - Jun 2025   1 contract / account rules: 368 sessions, 319 / 313 trades, identical True
+NQ 2018-2019         1 contract / account rules: 497 sessions, 422 / 422 trades, identical True
+
+3. Torture scenarios on the stand-in (each with 1 contract and with the account rules from +$5,000), every trade checked:
+no errors, no position held overnight, every entry with its stop set first and on the right side of the expected fill,
+never more than 3 contracts, no entry after the $600 day stop; and the reference's trades where it models the case.
+20 of 20 PASS: baseline, flat days (zero range), gaps +8% / -7%, a -10% crash day, 5% one-bar spikes, 5x volatility,
+near-dead days, missing bars, half days, data starting mid-session.
+Found on the way: a band entry whose close is a fraction past the band can get its stop one tick under the expected
+fill (the band edge rounds to the close); a valid order, a 1-tick risk; if the next bar opens under it the stop is
+rejected and the no-stop rule closes the position (tests/test_ninjatrader_clean.py covers that rule).
