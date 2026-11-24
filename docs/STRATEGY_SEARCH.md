@@ -306,6 +306,9 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    one more contract from 4x / 5x (median +$225-235, but the 25th percentile and the window's PF lower), from 8x
    (lower): 2-3x and 6x stay. A warning from it: skipping from 1.75x cuts the window to +$2,644, so live days sit
    near the 2x line; the rule's skip days in the window are the reason it stays at 2x.
+   The band from the open alone (not max / min with the prior close: the "never past the band" misses of 31, e.g. Nov
+   12's gap down and rally): the TradingView window +$14,807 (PF 5.17, 62 trades) but **17.3% of starts lost** and the
+   25th percentile $2,282; half way: 3.8% lost. The prior close in the band is what keeps the account through 2015-25.
 
 ## The result (the shipped defaults, research numbers, 2 ticks of stop slippage, $0.62 a side)
 

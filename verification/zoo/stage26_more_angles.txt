@@ -27,3 +27,5 @@ no skip: lost 2.9% median $14,914 p25 $9,788 | TV $+11,609 59tr PF 4.14 dd $670
 +1 from 4x: lost 0.0% median $16,807 p25 $11,082 | TV $+9,951 53tr PF 3.96 dd $670
 +1 from 5x: lost 0.0% median $16,817 p25 $11,225 | TV $+10,001 53tr PF 4.02 dd $670
 +1 from 8x: lost 0.0% median $15,677 p25 $11,063 | TV $+9,796 53tr PF 4.25 dd $670
+band from the open only: lost 17.3% median $15,955 p25 $2,282 | TV $+14,807 62tr PF 5.17 dd $539 | dev: PF 1.46 303/yr $5,410 | unseen_nq: PF 1.49 345/yr $7,769 | unseen_es: PF 1.08 289/yr $422 | live: PF 2.95 218/yr $16,912
+band half way: lost 3.8% median $16,140 p25 $10,638 | TV $+10,885 56tr PF 4.11 dd $485 | dev: PF 1.55 260/yr $5,239 | unseen_nq: PF 1.51 295/yr $6,851 | unseen_es: PF 1.10 246/yr $461 | live: PF 3.02 189/yr $13,889
