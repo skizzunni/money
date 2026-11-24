@@ -258,7 +258,8 @@ def gap_fade(days, i, tick, k=1.0, stop_mult=1.0, exit_m=715, n=20, fill=1.0):
     return [(side, 1, px, x, why)]
 
 
-def gap_go(days, i, tick, k=0.5, n=14, exit_m=955, r=0.0, cap=100.0, min_body=0.0, against_yday=False, stop_at=0.0):
+def gap_go(days, i, tick, k=0.5, n=14, exit_m=955, r=0.0, cap=100.0, min_body=0.0, against_yday=False, stop_at=0.0,
+           stop_pc=False, max_bar=0.0):
     """Gap and go: a gap over k x the average with the 09:30 bar closing the gap's way; in at 09:35, stop at the 09:30
     open (at most cap points), target r x risk."""
     if i < n + 1:
@@ -276,8 +277,14 @@ def gap_go(days, i, tick, k=0.5, n=14, exit_m=955, r=0.0, cap=100.0, min_body=0.
             return []
     if against_yday and side * (pc - prev(days, i, "o")) > 0:  # research: only gaps against yesterday's direction
         return []
+    if max_bar:  # research (2026-11-24): no gap trade when the 09:30 bar's range is over max_bar x its 14-day average
+        avg_bar = np.mean([(days[j]["h"][0] - days[j]["l"][0]) * d["s"] / days[j]["s"] for j in range(i - 14, i)])
+        if d["h"][0] - d["l"][0] > max_bar * avg_bar:
+            return []
     e = d["c"][0] + side * tick  # the expected fill: the signal close + a tick (NinjaTrader sets the stop with the entry)
     ref = d["o"][0] + stop_at * (d["c"][0] - d["o"][0])  # research (2026-11-24): the stop part of the way to the close
+    if stop_pc:  # research (2026-11-24): the stop at the prior close (the gap's own level), the cap as before
+        ref = pc
     dist = min(max(abs(e - ref), 4 * tick), cap)
     px, x, xb, why = walk(d, 1, side, e - side * dist, e + side * r * dist if r else np.nan, exit_m, tick, at_open=True)
     return [(side, 1, px, x, why, xb)]

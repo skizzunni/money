@@ -1,0 +1,19 @@
+Stage 54 (2026-11-24, a research round): the gap trade's stop at the prior close; no gap trade on a wild open
+(strats.gap_go stop_pc / max_bar)
+
+bench.py (104 fresh 50K starts, dev + unseen NQ; the TradingView window; per set PF and net a year at 1 MNQ):
+shipped:              lost 0.0% median $16,582 p25 $11,321 | TV $+9,796 53tr PF 4.25 | dev 1.60 $5,119 | unseen_nq 1.59 $6,971 | es 1.17 $679 | live 3.34 $13,572
+stop at prior close:  lost 0.0% median $16,433 p25 $11,184 | TV $+9,714 53tr PF 4.14 | dev 1.58 $5,045 | unseen_nq 1.59 $7,002 | es 1.20 $832 | live 3.20 $13,321
+09:30 bar > 1.0x avg: lost 0.0% median $15,364 p25 $10,272 | TV $+9,173 42tr PF 5.89 | dev 1.59 $4,483 | unseen_nq 1.64 $6,571 | es 1.20 $661 | live 4.89 $14,218
+09:30 bar > 1.25x:    lost 0.0% median $16,013 p25 $10,130 | TV $+8,605 48tr PF 4.45 | dev 1.62 $4,880 | unseen_nq 1.64 $6,987 | es 1.25 $869 | live 3.84 $13,301
+09:30 bar > 1.5x:     lost 0.0% median $16,460 p25 $11,205 | TV $+9,947 51tr PF 4.47 | dev 1.64 $5,189 | unseen_nq 1.63 $7,153 | es 1.22 $798 | live 3.77 $14,233
+09:30 bar > 1.75x:    lost 0.0% median $16,555 p25 $11,937 | TV $+9,921 52tr PF 4.43 | dev 1.62 $5,200 | unseen_nq 1.61 $7,081 | es 1.17 $643 | live 3.52 $13,875
+09:30 bar > 2.0x:     lost 0.0% median $16,331 p25 $11,550 | TV $+9,921 52tr PF 4.43 | dev 1.60 $5,111 | unseen_nq 1.60 $6,996 | es 1.15 $599 | live 3.52 $13,875
+09:30 bar > 2.5x:     lost 0.0% median $16,011 p25 $11,375 | TV $+9,796 53tr PF 4.25 | dev 1.60 $5,096 | unseen_nq 1.59 $6,937 | es 1.16 $630 | live 3.34 $13,572
+09:30 bar > 3.0x:     lost 0.0% median $16,209 p25 $11,321 | TV $+9,796 53tr PF 4.25 | dev 1.60 $5,127 | unseen_nq 1.59 $6,923 | es 1.16 $630 | live 3.34 $13,572
+
+Verdict: neither shipped. The prior-close stop is lower on the median, the window and dev. The wild-open skip (the
+09:30 bar's range over 1.5-1.75x its 14-day average) lifts the trades' PF on every set and the window by $125-151,
+but the account median is never above shipped ($15,364-16,555) and the 25th percentile goes up and down between
+neighbours (1.5: -$116, 1.75: +$616, 2.0: +$229): it does not beat shipped on every gate. A near miss; re-check
+with more live data (this autumn's 09:30 bars are 60-170 points, section 29).

@@ -556,6 +556,12 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    $15,411-16,484 against $16,582 and the TradingView window $7,824-9,496 against $9,796. Rejected: afternoon breaks
    reach 2.5R often enough before 15:55.
 
+60. **The gap trade's stop at the prior close; no gap trade on a wild open** (2026-11-24, a research round; `gap_go`
+   stop_pc / max_bar, `verification/zoo/stage54_gap_stop_wild_open.txt`). The prior-close stop: lower median, window
+   and dev. Skipping the gap trade when the 09:30 bar's range is over 1.5-1.75x its 14-day average: the trades' PF up
+   on every set and the window +$125-151, but the account median never above $16,582 ($15,364-16,555) and the 25th
+   percentile up and down between neighbours. A near miss, not shipped.
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-33; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |
