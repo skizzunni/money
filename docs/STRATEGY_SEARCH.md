@@ -44,7 +44,7 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
 
 8. **More money without more risk** (`verification/zoo/stage4_target_and_gap_leg.txt`): a take-profit at 2.5 hard
    stops lifts the win rate (24% to 28%) and the weak starts (25th percentile $2,090 to $3,454); the gap-and-go leg
-   (09:35 to 09:55, stop at the 09:30 open, at most 50 points; now 40, section 29) switched on only once the account is $4,500 up (the floor
+   (09:35 to 09:55, stop at the 09:30 open, at most 50 points; 30 now, section 29) switched on only once the account is $4,500 up (the floor
    has stopped trailing by then) lifts the median to $8,772. **Every neighbour** (target 2.0-3.0, gap from $4,000-6,000,
    break-even 0.3-0.5, hard stop $175-225) also loses no start: the target makes the risk settings less fragile, not
    more. Caveat: gap and go loses on ES (PF 0.69, 70 trades) while it holds on NQ dev / unseen (1.95 / 1.76) and the live
@@ -256,6 +256,11 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    to $10,873, per year at 1 MNQ dev $5,119 to $5,685, unseen NQ $6,971 to $7,157, ES $679 to $593, live $13,572 to
    $13,698; about 11 more trades a year. The 40-point stop at 3 MNQ risks $240. TradingView with 28 (Aug 27 - Nov 23
    2026): +$6,345, 44 trades, 43% winners, PF 4.02.
+   **Taken back the same day.** On the user's TradingView window with 0.3 / 40: +$5,370, 48 trades, 42% winners, PF
+   3.14. Gap trades Aug 27 - Nov 23: 19, +$244 at 1 MNQ against 14, +$618: the 5 smaller gaps all lost, and with the
+   09:30 bars 60-170 points this autumn the cap is nearly always the stop, so each of 9 stops lost 10 points more. The
+   adoption test was not met: live PF 3.34 to 2.94 and ES 1.17 to 1.14 (the per-year net over Jun 29 - Nov 23 hid it).
+   A small gain on 2015-2025 does not outweigh a clear loss in the market traded now: back to 0.5 / 30 with 28's rule.
 
 ## The result (the shipped defaults, research numbers, 2 ticks of stop slippage, $0.62 a side)
 
