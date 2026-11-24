@@ -85,6 +85,7 @@ def noise(days, i, tick, vwap=True, trend=0, hard=250.0, vwap_stop=False, pv=2.0
         hard = pv * min(max(hard_vol * avg14, hard_lo), hard_hi)
     out = []
     pos, entry, stop, pend, pend_stop, ebar, exit_next, hard_ref = 0, 0.0, np.nan, 0, np.nan, 0, False, 0.0
+    pend_px = np.nan  # research (limit_in): the pending entry's limit price
     nchk, be_hit = 0, False  # research (2026-11-24, stale): checks held, break-even reached
     pend_strong = no_be = False  # research (be_skip_strong): no break-even for a strong break
     pend_tp = tp_r  # research (2026-11-24): strong_tp x the hard stop as the target on entries strong_at sigmas past
