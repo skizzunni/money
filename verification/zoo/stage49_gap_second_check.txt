@@ -1,0 +1,16 @@
+Stage 49 (2026-11-24, a research round): a second gap check at 09:35 (research/zoo/gap_second_check.py)
+
+When the 09:30 bar does not qualify for the gap trade (against the gap, or its body under 3% of the 14-day average
+range), look again at the 09:35 close: the gap's way from the 09:30 open by body2 x the average range -> in at 09:40,
+the stop at the 09:30 open (4 ticks to 30 points), out at 09:55. bench.py gates (104 fresh 50K starts, dev + unseen NQ;
+the TradingView window Aug 27 - Nov 23 2026):
+
+shipped:                            lost 0.0% median $16,582 p25 $11,321 | TV $+9,796 53tr PF 4.25 | dev PF 1.60 240/yr | unseen_nq PF 1.59 265/yr
+second check body2 0.03:            lost 0.0% median $15,890 p25 $10,144 | TV $+9,695 55tr PF 4.11 | dev PF 1.57 259/yr | unseen_nq PF 1.54 279/yr
+second check body2 0.06:            lost 0.0% median $15,870 p25 $10,105 | TV $+9,695 55tr PF 4.11 | dev PF 1.56 252/yr | unseen_nq PF 1.56 274/yr
+second check body2 0.10:            lost 0.0% median $16,166 p25 $11,229 | TV $+9,735 54tr PF 4.16 | dev PF 1.56 248/yr | unseen_nq PF 1.57 270/yr
+09:30 its way but small, 0.03:      lost 0.0% median $16,430 p25 $11,001 | TV $+9,757 54tr PF 4.19 | dev PF 1.59 243/yr | unseen_nq PF 1.58 268/yr
+09:30 its way but small, 0.06:      lost 0.0% median $16,430 p25 $10,919 | TV $+9,757 54tr PF 4.19 | dev PF 1.59 242/yr | unseen_nq PF 1.59 267/yr
+
+Rejected: 2-19 more trades a year, lower PF, median, 25th percentile and window at every setting. A gap the opening
+bar does not follow is weaker by 09:35.
