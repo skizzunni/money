@@ -62,6 +62,16 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    alone, in all three (Python, NinjaTrader, Pine), and a stop the fill has already passed fills at the open.
    Trades: on about 30% of sessions (31 of 104 live), 2.7 a traded day on average, at most 8.
 
+10. **The MambaFx "2 minute strategy"** (the user's video, 2026-11-24; `research/zoo/sr_break.py`, `twomin.py`,
+   `run_sr.py`, `verification/zoo/mambafx_2min_grid.csv`). His rules from the transcript: the 2-minute chart, NASDAQ /
+   US30, support and resistance from levels touched several times, enter when a 2-minute candle breaks one, the stop
+   just past it, 1:4 (or break-even at 1:2 and trail from 1:4), stop after 2-3 losses a day, risking 2-5% a trade. Made
+   mechanical (levels: swing highs / lows of the prior session and today with 2-3 touches within 0.03-0.06%), 320
+   variants on 2-minute NQ 2015-25, ES and the live MNQ: it trades 80-100% of days but **no variant makes money on both
+   dev and unseen NQ** (best dev PF 1.04, its unseen 0.85, ES 0.73, live 0.75), 41-100% of 50K starts lost; with the
+   20-session trend filter 0 of 32 either. His risk (2-5% of the account a trade) would end a 50K with a $2,000 floor in
+   one or two losers. Not used.
+
 ## The result (the shipped defaults, research numbers, 2 ticks of stop slippage, $0.62 a side)
 
 | set | band trades | win | PF | band net (1 MNQ) | gap trades (PF, net) | 50K starts lost | median 12 months |
