@@ -687,6 +687,10 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    on the real sequence, since shuffled days have no streaks). Medians $12,126 / $15,471 against $13,639 / $18,453 and
    the 25th percentiles $1,221 / $3,060 lower: the strategy recovers right after its losing runs. Rejected.
 
+86. **A contract more after two losing days** (2026-11-24, a research round; `verification/zoo/stage80_streak_step_up.txt`).
+   2015-19 median $15,869 against $13,639, but 1.8% of 2020-25 starts lost. Rejected: size after losses is how an
+   account near its floor goes under.
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-33; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |

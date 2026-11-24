@@ -1,0 +1,8 @@
+Stage 80 (2026-11-24, a research round): one contract MORE after two losing traded days in a row (the mirror of stage
+79; at most 3), on the real sequence (fresh 50K starts by period):
+
+shipped:                                  2015-19 lost 0.0% med $13,639 p25 $5,256 | 2020-25 lost 0.0% med $18,453 p25 $15,085
+one contract more after two losing days:  2015-19 lost 0.0% med $15,869 p25 $6,671 | 2020-25 lost 1.8% med $18,443 p25 $16,220
+
+Verdict: rejected on the first gate: 1.8% of 2020-25 starts lost (none shipped). The strategy's results do revert after
+losing runs (2015-19 +$2,230 median), but adding size after losses is how an account near its floor goes under.
