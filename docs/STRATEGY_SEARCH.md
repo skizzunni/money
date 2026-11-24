@@ -625,6 +625,11 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    `verification/zoo/stage66_band_lookback.txt`). 10 / 20 / 30 sessions instead of 14: each better on 2015-19 and lower
    on 2020-25 (10: median $17,627 against $18,453; 20 and 30 lose 1.8% / 5.5% of 2020-25 starts). 14 stays.
 
+73. **Holding the gap trade into a same-way band entry** (2026-11-24, a research round;
+   `verification/zoo/stage67_hold_gap_into_band.txt`). Joined only when the 10:00 check agrees: +$223 / +$249 a year,
+   but that decision would need the 10:00 close at 09:50 (hindsight). The tradeable version (hold every gap trade to
+   the 10:00 check): 2015-19 -$137 a year, 2020-25 +$81. The 09:55 exit stays.
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-33; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |

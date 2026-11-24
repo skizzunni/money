@@ -1,0 +1,16 @@
+Stage 67 (2026-11-24, a research round): hold the gap trade past 09:55 into a same-way 10:00 band entry
+
+Per gap trade that reached its 09:55 time exit, at 1 MNQ, $0.62 a side, from the shipped gap_go and noise trades:
+
+1. Joining only the gap trades whose 10:00 band entry went the same way (one bar held, one round trip saved):
+   dev 53 joins, +$223 a year; unseen NQ 50, +$249 a year; live 2, +$136 a year. NOT REALIZABLE: the gap trade's exit
+   is sent at the 09:50 bar's close, before the 10:00 check is known; this measures with hindsight.
+
+2. The realizable rule: every gap trade held one bar more, to the 10:00 check; joined when the band agrees, else out
+   at the 10:00 open; the gap stop live through the extra bar (stopped there: out at the stop, a tick worse):
+   dev:        joins 53 (+$1,103), no join 63 (-$1,784), stopped in the extra bar 6 | net -$680 = -$137 a year
+   unseen NQ:  joins 50 (+$1,352), no join 46 (-$914),   stopped in the extra bar 2 | net +$438 = +$81 a year
+   live:       joins 2 (+$56),     no join 2 (+$81),     stopped 0                  | net +$137
+
+Verdict: rejected. The gain in (1) is hindsight; the version a bot can trade loses on 2015-19 and adds $81 a year on
+2020-25. The 09:55 exit stays (as section 41 found for later exits in general).
