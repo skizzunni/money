@@ -85,7 +85,7 @@ def noise(days, i, tick, vwap=True, trend=0, hard=250.0, vwap_stop=False, pv=2.0
             pos = 0
         if pos:
             if (pos > 0 and lo[b] <= stop) or (pos < 0 and h[b] >= stop):
-                px = (min(o[b], stop) if pos > 0 else max(o[b], stop)) if b > ebar else stop
+                px = (min(o[b], stop) if pos > 0 else max(o[b], stop)) if (b > ebar or nt) else stop
                 out.append((pos, ebar, entry, px - pos * stop_slip * tick, "stop", b))
                 pos = 0
             elif tp_r and (tp_fill_bar or b > ebar) and pos * ((h[b] if pos > 0 else lo[b]) - tgt) >= tick:
@@ -120,6 +120,9 @@ def noise(days, i, tick, vwap=True, trend=0, hard=250.0, vwap_stop=False, pv=2.0
                     band = bl if want > 0 else bs
                     hp = hard_ref - want * hard / pv
                     pend, pend_stop = want, (max(band, hp) if want > 0 else min(band, hp))
+                    if want * (hard_ref - pend_stop) <= 0:  # VWAP on the wrong side of the fill (no VWAP entry filter):
+                        raw = up if want > 0 else dn       # the band alone (a stop past the price would be rejected)
+                        pend_stop = max(raw, hp) if want > 0 else min(raw, hp)
                     if nt:
                         pend_stop = _tick(pend_stop, tick)
         if not nt and mm[b] >= 955 and pos:

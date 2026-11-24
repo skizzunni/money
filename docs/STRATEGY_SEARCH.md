@@ -51,6 +51,17 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    MNQ months (2.34); it is one switch ("Gap trade") and never runs before the cushion. The gap trade exits at 09:55
    (not 10:00) so it is never closing on the bar the band's 10:00 entry fills.
 
+9. **More trading days, and the VWAP entry filter** (2026-11-24, the user: "trade every day";
+   `verification/zoo/stage5_more_days.txt`, `stage5_no_vwap_entry.txt`). Trading more days costs accounts: without the
+   trend filter (61% of days traded) 9.6% of starts are lost, with a lower entry line too (69%) 38%. Without the VWAP
+   entry filter (the same days) none is lost and the median rises $8,769 to $9,913 (25th percentile $3,235 to $3,638),
+   every neighbour safe but trend 15 (1%); live Jun 29 - Nov 23 at 1 MNQ $5,678 against $6,036. Shipped: the filter off
+   (`VwapEntry` false). **A bug the parity test caught first:** without the filter a long can enter below VWAP and the
+   VWAP-tightened stop then sat above the fill; the reference booked those as wins at the stop (an earlier run showed
+   a $10,649 median, wrong). Now, when VWAP is on the wrong side of the expected fill, the stop at entry is the band
+   alone, in all three (Python, NinjaTrader, Pine), and a stop the fill has already passed fills at the open.
+   Trades: on about 30% of sessions (31 of 104 live), 2.7 a traded day on average, at most 8.
+
 ## The result (the shipped defaults, research numbers, 2 ticks of stop slippage, $0.62 a side)
 
 | set | band trades | win | PF | band net (1 MNQ) | gap trades (PF, net) | 50K starts lost | median 12 months |

@@ -1,0 +1,9 @@
+{'vwap': True}: lost 0.000 median 8769 p25 3235 {'es_pf': np.float64(1.17), 'live': 6036, 'live_days': '31/104', 'trades_per_traded_day': np.float64(2.61), 'trades_per_session': np.float64(0.78), 'max_day': 7}
+{'vwap': False}: lost 0.000 median 9913 p25 3638 {'es_pf': np.float64(1.17), 'live': 5678, 'live_days': '31/104', 'trades_per_traded_day': np.float64(2.74), 'trades_per_session': np.float64(0.82), 'max_day': 8}
+{'vwap': False, 'hard': 225.0}: lost 0.000 median 10020 p25 2845 {'es_pf': np.float64(1.17), 'live': 6497, 'live_days': '31/104', 'trades_per_traded_day': np.float64(2.68), 'trades_per_session': np.float64(0.8), 'max_day': 8}
+{'vwap': False, 'be_r': 0.5}: lost 0.000 median 9933 p25 3145 {'es_pf': np.float64(1.17), 'live': 5620, 'live_days': '31/104', 'trades_per_traded_day': np.float64(2.71), 'trades_per_session': np.float64(0.81), 'max_day': 8}
+{'vwap': False, 'tp_r': 2.0}: lost 0.000 median 8522 p25 2013 {'es_pf': np.float64(1.17), 'live': 5981, 'live_days': '31/104', 'trades_per_traded_day': np.float64(2.94), 'trades_per_session': np.float64(0.88), 'max_day': 8}
+{'vwap': False, 'tp_r': 3.0}: lost 0.000 median 9121 p25 3100 {'es_pf': np.float64(1.17), 'live': 5139, 'live_days': '31/104', 'trades_per_traded_day': np.float64(2.61), 'trades_per_session': np.float64(0.78), 'max_day': 8}
+{'vwap': False, 'trend': 15}: lost 0.010 median 9899 p25 3903 {'es_pf': np.float64(1.16), 'live': 5615, 'live_days': '34/104', 'trades_per_traded_day': np.float64(2.74), 'trades_per_session': np.float64(0.89), 'max_day': 8}
+{'vwap': False, 'last': 810}: lost 0.000 median 7931 p25 2661 {'es_pf': np.float64(1.05), 'live': 5263, 'live_days': '31/104', 'trades_per_traded_day': np.float64(2.58), 'trades_per_session': np.float64(0.77), 'max_day': 8}
+EXIT

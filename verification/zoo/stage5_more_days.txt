@@ -1,0 +1,11 @@
+trend 20 k 1.0 vwap True mt 9 gap_from 4500.0: lost 0.000 median 8772 p25 3235 green 0.38 {'dev_days': 0.45, 'live_days': '31/104', 'live_net1': 6036}
+trend 0 k 1.0 vwap True mt 9 gap_from 4500.0: lost 0.096 median 6897 p25 3040 green 0.35 {'dev_days': 0.61, 'live_days': '50/104', 'live_net1': 5027}
+trend 10 k 1.0 vwap True mt 9 gap_from 4500.0: lost 0.029 median 7905 p25 3274 green 0.37 {'dev_days': 0.49, 'live_days': '37/104', 'live_net1': 5570}
+trend 20 k 0.8 vwap True mt 9 gap_from 4500.0: lost 0.067 median 6827 p25 2210 green 0.37 {'dev_days': 0.51, 'live_days': '35/104', 'live_net1': 5832}
+trend 0 k 0.8 vwap True mt 9 gap_from 4500.0: lost 0.385 median 2394 p25 -40 green 0.33 {'dev_days': 0.69, 'live_days': '55/104', 'live_net1': 4680}
+trend 20 k 1.0 vwap False mt 9 gap_from 4500.0: lost 0.000 median 10649 p25 5117 green 0.39 {'dev_days': 0.45, 'live_days': '31/104', 'live_net1': 6561}
+trend 0 k 1.0 vwap False mt 9 gap_from 4500.0: lost 0.058 median 10133 p25 6530 green 0.36 {'dev_days': 0.61, 'live_days': '50/104', 'live_net1': 5883}
+trend 20 k 1.0 vwap True mt 9 gap_from 0.0: lost 0.019 median 9801 p25 6280 green 0.38 {'dev_days': 0.45, 'live_days': '31/104', 'live_net1': 6036}
+trend 0 k 1.0 vwap True mt 9 gap_from 0.0: lost 0.096 median 8533 p25 5000 green 0.35 {'dev_days': 0.61, 'live_days': '50/104', 'live_net1': 5027}
+trend 0 k 0.8 vwap True mt 9 gap_from 0.0: lost 0.317 median 5412 p25 -55 green 0.34 {'dev_days': 0.69, 'live_days': '55/104', 'live_net1': 4680}
+trend 20 k 0.8 vwap True mt 9 gap_from 0.0: lost 0.087 median 8984 p25 4014 green 0.37 {'dev_days': 0.51, 'live_days': '35/104', 'live_net1': 5832}

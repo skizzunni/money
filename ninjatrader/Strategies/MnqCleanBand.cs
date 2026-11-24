@@ -4,8 +4,8 @@
 // 5-minute chart, regular hours (09:30-16:00 New York). Every half hour from 10:00 to LastEntry (14:00):
 //   * the noise area: sigma = the mean over the last 14 complete sessions of |close at that time / the 09:30 open - 1|;
 //     upper = max(today's open, the prior close) x (1 + sigma), lower = min(...) x (1 - sigma);
-//   * flat: long when the close is above upper, above the session VWAP and above the TrendDays-session average of
-//     closes; short mirrored; a market order at the bar's close (filled at the next open);
+//   * flat: long when the close is above upper and above the TrendDays-session average of closes (VwapEntry: also
+//     above the session VWAP); short mirrored; a market order at the bar's close (filled at the next open);
 //   * the stop, set with the entry: the tighter of the band on the trade's side (or VWAP when tighter) and a hard stop
 //     HardStop $ a contract from the expected fill (the signal close + a tick); at each check it moves to the tighter
 //     of the new band / VWAP and the hard stop, never looser; if that is already at or past the close, out at market;
@@ -80,6 +80,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 StartProfit = 0;
                 UseAccountBalanceLive = true;
                 VwapStop = true;
+                VwapEntry = false;  // 2026-11-24: without the VWAP entry filter, more per start and no more lost (docs/STRATEGY_SEARCH.md, 9)
                 PlaceOrders = true;
                 BlockOnDataGap = true;
                 TakeProfitAt = 2.5;
@@ -308,13 +309,16 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (early && tradesToday >= EarlyMaxTrades)
                 return;
             int want = Close[0] > up ? 1 : Close[0] < dn ? -1 : 0;
-            if (want != 0 && want * (Close[0] - vwap) <= 0) want = 0;
+            if (want != 0 && VwapEntry && want * (Close[0] - vwap) <= 0) want = 0;
             if (want != 0 && TrendDays > 0 && want * (Close[0] - sma) <= 0) want = 0;
             if (want == 0)
                 return;
             hardRef = Close[0] + want * tick;
             double hp = hardRef - want * HardStop / pv;
-            stop = Instrument.MasterInstrument.RoundToTickSize(want > 0 ? Math.Max(bl, hp) : Math.Min(bs, hp));
+            stop = want > 0 ? Math.Max(bl, hp) : Math.Min(bs, hp);
+            if (want * (hardRef - stop) <= 0)  // VWAP on the wrong side of the fill: the band alone (a stop past the price is rejected)
+                stop = want > 0 ? Math.Max(up, hp) : Math.Min(dn, hp);
+            stop = Instrument.MasterInstrument.RoundToTickSize(stop);
             string name = want > 0 ? "Long" : "Short";
             SetStopLoss(name, CalculationMode.Price, stop, false);
             if (TakeProfitAt > 0)
@@ -427,6 +431,10 @@ namespace NinjaTrader.NinjaScript.Strategies
         [NinjaScriptProperty]
         [Display(Name = "The stop is also never looser than VWAP", Order = 4, GroupName = "1. Entries")]
         public bool VwapStop { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Entries also need the close on VWAP's side", Order = 5, GroupName = "1. Entries")]
+        public bool VwapEntry { get; set; }
 
         [NinjaScriptProperty]
         [Range(1, 2000)]

@@ -22,7 +22,7 @@ sys.path.insert(0, str(ROOT / "research"))
 import harness as H  # noqa: E402
 import strats as S  # noqa: E402
 
-DEFAULTS = dict(vwap=True, trend=20, hard=200.0, vwap_stop=True, k=1.0, be_r=0.4, max_trades=9, last=840, tp_r=2.5)
+DEFAULTS = dict(vwap=False, trend=20, hard=200.0, vwap_stop=True, k=1.0, be_r=0.4, max_trades=9, last=840, tp_r=2.5)
 GAP = dict(k=1.0, exit_m=590, r=0.0, cap=50.0)
 
 
@@ -98,7 +98,7 @@ def py_trades(days: list, idx: list, day_stop: float = 0.0, steps=None, gap_from
         for side, eb, epx, xpx, _why, *_ in legs:
             if day_stop and day <= -day_stop:
                 break
-            pnl = (xpx - epx) * side * 2.0 * q  # the stand-in books no commission
+            pnl = ((xpx - epx) * side * 2.0 - 2 * 0.62) * q  # $0.62 a side, as the stand-in books it
             day += pnl
             out.append((side, pos_of[(i, eb)], round(epx, 6), round(xpx, 6), q))
         cum += day

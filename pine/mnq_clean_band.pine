@@ -5,7 +5,7 @@
 // 5-minute MNQ chart. Every half hour from 10:00 to the last entry check (14:00):
 //   * noise area: sigma = the mean over the last 14 complete sessions of |close at that time / the 09:30 open - 1|;
 //     upper = max(open, prior close) x (1 + sigma), lower = min(...) x (1 - sigma);
-//   * flat: LONG when the close is above upper, above VWAP and above the 20-session average of closes; SHORT mirrored;
+//   * flat: LONG when the close is above upper and above the 20-session average of closes; SHORT mirrored;
 //   * stop: the tighter of the band (or VWAP) and $200 a contract from the expected fill; moved at each check, never
 //     looser; back at or past it: out at market. Break-even once up 0.4 x $200; take profit at 2.5 x $200; out at 15:55;
 //   * no new entry once the day is down $600; 1 / 2 / 3 contracts from +$2,000 / +$4,500;
@@ -24,6 +24,7 @@ tpAt = input.float(2.5, "Take profit at this many hard stops (0 = off)", minval 
 lastEntry = input.int(840, "Last entry check, minutes from midnight New York (840 = 14:00)", minval = 600, maxval = 900)
 maxTrades = input.int(9, "Most trades a day", minval = 1, maxval = 20)
 vwapStop = input.bool(true, "The stop is also never looser than VWAP")
+vwapEntry = input.bool(false, "Entries also need the close on VWAP's side")
 dayStop = input.float(600, "Day stop: no new entry once the day is down $ (0 = off)", minval = 0)
 maxQty = input.int(3, "Most contracts", minval = 1, maxval = 3)
 step2 = input.float(2000, "2 contracts from this profit $", minval = 0)
@@ -185,14 +186,17 @@ if inRth and ready
                     stopPx := nw
             else if pos == 0 and endMin <= lastEntry and tMin < 950 and tradesToday < maxTrades and (dayStop <= 0 or strategy.netprofit - dayStartNet > -dayStop)
                 want = close > up ? 1 : close < dn ? -1 : 0
-                if want != 0 and want * (close - vwapNow) <= 0
+                if want != 0 and vwapEntry and want * (close - vwapNow) <= 0
                     want := 0
                 if want != 0 and trendDays > 0 and want * (close - sma) <= 0
                     want := 0
                 if want != 0
                     hardRef := close + want * tk
                     hp = hardRef - want * hardStop / pv
-                    stopPx := math.round_to_mintick(want > 0 ? math.max(bl, hp) : math.min(bs, hp))
+                    stopPx := want > 0 ? math.max(bl, hp) : math.min(bs, hp)
+                    if want * (hardRef - stopPx) <= 0   // VWAP on the wrong side of the fill: the band alone
+                        stopPx := want > 0 ? math.max(up, hp) : math.min(dn, hp)
+                    stopPx := math.round_to_mintick(stopPx)
                     tgtPx := na
                     nid = want > 0 ? "Long" : "Short"
                     strategy.entry(nid, want > 0 ? strategy.long : strategy.short, qty)
