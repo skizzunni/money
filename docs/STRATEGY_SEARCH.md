@@ -522,6 +522,11 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    median $16,582 to $13,426-15,744, 25th percentile $11,321 to $8,527-11,558, the TradingView window $9,796 to
    $6,948-8,524; none lost either way. Rejected: the early contract is cut from the trades that reach 2.5x.
 
+54. **The day stop's level again** (2026-11-24, a research round; `verification/zoo/stage48_day_stop_level.txt`). With
+   the add and the +$3,500 step in: $400 / $500 cut the median to $15,256 / $15,419 and the 25th percentile to $8,987 /
+   $9,365 (shipped $600: $16,582 / $11,321); $700 no different; $800 +$157 median but more fresh shuffled years blown
+   (6.6% against 6.3%). $600 stays.
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-33; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |

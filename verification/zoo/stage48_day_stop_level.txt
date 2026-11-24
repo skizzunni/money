@@ -1,0 +1,17 @@
+Stage 48 (2026-11-24, a research round): the day stop's level with the 1.5-sigma add and +$3,500 steps in
+
+research/zoo/bench.py run(day_stop=...): 104 fresh 50K starts (dev + unseen NQ), the TradingView window replay
+day stop $600 (shipped): lost 0.0% median $16,582 p25 $11,321 | TV $+9,796 53tr PF 4.25 dd $670
+day stop $400:           lost 0.0% median $15,256 p25 $8,987  | TV $+9,791 52tr PF 4.25 dd $676
+day stop $500:           lost 0.0% median $15,419 p25 $9,365  | TV $+9,796 53tr PF 4.25 dd $670
+day stop $700:           lost 0.0% median $16,546 p25 $11,258 | TV $+9,796 53tr PF 4.25 dd $670
+day stop $800:           lost 0.0% median $16,739 p25 $11,482 | TV $+9,796 53tr PF 4.25 dd $670
+
+Shuffled days (research/stress/montecarlo.py with the day stop as a parameter; 2,000 years each; the cushion guard,
+without the strong-only tier; the same draws for both):
+day stop $600: from $50,000 blown 6.3%, median $16,632 | $48,806 18.9%, $12,811 | $48,998 14.5%, $14,351
+day stop $800: from $50,000 blown 6.6%, median $16,905 | $48,806 18.8%, $13,333 | $48,998 14.6%, $14,437
+
+Verdict: $600 stays. $400 / $500 cut the median $1,163-1,326 and the 25th percentile $1,956-2,334 (the day's
+later trades recover more often than not); $700 is no different; $800 adds $157 (bench) / $273 (shuffled) to the
+median but blows 6.6% of fresh shuffled years against 6.3% (and $1,000 lost 1% of bench starts, section 32).
