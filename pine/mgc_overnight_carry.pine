@@ -5,7 +5,8 @@
 // 5-minute MGC chart with extended hours (the overnight session and the 13:25 bar), New York times:
 //   * the move = the 08:20 bar's open less the prior session's 13:25 bar close;
 //   * at least 1.5x the last 14 sessions' average |move|, and the bars from 08:20 to 08:35 closing its way (the 08:30
-//     bar's close against the 08:20 open): in at the next open, the stop a tick past the 08:20 open;
+//     bar's close against the 08:20 open): in at the next open, the stop a tick past 60% of the way from the 08:20
+//     open to that close;
 //   * out at the 13:25 bar's close (filled at 13:30; a gap in the bars: the first bar from 13:25 on); a trade still
 //     open when the next trading day starts (a holiday's early close) goes out on its first bar; one trade a day;
 //   * 1 / 2 / 3 contracts from +$0 / +$2,000 / +$3,500; no trade while under $1,500 above the trailing floor.
@@ -18,6 +19,7 @@ const string TZ = "America/New_York"
 
 kMove = input.float(1.5, "Overnight move at least this many 14-session averages", minval = 0.1, step = 0.25)
 confirm = input.int(15, "Minutes from 08:20 that must close its way", minval = 5, maxval = 120, step = 5)
+stopAt = input.float(0.6, "Stop: this share of the way from the 08:20 open to the 08:30 bar's close (0 = the open)", minval = 0, maxval = 0.95, step = 0.05)
 openAt = input.int(500, "Session open, minutes from midnight New York (500 = 08:20)", minval = 0, maxval = 1439)
 exitAt = input.int(810, "Out at, minutes from midnight New York (810 = 13:30)", minval = 0, maxval = 1439)
 maxQty = input.int(3, "Most contracts", minval = 1, maxval = 3)
@@ -88,7 +90,7 @@ else if pos == 0 and tMin == openAt + confirm - 5 and not traded and not guarded
             s += math.abs(m)
     side = dMove > 0 ? 1 : -1
     if ok and math.abs(dMove) >= kMove * s / 14 and side * (close - dOpen) > 0
-        stp = math.round_to_mintick(dOpen - side * tk)
+        stp = math.round_to_mintick(dOpen + stopAt * (close - dOpen) - side * tk)
         id = side > 0 ? "CarryLong" : "CarryShort"
         strategy.entry(id, side > 0 ? strategy.long : strategy.short, qty)
         strategy.exit(id + " stop", id, stop = stp, comment = "Stop loss")

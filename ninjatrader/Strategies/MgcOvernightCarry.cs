@@ -6,7 +6,7 @@
 //   * the move = the 08:20 bar's open less the prior session's 13:25 bar close;
 //   * the last 14 sessions' average |move|: today's at least K x that, and the bars from 08:20 to 08:20 + Confirm
 //     minutes closing its way (the last one's close against the 08:20 open): a market order at that close (filled at
-//     the next open), the stop a tick past the 08:20 open, set with the entry;
+//     the next open), the stop a tick past StopAt (0.6) of the way from the 08:20 open to that close, set with the entry;
 //   * out at market at the 13:25 bar's close (filled at 13:30; a gap in the bars: the first bar from 13:25 on); a
 //     trade still open when the next trading day starts (a holiday's early close) goes out on its first bar; one trade
 //     a day at most.
@@ -66,6 +66,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 RealtimeErrorHandling = RealtimeErrorHandling.StopCancelCloseIgnoreRejects;
                 K = 1.5;
                 ConfirmMinutes = 15;
+                StopAt = 0.6;  // docs/STRATEGY_SEARCH.md 39: PF 1.24 / 1.54 to 1.80 / 1.88, the worst trade -$347 to -$141
                 OpenAt = 500;
                 ExitAt = 810;
                 MaxContracts = 3;
@@ -237,7 +238,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (side * (Close[0] - today.Open) <= 0)
                 return;
             double tick = TickSize;
-            double stop = Instrument.MasterInstrument.RoundToTickSize(today.Open - side * tick);
+            double stop = Instrument.MasterInstrument.RoundToTickSize(today.Open + StopAt * (Close[0] - today.Open) - side * tick);
             string name = side > 0 ? "CarryLong" : "CarryShort";
             SetStopLoss(name, CalculationMode.Price, stop, false);
             if (side > 0) EnterLong(qty, name); else EnterShort(qty, name);
@@ -308,6 +309,11 @@ namespace NinjaTrader.NinjaScript.Strategies
         [Range(5, 120)]
         [Display(Name = "Minutes from 08:20 that must close its way", Order = 2, GroupName = "1. Entry")]
         public int ConfirmMinutes { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, 0.95)]
+        [Display(Name = "Stop: this share of the way from the 08:20 open to the 08:30 bar's close (0 = the open)", Order = 5, GroupName = "1. Entry")]
+        public double StopAt { get; set; }
 
         [NinjaScriptProperty]
         [Range(0, 1439)]

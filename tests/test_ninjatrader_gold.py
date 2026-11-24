@@ -124,7 +124,8 @@ def test_gold_carry_matches_python(sim, tmp_path, props, py):  # noqa: F811
 
 @pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
 def test_gold_carry_safety(sim, tmp_path):  # noqa: F811
-    """Every entry has its stop set first, a tick past the 08:20 open on the right side; every trade is out the same
+    """Every entry has its stop set first, a tick past 60% of the way from the 08:20 open to the signal close, on the
+    right side; every trade is out the same
     trading day by 13:30; one trade a day at most; at most MaxContracts."""
     days = gold_days()
     path = tmp_path / "gold.csv"
@@ -139,7 +140,8 @@ def test_gold_carry_safety(sim, tmp_path):  # noqa: F811
         side = 1 if o[2] == "CarryLong" else -1
         k820 = int(np.searchsorted(days[di]["mm"], 860))
         assert (o[0], o[2]) in stops
-        assert abs(stops[(o[0], o[2])] - (days[di]["o"][k820] - side * TICK)) < 1e-6
+        want = np.round((days[di]["o"][k820] + 0.6 * (days[di]["c"][k] - days[di]["o"][k820]) - side * TICK) / TICK) * TICK
+        assert abs(stops[(o[0], o[2])] - want) < 1e-6  # 60% of the way from the 08:20 open to the signal close
         assert side * (days[di]["c"][k] + side * TICK - stops[(o[0], o[2])]) > 0
     tt = [x.split(",")[1:] for x in lines if x.startswith("T,")]
     for t in tt:  # out the same trading day by 13:30, or (a gap in the bars / an early close) the first bar after

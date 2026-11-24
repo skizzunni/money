@@ -358,7 +358,7 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    `tests/test_ninjatrader_gold.py`, `tests/test_pine_gold.py`, `verification/zoo/stage31_mnq_plus_gold.txt`). The one
    gold pattern of section 36's search, built for NinjaTrader: gold's move from the prior session's 13:25 close to the
    08:20 open at least 1.5x its 14-session average, the 08:20-08:35 bars closing its way: in at 08:35 its way, the stop a
-   tick past the 08:20 open, out at 13:30; sized like MNQ (1 / 2 / 3 from +$0 / 2,000 / 3,500); its own chart and
+   tick past the 08:20 open (60% of the way to the signal since section 39), out at 13:30; sized like MNQ (1 / 2 / 3 from +$0 / 2,000 / 3,500); its own chart and
    strategy beside MnqCleanBand on the same account. Gold alone (5-minute bars, as NinjaTrader trades it): about 20
    trades a year, PF 1.29 (2009-17) / 1.54 (2018 - Mar 2025), 65% of years up, the worst trade -$348 a contract. With
    MNQ on one 50K (100 starts 2015 - Mar 2025, gold with no day stop of its own, MNQ's $600 as shipped): **0 lost,
@@ -384,6 +384,18 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    floor: "Highest end-of-day balance so far" is copied from its dashboard, then the strategy raises it from each day's
    starting balance. It overrides FixedContracts near the floor (CushionGuard 0 turns it off). Tests: trade for trade
    with the reference from $800 above the floor and with a higher high-water mark, MNQ and gold, NinjaTrader and Pine.
+
+39. **The gold trade's stop** (2026-11-24, a research round; `mk_search.carry` stop_at / be_r / tp_r,
+   `verification/zoo/stage33_gold_stop.txt`). The stop sat a tick past the 08:20 open, as far as the first 15 minutes
+   had run. Moved part of the way from the 08:20 open toward the signal close (the 08:30 bar's), gold alone (PF 2009-17 /
+   2018 - Mar 2025, the worst trade a contract) and with MNQ on one 50K (100 starts, median / 25th percentile):
+   0% (as shipped in 37) 1.24 / 1.54, -$347, $17,062 / $11,581; 40% 1.48 / 1.70, -$209, $16,787 / $11,782; 50% 1.50 /
+   1.86, -$175, $17,076 / $11,824; **60% 1.80 / 1.88, -$141, $17,138 / $11,876**; 75% 1.65 / 2.55, -$89, $16,965 /
+   $12,326; 0 lost in every case. Every stop from 40% to 75% beats the open; 60% is the middle. Not used: break-even at
+   1-2x the risk (PF 1.31-1.34 / 1.66-1.82, the 25th percentile lower at 1.0 and 1.5), a target at 2-4x (PF 0.86-1.10
+   on 2009-17). With the 60% stop the other settings again: the move 1.25 / 1.75x, 10 / 20 minutes, out 13:00 / 13:40
+   (`StopAt` 0.6 with the shipped 1.5x / 15 / 13:30: all 0 lost). Shipped: `StopAt` 0.6 (NinjaTrader, Pine); tests
+   trade for trade on 2009 - Mar 2025 gold.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-33; research numbers, $0.62 a side)
 

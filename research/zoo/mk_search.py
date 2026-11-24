@@ -173,7 +173,8 @@ def five_min(days):
     return out
 
 
-def carry(days, i, tick=0.1, k=1.5, open_m=860, confirm=15, settle=1170, exit_m=1170, n=14):
+def carry(days, i, tick=0.1, k=1.5, open_m=860, confirm=15, settle=1170, exit_m=1170, n=14, stop_at=0.6, be_r=0.0,
+          tp_r=0.0):
     """Gold's overnight move carried on (MgcOvernightCarry.cs, 2026-11-24), on 5-minute bars: the move = the 08:20 bar's
     open less the prior session's 13:25 bar close; at least k x the last n sessions' average |move| and the bars from
     08:20 to 08:20 + confirm closing its way (the last one's close against the 08:20 open): a market order at that
@@ -199,8 +200,14 @@ def carry(days, i, tick=0.1, k=1.5, open_m=860, confirm=15, settle=1170, exit_m=
     side = 1 if mv > 0 else -1
     if side * (d["c"][kc - 1] - d["o"][ko]) <= 0:
         return []
-    stop = np.round((d["o"][ko] - side * tick) / tick) * tick  # as NinjaTrader's RoundToTickSize
     e = d["o"][kc] + side * tick
+    # stop_at (2026-11-24, docs 39): the stop that share of the way from the 08:20 open to the signal close, a tick past
+    # it (0: the 08:20 open itself, as first shipped); be_r / tp_r: break-even (+ a tick) / a target at that many times the risk from the expected fill
+    ref = d["o"][ko] + stop_at * (d["c"][kc - 1] - d["o"][ko])
+    stop = np.round((ref - side * tick) / tick) * tick  # as NinjaTrader's RoundToTickSize
+    risk = abs(d["c"][kc - 1] + side * tick - stop)
+    tgt = np.round((d["c"][kc - 1] + side * tick + side * tp_r * risk) / tick) * tick if tp_r else np.nan
+    be_done = False
     # as NinjaTrader acts (on a bar's close): the exit at the close of the first bar from exit_m - 5 on, filled at the
     # next open; a session that ends first (a holiday's early close): at the close of the next day's first bar
     nx = days[i + 1] if i + 1 < len(days) else None
@@ -213,5 +220,10 @@ def carry(days, i, tick=0.1, k=1.5, open_m=860, confirm=15, settle=1170, exit_m=
         if (side > 0 and dd["l"][b] <= stop) or (side < 0 and dd["h"][b] >= stop):
             x = (min(dd["o"][b], stop) if side > 0 else max(dd["o"][b], stop)) - side * tick
             return [(side, kc, e, x, "stop", b)]
+        if tp_r and ((side > 0 and dd["h"][b] >= tgt + tick) or (side < 0 and dd["l"][b] <= tgt - tick)):
+            return [(side, kc, e, tgt, "target", b)]
+        if be_r and not be_done and side * (dd["c"][b] - e) >= be_r * risk:
+            stop = max(stop, e + tick) if side > 0 else min(stop, e - tick)
+            be_done = True
     dd, b = seq[trig + 1]
     return [(side, kc, e, dd["o"][b] - side * tick, "time" if dd is d else "session", b - 1)]
