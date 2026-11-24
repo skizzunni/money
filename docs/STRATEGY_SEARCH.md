@@ -652,6 +652,10 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    0.94-1.04), so no degradation, but a full year should look like the history (PF about 1.6, losing months like July).
    Gold and MNQ days correlate +0.04 / +0.11: gold diversifies; nothing to change.
 
+78. **Slippage and fees with 61 in** (2026-11-24, a research round; `verification/zoo/stage72_slippage_fees_with_61.txt`).
+   Up to 3 more ticks on every entry and stop, and $1.00 a side: no start lost in either period; the 2020-25 median
+   $17,136 at +3 ticks. Section 61 leads more as fills worsen (2015-19 25th percentile $4,661 against $3,901 at +3 ticks).
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-33; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |

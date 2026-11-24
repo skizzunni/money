@@ -1,0 +1,20 @@
+Stage 72 (2026-11-24, a research round): execution stress with and without section 61 (fresh 50K starts by period)
+
+Every stop k ticks worse than the 2 already modelled (noise stop_slip 2 + k), every entry k ticks worse (k ticks off each
+trade), and fees per side. "with 61" is shipped; "without" has LadderAt 0, GapMaxBar 0.
++0 ticks, $0.62, with 61:  2015-19 lost 0.0% med $13,639 p25 $5,256 | 2020-25 lost 0.0% med $18,453 p25 $15,085
++0 ticks, $0.62, without:  2015-19 lost 0.0% med $13,058 p25 $5,802 | 2020-25 lost 0.0% med $17,530 p25 $14,215
++1 tick,  $0.62, with 61:  2015-19 lost 0.0% med $13,322 p25 $5,117 | 2020-25 lost 0.0% med $18,227 p25 $14,689
++1 tick,  $0.62, without:  2015-19 lost 0.0% med $13,343 p25 $5,174 | 2020-25 lost 0.0% med $16,908 p25 $13,603
++2 ticks, $0.62, with 61:  2015-19 lost 0.0% med $12,922 p25 $4,773 | 2020-25 lost 0.0% med $17,762 p25 $14,278
++2 ticks, $0.62, without:  2015-19 lost 0.0% med $13,037 p25 $5,019 | 2020-25 lost 0.0% med $16,397 p25 $13,134
++3 ticks, $0.62, with 61:  2015-19 lost 0.0% med $12,395 p25 $4,661 | 2020-25 lost 0.0% med $17,136 p25 $13,927
++3 ticks, $0.62, without:  2015-19 lost 0.0% med $12,125 p25 $3,901 | 2020-25 lost 0.0% med $14,853 p25 $12,704
++0 ticks, $1.00, with 61:  2015-19 lost 0.0% med $13,342 p25 $5,140 | 2020-25 lost 0.0% med $18,246 p25 $14,710
++0 ticks, $1.00, without:  2015-19 lost 0.0% med $12,474 p25 $5,192 | 2020-25 lost 0.0% med $16,946 p25 $13,626
++2 ticks, $1.00, with 61:  2015-19 lost 0.0% med $12,718 p25 $4,670 | 2020-25 lost 0.0% med $17,150 p25 $13,948
++2 ticks, $1.00, without:  2015-19 lost 0.0% med $12,144 p25 $3,919 | 2020-25 lost 0.0% med $14,876 p25 $12,720
+
+Verdict: robust. No start lost at any level. Section 61 keeps its 2020-25 lead at every level and widens it as fills
+worsen; its 2015-19 25th-percentile shortfall (section 68) appears at 0-2 extra ticks only and reverses at +3 ticks and
+at $1.00 fees with +2 ticks (+$751 / +$751). Nothing to change.
