@@ -1,0 +1,36 @@
+close in the top/bottom off of the day's range: lost 0.0%  median $13,711  p25 $7,471
+     dev       band PF 1.41 trades/yr 289 days 53% net/yr(1) $ 5,057
+     unseen_nq band PF 1.48 trades/yr 305 days 52% net/yr(1) $ 6,707
+     unseen_es band PF 1.17 trades/yr 253 days 52% net/yr(1) $   353
+     live      band PF 2.85 trades/yr 233 days 38% net/yr(1) $11,323  Nov 9-19 $  164 (18 trades)
+close in the top/bottom 50% of the day's range: lost 0.0%  median $13,719  p25 $7,771
+     dev       band PF 1.41 trades/yr 285 days 53% net/yr(1) $ 5,061
+     unseen_nq band PF 1.48 trades/yr 303 days 52% net/yr(1) $ 6,617
+     unseen_es band PF 1.16 trades/yr 251 days 52% net/yr(1) $   307
+     live      band PF 2.89 trades/yr 230 days 38% net/yr(1) $11,402  Nov 9-19 $  164 (18 trades)
+close in the top/bottom 40% of the day's range: lost 0.0%  median $14,221  p25 $7,850
+     dev       band PF 1.46 trades/yr 276 days 53% net/yr(1) $ 5,228
+     unseen_nq band PF 1.49 trades/yr 298 days 52% net/yr(1) $ 6,598
+     unseen_es band PF 1.17 trades/yr 246 days 52% net/yr(1) $   321
+     live      band PF 3.30 trades/yr 220 days 38% net/yr(1) $12,128  Nov 9-19 $  258 (16 trades)
+close in the top/bottom 30% of the day's range: lost 0.0%  median $13,244  p25 $7,790
+     dev       band PF 1.46 trades/yr 257 days 52% net/yr(1) $ 5,048
+     unseen_nq band PF 1.47 trades/yr 286 days 52% net/yr(1) $ 6,283
+     unseen_es band PF 1.21 trades/yr 236 days 52% net/yr(1) $   434
+     live      band PF 3.88 trades/yr 201 days 38% net/yr(1) $12,329  Nov 9-19 $  635 (11 trades)
+close in the top/bottom 25% of the day's range: lost 0.0%  median $11,643  p25 $7,033
+     dev       band PF 1.44 trades/yr 245 days 52% net/yr(1) $ 4,734
+     unseen_nq band PF 1.47 trades/yr 274 days 52% net/yr(1) $ 5,943
+     unseen_es band PF 1.21 trades/yr 229 days 52% net/yr(1) $   409
+     live      band PF 3.63 trades/yr 196 days 38% net/yr(1) $11,161  Nov 9-19 $  635 (11 trades)
+close in the top/bottom 20% of the day's range: lost 0.0%  median $9,008  p25 $5,243
+     dev       band PF 1.42 trades/yr 225 days 52% net/yr(1) $ 4,277
+     unseen_nq band PF 1.49 trades/yr 257 days 51% net/yr(1) $ 5,760
+     unseen_es band PF 1.20 trades/yr 219 days 51% net/yr(1) $   366
+     live      band PF 4.00 trades/yr 184 days 38% net/yr(1) $11,179  Nov 9-19 $  637 (10 trades)
+close in the top/bottom 15% of the day's range: lost 1.0%  median $7,284  p25 $3,608
+     dev       band PF 1.26 trades/yr 207 days 50% net/yr(1) $ 3,176
+     unseen_nq band PF 1.45 trades/yr 235 days 50% net/yr(1) $ 4,952
+     unseen_es band PF 1.26 trades/yr 198 days 50% net/yr(1) $   464
+     live      band PF 4.52 trades/yr 165 days 38% net/yr(1) $10,243  Nov 9-19 $  842 (7 trades)
+35%: lost 0.0% median $14,315 p25 $8,244   {'dev': 'band PF 1.47 net/yr(1) $ 5,280', 'unseen_nq': 'band PF 1.49 net/yr(1) $ 6,499', 'unseen_es': 'band PF 1.22 net/yr(1) $   449', 'live': 'band PF 3.88 net/yr(1) $12,913  Nov 9-19 $  580'}

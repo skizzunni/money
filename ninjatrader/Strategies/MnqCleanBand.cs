@@ -45,7 +45,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         TimeZoneInfo newYork;
         readonly List<Day> hist = new List<Day>();
         Day today;
-        double dayOpen, prevClose, sma, vwapNum, vwapDen, dayCumStart, hardRef, stop, entryPx;
+        double dayOpen, prevClose, sma, vwapNum, vwapDen, dayCumStart, hardRef, stop, entryPx, dayHigh, dayLow;
         int pos, tradesToday, qty, gapPos;
         bool ready, beDone, early, exiting, gapWarned, noisePending, gapPending, gapToday, stopGone;
         DateTime stopGoneUtc = DateTime.MinValue;
@@ -86,7 +86,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 StartProfit = 0;
                 UseAccountBalanceLive = true;
                 VwapStop = true;
-                VwapEntry = false;  // 2026-11-24: without the VWAP entry filter, more per start and no more lost (docs/STRATEGY_SEARCH.md, 9)
+                VwapEntry = false;
+                RangePos = 0.65;  // 2026-11-24: without the VWAP entry filter, more per start and no more lost (docs/STRATEGY_SEARCH.md, 9)
                 PlaceOrders = true;
                 BlockOnDataGap = true;
                 TakeProfitAt = 2.5;
@@ -163,6 +164,8 @@ namespace NinjaTrader.NinjaScript.Strategies
             today = new Day();
             today.Date = date;
             dayOpen = Open[0];
+            dayHigh = double.MinValue;
+            dayLow = double.MaxValue;
             if (hist.Count > 0) today.Gap = dayOpen - hist[hist.Count - 1].Close;
             gapToday = false;
             vwapNum = vwapDen = 0;
@@ -269,6 +272,8 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (today == null || t.Date != today.Date)
                 NewDay(t.Date);
             today.Bars++;
+            dayHigh = Math.Max(dayHigh, High[0]);
+            dayLow = Math.Min(dayLow, Low[0]);
             double vol = Volume[0] > 0 ? Volume[0] : 1;
             vwapNum += (High[0] + Low[0] + Close[0]) / 3 * vol;
             vwapDen += vol;
@@ -350,6 +355,11 @@ namespace NinjaTrader.NinjaScript.Strategies
             int want = Close[0] > up ? 1 : Close[0] < dn ? -1 : 0;
             if (want != 0 && VwapEntry && want * (Close[0] - vwap) <= 0) want = 0;
             if (want != 0 && TrendDays > 0 && want * (Close[0] - sma) <= 0) want = 0;
+            if (want != 0 && RangePos > 0)  // the close still near the day's extreme its way (docs/STRATEGY_SEARCH.md, 20)
+            {
+                double posR = dayHigh > dayLow ? (Close[0] - dayLow) / (dayHigh - dayLow) : 0.5;
+                if ((want > 0 && posR < RangePos) || (want < 0 && posR > 1 - RangePos)) want = 0;
+            }
             if (want == 0)
                 return;
             hardRef = Close[0] + want * tick;
@@ -474,6 +484,11 @@ namespace NinjaTrader.NinjaScript.Strategies
         [NinjaScriptProperty]
         [Display(Name = "Entries also need the close on VWAP's side", Order = 5, GroupName = "1. Entries")]
         public bool VwapEntry { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, 1)]
+        [Display(Name = "Entry close at least this far up the day's range (long; short mirrored; 0 = off)", Order = 6, GroupName = "1. Entries")]
+        public double RangePos { get; set; }
 
         [NinjaScriptProperty]
         [Range(1, 2000)]

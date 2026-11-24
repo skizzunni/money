@@ -159,6 +159,16 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    size tried with the 30-point stop (0.3 / 0.5 / 1x) loses none, the 50-point stop with smaller gaps 1.9-2.9%.
    Shipped: `GapFrom` 0 (= always), `GapK` 0.5, `GapCap` 30; NinjaTrader and Pine trade for trade (20 tests).
 
+20. **Why Nov 9-19 went down, and the day's-range rule** (2026-11-24, the user's TradingView chart;
+   `verification/zoo/stage14_day_range_rule.txt`). Trade by trade: on Nov 13 the 10:00 short hit its target after a
+   550-point fall, then the band re-shorted at every check while price was bouncing 100-250 points off the day's low (7
+   shorts, -$383 at 1 MNQ); Nov 17 the same (the 11:00 short 266 points off the low, then 3 more losers); Nov 20's
+   winners entered 38-126 points off the low, pressing it. Rule: an entry needs its close within the last 35% of the
+   day's range so far toward its side (long: at least 65% up the range; `range_pos` 0.65). 104 starts: none lost,
+   median $13,711 to $14,315, 25th percentile $7,471 to $8,244; band PF dev 1.41 to 1.47, unseen NQ 1.48 to 1.49, ES
+   1.17 to 1.22, live 2.85 to 3.88; live Nov 9-19 +$164 to +$580 at 1 MNQ. Every setting from 50% to 20% loses none.
+   Shipped (`RangePos` 0.65, NinjaTrader and Pine trade for trade).
+
 ## The result (the shipped defaults, research numbers, 2 ticks of stop slippage, $0.62 a side)
 
 | set | band trades | win | PF | band net (1 MNQ) | gap trades (PF, net) | 50K starts lost | median 12 months |
