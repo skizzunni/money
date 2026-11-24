@@ -1,0 +1,9 @@
+Stage 57 (2026-11-24, a research round): the break-even trigger again, with section 61's stop step and wild-open skip in
+
+bench.py (104 fresh 50K starts, dev + unseen NQ; the TradingView window):
+0.4R (shipped): lost 0.0% median $16,931 p25 $12,040 | TV $+9,921 52tr PF 4.43 | dev 1.62 $5,176 | unseen_nq 1.63 $7,349 | live 3.57 $14,112
+0.3R:           lost 0.0% median $14,917 p25 $8,803  | TV $+9,972 52tr PF 4.59 | dev 1.56 $4,692 | unseen_nq 1.63 $7,089 | live 3.56 $13,826
+0.5R:           lost 3.8% median $16,634 p25 $10,372 | TV $+9,921 52tr PF 4.43 | dev 1.65 $5,537 | unseen_nq 1.62 $7,367 | live 3.43 $13,901
+
+Verdict: 0.4R stays. 0.3 scratches trades that would have run (median -$2,014, 25th percentile -$3,237); 0.5 loses
+3.8% of starts, as it did before the stop step (section 32).
