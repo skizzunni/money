@@ -636,6 +636,12 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    contract; the window unchanged. Too small for a live change; not shipped. (A small-gap band reference: section 33's
    open-alone band lost accounts, and on small gaps the open and the prior close nearly coincide: not run.)
 
+75. **Calendar effects** (2026-11-24, a research round; `verification/zoo/stage69_calendar_effects.txt`). Turn of the
+   month, month ends and starts, options expiry, quarterly expiry, the days around holidays and the weekdays: every
+   bucket weak in one period is fine in the other (last day of the month PF 0.46 on 2015-19, 1.40 on 2020-25; quarterly
+   expiry 0.51 / 1.95), so nothing to skip. Fridays are above the average in all three sets, but one more contract on
+   them loses 1.9% of starts. Nothing used.
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-33; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |
