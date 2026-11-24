@@ -588,6 +588,10 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    `verification/zoo/stage59_move_cap_range_with_ladder.txt`). Cap 1.0 / 1.2 and range 0.6 / 0.7: every one lower on
    the median and the 25th percentile (range 0.7: the window +$179, the rest lower). 1.1 and 0.65 stay.
 
+66. **A second stop step for gold** (2026-11-24, a research round; `mk_search.carry` be_lock,
+   `verification/zoo/stage60_gold_stop_step.txt`). Once up 1-2x the risk, the stop to entry + 0.3-1.0x: 2009-17 up to
+   +$20 a year at 1 MGC, but 2018 - Mar 2025 $164-209 a year against $284 at every setting. Not shipped.
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-33; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |

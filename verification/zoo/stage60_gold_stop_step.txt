@@ -1,0 +1,15 @@
+Stage 60 (2026-11-24, a research round): a second stop step for gold (mk_search.carry be_r / be_lock)
+
+Like MNQ's (section 61): once a bar closes be_r x the trade's risk (the expected fill to the stop) up, the stop to the
+entry + be_lock x the risk (section 39 tried only a break-even a tick past entry). Gold alone, 1 MGC, $0.62 a side,
+gold5.pkl (spot gold on MGC's tick grid):
+shipped:              2009-17 171 tr PF 2.02 $361/yr worst $-141 | 2018 - Mar 2025 145 tr PF 1.84 $284/yr worst $-91
+step 1.0x -> +0.5x:   2009-17 171 tr PF 2.05 $280/yr            | 2018-25 145 tr PF 1.90 $206/yr
+step 1.5x -> +0.5x:   2009-17 171 tr PF 2.32 $381/yr            | 2018-25 145 tr PF 1.77 $187/yr
+step 2.0x -> +0.5x:   2009-17 171 tr PF 2.24 $368/yr            | 2018-25 145 tr PF 1.70 $176/yr
+step 1.5x -> +0.3x:   2009-17 171 tr PF 2.25 $363/yr            | 2018-25 145 tr PF 1.67 $164/yr
+step 2.0x -> +1.0x:   2009-17 171 tr PF 2.25 $370/yr            | 2018-25 145 tr PF 1.84 $209/yr
+
+Verdict: not shipped. Every setting cuts 2018-25 by $75-120 a year (a third); gold's moves since 2018 run through the
+afternoon and a locked stop takes them out early. The default-off path still matches NinjaTrader trade for trade
+(tests/test_ninjatrader_gold.py on 2009 - Mar 2025).

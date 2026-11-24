@@ -175,7 +175,7 @@ def five_min(days):
 
 
 def carry(days, i, tick=0.1, k=1.5, open_m=860, confirm=15, settle=1170, exit_m=1215, n=14, stop_at=0.6, be_r=0.0,
-          tp_r=0.0, limit_entry=False):
+          tp_r=0.0, limit_entry=False, be_lock=0.0):
     """Gold's overnight move carried on (MgcOvernightCarry.cs, 2026-11-24), on 5-minute bars: the move = the 08:20 bar's
     open less the prior session's 13:25 bar close; at least k x the last n sessions' average |move| and the bars from
     08:20 to 08:20 + confirm closing its way (the last one's close against the 08:20 open): a market order at that
@@ -229,7 +229,8 @@ def carry(days, i, tick=0.1, k=1.5, open_m=860, confirm=15, settle=1170, exit_m=
         if tp_r and ((side > 0 and dd["h"][b] >= tgt + tick) or (side < 0 and dd["l"][b] <= tgt - tick)):
             return [(side, kc, e, tgt, "target", b)]
         if be_r and not be_done and side * (dd["c"][b] - e) >= be_r * risk:
-            stop = max(stop, e + tick) if side > 0 else min(stop, e - tick)
+            lk = np.round((e + side * max(tick, be_lock * risk)) / tick) * tick  # research: be_lock x the risk past entry
+            stop = max(stop, lk) if side > 0 else min(stop, lk)
             be_done = True
     dd, b = seq[trig + 1]
     return [(side, kc, e, dd["o"][b] - side * tick, "time" if dd is d else "session", b - 1)]
