@@ -1,0 +1,10 @@
+Stage 73 (2026-11-24, a research round): the band entry as a limit at the signal close (strats.noise limit_in,
+research/zoo/limit_entry.py). Instead of a market order at the next open, a limit at the signal bar's close: filled at
+the next bar's open when that is better, at the limit when the next bar trades back to it, else no trade. Fresh 50K
+starts by period, the TradingView window:
+
+shipped (market):           2015-19 lost 0.0% med $13,639 p25 $5,256 237 tr/yr | 2020-25 lost 0.0% med $18,453 p25 $15,085 262 tr/yr | TV $+9,921 52tr PF 4.43
+limit at the signal close:  2015-19 lost 0.0% med $13,757 p25 $5,274 234 tr/yr | 2020-25 lost 0.0% med $17,867 p25 $12,838 260 tr/yr | TV $+10,053 50tr PF 4.64
+
+Verdict: rejected. The fills it saves are small; the breaks it misses (no trade back to the close) are the runners:
+2020-25's 25th percentile -$2,247 and median -$586 for +$118 / +$18 on 2015-19 and +$132 on the window. Market entries stay.
