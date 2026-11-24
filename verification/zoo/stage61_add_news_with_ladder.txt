@@ -1,0 +1,11 @@
+Stage 61 (2026-11-24, a research round): the strong-break contract and the big-news contract again, with section 61 in
+
+bench.py (104 fresh 50K starts, dev + unseen NQ; the TradingView window):
+shipped (add 1.5 sigma, news big 6x): lost 0.0% median $16,931 p25 $12,040 | TV $+9,921 52tr PF 4.43
+add at 1.25 sigma:                    lost 0.0% median $17,529 p25 $11,742 | TV $+9,822 52tr PF 4.28
+add at 1.75 sigma:                    lost 0.0% median $16,928 p25 $11,106 | TV $+9,921 52tr PF 4.43
+news big from 5x:                     lost 0.0% median $17,745 p25 $11,863 | TV $+10,126 52tr PF 4.18
+news big from 8x:                     lost 0.0% median $16,616 p25 $12,249 | TV $+9,921 52tr PF 4.43
+
+Verdict: both stay. The two that lift the median (add 1.25: +$598; news 5x: +$814) add contracts more often and
+lower the 25th percentile ($298 / $177): more size for a weaker tail. 1.75 and 8x are no better.

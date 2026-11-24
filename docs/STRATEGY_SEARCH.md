@@ -592,6 +592,11 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    `verification/zoo/stage60_gold_stop_step.txt`). Once up 1-2x the risk, the stop to entry + 0.3-1.0x: 2009-17 up to
    +$20 a year at 1 MGC, but 2018 - Mar 2025 $164-209 a year against $284 at every setting. Not shipped.
 
+67. **The extra contracts again, with 61 in** (2026-11-24, a research round;
+   `verification/zoo/stage61_add_news_with_ladder.txt`). The strong-break add at 1.25 sigma and the big-news add from 5x
+   lift the median ($17,529 / $17,745) but lower the 25th percentile ($11,742 / $11,863 against $12,040): more size for a
+   weaker tail. 1.75 sigma and 8x no better. 1.5 sigma and 6x stay.
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-33; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |
