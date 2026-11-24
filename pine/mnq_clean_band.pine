@@ -11,7 +11,11 @@
 //   * no new entry once the day is down $600; 1 / 2 / 3 contracts from +$2,000 / +$4,500;
 //   * gap trade: a gap of 0.5x the 14-session average whose 09:30 bar closes its way, in at 09:35, the stop at the
 //     09:30 open (at most 30 points), out at 09:55.
-strategy("MNQ Clean Noise-Band", overlay = true, default_qty_type = strategy.fixed, default_qty_value = 1, pyramiding = 0,
+// margin_long / margin_short 0: a futures account posts margin, not the contract's full value. TradingView's default
+// (100%) refused every order once the size reached 2 MNQ (about $107K of contract on a $100K test account): the
+// trades stopped (the user's chart, 2026-11-24).
+strategy("MNQ Clean Noise-Band", overlay = true, initial_capital = 50000, default_qty_type = strategy.fixed,
+     default_qty_value = 1, pyramiding = 0, margin_long = 0, margin_short = 0,
      commission_type = strategy.commission.cash_per_contract, commission_value = 0.62, slippage = 1)
 
 const string TZ = "America/New_York"
