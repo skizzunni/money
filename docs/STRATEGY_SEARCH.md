@@ -661,6 +661,10 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    25th percentile $12,838 against $15,085 (the missed breaks are the runners), 2015-19 and the window a little higher.
    Market entries stay.
 
+80. **Gold by the news spike** (2026-11-24, a research round; `verification/zoo/stage74_gold_by_news_spike.txt`). Big-news
+   days (6x+): 2 trades on 2015-19 and 9 on 2020-25 with opposite results: no size rule. 3-6x loses in both but on 23
+   trades in all (section 43's after-the-fact bucket). Nothing to change.
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-33; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |
