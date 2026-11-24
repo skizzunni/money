@@ -1,0 +1,23 @@
+Stage 68 (2026-11-24, a research round): the VWAP stop only until a time of day (strats.noise vwap_until)
+
+The band trade's stop is the tighter of the band and VWAP; here VWAP counts only at checks up to vwap_until, the band
+alone after. Known at the bar (the clock): no hindsight. Fresh 50K starts by period, the TradingView window:
+
+shipped:     2015-19 med $13,639 p25 $5,256 | 2020-25 med $18,453 p25 $15,085 | TV $+9,921 52tr PF 4.43 (none lost anywhere)
+to 10:30:    2015-19 med $13,727 p25 $5,330 | 2020-25 med $18,955 p25 $15,122 | TV $+9,921
+to 11:00:    2015-19 med $13,739 p25 $5,876 | 2020-25 med $18,955 p25 $15,162 | TV $+9,921
+to 11:30:    2015-19 med $13,600 p25 $5,395 | 2020-25 med $18,955 p25 $15,057 | TV $+9,921
+to 12:00:    2015-19 med $13,600 p25 $5,395 | 2020-25 med $18,990 p25 $15,047 | TV $+9,921
+to 13:00:    2015-19 med $13,626 p25 $5,395 | 2020-25 med $19,022 p25 $15,054 | TV $+9,921
+
+Shuffled days, 2,000 years, blown / median from $50,000, $48,806, $48,998:
+2020-25 shipped: 5.0% $17,606 | 17.2% $13,877 | 12.7% $15,162     to 11:00: 4.9% $17,788 | 16.7% $14,133 | 12.8% $15,241
+2015-19 shipped: 2.3% $11,854 | 10.8% $8,984  | 6.5% $9,664      to 11:00: 2.0% $11,985 | 10.3% $9,235  | 6.3% $9,939
+
+By year at 1 MNQ (shipped / to 11:00): 2015 3326 / 3419, 2016 6509 / 6545, 2017 1684 / 1623, 2018 7740 / 7959,
+2019 6355 / 6333, 2020 6426 / 6494, 2021 9217 / 9456, 2022 10885 / 10885, 2023 6557 / 6515, 2024 6226 / 6297,
+2025 H1 555 / 517, 2026 5824 / 5824: 6 of 12 up, 4 down, +$565 in all (about $50 a year).
+
+Verdict: not shipped. 10:30-11:00 are better on every period gate and the shuffled years mostly agree, but the gain is
+about $50 a year a contract, half the years are not better, and the window does not move: too small to change the live
+order code. Re-check with more live data.

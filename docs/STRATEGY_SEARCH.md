@@ -630,6 +630,12 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    but that decision would need the 10:00 close at 09:50 (hindsight). The tradeable version (hold every gap trade to
    the 10:00 check): 2015-19 -$137 a year, 2020-25 +$81. The 09:55 exit stays.
 
+74. **The VWAP stop only until 11:00** (2026-11-24, a research round; `noise` vwap_until,
+   `verification/zoo/stage68_vwap_stop_until.txt`). Better on both periods' medians and 25th percentiles at 10:30 /
+   11:00 and fewer shuffled-year accounts blown in 5 of 6 cases, but only 6 of 12 years up and about $50 a year a
+   contract; the window unchanged. Too small for a live change; not shipped. (A small-gap band reference: section 33's
+   open-alone band lost accounts, and on small gaps the open and the prior close nearly coincide: not run.)
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-33; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |

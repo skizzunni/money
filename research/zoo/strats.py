@@ -50,7 +50,7 @@ def _tick(x, tick):
 
 def noise(days, i, tick, vwap=True, trend=0, hard=250.0, vwap_stop=False, pv=2.0, k=1.0, last=900, max_trades=9,
           be_r=0.0, stop_slip=2, nt=True, tp_r=0.0, tp_fill_bar=True, step=30, range_pos=0.0, tp_frac=1.0,
-          runner_lock=0.0, max_move=0.0, be_plus=0.0, counter_k=0.0, after_target="", move_free="", min_stretch=0.0, stretch_gap=False, move_ref="open", hard_vol=0.0, hard_lo=0.0, hard_hi=1e9, max_losses=0, strong_at=0.0, strong_tp=0.0, stale=0, band_ref="both", be_on="close", exit_at=955, trend_ema=False, check_off=0, strong_last=0, be_skip_strong=0.0, vwap_after_be=False, band_stop_at=0.0, bar_pos=0.0, bar_n=1, lad_r=0.0, lad_lock=0.0, late_at=0, late_tp=0.0, extra_checks=(), trend_gap_k=0.0, sig_n=14):
+          runner_lock=0.0, max_move=0.0, be_plus=0.0, counter_k=0.0, after_target="", move_free="", min_stretch=0.0, stretch_gap=False, move_ref="open", hard_vol=0.0, hard_lo=0.0, hard_hi=1e9, max_losses=0, strong_at=0.0, strong_tp=0.0, stale=0, band_ref="both", be_on="close", exit_at=955, trend_ema=False, check_off=0, strong_last=0, be_skip_strong=0.0, vwap_after_be=False, band_stop_at=0.0, bar_pos=0.0, bar_n=1, lad_r=0.0, lad_lock=0.0, late_at=0, late_tp=0.0, extra_checks=(), trend_gap_k=0.0, sig_n=14, vwap_until=0):
     """The user's Clean Noise-Band spec (research/clean_noise_band.py): checks 10:00-15:00, the band (k x sigma) past
     max/min(open, prior close), the session VWAP agreeing, the band as a stop moved at the checks, a hard stop $hard a
     contract, out at 15:55. trend: also the close past the `trend`-session average of closes. be_r: the stop to entry +
@@ -134,6 +134,8 @@ def noise(days, i, tick, vwap=True, trend=0, hard=250.0, vwap_stop=False, pv=2.0
             up, dn = up_ref * (1 + s), dn_ref * (1 - s)
             bl, bs = (max(up, vw[b]), min(dn, vw[b])) if vwap_stop else (up, dn)
             if pos and vwap_after_be and not be_hit:  # research (2026-11-24): VWAP tightens the stop only after break-even
+                bl, bs = up, dn
+            if pos and vwap_until and end > vwap_until:  # research (2026-11-24): VWAP tightens the stop only until vwap_until
                 bl, bs = up, dn
             if pos:
                 hard_px = hard_ref - pos * hard / pv
