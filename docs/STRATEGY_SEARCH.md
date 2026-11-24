@@ -44,7 +44,7 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
 
 8. **More money without more risk** (`verification/zoo/stage4_target_and_gap_leg.txt`): a take-profit at 2.5 hard
    stops lifts the win rate (24% to 28%) and the weak starts (25th percentile $2,090 to $3,454); the gap-and-go leg
-   (09:35 to 09:55, stop at the 09:30 open, at most 50 points) switched on only once the account is $4,500 up (the floor
+   (09:35 to 09:55, stop at the 09:30 open, at most 50 points; now 40, section 29) switched on only once the account is $4,500 up (the floor
    has stopped trailing by then) lifts the median to $8,772. **Every neighbour** (target 2.0-3.0, gap from $4,000-6,000,
    break-even 0.3-0.5, hard stop $175-225) also loses no start: the target makes the risk settings less fragile, not
    more. Caveat: gap and go loses on ES (PF 0.69, 70 trades) while it holds on NQ dev / unseen (1.95 / 1.76) and the live
@@ -248,6 +248,14 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    fewer trades a year (0-8% of them winners). Neighbours 2% and 4%: 0 lost, the same way. Only gaps against
    yesterday's direction (live 52% winners, PF 4.46) cost dev and unseen NQ $500-700 a year: not used. Shipped
    (`GapMinBody` 0.03, NinjaTrader and Pine).
+
+29. **The gap trade's size and stop, again** (2026-11-24, after 28; `verification/zoo/stage22_gap_grid*.txt`). With the
+   small 09:30 bars out, the gap threshold 0.2-0.5 x the average gap and the stop cap 25-50 points: every 40-point cap
+   beats 30, and 50 loses 2.9% of starts at 0.3 and 0.4 (the edge). Shipped: **0.3 and 40 points** (neighbours 0.2 / 0.4
+   and 35 / 45: 0 lost, 25th percentile $9,666-10,465): 0 of 104 lost, median $15,314 to $15,719, 25th percentile $9,620
+   to $10,873, per year at 1 MNQ dev $5,119 to $5,685, unseen NQ $6,971 to $7,157, ES $679 to $593, live $13,572 to
+   $13,698; about 11 more trades a year. The 40-point stop at 3 MNQ risks $240. TradingView with 28 (Aug 27 - Nov 23
+   2026): +$6,345, 44 trades, 43% winners, PF 4.02.
 
 ## The result (the shipped defaults, research numbers, 2 ticks of stop slippage, $0.62 a side)
 

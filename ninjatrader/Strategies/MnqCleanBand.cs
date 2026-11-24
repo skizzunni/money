@@ -96,8 +96,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 TakeProfitAt = 2.5;
                 GapLeg = true;
                 GapFrom = 0;  // 2026-11-24: from day one with the news-day rule: 0 of 104 starts lost, more days (docs 19)
-                GapK = 0.5;
-                GapCap = 30;
+                GapK = 0.3;  // 2026-11-24: 0.3 and a 40-point cap once the small 09:30 bars are out (docs 29)
+                GapCap = 40;
                 GapMinBody = 0.03;
                 NewsDays = true;
                 NewsBigAt = 6;
