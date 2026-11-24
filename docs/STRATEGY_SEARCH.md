@@ -225,7 +225,10 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
      median $14,624;
    - the hard stop (and so break-even and target) 0.25-0.35x the 14-day average range: without bounds 6.7-8.7% of
      starts lost; bounded to 75-150 points the 25th percentile $9,478 to $11,265 but the median $14,417 and live wins
-     42% to 36%.
+     42% to 36%;
+   - limits for chop days like Nov 13 (a 10:00 target, then 3 scratches and 3 losers): no entry after 1 / 2 / 3 losing
+     trades that day (median $8,364 / $12,989 / $15,246) or at most 4 / 5 / 6 trades a day (4: live +$623 a year but
+     dev and unseen NQ lower, the 25th percentile $8,577; 5 and 6 within $200 a year of 9 everywhere). `max_losses`.
 
    One live fix from the walk through Nov 13 - 23: the history guard blocked the Mondays after Thanksgiving, Christmas
    and New Year. It counted calendar days (14 complete sessions within 23), but holidays and half days (out of the
