@@ -11,7 +11,7 @@ import pandas as pd
 import strats as S
 
 PK = "/tmp/claude-0/-home-user-money/a932a565-3474-5ea9-80d7-5853e3bebb0c/scratchpad/data/zoo_days_news.pkl"
-GAP = dict(k=0.5, exit_m=590, r=0.0, cap=30.0, min_body=0.03, max_bar=1.75)  # max_bar: docs 61
+GAP = dict(k=0.6, exit_m=590, r=0.0, cap=30.0, min_body=0.03, max_bar=1.75)  # max_bar: docs 61; k 0.6: docs 87
 BAND = dict(vwap=False, vwap_stop=True, hard=200.0, be_r=0.4, tp_r=2.5, last=840, trend=20, k=1.0, max_trades=9,
             range_pos=0.65, max_move=1.1, be_plus=2.0, move_free="first_check", lad_r=1.5, lad_lock=0.5)  # lad: docs 61
 STEPS = ((0, 1), (2000, 2), (3500, 3))

@@ -1,0 +1,23 @@
+Stage 81 (2026-11-24, a research round): the gap trade's minimum gap (0.5x the 14-session average) again, with section
+61's wild-open skip in. Fresh 50K starts by period, the TradingView window:
+
+0.4x:          2015-19 lost 0.0% med $13,787 p25 $5,205 | 2020-25 lost 0.0% med $18,114 p25 $15,278 | TV $+9,748 55tr PF 4.18
+0.5x (was):    2015-19 lost 0.0% med $13,639 p25 $5,256 | 2020-25 lost 0.0% med $18,453 p25 $15,085 | TV $+9,921 52tr PF 4.43
+0.55x:         2015-19 lost 0.0% med $13,838 p25 $5,324 | 2020-25 lost 0.0% med $18,519 p25 $15,322 | TV $+10,037 51tr PF 4.62
+0.6x:          2015-19 lost 0.0% med $14,028 p25 $5,324 | 2020-25 lost 0.0% med $18,980 p25 $15,811 | TV $+10,063 50tr PF 4.66
+0.7x:          2015-19 lost 0.0% med $13,533 p25 $5,371 | 2020-25 lost 0.0% med $18,167 p25 $15,278 | TV $+9,960 48tr PF 4.80
+0.8x:          2015-19 lost 0.0% med $12,803 p25 $4,909 | 2020-25 lost 0.0% med $17,912 p25 $15,373 | TV $+9,960 48tr PF 4.80
+
+Shuffled days (montecarlo.py with section 61 and the $1,500 guard; 2,000 years; the same draws), blown / median from
+$50,000, $48,806, $48,998:
+2020-25 0.5x: 5.0% $17,606 | 17.2% $13,877 | 12.7% $15,162     0.6x: 4.8% $17,491 | 16.9% $14,243 | 12.2% $15,169
+2015-19 0.5x: 2.3% $11,854 | 10.8% $8,984  | 6.5% $9,664      0.6x: 2.0% $11,983 | 10.7% $9,046  | 6.2% $9,750
+
+By year at 1 MNQ (0.5x / 0.6x): 2015 3326 / 3574, 2016 6509 / 6361, 2017 1684 / 1788, 2018 7740 / 7762,
+2019 6355 / 6432, 2020 6426 / 6498, 2021 9217 / 8983, 2022 10885 / 10585, 2023 6557 / 6811, 2024 6226 / 6540,
+2025 H1 555 / 682, 2026 5824 / 5908: 9 of 12 up, +$621 in all (about $54 a year a contract).
+
+Verdict: shipped as the new default (GapK 0.6; NinjaTrader, Pine). Better on every gate in both periods and the window,
+0.55 agrees (0.7 / 0.8 mixed), fewer shuffled-year accounts blown in all six cases, 9 of 12 years up. The gain a
+contract is small (about $54 a year, below the round's $200 bar), but the bar was set for new order code; this is one
+existing setting's default, with no new code, and it improves the account's survival everywhere it was measured.

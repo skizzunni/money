@@ -691,6 +691,13 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    2015-19 median $15,869 against $13,639, but 1.8% of 2020-25 starts lost. Rejected: size after losses is how an
    account near its floor goes under.
 
+87. **The gap trade's minimum gap again, with 61 in: 0.6x** (2026-11-24, a research round;
+   `verification/zoo/stage81_gap_min_size.txt`). 0.6x the 14-session average gap instead of 0.5x: better on every gate
+   in both periods (medians $14,028 / $18,980 against $13,639 / $18,453, 25th percentiles $5,324 / $15,811 against
+   $5,256 / $15,085) and the window +$10,063; 0.55x agrees; fewer shuffled-year accounts blown in all six cases; 9 of
+   12 years up, about $54 a year a contract. One setting's default, no new code: shipped (`GapK` 0.6, Pine "Gap at
+   least").
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-33; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |
@@ -764,7 +771,7 @@ NinjaTrader 8, on each funded account (both the same way):
 
 Defaults: trend 20 sessions; hard stop $200 a contract; take profit 2.5 hard stops; break-even at 0.4 to entry + 2
 points, and at 1.5 to entry + 0.5 hard stops (section 61); last entry 14:00 (840); at most 9 trades a day; day stop
-$600; range rule 0.65; move cap 1.1; the gap trade every day (gap 0.5x, 09:30 bar 3% of the range and not over 1.75x
+$600; range rule 0.65; move cap 1.1; the gap trade every day (gap 0.6x, section 87; 09:30 bar 3% of the range and not over 1.75x
 its usual size, stop at most 30 points); news days on (2-3x no trades, 6x a contract
 more); 1 contract, 2 from +$2,000, 3 from +$3,500 over the $50,000 start balance, one more on a break 1.5 sigma past
 the band, never more than 3 ("Most contracts"; "Fixed contracts" overrides all of it). Live it sizes from the
