@@ -1,0 +1,34 @@
+Stage 62 (2026-11-24, a research round): a walk-forward of section 61 (research/zoo/walkforward_61.py)
+
+Fresh 50K starts by period (dev 2015-19: 49 starts; unseen NQ 2020-25: 55), each grid point; then the pick made
+on dev alone, scored on unseen:
+
+ladder (0.0, 0.0) skip 0.0: dev lost 0.0% med $13,058 p25 $5,802 $5,119/yr | unseen lost 0.0% med $17,530 p25 $14,215 $6,971/yr
+ladder (0.0, 0.0) skip 1.5: dev lost 0.0% med $13,471 p25 $5,350 $5,189/yr | unseen lost 0.0% med $17,427 p25 $13,834 $7,153/yr
+ladder (0.0, 0.0) skip 1.75: dev lost 0.0% med $14,007 p25 $5,407 $5,200/yr | unseen lost 0.0% med $17,224 p25 $14,111 $7,081/yr
+ladder (0.0, 0.0) skip 2.0: dev lost 0.0% med $13,637 p25 $5,303 $5,111/yr | unseen lost 0.0% med $17,419 p25 $13,791 $6,996/yr
+ladder (1.25, 0.4) skip 0.0: dev lost 0.0% med $12,816 p25 $5,140 $5,015/yr | unseen lost 0.0% med $18,109 p25 $15,206 $7,398/yr
+ladder (1.25, 0.4) skip 1.5: dev lost 0.0% med $13,533 p25 $5,292 $5,086/yr | unseen lost 0.0% med $17,918 p25 $14,983 $7,580/yr
+ladder (1.25, 0.4) skip 1.75: dev lost 0.0% med $14,069 p25 $5,221 $5,096/yr | unseen lost 0.0% med $18,230 p25 $15,051 $7,508/yr
+ladder (1.25, 0.4) skip 2.0: dev lost 0.0% med $13,699 p25 $5,228 $5,007/yr | unseen lost 0.0% med $18,727 p25 $14,957 $7,423/yr
+ladder (1.5, 0.5) skip 0.0: dev lost 0.0% med $13,269 p25 $4,994 $5,095/yr | unseen lost 0.0% med $18,476 p25 $14,987 $7,240/yr
+ladder (1.5, 0.5) skip 1.5: dev lost 0.0% med $13,597 p25 $5,266 $5,166/yr | unseen lost 0.0% med $18,427 p25 $15,049 $7,421/yr
+ladder (1.5, 0.5) skip 1.75: dev lost 0.0% med $13,639 p25 $5,256 $5,176/yr | unseen lost 0.0% med $18,453 p25 $15,085 $7,349/yr
+ladder (1.5, 0.5) skip 2.0: dev lost 0.0% med $13,269 p25 $5,059 $5,087/yr | unseen lost 0.0% med $18,453 p25 $14,930 $7,264/yr
+ladder (1.75, 0.5) skip 0.0: dev lost 0.0% med $13,402 p25 $5,203 $5,123/yr | unseen lost 0.0% med $18,375 p25 $14,698 $7,124/yr
+ladder (1.75, 0.5) skip 1.5: dev lost 0.0% med $13,597 p25 $5,276 $5,193/yr | unseen lost 0.0% med $18,422 p25 $14,616 $7,305/yr
+ladder (1.75, 0.5) skip 1.75: dev lost 0.0% med $13,772 p25 $5,318 $5,203/yr | unseen lost 0.0% med $18,079 p25 $14,958 $7,233/yr
+ladder (1.75, 0.5) skip 2.0: dev lost 0.0% med $13,402 p25 $5,239 $5,114/yr | unseen lost 0.0% med $17,960 p25 $14,921 $7,148/yr
+picked on dev median: ladder (1.25, 0.4) skip 1.75 -> unseen med $18,230 p25 $15,051 lost 0.0% (off: med $17,530 p25 $14,215 lost 0.0%)
+picked on dev 25th pct: ladder (0.0, 0.0) skip 0.0 -> unseen med $17,530 p25 $14,215 lost 0.0% (off: med $17,530 p25 $14,215 lost 0.0%)
+picked on dev median + 25th: ladder (0.0, 0.0) skip 1.75 -> unseen med $17,224 p25 $14,111 lost 0.0% (off: med $17,530 p25 $14,215 lost 0.0%)
+
+Reading it honestly:
+  * 2015-19: every grid point with the rules lifts the median ($13,058 to $13,269-14,069) and lowers the 25th
+    percentile ($5,802 to $4,994-5,533). Shipped (1.5 / 0.5, 1.75): median +$581, 25th percentile -$546.
+  * 2020-25: shipped median +$923, 25th percentile +$870.
+  * Picked on 2015-19's median: ladder 1.25 / 0.4 with the skip at 1.75, which on 2020-25 beats no rules (median
+    $18,230 against $17,530, 25th percentile $15,051 against $14,215). Picked on 2015-19's 25th percentile: no rules.
+  * Section 61's "better everywhere it was measured" was the pooled starts and the shuffled years; the 2015-19 25th
+    percentile alone is lower. Kept as shipped (fewer blown accounts in the shuffled years of both periods, the newer
+    period better on every measure), but it is a judgment call: LadderAt 0 and GapMaxBar 0 restore the earlier rules.

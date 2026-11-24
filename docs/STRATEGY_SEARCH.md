@@ -571,7 +571,8 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    2.7 / 11.5 / 7.2% to 2.3 / 10.8 / 6.5%, medians higher in all six. By year at 1 MNQ: 8 of 12 up, +$2,553 in all
    (about $220 a year; 2015, 2017, 2022 down $217-354). Neighbours (ladder 1.25-1.75R / +0.4-0.6R, skip 1.5-2.0x):
    none lost, the 25th percentile and the window up in all six, the median $16,019-16,937 (three below $16,582). Small
-   and not certain, but on the user's first goal (not losing the account) better everywhere it was measured. Shipped:
+   and not certain: by period (section 68) the 2015-19 starts' 25th percentile is $546 lower ($5,256 against $5,802),
+   the 2020-25 one $870 higher; fewer accounts blown in the shuffled years of both. Shipped:
    `LadderAt` 1.5, `LadderLock` 0.5, `GapMaxBar` 1.75 (NinjaTrader and Pine, trade for trade; 0 switches each off).
 
 62. **The target again, with 61 in** (2026-11-24, a research round; `verification/zoo/stage56_target_with_ladder.txt`).
@@ -596,6 +597,13 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    `verification/zoo/stage61_add_news_with_ladder.txt`). The strong-break add at 1.25 sigma and the big-news add from 5x
    lift the median ($17,529 / $17,745) but lower the 25th percentile ($11,742 / $11,863 against $12,040): more size for a
    weaker tail. 1.75 sigma and 8x no better. 1.5 sigma and 6x stay.
+
+68. **A walk-forward of 61** (2026-11-24, a research round; `research/zoo/walkforward_61.py`,
+   `verification/zoo/stage62_walkforward_61.txt`). By period, fresh starts: 2015-19 median $13,058 to $13,639 but the
+   25th percentile $5,802 to $5,256 (every setting with the rules lowers it there); 2020-25 median $17,530 to $18,453,
+   25th percentile $14,215 to $15,085. Settings picked on 2015-19's median (ladder 1.25 / 0.4, skip 1.75) beat no rules
+   on 2020-25; picked on its 25th percentile, no rules. Kept, as a judgment call; `LadderAt` 0 and `GapMaxBar` 0 go
+   back to the earlier rules.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-33; research numbers, $0.62 a side)
 
