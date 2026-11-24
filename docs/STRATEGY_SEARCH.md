@@ -611,6 +611,11 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    $14,215. Neither half alone beats the pair; the pair stays. A fixed-point wild-open threshold is not stationary
    (NQ 4,000 to 21,000): the ratio stays.
 
+70. **Extra checks in the first hour** (2026-11-24, a research round; `noise` extra_checks,
+   `verification/zoo/stage64_extra_first_hour_checks.txt`). 10:15 (with or without 10:45): 7.3-10.9% of 2020-25
+   starts lost. 10:45 alone: none lost, 2015-19 and the window up, but 2020-25 median $17,304 / 25th percentile $13,288
+   against $18,453 / $15,085. The half-hour checks stay.
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-33; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |

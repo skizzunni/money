@@ -1,0 +1,13 @@
+Stage 64 (2026-11-24, a research round): extra band checks in the first hour (strats.noise extra_checks,
+research/zoo/extra_checks.py). Section 12 found checks every 15 minutes all day lose 13.5% of starts; this adds only
+10:15 and / or 10:45 to the half-hour checks. Fresh 50K starts by period (dev 2015-19, unseen NQ 2020-25), the
+TradingView window:
+
+shipped:        2015-19 lost 0.0% med $13,639 p25 $5,256 237 tr/yr | 2020-25 lost 0.0%  med $18,453 p25 $15,085 262 tr/yr | TV $+9,921 52tr PF 4.43
++10:15:         2015-19 lost 0.0% med $12,504 p25 $5,777 249 tr/yr | 2020-25 lost 10.9% med $16,619 p25 $12,275 279 tr/yr | TV $+9,853 55tr PF 4.33
++10:15 +10:45:  2015-19 lost 0.0% med $13,605 p25 $6,534 256 tr/yr | 2020-25 lost 7.3%  med $16,558 p25 $12,283 289 tr/yr | TV $+10,148 58tr PF 4.43
++10:45:         2015-19 lost 0.0% med $13,948 p25 $6,400 245 tr/yr | 2020-25 lost 0.0%  med $17,304 p25 $13,288 273 tr/yr | TV $+10,215 55tr PF 4.53
+
+Verdict: rejected. 10:15 loses 7.3-10.9% of 2020-25 starts; 10:45 alone loses none and lifts 2015-19 and the window,
+but costs 2020-25 $1,149 of median and $1,797 of 25th percentile. The half-hour checks stay. (The other candidate,
+gold skipped on MNQ's mild-news days, is section 43: PF 3.30 on 2015-19, 0.71 on 2020-25, no skip.)
