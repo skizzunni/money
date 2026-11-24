@@ -193,6 +193,12 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    unchanged or better, 0 of 104 starts lost, median $14,288 to $15,275. +1, +3 and +5 points also lose none (at 0.5x
    2.9% are lost, so the trigger stays at 0.4x). Shipped (`BreakEvenPlus` 2).
 
+24. **Counter-trend entries on strong breaks** (2026-11-24, the user's chart: no trades in the Nov 10-12 rally, price
+   below its 20-session average; `counter_k`, `verification/zoo/stage18_counter_trend.txt`). Against the trend only
+   past a band 1.0-2.5x as wide: days traded 51% to 53-64%, but 6.7-16.3% of starts lost at 1.0-2.0x and the live PF
+   falls (3.07 to 1.96-2.48); the loosest, the only one trading Nov 10-12, lost there (4 trades, -$96). 2.5x loses none
+   but its neighbour loses 6.7%. The trend filter stays.
+
 ## The result (the shipped defaults, research numbers, 2 ticks of stop slippage, $0.62 a side)
 
 | set | band trades | win | PF | band net (1 MNQ) | gap trades (PF, net) | 50K starts lost | median 12 months |
