@@ -1,0 +1,32 @@
+{'be_r': 0.4, 'last': 840, 'max_trades': 9}: 50K lost 0.0% median $12,418 p25 $6,878
+     dev         214/yr  full loss  13%  small loss/scratch  66%  win  21%  net/yr $  3508
+     unseen_nq   230/yr  full loss  19%  small loss/scratch  58%  win  23%  net/yr $  5319
+     live        167/yr  full loss  14%  small loss/scratch  59%  win  26%  net/yr $ 11091
+{'be_r': 0.4, 'last': 870, 'max_trades': 9}: 50K lost 4.8% median $10,516 p25 $4,009
+     dev         233/yr  full loss  14%  small loss/scratch  66%  win  21%  net/yr $  3157
+     unseen_nq   253/yr  full loss  20%  small loss/scratch  57%  win  23%  net/yr $  5222
+     live        189/yr  full loss  14%  small loss/scratch  63%  win  23%  net/yr $ 10445
+{'be_r': 0.3, 'last': 840, 'max_trades': 9}: 50K lost 0.0% median $10,205 p25 $4,408
+     dev         221/yr  full loss  13%  small loss/scratch  68%  win  19%  net/yr $  2861
+     unseen_nq   239/yr  full loss  18%  small loss/scratch  61%  win  21%  net/yr $  5031
+     live        174/yr  full loss  14%  small loss/scratch  62%  win  24%  net/yr $ 11122
+{'be_r': 0.3, 'last': 870, 'max_trades': 9}: 50K lost 4.8% median $8,477 p25 $3,421
+     dev         241/yr  full loss  13%  small loss/scratch  68%  win  19%  net/yr $  2589
+     unseen_nq   264/yr  full loss  19%  small loss/scratch  60%  win  21%  net/yr $  5159
+     live        199/yr  full loss  13%  small loss/scratch  66%  win  21%  net/yr $ 10472
+{'be_r': 0.2, 'last': 840, 'max_trades': 9}: 50K lost 0.0% median $9,342 p25 $4,115
+     dev         231/yr  full loss  12%  small loss/scratch  71%  win  17%  net/yr $  2667
+     unseen_nq   253/yr  full loss  17%  small loss/scratch  64%  win  19%  net/yr $  4678
+     live        182/yr  full loss  13%  small loss/scratch  64%  win  23%  net/yr $ 11414
+{'be_r': 0.2, 'last': 870, 'max_trades': 9}: 50K lost 3.8% median $6,626 p25 $2,834
+     dev         252/yr  full loss  12%  small loss/scratch  71%  win  17%  net/yr $  2387
+     unseen_nq   278/yr  full loss  18%  small loss/scratch  64%  win  18%  net/yr $  4615
+     live        206/yr  full loss  13%  small loss/scratch  67%  win  20%  net/yr $ 10868
+{'be_r': 0.15, 'last': 840, 'max_trades': 9}: 50K lost 0.0% median $9,445 p25 $4,413
+     dev         240/yr  full loss  11%  small loss/scratch  73%  win  16%  net/yr $  2889
+     unseen_nq   262/yr  full loss  16%  small loss/scratch  67%  win  17%  net/yr $  4603
+     live        184/yr  full loss  13%  small loss/scratch  64%  win  22%  net/yr $ 11398
+{'be_r': 0.15, 'last': 870, 'max_trades': 9}: 50K lost 3.8% median $8,620 p25 $2,639
+     dev         261/yr  full loss  11%  small loss/scratch  73%  win  16%  net/yr $  2554
+     unseen_nq   289/yr  full loss  16%  small loss/scratch  66%  win  17%  net/yr $  4472
+     live        208/yr  full loss  13%  small loss/scratch  67%  win  20%  net/yr $ 10851

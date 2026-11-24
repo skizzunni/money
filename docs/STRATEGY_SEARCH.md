@@ -142,6 +142,14 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    +$2,000 a contract over 5.5 years. His discretion (the 1-minute refinement, the daily bias read, SMT with ES) is
    not in rules here; as rules, no usable edge. Not used.
 
+18. **How the shipped strategy's trades end** (2026-11-24, the user: "trade more but try not to make losing ones";
+   `verification/zoo/stage12_how_trades_end.txt`). About 170-230 trades a year (0.8-1.1 a session, on 30-45% of days,
+   2.4-2.7 a traded day). At 1 MNQ on unseen NQ: 29% scratches (within $10, the break-even stop), 30% small losses
+   (under $100), 20% losses of $100 or more, 22% winners (13% over $250, the 2.5x targets and trend days). Red days
+   average -$122, green days +$332 (live: 45% red, -$124 against +$485). An earlier break-even (0.3 / 0.2 / 0.15 of the
+   hard stop) turns some full losses into scratches (full losses 19% to 16%) but lowers the median ($12,418 to
+   $9,342-10,205), and entries to 14:30 lose 3.8-4.8% of starts: the shipped 0.4 and 14:00 stay.
+
 ## The result (the shipped defaults, research numbers, 2 ticks of stop slippage, $0.62 a side)
 
 | set | band trades | win | PF | band net (1 MNQ) | gap trades (PF, net) | 50K starts lost | median 12 months |
