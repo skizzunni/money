@@ -1,20 +1,24 @@
-// MNQ Clean Noise-Band (2026-11-23): the user's "Clean Noise-Band Momentum (Prop Version)" spec, with the four fixes
-// research/zoo found it needs to keep a 50K account with the $2,000 trailing floor (docs/STRATEGY_SEARCH.md).
+// MNQ Clean Noise-Band: the user's "Clean Noise-Band Momentum (Prop Version)" spec with the changes research/zoo found
+// it needs to keep a 50K account with the $2,000 trailing floor (docs/STRATEGY_SEARCH.md, sections 1-33).
 //
-// 5-minute chart, regular hours (09:30-16:00 New York). Every half hour from 10:00 to LastEntry (14:00):
+// 5-minute MNQ chart (ETH, so the news rule can read the 08:30 bar). Every half hour from 10:00 to LastEntry (14:00):
 //   * the noise area: sigma = the mean over the last 14 complete sessions of |close at that time / the 09:30 open - 1|;
 //     upper = max(today's open, the prior close) x (1 + sigma), lower = min(...) x (1 - sigma);
-//   * flat: long when the close is above upper and above the TrendDays-session average of closes (VwapEntry: also
-//     above the session VWAP); short mirrored; a market order at the bar's close (filled at the next open);
+//   * flat: long when the close is above upper and above the TrendDays-session average of closes, at least RangePos up
+//     the day's range, and (after 10:00) the day not already MaxMove usual ranges up from its open; short mirrored;
+//     a market order at the bar's close (filled at the next open);
 //   * the stop, set with the entry: the tighter of the band on the trade's side (or VWAP when tighter) and a hard stop
 //     HardStop $ a contract from the expected fill (the signal close + a tick); at each check it moves to the tighter
 //     of the new band / VWAP and the hard stop, never looser; if that is already at or past the close, out at market;
-//   * once a bar closes BreakEvenAt x the hard stop in profit, the stop goes to the entry + a tick;
-//   * out at market at the 15:50 bar's close (filled at 15:55's open).
-// Account: no new entry once the day's closed P/L is down DayStop $; contracts by profit over the start balance (1, 2
-// from Step2At, 3 from Step3At, never more than MaxContracts); at most EarlyMaxTrades a day until the profit reaches
-// EarlyCushion. research/zoo/strats.py (noise, nt=True) is the same rule in Python and tests/test_ninjatrader_clean.py
-// holds the two to trade-for-trade agreement on the NinjaTrader stand-in.
+//   * a take profit TakeProfitAt hard stops from the fill; once a bar closes BreakEvenAt x the hard stop in profit,
+//     the stop goes to the entry + BreakEvenPlus points; out at market at the 15:50 bar's close (15:55's open);
+//   * a close StretchAddAt sigmas or more past the band trades one contract more (at most MaxContracts).
+// Gap trade: a gap of GapK x the 14-session average whose 09:30 bar moves the gap's way by GapMinBody x the average
+// range; in at 09:35, the stop at the 09:30 open (at most GapCap points), out at 09:55.
+// News days (the 08:30 volume against 08:20-08:29): NewsSkipFrom-NewsSkipTo x no trades; NewsBigAt x and up a contract
+// more. Account: no new entry once the day's closed P/L is down DayStop $; contracts by profit over the start balance
+// (1, 2 from Step2At, 3 from Step3At, never more than MaxContracts). research/zoo/strats.py (noise with nt=True, gap_go)
+// is the same rule in Python and tests/test_ninjatrader_clean.py holds the two to trade-for-trade agreement.
 #region Using declarations
 using System;
 using System.Collections.Generic;
@@ -38,8 +42,8 @@ namespace NinjaTrader.NinjaScript.Strategies
             public DateTime Date;
             public double Close;
             public int Bars;
-            public double Gap = double.NaN;
-            public double Range;  // the session's high - low (09:30-16:00)  // today's 09:30 open less the prior complete session's close
+            public double Gap = double.NaN;  // the 09:30 open less the prior complete session's close
+            public double Range;  // the session's high - low (09:30-16:00)
             public readonly Dictionary<int, double> Moves = new Dictionary<int, double>();
         }
 
@@ -62,7 +66,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (State == State.SetDefaults)
             {
                 Name = "MnqCleanBand";
-                Description = "The Clean Noise-Band spec with the 50K fixes: VWAP + trend entries at the half-hour checks, the band as the stop, a hard stop, break-even, a day stop.";
+                Description = "The Clean Noise-Band spec with the 50K fixes: trend entries at the half-hour checks, the band as the stop, a hard stop, a take profit, break-even, a day stop, the gap trade and news days.";
                 Calculate = Calculate.OnBarClose;
                 EntriesPerDirection = 1;
                 EntryHandling = EntryHandling.UniqueEntries;
@@ -81,16 +85,16 @@ namespace NinjaTrader.NinjaScript.Strategies
                 MaxContracts = 3;
                 FixedContracts = 0;
                 Step2At = 2000;
-                Step3At = 3500;  // 2026-11-24: from +$4,500, with the strong-break contract and the gap rule (docs 32)
+                Step3At = 3500;  // was 4500: safe since the strong-break contract and the gap rule (docs 32)
                 EarlyMaxTrades = 0;
                 EarlyCushion = 0;
                 StartBalance = 50000;
                 StartProfit = 0;
                 UseAccountBalanceLive = true;
                 VwapStop = true;
-                VwapEntry = false;
-                RangePos = 0.65;
-                MaxMove = 1.1;  // 2026-11-24: without the VWAP entry filter, more per start and no more lost (docs/STRATEGY_SEARCH.md, 9)
+                VwapEntry = false;  // off since docs/STRATEGY_SEARCH.md, 9
+                RangePos = 0.65;  // docs/STRATEGY_SEARCH.md, 20
+                MaxMove = 1.1;  // docs/STRATEGY_SEARCH.md, 22 and 26
                 PlaceOrders = true;
                 BlockOnDataGap = true;
                 TakeProfitAt = 2.5;
@@ -98,8 +102,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 GapFrom = 0;  // 2026-11-24: from day one with the news-day rule: 0 of 104 starts lost, more days (docs 19)
                 GapK = 0.5;  // 0.3 with a 40-point cap was tried and taken back (docs 29)
                 GapCap = 30;
-                GapMinBody = 0.03;
-                StretchAddAt = 1.5;
+                GapMinBody = 0.03;  // docs 28
+                StretchAddAt = 1.5;  // docs 30
                 NewsDays = true;
                 NewsBigAt = 6;
                 NewsSkipFrom = 2;
@@ -123,7 +127,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 Print("Clean band settings: " + Instrument.FullName + ", " + BarsPeriod.Value + " " + BarsPeriod.BarsPeriodType +
                       ", account " + (Account == null ? "none" : Account.Name) + ", trend " + TrendDays + " days, hard stop $" +
                       HardStop + ", break-even at " + BreakEvenAt + "x, last entry " + (LastEntry / 60) + ":" + (LastEntry % 60).ToString("00") +
-                      ", day stop $" + DayStop + ", up to " + MaxContracts + " MNQ (2 from +$" + Step2At + ", 3 from +$" + Step3At + ")");
+                      ", day stop $" + DayStop + ", up to " + MaxContracts + " MNQ (2 from +$" + Step2At + ", 3 from +$" + Step3At +
+                      (StretchAddAt > 0 ? ", +1 on a break " + StretchAddAt + " sigma past the band" : "") + ")");
             }
         }
 
@@ -402,7 +407,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             // FixedContracts). Those entries win 65-74% on 2015-2025 NQ, PF 2.1-2.8 (docs/STRATEGY_SEARCH.md, 30)
             double refPx = want > 0 ? Math.Max(dayOpen, prevClose) : Math.Min(dayOpen, prevClose);
             double stretch = want * (Close[0] - (want > 0 ? up : dn)) / (sg * refPx);
-            int q = StretchAddAt > 0 && FixedContracts <= 0 && stretch >= StretchAddAt ? Math.Min(qty + 1, MaxContracts) : qty;
+            int q = StretchAddAt > 0 && FixedContracts <= 0 && sg > 0 && stretch >= StretchAddAt ? Math.Min(qty + 1, MaxContracts) : qty;
             if (want > 0) EnterLong(q, name); else EnterShort(q, name);
             tradesToday++;
             Print(Time[0] + "  Clean band: " + (want > 0 ? "long " : "short ") + q + " MNQ" + (q > qty ? " (a strong break: +1)" : "") +
@@ -410,7 +415,8 @@ namespace NinjaTrader.NinjaScript.Strategies
         }
 
         // gap and go (research/zoo/strats.py gap_go): a gap of GapK x the last 14 sessions' average |gap| whose 09:30 bar
-        // closes the gap's way; in at 09:35, the stop at the 09:30 open but no farther than GapCap points; out at 09:55
+        // closes the gap's way by GapMinBody x the average range; in at 09:35, the stop at the 09:30 open but no farther
+        // than GapCap points; out at 09:55
         void GapEntry(double tick)
         {
             if (hist.Count < 15 || double.IsNaN(today.Gap))
@@ -606,7 +612,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         [NinjaScriptProperty]
         [Range(0, 20)]
-        [Display(Name = "One more contract when the entry closes this many sigmas past the band (0 = off)", Order = 9, GroupName = "3. Size")]
+        [Display(Name = "One more contract when the entry closes this many sigmas past the band (0 = off)", Order = 7, GroupName = "3. Size")]
         public double StretchAddAt { get; set; }
 
         [NinjaScriptProperty]

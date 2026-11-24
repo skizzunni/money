@@ -310,46 +310,39 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    12's gap down and rally): the TradingView window +$14,807 (PF 5.17, 62 trades) but **17.3% of starts lost** and the
    25th percentile $2,282; half way: 3.8% lost. The prior close in the band is what keeps the account through 2015-25.
 
-## The result (the shipped defaults, research numbers, 2 ticks of stop slippage, $0.62 a side)
+## The result (the shipped defaults, 2026-11-24, sections 1-33; research numbers, $0.62 a side)
 
-| set | band trades | win | PF | band net (1 MNQ) | gap trades (PF, net) | 50K starts lost | median 12 months |
-|---|---|---|---|---|---|---|---|
-| dev NQ 2015-19 | 1,004 | 21% | 1.44 | $17,649 | 224 (1.95, $6,799) | 0 of 49 | $4,211 |
-| unseen NQ 2020-25 | 1,216 | 22% | 1.45 | $26,340 | 270 (1.76, $8,713) | 0 of 55 | $10,838 |
-| unseen ES 2020-24 | 325 | 22% | 1.17 | $994 | 70 (0.69, -$379) | | |
-| live MNQ Jun 29 - Nov 20 2026 | 65 | 28% | 3.34 | $4,935 | 16 (2.34, $1,101) | | |
+| set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |
+|---|---|---|---|---|---|---|
+| dev NQ 2015-19 | 1,247 | 868 (42%, 1.55, $17,512) | 318 (1.75, $7,819) | 48% | 0 of 49 | $13,058 |
+| unseen NQ 2020 - Jun 2025 | 1,367 | 1,081 (48%, 1.61, $29,970) | 354 (1.54, $7,848) | 48% | 0 of 55 | $17,530 |
+| unseen ES 2020-24 (a cross-check) | 458 | 305 (24%, 1.27, $1,489) | 102 (0.86, -$255) | 48% | | |
+| live MNQ Jun 29 - Nov 23 2026 | 104 | 52 (56%, 4.95, $5,457) | 22 (1.14, $144) | 33% | | |
 
-(The accounts' numbers use the gap leg only from +$4,500 and the contract steps; the trade columns are 1 contract, every
-gap trade. ES's band uses the MNQ $ stop in points, a cross-check only.)
+The accounts: the news rule, the $600 day stop, 1 / 2 / 3 contracts from +$0 / +$2,000 / +$3,500 and one more on a
+break 1.5 sigma past the band. Pooled 104 fresh 50K starts, 12 months each: **none lost**, median **+$16,582**, 25th
+percentile +$11,321, 10th +$4,672, worst +$1,789, best +$30,355; 79% reach +$10,000, 57% +$15,000, 29% +$20,000, 9%
++$25,000; 40% of traded days green. A "win" includes the break-even exits at +2 points.
 
-Pooled 104 starts: **none lost**, median **+$8,772**, 25th percentile +$3,235, 10th +$1,441, worst -$20 (never near
-the floor), 43% reach +$10,000 and 12.5% +$15,000 in 12 months, none +$25,000; green on 38% of traded days. Live band by
-month (1 MNQ): Jul -$138, Aug +$745, Sep +$824, Oct +$2,086, Nov (to the 20th) +$1,418; Nov 13 +$236, Nov 16 -$102,
-Nov 17 -$297, Nov 19 -$2, Nov 20 +$1,295 (the 2.5x target took the trend day's first leg).
+By year, 1 contract, all trades: 2015 $3,543, 2016 $6,251, 2017 $2,038, 2018 $7,140, 2019 $6,360, 2020 $5,398, 2021
+$8,777, 2022 $11,240, 2023 $6,074, 2024 $5,933, 2025 H1 $395; live 2026 by month Jul -$257, Aug +$511, Sep +$885, Oct
++$1,997, Nov (to the 23rd) +$2,465. (No data here for Jul 2025 - Jun 2026.)
 
-By year, 1 contract (band / gap leg): 2015 $2,869 / $1,158, 2016 $3,709 / $2,802, 2017 $1,098 / $895, 2018 $6,486 /
-$64, 2019 $3,486 / $1,880, 2020 $3,352 / $1,505, 2021 $6,702 / $1,104, 2022 $6,670 / $3,844, 2023 $5,160 / $449, 2024
-$4,370 / $1,521, 2025 H1 $85 / $290, 2026 Jun 29 - Nov 20 $4,935 / $1,101: every year up for both. (No data here for
-Jul 2025 - Jun 2026.)
+The user's TradingView window (Aug 27 - Nov 23 2026, a fresh 50K, `zoo/tv_window.py`): the reference +$9,796, 53
+trades, PF 4.25, max drawdown $670. TradingView itself on the versions before: +$6,322 (section 27), +$6,345 (28),
++$9,186 (30); the reference's direction matched every time, its trade count runs higher.
 
 **How sure is "none lost"?** (`verification/zoo/walkforward_dev_only.txt`) The protections were picked on dev and
-unseen NQ together, so the 0 of 104 is partly in-sample. A walk-forward that picks on 2015-19 only: of the 294 settings
-in the stage-4 grid that lose no 2015-19 start, the average loses 5.7% of the 2020-25 starts and 47% lose none; picking
-by the safest dev neighbourhood does no better (5.3%). The 2015-19 data cannot see the 2020 regime coming. What the
-grid does show is where the losses come from: the $250 hard stop, the late break-even (0.75) and entries to 14:30;
-every setting at $200 or less with break-even at 0.3-0.5 and a target of 2-3 hard stops loses none on either. Expect a
-small chance (a few percent) of losing a fresh account in a year like 2020, almost all of it in its first months, before
-the $2,000 cushion that brings the second contract; never loosen the risk settings.
+unseen NQ together, so the 0 of 104 is partly in-sample. A walk-forward that picks on 2015-19 only loses on average
+5.7% of the 2020-25 starts: the 2015-19 data cannot see the 2020 regime coming. The losses come from the $250 hard
+stop, a late break-even and entries to 14:30, and every one-step change in sections 32-33 that loosens risk (a $225
+stop, break-even 0.5, a band 0.9 or 1.1 sigma, the band from the open alone) loses 2.9-17% of starts. Expect a small
+chance of losing a fresh account in a year like 2020, mostly in its first months; never loosen the risk settings.
 
-**Fewer trades while the account is new does not help** (`verification/zoo/early_trade_limit.txt`): at most 1-3
-trades a day until +$1,000 / +$2,000, on the shipped setting and on the walk-forward's riskier picks, loses as many or
-more starts (the shipped one: up to 20%) and halves the median. The cushion comes from the trend-day winners; cutting
-trades delays it. Not used.
-
-**What it is not:** a high win-rate strategy. About 1 trade in 4 wins and about 3 traded days in 8 are green; the
-winners (the 2.5x target or the 15:55 close on trend days) are 4-6x the losers, which the band and break-even keep small. It trades on about a third of the sessions. With the user's
-3-contract cap the edge supports roughly $4-11K a year on a 50K (median $8.8K), not $25K; starting at 3 contracts
-loses about half of fresh accounts.
+**What it is not:** a trade-every-day strategy. It trades on about half of the sessions (a third live); the days it
+skips are inside the noise band, against the 20-day trend or mild-news days, and every rule tried that trades them
+loses accounts (sections 9, 19, 31, 33). ES is weaker than NQ (the gap trade and the strong-break contract lose there);
+the bot trades MNQ.
 
 ## TradingView
 
@@ -360,28 +353,36 @@ bar (NinjaTrader's bracket works from the fill bar).
 
 ## Running it
 
-NinjaTrader 8, on each funded account:
+NinjaTrader 8, on each funded account (both the same way):
 
-1. **Disable MnqNoiseV38 (and any other strategy) on the account first.** Two strategies on one account fight over
-   the position.
-2. Copy `ninjatrader/Strategies/MnqCleanBand.cs` to Documents\NinjaTrader 8\bin\Custom\Strategies and compile (F5
-   in the NinjaScript editor, or open and close the editor).
-3. Open an **MNQ 5-minute** chart (the front month; **CME US Index Futures ETH**, so the news rule sees the 08:30 bar)
-   with **Days to load: 40** or more
-   (Data Series window). It needs 21 complete sessions to start.
-4. Strategies tab, add **MnqCleanBand**, account = the funded account, keep the defaults, **Enabled**. The chart's
-   top-right corner must say **Setup: OK**. The Output window prints the settings and every order.
+1. **Turn off every other strategy on the account** (Control Center > Strategies tab: untick Enabled on MnqNoiseV38
+   or anything else on that account). Two strategies on one account fight over the position.
+2. **Install the file.** Copy `ninjatrader/Strategies/MnqCleanBand.cs` to
+   `Documents\NinjaTrader 8\bin\Custom\Strategies\` (replace the old one). Open New > NinjaScript Editor, then press
+   **F5** to compile; the bottom of the editor must show no errors. Close the editor.
+3. **Open the chart.** New > Chart; instrument **MNQ** front month (MNQ 12-26 until the December roll); type
+   **Minute**, value **5**; Trading hours **CME US Index Futures ETH** (the news rule reads the 08:30 bar); Load data
+   based on **Days**, Days to load **40** or more. OK.
+4. **Add the strategy.** Right-click the chart > Strategies > **MnqCleanBand** > Add. Set **Account** to the funded
+   account. Leave every other setting at its default. Tick **Enabled**, then OK.
+5. **Check it.** The chart's top-right corner must say **Setup: OK**, the size (1 MNQ on a fresh account) and the
+   news status. New > NinjaScript Output shows the settings line and every order. NOT READY: raise Days to load. NO
+   TRADING: right-click the chart > Reload All Historical Data.
+6. Leave NinjaTrader running through the session (09:30-16:00 New York); the strategy is flat by 15:55 every day.
+7. **Before Monday Nov 30** install this version: the older one would block that day (the holiday guard, section 27).
 
-Defaults: trend 20 sessions, hard stop $200 a contract, break-even at 0.4, take profit at 2.5 hard stops, last entry
-14:00 (840), up to 9 trades a day, day stop $600, the gap trade from the first day, at most 3 contracts (2 from +$2,000, 3 from
-+$4,500 (+$3,500 since section 32) over the $50,000 start balance; live it sizes from the account's net liquidation). An account below $50,000
-trades 1 contract until it is back above.
+Defaults: trend 20 sessions; hard stop $200 a contract; take profit 2.5 hard stops; break-even at 0.4 to entry + 2
+points; last entry 14:00 (840); at most 9 trades a day; day stop $600; range rule 0.65; move cap 1.1; the gap trade
+every day (gap 0.5x, 09:30 bar 3% of the range, stop at most 30 points); news days on (2-3x no trades, 6x a contract
+more); 1 contract, 2 from +$2,000, 3 from +$3,500 over the $50,000 start balance, one more on a break 1.5 sigma past
+the band, never more than 3 ("Most contracts"; "Fixed contracts" overrides all of it). Live it sizes from the
+account's net liquidation; an account below $50,000 trades 1 contract until it is back above.
 
 Live safety (tests/test_ninjatrader_clean.py): a stop the broker cancels or rejects while the position is open closes it
 at market ("No stop"); no entries while the chart's last 14 sessions leave out more than 5 weekdays (a hole in the
 history, as NinjaTrader's Oct 19 - Nov 6 2026 gap; holidays and half days leave at most 4; the Output window says to
-reload the data); NinjaTrader's exit on session close
-as a backstop (half days, e.g. Nov 27 2026, close at 13:15 before the 15:55 exit). The no-stop exit waits out the
-race where a target's OCO cancel of the stop arrives before the position shows flat (closes at the bar's close, or live
-2 s later, only if still open and no stop is back), so a target never closes twice. The chart shows Setup: OK / NOT READY
-(too few sessions loaded) / NO TRADING (a hole), the size, the gap leg and today's P/L.
+reload the data); NinjaTrader's exit on session close as a backstop (half days, e.g. Nov 27 2026, close at 13:15
+before the 15:55 exit). The no-stop exit waits out the race where a target's OCO cancel of the stop arrives before the
+position shows flat (closes at the bar's close, or live 2 s later, only if still open and no stop is back), so a
+target never closes twice. The chart shows Setup: OK / NOT READY (too few sessions loaded) / NO TRADING (a hole), the
+size, the gap trade, the news status and today's P/L.

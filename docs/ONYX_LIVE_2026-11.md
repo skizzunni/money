@@ -1,6 +1,6 @@
 # The ONYX account's live trades, Oct 30 - Nov 6, 2026 (analysis)
 
-Source: the user's Tradovate export `completed_trades_2026-11-08T21-18-35.csv` (account TAKEPROFIT113061309, MNQ),
+Source: the user's Tradovate export `completed_trades_2026-11-08T21-18-35.csv` (a funded account, MNQ),
 and screenshots of ONYX's Displacement Fill (archived v2), Sweep Reversal (v3, live) and Trend Follow (v2, sim).
 Partial fills of one entry (same time, side and price) are counted as one position. Times are New York.
 

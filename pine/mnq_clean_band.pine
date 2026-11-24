@@ -1,19 +1,23 @@
 //@version=6
-// MNQ Clean Noise-Band (2026-11-23): the user's "Clean Noise-Band Momentum (Prop Version)" spec with the fixes that keep a
-// 50K account with the $2,000 trailing floor (docs/STRATEGY_SEARCH.md). The same rules as
+// MNQ Clean Noise-Band: the user's "Clean Noise-Band Momentum (Prop Version)" spec with the changes that keep a 50K
+// account with the $2,000 trailing floor (docs/STRATEGY_SEARCH.md, sections 1-33). The same rules as
 // ninjatrader/Strategies/MnqCleanBand.cs; research/zoo/strats.py is the reference both are tested against.
-// 5-minute MNQ chart. Every half hour from 10:00 to the last entry check (14:00):
+// 5-minute MNQ chart with extended hours (the news rule reads the 08:30 bar). Every half hour from 10:00 to 14:00:
 //   * noise area: sigma = the mean over the last 14 complete sessions of |close at that time / the 09:30 open - 1|;
 //     upper = max(open, prior close) x (1 + sigma), lower = min(...) x (1 - sigma);
-//   * flat: LONG when the close is above upper and above the 20-session average of closes; SHORT mirrored;
+//   * flat: LONG when the close is above upper and above the 20-session average of closes, at least 65% up the day's
+//     range, and (after 10:00) the day not already 1.1 usual ranges up from its open; SHORT mirrored;
 //   * stop: the tighter of the band (or VWAP) and $200 a contract from the expected fill; moved at each check, never
-//     looser; back at or past it: out at market. Break-even once up 0.4 x $200; take profit at 2.5 x $200; out at 15:55;
-//   * no new entry once the day is down $600; 1 / 2 / 3 contracts from +$2,000 / +$3,500;
-//   * gap trade: a gap of 0.5x the 14-session average whose 09:30 bar closes its way by 3% of the average range, in at
-//     09:35, the stop at the 09:30 open (at most 30 points), out at 09:55.
+//     looser; back at or past it: out at market. Take profit at 2.5 x $200; once up 0.4 x $200 the stop goes to the
+//     entry + 2 points; out at 15:55;
+//   * a close 1.5 sigma or more past the band trades one contract more (at most "Most contracts");
+//   * no new entry once the day is down $600; 1 / 2 / 3 contracts from +$0 / +$2,000 / +$3,500;
+//   * gap trade: a gap of 0.5x the 14-session average whose 09:30 bar moves its way by 3% of the average range, in at
+//     09:35, the stop at the 09:30 open (at most 30 points), out at 09:55;
+//   * news days (the 08:30 volume against 08:20-08:29): 2-3x no trades, 6x and up a contract more.
 // margin_long / margin_short 0: a futures account posts margin, not the contract's full value. TradingView's default
-// (100%) refused every order once the size reached 2 MNQ (about $107K of contract on a $100K test account): the
-// trades stopped (the user's chart, 2026-11-24).
+// (100% of the contract's value) refused every order once the size reached 2 MNQ (about $107K of contracts): the trades
+// stopped (the user's chart, 2026-11-24).
 strategy("MNQ Clean Noise-Band", overlay = true, initial_capital = 50000, default_qty_type = strategy.fixed,
      default_qty_value = 1, pyramiding = 0, margin_long = 0, margin_short = 0,
      commission_type = strategy.commission.cash_per_contract, commission_value = 0.62, slippage = 1)
@@ -268,7 +272,7 @@ if inRth and ready
                     // a close stretchAdd sigmas or more past the band: one more contract (docs/STRATEGY_SEARCH.md, 30)
                     refPx = want > 0 ? math.max(dayOpen, prevC) : math.min(dayOpen, prevC)
                     stretch = want * (close - (want > 0 ? up : dn)) / (sg * refPx)
-                    q = stretchAdd > 0 and fixedQty == 0 and stretch >= stretchAdd ? math.min(qty + 1, maxQty) : qty
+                    q = stretchAdd > 0 and fixedQty == 0 and sg > 0 and stretch >= stretchAdd ? math.min(qty + 1, maxQty) : qty
                     strategy.entry(nid, want > 0 ? strategy.long : strategy.short, q)
                     strategy.exit(nid + " exit", nid, stop = stopPx, comment = "Stop loss")
                     tradesToday += 1
