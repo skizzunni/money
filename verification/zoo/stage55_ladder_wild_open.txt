@@ -1,0 +1,32 @@
+Stage 55 (2026-11-24, a research round): the second stop step (stage 52) and the wild-open gap skip (stage 54)
+together. Shipped.
+
+Caution first: both were near misses on their own, and combining near misses risks fitting noise. The bar set before
+the run: better than shipped on every gate on both periods, and by year in most years.
+
+bench.py (104 fresh 50K starts, dev + unseen NQ; the TradingView window; PF and net a year at 1 MNQ per set):
+shipped:                       lost 0.0% median $16,582 p25 $11,321 | TV $+9,796 53tr PF 4.25 | dev 1.60 $5,119 | unseen_nq 1.59 $6,971 | es 1.17 $679 | live 3.34 $13,572
+ladder 1.5/0.5 + skip 1.75:    lost 0.0% median $16,931 p25 $12,040 | TV $+9,921 52tr PF 4.43 | dev 1.62 $5,176 | unseen_nq 1.63 $7,349 | es 1.17 $643 | live 3.57 $14,112
+neighbours:
+ladder 1.25/0.4 + skip 1.75:   lost 0.0% median $16,937 p25 $11,955 | TV $+9,921 52tr PF 4.43 | dev 1.60 $5,096 | unseen_nq 1.64 $7,508
+ladder 1.75/0.5 + skip 1.75:   lost 0.0% median $16,821 p25 $12,051 | TV $+9,921 52tr PF 4.43 | dev 1.62 $5,203 | unseen_nq 1.62 $7,233
+ladder 1.5/0.4 + skip 1.5:     lost 0.0% median $16,830 p25 $11,563 | TV $+9,947 51tr PF 4.47 | dev 1.63 $5,159 | unseen_nq 1.65 $7,410
+ladder 1.5/0.5 + skip 2.0:     lost 0.0% median $16,440 p25 $11,886 | TV $+9,921 52tr PF 4.43 | dev 1.60 $5,087 | unseen_nq 1.62 $7,264
+ladder 1.5/0.6 + skip 1.75:    lost 0.0% median $16,019 p25 $11,835 | TV $+9,921 52tr PF 4.43 | dev 1.60 $5,033 | unseen_nq 1.63 $7,364
+ladder 1.75/0.6 + skip 2.0:    lost 0.0% median $16,565 p25 $11,938 | TV $+9,921 52tr PF 4.43 | dev 1.60 $5,090 | unseen_nq 1.60 $7,105
+
+Shuffled days (montecarlo.py with both rules; 2,000 years each; the guard without the strong-only tier; the same
+draws), blown / median from $50,000, $48,806, $48,998:
+2020-25 shipped:   6.3% $16,632 | 18.9% $12,811 | 14.5% $14,351
+2020-25 combined:  5.0% $17,606 | 17.2% $13,877 | 12.7% $15,162
+2015-19 shipped:   2.7% $11,641 | 11.5% $8,964  | 7.2% $9,644
+2015-19 combined:  2.3% $11,854 | 10.8% $8,984  | 6.5% $9,664
+
+By year, 1 contract, all trades (shipped / combined): 2015 3543 / 3326, 2016 6251 / 6509, 2017 2038 / 1684,
+2018 7140 / 7740, 2019 6360 / 6355, 2020 5398 / 6426, 2021 8777 / 9217, 2022 11240 / 10885, 2023 6074 / 6557,
+2024 5933 / 6226, 2025 H1 395 / 555, 2026 5601 / 5824: 8 of 12 up, +$2,553 in all.
+
+Verdict: shipped (LadderAt 1.5, LadderLock 0.5, GapMaxBar 1.75; NinjaTrader and Pine trade for trade with the
+reference on synthetic and real data, each rule switched off alone also matching). Small (about $220 a year a
+contract) and not certain (three of six neighbours have a lower median), but fewer accounts blown in every shuffled
+case on both periods.

@@ -11,13 +11,15 @@
 //     HardStop $ a contract from the expected fill (the signal close + a tick); at each check it moves to the tighter
 //     of the new band / VWAP and the hard stop, never looser; if that is already at or past the close, out at market;
 //   * a take profit TakeProfitAt hard stops from the fill; once a bar closes BreakEvenAt x the hard stop in profit,
-//     the stop goes to the entry + BreakEvenPlus points; out at market at the 15:50 bar's close (15:55's open);
+//     the stop goes to the entry + BreakEvenPlus points; once a bar closes LadderAt (1.5) hard stops up, to the entry +
+//     LadderLock (0.5) hard stops; out at market at the 15:50 bar's close (15:55's open);
 //     a half day (the trading-hours template's early close; the Friday after Thanksgiving and Christmas Eve, 13:15,
 //     whatever the template says): out 5 minutes before it; a trade still open after any other early close goes out on
 //     the next bar;
 //   * a close StretchAddAt sigmas or more past the band trades one contract more (at most MaxContracts).
 // Gap trade: a gap of GapK x the 14-session average whose 09:30 bar moves the gap's way by GapMinBody x the average
-// range; in at 09:35, the stop at the 09:30 open (at most GapCap points), out at 09:55.
+// range, its own range not over GapMaxBar (1.75) x the last 14 sessions' 09:30 bars' average (a wild open); in at
+// 09:35, the stop at the 09:30 open (at most GapCap points), out at 09:55.
 // News days (the 08:30 volume against 08:20-08:29): NewsSkipFrom-NewsSkipTo x no trades; NewsBigAt x and up a contract
 // more. Account: no new entry once the day's closed P/L is down DayStop $; contracts by profit over the start balance
 // (1, 2 from Step2At, 3 from Step3At, never more than MaxContracts); the cushion guard: less than CushionGuard $ above the
@@ -49,6 +51,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             public int Bars;
             public double Gap = double.NaN;  // the 09:30 open less the prior complete session's close
             public double Range;  // the session's high - low (09:30-16:00)
+            public double Bar0Range = double.NaN;  // the first regular-hours bar's high - low (the 09:30 bar)
             public readonly Dictionary<int, double> Moves = new Dictionary<int, double>();
         }
 
@@ -88,6 +91,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 HardStop = 200;
                 BreakEvenAt = 0.4;
                 BreakEvenPlus = 2;  // points past entry: the scratch exits close as small wins (docs/STRATEGY_SEARCH.md, 23)
+                LadderAt = 1.5;     // docs 61
+                LadderLock = 0.5;
                 LastEntry = 840;
                 MaxTradesPerDay = 9;
                 DayStop = 600;
@@ -112,6 +117,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 GapK = 0.5;  // 0.3 with a 40-point cap was tried and taken back (docs 29)
                 GapCap = 30;
                 GapMinBody = 0.03;  // docs 28
+                GapMaxBar = 1.75;   // docs 61
                 StretchAddAt = 1.5;  // docs 30
                 NewsDays = true;
                 NewsBigAt = 6;
@@ -237,6 +243,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (hist.Count > 60) hist.RemoveAt(0);
             today = new Day();
             today.Date = date;
+            today.Bar0Range = High[0] - Low[0];
             dayOpen = Open[0];
             dayHigh = double.MinValue;
             dayLow = double.MaxValue;
@@ -451,6 +458,17 @@ namespace NinjaTrader.NinjaScript.Strategies
                 }
                 beDone = true;
             }
+            // the second step: once a bar closes LadderAt hard stops up, the stop to the entry + LadderLock hard stops
+            // (docs/STRATEGY_SEARCH.md 61)
+            if (pos != 0 && LadderAt > 0 && pos * (Close[0] - entryPx) >= LadderAt * HardStop / pv)
+            {
+                double lk = Instrument.MasterInstrument.RoundToTickSize(entryPx + pos * LadderLock * HardStop / pv);
+                if (pos * (lk - stop) > 0)
+                {
+                    stop = lk;
+                    SetStopLoss(pos > 0 ? "Long" : "Short", CalculationMode.Price, stop, false);
+                }
+            }
             double sg;
             if (!sigma.TryGetValue(end, out sg) || double.IsNaN(sg))
                 return;
@@ -536,6 +554,16 @@ namespace NinjaTrader.NinjaScript.Strategies
             // docs/STRATEGY_SEARCH.md, 28)
             if (side * (Close[0] - dayOpen) < GapMinBody * avgRange)
                 return;
+            // a wild open: no gap trade when the 09:30 bar's range is over GapMaxBar x its 14-session average (the stop
+            // is then the 30-point cap inside a bar that size; docs/STRATEGY_SEARCH.md 61)
+            if (GapMaxBar > 0)
+            {
+                double bs = 0;
+                for (int j = hist.Count - 14; j < hist.Count; j++)
+                    bs += hist[j].Bar0Range;
+                if (High[0] - Low[0] > GapMaxBar * bs / 14)
+                    return;
+            }
             double e = Close[0] + side * tick;
             double dist = Math.Min(Math.Max(Math.Abs(e - dayOpen), 4 * tick), GapCap);
             string name = side > 0 ? "GapLong" : "GapShort";
@@ -653,6 +681,16 @@ namespace NinjaTrader.NinjaScript.Strategies
         public double BreakEvenPlus { get; set; }
 
         [NinjaScriptProperty]
+        [Range(0, 10)]
+        [Display(Name = "Second stop step once up this many hard stops (0 = off)", Order = 6, GroupName = "2. Risk")]
+        public double LadderAt { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, 10)]
+        [Display(Name = "Second stop step: the stop this many hard stops past the entry", Order = 7, GroupName = "2. Risk")]
+        public double LadderLock { get; set; }
+
+        [NinjaScriptProperty]
         [Range(0, 10000)]
         [Display(Name = "Day stop: no new entry once the day is down $ (0 = off)", Order = 3, GroupName = "2. Risk")]
         public double DayStop { get; set; }
@@ -734,6 +772,11 @@ namespace NinjaTrader.NinjaScript.Strategies
         [Range(0, 1)]
         [Display(Name = "Gap: the 09:30 bar moves its way at least this x the average range", Order = 5, GroupName = "5. Gap trade")]
         public double GapMinBody { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, 20)]
+        [Display(Name = "Gap: no trade when the 09:30 bar's range is over this x its 14-session average (0 = off)", Order = 6, GroupName = "5. Gap trade")]
+        public double GapMaxBar { get; set; }
 
         [NinjaScriptProperty]
         [Range(1, 3)]

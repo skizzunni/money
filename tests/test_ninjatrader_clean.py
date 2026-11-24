@@ -23,8 +23,8 @@ import harness as H  # noqa: E402
 import strats as S  # noqa: E402
 
 DEFAULTS = dict(vwap=False, trend=20, hard=200.0, vwap_stop=True, k=1.0, be_r=0.4, max_trades=9, last=840, tp_r=2.5,
-                range_pos=0.65, max_move=1.1, be_plus=2.0, move_free="first_check")
-GAP = dict(k=0.5, exit_m=590, r=0.0, cap=30.0, min_body=0.03)
+                range_pos=0.65, max_move=1.1, be_plus=2.0, move_free="first_check", lad_r=1.5, lad_lock=0.5)
+GAP = dict(k=0.5, exit_m=590, r=0.0, cap=30.0, min_body=0.03, max_bar=1.75)
 
 
 def fixture_days() -> list:
@@ -144,6 +144,9 @@ def py_trades(days: list, idx: list, day_stop: float = 0.0, steps=None, gap_from
     ({"MaxContracts": 1, "DayStop": 0}, {}),
     ({"MaxContracts": 1, "DayStop": 0, "TrendDays": 0, "BreakEvenAt": 0, "LastEntry": 900}, {"trend": 0, "be_r": 0.0, "last": 900}),
     ({"MaxContracts": 1, "DayStop": 0, "VwapStop": False, "HardStop": 150}, {"vwap_stop": False, "hard": 150.0}),
+    ({"MaxContracts": 1, "DayStop": 0, "LadderAt": 0, "GapMaxBar": 0}, {"lad_r": 0.0, "gap": {**GAP, "max_bar": 0.0}}),
+    ({"MaxContracts": 1, "DayStop": 0, "LadderAt": 1.25, "LadderLock": 0.4, "GapMaxBar": 1.5},
+     {"lad_r": 1.25, "lad_lock": 0.4, "gap": {**GAP, "max_bar": 1.5}}),
 ])
 def test_clean_band_matches_python(sim, tmp_path, props, py):  # noqa: F811
     days = fixture_days()
@@ -530,3 +533,21 @@ def test_clean_band_half_day_never_holds_overnight(sim, tmp_path, mode):  # noqa
     for t in tt:  # no trade anywhere runs past its session's first bar of the next day
         (d0, _k0), (d1, k1) = idx[int(t[1])], idx[int(t[3])]
         assert d1 == d0 or (d1 == d0 + 1 and k1 <= 1 and d0 in halves), (d0, d1, k1)
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+def test_clean_band_ladder_and_wild_open_act(sim, tmp_path):  # noqa: F811
+    """The second stop step and the wild-open gap skip (docs/STRATEGY_SEARCH.md 61) each change trades on the test data
+    (so the parity tests above check them, not only the trades they leave alone), and each switched off alone matches
+    the reference without it."""
+    days = fixture_days()
+    path = tmp_path / "bars.csv"
+    idx = write_bars(days, path)
+    def got(**props):
+        return [(int(t[0]), int(t[1]), round(float(t[2]), 6), round(float(t[4]), 6)) for t in
+                run_nt(sim, path, MaxContracts=1, DayStop=0, **props)]
+    def want(**py):
+        return [(s, b, e, x) for s, b, e, x, _q in py_trades(days, idx, **py)]
+    both, no_ladder, no_skip = got(), got(LadderAt=0), got(GapMaxBar=0)
+    assert no_ladder == want(lad_r=0.0) and no_skip == want(gap={**GAP, "max_bar": 0.0})
+    assert both != no_ladder and both != no_skip

@@ -30,6 +30,10 @@ def bars_of(days: list) -> tuple[pd.DataFrame, list]:
 @pytest.mark.slow
 @pytest.mark.parametrize("inputs,kw", [
     ({"Most contracts": 1, "Day stop: no new entry once the day is down $ (0 = off)": 0}, {}),
+    ({"Most contracts": 1, "Day stop: no new entry once the day is down $ (0 = off)": 0,
+      "Second stop step once up this many hard stops (0 = off)": 0,
+      "Gap: no trade when the 09:30 bar's range is over this x its 14-session average (0 = off)": 0},
+     {"lad_r": 0.0, "gap": {**GAP, "max_bar": 0.0}}),
     ({}, {"day_stop": 600.0, "steps": ((0, 1), (2000, 2), (3500, 3))}),
     ({"Most contracts": 1, "Day stop: no new entry once the day is down $ (0 = off)": 0, "Gap trade only from this profit $ (0 = always)": 0,
       "Profit already made at the start $": 100000}, {"start": 100000.0}),

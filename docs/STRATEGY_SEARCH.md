@@ -562,6 +562,18 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    on every set and the window +$125-151, but the account median never above $16,582 ($15,364-16,555) and the 25th
    percentile up and down between neighbours. A near miss, not shipped.
 
+61. **The two near misses together: shipped** (2026-11-24, a research round; `verification/zoo/stage55_ladder_wild_open.txt`).
+   The second stop step (58: a close 1.5R up moves the stop to entry + 0.5R) with the wild-open gap skip (60: no gap
+   trade when the 09:30 bar's range is over 1.75x its 14-session average). Combining two near misses risks fitting
+   noise, so the bar was every gate on both periods. 104 starts: none lost, median $16,582 to $16,931, 25th percentile
+   $11,321 to $12,040, the window +$9,796 to +$9,921 (PF 4.25 to 4.43), PF up on dev, unseen NQ and live (ES flat).
+   Shuffled years, blown from $50,000 / $48,806 / $48,998: 2020-25 6.3 / 18.9 / 14.5% to 5.0 / 17.2 / 12.7%, 2015-19
+   2.7 / 11.5 / 7.2% to 2.3 / 10.8 / 6.5%, medians higher in all six. By year at 1 MNQ: 8 of 12 up, +$2,553 in all
+   (about $220 a year; 2015, 2017, 2022 down $217-354). Neighbours (ladder 1.25-1.75R / +0.4-0.6R, skip 1.5-2.0x):
+   none lost, the 25th percentile and the window up in all six, the median $16,019-16,937 (three below $16,582). Small
+   and not certain, but on the user's first goal (not losing the account) better everywhere it was measured. Shipped:
+   `LadderAt` 1.5, `LadderLock` 0.5, `GapMaxBar` 1.75 (NinjaTrader and Pine, trade for trade; 0 switches each off).
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-33; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |
@@ -581,7 +593,8 @@ $8,777, 2022 $11,240, 2023 $6,074, 2024 $5,933, 2025 H1 $395; live 2026 by month
 +$1,997, Nov (to the 23rd) +$2,465. (No data here for Jul 2025 - Jun 2026.)
 
 The user's TradingView window (Aug 27 - Nov 23 2026, a fresh 50K, `zoo/tv_window.py`): the reference +$9,796, 53
-trades, PF 4.25, max drawdown $670. TradingView itself on the versions before: +$6,322 (section 27), +$6,345 (28),
+trades, PF 4.25, max drawdown $670 (with section 61: +$9,921, 52 trades, PF 4.43; the 104 starts' median $16,931, 25th
+percentile $12,040). TradingView itself on the versions before: +$6,322 (section 27), +$6,345 (28),
 +$9,186 (30); the reference's direction matched every time, its trade count runs higher.
 
 **How sure is "none lost"?** (`verification/zoo/walkforward_dev_only.txt`) The protections were picked on dev and
@@ -633,8 +646,9 @@ NinjaTrader 8, on each funded account (both the same way):
    (08:35 to 14:15) and sizes from the same account balance as MNQ.
 
 Defaults: trend 20 sessions; hard stop $200 a contract; take profit 2.5 hard stops; break-even at 0.4 to entry + 2
-points; last entry 14:00 (840); at most 9 trades a day; day stop $600; range rule 0.65; move cap 1.1; the gap trade
-every day (gap 0.5x, 09:30 bar 3% of the range, stop at most 30 points); news days on (2-3x no trades, 6x a contract
+points, and at 1.5 to entry + 0.5 hard stops (section 61); last entry 14:00 (840); at most 9 trades a day; day stop
+$600; range rule 0.65; move cap 1.1; the gap trade every day (gap 0.5x, 09:30 bar 3% of the range and not over 1.75x
+its usual size, stop at most 30 points); news days on (2-3x no trades, 6x a contract
 more); 1 contract, 2 from +$2,000, 3 from +$3,500 over the $50,000 start balance, one more on a break 1.5 sigma past
 the band, never more than 3 ("Most contracts"; "Fixed contracts" overrides all of it). Live it sizes from the
 account's net liquidation; an account below $50,000 trades 1 contract until it is back above.
