@@ -119,6 +119,16 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    hours chart for the 08:30 bar, else it stays off), with the live caveat stated. Tests: trade for trade with pre-open
    bars in NinjaTrader and Pine.
 
+16. **TJR's New York-morning liquidity sweep** (2026-11-24; the user's video "How To Start Day Trading In 2026 [Full
+   Tutorial] | TJR", which YouTube does not serve to this machine, so his widely taught model rather than the video's
+   words; `research/zoo/overnight.py`, `tjr_sweep`, `verification/zoo/stage10_tjr_sweep_grid.csv`). Liquidity: the prior
+   session's and the overnight high / low; 09:30-11:00 a sweep past one, a break of structure back through the last 3-6
+   bars within 6-12 bars, entry at market or at the fair value gap the break left, the stop past the sweep, 2-3R or the
+   opposite level. Sweeps happen on 96% of days by 11:00. At market (trades on about 38% of days) PF about 1.0; 192
+   variants with stop caps of 80 / 150 points: 35 above 1 on dev and unseen NQ, **none on ES as well**, and those 35
+   are the gap entries that trade on 1-2% of days (10-30 trades). No edge as rules; not used. (G14 had rejected the
+   evening-session sweep with an inversion gap the same way.)
+
 ## The result (the shipped defaults, research numbers, 2 ticks of stop slippage, $0.62 a side)
 
 | set | band trades | win | PF | band net (1 MNQ) | gap trades (PF, net) | 50K starts lost | median 12 months |

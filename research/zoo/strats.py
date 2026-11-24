@@ -525,3 +525,92 @@ def news_mom(days, i, tick, thr=3.0, min_move=0.0, mode="mom", hard=200.0, pv=2.
     px, x, xb, why = walk(d, entry_bar, side, e - side * pts, e + side * r * pts if r else np.nan, exit_m, tick,
                           be_at=be * pts if be else np.nan, at_open=True)
     return [(side, entry_bar, px, x, why, xb)]
+
+
+def tjr_sweep(days, i, tick, k=3, window=6, entry="market", r=2.0, tgt="r", last=660, levels="pd+on", sweep_ticks=2,
+              max_trades=2, max_losses=1, cap=60.0, min_risk=8.0):
+    """A New York-morning liquidity sweep (TJR's widely taught model; 2026-11-24, the user's video, not readable here):
+    liquidity = the prior session's high / low and the overnight high / low; from 09:30 to `last`, a bar trading
+    `sweep_ticks` past a high level starts a short setup (a low level, a long); within `window` bars a close below the
+    lowest low of the `k` bars before the sweep (a break of structure) confirms it; entry at the next open ("market") or
+    a limit at the fair value gap the break left ("fvg": the gap's near edge, the next `window` bars); the stop a tick
+    past the sweep's extreme; the target r x the risk ("r") or the opposite level ("opp", at least 1R); out at 15:55.
+    Risk from `min_risk` to `cap` points. At most `max_trades` a day, none after `max_losses` losers."""
+    if i < 1:
+        return []
+    d = days[i]
+    o, h, lo, c, mm = d["o"], d["h"], d["l"], d["c"], d["mm"]
+    pdh, pdl = prev(days, i, "h"), prev(days, i, "l")
+    onh, onl = d.get("on", (np.nan, np.nan))
+    highs = [pdh] + ([onh] if levels == "pd+on" and not np.isnan(onh) else [])
+    lows = [pdl] + ([onl] if levels == "pd+on" and not np.isnan(onl) else [])
+    n = len(c)
+    out, losses, b = [], 0, 1
+    taken_hi, taken_lo = set(), set()
+    while b < n - 2 and len(out) < max_trades and losses < max_losses:
+        if mm[b] + 5 > last:
+            break
+        setup = None
+        for L in highs:
+            if L not in taken_hi and h[b] >= L + sweep_ticks * tick:
+                setup = (-1, L)
+                taken_hi.add(L)
+                break
+        if setup is None:
+            for L in lows:
+                if L not in taken_lo and lo[b] <= L - sweep_ticks * tick:
+                    setup = (1, L)
+                    taken_lo.add(L)
+                    break
+        if setup is None:
+            b += 1
+            continue
+        side, lvl = setup
+        s = b
+        ref = lo[max(0, s - k):s].min() if side < 0 else h[max(0, s - k):s].max()  # the structure to break back through
+        ext = h[s] if side < 0 else lo[s]
+        trig = None
+        for q in range(s, min(n - 1, s + window + 1)):
+            ext = max(ext, h[q]) if side < 0 else min(ext, lo[q])
+            if mm[q] + 5 > last + 30:
+                break
+            if (side < 0 and c[q] < ref) or (side > 0 and c[q] > ref):
+                trig = q
+                break
+        if trig is None:
+            b = s + 1
+            continue
+        stop = ext + tick if side < 0 else ext - tick
+        if entry == "market":
+            eb, e = trig + 1, o[trig + 1] + side * tick
+        else:  # a limit at the fair value gap's near edge (the gap between bars trig-2 and trig)
+            gap_edge = lo[trig - 2] if side < 0 and lo[trig - 2] > h[trig] else (h[trig - 2] if side > 0 and h[trig - 2] < lo[trig] else np.nan)
+            if np.isnan(gap_edge):
+                b = trig + 1
+                continue
+            eb = None
+            for q in range(trig + 1, min(n - 1, trig + 1 + window)):
+                if (side < 0 and h[q] >= gap_edge) or (side > 0 and lo[q] <= gap_edge):
+                    eb, e = q, gap_edge
+                    break
+                if (side < 0 and lo[q] <= c[trig] - 3 * abs(stop - c[trig])) or (side > 0 and h[q] >= c[trig] + 3 * abs(stop - c[trig])):
+                    break
+            if eb is None:
+                b = trig + 1
+                continue
+        risk = side * (e - stop)
+        if risk < min_risk or risk > cap:
+            b = trig + 1
+            continue
+        if tgt == "opp":
+            opp = [x for x in (lows if side < 0 else highs) if side * (x - e) >= risk]
+            target = (max(opp) if side < 0 else min(opp)) if opp else e + side * r * risk
+        else:
+            target = e + side * r * risk
+        target = _tick(target, tick)
+        px, x, xb, why = walk(d, eb, side, stop, target, 955, tick, entry=e if entry != "market" else None, at_open=True)
+        out.append((side, eb, px, x, why, xb))
+        if side * (x - px) < 0:
+            losses += 1
+        b = xb + 1
+    return out
