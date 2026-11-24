@@ -35,6 +35,7 @@ rangePos = input.float(0.65, "Entry close at least this far up the day's range (
 dayStop = input.float(600, "Day stop: no new entry once the day is down $ (0 = off)", minval = 0)
 maxQty = input.int(3, "Most contracts", minval = 1, maxval = 3)
 fixedQty = input.int(0, "Fixed contracts (0 = the profit steps; any other number trades that many from the start)", minval = 0, maxval = 50)
+stretchAdd = input.float(1.5, "One more contract when the entry closes this many sigmas past the band (0 = off)", minval = 0, step = 0.25)
 step2 = input.float(2000, "2 contracts from this profit $", minval = 0)
 step3 = input.float(4500, "3 contracts from this profit $", minval = 0)
 startProfit = input.float(0, "Profit already made at the start $")
@@ -264,7 +265,11 @@ if inRth and ready
                     stopPx := math.round_to_mintick(stopPx)
                     tgtPx := na
                     nid = want > 0 ? "Long" : "Short"
-                    strategy.entry(nid, want > 0 ? strategy.long : strategy.short, qty)
+                    // a close stretchAdd sigmas or more past the band: one more contract (docs/STRATEGY_SEARCH.md, 30)
+                    refPx = want > 0 ? math.max(dayOpen, prevC) : math.min(dayOpen, prevC)
+                    stretch = want * (close - (want > 0 ? up : dn)) / (sg * refPx)
+                    q = stretchAdd > 0 and fixedQty == 0 and stretch >= stretchAdd ? math.min(qty + 1, maxQty) : qty
+                    strategy.entry(nid, want > 0 ? strategy.long : strategy.short, q)
                     strategy.exit(nid + " exit", nid, stop = stopPx, comment = "Stop loss")
                     tradesToday += 1
                     leg := 1

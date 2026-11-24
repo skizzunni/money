@@ -145,7 +145,7 @@ def trades_of(strat, days: list, sym: str, **p) -> pd.DataFrame:
 
 def account(t: pd.DataFrame, all_days: list, qty_fn=lambda prof: 1, day_stop: float = 0.0, start_every: str = "M",
             early_max: int = 0, early_cushion: float = 0.0, eq_n: int = 0, eq_min: float = 0.0, steps: tuple = (),
-            extra: pd.DataFrame | None = None, extra_from: float = 0.0, day_qty=None):
+            extra: pd.DataFrame | None = None, extra_from: float = 0.0, day_qty=None, max_q: int = 3, add_from_q: int = 1):
     """Fresh 50K starts (every month), 12 months each. day_stop: no more trades once the day is down this much ($, at
     the sizes taken). early_max: at most this many trades a day while the profit is under early_cushion. eq_n / eq_min:
     sit a day out when the strategy's own 1-contract P/L over the last eq_n sessions (taken or not) is below eq_min.
@@ -153,6 +153,8 @@ def account(t: pd.DataFrame, all_days: list, qty_fn=lambda prof: 1, day_stop: fl
     Returns per-start (lost, profit, green days, traded days)."""
     days = [r["d"] for r in all_days]
     byday = {d: g.usd.to_numpy() for d, g in t.groupby("d")}
+    # research (2026-11-24): t["add"], extra contracts on that trade (capped at max_q); extra legs add none
+    adds = {d: g["add"].to_numpy() for d, g in t.groupby("d")} if "add" in t else {}
     exday = {d: g.usd.to_numpy() for d, g in extra.groupby("d")} if extra is not None else {}  # a second leg, first in the day
     hyp = np.array([byday[d].sum() if d in byday else 0.0 for d in days])
     idx = pd.Series(range(len(days)), index=pd.to_datetime(days))
@@ -186,10 +188,12 @@ def account(t: pd.DataFrame, all_days: list, qty_fn=lambda prof: 1, day_stop: fl
                         q = 0
                 if g is not None and early_max and prof < early_cushion:
                     g = g[:early_max]
-                for usd in (g if g is not None else []):
+                ad = adds.get(d, np.zeros(0))
+                ad = np.concatenate([np.zeros(len(g) - len(ad)), ad]) if g is not None and len(ad) < len(g) else ad
+                for k_, usd in enumerate(g if g is not None else []):
                     if day_stop and day_pl <= -day_stop:
                         break
-                    day_pl += usd * q
+                    day_pl += usd * (min(q + int(ad[k_]), max(q, max_q)) if len(ad) and q >= add_from_q else q)
                     if bal + day_pl <= floor:
                         lost = True
                         break

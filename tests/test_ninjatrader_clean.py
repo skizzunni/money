@@ -78,7 +78,7 @@ def run_nt(sim, path: Path, **props) -> list:  # noqa: F811
 
 
 def py_trades(days: list, idx: list, day_stop: float = 0.0, steps=None, gap_from: float | None = 0.0,
-              start: float = 0.0, gap: dict | None = None, **p) -> list:
+              start: float = 0.0, gap: dict | None = None, max_q: int | None = None, add_at: float = 1.5, **p) -> list:
     """The reference trades as (direction, entry bar, entry, exit, contracts), with the account rules the C# applies:
     contracts by the profit at the day's start, the gap leg (first in the day) once the profit reaches gap_from, the day
     stop across both."""
@@ -93,15 +93,20 @@ def py_trades(days: list, idx: list, day_stop: float = 0.0, steps=None, gap_from
                     q = qq
         day = 0.0
         legs = []
+        cap = max_q if max_q is not None else (3 if steps else 1)  # MaxContracts as the C# run sets it
         if gap_from is not None and (gap_from <= 0 or cum >= gap_from) and i >= max(21, cfg["trend"] + 1):
             legs += S.gap_go(days, i, 0.25, **(gap or GAP))
+        ng = len(legs)
         legs += S.noise(days, i, 0.25, stop_slip=1, nt=True, **cfg)
-        for side, eb, epx, xpx, _why, *_ in legs:
+        for n_, (side, eb, epx, xpx, _why, *_) in enumerate(legs):
             if day_stop and day <= -day_stop:
                 break
-            pnl = ((xpx - epx) * side * 2.0 - 2 * 0.62) * q  # $0.62 a side, as the stand-in books it
+            qq = q  # a band entry StretchAddAt sigmas past the band: one more contract, at most MaxContracts
+            if n_ >= ng and add_at and S.band_stretch(days, i, side, eb, cfg["k"]) >= add_at:
+                qq = min(q + 1, cap)
+            pnl = ((xpx - epx) * side * 2.0 - 2 * 0.62) * qq  # $0.62 a side, as the stand-in books it
             day += pnl
-            out.append((side, pos_of[(i, eb)], round(epx, 6), round(xpx, 6), q))
+            out.append((side, pos_of[(i, eb)], round(epx, 6), round(xpx, 6), qq))
         cum += day
     return out
 
@@ -357,9 +362,11 @@ def test_clean_band_news_days(sim, tmp_path):  # noqa: F811
         if spikes[i] >= 6:
             q = min(q + 1, 3)
         legs = (S.gap_go(days, i, 0.25, **GAP) if i >= 21 else []) + S.noise(days, i, 0.25, stop_slip=1, nt=True, **DEFAULTS)
-        for side, eb, epx, xpx, _w, *_ in legs:
-            day += ((xpx - epx) * side * 2.0 - 2 * 0.62) * q
-            ref.append((side, pos_of[(i, eb)], round(epx, 6), round(xpx, 6), q))
+        ng = len(legs) - len([x for x in legs if x[1] > 1])  # the gap leg enters on bar 1, band entries later
+        for n_, (side, eb, epx, xpx, _w, *_) in enumerate(legs):
+            qq = min(q + 1, 3) if n_ >= ng and S.band_stretch(days, i, side, eb) >= 1.5 else q
+            day += ((xpx - epx) * side * 2.0 - 2 * 0.62) * qq
+            ref.append((side, pos_of[(i, eb)], round(epx, 6), round(xpx, 6), qq))
         cum += day
     got = [(int(t[0]), int(t[1]), round(float(t[2]), 6), round(float(t[4]), 6), int(n[1])) for t, n in zip(tt, tn, strict=True)]
     assert len(ref) > 20 and rth

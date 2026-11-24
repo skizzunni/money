@@ -262,6 +262,16 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    adoption test was not met: live PF 3.34 to 2.94 and ES 1.17 to 1.14 (the per-year net over Jun 29 - Nov 23 hid it).
    A small gain on 2015-2025 does not outweigh a clear loss in the market traded now: back to 0.5 / 30 with 28's rule.
 
+30. **One more contract on a strong break** (2026-11-24, the user: "improve it even more"; `harness.account`'s per-trade
+   `add`, `strats.band_stretch`, `zoo/tv_window.py`, `verification/zoo/stage23_strong_break_size.txt`). Band entries
+   whose signal close is 1.5 sigma or more past the band: 19 / 17 a year on dev / unseen NQ, 65% / 74% winners, PF
+   2.11 / 2.84 (the rest 1.53 / 1.50); live 4 in the TradingView window, 3 targets and a scratch. One contract more on
+   those (at most MaxContracts, not with FixedContracts): 0 of 104 starts lost (dev and unseen NQ each 0, the worst
+   start up), median $15,314 to $16,030, 25th percentile $9,620 to $11,173; the TradingView window (`tv_window`) +$6,404
+   to +$9,224, max drawdown $447 to $670. Neighbours 1.25 and 2.0 sigma: 0 lost; 1.0: 2.9% lost, 0.5: 3.8% (the edge).
+   From 2 contracts only: no better. Against it: on ES those entries lose (PF 0.42, about 40 trades), as the gap trade
+   does; the bot trades MNQ. Shipped (`StretchAddAt` 1.5, NinjaTrader and Pine; parity tests check every trade's size).
+
 ## The result (the shipped defaults, research numbers, 2 ticks of stop slippage, $0.62 a side)
 
 | set | band trades | win | PF | band net (1 MNQ) | gap trades (PF, net) | 50K starts lost | median 12 months |

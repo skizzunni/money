@@ -791,3 +791,16 @@ def everyday(days, i, tick, legs=(), **_):
     for name, p in legs:
         out += globals()[name](days, i, tick, **p) or []
     return merge(out)
+
+
+def band_stretch(days, i, side, eb, k=1.0):
+    """research (2026-11-24): how far past the band the signal close (the bar before the fill, eb - 1) was, in sigmas
+    of the band's reference (max / min of the open and the prior close), as MnqCleanBand sizes it."""
+    d = days[i]
+    b = eb - 1
+    end = d["mm"][b] + 5
+    sg = np.mean([_moves(days, j).get(end, np.nan) for j in range(i - 14, i)]) * k
+    pc = prev(days, i, "c")
+    ref = max(d["o"][0], pc) if side > 0 else min(d["o"][0], pc)
+    edge = ref * (1 + sg) if side > 0 else ref * (1 - sg)
+    return side * (d["c"][b] - edge) / (sg * ref)

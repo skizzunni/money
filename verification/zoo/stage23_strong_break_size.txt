@@ -1,0 +1,27 @@
++1 contract when stretch >= 0: lost 0.0% median $15,314 p25 $9,620 | boosted 0% of trades | TVwin $+6,404 53tr 45% PF 3.74
++1 contract when stretch >= 0.5: lost 3.8% median $17,227 p25 $10,918 | boosted 31% of trades | TVwin $+11,555 53tr 45% PF 4.32
++1 contract when stretch >= 0.75: lost 2.9% median $16,449 p25 $10,946 | boosted 20% of trades | TVwin $+9,127 53tr 45% PF 3.93
++1 contract when stretch >= 1.0: lost 2.9% median $16,280 p25 $10,549 | boosted 14% of trades | TVwin $+9,125 53tr 45% PF 3.93
++1 contract when stretch >= 1.5: lost 0.0% median $16,030 p25 $11,173 | boosted 8% of trades | TVwin $+9,224 53tr 45% PF 4.06
++1 contract none (now): lost 0.0% median $15,314 p25 $9,620 | ES lost nan% med $nan | TVwin $+6,404 53tr PF 3.74 dd $447
++1 contract >= 1.25 sigma: lost 0.0% median $16,134 p25 $11,035 | ES lost nan% med $nan | TVwin $+9,125 53tr PF 3.93 dd $670
++1 contract >= 1.5 sigma: lost 0.0% median $16,030 p25 $11,173 | ES lost nan% med $nan | TVwin $+9,224 53tr PF 4.06 dd $670
++1 contract >= 2.0 sigma: lost 0.0% median $15,769 p25 $10,491 | ES lost nan% med $nan | TVwin $+7,107 53tr PF 3.70 dd $609
++1 contract >= 0.5 sigma from 2 contracts: lost 2.9% median $15,880 p25 $8,213 | ES lost nan% med $nan | TVwin $+7,650 53tr PF 3.95 dd $447
++1 contract >= 0.75 sigma from 2 contracts: lost 1.0% median $15,230 p25 $9,904 | ES lost nan% med $nan | TVwin $+7,207 53tr PF 3.84 dd $447
++1 contract >= 1.0 sigma from 2 contracts: lost 0.0% median $15,211 p25 $10,723 | ES lost nan% med $nan | TVwin $+6,708 53tr PF 3.64 dd $447
++1 contract >= 1.5 sigma from 2 contracts: lost 0.0% median $15,272 p25 $10,223 | ES lost nan% med $nan | TVwin $+6,406 53tr PF 3.74 dd $447
+dev: trades >=1.5 sigma 19/yr win 65% PF 2.11 net $1,068/yr | the rest PF 1.53
+unseen_nq: trades >=1.5 sigma 17/yr win 74% PF 2.84 net $1,492/yr | the rest PF 1.50
+unseen_es: trades >=1.5 sigma 9/yr win 19% PF 0.42 net $-173/yr | the rest PF 1.23
+live: trades >=1.5 sigma 12/yr win 100% PF 1499800000000.00 net $3,634/yr | the rest PF 2.71
+  dev boost 0: starts 49 lost 0.0% median $11,844 p25 $5,048 worst $1,491
+  dev boost 1.5: starts 49 lost 0.0% median $12,928 p25 $5,283 worst $1,789
+  unseen_nq boost 0: starts 55 lost 0.0% median $15,880 p25 $12,697 worst $5,651
+  unseen_nq boost 1.5: starts 55 lost 0.0% median $16,746 p25 $14,073 worst $5,947
+live window boosted trades:
+            d  side  bar    pts     usd     why    st
+24 2026-09-21     1    6  250.0  498.76  target  2.31
+44 2026-10-16    -1   36  250.0  498.76  target  1.91
+56 2026-11-05    -1    6  250.0  498.76  target  7.69
+59 2026-11-13    -1   12    1.5    1.76    stop  1.57

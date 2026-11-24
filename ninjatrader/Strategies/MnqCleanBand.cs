@@ -99,6 +99,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 GapK = 0.5;  // 0.3 with a 40-point cap was tried and taken back (docs 29)
                 GapCap = 30;
                 GapMinBody = 0.03;
+                StretchAddAt = 1.5;
                 NewsDays = true;
                 NewsBigAt = 6;
                 NewsSkipFrom = 2;
@@ -397,9 +398,15 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (TakeProfitAt > 0)
                 SetProfitTarget(name, CalculationMode.Ticks, Math.Max(1, Math.Round(TakeProfitAt * HardStop / pv / tick)));
             noisePending = true;
-            if (want > 0) EnterLong(qty, name); else EnterShort(qty, name);
+            // a close StretchAddAt sigmas or more past the band: one more contract, at most MaxContracts (not with
+            // FixedContracts). Those entries win 65-74% on 2015-2025 NQ, PF 2.1-2.8 (docs/STRATEGY_SEARCH.md, 30)
+            double refPx = want > 0 ? Math.Max(dayOpen, prevClose) : Math.Min(dayOpen, prevClose);
+            double stretch = want * (Close[0] - (want > 0 ? up : dn)) / (sg * refPx);
+            int q = StretchAddAt > 0 && FixedContracts <= 0 && stretch >= StretchAddAt ? Math.Min(qty + 1, MaxContracts) : qty;
+            if (want > 0) EnterLong(q, name); else EnterShort(q, name);
             tradesToday++;
-            Print(Time[0] + "  Clean band: " + (want > 0 ? "long " : "short ") + qty + " MNQ, stop " + stop.ToString("F2", CultureInfo.InvariantCulture));
+            Print(Time[0] + "  Clean band: " + (want > 0 ? "long " : "short ") + q + " MNQ" + (q > qty ? " (a strong break: +1)" : "") +
+                  ", stop " + stop.ToString("F2", CultureInfo.InvariantCulture));
         }
 
         // gap and go (research/zoo/strats.py gap_go): a gap of GapK x the last 14 sessions' average |gap| whose 09:30 bar
@@ -596,6 +603,11 @@ namespace NinjaTrader.NinjaScript.Strategies
         [Range(1, 3)]
         [Display(Name = "Most contracts", Order = 1, GroupName = "3. Size")]
         public int MaxContracts { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, 20)]
+        [Display(Name = "One more contract when the entry closes this many sigmas past the band (0 = off)", Order = 9, GroupName = "3. Size")]
+        public double StretchAddAt { get; set; }
 
         [NinjaScriptProperty]
         [Range(0, 50)]

@@ -81,9 +81,11 @@ def test_pine_clean_band_news_days():
             q = min(q + 1, 3)
         legs = (S.gap_go(days, i, 0.25, **GAP) if i >= 21 else []) + S.noise(days, i, 0.25, stop_slip=1, nt=True, tp_fill_bar=False, **DEFAULTS)
         day = 0.0
-        for side, eb, epx, xpx, _w, *_ in legs:
-            day += ((xpx - epx) * side * 2.0 - 2 * 0.62) * q
-            ref.append((side, pos_of[(i, eb)], round(epx, 6), round(xpx, 6), q))
+        ng = len(legs) - len([x for x in legs if x[1] > 1])  # the gap leg enters on bar 1, band entries later
+        for n_, (side, eb, epx, xpx, _w, *_) in enumerate(legs):
+            qq = min(q + 1, 3) if n_ >= ng and S.band_stretch(days, i, side, eb) >= 1.5 else q
+            day += ((xpx - epx) * side * 2.0 - 2 * 0.62) * qq
+            ref.append((side, pos_of[(i, eb)], round(epx, 6), round(xpx, 6), qq))
         cum += day
     assert len(ref) > 20
     assert got == ref
