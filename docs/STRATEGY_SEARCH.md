@@ -272,6 +272,17 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    From 2 contracts only: no better. Against it: on ES those entries lose (PF 0.42, about 40 trades), as the gap trade
    does; the bot trades MNQ. Shipped (`StretchAddAt` 1.5, NinjaTrader and Pine; parity tests check every trade's size).
 
+31. **The missed big days** (2026-11-24, the user: "too many missed signals"; `verification/zoo/stage24_trend_misses.txt`,
+   `zoo/bench.py`: every gate in one call). TradingView with 30: +$9,186, 44 trades, 43% winners, PF 4.33, max drawdown
+   $1,626 (the reference: +$9,224). In that window (62 sessions) 26 traded; of the 36 without a trade 13 moved (half the
+   average range open to close or a full range): 6 never closed past the band at a check, 5 against the 20-day trend
+   (Nov 2 -583, Oct 8 -260, Sep 3 +282), 1 mild news, 1 the range rule (Nov 17). Tried for the trend ones, none used:
+   - the trend over 5 / 10 / 15 / 30 / 50 sessions: 5 loses 3.8% of starts; 10 and 15 the TradingView window
+     +$6,314 / +$8,972 and a lower 25th percentile; 30 the window +$11,138 but the 25th percentile $11,173 to $7,778
+     and dev $5,119 to $4,581 a year; 50 lower everywhere;
+   - against the trend past a band 2 / 2.5 / 3 / 4x as wide: 2x loses 8.7%; 3x the 25th percentile $12,684 but the
+     window +$6,761 and live PF 3.34 to 2.73; 2.5x and 4x the window flat and PF lower.
+
 ## The result (the shipped defaults, research numbers, 2 ticks of stop slippage, $0.62 a side)
 
 | set | band trades | win | PF | band net (1 MNQ) | gap trades (PF, net) | 50K starts lost | median 12 months |
