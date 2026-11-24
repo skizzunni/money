@@ -1,0 +1,18 @@
+now: 2 from +2000, 3 from +4500, day stop 600: lost 0.0% median $16,030 p25 $11,173 | TV $+9,224 PF 4.06 dd $670
+2 from +1500, 3 from +4000: lost 0.0% median $17,000 p25 $10,983 | TV $+8,994 PF 3.77 dd $670
+2 from +1500, 3 from +3500: lost 0.0% median $16,996 p25 $11,197 | TV $+8,994 PF 3.77 dd $670
+2 from +2000, 3 from +3500: lost 0.0% median $16,582 p25 $11,321 | TV $+9,796 PF 4.25 dd $670
+2 from +1000, 3 from +3000: lost 0.0% median $17,168 p25 $10,815 | TV $+11,497 PF 3.99 dd $670
+2 from +2500, 3 from +5000: lost 0.0% median $15,391 p25 $10,864 | TV $+7,608 PF 3.89 dd $609
+2 from day one, 3 from +3000: lost 5.8% median $17,555 p25 $11,808 | TV $+11,437 PF 3.87 dd $670
+day stop 450: lost 0.0% median $15,433 p25 $9,017 | TV $+9,219 PF 4.06 dd $676
+day stop 800: lost 0.0% median $16,459 p25 $11,599 | TV $+9,224 PF 4.06 dd $670
+no day stop: lost 1.0% median $16,156 p25 $11,328 | TV $+9,224 PF 4.06 dd $670
+2000/3000: lost 0.0% median $16,491 p25 $10,963 | TV $+9,675 PF 4.08 dd $670
+2000/4000: lost 0.0% median $16,309 p25 $11,270 | TV $+9,224 PF 4.06 dd $670
+1750/3500: lost 0.0% median $16,599 p25 $11,333 | TV $+9,746 PF 4.18 dd $670
+2250/3500: lost 0.0% median $15,806 p25 $11,082 | TV $+9,796 PF 4.25 dd $670
+2000/3500 day stop 700: lost 0.0% median $16,546 p25 $11,258 | TV $+9,796 PF 4.25 dd $670
+2000/3500 day stop 800: lost 0.0% median $16,739 p25 $11,482 | TV $+9,796 PF 4.25 dd $670
+2000/4500 day stop 700: lost 0.0% median $16,175 p25 $10,983 | TV $+9,224 PF 4.06 dd $670
+2000/4500 day stop 1000: lost 1.0% median $16,349 p25 $10,787 | TV $+9,224 PF 4.06 dd $670

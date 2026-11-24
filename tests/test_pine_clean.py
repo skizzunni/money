@@ -30,7 +30,7 @@ def bars_of(days: list) -> tuple[pd.DataFrame, list]:
 @pytest.mark.slow
 @pytest.mark.parametrize("inputs,kw", [
     ({"Most contracts": 1, "Day stop: no new entry once the day is down $ (0 = off)": 0}, {}),
-    ({}, {"day_stop": 600.0, "steps": ((0, 1), (2000, 2), (4500, 3))}),
+    ({}, {"day_stop": 600.0, "steps": ((0, 1), (2000, 2), (3500, 3))}),
     ({"Most contracts": 1, "Day stop: no new entry once the day is down $ (0 = off)": 0, "Gap trade only from this profit $ (0 = always)": 0,
       "Profit already made at the start $": 100000}, {"start": 100000.0}),
 ])
@@ -74,7 +74,7 @@ def test_pine_clean_band_news_days():
     got = [(t["dir"], t["entry_bar"], round(t["entry"], 6), round(t["exit"], 6), t["qty"]) for t in rt.strategy.closed]
     ref, cum = [], 2500.0
     for i in range(len(days)):
-        q = 3 if cum >= 4500 else 2 if cum >= 2000 else 1
+        q = 3 if cum >= 3500 else 2 if cum >= 2000 else 1
         if 2 <= spikes[i] < 3:
             continue
         if spikes[i] >= 6:

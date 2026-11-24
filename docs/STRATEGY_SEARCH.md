@@ -283,6 +283,18 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    - against the trend past a band 2 / 2.5 / 3 / 4x as wide: 2x loses 8.7%; 3x the 25th percentile $12,684 but the
      window +$6,761 and live PF 3.34 to 2.73; 2.5x and 4x the window flat and PF lower.
 
+32. **Every setting again, and the size steps** (2026-11-24, the user: "every way and every angle";
+   `verification/zoo/stage25_settings_sweep.txt`, `stage25_steps_day_stop.txt`). With 28 and 30 in, each setting one
+   step either way (target 2.0-3.5R, break-even 0.3 / 0.5 and its lock 1-8 points, hard stop $175 / $225, last entry
+   13:30 / 14:30, move cap 1.0 / 1.2, range rule 0.6 / 0.7, the band 0.9 / 1.1 sigma, a gap target 1-2R or exit at
+   10:25): none beats the shipped settings on every gate (the 104 starts and the TradingView window); a wider stop, a
+   later break-even and either band width lose 2.9-3.8% of starts. The rules are at their best point.
+   The size steps were set before 20-30 made the trades safer. **3 contracts from +$3,500** (was +$4,500): 0 of 104
+   lost, median $16,030 to $16,582, 25th percentile $11,173 to $11,321, the TradingView window +$9,224 to +$9,796 (PF
+   4.06 to 4.25). Neighbours 3 from +$3,000 / +$4,000 and 2 from +$1,750 / +$2,250: 0 lost. Not used: 2 from +$1,000
+   (window +$11,497, 25th percentile lower), 2 from day one (5.8% lost), the day stop $800 (+$400 median and 25th
+   percentile, but $1,000 loses 1%: too near the edge).
+
 ## The result (the shipped defaults, research numbers, 2 ticks of stop slippage, $0.62 a side)
 
 | set | band trades | win | PF | band net (1 MNQ) | gap trades (PF, net) | 50K starts lost | median 12 months |
@@ -347,7 +359,7 @@ NinjaTrader 8, on each funded account:
 
 Defaults: trend 20 sessions, hard stop $200 a contract, break-even at 0.4, take profit at 2.5 hard stops, last entry
 14:00 (840), up to 9 trades a day, day stop $600, the gap trade from the first day, at most 3 contracts (2 from +$2,000, 3 from
-+$4,500 over the $50,000 start balance; live it sizes from the account's net liquidation). An account below $50,000
++$4,500 (+$3,500 since section 32) over the $50,000 start balance; live it sizes from the account's net liquidation). An account below $50,000
 trades 1 contract until it is back above.
 
 Live safety (tests/test_ninjatrader_clean.py): a stop the broker cancels or rejects while the position is open closes it

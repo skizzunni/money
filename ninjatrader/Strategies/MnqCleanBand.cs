@@ -81,7 +81,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 MaxContracts = 3;
                 FixedContracts = 0;
                 Step2At = 2000;
-                Step3At = 4500;
+                Step3At = 3500;  // 2026-11-24: from +$4,500, with the strong-break contract and the gap rule (docs 32)
                 EarlyMaxTrades = 0;
                 EarlyCushion = 0;
                 StartBalance = 50000;

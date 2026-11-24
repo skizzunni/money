@@ -35,7 +35,7 @@ def _news(d):
     return f
 
 
-def tv(d, t, start="2026-08-27"):
+def tv(d, t, start="2026-08-27", steps=STEPS, day_stop=600.0):
     t = t.copy()
     t["d"] = pd.to_datetime(t.d)
     cum, n, w, gw, gl, peak, dd = 0.0, 0, 0, 0.0, 0.0, 0.0, 0.0
@@ -44,7 +44,10 @@ def tv(d, t, start="2026-08-27"):
         if day < pd.Timestamp(start):
             continue
         sp = d[i]["news"][0]
-        q = 3 if cum >= 4500 else 2 if cum >= 2000 else 1
+        q = 1
+        for lim, qq in steps:
+            if cum >= lim:
+                q = qq
         if not np.isnan(sp):
             if 2 <= sp < 3:
                 continue
@@ -52,7 +55,7 @@ def tv(d, t, start="2026-08-27"):
                 q = min(q + 1, 3)
         dp = 0.0
         for r in t[t.d == day].itertuples():
-            if dp <= -600:
+            if day_stop and dp <= -day_stop:
                 break
             p = r.usd * min(q + int(r.add), 3)
             dp += p
@@ -63,7 +66,8 @@ def tv(d, t, start="2026-08-27"):
     return dict(net=cum, trades=n, win=w / max(n, 1), pf=gw / max(gl, 1e-9), dd=dd)
 
 
-def run(band: dict | None = None, gap: dict | None = None, add_at: float = 1.5, legs_fn=None) -> dict:
+def run(band: dict | None = None, gap: dict | None = None, add_at: float = 1.5, legs_fn=None, steps=STEPS,
+        day_stop: float = 600.0) -> dict:
     sets = pickle.load(open(PK, "rb"))
     b, g = {**BAND, **(band or {})}, {**GAP, **(gap or {})}
     pool, out = [], {}
@@ -77,9 +81,9 @@ def run(band: dict | None = None, gap: dict | None = None, add_at: float = 1.5, 
         out[n] = dict(win=(u > 0).mean(), pf=u[u > 0].sum() / max(1e-9, -u[u < 0].sum()), per_yr=len(t) / yrs,
                       net_yr=u.sum() / yrs)
         if n in ("dev", "unseen_nq"):
-            pool += H.account(t, d, steps=STEPS, day_stop=600.0, day_qty=_news(d))
+            pool += H.account(t, d, steps=steps, day_stop=day_stop, day_qty=_news(d))
         if n == "live":
-            out["tv"] = tv(d, t)
+            out["tv"] = tv(d, t, steps=steps, day_stop=day_stop)
     prof = np.array([x[1] for x in pool])
     out["acct"] = dict(lost=np.mean([x[0] for x in pool]), median=np.median(prof), p25=np.percentile(prof, 25))
     return out

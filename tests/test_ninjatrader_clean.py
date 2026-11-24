@@ -131,18 +131,18 @@ def test_clean_band_matches_python(sim, tmp_path, props, py):  # noqa: F811
 
 @pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
 def test_clean_band_defaults_with_account_rules(sim, tmp_path):  # noqa: F811
-    """The shipped defaults: the $600 day stop and 1 / 2 / 3 contracts from +$2,000 / +$4,500 (StartProfit puts the
+    """The shipped defaults: the $600 day stop and 1 / 2 / 3 contracts from +$2,000 / +$3,500 (StartProfit puts the
     account part way up so the steps act inside the test window)."""
     days = fixture_days()
     path = tmp_path / "bars.csv"
     idx = write_bars(days, path)
     nt = run_nt(sim, path, StartProfit=1500)
-    ref = py_trades(days, idx, day_stop=600.0, steps=((0, 1), (2000, 2), (4500, 3)), start=1500.0)
+    ref = py_trades(days, idx, day_stop=600.0, steps=((0, 1), (2000, 2), (3500, 3)), start=1500.0)
     got = [(int(t[0]), int(t[1]), round(float(t[2]), 6), round(float(t[4]), 6)) for t in nt]
     qty = [int(x) for x in _qty(sim, path, StartProfit=1500)]
     assert got == [(s, b, e, x) for s, b, e, x, _q in ref]
     assert qty == [q for *_, q in ref]
-    assert _qty(sim, path, StartProfit=4500)[0] == "3"  # +$4,500 and up: 3 MNQ (and back down after losses)
+    assert _qty(sim, path, StartProfit=3500)[0] == "3"  # +$3,500 and up: 3 MNQ (and back down after losses)
     assert _qty(sim, path, StartProfit=2000)[0] == "2"
     assert set(_qty(sim, path, StartProfit=10**5)) == {"3"}  # never more than MaxContracts
     assert _qty(sim, path, StartProfit=0)[0] == "1"  # a fresh account starts at 1
@@ -355,7 +355,7 @@ def test_clean_band_news_days(sim, tmp_path):  # noqa: F811
     ref, cum = [], 2500.0
     for i in range(len(days)):
         q = 2 if cum >= 2000 else 1
-        q = 3 if cum >= 4500 else q
+        q = 3 if cum >= 3500 else q
         day = 0.0
         if 2 <= spikes[i] < 3:
             continue
