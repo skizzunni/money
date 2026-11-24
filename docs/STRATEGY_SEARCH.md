@@ -342,6 +342,17 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    other index micros (MES, MYM, M2K) chop on the same days and ES is weaker (section 9). A file the user sent,
    "FUND US ARCX MGC", is the Vanguard Mega Cap Growth ETF (daily bars), not micro gold.
 
+36. **The MNQ script as it is on Micro Gold** (2026-11-24; the user ran `pine/mnq_clean_band.pine` on MGC1! 5-minute,
+   Aug 27 - Nov 23 2026: +$1,353, 45 trades, 42% winners, PF 2.08; the same run on MNQ1!: +$9,757, PF 4.53, the reference
+   +$9,796). Gold 2009 - Mar 2025 with the script's own settings (a $200 stop = 20 MGC points, the gap trade, 09:30-16:00;
+   `verification/zoo/stage30_gold_with_mnq_settings.txt`): PF 1.04 / 1.03 (2009-17 / 2018-25), 9 of 17 years up, 2024
+   -$439, 2025 Q1 -$827; $150 / $300 stops and an 08:30 session the same (PF 1.01-1.07). Autumn 2026's +$1,353 is gold's
+   fall from 4,200 to 3,500 (a trend the band rides), not an edge that lasts: not used.
+   Also found by the gold / crude setup search (`verification/zoo/stage29_gold_crude_setups.csv`, 354 variants): gold's
+   overnight move carried on from 08:20 (a 1-1.5x average overnight move, the first 15 minutes its way, the stop at the
+   08:20 open, out 13:30 or 16:00): PF 1.31-1.46 / 1.23-1.32, 59-71% of years up, but 15% winners and $200-500 a contract
+   a year. Crude: nothing above PF 1.15 on both halves with enough trades.
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-33; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |
