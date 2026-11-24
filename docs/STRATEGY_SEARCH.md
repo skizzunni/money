@@ -238,6 +238,17 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    Tests: a holiday calendar trades exactly the guard-free reference (NinjaTrader, Pine), six missing sessions still
    block. Shipped (NinjaTrader, Pine).
 
+28. **The gap trade's 09:30 bar** (2026-11-24; live since October the gap trade won 2 of 14; `min_body`,
+   `verification/zoo/stage22_gap_first_bar.txt`). Its trades split by trend, gap size, opening outside yesterday's range,
+   yesterday's direction, news and the 09:30 bar's size (dev / unseen NQ / ES / live): one bucket loses on all four, a
+   09:30 bar moving the gap's way by under 3% of the 14-day average range (PF 0.76 / 0.64 / 0.00 / 0.00, 8% / 5% / 0% /
+   0% winners). The stop is that bar's open, so a small bar leaves a stop a few points away, inside the noise. With
+   the bar at least 3% of the average range: 0 of 104 starts lost, median $15,275 to $15,314, 25th percentile $9,478 to
+   $9,620, win rate up 1-3 points on every set, per year at 1 MNQ dev +$31, unseen NQ +$59, ES +$98, live +$118, about 10
+   fewer trades a year (0-8% of them winners). Neighbours 2% and 4%: 0 lost, the same way. Only gaps against
+   yesterday's direction (live 52% winners, PF 4.46) cost dev and unseen NQ $500-700 a year: not used. Shipped
+   (`GapMinBody` 0.03, NinjaTrader and Pine).
+
 ## The result (the shipped defaults, research numbers, 2 ticks of stop slippage, $0.62 a side)
 
 | set | band trades | win | PF | band net (1 MNQ) | gap trades (PF, net) | 50K starts lost | median 12 months |

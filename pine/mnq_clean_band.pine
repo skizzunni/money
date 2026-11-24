@@ -42,6 +42,7 @@ gapLeg = input.bool(true, "Gap trade (09:35-09:55)")
 gapFrom = input.float(0, "Gap trade only from this profit $ (0 = always)")
 gapK = input.float(0.5, "Gap at least this many 14-session average gaps", minval = 0, step = 0.1)
 gapCap = input.float(30, "Gap stop at most this many points", minval = 1)
+gapBody = input.float(0.03, "Gap: the 09:30 bar moves its way at least this x the average range", minval = 0, step = 0.01)
 blockHole = input.bool(true, "No trading when the chart's history has a hole")
 newsDays = input.bool(true, "News days (needs extended hours: the 08:30 volume)")
 newsBig = input.float(6, "Big news: a contract more from this 08:30 volume spike (x)", minval = 1)
@@ -215,7 +216,8 @@ if inRth and ready
                 else
                     gs += math.abs(gv)
             side = tGap > 0 ? 1 : -1
-            if gOk and math.abs(tGap) >= gapK * gs / 14 and side * (close - dayOpen) > 0
+            // a 09:30 bar under gapBody x the average range puts the stop inside the noise (docs/STRATEGY_SEARCH.md, 28)
+            if gOk and math.abs(tGap) >= gapK * gs / 14 and side * (close - dayOpen) > 0 and side * (close - dayOpen) >= gapBody * avgRange
                 e = close + side * tk
                 dist = math.min(math.max(math.abs(e - dayOpen), 4 * tk), gapCap)
                 gid = side > 0 ? "GapLong" : "GapShort"

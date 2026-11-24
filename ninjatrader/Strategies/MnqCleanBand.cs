@@ -98,6 +98,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 GapFrom = 0;  // 2026-11-24: from day one with the news-day rule: 0 of 104 starts lost, more days (docs 19)
                 GapK = 0.5;
                 GapCap = 30;
+                GapMinBody = 0.03;
                 NewsDays = true;
                 NewsBigAt = 6;
                 NewsSkipFrom = 2;
@@ -417,6 +418,11 @@ namespace NinjaTrader.NinjaScript.Strategies
             int side = gap > 0 ? 1 : -1;
             if (Math.Abs(gap) < GapK * avg || side * (Close[0] - dayOpen) <= 0)
                 return;
+            // the 09:30 bar must move the gap's way by GapMinBody x the 14-day average range: a smaller bar puts the
+            // stop (its open) a few points away, inside the noise (2015-2025 NQ, ES, live: PF 0.0-0.76, 0-8% winners;
+            // docs/STRATEGY_SEARCH.md, 28)
+            if (side * (Close[0] - dayOpen) < GapMinBody * avgRange)
+                return;
             double e = Close[0] + side * tick;
             double dist = Math.Min(Math.Max(Math.Abs(e - dayOpen), 4 * tick), GapCap);
             string name = side > 0 ? "GapLong" : "GapShort";
@@ -580,6 +586,11 @@ namespace NinjaTrader.NinjaScript.Strategies
         [Range(1, 1000)]
         [Display(Name = "Gap stop at most this many points", Order = 4, GroupName = "5. Gap trade")]
         public double GapCap { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, 1)]
+        [Display(Name = "Gap: the 09:30 bar moves its way at least this x the average range", Order = 5, GroupName = "5. Gap trade")]
+        public double GapMinBody { get; set; }
 
         [NinjaScriptProperty]
         [Range(1, 3)]

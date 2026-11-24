@@ -24,7 +24,7 @@ import strats as S  # noqa: E402
 
 DEFAULTS = dict(vwap=False, trend=20, hard=200.0, vwap_stop=True, k=1.0, be_r=0.4, max_trades=9, last=840, tp_r=2.5,
                 range_pos=0.65, max_move=1.1, be_plus=2.0, move_free="first_check")
-GAP = dict(k=0.5, exit_m=590, r=0.0, cap=30.0)
+GAP = dict(k=0.5, exit_m=590, r=0.0, cap=30.0, min_body=0.03)
 
 
 def fixture_days() -> list:
@@ -78,7 +78,7 @@ def run_nt(sim, path: Path, **props) -> list:  # noqa: F811
 
 
 def py_trades(days: list, idx: list, day_stop: float = 0.0, steps=None, gap_from: float | None = 0.0,
-              start: float = 0.0, **p) -> list:
+              start: float = 0.0, gap: dict | None = None, **p) -> list:
     """The reference trades as (direction, entry bar, entry, exit, contracts), with the account rules the C# applies:
     contracts by the profit at the day's start, the gap leg (first in the day) once the profit reaches gap_from, the day
     stop across both."""
@@ -94,7 +94,7 @@ def py_trades(days: list, idx: list, day_stop: float = 0.0, steps=None, gap_from
         day = 0.0
         legs = []
         if gap_from is not None and (gap_from <= 0 or cum >= gap_from) and i >= max(21, cfg["trend"] + 1):
-            legs += S.gap_go(days, i, 0.25, **GAP)
+            legs += S.gap_go(days, i, 0.25, **(gap or GAP))
         legs += S.noise(days, i, 0.25, stop_slip=1, nt=True, **cfg)
         for side, eb, epx, xpx, _why, *_ in legs:
             if day_stop and day <= -day_stop:
@@ -163,6 +163,12 @@ def test_clean_band_gap_leg(sim, tmp_path):  # noqa: F811
     names = {x[5] for x in nt}
     assert sum(idx[int(t[1])][1] == 1 for t in nt) >= 5  # gap entries at 09:35
     assert "Profit target" in names
+    # without the 09:30 bar size rule (GapMinBody 0) the gap trades of the reference without it, and more of them
+    nt0 = run_nt(sim, path, MaxContracts=1, DayStop=0, GapMinBody=0)
+    ref0 = py_trades(days, idx, gap={**GAP, "min_body": 0.0})
+    got0 = [(int(t[0]), int(t[1]), round(float(t[2]), 6), round(float(t[4]), 6)) for t in nt0]
+    assert got0 == [(s, b, e, x) for s, b, e, x, _q in ref0]
+    assert sum(idx[int(t[1])][1] == 1 for t in nt0) > sum(idx[int(t[1])][1] == 1 for t in nt)
 
 
 def _run_all(sim, path, **props):  # noqa: F811
