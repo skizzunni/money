@@ -46,3 +46,44 @@ def test_pine_clean_band_matches_python(inputs, kw):
     assert len(want) > 20
     assert got == want
     assert GAP and S
+
+
+@pytest.mark.slow
+def test_pine_clean_band_news_days():
+    """The news rule in Pine (extended hours): as tests/test_ninjatrader_clean.py's news test, trade for trade."""
+    pytest.importorskip("pynescript", reason="pip install pynescript to check the .pine files")
+    from pine_interpreter import PineRuntime, load_pine
+    from test_ninjatrader_clean import DEFAULTS, synthetic_days
+    days = synthetic_days()
+    spikes = [(1.0, 2.5, 8.0)[i % 3] for i in range(len(days))]
+    rows, idx = [], []
+    for di, d in enumerate(days):
+        o0 = float(d["o"][0])
+        for m in range(500, 570, 5):
+            rows.append((pd.Timestamp(d["d"]) + pd.Timedelta(minutes=m), o0, o0, o0, o0, 1000.0 * (spikes[di] if m == 510 else 1.0)))
+            idx.append(None)
+        for k in range(len(d["o"])):
+            rows.append((pd.Timestamp(d["d"]) + pd.Timedelta(minutes=int(d["mm"][k])), d["o"][k], d["h"][k], d["l"][k], d["c"][k], d["v"][k]))
+            idx.append((di, k))
+    bars = pd.DataFrame(rows, columns=["t", "open", "high", "low", "close", "volume"]).set_index("t")
+    bars.index = bars.index.tz_localize("America/New_York")
+    pos_of = {v: i for i, v in enumerate(idx)}
+    rt = PineRuntime(load_pine(PINE), bars, {"Day stop: no new entry once the day is down $ (0 = off)": 0,
+                                             "Profit already made at the start $": 2500}, timeframe_seconds=300)
+    rt.run(lambda i, g: None)
+    got = [(t["dir"], t["entry_bar"], round(t["entry"], 6), round(t["exit"], 6), t["qty"]) for t in rt.strategy.closed]
+    ref, cum = [], 2500.0
+    for i in range(len(days)):
+        q = 3 if cum >= 4500 else 2 if cum >= 2000 else 1
+        if 2 <= spikes[i] < 3:
+            continue
+        if spikes[i] >= 6:
+            q = min(q + 1, 3)
+        legs = (S.gap_go(days, i, 0.25, **GAP) if cum >= 4500 and i >= 21 else []) + S.noise(days, i, 0.25, stop_slip=1, nt=True, tp_fill_bar=False, **DEFAULTS)
+        day = 0.0
+        for side, eb, epx, xpx, _w, *_ in legs:
+            day += ((xpx - epx) * side * 2.0 - 2 * 0.62) * q
+            ref.append((side, pos_of[(i, eb)], round(epx, 6), round(xpx, 6), q))
+        cum += day
+    assert len(ref) > 20
+    assert got == ref

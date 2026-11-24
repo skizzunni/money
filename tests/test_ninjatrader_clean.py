@@ -279,3 +279,59 @@ def test_clean_band_fixed_contracts(sim, tmp_path):  # noqa: F811
     one = [x.split(",")[1:6] for x in _run_all(sim, path, MaxContracts=1, DayStop=0) if x.startswith("T,")]
     three = [x.split(",")[1:6] for x in _run_all(sim, path, FixedContracts=3, DayStop=0) if x.startswith("T,")]
     assert one == three
+
+
+def write_bars_eth(days: list, path: Path, spikes: list) -> list:
+    """The RTH bars plus 08:20-09:25 pre-open bars (flat at the day's open) whose 08:30 volume is `spikes[i]` x the
+    08:20 / 08:25 bars' (1,000 each). Returns the RTH bars' (day, bar) by row, None for pre-open rows."""
+    rows, idx = [], []
+    for di, d in enumerate(days):
+        o0 = float(d["o"][0])
+        for m in range(500, 570, 5):
+            t = pd.Timestamp(d["d"]) + pd.Timedelta(minutes=m)
+            v = 1000.0 * spikes[di] if m == 510 else 1000.0
+            rows.append(f"{t:%Y-%m-%d %H:%M},{o0!r},{o0!r},{o0!r},{o0!r},{v!r}")
+            idx.append(None)
+        for k in range(len(d["o"])):
+            t = pd.Timestamp(d["d"]) + pd.Timedelta(minutes=int(d["mm"][k]))
+            rows.append(f"{t:%Y-%m-%d %H:%M}," + ",".join(repr(float(d[x][k])) for x in ("o", "h", "l", "c", "v")))
+            idx.append((di, k))
+    path.write_text("\n".join(rows) + "\n")
+    return idx
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+def test_clean_band_news_days(sim, tmp_path):  # noqa: F811
+    """News days (an ETH chart): a mild-news day (2-3x) has no trades, a big-news day (>= 6x) a contract more (never past
+    MaxContracts), the rest as usual; trade for trade against the reference."""
+    days = synthetic_days()
+    spikes = [(1.0, 2.5, 8.0)[i % 3] for i in range(len(days))]
+    path = tmp_path / "bars.csv"
+    idx = write_bars_eth(days, path, spikes)
+    rth = [x for x in idx if x is not None]
+    pos_of = {v: i for i, v in enumerate(idx)}
+    out = _run_all(sim, path, DayStop=0, StartProfit=2500)
+    tt = [x.split(",")[1:] for x in out if x.startswith("T,")]
+    tn = [x.split(",")[1:] for x in out if x.startswith("TN,")]
+    ref, cum = [], 2500.0
+    for i in range(len(days)):
+        q = 2 if cum >= 2000 else 1
+        q = 3 if cum >= 4500 else q
+        day = 0.0
+        if 2 <= spikes[i] < 3:
+            continue
+        if spikes[i] >= 6:
+            q = min(q + 1, 3)
+        legs = (S.gap_go(days, i, 0.25, **GAP) if cum >= 4500 and i >= 21 else []) + S.noise(days, i, 0.25, stop_slip=1, nt=True, **DEFAULTS)
+        for side, eb, epx, xpx, _w, *_ in legs:
+            day += ((xpx - epx) * side * 2.0 - 2 * 0.62) * q
+            ref.append((side, pos_of[(i, eb)], round(epx, 6), round(xpx, 6), q))
+        cum += day
+    got = [(int(t[0]), int(t[1]), round(float(t[2]), 6), round(float(t[4]), 6), int(n[1])) for t, n in zip(tt, tn, strict=True)]
+    assert len(ref) > 20 and rth
+    assert got == ref
+    assert any(q == 3 for *_, q in got)
+    d = [x for x in out if x.startswith("D,")]
+    assert d and "news 8.0x (+1 contract)" in d[0] or "news 1.0x" in d[0] or "news 2.5x: no trades today" in d[0]
+    off = _run_all(sim, path, DayStop=0, StartProfit=2500, NewsDays=False)
+    assert len([x for x in off if x.startswith("T,")]) > len(tt)

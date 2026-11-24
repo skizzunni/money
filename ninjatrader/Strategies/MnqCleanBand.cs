@@ -49,6 +49,11 @@ namespace NinjaTrader.NinjaScript.Strategies
         int pos, tradesToday, qty, gapPos;
         bool ready, beDone, early, exiting, gapWarned, noisePending, gapPending, gapToday, stopGone;
         DateTime stopGoneUtc = DateTime.MinValue;
+        // news days (docs/STRATEGY_SEARCH.md, 15): the 08:30 bar's volume against the 08:20 and 08:25 bars' average
+        DateTime preDate = DateTime.MinValue;
+        double preVol, atVol, newsSpike = double.NaN;
+        int preBars;
+        bool newsSkip;
         readonly Dictionary<int, double> sigma = new Dictionary<int, double>();
 
         protected override void OnStateChange()
@@ -89,6 +94,10 @@ namespace NinjaTrader.NinjaScript.Strategies
                 GapFrom = 4500;
                 GapK = 1.0;
                 GapCap = 50;
+                NewsDays = true;
+                NewsBigAt = 6;
+                NewsSkipFrom = 2;
+                NewsSkipTo = 3;
             }
             else if (State == State.Realtime && today != null)
             {
@@ -98,6 +107,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 qty = Contracts(prof);
                 early = EarlyMaxTrades > 0 && prof < EarlyCushion;
                 gapToday = GapLeg && prof >= GapFrom && ready;
+                ApplyNews();
                 Print("Clean band live: profit over the start balance $" + prof.ToString("F0", CultureInfo.InvariantCulture) + ", " + qty +
                       " MNQ a trade, gap trade " + (gapToday ? "on" : "off") + (ready ? "" : " - NOT READY (history)"));
             }
@@ -193,6 +203,21 @@ namespace NinjaTrader.NinjaScript.Strategies
             qty = Contracts(prof);
             early = EarlyMaxTrades > 0 && prof < EarlyCushion;  // decided at the day's start
             gapToday = GapLeg && prof >= GapFrom;  // the gap leg only once the account has its cushion
+            newsSpike = preDate == date && preBars == 2 && preVol > 0 && !double.IsNaN(atVol) ? atVol / (preVol / 2) : double.NaN;
+            ApplyNews();
+        }
+
+        // a mild-news day (spike in [NewsSkipFrom, NewsSkipTo)): no trades; a big-news day (>= NewsBigAt): a contract more,
+        // never past MaxContracts. Unknown spike (an RTH chart, a missing bar): the day as usual.
+        void ApplyNews()
+        {
+            newsSkip = false;
+            if (!NewsDays || double.IsNaN(newsSpike))
+                return;
+            if (newsSpike >= NewsSkipFrom && newsSpike < NewsSkipTo)
+                newsSkip = true;
+            else if (newsSpike >= NewsBigAt && FixedContracts == 0)
+                qty = Math.Min(qty + 1, MaxContracts);
         }
 
         protected override void OnBarUpdate()
@@ -222,6 +247,9 @@ namespace NinjaTrader.NinjaScript.Strategies
                          " | " + qty + " MNQ a trade, gap trade " + (gapToday ? "on" : "off") +
                          " | today $" + (CumProfit - dayCumStart).ToString("F0", CultureInfo.InvariantCulture) +
                          (DayStop > 0 && CumProfit - dayCumStart <= -DayStop ? " (day stop: done for today)" : "") +
+                         " | news " + (!NewsDays ? "off" : double.IsNaN(newsSpike) ? "n/a (needs an ETH chart)" :
+                                       newsSkip ? newsSpike.ToString("F1", CultureInfo.InvariantCulture) + "x: no trades today" :
+                                       newsSpike.ToString("F1", CultureInfo.InvariantCulture) + "x" + (newsSpike >= NewsBigAt ? " (+1 contract)" : "")) +
                          " | trades today " + tradesToday + " | profit over start $" + Profit().ToString("F0", CultureInfo.InvariantCulture);
             Draw.TextFixed(this, "clean_dash", txt, TextPosition.TopRight);
         }
@@ -230,6 +258,12 @@ namespace NinjaTrader.NinjaScript.Strategies
         {
             DateTime t = ToNy(Time[0]).AddMinutes(-5);  // the bar's start, New York
             int mm = t.Hour * 60 + t.Minute;
+            if (mm >= 500 && mm <= 510)  // an ETH chart's pre-open bars: the news spike's inputs
+            {
+                if (t.Date != preDate) { preDate = t.Date; preVol = 0; preBars = 0; atVol = double.NaN; }
+                if (mm < 510) { preVol += Volume[0]; preBars++; }
+                else atVol = Volume[0];
+            }
             if (mm < 570 || mm >= 960)
                 return;
             if (today == null || t.Date != today.Date)
@@ -274,6 +308,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 Exit("Gap exit");
                 return;
             }
+            if (newsSkip && mp == 0)  // a mild-news day: no new trades
+                return;
             if (mm == 570 && gapToday && mp == 0 && PlaceOrders)
                 GapEntry(tick);
             if (pos != 0 && BreakEvenAt > 0 && !beDone && pos * (Close[0] - entryPx) >= BreakEvenAt * HardStop / pv)
@@ -458,6 +494,25 @@ namespace NinjaTrader.NinjaScript.Strategies
         [Range(0, 20)]
         [Display(Name = "Take profit at this many hard stops (0 = off)", Order = 4, GroupName = "2. Risk")]
         public double TakeProfitAt { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "News days (needs an ETH chart: the 08:30 volume)", Order = 1, GroupName = "6. News")]
+        public bool NewsDays { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(1, 100)]
+        [Display(Name = "Big news: a contract more from this 08:30 volume spike (x)", Order = 2, GroupName = "6. News")]
+        public double NewsBigAt { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, 100)]
+        [Display(Name = "Mild news: no trades from this spike (x)", Order = 3, GroupName = "6. News")]
+        public double NewsSkipFrom { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, 100)]
+        [Display(Name = "Mild news: ... up to this spike (x)", Order = 4, GroupName = "6. News")]
+        public double NewsSkipTo { get; set; }
 
         [NinjaScriptProperty]
         [Display(Name = "Gap trade (09:35-09:55)", Order = 1, GroupName = "5. Gap trade")]

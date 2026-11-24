@@ -145,7 +145,7 @@ def trades_of(strat, days: list, sym: str, **p) -> pd.DataFrame:
 
 def account(t: pd.DataFrame, all_days: list, qty_fn=lambda prof: 1, day_stop: float = 0.0, start_every: str = "M",
             early_max: int = 0, early_cushion: float = 0.0, eq_n: int = 0, eq_min: float = 0.0, steps: tuple = (),
-            extra: pd.DataFrame | None = None, extra_from: float = 0.0):
+            extra: pd.DataFrame | None = None, extra_from: float = 0.0, day_qty=None):
     """Fresh 50K starts (every month), 12 months each. day_stop: no more trades once the day is down this much ($, at
     the sizes taken). early_max: at most this many trades a day while the profit is under early_cushion. eq_n / eq_min:
     sit a day out when the strategy's own 1-contract P/L over the last eq_n sessions (taken or not) is below eq_min.
@@ -179,9 +179,14 @@ def account(t: pd.DataFrame, all_days: list, qty_fn=lambda prof: 1, day_stop: fl
                 for lim, qq in steps:
                     if prof >= lim:
                         q = qq
-                if early_max and prof < early_cushion:
+                if day_qty is not None:  # research: a day's contracts from the day (e.g. news days)
+                    q = day_qty(d, q)
+                    if q <= 0:
+                        g = None
+                        q = 0
+                if g is not None and early_max and prof < early_cushion:
                     g = g[:early_max]
-                for usd in g:
+                for usd in (g if g is not None else []):
                     if day_stop and day_pl <= -day_stop:
                         break
                     day_pl += usd * q

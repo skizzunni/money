@@ -108,6 +108,17 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    against $9,913) and no lost start; from the start the 25th percentile rises ($3,638 to $5,280) but 2.9% of starts are
    lost. Recorded, not shipped: it does not move the account.
 
+15. **News days size the band's trades** (2026-11-24; `verification/zoo/stage9_news_size*.txt`). The shipped band's
+   trades by the day's 08:30 volume spike: big news (> 6x) PF 3.35 dev / 1.94 unseen NQ ($71 / $34 a trade), quiet days
+   1.44 / 1.52, mild news (2-3x) 0.72 / 0.94 (ES weaker: 1.09 / 1.16 / 1.02). Visible in dev alone, held on unseen.
+   Rule: a mild-news day has no trades; a big-news day trades a contract more (never past 3). 104 starts: **none
+   lost, median $9,913 to $12,418, 25th percentile $3,638 to $6,878**; all 36 neighbours (big at 5-8x, skip from 1.8-2.2x
+   to 2.8-3.5x) lose 0-1%, median $9,644-12,962, 25th percentile $4,880-7,133. Against it: the live months (only 52 days
+   with pre-open bars, no big-news band trade among them, 9 mild-news trades that made +$617) give $3,961 at 1 MNQ
+   against $4,577 without the rule. Shipped on (NinjaTrader `NewsDays`, Pine "News days"; it needs an ETH / extended
+   hours chart for the 08:30 bar, else it stays off), with the live caveat stated. Tests: trade for trade with pre-open
+   bars in NinjaTrader and Pine.
+
 ## The result (the shipped defaults, research numbers, 2 ticks of stop slippage, $0.62 a side)
 
 | set | band trades | win | PF | band net (1 MNQ) | gap trades (PF, net) | 50K starts lost | median 12 months |
@@ -164,7 +175,8 @@ NinjaTrader 8, on each funded account:
    the position.
 2. Copy `ninjatrader/Strategies/MnqCleanBand.cs` to Documents\NinjaTrader 8\bin\Custom\Strategies and compile (F5
    in the NinjaScript editor, or open and close the editor).
-3. Open an **MNQ 5-minute** chart (the front month; CME US Index Futures ETH or RTH) with **Days to load: 40** or more
+3. Open an **MNQ 5-minute** chart (the front month; **CME US Index Futures ETH**, so the news rule sees the 08:30 bar)
+   with **Days to load: 40** or more
    (Data Series window). It needs 21 complete sessions to start.
 4. Strategies tab, add **MnqCleanBand**, account = the funded account, keep the defaults, **Enabled**. The chart's
    top-right corner must say **Setup: OK**. The Output window prints the settings and every order.

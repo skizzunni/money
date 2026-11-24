@@ -1,0 +1,7 @@
+base                     lost 0.000 median   9913 p25   3638 reach25k 0.000  dev/unseen (lost, median) {'dev': (np.float64(0.0), 4677), 'unseen_nq': (np.float64(0.0), 11204)}
++1 on >6x                lost 0.010 median  11159 p25   4849 reach25k 0.010  dev/unseen (lost, median) {'dev': (np.float64(0.0), 6721), 'unseen_nq': (np.float64(0.018), 13262)}
++1 on >4x                lost 0.029 median  11443 p25   5390 reach25k 0.000  dev/unseen (lost, median) {'dev': (np.float64(0.0), 8124), 'unseen_nq': (np.float64(0.055), 13128)}
++1 on >8x                lost 0.000 median  10791 p25   5001 reach25k 0.010  dev/unseen (lost, median) {'dev': (np.float64(0.0), 6500), 'unseen_nq': (np.float64(0.0), 13047)}
+skip 2-3x                lost 0.010 median  10726 p25   4455 reach25k 0.000  dev/unseen (lost, median) {'dev': (np.float64(0.0), 6746), 'unseen_nq': (np.float64(0.018), 12527)}
++1 on >6x, skip 2-3x     lost 0.000 median  12418 p25   6878 reach25k 0.010  dev/unseen (lost, median) {'dev': (np.float64(0.0), 8329), 'unseen_nq': (np.float64(0.0), 14269)}
++2 on >6x (cap 3)        lost 0.087 median  11313 p25   2717 reach25k 0.038  dev/unseen (lost, median) {'dev': (np.float64(0.0), 8837), 'unseen_nq': (np.float64(0.164), 13343)}

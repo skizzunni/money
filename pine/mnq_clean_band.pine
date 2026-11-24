@@ -36,6 +36,10 @@ gapFrom = input.float(4500, "Gap trade only from this profit $")
 gapK = input.float(1.0, "Gap at least this many 14-session average gaps", minval = 0, step = 0.1)
 gapCap = input.float(50, "Gap stop at most this many points", minval = 1)
 blockHole = input.bool(true, "No trading when the chart's history has a hole")
+newsDays = input.bool(true, "News days (needs extended hours: the 08:30 volume)")
+newsBig = input.float(6, "Big news: a contract more from this 08:30 volume spike (x)", minval = 1)
+newsSkipLo = input.float(2, "Mild news: no trades from this spike (x)", minval = 0)
+newsSkipHi = input.float(3, "Mild news: ... up to this spike (x)", minval = 0)
 
 pv = syminfo.pointvalue
 tk = syminfo.mintick
@@ -71,6 +75,23 @@ var float tgtPx = na
 var float entryPx = na
 var bool beDone = false
 var int leg = 0   // the open or pending position: 1 the band, 2 the gap trade
+var int preDay = -1
+var float preVol = 0.0
+var int preBars = 0
+var float atVol = na
+var bool newsSkip = false
+var float spike = na
+if tMin >= 500 and tMin <= 510   // extended hours: the news spike's inputs (08:20, 08:25 and the 08:30 bar)
+    if dayNum != preDay
+        preDay := dayNum
+        preVol := 0.0
+        preBars := 0
+        atVol := na
+    if tMin < 510
+        preVol += volume
+        preBars += 1
+    else
+        atVol := volume
 
 if inRth and dayNum != tDay
     if tDay >= 0 and tBars >= 76   // only complete sessions count
@@ -120,6 +141,13 @@ if inRth and dayNum != tDay
         prof = startProfit + strategy.netprofit
         qty := fixedQty > 0 ? fixedQty : math.min(prof >= step3 ? 3 : prof >= step2 ? 2 : 1, maxQty)
         gapToday := gapLeg and prof >= gapFrom
+        spike := preDay == dayNum and preBars == 2 and preVol > 0 and not na(atVol) ? atVol / (preVol / 2) : na
+        newsSkip := false
+        if newsDays and not na(spike)
+            if spike >= newsSkipLo and spike < newsSkipHi
+                newsSkip := true
+            else if spike >= newsBig and fixedQty == 0
+                qty := math.min(qty + 1, maxQty)
 
 float vwapNow = na
 if inRth
@@ -146,7 +174,7 @@ if inRth and ready
         strategy.close(bandId, comment = "Session end")
     else if pos != 0 and leg == 2 and tMin >= 590
         strategy.close(pos > 0 ? "GapLong" : "GapShort", comment = "Gap exit")
-    else
+    else if not (newsSkip and pos == 0)
         if tMin == 570 and gapToday and pos == 0 and array.size(hGaps) >= 15 and not na(tGap)
             float gs = 0.0
             bool gOk = true
