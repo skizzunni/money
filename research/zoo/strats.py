@@ -506,3 +506,22 @@ def band_fade(days, i, tick, k_sd=2.0, first=600, last=900, max_trades=2, hard=2
         out.append((side, b + 1, e, x, why, xb))
         b = xb + 1
     return out
+
+
+def news_mom(days, i, tick, thr=3.0, min_move=0.0, mode="mom", hard=200.0, pv=2.0, exit_m=595, r=0.0, entry_bar=0,
+             be=0.0):
+    """The 08:30 news move into the cash open (research/zoo/news.py's d["news"] = (spike, pre-news price, move to
+    09:29)): on a day whose 08:30 volume spike is at least `thr` (0: every day) and whose news move is at least
+    `min_move` of the price, in at the open of bar `entry_bar` (0: 09:30) its way ("mom") or against it ("fade"); a
+    hard stop $hard a contract from the fill, a target r x that (0: none), out at the close of the bar starting at
+    `exit_m` (filled at the next open)."""
+    d = days[i]
+    spike, pre, move = d.get("news", (np.nan, np.nan, np.nan))
+    if np.isnan(spike) or spike < thr or abs(move) < min_move * pre or move == 0:
+        return []
+    side = (1 if move > 0 else -1) * (1 if mode == "mom" else -1)
+    e = d["o"][entry_bar] + side * tick
+    pts = hard / pv
+    px, x, xb, why = walk(d, entry_bar, side, e - side * pts, e + side * r * pts if r else np.nan, exit_m, tick,
+                          be_at=be * pts if be else np.nan, at_open=True)
+    return [(side, entry_bar, px, x, why, xb)]

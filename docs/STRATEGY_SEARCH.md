@@ -96,6 +96,18 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    and lose on ES (PF 0.29-0.73); the live months are positive for some (PF up to 1.68, 35-42 days), too few to trust
    against 10 years. Not used. The no-trade days are the strategy declining trades with no edge.
 
+14. **News: fading the 08:30 move at the cash open** (2026-11-24, the user: "it's all about signals and news";
+   `research/zoo/news.py`, `news_mom`, `verification/zoo/stage8_news_fade_*`). News days are read from the market (the
+   08:30-08:34 volume against 08:20-08:29: first Fridays 8x, Mondays 1.2x), not a calendar. On those days, entering at
+   09:30 against the move from 08:29 to 09:29 (a hard stop, out by 09:55-12:00) is **the first new edge that survives a
+   dev-only pick**: of the 124 settings robust on 2015-19 (worst one-step neighbour PF > 1.1), 82% also make money on
+   2020-25 NQ and on ES; momentum (with the move) does not; the same fade on every day does not. It is small: about
+   20-40 trades a year, +$400-2,800 a contract in most years (2019, 2020 slightly down), and the live months are slightly
+   negative (5-17 trades, from 5-minute Yahoo pre-open bars). Added to the shipped strategy in place of the gap trade on
+   news days (out at 09:55, before the 10:00 entries): from +$4,500 it trades 8% more days with the same median ($9,942
+   against $9,913) and no lost start; from the start the 25th percentile rises ($3,638 to $5,280) but 2.9% of starts are
+   lost. Recorded, not shipped: it does not move the account.
+
 ## The result (the shipped defaults, research numbers, 2 ticks of stop slippage, $0.62 a side)
 
 | set | band trades | win | PF | band net (1 MNQ) | gap trades (PF, net) | 50K starts lost | median 12 months |
