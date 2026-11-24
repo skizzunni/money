@@ -1,0 +1,15 @@
+Stage 51 (2026-11-24, a research round): a bar-quality filter on band entries (strats.noise bar_pos / bar_n)
+
+A band entry only when the signal bar (or the last bar_n bars, 6 = the half hour) closed in its strong part: at least
+bar_pos of the way up its range for a long (down for a short). Distinct from the shipped range rule (the close's place
+in the day's range). bench.py gates (104 fresh 50K starts, dev + unseen NQ; the TradingView window):
+
+shipped:                 lost 0.0% median $16,582 p25 $11,321 | TV $+9,796 53tr PF 4.25 | dev PF 1.60 240/yr | unseen_nq PF 1.59 265/yr
+bar_pos 0.5, 1 bar:      lost 6.7% median $9,413  p25 $5,383  | TV $+7,374 38tr PF 5.11 | dev PF 1.51 190/yr | unseen_nq PF 1.47 216/yr
+bar_pos 0.67, 1 bar:     lost 7.7% median $6,657  p25 $3,572  | TV $+3,756 32tr PF 4.03 | dev PF 1.59 161/yr | unseen_nq PF 1.45 189/yr
+bar_pos 0.8, 1 bar:      lost 3.8% median $4,724  p25 $2,237  | TV $+2,949 28tr PF 3.88 | dev PF 1.55 135/yr | unseen_nq PF 1.46 153/yr
+bar_pos 0.5, 6 bars:     lost 2.9% median $11,237 p25 $7,238  | TV $+8,634 46tr PF 5.11 | dev PF 1.51 217/yr | unseen_nq PF 1.50 239/yr
+bar_pos 0.67, 6 bars:    lost 3.8% median $9,178  p25 $6,278  | TV $+6,376 40tr PF 4.55 | dev PF 1.49 201/yr | unseen_nq PF 1.52 223/yr
+
+Rejected: every setting loses starts (2.9-7.7%) and cuts the median 32-72%. The breaks whose signal bar closes weakly
+still pay; the filter removes winners with the losers.

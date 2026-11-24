@@ -538,6 +538,12 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    median, and shuffled years blow more accounts from $48,998 (14.8-14.9% against 14.5%) for $35-195 of median. Not
    shipped: the extra size lands where an account is most fragile.
 
+57. **A bar-quality filter** (2026-11-24, a research round; `noise` bar_pos / bar_n,
+   `verification/zoo/stage51_bar_quality.txt`). A band entry only when the signal bar (or the half hour) closed in the
+   top half / third / fifth of its own range (a short mirrored): 2.9-7.7% of starts lost, median $4,724-11,237 against
+   $16,582, the window +$2,949-8,634. Rejected: the weak-closing breaks still pay. The most trades a day (27, 33) and a
+   break-even for the gap trade (it has none: its stop stays at the 09:30 open) need nothing new.
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-33; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |
