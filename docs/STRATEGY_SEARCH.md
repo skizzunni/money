@@ -616,6 +616,11 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    starts lost. 10:45 alone: none lost, 2015-19 and the window up, but 2020-25 median $17,304 / 25th percentile $13,288
    against $18,453 / $15,085. The half-hour checks stay.
 
+71. **Counter-trend breaks on gap days** (2026-11-24, a research round; `noise` trend_gap_k,
+   `verification/zoo/stage65_counter_trend_on_gap_days.txt`). Breaks against the trend on days that opened 1.0-2.0x the
+   average gap the break's way: 1.5x better in both periods but the window -$413 (PF 3.88), and 1.0x / 2.0x lower in one
+   period each. A lone peak: not shipped.
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-33; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |

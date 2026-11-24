@@ -1,0 +1,14 @@
+Stage 65 (2026-11-24, a research round): counter-trend band breaks allowed on days that gap the trade's way
+(strats.noise trend_gap_k, research/zoo/trend_gap.py). A break against the 20-session trend is taken when the day
+opened trend_gap_k x the 14-session average gap or more the break's way. Fresh 50K starts by period, the TradingView
+window:
+
+shipped:   2015-19 lost 0.0% med $13,639 p25 $5,256 237 tr/yr | 2020-25 lost 0.0% med $18,453 p25 $15,085 262 tr/yr | TV $+9,921 52tr PF 4.43
+gap 1.0x:  2015-19 lost 0.0% med $13,818 p25 $5,175 262 tr/yr | 2020-25 lost 0.0% med $18,325 p25 $14,255 292 tr/yr | TV $+10,489 62tr PF 3.55
+gap 1.5x:  2015-19 lost 0.0% med $14,817 p25 $5,275 253 tr/yr | 2020-25 lost 0.0% med $18,904 p25 $15,167 277 tr/yr | TV $+9,508 57tr PF 3.88
+gap 2.0x:  2015-19 lost 0.0% med $12,682 p25 $5,266 244 tr/yr | 2020-25 lost 0.0% med $18,423 p25 $14,484 271 tr/yr | TV $+9,797 53tr PF 4.25
+
+Verdict: not shipped. 1.5x is better in both periods (median +$1,178 / +$451, 25th percentile +$19 / +$82) but lowers
+the TradingView window $413 (PF 4.43 to 3.88), and its neighbours do not hold it (1.0x: 2020-25 25th percentile -$830;
+2.0x: 2015-19 median -$957): a lone peak. The other candidate, the day stop counting the open trade, is section 48
+("no different").
