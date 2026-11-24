@@ -1,0 +1,5 @@
+shipped (guard, MNQ + gold): $50,000: lost 0.0% med $16,251 p25 $11,745 | $48,806: lost 4.5% med $3,102 p25 $2,064 | $48,998: lost 0.9% med $3,468 p25 $2,349 | $49,500: lost 0.0% med $3,822 p25 $2,394
+shipped (guard, MNQ + gold), weekly loss limit $600: $50,000: lost 0.0% med $14,658 p25 $10,207 | $48,806: lost 4.5% med $3,023 p25 $2,064 | $48,998: lost 0.9% med $3,300 p25 $2,411 | $49,500: lost 0.0% med $3,724 p25 $2,363
+shipped (guard, MNQ + gold), weekly loss limit $900: $50,000: lost 0.0% med $15,822 p25 $11,804 | $48,806: lost 4.5% med $3,091 p25 $2,064 | $48,998: lost 0.9% med $3,453 p25 $2,411 | $49,500: lost 0.0% med $3,846 p25 $2,394
+shipped (guard, MNQ + gold), weekly loss limit $1200: $50,000: lost 0.0% med $16,483 p25 $11,765 | $48,806: lost 4.5% med $3,102 p25 $2,064 | $48,998: lost 0.9% med $3,468 p25 $2,349 | $49,500: lost 0.0% med $3,822 p25 $2,394
+shipped (guard, MNQ + gold), weekly loss limit $1500: $50,000: lost 0.0% med $16,251 p25 $11,745 | $48,806: lost 4.5% med $3,102 p25 $2,064 | $48,998: lost 0.9% med $3,468 p25 $2,349 | $49,500: lost 0.0% med $3,822 p25 $2,394

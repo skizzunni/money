@@ -430,6 +430,14 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    bucket picked after the fact: noted, not used. The range rule with the overnight session: not testable here (the NQ
    history is regular hours only).
 
+44. **A weekly loss limit** (2026-11-24, a research round; `verification/zoo/stage38_weekly_limit.txt`; on the shipped
+   setup with the cushion guard and gold). No trades for the rest of the week once it is down $600 / $900 / $1,200 /
+   $1,500: fresh 50K median $14,658 / $15,822 / $16,483 / $16,251 against $16,251, 25th percentile $10,207 / $11,804 /
+   $11,765 / $11,745 against $11,745; accounts started near the floor lose the same (4.5% / 0.9%): the guard already
+   covers it, and $1,200's +$232 sits between a lower $900 and no change. Not used. Also not repeated this round: a hard
+   stop scaled to the band or the day's range (section 21: lost starts unbounded, mixed bounded) and a contract more on
+   very large gaps (section 28's breakdown: gaps over 2.5x are the gap trade's weakest, PF 0.60 unseen NQ, 0.07 ES).
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-33; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |
