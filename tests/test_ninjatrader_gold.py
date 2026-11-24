@@ -126,7 +126,7 @@ def test_gold_carry_matches_python(sim, tmp_path, props, py):  # noqa: F811
 def test_gold_carry_safety(sim, tmp_path):  # noqa: F811
     """Every entry has its stop set first, a tick past 60% of the way from the 08:20 open to the signal close, on the
     right side; every trade is out the same
-    trading day by 13:30; one trade a day at most; at most MaxContracts."""
+    trading day by 14:15; one trade a day at most; at most MaxContracts."""
     days = gold_days()
     path = tmp_path / "gold.csv"
     idx = write_gold(days, path)
@@ -144,13 +144,13 @@ def test_gold_carry_safety(sim, tmp_path):  # noqa: F811
         assert abs(stops[(o[0], o[2])] - want) < 1e-6  # 60% of the way from the 08:20 open to the signal close
         assert side * (days[di]["c"][k] + side * TICK - stops[(o[0], o[2])]) > 0
     tt = [x.split(",")[1:] for x in lines if x.startswith("T,")]
-    for t in tt:  # out the same trading day by 13:30, or (a gap in the bars / an early close) the first bar after
+    for t in tt:  # out the same trading day by 14:15, or (a gap in the bars / an early close) the first bar after
         (d0, k0), (d1, k1) = idx[int(t[1])], idx[int(t[3])]
         if d1 == d0:
-            gap_bars = [m for m in days[d0]["mm"][k0:k1 + 1] if m >= 1165]
-            assert days[d1]["mm"][k1] <= 1170 or len(gap_bars) <= 2
+            gap_bars = [m for m in days[d0]["mm"][k0:k1 + 1] if m >= 1210]
+            assert days[d1]["mm"][k1] <= 1215 or len(gap_bars) <= 2
         else:
-            assert d1 == d0 + 1 and k1 <= 1 and not any(m >= 1165 for m in days[d0]["mm"][k0:])
+            assert d1 == d0 + 1 and k1 <= 1 and not any(m >= 1210 for m in days[d0]["mm"][k0:])
     assert len({idx[int(t[1])][0] for t in tt}) == len(tt)
     assert max(int(x.split(",")[2]) for x in lines if x.startswith("TN,")) <= 3
 

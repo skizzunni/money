@@ -358,7 +358,7 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    `tests/test_ninjatrader_gold.py`, `tests/test_pine_gold.py`, `verification/zoo/stage31_mnq_plus_gold.txt`). The one
    gold pattern of section 36's search, built for NinjaTrader: gold's move from the prior session's 13:25 close to the
    08:20 open at least 1.5x its 14-session average, the 08:20-08:35 bars closing its way: in at 08:35 its way, the stop a
-   tick past the 08:20 open (60% of the way to the signal since section 39), out at 13:30; sized like MNQ (1 / 2 / 3 from +$0 / 2,000 / 3,500); its own chart and
+   tick past the 08:20 open (60% of the way to the signal since section 39), out at 13:30 (14:15 since 41); sized like MNQ (1 / 2 / 3 from +$0 / 2,000 / 3,500); its own chart and
    strategy beside MnqCleanBand on the same account. Gold alone (5-minute bars, as NinjaTrader trades it): about 20
    trades a year, PF 1.29 (2009-17) / 1.54 (2018 - Mar 2025), 65% of years up, the worst trade -$348 a contract. With
    MNQ on one 50K (100 starts 2015 - Mar 2025, gold with no day stop of its own, MNQ's $600 as shipped): **0 lost,
@@ -402,6 +402,17 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    the bar's close): 2.9-3.8% of starts lost at 0.4 / 0.5 / 0.6 (it scratches trades that would have run). Out at 15:30 /
    15:40 / 15:45 instead of 15:55: median $16,708 / $16,171 / $16,506 against $16,582, 25th percentile $11,576 / $10,388 /
    $10,987 against $11,321, ES lower in all three: up then down then down, no edge. None used.
+
+41. **Gold's exit time, the gap trade's exit, gold's confirmation** (2026-11-24, a research round;
+   `verification/zoo/stage35_gold_exit_gap_exit.txt`). With the 60% stop (39), gold out at (with MNQ, median / 25th
+   percentile; gold alone PF 2009-17 / 2018 - Mar 2025): 13:30 $17,138 / $11,876, 1.80 / 1.88; 13:45 $17,213 / $11,942,
+   1.86 / 1.85; 14:00 $17,405 / $12,038, 1.84 / 1.90; **14:15 $17,366 / $12,077, 2.02 / 1.84**; 14:30 $17,387 / $12,117,
+   1.95 / 1.80; 15:00 $17,277 / $12,083, 1.88 / 1.73; all 0 lost: every exit from 13:45 to 15:00 beats 13:30, and 14:15
+   is that plateau's middle. Shipped: `ExitAt` 855 (14:15); the move's reference stays the prior session's 13:25 bar
+   (`SettleAt` 810, a separate setting now). Not used: gold confirmed over 10 / 20 minutes (median $16,866 / $16,815, PF
+   1.24 / 1.32 on 2009-17); the MNQ gap trade out at 10:00 / 10:10 / 10:15 instead of 09:55 (the window +$289 at 10:00,
+   but median -$1,002 and 25th percentile -$790; 10:10 / 10:15 lower everywhere). Re-entries after a target were
+   section 25.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-33; research numbers, $0.62 a side)
 
@@ -471,7 +482,7 @@ NinjaTrader 8, on each funded account (both the same way):
    **MGC** 5-minute chart (front month, e.g. MGC 02-27; trading hours **CME/COMEX metals ETH**, the overnight session
    is needed), Days to load **30**. Right-click > Strategies > **MgcOvernightCarry** > the same funded account,
    defaults, Enabled. The top-right corner says OK once 14 complete sessions are loaded. It trades at most once a day
-   (08:35 to 13:30) and sizes from the same account balance as MNQ.
+   (08:35 to 14:15) and sizes from the same account balance as MNQ.
 
 Defaults: trend 20 sessions; hard stop $200 a contract; take profit 2.5 hard stops; break-even at 0.4 to entry + 2
 points; last entry 14:00 (840); at most 9 trades a day; day stop $600; range rule 0.65; move cap 1.1; the gap trade

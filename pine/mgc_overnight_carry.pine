@@ -7,7 +7,7 @@
 //   * at least 1.5x the last 14 sessions' average |move|, and the bars from 08:20 to 08:35 closing its way (the 08:30
 //     bar's close against the 08:20 open): in at the next open, the stop a tick past 60% of the way from the 08:20
 //     open to that close;
-//   * out at the 13:25 bar's close (filled at 13:30; a gap in the bars: the first bar from 13:25 on); a trade still
+//   * out at the 14:10 bar's close (filled at 14:15; a gap in the bars: the first bar from 14:10 on); a trade still
 //     open when the next trading day starts (a holiday's early close) goes out on its first bar; one trade a day;
 //   * 1 / 2 / 3 contracts from +$0 / +$2,000 / +$3,500; no trade while under $1,500 above the trailing floor.
 // A session counts in the 14 only with at least 180 five-minute bars (a full gold session has 276).
@@ -21,7 +21,8 @@ kMove = input.float(1.5, "Overnight move at least this many 14-session averages"
 confirm = input.int(15, "Minutes from 08:20 that must close its way", minval = 5, maxval = 120, step = 5)
 stopAt = input.float(0.6, "Stop: this share of the way from the 08:20 open to the 08:30 bar's close (0 = the open)", minval = 0, maxval = 0.95, step = 0.05)
 openAt = input.int(500, "Session open, minutes from midnight New York (500 = 08:20)", minval = 0, maxval = 1439)
-exitAt = input.int(810, "Out at, minutes from midnight New York (810 = 13:30)", minval = 0, maxval = 1439)
+exitAt = input.int(855, "Out at, minutes from midnight New York (855 = 14:15)", minval = 0, maxval = 1439)
+settleAt = input.int(810, "The move's reference: the prior session's bar ending at (810 = 13:30)", minval = 0, maxval = 1439)
 maxQty = input.int(3, "Most contracts", minval = 1, maxval = 3)
 fixedQty = input.int(0, "Fixed contracts (0 = the profit steps)", minval = 0, maxval = 50)
 step2 = input.float(2000, "2 contracts from this profit $", minval = 0)
@@ -70,7 +71,7 @@ dBars += 1
 if tMin == openAt
     dOpen := open
     dMove := open - lastSettle
-if tMin == exitAt - 5
+if tMin == settleAt - 5
     dSettle := close
 
 pos = strategy.position_size > 0 ? 1 : strategy.position_size < 0 ? -1 : 0

@@ -1,0 +1,20 @@
+now (gap out 09:55): lost 0.0% median $16,582 p25 $11,321 | TV $+9,796 53tr PF 4.25 dd $670 | dev: PF 1.60 240/yr $5,119 | unseen_nq: PF 1.59 265/yr $6,971 | unseen_es: PF 1.17 224/yr $679 | live: PF 3.34 179/yr $13,572
+gap out 10:00: lost 0.0% median $15,580 p25 $10,531 | TV $+10,085 53tr PF 4.34 dd $670 | dev: PF 1.57 240/yr $4,942 | unseen_nq: PF 1.59 265/yr $6,973 | unseen_es: PF 1.15 224/yr $593 | live: PF 3.39 179/yr $13,893
+gap out 10:10: lost 0.0% median $14,449 p25 $9,820 | TV $+8,584 51tr PF 3.94 dd $670 | dev: PF 1.55 229/yr $4,546 | unseen_nq: PF 1.57 255/yr $6,620 | unseen_es: PF 1.12 215/yr $479 | live: PF 3.37 174/yr $13,177
+gap out 10:15: lost 0.0% median $14,884 p25 $10,216 | TV $+8,890 51tr PF 4.05 dd $670 | dev: PF 1.54 229/yr $4,505 | unseen_nq: PF 1.61 255/yr $7,015 | unseen_es: PF 1.13 215/yr $534 | live: PF 3.45 174/yr $13,649
++ gold as shipped: lost 0.0% median $17,138 p25 $11,876 trades/yr 234 | gold alone: 20/yr PF 1.80 (2009-17) 1.88 (2018-25), worst $-141, years up 65%
++ gold confirm 10: lost 0.0% median $16,866 p25 $11,798 trades/yr 234 | gold alone: 19/yr PF 1.24 (2009-17) 1.72 (2018-25), worst $-101, years up 47%
++ gold confirm 20: lost 0.0% median $16,815 p25 $11,030 trades/yr 233 | gold alone: 19/yr PF 1.32 (2009-17) 1.43 (2018-25), worst $-151, years up 59%
++ gold k 1.25: lost 0.0% median $17,125 p25 $12,007 trades/yr 239 | gold alone: 26/yr PF 1.61 (2009-17) 2.07 (2018-25), worst $-141, years up 71%
++ gold k 1.75: lost 0.0% median $16,906 p25 $12,088 trades/yr 231 | gold alone: 16/yr PF 1.69 (2009-17) 2.12 (2018-25), worst $-141, years up 53%
++ gold exit_m 1140: lost 0.0% median $17,174 p25 $11,869 trades/yr 234 | gold alone: 20/yr PF 1.75 (2009-17) 1.74 (2018-25), worst $-141, years up 59%
++ gold exit_m 1200: lost 0.0% median $17,405 p25 $12,038 trades/yr 234 | gold alone: 20/yr PF 1.84 (2009-17) 1.90 (2018-25), worst $-141, years up 65%
++ gold exit_m 1185: lost 0.0% median $17,213 p25 $11,942 trades/yr 234 | gold alone: 20/yr PF 1.86 (2009-17) 1.85 (2018-25), worst $-141, years up 65%
++ gold exit_m 1200: lost 0.0% median $17,405 p25 $12,038 trades/yr 234 | gold alone: 20/yr PF 1.84 (2009-17) 1.90 (2018-25), worst $-141, years up 65%
++ gold exit_m 1215: lost 0.0% median $17,366 p25 $12,077 trades/yr 234 | gold alone: 20/yr PF 2.02 (2009-17) 1.84 (2018-25), worst $-141, years up 65%
++ gold exit_m 1230: lost 0.0% median $17,387 p25 $12,117 trades/yr 234 | gold alone: 20/yr PF 1.95 (2009-17) 1.80 (2018-25), worst $-141, years up 71%
++ gold exit_m 1260: lost 0.0% median $17,277 p25 $12,083 trades/yr 234 | gold alone: 20/yr PF 1.88 (2009-17) 1.73 (2018-25), worst $-141, years up 71%
++ gold k 1.25, exit_m 1200: lost 0.0% median $17,186 p25 $12,039 trades/yr 239 | gold alone: 26/yr PF 1.58 (2009-17) 2.06 (2018-25), worst $-141, years up 65%
++ gold k 1.75, exit_m 1200: lost 0.0% median $16,876 p25 $12,480 trades/yr 231 | gold alone: 16/yr PF 1.75 (2009-17) 2.12 (2018-25), worst $-141, years up 53%
++ gold exit_m 1200, stop_at 0.5: lost 0.0% median $17,037 p25 $11,965 trades/yr 234 | gold alone: 20/yr PF 1.53 (2009-17) 1.87 (2018-25), worst $-175, years up 65%
++ gold exit_m 1200, stop_at 0.75: lost 0.0% median $16,943 p25 $12,361 trades/yr 234 | gold alone: 20/yr PF 1.67 (2009-17) 2.59 (2018-25), worst $-89, years up 65%

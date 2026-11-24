@@ -3,11 +3,11 @@
 // MnqCleanBand on the same account, on its own chart.
 //
 // 5-minute MGC chart with the metals' extended hours (the overnight session and the 13:25 bar), New York times:
-//   * the move = the 08:20 bar's open less the prior session's 13:25 bar close;
+//   * the move = the 08:20 bar's open less the prior session's 13:25 bar close (SettleAt);
 //   * the last 14 sessions' average |move|: today's at least K x that, and the bars from 08:20 to 08:20 + Confirm
 //     minutes closing its way (the last one's close against the 08:20 open): a market order at that close (filled at
 //     the next open), the stop a tick past StopAt (0.6) of the way from the 08:20 open to that close, set with the entry;
-//   * out at market at the 13:25 bar's close (filled at 13:30; a gap in the bars: the first bar from 13:25 on); a
+//   * out at market at the 14:10 bar's close (filled at 14:15, ExitAt; a gap in the bars: the first bar from 14:10 on); a
 //     trade still open when the next trading day starts (a holiday's early close) goes out on its first bar; one trade
 //     a day at most.
 // Size: as MnqCleanBand, by the account's profit over its start balance (1, 2 from Step2At, 3 from Step3At, at most
@@ -68,7 +68,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 ConfirmMinutes = 15;
                 StopAt = 0.6;  // docs/STRATEGY_SEARCH.md 39: PF 1.24 / 1.54 to 1.80 / 1.88, the worst trade -$347 to -$141
                 OpenAt = 500;
-                ExitAt = 810;
+                ExitAt = 855;    // 14:15 (docs/STRATEGY_SEARCH.md 41; 13:30 as first shipped)
+                SettleAt = 810;  // the prior session's 13:25 bar ends at 13:30: the move's reference
                 MaxContracts = 3;
                 FixedContracts = 0;
                 Step2At = 2000;
@@ -186,7 +187,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 Day prev = hist.Count > 0 ? hist[hist.Count - 1] : null;
                 today.Move = prev != null ? today.Open - prev.Settle : double.NaN;
             }
-            if (mm == ExitAt - 5)
+            if (mm == SettleAt - 5)
                 today.Settle = Close[0];
 
             int mp = Position.MarketPosition == MarketPosition.Long ? 1 : Position.MarketPosition == MarketPosition.Short ? -1 : 0;
@@ -207,7 +208,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 Exit("Session end");
                 return;
             }
-            if (pos != 0 && mm >= ExitAt - 5 && mm < 1020)  // out at the next open (13:30's, or the first bar after a gap)
+            if (pos != 0 && mm >= ExitAt - 5 && mm < 1020)  // out at the next open (14:15's, or the first bar after a gap)
             {
                 Exit("Time exit");
                 return;
@@ -322,8 +323,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         [NinjaScriptProperty]
         [Range(0, 1439)]
-        [Display(Name = "Out at (minutes from midnight New York; 810 = 13:30)", Order = 4, GroupName = "1. Entry")]
+        [Display(Name = "Out at (minutes from midnight New York; 855 = 14:15)", Order = 4, GroupName = "1. Entry")]
         public int ExitAt { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, 1439)]
+        [Display(Name = "The move's reference: the prior session's bar ending at (810 = 13:30)", Order = 6, GroupName = "1. Entry")]
+        public int SettleAt { get; set; }
 
         [NinjaScriptProperty]
         [Range(1, 3)]

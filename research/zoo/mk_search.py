@@ -173,13 +173,13 @@ def five_min(days):
     return out
 
 
-def carry(days, i, tick=0.1, k=1.5, open_m=860, confirm=15, settle=1170, exit_m=1170, n=14, stop_at=0.6, be_r=0.0,
+def carry(days, i, tick=0.1, k=1.5, open_m=860, confirm=15, settle=1170, exit_m=1215, n=14, stop_at=0.6, be_r=0.0,
           tp_r=0.0):
     """Gold's overnight move carried on (MgcOvernightCarry.cs, 2026-11-24), on 5-minute bars: the move = the 08:20 bar's
     open less the prior session's 13:25 bar close; at least k x the last n sessions' average |move| and the bars from
     08:20 to 08:20 + confirm closing its way (the last one's close against the 08:20 open): a market order at that
     close, filled at the next bar's open + a tick; the stop a tick past the 08:20 open, set with the entry; out at the
-    open of the bar starting at exit_m (13:30). A stop fills at the bar's open when it opens through, a tick worse.
+    open of the bar starting at exit_m (14:15 since docs 41; 13:30 before). A stop fills at the bar's open when it opens through, a tick worse.
     Returns [(side, entry bar, entry, exit, why, exit bar)]."""
     def move(j):
         d, p = days[j], days[j - 1]
