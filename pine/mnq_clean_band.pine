@@ -24,6 +24,7 @@ const int NCH = 11   // the checks 10:00, 10:30, ..., 15:00
 trendDays = input.int(20, "Trend filter: sessions in the average of closes (0 = off)", minval = 0, maxval = 100)
 hardStop = input.float(200, "Hard stop, $ a contract", minval = 1)
 beAt = input.float(0.4, "Break-even once up this many hard stops (0 = off)", minval = 0, step = 0.1)
+bePlus = input.float(2, "Break-even stop: points past the entry", minval = 0, step = 0.25)
 tpAt = input.float(2.5, "Take profit at this many hard stops (0 = off)", minval = 0, step = 0.1)
 lastEntry = input.int(840, "Last entry check, minutes from midnight New York (840 = 14:00)", minval = 600, maxval = 900)
 maxTrades = input.int(9, "Most trades a day", minval = 1, maxval = 20)
@@ -214,7 +215,7 @@ if inRth and ready
                 strategy.exit(gid + " stop", gid, stop = e - side * dist, comment = "Stop loss")
                 leg := 2
         if pos != 0 and leg == 1 and beAt > 0 and not beDone and pos * (close - entryPx) >= beAt * hardStop / pv
-            be = math.round_to_mintick(entryPx + pos * tk)
+            be = math.round_to_mintick(entryPx + pos * math.max(tk, bePlus))
             if pos * (be - stopPx) > 0
                 stopPx := be
             beDone := true

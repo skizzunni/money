@@ -74,6 +74,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 TrendDays = 20;
                 HardStop = 200;
                 BreakEvenAt = 0.4;
+                BreakEvenPlus = 2;  // points past entry: the scratch exits close as small wins (docs/STRATEGY_SEARCH.md, 23)
                 LastEntry = 840;
                 MaxTradesPerDay = 9;
                 DayStop = 600;
@@ -327,7 +328,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 GapEntry(tick);
             if (pos != 0 && BreakEvenAt > 0 && !beDone && pos * (Close[0] - entryPx) >= BreakEvenAt * HardStop / pv)
             {
-                double be = Instrument.MasterInstrument.RoundToTickSize(entryPx + pos * tick);
+                double be = Instrument.MasterInstrument.RoundToTickSize(entryPx + pos * Math.Max(tick, BreakEvenPlus));
                 if (pos * (be - stop) > 0)
                 {
                     stop = be;
@@ -514,6 +515,11 @@ namespace NinjaTrader.NinjaScript.Strategies
         [Range(0, 10)]
         [Display(Name = "Break-even once up this many hard stops (0 = off)", Order = 2, GroupName = "2. Risk")]
         public double BreakEvenAt { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, 100)]
+        [Display(Name = "Break-even stop: points past the entry", Order = 5, GroupName = "2. Risk")]
+        public double BreakEvenPlus { get; set; }
 
         [NinjaScriptProperty]
         [Range(0, 10000)]

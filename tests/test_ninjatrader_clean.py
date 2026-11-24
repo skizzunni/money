@@ -23,7 +23,7 @@ import harness as H  # noqa: E402
 import strats as S  # noqa: E402
 
 DEFAULTS = dict(vwap=False, trend=20, hard=200.0, vwap_stop=True, k=1.0, be_r=0.4, max_trades=9, last=840, tp_r=2.5,
-                range_pos=0.65, max_move=1.1)
+                range_pos=0.65, max_move=1.1, be_plus=2.0)
 GAP = dict(k=0.5, exit_m=590, r=0.0, cap=30.0)
 
 

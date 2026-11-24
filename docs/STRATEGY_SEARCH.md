@@ -186,6 +186,13 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    1.27, live 4.51 (from 1.47 / 1.49 / 1.22 / 3.88); about 8% fewer trades. 1.0x and 1.3x also lose none. Shipped
    (`MaxMove` 1.1; NinjaTrader and Pine trade for trade).
 
+23. **Scratch exits as small wins** (2026-11-24, the user: "profitable trades is still bad", TradingView's 26%;
+   `verification/zoo/stage17_break_even_lock.txt`). About 30% of trades left at the break-even stop, one tick past entry:
+   after the stop's slippage and $1.24 of fees each closed at about -$1, counted a loss. The break-even stop at entry
+   + 2 points instead (`be_plus` 2): winners 25% / 24% / 26% to **39% / 41% / 41%** (dev / unseen NQ / live), PF and net
+   unchanged or better, 0 of 104 starts lost, median $14,288 to $15,275. +1, +3 and +5 points also lose none (at 0.5x
+   2.9% are lost, so the trigger stays at 0.4x). Shipped (`BreakEvenPlus` 2).
+
 ## The result (the shipped defaults, research numbers, 2 ticks of stop slippage, $0.62 a side)
 
 | set | band trades | win | PF | band net (1 MNQ) | gap trades (PF, net) | 50K starts lost | median 12 months |
