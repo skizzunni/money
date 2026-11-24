@@ -447,6 +447,13 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    instead of 14: median $17,295 / $17,454 / $16,694 against $17,366, PF 2.10 / 1.77 / 1.67 on 2009-17 against 2.02;
    no window better on every count. None used.
 
+46. **Strong breaks late or without break-even, gold by weekday** (2026-11-24, a research round; `noise` strong_last /
+   be_skip_strong, `verification/zoo/stage40_strong_late_be.txt`). Entries at 14:30 (or 15:00 too) for strong breaks
+   (1.5 sigma) only: median $16,212 / $16,049 against $16,582, the window unchanged (they hardly happen that late). No
+   break-even for breaks past 1.0 / 1.5 / 2.0 sigma: 3.8% of starts lost in each. Gold by weekday (PF 2009-17 / 2018 -
+   Mar 2025): Mon 0.48 / 2.25, Tue 3.63 / 3.34, Wed 4.82 / 0.15, Thu 1.06 / 1.34, Fri 2.42 / 2.52: Monday and Wednesday
+   flip, no day loses in both. None used.
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-33; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |

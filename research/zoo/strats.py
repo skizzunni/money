@@ -50,7 +50,7 @@ def _tick(x, tick):
 
 def noise(days, i, tick, vwap=True, trend=0, hard=250.0, vwap_stop=False, pv=2.0, k=1.0, last=900, max_trades=9,
           be_r=0.0, stop_slip=2, nt=True, tp_r=0.0, tp_fill_bar=True, step=30, range_pos=0.0, tp_frac=1.0,
-          runner_lock=0.0, max_move=0.0, be_plus=0.0, counter_k=0.0, after_target="", move_free="", min_stretch=0.0, stretch_gap=False, move_ref="open", hard_vol=0.0, hard_lo=0.0, hard_hi=1e9, max_losses=0, strong_at=0.0, strong_tp=0.0, stale=0, band_ref="both", be_on="close", exit_at=955, trend_ema=False, check_off=0):
+          runner_lock=0.0, max_move=0.0, be_plus=0.0, counter_k=0.0, after_target="", move_free="", min_stretch=0.0, stretch_gap=False, move_ref="open", hard_vol=0.0, hard_lo=0.0, hard_hi=1e9, max_losses=0, strong_at=0.0, strong_tp=0.0, stale=0, band_ref="both", be_on="close", exit_at=955, trend_ema=False, check_off=0, strong_last=0, be_skip_strong=0.0):
     """The user's Clean Noise-Band spec (research/clean_noise_band.py): checks 10:00-15:00, the band (k x sigma) past
     max/min(open, prior close), the session VWAP agreeing, the band as a stop moved at the checks, a hard stop $hard a
     contract, out at 15:55. trend: also the close past the `trend`-session average of closes. be_r: the stop to entry +
@@ -84,6 +84,7 @@ def noise(days, i, tick, vwap=True, trend=0, hard=250.0, vwap_stop=False, pv=2.0
     out = []
     pos, entry, stop, pend, pend_stop, ebar, exit_next, hard_ref = 0, 0.0, np.nan, 0, np.nan, 0, False, 0.0
     nchk, be_hit = 0, False  # research (2026-11-24, stale): checks held, break-even reached
+    pend_strong = no_be = False  # research (be_skip_strong): no break-even for a strong break
     pend_tp = tp_r  # research (2026-11-24): strong_tp x the hard stop as the target on entries strong_at sigmas past
     banked = None  # research (tp_frac < 1): the part taken at the target; the rest runs on the band / break-even stop
 
@@ -99,6 +100,7 @@ def noise(days, i, tick, vwap=True, trend=0, hard=250.0, vwap_stop=False, pv=2.0
             pos, entry, ebar = pend, o[b] + pend * tick, b
             stop = pend_stop
             nchk, be_hit = 0, False
+            no_be = pend_strong
             banked = None
             tgt = _tick(entry + pos * pend_tp * hard / pv, tick) if tp_r else np.nan
             pend = 0
@@ -118,7 +120,7 @@ def noise(days, i, tick, vwap=True, trend=0, hard=250.0, vwap_stop=False, pv=2.0
                 # a take-profit limit: from the fill bar in NinjaTrader (set with the entry), from the next in Pine
                 out.append((pos, ebar, entry, tgt, "target", b))
                 pos = 0
-            elif be_r and pos * ((c[b] if be_on == "close" else h[b] if pos > 0 else lo[b]) - entry) >= be_pts:
+            elif be_r and not no_be and pos * ((c[b] if be_on == "close" else h[b] if pos > 0 else lo[b]) - entry) >= be_pts:
                 be_hit = True
                 lk = _tick(entry + pos * max(tick, be_plus), tick)  # be_plus: the break-even stop this many points past entry
                 stop = max(stop, lk) if pos > 0 else min(stop, lk)
@@ -138,7 +140,7 @@ def noise(days, i, tick, vwap=True, trend=0, hard=250.0, vwap_stop=False, pv=2.0
                     exit_next = True
                 else:
                     stop = new
-            elif end <= last and len(out) < max_trades and mm[b] < 950 and not (
+            elif end <= max(last, strong_last) and len(out) < max_trades and mm[b] < 950 and not (
                     after_target == "day" and any(t[4] == "target" for t in out)) and not (
                     max_losses and sum((t[3] - t[2]) * t[0] < 0 for t in out) >= max_losses):  # research: losers a day  # research: after a target, done for the day
                 want = 1 if c[b] > up else -1 if c[b] < dn else 0
@@ -170,6 +172,14 @@ def noise(days, i, tick, vwap=True, trend=0, hard=250.0, vwap_stop=False, pv=2.0
                     mref = o[0] if move_ref == "open" else pc if move_ref == "close" else (up_ref if want > 0 else dn_ref)
                     if want * (c[b] - mref) > max_move * avg_rng and not free:
                         want = 0
+                if want and (end > last or be_skip_strong):  # research (2026-11-24): the break's stretch past the band
+                    ref_ = up_ref if want > 0 else dn_ref
+                    st_ = want * (c[b] - (up if want > 0 else dn)) / (sig[end] * k * ref_)
+                    if end > last and st_ < 1.5:  # after `last` only strong breaks (strong_last)
+                        want = 0
+                    pend_strong = st_ >= be_skip_strong if be_skip_strong else False
+                elif want:
+                    pend_strong = False
                 if want:
                     pend_tp = tp_r
                     if strong_at and strong_tp:

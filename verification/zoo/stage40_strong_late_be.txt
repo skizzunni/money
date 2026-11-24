@@ -1,0 +1,6 @@
+now: lost 0.0% median $16,582 p25 $11,321 | TV $+9,796 53tr PF 4.25 dd $670 | dev: PF 1.60 240/yr $5,119 | unseen_nq: PF 1.59 265/yr $6,971 | unseen_es: PF 1.17 224/yr $679 | live: PF 3.34 179/yr $13,572
+14:30 check for strong breaks only: lost 0.0% median $16,212 p25 $11,238 | TV $+9,796 53tr PF 4.25 dd $670 | dev: PF 1.60 240/yr $5,114 | unseen_nq: PF 1.58 265/yr $6,860 | unseen_es: PF 1.17 224/yr $679 | live: PF 3.34 179/yr $13,572
+15:00 too, strong only: lost 0.0% median $16,049 p25 $11,238 | TV $+9,796 53tr PF 4.25 dd $670 | dev: PF 1.60 241/yr $5,191 | unseen_nq: PF 1.58 266/yr $6,886 | unseen_es: PF 1.17 224/yr $679 | live: PF 3.34 179/yr $13,572
+no break-even on strong breaks (1.5): lost 3.8% median $15,417 p25 $10,754 | TV $+9,800 50tr PF 4.27 dd $670 | dev: PF 1.59 237/yr $5,208 | unseen_nq: PF 1.56 261/yr $6,834 | unseen_es: PF 1.17 224/yr $679 | live: PF 3.26 170/yr $13,419
+no break-even on very strong (2.0): lost 3.8% median $15,149 p25 $10,108 | TV $+9,796 53tr PF 4.25 dd $670 | dev: PF 1.58 238/yr $5,058 | unseen_nq: PF 1.58 262/yr $6,903 | unseen_es: PF 1.17 224/yr $679 | live: PF 3.34 179/yr $13,572
+no break-even on 1.0+: lost 3.8% median $15,489 p25 $11,018 | TV $+9,185 50tr PF 3.55 dd $670 | dev: PF 1.53 235/yr $4,909 | unseen_nq: PF 1.58 256/yr $7,229 | unseen_es: PF 1.17 224/yr $679 | live: PF 3.03 167/yr $12,966
