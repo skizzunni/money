@@ -240,7 +240,7 @@ if inRth and ready
                     want := 0
                 if want != 0 and trendDays > 0 and want * (close - sma) <= 0
                     want := 0
-                if want != 0 and maxMove > 0 and want * (close - dayOpen) > maxMove * avgRange
+                if want != 0 and maxMove > 0 and endMin != 600 and want * (close - dayOpen) > maxMove * avgRange
                     want := 0
                 posR = dHi > dLo ? (close - dLo) / (dHi - dLo) : 0.5
                 if want != 0 and rangePos > 0 and ((want > 0 and posR < rangePos) or (want < 0 and posR > 1 - rangePos))

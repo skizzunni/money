@@ -205,6 +205,12 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    TradingView on the user's chart with the shipped rules (Aug 27 - Nov 23 2026): +$5,253, 46 trades, 39% winners,
    PF 3.48, max drawdown $1,084.
 
+26. **The move cap not at 10:00** (2026-11-24, the user's chart: Nov 5 fell 1,500 points with one trade; 
+   `move_free`, `verification/zoo/stage20_move_cap_at_ten.txt`). Nov 5 had fallen 1.47x its (quiet) usual range by the
+   first check, so the cap blocked every short; the 10:00 short would have hit its target. A break at the first check
+   is not a chase: without the cap there, dev, unseen NQ and ES are unchanged to the dollar (it hardly happens), live
+   +$1,208 a year at 1 MNQ (Nov 5: 2 trades +$436 against 1, -$63), 0 of 104 starts lost. Shipped (NinjaTrader, Pine).
+
 ## The result (the shipped defaults, research numbers, 2 ticks of stop slippage, $0.62 a side)
 
 | set | band trades | win | PF | band net (1 MNQ) | gap trades (PF, net) | 50K starts lost | median 12 months |

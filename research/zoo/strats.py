@@ -50,7 +50,7 @@ def _tick(x, tick):
 
 def noise(days, i, tick, vwap=True, trend=0, hard=250.0, vwap_stop=False, pv=2.0, k=1.0, last=900, max_trades=9,
           be_r=0.0, stop_slip=2, nt=True, tp_r=0.0, tp_fill_bar=True, step=30, range_pos=0.0, tp_frac=1.0,
-          runner_lock=0.0, max_move=0.0, be_plus=0.0, counter_k=0.0, after_target=""):
+          runner_lock=0.0, max_move=0.0, be_plus=0.0, counter_k=0.0, after_target="", move_free=""):
     """The user's Clean Noise-Band spec (research/clean_noise_band.py): checks 10:00-15:00, the band (k x sigma) past
     max/min(open, prior close), the session VWAP agreeing, the band as a stop moved at the checks, a hard stop $hard a
     contract, out at 15:55. trend: also the close past the `trend`-session average of closes. be_r: the stop to entry +
@@ -140,7 +140,8 @@ def noise(days, i, tick, vwap=True, trend=0, hard=250.0, vwap_stop=False, pv=2.0
                         want = 0
                 if want and max_move:  # research (2026-11-24): skip when the day has already run past max_move x its usual range
                     avg_rng = np.mean([(days[j]["h"].max() - days[j]["l"].min()) * d["s"] / days[j]["s"] for j in range(i - 14, i)])
-                    if want * (c[b] - o[0]) > max_move * avg_rng:
+                    free = (move_free == "first_check" and end == 600) or (move_free == "first_trade" and not out)
+                    if want * (c[b] - o[0]) > max_move * avg_rng and not free:
                         want = 0
                 if want:
                     hard_ref = c[b] + want * tick

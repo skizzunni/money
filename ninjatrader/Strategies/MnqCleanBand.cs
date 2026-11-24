@@ -364,7 +364,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             int want = Close[0] > up ? 1 : Close[0] < dn ? -1 : 0;
             if (want != 0 && VwapEntry && want * (Close[0] - vwap) <= 0) want = 0;
             if (want != 0 && TrendDays > 0 && want * (Close[0] - sma) <= 0) want = 0;
-            if (want != 0 && MaxMove > 0 && want * (Close[0] - dayOpen) > MaxMove * avgRange)
+            if (want != 0 && MaxMove > 0 && end != 600 && want * (Close[0] - dayOpen) > MaxMove * avgRange)  // not at 10:00 (24)
                 want = 0;  // the day has already run past its usual range its way (docs/STRATEGY_SEARCH.md, 22)
             if (want != 0 && RangePos > 0)  // the close still near the day's extreme its way (docs/STRATEGY_SEARCH.md, 20)
             {
