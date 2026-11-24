@@ -14,7 +14,7 @@ PK = "/tmp/claude-0/-home-user-money/a932a565-3474-5ea9-80d7-5853e3bebb0c/scratc
 GAP = dict(k=0.5, exit_m=590, r=0.0, cap=30.0, min_body=0.03)
 BAND = dict(vwap=False, vwap_stop=True, hard=200.0, be_r=0.4, tp_r=2.5, last=840, trend=20, k=1.0, max_trades=9,
             range_pos=0.65, max_move=1.1, be_plus=2.0, move_free="first_check")
-STEPS = ((0, 1), (2000, 2), (4500, 3))
+STEPS = ((0, 1), (2000, 2), (3500, 3))
 
 
 def _stretch(d, t, k):
@@ -67,7 +67,7 @@ def tv(d, t, start="2026-08-27", steps=STEPS, day_stop=600.0):
 
 
 def run(band: dict | None = None, gap: dict | None = None, add_at: float = 1.5, legs_fn=None, steps=STEPS,
-        day_stop: float = 600.0) -> dict:
+        day_stop: float = 600.0, add2_at: float = 0.0, news: bool = True) -> dict:
     sets = pickle.load(open(PK, "rb"))
     b, g = {**BAND, **(band or {})}, {**GAP, **(gap or {})}
     pool, out = [], {}
@@ -75,13 +75,13 @@ def run(band: dict | None = None, gap: dict | None = None, add_at: float = 1.5, 
         legs = legs_fn(g, b) if legs_fn else (("gap_go", g), ("noise", b))
         t = H.trades_of(S.everyday, d, s, legs=legs)
         st = _stretch(d, t, b["k"])
-        t["add"] = ((st >= add_at) & (add_at > 0)).astype(int)
+        t["add"] = ((st >= add_at) & (add_at > 0)).astype(int) + ((st >= add2_at) & (add2_at > 0)).astype(int)
         u = t.usd
         yrs = len(d) / 252
         out[n] = dict(win=(u > 0).mean(), pf=u[u > 0].sum() / max(1e-9, -u[u < 0].sum()), per_yr=len(t) / yrs,
                       net_yr=u.sum() / yrs)
         if n in ("dev", "unseen_nq"):
-            pool += H.account(t, d, steps=steps, day_stop=day_stop, day_qty=_news(d))
+            pool += H.account(t, d, steps=steps, day_stop=day_stop, day_qty=_news(d) if news else None)
         if n == "live":
             out["tv"] = tv(d, t, steps=steps, day_stop=day_stop)
     prof = np.array([x[1] for x in pool])

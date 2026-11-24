@@ -295,6 +295,14 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    (window +$11,497, 25th percentile lower), 2 from day one (5.8% lost), the day stop $800 (+$400 median and 25th
    percentile, but $1,000 loses 1%: too near the edge).
 
+33. **More angles with 32 in** (2026-11-24; `verification/zoo/stage26_more_angles.txt`; the bench's steps now +$3,500).
+   None used: the strong-break contract at 1.25 / 2.0 sigma (both lower), a second contract at 2.5-4 sigma (no change:
+   too rare); a bigger target on strong breaks (3R: median -$495; 4R: the TradingView window +$12,423 but median and
+   25th percentile -$1,100 to -1,200, a November fit; none: lower); a time stop after 1-4 checks short of break-even
+   (1-2: median down, ES negative; 3-4: no change); the VWAP stop off (3.8% lost), the VWAP entry filter on (lower);
+   at most 6 trades a day (+$24 median, the window +$111: within noise, as in 27). The news-day rule is still worth
+   $2,700 of median. The news fade at the open stays out (its live months were negative, section 14).
+
 ## The result (the shipped defaults, research numbers, 2 ticks of stop slippage, $0.62 a side)
 
 | set | band trades | win | PF | band net (1 MNQ) | gap trades (PF, net) | 50K starts lost | median 12 months |

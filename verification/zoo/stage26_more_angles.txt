@@ -1,0 +1,21 @@
+now (+1 at 1.5): lost 0.0% median $16,582 p25 $11,321 | TV $+9,796 PF 4.25 dd $670
++1 at 1.25: lost 0.0% median $16,501 p25 $10,981 | TV $+9,698 PF 4.11 dd $670
++1 at 2.0: lost 0.0% median $15,447 p25 $10,521 | TV $+8,725 PF 3.89 dd $670
++1 at 1.5, +2 at 3: lost 0.0% median $16,485 p25 $11,321 | TV $+9,796 PF 4.25 dd $670
++1 at 1.5, +2 at 4: lost 0.0% median $16,582 p25 $11,321 | TV $+9,796 PF 4.25 dd $670
++1 at 1.5, +2 at 2.5: lost 0.0% median $16,582 p25 $11,191 | TV $+9,796 PF 4.25 dd $670
+no news-day rule in accounts: lost 0.0% median $13,835 p25 $10,190 | TV $+9,796 PF 4.25 dd $670
+now: lost 0.0% median $16,582 p25 $11,321 | TV $+9,796 53tr PF 4.25 dd $670 | dev: PF 1.60 240/yr $5,119 | unseen_nq: PF 1.59 265/yr $6,971 | unseen_es: PF 1.17 224/yr $679 | live: PF 3.34 179/yr $13,572
+strong breaks target 3R: lost 0.0% median $16,087 p25 $11,653 | TV $+10,075 53tr PF 4.21 dd $670 | dev: PF 1.62 239/yr $5,257 | unseen_nq: PF 1.60 264/yr $7,010 | unseen_es: PF 1.17 224/yr $679 | live: PF 3.46 179/yr $14,299
+strong breaks target 4R: lost 0.0% median $15,494 p25 $10,128 | TV $+12,423 53tr PF 4.39 dd $670 | dev: PF 1.58 238/yr $4,941 | unseen_nq: PF 1.59 263/yr $6,893 | unseen_es: PF 1.17 224/yr $679 | live: PF 3.71 179/yr $15,753
+strong breaks target 5R: lost 0.0% median $15,694 p25 $10,727 | TV $+11,802 53tr PF 4.22 dd $670 | dev: PF 1.58 238/yr $4,921 | unseen_nq: PF 1.58 263/yr $6,772 | unseen_es: PF 1.17 224/yr $679 | live: PF 3.71 179/yr $15,700
+strong breaks no target: lost 0.0% median $15,466 p25 $10,157 | TV $+11,802 53tr PF 4.22 dd $670 | dev: PF 1.55 238/yr $4,673 | unseen_nq: PF 1.59 263/yr $6,842 | unseen_es: PF 1.17 224/yr $679 | live: PF 3.44 179/yr $14,172
+strong breaks target 2R: lost 0.0% median $16,095 p25 $11,193 | TV $+8,824 53tr PF 3.93 dd $670 | dev: PF 1.58 240/yr $5,019 | unseen_nq: PF 1.59 265/yr $6,958 | unseen_es: PF 1.17 224/yr $679 | live: PF 3.21 179/yr $12,845
+now: lost 0.0% median $16,582 p25 $11,321 | TV $+9,796 53tr PF 4.25 dd $670 | dev: PF 1.60 240/yr $5,119 | unseen_nq: PF 1.59 265/yr $6,971 | unseen_es: PF 1.17 224/yr $679 | live: PF 3.34 179/yr $13,572
+time stop 1 check: lost 0.0% median $14,339 p25 $9,328 | TV $+9,661 55tr PF 4.13 dd $670 | dev: PF 1.54 269/yr $4,674 | unseen_nq: PF 1.58 280/yr $6,601 | unseen_es: PF 0.96 297/yr $-183 | live: PF 3.17 191/yr $12,764
+time stop 2 checks: lost 0.0% median $16,037 p25 $10,781 | TV $+9,724 53tr PF 4.27 dd $670 | dev: PF 1.58 249/yr $4,969 | unseen_nq: PF 1.59 268/yr $6,899 | unseen_es: PF 1.02 264/yr $74 | live: PF 3.37 184/yr $13,474
+time stop 3 checks: lost 0.0% median $16,098 p25 $11,740 | TV $+9,796 53tr PF 4.25 dd $670 | dev: PF 1.59 243/yr $5,036 | unseen_nq: PF 1.59 265/yr $6,972 | unseen_es: PF 1.11 246/yr $461 | live: PF 3.34 179/yr $13,572
+time stop 4 checks: lost 0.0% median $16,615 p25 $11,164 | TV $+9,796 53tr PF 4.25 dd $670 | dev: PF 1.61 241/yr $5,147 | unseen_nq: PF 1.59 265/yr $6,922 | unseen_es: PF 1.10 238/yr $412 | live: PF 3.34 179/yr $13,572
+VWAP stop off: lost 3.8% median $16,106 p25 $10,272 | TV $+9,910 51tr PF 4.41 dd $670 | dev: PF 1.60 235/yr $5,174 | unseen_nq: PF 1.59 262/yr $7,033 | unseen_es: PF 1.14 220/yr $572 | live: PF 2.89 174/yr $12,672
+VWAP entry filter on: lost 0.0% median $16,109 p25 $11,101 | TV $+9,796 53tr PF 4.25 dd $670 | dev: PF 1.59 240/yr $5,019 | unseen_nq: PF 1.58 265/yr $6,837 | unseen_es: PF 1.17 224/yr $679 | live: PF 3.34 179/yr $13,572
+max 6 trades: lost 0.0% median $16,606 p25 $11,321 | TV $+9,907 52tr PF 4.41 dd $670 | dev: PF 1.61 239/yr $5,151 | unseen_nq: PF 1.60 264/yr $7,046 | unseen_es: PF 1.17 223/yr $687 | live: PF 3.39 177/yr $13,661

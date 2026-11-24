@@ -50,7 +50,7 @@ def _tick(x, tick):
 
 def noise(days, i, tick, vwap=True, trend=0, hard=250.0, vwap_stop=False, pv=2.0, k=1.0, last=900, max_trades=9,
           be_r=0.0, stop_slip=2, nt=True, tp_r=0.0, tp_fill_bar=True, step=30, range_pos=0.0, tp_frac=1.0,
-          runner_lock=0.0, max_move=0.0, be_plus=0.0, counter_k=0.0, after_target="", move_free="", min_stretch=0.0, stretch_gap=False, move_ref="open", hard_vol=0.0, hard_lo=0.0, hard_hi=1e9, max_losses=0):
+          runner_lock=0.0, max_move=0.0, be_plus=0.0, counter_k=0.0, after_target="", move_free="", min_stretch=0.0, stretch_gap=False, move_ref="open", hard_vol=0.0, hard_lo=0.0, hard_hi=1e9, max_losses=0, strong_at=0.0, strong_tp=0.0, stale=0):
     """The user's Clean Noise-Band spec (research/clean_noise_band.py): checks 10:00-15:00, the band (k x sigma) past
     max/min(open, prior close), the session VWAP agreeing, the band as a stop moved at the checks, a hard stop $hard a
     contract, out at 15:55. trend: also the close past the `trend`-session average of closes. be_r: the stop to entry +
@@ -74,6 +74,8 @@ def noise(days, i, tick, vwap=True, trend=0, hard=250.0, vwap_stop=False, pv=2.0
         hard = pv * min(max(hard_vol * avg14, hard_lo), hard_hi)
     out = []
     pos, entry, stop, pend, pend_stop, ebar, exit_next, hard_ref = 0, 0.0, np.nan, 0, np.nan, 0, False, 0.0
+    nchk, be_hit = 0, False  # research (2026-11-24, stale): checks held, break-even reached
+    pend_tp = tp_r  # research (2026-11-24): strong_tp x the hard stop as the target on entries strong_at sigmas past
     banked = None  # research (tp_frac < 1): the part taken at the target; the rest runs on the band / break-even stop
 
     def done(x):  # the trade's exit price as one position: the banked part at the target, the rest at x
@@ -87,8 +89,9 @@ def noise(days, i, tick, vwap=True, trend=0, hard=250.0, vwap_stop=False, pv=2.0
         if pend and pos == 0:
             pos, entry, ebar = pend, o[b] + pend * tick, b
             stop = pend_stop
+            nchk, be_hit = 0, False
             banked = None
-            tgt = _tick(entry + pos * tp_r * hard / pv, tick) if tp_r else np.nan
+            tgt = _tick(entry + pos * pend_tp * hard / pv, tick) if tp_r else np.nan
             pend = 0
         if pos and nt and mm[b] >= 955:
             out.append((pos, ebar, entry, done(o[b] - pos * tick), "time", b - 1))
@@ -107,6 +110,7 @@ def noise(days, i, tick, vwap=True, trend=0, hard=250.0, vwap_stop=False, pv=2.0
                 out.append((pos, ebar, entry, tgt, "target", b))
                 pos = 0
             elif be_r and pos * (c[b] - entry) >= be_pts:
+                be_hit = True
                 lk = _tick(entry + pos * max(tick, be_plus), tick)  # be_plus: the break-even stop this many points past entry
                 stop = max(stop, lk) if pos > 0 else min(stop, lk)
         if end in sig and not np.isnan(sig[end]):
@@ -120,7 +124,8 @@ def noise(days, i, tick, vwap=True, trend=0, hard=250.0, vwap_stop=False, pv=2.0
                 if nt:
                     new = _tick(new, tick)  # NinjaTrader: the stop is only ever tightened
                     new = max(new, stop) if pos > 0 else min(new, stop)
-                if pos * (c[b] - new) <= 0:
+                nchk += 1
+                if pos * (c[b] - new) <= 0 or (stale and nchk >= stale and not be_hit):
                     exit_next = True
                 else:
                     stop = new
@@ -157,6 +162,11 @@ def noise(days, i, tick, vwap=True, trend=0, hard=250.0, vwap_stop=False, pv=2.0
                     if want * (c[b] - mref) > max_move * avg_rng and not free:
                         want = 0
                 if want:
+                    pend_tp = tp_r
+                    if strong_at and strong_tp:
+                        ref = up_ref if want > 0 else dn_ref
+                        if want * (c[b] - (up if want > 0 else dn)) / (sig[end] * k * ref) >= strong_at:
+                            pend_tp = strong_tp
                     hard_ref = c[b] + want * tick
                     band = bl if want > 0 else bs
                     hp = hard_ref - want * hard / pv
