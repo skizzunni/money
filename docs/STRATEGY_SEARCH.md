@@ -483,6 +483,23 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
      0.0-0.1% lost but the account barely moves (median +$165), 3 MGC 19-30% lost. Nothing removes the risk without
      removing the profit: none used.
 
+50. **The guard's last tier: strong breaks only** (2026-11-24, a research round; `verification/zoo/stage44_strong_only_tier.txt`).
+   Against section 49's risk, while guarded (2,000 shuffled 2020 - Mar 2025 years; blown / median from $50,000,
+   $48,806, $48,998): shipped 6.3% / $16,632, 19.7% / $12,581, 14.7% / $13,616; a $150 / $100 MNQ stop 5.5-5.9%,
+   16.3-18.1%, 12.8-14.0% (median lower at $100); at most 1 MNQ trade a day 4.9%, 17.0%, 12.6% (median $6,369 from
+   $48,806); **only strong breaks (1.5 sigma) and the gap trade** 1.5%, 6.2%, 3.8% but median $13,881 / $6,791 / $8,373.
+   As a tier under the guard, with the strategy run again with `min_stretch` 1.5 on those days (exact), strong breaks
+   only under $750 / **$1,000** / $1,250 above the floor: 3.6% / **2.7%** / 2.5%, 12.2% / **10.2%** / 8.8%, 8.6% / **6.5%** /
+   5.1%, median $16,597 / **$16,017** / $15,218 fresh. In calendar order (104 + 111 + 111 starts): $750 no better near the
+   floor (4.5% / 0.9%, $49,500 0.9%); **$1,000: fresh 0 lost, median $16,251 to $15,213, 25th percentile $11,745 to
+   $10,135; from $48,806 4.5% to 1.8%, from $48,998 0.9% to 0.0%**; $1,250 the 25th percentile $6,324. Shipped at $1,000
+   (`GuardStrongOnlyBelow`, `GuardStrongOnlyStretch` 1.5; NinjaTrader and Pine): a risk cut at a profit cost, the user's
+   rule first ("never lose the account"); `CushionGuard` 0 turns the whole guard off. Two catches by the tests: the
+   guard's high-water mark came from the replay of the loaded history, so live the floor could sit at the start
+   balance (a $49,600 account read as $400 below it: 1 contract, a $100 day stop); at the switch to real time it now
+   starts again from "Highest end-of-day balance" (MNQ and gold; a test reads the live dashboard at $49,600 and
+   $48,800 and fails without the fix). Rejected with it: gold-only or gold-added modes while guarded (49).
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-33; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |

@@ -82,14 +82,17 @@ class Guard:
     balance by `dd` (stopping at the start balance); under `below` $ of cushion, 1 contract and a day stop of `share` x
     the cushion ($100 at least, at most the day stop)."""
 
-    def __init__(self, below: float = 1500.0, share: float = 0.25, dd: float = 2000.0, highest: float = 0.0, base: float = 50000.0):
-        self.below, self.share, self.dd, self.base = below, share, dd, base
+    def __init__(self, below: float = 1500.0, share: float = 0.25, dd: float = 2000.0, highest: float = 0.0, base: float = 50000.0,
+                 strong_below: float = 1000.0):
+        self.below, self.share, self.dd, self.base, self.strong_below = below, share, dd, base, strong_below
         self.hwm = max(base, highest)
+        self.strong = False  # the day's "strong breaks only" (under strong_below $ above the floor)
 
     def day(self, profit: float, cap: int, day_stop: float) -> tuple[int, float]:
         bal = self.base + profit
         self.hwm = max(self.hwm, bal)
         cushion = bal - min(self.hwm - self.dd, self.base)
+        self.strong = bool(self.below) and bool(self.strong_below) and cushion < self.strong_below
         if self.below and cushion < self.below:
             return 1, max(100.0, min(day_stop or float("inf"), self.share * cushion))
         return cap, day_stop
@@ -115,13 +118,14 @@ def py_trades(days: list, idx: list, day_stop: float = 0.0, steps=None, gap_from
         legs = []
         cap = max_q if max_q is not None else (3 if steps else 1)  # MaxContracts as the C# run sets it
         ds = day_stop
+        guard.strong = False
         if i >= max(21, cfg["trend"] + 1):  # the cushion guard on ready days
             cap, ds = guard.day(cum, cap, day_stop)
             q = min(q, cap)
         if gap_from is not None and (gap_from <= 0 or cum >= gap_from) and i >= max(21, cfg["trend"] + 1):
             legs += S.gap_go(days, i, 0.25, **(gap or GAP))
         ng = len(legs)
-        legs += S.noise(days, i, 0.25, stop_slip=1, nt=True, **cfg)
+        legs += S.noise(days, i, 0.25, stop_slip=1, nt=True, **{**cfg, "min_stretch": 1.5 if guard.strong else 0.0})
         for n_, (side, eb, epx, xpx, _why, *_) in enumerate(legs):
             if ds and day <= -ds:
                 break
@@ -189,9 +193,11 @@ def test_clean_band_gap_leg(sim, tmp_path):  # noqa: F811
     ref = py_trades(days, idx)
     got = [(int(t[0]), int(t[1]), round(float(t[2]), 6), round(float(t[4]), 6)) for t in nt]
     assert got == [(s, b, e, x) for s, b, e, x, _q in ref]
-    names = {x[5] for x in nt}
     assert sum(idx[int(t[1])][1] == 1 for t in nt) >= 5  # gap entries at 09:35
-    assert "Profit target" in names
+    free = run_nt(sim, path, MaxContracts=1, DayStop=0, CushionGuard=0)  # the target, without the guard's choices
+    assert [(int(t[0]), int(t[1]), round(float(t[2]), 6), round(float(t[4]), 6)) for t in free] == \
+        [(s, b, e, x) for s, b, e, x, _q in py_trades(days, idx, guard=Guard(below=0))]
+    assert "Profit target" in {x[5] for x in free}
     # without the 09:30 bar size rule (GapMinBody 0) the gap trades of the reference without it, and more of them
     nt0 = run_nt(sim, path, MaxContracts=1, DayStop=0, GapMinBody=0)
     ref0 = py_trades(days, idx, gap={**GAP, "min_body": 0.0})
@@ -309,8 +315,9 @@ def test_clean_band_oco_cancel_does_not_exit_twice(sim, tmp_path, live):  # noqa
     path = tmp_path / "bars.csv"
     write_bars(days, path)
     extra = {"SimRealtimeFrom": 30 * 78} if live else {}
-    plain = _run_all(sim, path, MaxContracts=1, DayStop=0, SimStopUpdates=True, StartProfit=100000, **extra)
-    worst = _run_all(sim, path, MaxContracts=1, DayStop=0, SimStopUpdates=True, StartProfit=100000, SimOcoCancelFirst=True, **extra)
+    plain = _run_all(sim, path, MaxContracts=1, DayStop=0, SimStopUpdates=True, StartProfit=100000, CushionGuard=0, **extra)
+    worst = _run_all(sim, path, MaxContracts=1, DayStop=0, SimStopUpdates=True, StartProfit=100000, SimOcoCancelFirst=True,
+                     CushionGuard=0, **extra)
     tp = [x for x in plain if x.startswith("T,")]
     tw = [x for x in worst if x.startswith("T,")]
     assert tw == tp
@@ -383,13 +390,14 @@ def test_clean_band_news_days(sim, tmp_path):  # noqa: F811
         q = 2 if cum >= 2000 else 1
         q = 3 if cum >= 3500 else q
         day = 0.0
+        guard.strong = False
         cap, ds = guard.day(cum, 3, 0.0) if i >= 21 else (3, 0.0)
         q = min(q, cap)
         if 2 <= spikes[i] < 3:
             continue
         if spikes[i] >= 6:
             q = min(q + 1, cap)
-        legs = (S.gap_go(days, i, 0.25, **GAP) if i >= 21 else []) + S.noise(days, i, 0.25, stop_slip=1, nt=True, **DEFAULTS)
+        legs = (S.gap_go(days, i, 0.25, **GAP) if i >= 21 else []) + S.noise(days, i, 0.25, stop_slip=1, nt=True, **{**DEFAULTS, "min_stretch": 1.5 if guard.strong else 0.0})
         ng = len(legs) - len([x for x in legs if x[1] > 1])  # the gap leg enters on bar 1, band entries later
         for n_, (side, eb, epx, xpx, _w, *_) in enumerate(legs):
             if ds and day <= -ds:
@@ -431,3 +439,21 @@ def test_clean_band_cushion_guard(sim, tmp_path, props, guard):  # noqa: F811
     assert off != ref  # the guard changed the trades
     d = [x for x in out if x.startswith("D,")]
     assert d
+
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+def test_clean_band_guard_live_floor_from_the_account(sim, tmp_path):  # noqa: F811
+    """The replay of the history (here +$100,000 of simulated profit) must not set the live floor: at the switch to real
+    time the high-water mark starts again from HighestBalance (0: the start balance), so live at $49,600 the floor is
+    $48,000 and the cushion $1,600 (no guard); at $48,800 the cushion is $800 (guarded, strong breaks only)."""
+    days = synthetic_days()
+    path = tmp_path / "bars.csv"
+    write_bars(days, path)
+    start = len(days) * 78 - 30
+    for liq, guarded in ((49600, False), (48800, True)):
+        out = _run_all(sim, path, DayStop=0, StartProfit=100000, SimRealtimeFrom=start, SimNetLiq=liq)
+        dash = [x for x in out if x.startswith("D,")]
+        assert dash and ("CUSHION GUARD" in dash[-1]) == guarded, (liq, dash[-1])
+        if guarded:
+            assert "$800 above the floor" in dash[-1] and "strong breaks only" in dash[-1]

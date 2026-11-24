@@ -76,13 +76,14 @@ def test_pine_clean_band_news_days():
     guard = Guard()
     for i in range(len(days)):
         q = 3 if cum >= 3500 else 2 if cum >= 2000 else 1
+        guard.strong = False
         cap, ds = guard.day(cum, 3, 0.0) if i >= 21 else (3, 0.0)
         q = min(q, cap)
         if 2 <= spikes[i] < 3:
             continue
         if spikes[i] >= 6:
             q = min(q + 1, cap)
-        legs = (S.gap_go(days, i, 0.25, **GAP) if i >= 21 else []) + S.noise(days, i, 0.25, stop_slip=1, nt=True, tp_fill_bar=False, **DEFAULTS)
+        legs = (S.gap_go(days, i, 0.25, **GAP) if i >= 21 else []) + S.noise(days, i, 0.25, stop_slip=1, nt=True, tp_fill_bar=False, **{**DEFAULTS, "min_stretch": 1.5 if guard.strong else 0.0})
         day = 0.0
         ng = len(legs) - len([x for x in legs if x[1] > 1])  # the gap leg enters on bar 1, band entries later
         for n_, (side, eb, epx, xpx, _w, *_) in enumerate(legs):

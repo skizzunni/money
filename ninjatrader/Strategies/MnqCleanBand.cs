@@ -18,7 +18,8 @@
 // News days (the 08:30 volume against 08:20-08:29): NewsSkipFrom-NewsSkipTo x no trades; NewsBigAt x and up a contract
 // more. Account: no new entry once the day's closed P/L is down DayStop $; contracts by profit over the start balance
 // (1, 2 from Step2At, 3 from Step3At, never more than MaxContracts); the cushion guard: less than CushionGuard $ above the
-// trailing floor, 1 contract and a day stop of GuardDayStopShare x the cushion. research/zoo/strats.py (noise with nt=True, gap_go)
+// trailing floor, 1 contract and a day stop of GuardDayStopShare x the cushion; under GuardStrongOnlyBelow $, only band
+// entries GuardStrongOnlyStretch sigmas past the band (and the gap trade). research/zoo/strats.py (noise with nt=True, gap_go)
 // is the same rule in Python and tests/test_ninjatrader_clean.py holds the two to trade-for-trade agreement.
 #region Using declarations
 using System;
@@ -62,7 +63,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         bool newsSkip;
         // the cushion guard (docs/STRATEGY_SEARCH.md, 38): the trailing floor from the high-water mark, today's cap and day stop
         double hwm = double.NaN, cushion = double.NaN, dayStopToday;
-        bool guarded;
+        bool guarded, strongOnly, hwmLive;  // strongOnly: under GuardStrongOnlyBelow $ above the floor, only strong breaks (and the gap trade)
         int capToday = 3;
         readonly Dictionary<int, double> sigma = new Dictionary<int, double>();
 
@@ -117,6 +118,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 GuardDayStopShare = 0.25;
                 TrailingDrawdown = 2000;
                 HighestBalance = 0;
+                GuardStrongOnlyBelow = 1000;
+                GuardStrongOnlyStretch = 1.5;
             }
             else if (State == State.Realtime && today != null)
             {
@@ -256,11 +259,18 @@ namespace NinjaTrader.NinjaScript.Strategies
         void ApplyGuard(double prof)
         {
             double bal = StartBalance + prof;
-            if (double.IsNaN(hwm)) hwm = Math.Max(StartBalance, HighestBalance);
+            // the replay of the loaded history raises hwm with simulated profits; live, the floor comes from the real
+            // account: at the switch to real time start again from HighestBalance (or the start balance)
+            if (double.IsNaN(hwm) || (State == State.Realtime && !hwmLive))
+            {
+                hwm = Math.Max(StartBalance, HighestBalance);
+                hwmLive = State == State.Realtime;
+            }
             hwm = Math.Max(hwm, bal);
             double floor = Math.Min(hwm - TrailingDrawdown, StartBalance);
             cushion = bal - floor;
             guarded = CushionGuard > 0 && cushion < CushionGuard;
+            strongOnly = CushionGuard > 0 && GuardStrongOnlyBelow > 0 && cushion < GuardStrongOnlyBelow;  // CushionGuard 0: all off
             capToday = guarded ? 1 : MaxContracts;
             qty = Math.Min(qty, capToday);
             double ds = DayStop > 0 ? DayStop : double.MaxValue;
@@ -308,7 +318,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                          " | today $" + (CumProfit - dayCumStart).ToString("F0", CultureInfo.InvariantCulture) +
                          (dayStopToday > 0 && CumProfit - dayCumStart <= -dayStopToday ? " (day stop: done for today)" : "") +
                          (guarded ? " | CUSHION GUARD: $" + cushion.ToString("F0", CultureInfo.InvariantCulture) + " above the floor, 1 contract, day stop $" +
-                                    dayStopToday.ToString("F0", CultureInfo.InvariantCulture) : "") +
+                                    dayStopToday.ToString("F0", CultureInfo.InvariantCulture) + (strongOnly ? ", strong breaks only" : "") : "") +
                          " | news " + (!NewsDays ? "off" : double.IsNaN(newsSpike) ? "n/a (needs an ETH chart)" :
                                        newsSkip ? newsSpike.ToString("F1", CultureInfo.InvariantCulture) + "x: no trades today" :
                                        newsSpike.ToString("F1", CultureInfo.InvariantCulture) + "x" + (newsSpike >= NewsBigAt ? " (+1 contract)" : "")) +
@@ -422,6 +432,10 @@ namespace NinjaTrader.NinjaScript.Strategies
                 if ((want > 0 && posR < RangePos) || (want < 0 && posR > 1 - RangePos)) want = 0;
             }
             if (want == 0)
+                return;
+            // under GuardStrongOnlyBelow $ above the floor only a close GuardStrongOnlyStretch sigmas past the band enters
+            // (docs/STRATEGY_SEARCH.md 50: shuffled years lost 19.7% / 14.7% to 10.2% / 6.5% from $800-1,000 above it)
+            if (strongOnly && want * (Close[0] - (want > 0 ? up : dn)) < GuardStrongOnlyStretch * sg * (want > 0 ? Math.Max(dayOpen, prevClose) : Math.Min(dayOpen, prevClose)))
                 return;
             hardRef = Close[0] + want * tick;
             double hp = hardRef - want * HardStop / pv;
@@ -635,6 +649,16 @@ namespace NinjaTrader.NinjaScript.Strategies
         [NinjaScriptProperty]
         [Display(Name = "Gap trade (09:35-09:55)", Order = 1, GroupName = "5. Gap trade")]
         public bool GapLeg { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, 10000)]
+        [Display(Name = "Cushion guard: below this $ above the floor, only strong breaks and the gap trade (0 = off)", Order = 5, GroupName = "7. Cushion guard")]
+        public double GuardStrongOnlyBelow { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, 20)]
+        [Display(Name = "Cushion guard: a strong break is this many sigmas past the band", Order = 6, GroupName = "7. Cushion guard")]
+        public double GuardStrongOnlyStretch { get; set; }
 
         [NinjaScriptProperty]
         [Range(0, 100000)]

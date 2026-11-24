@@ -1,0 +1,29 @@
+shipped: $50,000: blown 6.3% med $16,632 | $48,806: blown 19.7% med $12,581 | $48,998: blown 14.7% med $13,616
+guarded: $150 MNQ stop: $50,000: blown 5.5% med $16,364 | $48,806: blown 16.3% med $12,758 | $48,998: blown 12.8% med $13,456
+guarded: $100 MNQ stop: $50,000: blown 5.9% med $15,251 | $48,806: blown 18.1% med $10,161 | $48,998: blown 14.0% med $11,412
+guarded: strong breaks + gap only: $50,000: blown 1.5% med $13,881 | $48,806: blown 6.2% med $6,791 | $48,998: blown 3.8% med $8,373
+guarded: 1 MNQ trade a day: $50,000: blown 4.9% med $13,804 | $48,806: blown 17.0% med $6,369 | $48,998: blown 12.6% med $7,751
+guarded: $150 stop + 1 trade a day: $50,000: blown 3.5% med $13,747 | $48,806: blown 12.7% med $5,885 | $48,998: blown 8.7% med $7,616
+guarded: strong >=1.5 + gap: $50,000: blown 1.5% med $13,881 | $48,806: blown 6.2% med $6,791 | $48,998: blown 3.8% med $8,373
+guarded: strong >=1.0 + gap: $50,000: blown 3.8% med $14,914 | $48,806: blown 12.9% med $8,572 | $48,998: blown 9.0% med $10,012
+guarded: strong >=2.0 + gap: $50,000: blown 1.4% med $12,756 | $48,806: blown 7.6% med $3,508 | $48,998: blown 4.3% med $4,512
+guarded: strong >=1.5 + gap + 1 MGC: $50,000: blown 1.9% med $14,123 | $48,806: blown 7.0% med $8,295 | $48,998: blown 4.8% med $9,358
+guard under $1,000: strong >=1.5 + gap: $50,000: blown 3.6% med $16,246 | $48,806: blown 9.7% med $11,462 | $48,998: blown 7.3% med $12,679
+guard under $2,000: strong >=1.5 + gap: $50,000: blown 0.4% med $6,853 | $48,806: blown 5.5% med $2,914 | $48,998: blown 3.1% med $2,905
+guarded: strong >=1.0 + gap + 1 MGC: $50,000: blown 3.7% med $15,132 | $48,806: blown 13.5% med $9,403 | $48,998: blown 8.9% med $10,705
+tiers: strongest only under $1,000, 1 contract under $1,500: $50,000: blown 2.5% med $15,973 | $48,806: blown 8.2% med $10,623 | $48,998: blown 5.4% med $11,988
+tiers: strongest only under $750, 1 contract under $1,500: $50,000: blown 3.0% med $16,631 | $48,806: blown 10.3% med $11,886 | $48,998: blown 7.9% med $13,036
+tiers: strongest only under $1,250, 1 contract under $1,500: $50,000: blown 1.8% med $15,153 | $48,806: blown 7.1% med $8,819 | $48,998: blown 4.5% med $10,408
+tiers + 1 MGC while guarded (under $1,000 / $1,500): $50,000: blown 2.9% med $16,013 | $48,806: blown 8.9% med $11,452 | $48,998: blown 6.2% med $12,254
+shipped: $50,000: blown 6.3% med $16,632 | $48,806: blown 19.7% med $12,581 | $48,998: blown 14.7% med $13,616
+exact: strongest only under $750: $50,000: blown 3.6% med $16,597 | $48,806: blown 12.2% med $11,797 | $48,998: blown 8.6% med $13,008
+exact: under $1,000: $50,000: blown 2.7% med $16,017 | $48,806: blown 10.2% med $10,655 | $48,998: blown 6.5% med $11,986
+exact: under $1,250: $50,000: blown 2.5% med $15,218 | $48,806: blown 8.8% med $8,881 | $48,998: blown 5.1% med $10,452
+shipped: $50,000: lost 0.0% med $16,251 p25 $11,745 | $48,806: lost 4.5% med $3,102 p25 $2,064 | $48,998: lost 0.9% med $3,468 p25 $2,349 | $49,500: lost 0.0% med $3,822 p25 $2,394
+shipped + strongest only under $1,000: $50,000: lost 0.0% med $15,023 p25 $8,824 | $48,806: lost 0.9% med $2,659 p25 $1,295 | $48,998: lost 0.0% med $2,766 p25 $1,488 | $49,500: lost 0.0% med $3,475 p25 $2,168
+shipped + strongest only under $750: $50,000: lost 0.0% med $16,154 p25 $11,688 | $48,806: lost 0.9% med $2,926 p25 $1,464 | $48,998: lost 0.9% med $3,232 p25 $2,130 | $49,500: lost 0.0% med $3,729 p25 $2,379
+shipped + strongest only under $1,250: $50,000: lost 0.0% med $13,477 p25 $7,011 | $48,806: lost 0.9% med $1,884 p25 $806 | $48,998: lost 0.0% med $2,228 p25 $944 | $49,500: lost 0.0% med $3,400 p25 $1,683
+shipped: $50,000: lost 0.0% med $16,251 p25 $11,745 | $48,806: lost 4.5% med $3,102 p25 $2,064 | $48,998: lost 0.9% med $3,468 p25 $2,349 | $49,500: lost 0.0% med $3,822 p25 $2,394
+shipped + strongest only under $1,000: $50,000: lost 0.0% med $15,213 p25 $10,135 | $48,806: lost 1.8% med $2,585 p25 $908 | $48,998: lost 0.0% med $2,679 p25 $1,488 | $49,500: lost 0.0% med $3,505 p25 $2,168
+shipped + strongest only under $750: $50,000: lost 0.0% med $16,154 p25 $11,688 | $48,806: lost 4.5% med $2,860 p25 $1,441 | $48,998: lost 0.9% med $3,232 p25 $2,029 | $49,500: lost 0.9% med $3,797 p25 $2,379
+shipped + strongest only under $1,250: $50,000: lost 0.0% med $13,650 p25 $6,324 | $48,806: lost 1.8% med $1,962 p25 $787 | $48,998: lost 0.0% med $2,252 p25 $870 | $49,500: lost 0.0% med $3,233 p25 $1,746

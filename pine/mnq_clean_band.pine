@@ -15,7 +15,8 @@
 //   * gap trade: a gap of 0.5x the 14-session average whose 09:30 bar moves its way by 3% of the average range, in at
 //     09:35, the stop at the 09:30 open (at most 30 points), out at 09:55;
 //   * news days (the 08:30 volume against 08:20-08:29): 2-3x no trades, 6x and up a contract more;
-//   * the cushion guard: under $1,500 above the trailing floor, 1 contract and a day stop of a quarter of the cushion.
+//   * the cushion guard: under $1,500 above the trailing floor, 1 contract and a day stop of a quarter of the cushion;
+//     under $1,000, only band entries 1.5 sigma past the band (and the gap trade).
 // margin_long / margin_short 0: a futures account posts margin, not the contract's full value. TradingView's default
 // (100% of the contract's value) refused every order once the size reached 2 MNQ (about $107K of contracts): the trades
 // stopped (the user's chart, 2026-11-24).
@@ -42,6 +43,8 @@ cushionGuard = input.float(1500, "Cushion guard: below this $ above the floor, 1
 guardShare = input.float(0.25, "Cushion guard: the day stop as this share of the cushion", minval = 0.05, maxval = 1, step = 0.05)
 trailDD = input.float(2000, "The account's trailing drawdown $", minval = 100)
 highestBal = input.float(0, "Highest end-of-day balance so far $ (0 = the start balance)", minval = 0)
+strongBelow = input.float(1000, "Cushion guard: below this $ above the floor, only strong breaks and the gap trade (0 = off)", minval = 0)
+strongStretch = input.float(1.5, "Cushion guard: a strong break is this many sigmas past the band", minval = 0, step = 0.25)
 maxQty = input.int(3, "Most contracts", minval = 1, maxval = 3)
 fixedQty = input.int(0, "Fixed contracts (0 = the profit steps; any other number trades that many from the start)", minval = 0, maxval = 50)
 stretchAdd = input.float(1.5, "One more contract when the entry closes this many sigmas past the band (0 = off)", minval = 0, step = 0.25)
@@ -91,6 +94,7 @@ var int qty = 1
 var float hwm = na          // the cushion guard: the high-water mark, today's cap and day stop
 var int capToday = 3
 var float dsToday = 0.0
+var bool strongOnly = false
 var bool gapToday = false
 var float dayStartNet = 0.0
 var int tradesToday = 0
@@ -188,6 +192,7 @@ if inRth and dayNum != tDay
         cush = bal - math.min(hwm - trailDD, strategy.initial_capital)
         guarded = cushionGuard > 0 and cush < cushionGuard
         capToday := guarded ? 1 : maxQty
+        strongOnly := cushionGuard > 0 and strongBelow > 0 and cush < strongBelow
         qty := math.min(qty, capToday)
         dsToday := guarded ? math.max(100, math.min(dayStop > 0 ? dayStop : 1e12, guardShare * cush)) : dayStop
         gapToday := gapLeg and (gapFrom <= 0 or prof >= gapFrom)
@@ -274,6 +279,8 @@ if inRth and ready
                     want := 0
                 if want != 0 and maxMove > 0 and endMin != 600 and want * (close - dayOpen) > maxMove * avgRange
                     want := 0
+                if want != 0 and strongOnly and want * (close - (want > 0 ? up : dn)) < strongStretch * sg * (want > 0 ? math.max(dayOpen, prevC) : math.min(dayOpen, prevC))
+                    want := 0   // the cushion guard's last tier: strong breaks only
                 posR = dHi > dLo ? (close - dLo) / (dHi - dLo) : 0.5
                 if want != 0 and rangePos > 0 and ((want > 0 and posR < rangePos) or (want < 0 and posR > 1 - rangePos))
                     want := 0

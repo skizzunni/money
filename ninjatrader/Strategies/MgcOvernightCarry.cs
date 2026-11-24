@@ -48,7 +48,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         DateTime stopGoneUtc = DateTime.MinValue;
         string status = "waiting for history";
         double hwm = double.NaN, cushion = double.NaN;  // the cushion guard (as MnqCleanBand's): no gold trade near the floor
-        bool guarded;
+        bool guarded, hwmLive;
 
         protected override void OnStateChange()
         {
@@ -150,7 +150,13 @@ namespace NinjaTrader.NinjaScript.Strategies
         void ApplyGuard(double prof)
         {
             double bal = StartBalance + prof;
-            if (double.IsNaN(hwm)) hwm = Math.Max(StartBalance, HighestBalance);
+            // the replay of the loaded history raises hwm with simulated profits; live, the floor comes from the real
+            // account: at the switch to real time start again from HighestBalance (or the start balance)
+            if (double.IsNaN(hwm) || (State == State.Realtime && !hwmLive))
+            {
+                hwm = Math.Max(StartBalance, HighestBalance);
+                hwmLive = State == State.Realtime;
+            }
             hwm = Math.Max(hwm, bal);
             cushion = bal - Math.Min(hwm - TrailingDrawdown, StartBalance);
             guarded = CushionGuard > 0 && cushion < CushionGuard;
