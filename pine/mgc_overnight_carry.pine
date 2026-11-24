@@ -8,7 +8,7 @@
 //     bar's close against the 08:20 open): in at the next open, the stop a tick past the 08:20 open;
 //   * out at the 13:25 bar's close (filled at 13:30; a gap in the bars: the first bar from 13:25 on); a trade still
 //     open when the next trading day starts (a holiday's early close) goes out on its first bar; one trade a day;
-//   * 1 / 2 / 3 contracts from +$0 / +$2,000 / +$3,500.
+//   * 1 / 2 / 3 contracts from +$0 / +$2,000 / +$3,500; no trade while under $1,500 above the trailing floor.
 // A session counts in the 14 only with at least 180 five-minute bars (a full gold session has 276).
 strategy("MGC Overnight Carry", overlay = true, initial_capital = 50000, default_qty_type = strategy.fixed,
      default_qty_value = 1, pyramiding = 0, margin_long = 0, margin_short = 0,
@@ -25,6 +25,9 @@ fixedQty = input.int(0, "Fixed contracts (0 = the profit steps)", minval = 0, ma
 step2 = input.float(2000, "2 contracts from this profit $", minval = 0)
 step3 = input.float(3500, "3 contracts from this profit $", minval = 0)
 startProfit = input.float(0, "Profit already made at the start $")
+cushionGuard = input.float(1500, "Cushion guard: no trade below this $ above the floor (0 = off)", minval = 0)
+trailDD = input.float(2000, "The account's trailing drawdown $", minval = 100)
+highestBal = input.float(0, "Highest end-of-day balance so far $ (0 = the start balance)", minval = 0)
 
 tk = syminfo.mintick
 tMin = hour(time, TZ) * 60 + minute(time, TZ)
@@ -41,6 +44,8 @@ var float dMove = na
 var bool traded = false
 var int qty = 1
 var int posDay = -1
+var float hwm = na
+var bool guarded = false
 
 if tDay != curDay
     if curDay >= 0 and dBars >= 180   // the session that ended: kept only when complete
@@ -56,6 +61,9 @@ if tDay != curDay
     traded := false
     prof = startProfit + strategy.netprofit
     qty := fixedQty > 0 ? fixedQty : math.min(prof >= step3 ? 3 : prof >= step2 ? 2 : 1, maxQty)
+    bal = strategy.initial_capital + prof   // the cushion guard: no trade under cushionGuard $ above the trailing floor
+    hwm := math.max(na(hwm) ? math.max(strategy.initial_capital, highestBal) : hwm, bal)
+    guarded := cushionGuard > 0 and bal - math.min(hwm - trailDD, strategy.initial_capital) < cushionGuard
 dBars += 1
 if tMin == openAt
     dOpen := open
@@ -68,7 +76,7 @@ if pos != 0 and posDay != tDay   // the session ended before the exit (a holiday
     strategy.close_all(comment = "Session end")
 else if pos != 0 and tMin >= exitAt - 5 and tMin < 1020
     strategy.close_all(comment = "Time exit")
-else if pos == 0 and tMin == openAt + confirm - 5 and not traded and not na(dMove) and array.size(moves) >= 14
+else if pos == 0 and tMin == openAt + confirm - 5 and not traded and not guarded and not na(dMove) and array.size(moves) >= 14
     float s = 0.0
     bool ok = true
     n = array.size(moves)

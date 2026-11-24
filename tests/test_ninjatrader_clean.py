@@ -77,14 +77,34 @@ def run_nt(sim, path: Path, **props) -> list:  # noqa: F811
     return [x.split(",")[1:] for x in r.stdout.splitlines() if x.startswith("T,")]
 
 
+class Guard:
+    """The cushion guard as MnqCleanBand.cs applies it at a ready day's start: the floor trails the highest day-start
+    balance by `dd` (stopping at the start balance); under `below` $ of cushion, 1 contract and a day stop of `share` x
+    the cushion ($100 at least, at most the day stop)."""
+
+    def __init__(self, below: float = 1500.0, share: float = 0.25, dd: float = 2000.0, highest: float = 0.0, base: float = 50000.0):
+        self.below, self.share, self.dd, self.base = below, share, dd, base
+        self.hwm = max(base, highest)
+
+    def day(self, profit: float, cap: int, day_stop: float) -> tuple[int, float]:
+        bal = self.base + profit
+        self.hwm = max(self.hwm, bal)
+        cushion = bal - min(self.hwm - self.dd, self.base)
+        if self.below and cushion < self.below:
+            return 1, max(100.0, min(day_stop or float("inf"), self.share * cushion))
+        return cap, day_stop
+
+
 def py_trades(days: list, idx: list, day_stop: float = 0.0, steps=None, gap_from: float | None = 0.0,
-              start: float = 0.0, gap: dict | None = None, max_q: int | None = None, add_at: float = 1.5, **p) -> list:
+              start: float = 0.0, gap: dict | None = None, max_q: int | None = None, add_at: float = 1.5,
+              guard: Guard | None = None, **p) -> list:
     """The reference trades as (direction, entry bar, entry, exit, contracts), with the account rules the C# applies:
     contracts by the profit at the day's start, the gap leg (first in the day) once the profit reaches gap_from, the day
     stop across both."""
     pos_of = {v: i for i, v in enumerate(idx)}
     cfg = {**DEFAULTS, **p}
     out, cum = [], start
+    guard = guard or Guard()
     for i in range(len(days)):
         q = 1
         if steps:
@@ -94,12 +114,16 @@ def py_trades(days: list, idx: list, day_stop: float = 0.0, steps=None, gap_from
         day = 0.0
         legs = []
         cap = max_q if max_q is not None else (3 if steps else 1)  # MaxContracts as the C# run sets it
+        ds = day_stop
+        if i >= max(21, cfg["trend"] + 1):  # the cushion guard on ready days
+            cap, ds = guard.day(cum, cap, day_stop)
+            q = min(q, cap)
         if gap_from is not None and (gap_from <= 0 or cum >= gap_from) and i >= max(21, cfg["trend"] + 1):
             legs += S.gap_go(days, i, 0.25, **(gap or GAP))
         ng = len(legs)
         legs += S.noise(days, i, 0.25, stop_slip=1, nt=True, **cfg)
         for n_, (side, eb, epx, xpx, _why, *_) in enumerate(legs):
-            if day_stop and day <= -day_stop:
+            if ds and day <= -ds:
                 break
             qq = q  # a band entry StretchAddAt sigmas past the band: one more contract, at most MaxContracts
             if n_ >= ng and add_at and S.band_stretch(days, i, side, eb, cfg["k"]) >= add_at:
@@ -313,10 +337,12 @@ def test_clean_band_fixed_contracts(sim, tmp_path):  # noqa: F811
     days = synthetic_days()
     path = tmp_path / "bars.csv"
     write_bars(days, path)
-    q = _qty(sim, path, FixedContracts=3, DayStop=0)
+    q = _qty(sim, path, FixedContracts=3, DayStop=0, CushionGuard=0)
     assert q and set(q) == {"3"}
-    one = [x.split(",")[1:6] for x in _run_all(sim, path, MaxContracts=1, DayStop=0) if x.startswith("T,")]
-    three = [x.split(",")[1:6] for x in _run_all(sim, path, FixedContracts=3, DayStop=0) if x.startswith("T,")]
+    guarded = _qty(sim, path, FixedContracts=3, DayStop=0)  # the cushion guard overrides it near the floor
+    assert set(guarded) == {"1", "3"}
+    one = [x.split(",")[1:6] for x in _run_all(sim, path, MaxContracts=1, DayStop=0, CushionGuard=0) if x.startswith("T,")]
+    three = [x.split(",")[1:6] for x in _run_all(sim, path, FixedContracts=3, DayStop=0, CushionGuard=0) if x.startswith("T,")]
     assert one == three
 
 
@@ -352,19 +378,23 @@ def test_clean_band_news_days(sim, tmp_path):  # noqa: F811
     out = _run_all(sim, path, DayStop=0, StartProfit=2500)
     tt = [x.split(",")[1:] for x in out if x.startswith("T,")]
     tn = [x.split(",")[1:] for x in out if x.startswith("TN,")]
-    ref, cum = [], 2500.0
+    ref, cum, guard = [], 2500.0, Guard()
     for i in range(len(days)):
         q = 2 if cum >= 2000 else 1
         q = 3 if cum >= 3500 else q
         day = 0.0
+        cap, ds = guard.day(cum, 3, 0.0) if i >= 21 else (3, 0.0)
+        q = min(q, cap)
         if 2 <= spikes[i] < 3:
             continue
         if spikes[i] >= 6:
-            q = min(q + 1, 3)
+            q = min(q + 1, cap)
         legs = (S.gap_go(days, i, 0.25, **GAP) if i >= 21 else []) + S.noise(days, i, 0.25, stop_slip=1, nt=True, **DEFAULTS)
         ng = len(legs) - len([x for x in legs if x[1] > 1])  # the gap leg enters on bar 1, band entries later
         for n_, (side, eb, epx, xpx, _w, *_) in enumerate(legs):
-            qq = min(q + 1, 3) if n_ >= ng and S.band_stretch(days, i, side, eb) >= 1.5 else q
+            if ds and day <= -ds:
+                break
+            qq = min(q + 1, cap) if n_ >= ng and S.band_stretch(days, i, side, eb) >= 1.5 else q
             day += ((xpx - epx) * side * 2.0 - 2 * 0.62) * qq
             ref.append((side, pos_of[(i, eb)], round(epx, 6), round(xpx, 6), qq))
         cum += day
@@ -376,3 +406,28 @@ def test_clean_band_news_days(sim, tmp_path):  # noqa: F811
     assert d and "news 8.0x (+1 contract)" in d[0] or "news 1.0x" in d[0] or "news 2.5x: no trades today" in d[0]
     off = _run_all(sim, path, DayStop=0, StartProfit=2500, NewsDays=False)
     assert len([x for x in off if x.startswith("T,")]) > len(tt)
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+@pytest.mark.parametrize("props,guard", [
+    ({"StartProfit": -1200}, Guard()),                              # $48,800: $800 above a $48,000 floor
+    ({"StartProfit": 0, "HighestBalance": 51000}, Guard(highest=51000)),  # the floor at $49,000: $1,000 above it
+])
+def test_clean_band_cushion_guard(sim, tmp_path, props, guard):  # noqa: F811
+    """Near the trailing floor: 1 contract (no strong-break or news contract) and a day stop of a quarter of the
+    cushion, trade for trade against the reference; the dashboard says so; off again once the cushion is back."""
+    days = fixture_days()
+    path = tmp_path / "bars.csv"
+    idx = write_bars(days, path)
+    out = _run_all(sim, path, DayStop=600, **props)
+    tt = [x.split(",")[1:] for x in out if x.startswith("T,")]
+    tn = [x.split(",")[1:] for x in out if x.startswith("TN,")]
+    got = [(int(t[0]), int(t[1]), round(float(t[2]), 6), round(float(t[4]), 6), int(n[1])) for t, n in zip(tt, tn, strict=True)]
+    ref = py_trades(days, idx, day_stop=600.0, steps=((0, 1), (2000, 2), (3500, 3)), start=float(props["StartProfit"]), guard=guard)
+    assert len(ref) > 20 and got == ref
+    assert got[0][4] == 1  # guarded from the first trade
+    off = py_trades(days, idx, day_stop=600.0, steps=((0, 1), (2000, 2), (3500, 3)), start=float(props["StartProfit"]),
+                    guard=Guard(below=0))
+    assert off != ref  # the guard changed the trades
+    d = [x for x in out if x.startswith("D,")]
+    assert d

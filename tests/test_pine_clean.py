@@ -9,7 +9,7 @@ from pathlib import Path
 
 import pandas as pd
 import pytest
-from test_ninjatrader_clean import GAP, S, fixture_days, py_trades
+from test_ninjatrader_clean import GAP, Guard, S, fixture_days, py_trades
 
 ROOT = Path(__file__).resolve().parents[1]
 PINE = ROOT / "pine" / "mnq_clean_band.pine"
@@ -73,17 +73,22 @@ def test_pine_clean_band_news_days():
     rt.run(lambda i, g: None)
     got = [(t["dir"], t["entry_bar"], round(t["entry"], 6), round(t["exit"], 6), t["qty"]) for t in rt.strategy.closed]
     ref, cum = [], 2500.0
+    guard = Guard()
     for i in range(len(days)):
         q = 3 if cum >= 3500 else 2 if cum >= 2000 else 1
+        cap, ds = guard.day(cum, 3, 0.0) if i >= 21 else (3, 0.0)
+        q = min(q, cap)
         if 2 <= spikes[i] < 3:
             continue
         if spikes[i] >= 6:
-            q = min(q + 1, 3)
+            q = min(q + 1, cap)
         legs = (S.gap_go(days, i, 0.25, **GAP) if i >= 21 else []) + S.noise(days, i, 0.25, stop_slip=1, nt=True, tp_fill_bar=False, **DEFAULTS)
         day = 0.0
         ng = len(legs) - len([x for x in legs if x[1] > 1])  # the gap leg enters on bar 1, band entries later
         for n_, (side, eb, epx, xpx, _w, *_) in enumerate(legs):
-            qq = min(q + 1, 3) if n_ >= ng and S.band_stretch(days, i, side, eb) >= 1.5 else q
+            if ds and day <= -ds:
+                break
+            qq = min(q + 1, cap) if n_ >= ng and S.band_stretch(days, i, side, eb) >= 1.5 else q
             day += ((xpx - epx) * side * 2.0 - 2 * 0.62) * qq
             ref.append((side, pos_of[(i, eb)], round(epx, 6), round(xpx, 6), qq))
         cum += day
@@ -112,3 +117,18 @@ def test_pine_clean_band_trades_through_holidays():
     rt.run(lambda i, g: None)
     entries = {idx[t["entry_bar"]][0] for t in rt.strategy.closed}
     assert not any(60 <= d < 72 for d in entries) and any(d >= 75 for d in entries)
+
+
+@pytest.mark.slow
+def test_pine_clean_band_cushion_guard():
+    """$800 above the floor ($48,800): the cushion guard as MnqCleanBand.cs applies it, trade for trade."""
+    pytest.importorskip("pynescript", reason="pip install pynescript to check the .pine files")
+    from pine_interpreter import PineRuntime, load_pine
+    days = fixture_days()
+    bars, idx = bars_of(days)
+    rt = PineRuntime(load_pine(PINE), bars, {"Profit already made at the start $": -1200}, timeframe_seconds=300)
+    rt.run(lambda i, g: None)
+    got = [(t["dir"], t["entry_bar"], round(t["entry"], 6), round(t["exit"], 6), t["qty"]) for t in rt.strategy.closed]
+    want = py_trades(days, idx, tp_fill_bar=False, day_stop=600.0, steps=((0, 1), (2000, 2), (3500, 3)), start=-1200.0)
+    assert len(want) > 20 and got == want and got[0][4] == 1
+    assert GAP and S

@@ -65,11 +65,17 @@ def run(sim, path: Path, **props) -> list:  # noqa: F811
     return r.stdout.splitlines()
 
 
-def py_trades(days: list, idx: list, steps=None, start: float = 0.0, max_q: int = 1) -> list:
-    """The reference: carry with the shipped settings, contracts by the profit at the day's start."""
+def py_trades(days: list, idx: list, steps=None, start: float = 0.0, max_q: int = 1, guard: float = 1500.0,
+              highest: float = 0.0) -> list:
+    """The reference: carry with the shipped settings, contracts by the profit at the day's start, no trade while the
+    balance is under `guard` $ above the floor (the highest day-start balance less $2,000, at most $50,000)."""
     pos_of = {v: i for i, v in enumerate(idx)}
-    out, cum = [], start
+    out, cum, hwm = [], start, max(50000.0, highest)
     for i in range(len(days)):
+        bal = 50000.0 + cum
+        hwm = max(hwm, bal)
+        if guard and bal - min(hwm - 2000.0, 50000.0) < guard:
+            continue
         q = 1
         for lim, qq in steps or ():
             if cum >= lim:
@@ -155,3 +161,19 @@ def test_gold_carry_not_ready_without_history(sim, tmp_path):  # noqa: F811
     lines = run(sim, path)
     assert not [x for x in lines if x.startswith("T,")]
     assert any("NOT READY" in x for x in lines if x.startswith("D,"))
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+def test_gold_carry_cushion_guard(sim, tmp_path):  # noqa: F811
+    """$800 above the floor ($48,800): no gold trade until the cushion is back to $1,500; trade for trade with the
+    reference; with the guard off it trades from the start."""
+    days = gold_days()
+    path = tmp_path / "gold.csv"
+    idx = write_gold(days, path)
+    lines = run(sim, path, MaxContracts=1, StartProfit=-1200)
+    got, ref = got_trades(lines), py_trades(days, idx, start=-1200.0)
+    assert got == ref
+    free = got_trades(run(sim, path, MaxContracts=1, StartProfit=-1200, CushionGuard=0))
+    assert free == py_trades(days, idx, start=-1200.0, guard=0)
+    assert len(free) > len(got)
+    assert any("CUSHION GUARD" in x for x in lines if x.startswith("D,")) or not got

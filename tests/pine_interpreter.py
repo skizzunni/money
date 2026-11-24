@@ -594,7 +594,11 @@ class StrategyEmulator:
         self.closed: list[dict] = []
         self.orders: list[dict] = []
 
+    initial_capital = 1000000.0  # TradingView's default; the strategy(...) declaration's initial_capital replaces it
+
     def __call__(self, *args, **kwargs):  # the strategy(...) declaration
+        if "initial_capital" in kwargs:
+            self.initial_capital = float(kwargs["initial_capital"])
         return None
 
     # ---- read-only state the script uses

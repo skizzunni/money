@@ -17,7 +17,8 @@
 // range; in at 09:35, the stop at the 09:30 open (at most GapCap points), out at 09:55.
 // News days (the 08:30 volume against 08:20-08:29): NewsSkipFrom-NewsSkipTo x no trades; NewsBigAt x and up a contract
 // more. Account: no new entry once the day's closed P/L is down DayStop $; contracts by profit over the start balance
-// (1, 2 from Step2At, 3 from Step3At, never more than MaxContracts). research/zoo/strats.py (noise with nt=True, gap_go)
+// (1, 2 from Step2At, 3 from Step3At, never more than MaxContracts); the cushion guard: less than CushionGuard $ above the
+// trailing floor, 1 contract and a day stop of GuardDayStopShare x the cushion. research/zoo/strats.py (noise with nt=True, gap_go)
 // is the same rule in Python and tests/test_ninjatrader_clean.py holds the two to trade-for-trade agreement.
 #region Using declarations
 using System;
@@ -59,6 +60,10 @@ namespace NinjaTrader.NinjaScript.Strategies
         double preVol, atVol, newsSpike = double.NaN;
         int preBars;
         bool newsSkip;
+        // the cushion guard (docs/STRATEGY_SEARCH.md, 38): the trailing floor from the high-water mark, today's cap and day stop
+        double hwm = double.NaN, cushion = double.NaN, dayStopToday;
+        bool guarded;
+        int capToday = 3;
         readonly Dictionary<int, double> sigma = new Dictionary<int, double>();
 
         protected override void OnStateChange()
@@ -108,6 +113,10 @@ namespace NinjaTrader.NinjaScript.Strategies
                 NewsBigAt = 6;
                 NewsSkipFrom = 2;
                 NewsSkipTo = 3;
+                CushionGuard = 1500;
+                GuardDayStopShare = 0.25;
+                TrailingDrawdown = 2000;
+                HighestBalance = 0;
             }
             else if (State == State.Realtime && today != null)
             {
@@ -117,6 +126,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 qty = Contracts(prof);
                 early = EarlyMaxTrades > 0 && prof < EarlyCushion;
                 gapToday = GapLeg && (GapFrom <= 0 || prof >= GapFrom) && ready;
+                ApplyGuard(prof);
                 ApplyNews();
                 Print("Clean band live: profit over the start balance $" + prof.ToString("F0", CultureInfo.InvariantCulture) + ", " + qty +
                       " MNQ a trade, gap trade " + (gapToday ? "on" : "off") + (ready ? "" : " - NOT READY (history)"));
@@ -232,10 +242,29 @@ namespace NinjaTrader.NinjaScript.Strategies
             }
             double prof = Profit();
             qty = Contracts(prof);
+            ApplyGuard(prof);
             early = EarlyMaxTrades > 0 && prof < EarlyCushion;  // decided at the day's start
             gapToday = GapLeg && (GapFrom <= 0 || prof >= GapFrom);  // GapFrom 0: always; else once the account has that cushion
             newsSpike = preDate == date && preBars == 2 && preVol > 0 && !double.IsNaN(atVol) ? atVol / (preVol / 2) : double.NaN;
             ApplyNews();
+        }
+
+        // the cushion guard, at the day's start: the floor trails the highest end-of-day balance (HighestBalance, then the
+        // balance at each day's start) by TrailingDrawdown and stops at StartBalance; with less than CushionGuard $ above it,
+        // 1 contract (no strong-break or news contract) and a day stop of GuardDayStopShare x the cushion ($100 at least).
+        // 2015-2025 NQ: accounts started $1,000-1,200 above the floor lose 1-5% of 6-month runs, not 7-16%
+        void ApplyGuard(double prof)
+        {
+            double bal = StartBalance + prof;
+            if (double.IsNaN(hwm)) hwm = Math.Max(StartBalance, HighestBalance);
+            hwm = Math.Max(hwm, bal);
+            double floor = Math.Min(hwm - TrailingDrawdown, StartBalance);
+            cushion = bal - floor;
+            guarded = CushionGuard > 0 && cushion < CushionGuard;
+            capToday = guarded ? 1 : MaxContracts;
+            qty = Math.Min(qty, capToday);
+            double ds = DayStop > 0 ? DayStop : double.MaxValue;
+            dayStopToday = guarded ? Math.Max(100, Math.Min(ds, GuardDayStopShare * cushion)) : DayStop;
         }
 
         // a mild-news day (spike in [NewsSkipFrom, NewsSkipTo)): no trades; a big-news day (>= NewsBigAt): a contract more,
@@ -248,7 +277,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (newsSpike >= NewsSkipFrom && newsSpike < NewsSkipTo)
                 newsSkip = true;
             else if (newsSpike >= NewsBigAt && FixedContracts == 0)
-                qty = Math.Min(qty + 1, MaxContracts);
+                qty = Math.Min(qty + 1, capToday);
         }
 
         protected override void OnBarUpdate()
@@ -277,7 +306,9 @@ namespace NinjaTrader.NinjaScript.Strategies
             string txt = "MNQ Clean Noise-Band | Setup: " + setup +
                          " | " + qty + " MNQ a trade, gap trade " + (gapToday ? "on" : "off") +
                          " | today $" + (CumProfit - dayCumStart).ToString("F0", CultureInfo.InvariantCulture) +
-                         (DayStop > 0 && CumProfit - dayCumStart <= -DayStop ? " (day stop: done for today)" : "") +
+                         (dayStopToday > 0 && CumProfit - dayCumStart <= -dayStopToday ? " (day stop: done for today)" : "") +
+                         (guarded ? " | CUSHION GUARD: $" + cushion.ToString("F0", CultureInfo.InvariantCulture) + " above the floor, 1 contract, day stop $" +
+                                    dayStopToday.ToString("F0", CultureInfo.InvariantCulture) : "") +
                          " | news " + (!NewsDays ? "off" : double.IsNaN(newsSpike) ? "n/a (needs an ETH chart)" :
                                        newsSkip ? newsSpike.ToString("F1", CultureInfo.InvariantCulture) + "x: no trades today" :
                                        newsSpike.ToString("F1", CultureInfo.InvariantCulture) + "x" + (newsSpike >= NewsBigAt ? " (+1 contract)" : "")) +
@@ -376,7 +407,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             }
             if (mp != 0 || end > LastEntry || mm >= 950 || tradesToday >= MaxTradesPerDay || !PlaceOrders)
                 return;
-            if (DayStop > 0 && CumProfit - dayCumStart <= -DayStop)
+            if (dayStopToday > 0 && CumProfit - dayCumStart <= -dayStopToday)
                 return;
             if (early && tradesToday >= EarlyMaxTrades)
                 return;
@@ -407,7 +438,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             // FixedContracts). Those entries win 65-74% on 2015-2025 NQ, PF 2.1-2.8 (docs/STRATEGY_SEARCH.md, 30)
             double refPx = want > 0 ? Math.Max(dayOpen, prevClose) : Math.Min(dayOpen, prevClose);
             double stretch = want * (Close[0] - (want > 0 ? up : dn)) / (sg * refPx);
-            int q = StretchAddAt > 0 && FixedContracts <= 0 && sg > 0 && stretch >= StretchAddAt ? Math.Min(qty + 1, MaxContracts) : qty;
+            int q = StretchAddAt > 0 && FixedContracts <= 0 && sg > 0 && stretch >= StretchAddAt ? Math.Min(qty + 1, capToday) : qty;
             if (want > 0) EnterLong(q, name); else EnterShort(q, name);
             tradesToday++;
             Print(Time[0] + "  Clean band: " + (want > 0 ? "long " : "short ") + q + " MNQ" + (q > qty ? " (a strong break: +1)" : "") +
@@ -580,6 +611,26 @@ namespace NinjaTrader.NinjaScript.Strategies
         [Range(0, 100)]
         [Display(Name = "Mild news: ... up to this spike (x)", Order = 4, GroupName = "6. News")]
         public double NewsSkipTo { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, 10000)]
+        [Display(Name = "Cushion guard: below this $ above the floor, 1 contract and a smaller day stop (0 = off)", Order = 1, GroupName = "7. Cushion guard")]
+        public double CushionGuard { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0.05, 1)]
+        [Display(Name = "Cushion guard: the day stop as this share of the cushion", Order = 2, GroupName = "7. Cushion guard")]
+        public double GuardDayStopShare { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(100, 100000)]
+        [Display(Name = "The account's trailing drawdown $", Order = 3, GroupName = "7. Cushion guard")]
+        public double TrailingDrawdown { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, 10000000)]
+        [Display(Name = "Highest end-of-day balance so far $ (from the prop firm's dashboard; 0 = the start balance)", Order = 4, GroupName = "7. Cushion guard")]
+        public double HighestBalance { get; set; }
 
         [NinjaScriptProperty]
         [Display(Name = "Gap trade (09:35-09:55)", Order = 1, GroupName = "5. Gap trade")]

@@ -58,3 +58,13 @@ def test_pine_gold_carry_on_real_gold():
     want = py_trades(days, idx)
     assert len(want) >= 10
     assert got == want
+
+
+@pytest.mark.slow
+def test_pine_gold_carry_cushion_guard():
+    days = synthetic_gold()
+    got, idx = run(days, {"Most contracts": 1, "Profit already made at the start $": -1200})
+    assert got == py_trades(days, idx, start=-1200.0)
+    free, _ = run(days, {"Most contracts": 1, "Profit already made at the start $": -1200,
+                         "Cushion guard: no trade below this $ above the floor (0 = off)": 0})
+    assert free == py_trades(days, idx, start=-1200.0, guard=0) and len(free) > len(got)

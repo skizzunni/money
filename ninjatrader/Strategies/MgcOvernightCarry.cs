@@ -11,7 +11,8 @@
 //     trade still open when the next trading day starts (a holiday's early close) goes out on its first bar; one trade
 //     a day at most.
 // Size: as MnqCleanBand, by the account's profit over its start balance (1, 2 from Step2At, 3 from Step3At, at most
-// MaxContracts; FixedContracts overrides). research/zoo/mk_search.py carry is the same rule in Python and
+// MaxContracts; FixedContracts overrides); no trade while the account is under CushionGuard $ above its trailing floor.
+// research/zoo/mk_search.py carry is the same rule in Python and
 // tests/test_ninjatrader_gold.py holds the two to trade-for-trade agreement on the NinjaTrader stand-in.
 #region Using declarations
 using System;
@@ -46,6 +47,8 @@ namespace NinjaTrader.NinjaScript.Strategies
         bool tradedToday, entryPending, exiting, stopGone;
         DateTime stopGoneUtc = DateTime.MinValue;
         string status = "waiting for history";
+        double hwm = double.NaN, cushion = double.NaN;  // the cushion guard (as MnqCleanBand's): no gold trade near the floor
+        bool guarded;
 
         protected override void OnStateChange()
         {
@@ -73,6 +76,9 @@ namespace NinjaTrader.NinjaScript.Strategies
                 StartProfit = 0;
                 UseAccountBalanceLive = true;
                 PlaceOrders = true;
+                CushionGuard = 1500;
+                TrailingDrawdown = 2000;
+                HighestBalance = 0;
             }
             else if (State == State.DataLoaded)
             {
@@ -85,6 +91,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             else if (State == State.Realtime)
             {
                 qty = Contracts(Profit());  // enabled mid-session: the size from the account, not the replayed history
+                ApplyGuard(Profit());
                 Print("Gold carry live: " + qty + " MGC a trade");
             }
         }
@@ -132,6 +139,19 @@ namespace NinjaTrader.NinjaScript.Strategies
             today.Date = date;
             tradedToday = false;
             qty = Contracts(Profit());
+            ApplyGuard(Profit());
+        }
+
+        // the floor trails the highest end-of-day balance (HighestBalance, then the balance at each day's start) by
+        // TrailingDrawdown and stops at StartBalance; under CushionGuard $ above it: no gold trade that day (with MNQ on the
+        // same account, 2015 - Mar 2025: the safest of the guard's versions, docs/STRATEGY_SEARCH.md 38)
+        void ApplyGuard(double prof)
+        {
+            double bal = StartBalance + prof;
+            if (double.IsNaN(hwm)) hwm = Math.Max(StartBalance, HighestBalance);
+            hwm = Math.Max(hwm, bal);
+            cushion = bal - Math.Min(hwm - TrailingDrawdown, StartBalance);
+            guarded = CushionGuard > 0 && cushion < CushionGuard;
         }
 
         protected override void OnBarUpdate()
@@ -193,6 +213,11 @@ namespace NinjaTrader.NinjaScript.Strategies
             }
             if (mm != OpenAt + ConfirmMinutes - 5 || mp != 0 || tradedToday || !PlaceOrders)
                 return;
+            if (guarded)
+            {
+                status = "CUSHION GUARD: $" + cushion.ToString("F0", CultureInfo.InvariantCulture) + " above the floor - no gold trade today";
+                return;
+            }
             if (hist.Count < 14 || double.IsNaN(today.Move))
             {
                 status = hist.Count < 14 ? "NOT READY: " + hist.Count + " complete sessions, needs 14 (load 30 days)" : "no move today";
@@ -313,6 +338,21 @@ namespace NinjaTrader.NinjaScript.Strategies
         [Range(0, 100000)]
         [Display(Name = "3 contracts from this profit $", Order = 4, GroupName = "2. Size")]
         public double Step3At { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, 10000)]
+        [Display(Name = "Cushion guard: no trade below this $ above the floor (0 = off)", Order = 1, GroupName = "4. Cushion guard")]
+        public double CushionGuard { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(100, 100000)]
+        [Display(Name = "The account's trailing drawdown $", Order = 2, GroupName = "4. Cushion guard")]
+        public double TrailingDrawdown { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(0, 10000000)]
+        [Display(Name = "Highest end-of-day balance so far $ (from the prop firm's dashboard; 0 = the start balance)", Order = 3, GroupName = "4. Cushion guard")]
+        public double HighestBalance { get; set; }
 
         [NinjaScriptProperty]
         [Range(0, 10000000)]

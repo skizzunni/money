@@ -370,6 +370,21 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    2011) exits on the first bar from 13:25 on. No live gold months here (the data ends Mar 2025): check it in
    TradingView on MGC1! before trusting it.
 
+38. **The cushion guard** (2026-11-24; the user's accounts sat $800-1,000 above their floors; `verification/zoo/
+   stage32_cushion_guard.txt`). Every test before started with the full $2,000 above the floor. From $1,000-1,200 above
+   it the shipped rules lose far more (6-month runs on 2015-2025 NQ, a $48,000 floor): MNQ + gold from $48,806 16.1%,
+   from $48,998 7.1%, from $49,500 1.8%. The guard, at each day's start: the floor trails the highest end-of-day balance
+   by $2,000 (stopping at the start balance); under $1,500 above it, 1 contract (no strong-break or news contract), a
+   day stop of a quarter of the cushion ($100 at least) and no gold trade; normal again once the cushion is back. With
+   it: 4.5% / 0.9% / 0.0%; fresh 50K starts still 0 lost, median $17,062 to $16,078 (MNQ alone $16,582 to $14,835:
+   the guard also acts after a fresh account's early losses). Tried: triggers $1,000 / $1,250 (fresh median $16,817 /
+   $16,221, but $49,500 starts 1.8% / 0.0%), a guard held on until $2,000 (lower medians, no fewer lost), a fixed $150-250
+   day stop (2.7% / 2.7% at $200, fresh median lower). Shipped at $1,500 (`CushionGuard`, `GuardDayStopShare`,
+   `TrailingDrawdown`, `HighestBalance`; NinjaTrader and Pine, MNQ and gold). NinjaTrader cannot see the prop firm's
+   floor: "Highest end-of-day balance so far" is copied from its dashboard, then the strategy raises it from each day's
+   starting balance. It overrides FixedContracts near the floor (CushionGuard 0 turns it off). Tests: trade for trade
+   with the reference from $800 above the floor and with a higher high-water mark, MNQ and gold, NinjaTrader and Pine.
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-33; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |
@@ -429,8 +444,12 @@ NinjaTrader 8, on each funded account (both the same way):
    news status. New > NinjaScript Output shows the settings line and every order. NOT READY: raise Days to load. NO
    TRADING: right-click the chart > Reload All Historical Data.
 6. Leave NinjaTrader running through the session (09:30-16:00 New York); the strategy is flat by 15:55 every day.
-7. **Before Monday Nov 30** install this version: the older one would block that day (the holiday guard, section 27).
-8. **Gold (optional, section 37):** copy `ninjatrader/Strategies/MgcOvernightCarry.cs` to the same folder, F5. Open an
+7. **The cushion guard (section 38):** in group "7. Cushion guard" set "Highest end-of-day balance so far" to the
+   highest end-of-day balance the prop firm's dashboard shows (0 if the account never closed a day above its start
+   balance) and the trailing drawdown ($2,000 for the 50K); the same two numbers in MgcOvernightCarry. The chart then
+   says CUSHION GUARD whenever the account is within $1,500 of its floor.
+8. **Before Monday Nov 30** install this version: the older one would block that day (the holiday guard, section 27).
+9. **Gold (optional, section 37):** copy `ninjatrader/Strategies/MgcOvernightCarry.cs` to the same folder, F5. Open an
    **MGC** 5-minute chart (front month, e.g. MGC 02-27; trading hours **CME/COMEX metals ETH**, the overnight session
    is needed), Days to load **30**. Right-click > Strategies > **MgcOvernightCarry** > the same funded account,
    defaults, Enabled. The top-right corner says OK once 14 complete sessions are loaded. It trades at most once a day
