@@ -199,6 +199,12 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    falls (3.07 to 1.96-2.48); the loosest, the only one trading Nov 10-12, lost there (4 trades, -$96). 2.5x loses none
    but its neighbour loses 6.7%. The trend filter stays.
 
+25. **Done after a target?** (2026-11-24, Nov 13's re-entries after its 10:00 target: 6 more shorts, -$252;
+   `after_target`, `verification/zoo/stage19_after_target.txt`). No more trades that day (or that direction) after a
+   target: median $15,275 to $12,944, live per year $12,246 to $8,433 (Nov 20's second and third targets go). Not used.
+   TradingView on the user's chart with the shipped rules (Aug 27 - Nov 23 2026): +$5,253, 46 trades, 39% winners,
+   PF 3.48, max drawdown $1,084.
+
 ## The result (the shipped defaults, research numbers, 2 ticks of stop slippage, $0.62 a side)
 
 | set | band trades | win | PF | band net (1 MNQ) | gap trades (PF, net) | 50K starts lost | median 12 months |
