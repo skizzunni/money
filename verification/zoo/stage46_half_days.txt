@@ -1,0 +1,55 @@
+Stage 46 (2026-11-24): half days (the CME index futures' 13:15 early close: the Friday after Thanksgiving, Christmas Eve)
+
+The finding (research/stress/torture.py, "half days": sessions cut at 13:15 with a trade open): a band trade still open
+at the cut was held into the next session (overnight 1, both runs). On a real half day the next bar is Sunday evening:
+the trade would have carried over a weekend, protected only by NinjaTrader's session-close exit (which depends on the
+trading-hours template listing the early close).
+
+The fix, MnqCleanBand.cs and MgcOvernightCarry.cs (three layers):
+  1. the session's actual end from the trading-hours template (SessionIterator.ActualSessionEnd, as MnqMomentumC.cs
+     FlatBy): out 5 minutes before it when that is before the usual exit (13:15: out at the 13:10 open; COMEX's 13:45:
+     at the 13:40 open); no new MNQ entry from then on;
+  2. the calendar, whatever the template says: the Friday after Thanksgiving (Nov 23-29) and Dec 24: out by the 13:10
+     open;
+  3. the backstop: a trade still open outside regular hours, or when a new session starts, goes out on the next bar.
+The Pine scripts have 2 and 3 (TradingView has no early-close calendar).
+
+A bug the new tests caught before it shipped: the calendar's 13:10 was first written 1310 (it is minutes from midnight:
+790), which left the exit at 15:55. Fixed; the calendar test fails without the fix.
+
+Tests (each fails without its fix, passes with it):
+  tests/test_ninjatrader_clean.py test_clean_band_half_day_never_holds_overnight [template, calendar, rth, eth]
+  tests/test_ninjatrader_gold.py  test_gold_carry_out_before_an_early_close [template, calendar]
+  tests/test_pine_clean.py        test_pine_clean_band_half_day_never_holds_overnight [calendar, rth, eth]
+  tests/test_pine_gold.py         test_pine_gold_carry_out_by_13_10_on_a_half_day
+  (tests/pine_interpreter.py: dayofweek() and dayofweek.* added, Sunday 1 .. Saturday 7 as Pine)
+
+torture.py after the fix (the stand-in does not model NinjaTrader's session-close exit):
+  half days, template (the early close listed, as NinjaTrader's templates do): PASS, overnight 0, both runs
+  half days (an early close on a date neither the template nor the calendar knows): overnight 1, both runs: the
+    backstop, out at the next session's 09:35 open; the only case left, and it needs a wrong template on a date that
+    is not a CME half day
+  the other 20 runs: PASS as before
+
+Half days in the research: the day sets keep complete sessions only (76 bars), so 2015-2025 never traded one. Built
+from the raw 5-minute NQ (nq5m_scaled.pkl, 09:30-13:15), each with its prior complete sessions as history, the shipped
+band and gap rules (1 contract, $0.62 a side):
+          date  bars   leg  side  entry     why     usd
+    2017-11-24    45  band     1    690    exit   -6.74
+    2018-12-24    45  band    -1    600    stop -202.24
+    2018-12-24    45  band    -1    780    time  181.76
+    2019-11-29    45   gap    -1    575    stop  -26.74
+    2020-11-27    45   gap     1    575    stop  -61.74
+    2020-11-27    45  band     1    630    stop    1.76
+    2020-11-27    45  band     1    660    stop -108.74
+    2020-12-24    45  band     1    600    stop  -22.74
+    2020-12-24    45  band     1    630    stop  -44.24
+    2021-11-26    45  band    -1    630  target  498.76
+    2021-11-26    45  band    -1    690    stop -201.24
+    2021-11-26    45  band    -1    780    time   -9.74
+    2022-11-25    45   gap    -1    575    stop  -59.24
+    2024-11-29    45  band     1    600    time  228.76
+    2024-12-24    45  band     1    600    stop  145.26
+    2024-12-24    45  band     1    780    time   40.26
+  16 trades in 10.5 years, +$353, 38% won, PF 1.48 (entry = the fill bar's start, minutes from midnight): too few to
+  tune; positive, so half days trade as any day, out by 13:10.

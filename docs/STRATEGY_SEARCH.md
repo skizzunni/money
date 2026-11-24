@@ -508,6 +508,20 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    not used. The floor: the prop firm trails it from end-of-day balances, and the guard's high-water mark is each day's
    starting balance (the last end of day), so it matches.
 
+52. **Half days: never held over the weekend** (2026-11-24; `verification/zoo/stage46_half_days.txt`). The torture
+   script cut sessions at 13:15 (the Friday after Thanksgiving, Christmas Eve) with a trade open: it was held into the
+   next session, which on a real half day is Sunday evening, with only NinjaTrader's session-close exit in the way.
+   Now, MNQ and gold: out 5 minutes before the session's end from the trading-hours template (13:15: the 13:10 open;
+   COMEX's 13:45: the 13:40 open), by 13:10 on those two dates whatever the template says, and a trade still open after
+   any other early close goes out on the next bar (Pine: the calendar and the next bar). Each case has a test that
+   fails without it. Half days were never in the research (complete sessions only); from the raw 2015-2025 NQ: 16
+   trades, +$353 at 1 contract, PF 1.48: they trade as any day.
+
+53. **One contract off early** (2026-11-24, a research round; `research/zoo/scale_out.py`,
+   `verification/zoo/stage47_scale_out.txt`). With 2-3 contracts, one off at 0.5-2x the $200 stop, the rest as shipped:
+   median $16,582 to $13,426-15,744, 25th percentile $11,321 to $8,527-11,558, the TradingView window $9,796 to
+   $6,948-8,524; none lost either way. Rejected: the early contract is cut from the trades that reach 2.5x.
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-33; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |

@@ -133,3 +133,64 @@ def test_pine_clean_band_cushion_guard():
     want = py_trades(days, idx, tp_fill_bar=False, day_stop=600.0, steps=((0, 1), (2000, 2), (3500, 3)), start=-1200.0)
     assert len(want) > 20 and got == want and got[0][4] == 1
     assert GAP and S
+
+
+@pytest.mark.slow
+@pytest.mark.parametrize("eth,calendar", [(False, True), (False, False), (True, False)])
+def test_pine_clean_band_half_day_never_holds_overnight(eth, calendar):
+    """As the NinjaTrader test: the Friday after Thanksgiving (calendar): out at the 13:10 open; sessions cut at 13:15 on
+    other dates with a trade open go out on the next bar (an ETH chart: the open after the first bar past the cut; a
+    regular-hours chart: the 09:35 open), never into the next session's trading."""
+    pytest.importorskip("pynescript", reason="pip install pynescript to check the .pine files")
+    from pine_interpreter import PineRuntime, load_pine
+    from test_ninjatrader_clean import synthetic_days
+    one = {"Most contracts": 1, "Day stop: no new entry once the day is down $ (0 = off)": 0}
+    days = synthetic_days()
+    bars, idx = bars_of(days)
+    rt = PineRuntime(load_pine(PINE), bars, one, timeframe_seconds=300)
+    rt.run(lambda i, g: None)
+    cut = 45
+    halves = sorted({idx[t["entry_bar"]][0] for t in rt.strategy.closed if idx[t["entry_bar"]][1] < cut <= idx[t["exit_bar"]][1]
+                     and idx[t["exit_bar"]][0] == idx[t["entry_bar"]][0] and idx[t["entry_bar"]][0] >= 25})[:4]
+    assert len(halves) >= 2
+    if calendar:  # the same sessions, dated so the first half day is 2026-11-27
+        halves = halves[:1]
+        start = pd.Timestamp("2026-11-27") - pd.offsets.BDay(halves[0])
+        for d, when in zip(days, pd.bdate_range(start, periods=len(days)), strict=True):
+            d["d"] = when.date()
+    for i in halves:
+        for k in ("o", "h", "l", "c", "v", "mm"):
+            days[i][k] = days[i][k][:cut]
+    bars, idx = bars_of(days)
+    if eth:  # the half day's evening bars (18:00 - 18:25), flat at its last close
+        extra = []
+        for i in halves:
+            px = float(days[i]["c"][-1])
+            for j in range(6):
+                t = pd.Timestamp(days[i]["d"]) + pd.Timedelta(hours=18, minutes=5 * j)
+                extra.append((t.tz_localize("America/New_York"), px, px, px, px, 10.0, (i, 100 + j)))
+        add = pd.DataFrame([e[:6] for e in extra], columns=["t", "open", "high", "low", "close", "volume"]).set_index("t")
+        both = pd.concat([bars.assign(k=range(len(bars))), add.assign(k=range(len(bars), len(bars) + len(add)))]).sort_index()
+        idx = [(idx + [e[6] for e in extra])[k] for k in both["k"]]
+        bars = both.drop(columns="k")
+    rt = PineRuntime(load_pine(PINE), bars, one, timeframe_seconds=300)
+    rt.run(lambda i, g: None)
+    if calendar:
+        i = halves[0]
+        last = [t for t in rt.strategy.closed if idx[t["entry_bar"]][0] == i
+                and not (idx[t["exit_bar"]][0] == i and idx[t["exit_bar"]][1] < cut - 1)]
+        assert [(idx[t["exit_bar"]], t["reason"]) for t in last] == [((i, cut - 1), "Session end")], last
+        assert all(idx[t["entry_bar"]][0] == idx[t["exit_bar"]][0] for t in rt.strategy.closed)
+        return
+    for i in halves:
+        held = [t for t in rt.strategy.closed if idx[t["entry_bar"]][0] == i
+                and not (idx[t["exit_bar"]][0] == i and idx[t["exit_bar"]][1] < cut)]
+        assert len(held) == 1, (i, held)
+        d1, k1 = idx[held[0]["exit_bar"]]
+        if eth:
+            assert (d1, k1) == (i, 101), (i, d1, k1)
+        else:
+            assert (d1, k1) in ((i + 1, 1), (i + 1, 0)), (i, d1, k1)  # out at 09:35 (or the stop, gapped through at 09:30)
+    for t in rt.strategy.closed:
+        (d0, _), (d1, k1) = idx[t["entry_bar"]], idx[t["exit_bar"]]
+        assert d1 == d0 or (d1 == d0 + 1 and k1 <= 1 and d0 in halves), (d0, d1, k1)

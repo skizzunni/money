@@ -515,6 +515,9 @@ class PineRuntime:
             "year": part("year"),
             "month": part("month"),
             "dayofmonth": part("day"),
+            # Pine's day numbers: Sunday 1 .. Saturday 7
+            "dayofweek": Namespace("dayofweek", call=lambda t, tz: (rt._ny(t, tz).weekday() + 1) % 7 + 1,
+                                   sunday=1, monday=2, tuesday=3, wednesday=4, thursday=5, friday=6, saturday=7),
             "input": Namespace("input", int=self._input, float=self._input, bool=self._input,
                                string=self._input, session=self._input),
             "math": Namespace("math", max=nmax, min=nmin, floor=floor, ceil=ceil, abs=abs,

@@ -1,3 +1,4 @@
+# ruff: noqa: E501
 """Market-specific intraday setups for gold and crude (2026-11-24, the user: "if you can't trade MNQ, trade other
 stuff; the same strategy is not going to work on all"). Minute bars from zoo/mk_full.py (minutes from 18:00 New York:
 08:00 = 840, 08:20 = 860, 08:30 = 870, 09:00 = 900, 10:30 = 990, 13:30 = 1170, 14:30 = 1230, 16:00 = 1320). Every trade:

@@ -457,3 +457,76 @@ def test_clean_band_guard_live_floor_from_the_account(sim, tmp_path):  # noqa: F
         assert dash and ("CUSHION GUARD" in dash[-1]) == guarded, (liq, dash[-1])
         if guarded:
             assert "$800 above the floor" in dash[-1] and "strong breaks only" in dash[-1]
+
+
+def half_days(days: list, idx: list, full: list, cut: int = 45, n: int = 4) -> list:
+    """Up to n days (from the 25th) with a trade open at the 13:15 cut that closed later the same day."""
+    return sorted({idx[int(t[1])][0] for t in full
+                   if idx[int(t[1])][1] < cut <= idx[int(t[3])][1] and idx[int(t[3])][0] == idx[int(t[1])][0]
+                   and idx[int(t[1])][0] >= 25})[:n]
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+@pytest.mark.parametrize("mode", ["template", "calendar", "rth", "eth"])
+def test_clean_band_half_day_never_holds_overnight(sim, tmp_path, mode):  # noqa: F811
+    """Half days (the session ends at 13:15) with a trade still open at 13:10:
+      * template: the early close in the trading-hours template (NinjaTrader's lists them): out at the 13:10 open;
+      * calendar: not in the template, but the Friday after Thanksgiving (2026-11-27): out at the 13:10 open all the same;
+      * rth / eth, neither (an unlisted early close), the backstop: out on the next bar (an ETH chart: the open after the
+        first bar past the cut; a regular-hours chart: the 09:35 open, the first fill after the next session's first bar).
+    The session-close exit (IsExitOnSessionCloseStrategy) is not modelled by the stand-in: these are the strategy's own
+    rules."""
+    days = synthetic_days()
+    path = tmp_path / "bars.csv"
+    idx = write_bars(days, path)
+    full = [x.split(",")[1:] for x in _run_all(sim, path, MaxContracts=1, DayStop=0) if x.startswith("T,")]
+    cut = 45  # 13:15
+    halves = half_days(days, idx, full, cut)
+    assert len(halves) >= 2
+    if mode == "calendar":  # the same sessions, dated so the first half day is 2026-11-27
+        halves = halves[:1]
+        start = pd.Timestamp("2026-11-27") - pd.offsets.BDay(halves[0])
+        for d, when in zip(days, pd.bdate_range(start, periods=len(days)), strict=True):
+            d["d"] = when.date()
+        assert days[halves[0]]["d"] == pd.Timestamp("2026-11-27").date()
+    for i in halves:
+        for k in ("o", "h", "l", "c", "v", "mm"):
+            days[i][k] = days[i][k][:cut]
+    if mode == "eth":  # the overnight bars after the cut (18:00 - 18:25 the evening of the half day)
+        rows, idx = [], []
+        for di, d in enumerate(days):
+            for k in range(len(d["o"])):
+                t = pd.Timestamp(d["d"]) + pd.Timedelta(minutes=int(d["mm"][k]))
+                rows.append(f"{t:%Y-%m-%d %H:%M}," + ",".join(repr(float(d[x][k])) for x in ("o", "h", "l", "c", "v")))
+                idx.append((di, k))
+            if di in halves:
+                px = float(d["c"][-1])
+                for j in range(6):
+                    t = pd.Timestamp(d["d"]) + pd.Timedelta(hours=18, minutes=5 * j)
+                    rows.append(f"{t:%Y-%m-%d %H:%M},{px!r},{px!r},{px!r},{px!r},10.0")
+                    idx.append((di, 100 + j))
+        path.write_text("\n".join(rows) + "\n")
+    else:
+        idx = write_bars(days, path)
+    early = {"SimEarlyClose": ",".join(f"{days[i]['d']:%Y-%m-%d} 13:15" for i in halves)} if mode == "template" else {}
+    out = _run_all(sim, path, MaxContracts=1, DayStop=0, **early)
+    tt = [x.split(",")[1:] for x in out if x.startswith("T,")]
+    assert not [x for x in out if "Exception" in x or "LOG:" in x]
+    if mode in ("template", "calendar"):
+        for i in halves:
+            last = [t for t in tt if idx[int(t[1])][0] == i and not (idx[int(t[3])][0] == i and idx[int(t[3])][1] < cut - 1)]
+            assert [(idx[int(t[3])], t[5]) for t in last] == [((i, cut - 1), "Session end")], (i, last)  # the 13:10 open
+        assert all(idx[int(t[1])][0] == idx[int(t[3])][0] for t in tt)
+        return
+    for i in halves:
+        held = [t for t in tt if idx[int(t[1])][0] == i and not (idx[int(t[3])][0] == i and idx[int(t[3])][1] < cut)]
+        assert len(held) == 1, f"day {i}: {held}"  # the trade open at the cut (any earlier ones closed before it)
+        d1, k1 = idx[int(held[0][3])]
+        why = held[0][5]
+        if mode == "eth":  # out at the next open after the first overnight bar: the half day's evening, not the next session
+            assert (d1, k1, why) == (i, 101, "Session end"), (i, d1, k1, why)
+        else:  # seen at the next session's first bar's close: out at the 09:35 open (or the stop, gapped through at 09:30)
+            assert (d1, k1, why) in ((i + 1, 1, "Session end"), (i + 1, 0, "Stop loss")), (i, d1, k1, why)
+    for t in tt:  # no trade anywhere runs past its session's first bar of the next day
+        (d0, _k0), (d1, k1) = idx[int(t[1])], idx[int(t[3])]
+        assert d1 == d0 or (d1 == d0 + 1 and k1 <= 1 and d0 in halves), (d0, d1, k1)

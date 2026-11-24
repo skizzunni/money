@@ -12,6 +12,9 @@
 //     of the new band / VWAP and the hard stop, never looser; if that is already at or past the close, out at market;
 //   * a take profit TakeProfitAt hard stops from the fill; once a bar closes BreakEvenAt x the hard stop in profit,
 //     the stop goes to the entry + BreakEvenPlus points; out at market at the 15:50 bar's close (15:55's open);
+//     a half day (the trading-hours template's early close; the Friday after Thanksgiving and Christmas Eve, 13:15,
+//     whatever the template says): out 5 minutes before it; a trade still open after any other early close goes out on
+//     the next bar;
 //   * a close StretchAddAt sigmas or more past the band trades one contract more (at most MaxContracts).
 // Gap trade: a gap of GapK x the 14-session average whose 09:30 bar moves the gap's way by GapMinBody x the average
 // range; in at 09:35, the stop at the 09:30 open (at most GapCap points), out at 09:55.
@@ -137,6 +140,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             else if (State == State.DataLoaded)
             {
                 newYork = NewYork();
+                sessions = new SessionIterator(Bars);
                 Print("Clean band settings: " + Instrument.FullName + ", " + BarsPeriod.Value + " " + BarsPeriod.BarsPeriodType +
                       ", account " + (Account == null ? "none" : Account.Name) + ", trend " + TrendDays + " days, hard stop $" +
                       HardStop + ", break-even at " + BreakEvenAt + "x, last entry " + (LastEntry / 60) + ":" + (LastEntry % 60).ToString("00") +
@@ -149,6 +153,40 @@ namespace NinjaTrader.NinjaScript.Strategies
         {
             try { return TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time"); }
             catch (TimeZoneNotFoundException) { return TimeZoneInfo.FindSystemTimeZoneById("America/New_York"); }
+        }
+
+        // the bar end (New York minutes) by which to be out: the 15:55 open, or 5 minutes before an earlier session end
+        // from the trading-hours template (a half day's 13:15 close: out at the 13:10 open). As MnqMomentumC.cs FlatBy.
+        SessionIterator sessions;
+        DateTime flatDay = DateTime.MinValue;
+        int flatCached = 955;
+
+        int FlatBy(DateTime barEndPlatform)
+        {
+            DateTime endNy = ToNy(barEndPlatform);
+            if (endNy.Date == flatDay) return flatCached;
+            int flat = 955;
+            try
+            {
+                if (sessions != null && sessions.GetNextSession(barEndPlatform, true))
+                {
+                    DateTime end = ToNy(sessions.ActualSessionEnd);
+                    if (end.Date == endNy.Date)
+                        flat = Math.Min(flat, end.Hour * 60 + end.Minute - 5);
+                }
+            }
+            catch (Exception)
+            {
+                // no session information: 15:55, and the next-bar rule in Bar() as the backstop
+            }
+            // the CME half days, should the template not list them: the Friday after Thanksgiving and Christmas Eve (13:15
+            // New York for the index futures, 13:45 for metals): out by the 13:10 open
+            if ((endNy.Month == 11 && endNy.DayOfWeek == DayOfWeek.Friday && endNy.Day >= 23 && endNy.Day <= 29) ||
+                (endNy.Month == 12 && endNy.Day == 24))
+                flat = Math.Min(flat, 790);  // 13:10
+            flatDay = endNy.Date;
+            flatCached = flat;
+            return flat;
         }
 
         DateTime ToNy(DateTime t)
@@ -336,10 +374,21 @@ namespace NinjaTrader.NinjaScript.Strategies
                 if (mm < 510) { preVol += Volume[0]; preBars++; }
                 else atVol = Volume[0];
             }
+            bool inTrade = Position.MarketPosition != MarketPosition.Flat;
             if (mm < 570 || mm >= 960)
+            {
+                // a trade still open outside regular hours (a half day's 13:15 close came before the 15:55 exit, and the
+                // session-close backstop did not fire): out now, never carried into the next session
+                if (inTrade && !exiting && (pos != 0 || gapPos != 0))
+                    Exit("Session end");
                 return;
+            }
+            bool carried = false;
             if (today == null || t.Date != today.Date)
+            {
+                carried = inTrade && today != null;  // the same on a regular-hours chart: out on the new session's first bar
                 NewDay(t.Date);
+            }
             today.Bars++;
             dayHigh = Math.Max(dayHigh, High[0]);
             dayLow = Math.Min(dayLow, Low[0]);
@@ -368,16 +417,22 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (gapPending && mp != 0 && gapPos == 0)  // the gap entry filled
                 gapPos = mp;
             noisePending = gapPending = false;
-            if (!ready)
-                return;
-            double tick = TickSize, pv = Instrument.MasterInstrument.PointValue;
-
-            if (pos != 0 && mm >= 950)  // out at the 15:55 open
+            if (carried && mp != 0 && !exiting)
             {
                 Exit("Session end");
                 return;
             }
-            if (gapPos != 0 && mm >= 590)  // the gap trade: out at the 09:55 open
+            if (!ready)
+                return;
+            double tick = TickSize, pv = Instrument.MasterInstrument.PointValue;
+
+            int flatAt = FlatBy(Time[0]);
+            if (pos != 0 && end >= flatAt)  // out at the 15:55 open (a half day: 5 minutes before its early close)
+            {
+                Exit("Session end");
+                return;
+            }
+            if (gapPos != 0 && (mm >= 590 || end >= flatAt))  // the gap trade: out at the 09:55 open
             {
                 Exit("Gap exit");
                 return;
@@ -415,7 +470,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 }
                 return;
             }
-            if (mp != 0 || end > LastEntry || mm >= 950 || tradesToday >= MaxTradesPerDay || !PlaceOrders)
+            if (mp != 0 || end > LastEntry || end >= flatAt || tradesToday >= MaxTradesPerDay || !PlaceOrders)
                 return;
             if (dayStopToday > 0 && CumProfit - dayCumStart <= -dayStopToday)
                 return;

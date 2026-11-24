@@ -7,8 +7,9 @@
 //   * at least 1.5x the last 14 sessions' average |move|, and the bars from 08:20 to 08:35 closing its way (the 08:30
 //     bar's close against the 08:20 open): in at the next open, the stop a tick past 60% of the way from the 08:20
 //     open to that close;
-//   * out at the 14:10 bar's close (filled at 14:15; a gap in the bars: the first bar from 14:10 on); a trade still
-//     open when the next trading day starts (a holiday's early close) goes out on its first bar; one trade a day;
+//   * out at the 14:10 bar's close (filled at 14:15; a gap in the bars: the first bar from 14:10 on); the Friday after
+//     Thanksgiving and Christmas Eve: by the 13:10 open; a trade still open when the next trading day starts (another
+//     early close) goes out on its first bar; one trade a day;
 //   * 1 / 2 / 3 contracts from +$0 / +$2,000 / +$3,500; no trade while under $1,500 above the trailing floor.
 // A session counts in the 14 only with at least 180 five-minute bars (a full gold session has 276).
 strategy("MGC Overnight Carry", overlay = true, initial_capital = 50000, default_qty_type = strategy.fixed,
@@ -36,6 +37,11 @@ tk = syminfo.mintick
 tMin = hour(time, TZ) * 60 + minute(time, TZ)
 later = time + 21600000   // + 6 hours: the trading day runs 18:00 the evening before to 17:00
 tDay = year(later, TZ) * 10000 + month(later, TZ) * 100 + dayofmonth(later, TZ)
+// the CME half days (TradingView has no early-close calendar): the Friday after Thanksgiving and Christmas Eve, out by
+// the 13:10 open
+dom = dayofmonth(time, TZ)
+halfDay = (month(time, TZ) == 11 and dayofweek(time, TZ) == dayofweek.friday and dom >= 23 and dom <= 29) or (month(time, TZ) == 12 and dom == 24)
+flatAt = halfDay ? math.min(exitAt, 790) : exitAt   // the bar end (minutes from midnight) from which to be out
 
 var moves = array.new_float(0)   // the kept sessions' moves, oldest first
 var float lastSettle = na        // the last kept session's 13:25 close
@@ -77,7 +83,7 @@ if tMin == settleAt - 5
 pos = strategy.position_size > 0 ? 1 : strategy.position_size < 0 ? -1 : 0
 if pos != 0 and posDay != tDay   // the session ended before the exit (a holiday's early close): out now
     strategy.close_all(comment = "Session end")
-else if pos != 0 and tMin >= exitAt - 5 and tMin < 1020
+else if pos != 0 and tMin + 5 >= flatAt and tMin < 1020
     strategy.close_all(comment = "Time exit")
 else if pos == 0 and tMin == openAt + confirm - 5 and not traded and not guarded and not na(dMove) and array.size(moves) >= 14
     float s = 0.0

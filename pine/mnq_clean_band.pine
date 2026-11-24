@@ -9,7 +9,8 @@
 //     range, and (after 10:00) the day not already 1.1 usual ranges up from its open; SHORT mirrored;
 //   * stop: the tighter of the band (or VWAP) and $200 a contract from the expected fill; moved at each check, never
 //     looser; back at or past it: out at market. Take profit at 2.5 x $200; once up 0.4 x $200 the stop goes to the
-//     entry + 2 points; out at 15:55;
+//     entry + 2 points; out at 15:55 (the half days, the Friday after Thanksgiving and Christmas Eve: at 13:10; a trade
+//     still open after any other early close: on the next bar);
 //   * a close 1.5 sigma or more past the band trades one contract more (at most "Most contracts");
 //   * no new entry once the day is down $600; 1 / 2 / 3 contracts from +$0 / +$2,000 / +$3,500;
 //   * gap trade: a gap of 0.5x the 14-session average whose 09:30 bar moves its way by 3% of the average range, in at
@@ -67,6 +68,10 @@ tk = syminfo.mintick
 tMin = hour(time, TZ) * 60 + minute(time, TZ)
 endMin = tMin + 5
 inRth = tMin >= 570 and tMin < 960
+// the CME index futures' half days (13:15 close): the Friday after Thanksgiving and Christmas Eve, out at the 13:10 open
+dom = dayofmonth(time, TZ)
+halfDay = (month(time, TZ) == 11 and dayofweek(time, TZ) == dayofweek.friday and dom >= 23 and dom <= 29) or (month(time, TZ) == 12 and dom == 24)
+flatAt = halfDay ? 790 : 955   // the bar end (minutes from midnight) from which to be out: 13:10 or 15:55
 isCheck = inRth and endMin >= 600 and endMin <= 900 and (endMin - 600) % 30 == 0
 dayNum = int(math.floor((time - 18000000) / 86400000))   // the New York session's day (any RTH bar)
 
@@ -225,9 +230,14 @@ if pos != 0 and leg == 1 and na(entryPx)   // the band entry filled at this bar'
     beDone := false
     tgtPx := tpAt > 0 ? strategy.position_avg_price + pos * math.round(tpAt * hardStop / pv / tk) * tk : na
 bandId = pos > 0 ? "Long" : "Short"
+// a trade still open outside regular hours (a half day's 13:15 close came before the 15:55 exit) or on a new session's
+// first bar (a regular-hours chart): out now, never carried into the next session
+carryOut = pos != 0 and (not inRth or tBars == 1)
+if carryOut
+    strategy.close_all(comment = "Session end")
 
-if inRth and ready
-    if pos != 0 and leg == 1 and tMin >= 950
+if inRth and ready and not carryOut
+    if pos != 0 and leg == 1 and endMin >= flatAt
         strategy.close(bandId, comment = "Session end")
     else if pos != 0 and leg == 2 and tMin >= 590
         strategy.close(pos > 0 ? "GapLong" : "GapShort", comment = "Gap exit")
@@ -271,7 +281,7 @@ if inRth and ready
                     strategy.close(bandId, comment = "Back inside")
                 else
                     stopPx := nw
-            else if pos == 0 and endMin <= lastEntry and tMin < 950 and tradesToday < maxTrades and (dsToday <= 0 or strategy.netprofit - dayStartNet > -dsToday)
+            else if pos == 0 and endMin <= lastEntry and endMin < flatAt and tradesToday < maxTrades and (dsToday <= 0 or strategy.netprofit - dayStartNet > -dsToday)
                 want = close > up ? 1 : close < dn ? -1 : 0
                 if want != 0 and vwapEntry and want * (close - vwapNow) <= 0
                     want := 0

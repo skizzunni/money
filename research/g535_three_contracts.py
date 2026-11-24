@@ -1,3 +1,4 @@
+# ruff: noqa: E501
 """G535 (docs/NINJATRADER_V38.md): the user trades a fixed 3 MNQ from now on (2026-11-23). Funded growth at 3 MNQ with
 less loss per trade and per day, on G495's measure (the floor and the day budget as the 50K's).
 

@@ -26,6 +26,7 @@ def drop(d, ks):
     keep = np.ones(len(d['o']), bool); keep[ks] = False
     for k in ('o', 'h', 'l', 'c', 'v', 'mm'): d[k] = d[k][keep]
     return d
+EARLY = {}
 def scen():
     base = T.synthetic_days()
     yield "baseline", base, True
@@ -42,11 +43,13 @@ def scen():
     s = copy.deepcopy(base); [scale_dev(s[i], 0.05) for i in range(120, 131)]; yield "near-dead days", [fix(d) for d in s], True
     s = copy.deepcopy(base); [drop(s[i], sorted(rng.choice(np.arange(1, 77), 6, replace=False))) for i in range(40, 80, 3)]; yield "missing bars", s, False
     s = copy.deepcopy(base); [drop(s[i], np.arange(45, 78)) for i in (45, 100, 140)]; yield "half days", s, False
+    # the same, as NinjaTrader's trading-hours template has them (the 13:15 early close listed): out by the 13:10 open
+    EARLY["half days, template"] = ",".join(f"{s[i]['d']:%Y-%m-%d} 13:15" for i in (45, 100, 140)); yield "half days, template", s, False
     s = copy.deepcopy(base); drop(s[0], np.arange(0, 30)); yield "data starts mid-session", s, False
 for name, days, comparable in scen():
     path = out / "b.csv"; idx = T.write_bars(days, path)
     for props in (dict(MaxContracts=1, DayStop=0), dict(StartProfit=5000)):
-        lines = T._run_all(sim, path, **props)
+        lines = T._run_all(sim, path, **props, **({"SimEarlyClose": EARLY[name]} if name in EARLY else {}))
         tt = [x.split(",")[1:] for x in lines if x.startswith("T,")]
         tn = [x.split(",")[1:] for x in lines if x.startswith("TN,")]
         orders = [x.split(",")[1:] for x in lines if x.startswith("O,")]

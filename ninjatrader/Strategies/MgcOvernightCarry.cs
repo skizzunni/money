@@ -7,9 +7,11 @@
 //   * the last 14 sessions' average |move|: today's at least K x that, and the bars from 08:20 to 08:20 + Confirm
 //     minutes closing its way (the last one's close against the 08:20 open): a market order at that close (filled at
 //     the next open), the stop a tick past StopAt (0.6) of the way from the 08:20 open to that close, set with the entry;
-//   * out at market at the 14:10 bar's close (filled at 14:15, ExitAt; a gap in the bars: the first bar from 14:10 on); a
-//     trade still open when the next trading day starts (a holiday's early close) goes out on its first bar; one trade
-//     a day at most.
+//   * out at market at the 14:10 bar's close (filled at 14:15, ExitAt; a gap in the bars: the first bar from 14:10 on);
+//     a holiday's early close in the trading-hours template: out 5 minutes before it (13:45: at the 13:40 open; the
+//     Friday after Thanksgiving and Christmas Eve: by the 13:10 open, whatever the template says); a
+//     trade still open when the next trading day starts (no early close in the template) goes out on its first bar; one
+//     trade a day at most.
 // Size: as MnqCleanBand, by the account's profit over its start balance (1, 2 from Step2At, 3 from Step3At, at most
 // MaxContracts; FixedContracts overrides); no trade while the account is under CushionGuard $ above its trailing floor.
 // research/zoo/mk_search.py carry is the same rule in Python and
@@ -85,6 +87,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             else if (State == State.DataLoaded)
             {
                 newYork = NewYork();
+                sessions = new SessionIterator(Bars);
                 Print("Gold carry settings: " + Instrument.FullName + ", " + BarsPeriod.Value + " " + BarsPeriod.BarsPeriodType +
                       ", account " + (Account == null ? "none" : Account.Name) + ", move at least " + K + "x the 14-session average, " +
                       ConfirmMinutes + " minutes to confirm, out " + (ExitAt / 60) + ":" + (ExitAt % 60).ToString("00") +
@@ -102,6 +105,40 @@ namespace NinjaTrader.NinjaScript.Strategies
         {
             try { return TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time"); }
             catch (TimeZoneNotFoundException) { return TimeZoneInfo.FindSystemTimeZoneById("America/New_York"); }
+        }
+
+        // the bar end (New York minutes) at which to exit: ExitAt, or 5 minutes before an earlier session end from the
+        // trading-hours template (a holiday's early close, COMEX 13:45 the day after Thanksgiving: out at the 13:40 open)
+        SessionIterator sessions;
+        DateTime flatDay = DateTime.MinValue;
+        int flatCached;
+
+        int FlatBy(DateTime barEndPlatform)
+        {
+            DateTime endNy = ToNy(barEndPlatform);
+            if (endNy.Date == flatDay) return flatCached;
+            int flat = ExitAt;
+            try
+            {
+                if (sessions != null && sessions.GetNextSession(barEndPlatform, true))
+                {
+                    DateTime end = ToNy(sessions.ActualSessionEnd);
+                    if (end.Date == endNy.Date)
+                        flat = Math.Min(flat, end.Hour * 60 + end.Minute - 5);
+                }
+            }
+            catch (Exception)
+            {
+                // no session information: ExitAt, and the next-day rule in OnBarUpdate as the backstop
+            }
+            // the CME half days, should the template not list them: the Friday after Thanksgiving and Christmas Eve (13:15
+            // New York for the index futures, 13:45 for metals): out by the 13:10 open
+            if ((endNy.Month == 11 && endNy.DayOfWeek == DayOfWeek.Friday && endNy.Day >= 23 && endNy.Day <= 29) ||
+                (endNy.Month == 12 && endNy.Day == 24))
+                flat = Math.Min(flat, 790);  // 13:10
+            flatDay = endNy.Date;
+            flatCached = flat;
+            return flat;
         }
 
         DateTime ToNy(DateTime t)
@@ -214,7 +251,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 Exit("Session end");
                 return;
             }
-            if (pos != 0 && mm >= ExitAt - 5 && mm < 1020)  // out at the next open (14:15's, or the first bar after a gap)
+            if (pos != 0 && mm + 5 >= FlatBy(Time[0]) && mm < 1020)  // out at the next open (14:15's, or the first bar after a gap)
             {
                 Exit("Time exit");
                 return;

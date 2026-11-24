@@ -1,0 +1,21 @@
+Stage 47 (2026-11-24, a research round): one contract off early when 2-3 trade (research/zoo/scale_out.py)
+
+The idea: with 2-3 contracts, take one off at scale_r x the $200 hard stop, the rest to the shipped 2.5x target or the
+stops (section 21 tested the opposite, part off at the target and the rest running: rejected). Exact per trade: the
+early contract shares the stop path (break-even included) until its target, so it exits there if price trades a tick
+through it before the shipped exit (the fill bar to the bar before the exit; the exit bar only on a 2.5x target), else
+with the rest. 104 fresh 50K starts (dev + unseen NQ, 12 months, steps 1/2/3 from +$0/+$2,000/+$3,500, news days, the
+1.5-sigma add, day stop $600); the TradingView window (Aug 27 - Nov 23 2026) replayed the same way.
+
+trades: dev 1186, unseen_nq 1435, live 74
+early None (shipped): starts 104 lost 0.000 median $16,582 p25 $11,321 p10 $4,672 | TV window $9,796 (53 trades)
+early 0.5:            starts 104 lost 0.000 median $13,623 p25 $8,527 p10 $4,094 | TV window $7,045 (53 trades)
+early 0.75:           starts 104 lost 0.000 median $13,881 p25 $9,001 p10 $4,183 | TV window $7,509 (53 trades)
+early 1.0:            starts 104 lost 0.000 median $13,426 p25 $9,431 p10 $4,530 | TV window $7,321 (53 trades)
+early 1.25:           starts 104 lost 0.000 median $14,260 p25 $10,038 p10 $4,748 | TV window $7,474 (53 trades)
+early 1.5:            starts 104 lost 0.000 median $14,846 p25 $10,788 p10 $4,763 | TV window $7,824 (53 trades)
+early 2.0:            starts 104 lost 0.000 median $15,744 p25 $11,558 p10 $4,497 | TV window $8,524 (53 trades)
+early 1.0, gap too:   starts 104 lost 0.000 median $13,573 p25 $9,397 p10 $4,537 | TV window $6,948 (53 trades)
+
+Rejected: every level lowers the median, the 25th percentile and the TradingView window; nothing is lost either way.
+The contracts the early exit takes off are the ones that reach the 2.5x target, which pay for the stops.

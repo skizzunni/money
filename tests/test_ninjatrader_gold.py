@@ -179,3 +179,43 @@ def test_gold_carry_cushion_guard(sim, tmp_path):  # noqa: F811
     assert free == py_trades(days, idx, start=-1200.0, guard=0)
     assert len(free) > len(got)
     assert any("CUSHION GUARD" in x for x in lines if x.startswith("D,")) or not got
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+@pytest.mark.parametrize("mode", ["template", "calendar"])
+def test_gold_carry_out_before_an_early_close(sim, tmp_path, mode):  # noqa: F811
+    """A holiday's early close with a trade open, not held to the next session; the other days' trades unchanged:
+      * template: COMEX's 13:45 close in the trading-hours template: out at the 13:40 open, 5 minutes before it;
+      * calendar: not in the template, but the Friday after Thanksgiving (2026-11-27): out at the 13:10 open."""
+    days = synthetic_gold(n=400)
+    path = tmp_path / "gold.csv"
+    idx = write_gold(days, path)
+    full = [x.split(",")[1:] for x in run(sim, path, MaxContracts=1) if x.startswith("T,")]
+    out_at = 1180 if mode == "template" else 1150  # 13:40 / 13:10 New York, minutes from 18:00 the evening before
+    halves = [idx[int(t[1])][0] for t in full if days[idx[int(t[3])][0]]["mm"][idx[int(t[3])][1]] >= out_at][:3]
+    assert len(halves) >= 2
+    if mode == "calendar":  # the same sessions, dated so the first half day is 2026-11-27 (and no other is a half day)
+        halves = halves[:1]
+        start = pd.Timestamp("2026-11-27") - pd.offsets.BDay(halves[0])
+        for d, when in zip(days, pd.bdate_range(start, periods=len(days)), strict=True):
+            d["d"] = when.date()
+        assert days[halves[0]]["d"] == pd.Timestamp("2026-11-27").date()
+        days = days[:halves[0] + 15]  # before Christmas Eve
+    rest = [(t[0], idx[int(t[1])], t[2], t[4]) for t in full if idx[int(t[1])][0] not in halves and idx[int(t[1])][0] < len(days)]
+    cut = 1185  # 13:45 New York
+    for i in halves:
+        keep = days[i]["mm"] < cut
+        for k in ("o", "h", "l", "c", "mm"):
+            days[i][k] = days[i][k][keep]
+    idx = write_gold(days, path)
+    early = {"SimEarlyClose": ",".join(f"{days[i]['d']:%Y-%m-%d} 13:45" for i in halves)} if mode == "template" else {}
+    lines = run(sim, path, MaxContracts=1, **early)
+    tt = [x.split(",")[1:] for x in lines if x.startswith("T,")]
+    assert not [x for x in lines if "LOG:" in x or "Exception" in x]
+    for i in halves:
+        mine = [t for t in tt if idx[int(t[1])][0] == i]
+        assert len(mine) == 1
+        d1, k1 = idx[int(mine[0][3])]
+        assert (d1, days[i]["mm"][k1], mine[0][5]) == (i, out_at, "Time exit"), (i, d1, days[d1]["mm"][k1], mine[0][5])
+    assert all(idx[int(t[1])][0] == idx[int(t[3])][0] for t in tt)
+    assert [(t[0], idx[int(t[1])], t[2], t[4]) for t in tt if idx[int(t[1])][0] not in halves] == rest
