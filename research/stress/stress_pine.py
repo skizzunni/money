@@ -3,7 +3,7 @@ import numpy as np, pandas as pd
 import test_ninjatrader_clean as T
 from test_pine_clean import bars_of, PINE
 from pine_interpreter import PineRuntime, load_pine
-sets = pickle.load(open('" + __import__("os").environ["ZOO_DATA"] + "/zoo_days_news.pkl', 'rb'))
+sets = pickle.load(open(__import__("os").environ["ZOO_DATA"] + '/zoo_days_news.pkl', 'rb'))
 def raw(days):
     res = []
     for d in days:

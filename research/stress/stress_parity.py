@@ -5,7 +5,7 @@ sys.path.insert(0, 'tests')
 import numpy as np
 import test_ninjatrader_clean as T
 from test_ninjatrader import build, NT
-sets = pickle.load(open('" + __import__("os").environ["ZOO_DATA"] + "/zoo_days_news.pkl', 'rb'))
+sets = pickle.load(open(__import__("os").environ["ZOO_DATA"] + '/zoo_days_news.pkl', 'rb'))
 out = pathlib.Path(tempfile.mkdtemp()); build(NT / "tests" / "Sim" / "Sim.csproj", out); sim = out / "Sim.dll"
 def raw(days):
     res = []
