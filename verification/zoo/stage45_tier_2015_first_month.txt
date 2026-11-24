@@ -1,0 +1,8 @@
+2015-19 shipped (guard, no tier): $50,000: blown 2.7% med $11,641 | $48,806: blown 10.8% med $8,714 | $48,998: blown 7.2% med $9,350
+2015-19 with the tier under $1,000: $50,000: blown 0.8% med $11,386 | $48,806: blown 6.3% med $7,033 | $48,998: blown 3.8% med $8,136
+2020-25 tier $1,000: $50,000: blown 2.7% med $16,017 | $48,806: blown 10.2% med $10,655 | $48,998: blown 6.5% med $11,986
+2020-25 tier + strong only until the first +$500: $50,000: blown 2.5% med $14,223 | $48,806: blown 8.2% med $7,243 | $48,998: blown 5.0% med $8,616
+2020-25 tier + until +$1,000: $50,000: blown 2.1% med $13,610 | $48,806: blown 8.0% med $6,168 | $48,998: blown 4.9% med $7,777
+2015-19 tier $1,000: $50,000: blown 0.8% med $11,386 | $48,806: blown 6.3% med $7,033 | $48,998: blown 3.8% med $8,136
+2015-19 tier + strong only until the first +$500: $50,000: blown 1.1% med $9,650 | $48,806: blown 6.3% med $4,132 | $48,998: blown 3.5% med $4,868
+2015-19 tier + until +$1,000: $50,000: blown 1.1% med $8,589 | $48,806: blown 6.3% med $3,481 | $48,998: blown 3.5% med $4,166

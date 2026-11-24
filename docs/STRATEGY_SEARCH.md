@@ -500,6 +500,14 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    starts again from "Highest end-of-day balance" (MNQ and gold; a test reads the live dashboard at $49,600 and
    $48,800 and fails without the fix). Rejected with it: gold-only or gold-added modes while guarded (49).
 
+51. **The tier on 2015-19, a careful first month, the floor rule** (2026-11-24, a research round;
+   `verification/zoo/stage45_tier_2015_first_month.txt`). Shuffled 2015-19 years (2,000 runs; blown / median from $50,000,
+   $48,806, $48,998): without the tier 2.7% / $11,641, 10.8% / $8,714, 7.2% / $9,350; with it 0.8% / $11,386, 6.3% /
+   $7,033, 3.8% / $8,136: the same cut as on 2020-25. Strong breaks only from a fresh start until the first +$500 /
+   +$1,000: 2020-25 fresh 2.5% / 2.1% lost against 2.7%, but 2015-19 1.1% against 0.8% and medians $1,700-2,800 lower:
+   not used. The floor: the prop firm trails it from end-of-day balances, and the guard's high-water mark is each day's
+   starting balance (the last end of day), so it matches.
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-33; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |
