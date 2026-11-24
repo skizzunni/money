@@ -574,6 +574,10 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    and not certain, but on the user's first goal (not losing the account) better everywhere it was measured. Shipped:
    `LadderAt` 1.5, `LadderLock` 0.5, `GapMaxBar` 1.75 (NinjaTrader and Pine, trade for trade; 0 switches each off).
 
+62. **The target again, with 61 in** (2026-11-24, a research round; `verification/zoo/stage56_target_with_ladder.txt`).
+   2.0 / 3.0 / 3.5R against 2.5R: 3.0R the same median ($16,929) and a higher 25th percentile ($12,680) but the window
+   +$7,590 against +$9,921; 2.0 and 3.5 lower. 2.5R stays.
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-33; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |

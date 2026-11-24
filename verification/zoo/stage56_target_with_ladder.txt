@@ -1,0 +1,10 @@
+Stage 56 (2026-11-24, a research round): the take-profit again, with section 61's stop step and wild-open skip in
+
+bench.py (104 fresh 50K starts, dev + unseen NQ; the TradingView window):
+2.5R (shipped): lost 0.0% median $16,931 p25 $12,040 | TV $+9,921 52tr PF 4.43 | dev 1.62 $5,176 | unseen_nq 1.63 $7,349 | live 3.57 $14,112
+2.0R:           lost 0.0% median $15,177 p25 $10,621 | TV $+7,357 54tr PF 3.54 | dev 1.54 $4,775 | unseen_nq 1.55 $6,830 | live 3.07 $11,395
+3.0R:           lost 0.0% median $16,929 p25 $12,680 | TV $+7,590 50tr PF 3.58 | dev 1.65 $5,331 | unseen_nq 1.64 $7,108 | live 3.24 $12,344
+3.5R:           lost 0.0% median $16,254 p25 $10,753 | TV $+8,610 51tr PF 3.93 | dev 1.65 $5,370 | unseen_nq 1.61 $6,735 | live 3.37 $13,051
+
+Verdict: 2.5R stays. The stop step protects more of a runner, but 3.0R only moves the median $2 and the 25th
+percentile up $640 while the window falls $2,331 and live PF 3.57 to 3.24; 2.0 and 3.5 are lower on most gates.
