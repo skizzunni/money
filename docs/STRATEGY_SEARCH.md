@@ -438,6 +438,15 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    stop scaled to the band or the day's range (section 21: lost starts unbounded, mixed bounded) and a contract more on
    very large gaps (section 28's breakdown: gaps over 2.5x are the gap trade's weakest, PF 0.60 unseen NQ, 0.07 ES).
 
+45. **The check times, the target's first bar, gold's window** (2026-11-24, a research round; `noise` check_off,
+   `verification/zoo/stage39_check_times_gold_window.txt`). The band's checks moved off the half hour (:05 / :35, :10 /
+   :40, :15 / :45): 8.7% / 14.4% / 21.2% of starts lost, the TradingView window +$1,647-3,108 against +$9,796, live PF
+   1.54-1.79 against 3.34: the edge is at the half-hour closes (the noise-band papers' times). The take-profit working
+   from the next bar (Pine's way) instead of the fill bar: identical results (a 2.5x target is not reached on the fill
+   bar), so it is not the reason TradingView and NinjaTrader can differ. Gold's average move over 10 / 20 / 30 sessions
+   instead of 14: median $17,295 / $17,454 / $16,694 against $17,366, PF 2.10 / 1.77 / 1.67 on 2009-17 against 2.02;
+   no window better on every count. None used.
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-33; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |

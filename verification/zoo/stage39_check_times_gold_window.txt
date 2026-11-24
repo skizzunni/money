@@ -1,0 +1,9 @@
+now (checks on :00 / :30, target from the fill bar): lost 0.0% median $16,582 p25 $11,321 | TV $+9,796 53tr PF 4.25 dd $670 | dev: PF 1.60 240/yr $5,119 | unseen_nq: PF 1.59 265/yr $6,971 | unseen_es: PF 1.17 224/yr $679 | live: PF 3.34 179/yr $13,572
+checks on :15 / :45: lost 21.2% median $11,629 p25 $3,507 | TV $+3,108 49tr PF 2.25 dd $1,208 | dev: PF 1.61 216/yr $4,988 | unseen_nq: PF 1.47 247/yr $5,424 | unseen_es: PF 1.15 202/yr $570 | live: PF 1.54 182/yr $3,950
+checks on :05 / :35: lost 8.7% median $7,879 p25 $3,147 | TV $+1,753 57tr PF 1.44 dd $1,995 | dev: PF 1.49 227/yr $4,204 | unseen_nq: PF 1.40 249/yr $4,736 | unseen_es: PF 1.02 213/yr $92 | live: PF 1.73 184/yr $5,541
+checks on :10 / :40: lost 14.4% median $11,926 p25 $3,460 | TV $+1,647 51tr PF 1.68 dd $434 | dev: PF 1.69 218/yr $5,456 | unseen_nq: PF 1.46 253/yr $5,403 | unseen_es: PF 1.07 207/yr $280 | live: PF 1.79 177/yr $5,594
+target from the next bar: lost 0.0% median $16,582 p25 $11,321 | TV $+9,796 53tr PF 4.25 dd $670 | dev: PF 1.60 240/yr $5,119 | unseen_nq: PF 1.59 265/yr $6,971 | unseen_es: PF 1.17 224/yr $679 | live: PF 3.34 179/yr $13,572
++ gold as shipped: lost 0.0% median $17,366 p25 $12,077 trades/yr 234 | gold alone: 20/yr PF 2.02 (2009-17) 1.84 (2018-25), worst $-141, years up 65%
++ gold n 10: lost 0.0% median $17,295 p25 $12,206 trades/yr 236 | gold alone: 22/yr PF 2.10 (2009-17) 1.93 (2018-25), worst $-141, years up 65%
++ gold n 20: lost 0.0% median $17,454 p25 $12,454 trades/yr 233 | gold alone: 18/yr PF 1.77 (2009-17) 2.43 (2018-25), worst $-141, years up 59%
++ gold n 30: lost 0.0% median $16,694 p25 $12,350 trades/yr 231 | gold alone: 16/yr PF 1.67 (2009-17) 2.26 (2018-25), worst $-141, years up 65%
