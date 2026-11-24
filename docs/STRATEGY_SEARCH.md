@@ -708,27 +708,30 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    The wild-open skip at 1.5 / 2.0x and the stop step at 1.25 / 1.75R: each lowers at least one period's median. 1.75x
    and 1.5R / 0.5R stay.
 
-## The result (the shipped defaults, 2026-11-24, sections 1-33; research numbers, $0.62 a side)
+## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |
 |---|---|---|---|---|---|---|
-| dev NQ 2015-19 | 1,247 | 868 (42%, 1.55, $17,512) | 318 (1.75, $7,819) | 48% | 0 of 49 | $13,058 |
-| unseen NQ 2020 - Jun 2025 | 1,367 | 1,081 (48%, 1.61, $29,970) | 354 (1.54, $7,848) | 48% | 0 of 55 | $17,530 |
-| unseen ES 2020-24 (a cross-check) | 458 | 305 (24%, 1.27, $1,489) | 102 (0.86, -$255) | 48% | | |
-| live MNQ Jun 29 - Nov 23 2026 | 104 | 52 (56%, 4.95, $5,457) | 22 (1.14, $144) | 33% | | |
+| dev NQ 2015-19 | 1,247 | 873 (42%, 1.54, $17,395) | 272 (2.01, $8,522) | 46% | 0 of 49 | $14,028 |
+| unseen NQ 2020 - Jun 2025 | 1,367 | 1,091 (48%, 1.63, $31,425) | 306 (1.70, $8,675) | 46% | 0 of 55 | $18,980 |
+| unseen ES 2020-24 (a cross-check) | 458 | 305 (24%, 1.27, $1,489) | 89 (0.71, -$462) | 46% | | |
+| live MNQ Jun 29 - Nov 23 2026 | 104 | 53 (57%, 5.02, $5,555) | 18 (1.44, $353) | 30% | | |
 
 The accounts: the news rule, the $600 day stop, 1 / 2 / 3 contracts from +$0 / +$2,000 / +$3,500 and one more on a
-break 1.5 sigma past the band. Pooled 104 fresh 50K starts, 12 months each: **none lost**, median **+$16,582**, 25th
-percentile +$11,321, 10th +$4,672, worst +$1,789, best +$30,355; 79% reach +$10,000, 57% +$15,000, 29% +$20,000, 9%
-+$25,000; 40% of traded days green. A "win" includes the break-even exits at +2 points.
+break 1.5 sigma past the band; the second stop step and the wild-open gap skip (61); the gap at least 0.6x (87). Pooled
+104 fresh 50K starts, 12 months each: **none lost**, median **+$17,032**, 25th percentile +$12,433, 10th +$3,526, worst
++$1,404, best +$28,053; 79% reach +$10,000, 64% +$15,000, 30% +$20,000, 5% +$25,000; 41% of traded days green. A "win"
+includes the break-even exits at +2 points. By period (68, 87): 2015-19 median $14,028, 25th percentile $5,324;
+2020-25 median $18,980, 25th percentile $15,811.
 
-By year, 1 contract, all trades: 2015 $3,543, 2016 $6,251, 2017 $2,038, 2018 $7,140, 2019 $6,360, 2020 $5,398, 2021
-$8,777, 2022 $11,240, 2023 $6,074, 2024 $5,933, 2025 H1 $395; live 2026 by month Jul -$257, Aug +$511, Sep +$885, Oct
+By year, 1 contract, all trades (shipped now, section 87's table): 2015 $3,574, 2016 $6,361, 2017 $1,788, 2018 $7,762,
+2019 $6,432, 2020 $6,498, 2021 $8,983, 2022 $10,585, 2023 $6,811, 2024 $6,540, 2025 H1 $682, 2026 $5,908. Before
+sections 61 and 87 (the figures below were for those rules): 2015 $3,543, 2016 $6,251, 2017 $2,038, 2018 $7,140, 2019
+$6,360, 2020 $5,398, 2021 $8,777, 2022 $11,240, 2023 $6,074, 2024 $5,933, 2025 H1 $395; live 2026 by month Jul -$257, Aug +$511, Sep +$885, Oct
 +$1,997, Nov (to the 23rd) +$2,465. (No data here for Jul 2025 - Jun 2026.)
 
 The user's TradingView window (Aug 27 - Nov 23 2026, a fresh 50K, `zoo/tv_window.py`): the reference +$9,796, 53
-trades, PF 4.25, max drawdown $670 (with section 61: +$9,921, 52 trades, PF 4.43; the 104 starts' median $16,931, 25th
-percentile $12,040). TradingView itself on the versions before: +$6,322 (section 27), +$6,345 (28),
+trades, PF 4.25, max drawdown $670 before section 61; now (61 and 87): +$10,063, 50 trades, PF 4.66, max drawdown $670. TradingView itself on the versions before: +$6,322 (section 27), +$6,345 (28),
 +$9,186 (30); the reference's direction matched every time, its trade count runs higher.
 
 **How sure is "none lost"?** (`verification/zoo/walkforward_dev_only.txt`) The protections were picked on dev and
