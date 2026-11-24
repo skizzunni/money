@@ -1,0 +1,4 @@
+now: lost 0.0% median $16,582 p25 $11,321 | TV $+9,796 53tr PF 4.25 dd $670 | dev: PF 1.60 240/yr $5,119 | unseen_nq: PF 1.59 265/yr $6,971 | unseen_es: PF 1.17 224/yr $679 | live: PF 3.34 179/yr $13,572
+VWAP stop only after break-even: lost 0.0% median $16,528 p25 $11,251 | TV $+9,745 53tr PF 4.18 dd $670 | dev: PF 1.60 239/yr $5,131 | unseen_nq: PF 1.60 264/yr $7,024 | unseen_es: PF 1.18 221/yr $712 | live: PF 3.27 179/yr $13,447
++ gold as shipped: lost 0.0% median $17,366 p25 $12,077 trades/yr 234 | gold alone: 20/yr PF 2.02 (2009-17) 1.84 (2018-25), worst $-141, years up 65%
++ gold limit_entry True: lost 0.0% median $16,482 p25 $11,294 trades/yr 233 | gold alone: 18/yr PF 1.52 (2009-17) 1.00 (2018-25), worst $-140, years up 53%

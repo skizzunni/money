@@ -174,7 +174,7 @@ def five_min(days):
 
 
 def carry(days, i, tick=0.1, k=1.5, open_m=860, confirm=15, settle=1170, exit_m=1215, n=14, stop_at=0.6, be_r=0.0,
-          tp_r=0.0):
+          tp_r=0.0, limit_entry=False):
     """Gold's overnight move carried on (MgcOvernightCarry.cs, 2026-11-24), on 5-minute bars: the move = the 08:20 bar's
     open less the prior session's 13:25 bar close; at least k x the last n sessions' average |move| and the bars from
     08:20 to 08:20 + confirm closing its way (the last one's close against the 08:20 open): a market order at that
@@ -201,6 +201,11 @@ def carry(days, i, tick=0.1, k=1.5, open_m=860, confirm=15, settle=1170, exit_m=
     if side * (d["c"][kc - 1] - d["o"][ko]) <= 0:
         return []
     e = d["o"][kc] + side * tick
+    if limit_entry:  # research (2026-11-24): a limit at the signal close, good for the entry bar; filled only through it
+        lim = d["c"][kc - 1]
+        if not ((side > 0 and d["l"][kc] <= lim - tick) or (side < 0 and d["h"][kc] >= lim + tick)):
+            return []
+        e = min(d["o"][kc], lim) if side > 0 else max(d["o"][kc], lim)
     # stop_at (2026-11-24, docs 39): the stop that share of the way from the 08:20 open to the signal close, a tick past
     # it (0: the 08:20 open itself, as first shipped); be_r / tp_r: break-even (+ a tick) / a target at that many times the risk from the expected fill
     ref = d["o"][ko] + stop_at * (d["c"][kc - 1] - d["o"][ko])

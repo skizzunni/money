@@ -454,6 +454,13 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    Mar 2025): Mon 0.48 / 2.25, Tue 3.63 / 3.34, Wed 4.82 / 0.15, Thu 1.06 / 1.34, Fri 2.42 / 2.52: Monday and Wednesday
    flip, no day loses in both. None used.
 
+47. **The VWAP stop after break-even, gold by limit** (2026-11-24, a research round; `noise` vwap_after_be,
+   `carry` limit_entry, `verification/zoo/stage41_vwap_be_gold_limit.txt`). The VWAP tightening of MNQ's stop only after
+   break-even: median $16,528 / 25th percentile $11,251 against $16,582 / $11,321, the window -$51. Gold in by a limit at
+   the signal close (filled only through it): PF 1.52 / 1.00 against 2.02 / 1.84 (it fills the moves that come back,
+   not the ones that run), median $16,482 against $17,366. MNQ's day stop with the open trade counted: no different (it
+   enters only flat, so nothing is open when it decides). None used.
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-33; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |
