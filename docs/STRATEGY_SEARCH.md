@@ -532,6 +532,12 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    way by 3-10% of the average range -> in at 09:40: 2-19 more trades a year, but median $15,870-16,430 against
    $16,582, the 25th percentile and the TradingView window lower at every setting. Rejected.
 
+56. **A second extra contract on very strong breaks** (2026-11-24, a research round; `bench.run(add2_at)`,
+   `verification/zoo/stage50_second_add.txt`). Another contract at 1.75-4 sigma past the band (it only matters while
+   trading 1): at 1.75 the median $16,994 and the window +$10,746, but 2.25-3.0 lower the 25th percentile or the
+   median, and shuffled years blow more accounts from $48,998 (14.8-14.9% against 14.5%) for $35-195 of median. Not
+   shipped: the extra size lands where an account is most fragile.
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-33; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |

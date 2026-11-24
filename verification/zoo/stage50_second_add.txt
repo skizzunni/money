@@ -1,0 +1,21 @@
+Stage 50 (2026-11-24, a research round): a second extra contract on very strong breaks (bench.py run(add2_at=...))
+
+One contract more at 1.5 sigma past the band is shipped (section 30); add2_at adds another at add2_at sigma (at most 3
+contracts, so it only matters while trading 1, under +$2,000 of profit). 104 fresh 50K starts, TradingView window:
+add2 off (shipped): lost 0.0% median $16,582 p25 $11,321 | TV $+9,796 53tr PF 4.25 dd $670
+add2_at 1.75:       lost 0.0% median $16,994 p25 $11,547 | TV $+10,746 53tr PF 4.02 dd $670
+add2_at 2.0:        lost 0.0% median $16,940 p25 $11,454 | TV $+10,001 53tr PF 4.02 dd $670
+add2_at 2.25:       lost 0.0% median $16,582 p25 $11,191 | TV $+10,001 53tr PF 4.02 dd $670
+add2_at 2.5:        lost 0.0% median $16,582 p25 $11,191 | TV $+9,796 53tr PF 4.25 dd $670
+add2_at 3.0:        lost 0.0% median $16,485 p25 $11,321 | TV $+9,796 53tr PF 4.25 dd $670
+add2_at 4.0:        lost 0.0% median $16,582 p25 $11,321 | TV $+9,796 53tr PF 4.25 dd $670
+
+Shuffled days (research/stress/montecarlo.py with the second add; 2,000 years; the guard without the strong-only tier;
+the same draws):
+add2 off: from $50,000 blown 6.3%, median $16,632 | $48,806 18.9%, $12,811 | $48,998 14.5%, $14,351
+add2 1.75: from $50,000 blown 6.3%, median $16,667 | $48,806 18.9%, $13,006 | $48,998 14.8%, $14,543
+add2 2.0:  from $50,000 blown 6.4%, median $16,486 | $48,806 19.0%, $12,844 | $48,998 14.9%, $14,335
+
+Verdict: not shipped. The bench gain (+$412 median at 1.75) is not robust: 2.25-2.5 lower the 25th percentile, 3.0
+the median; shuffled years gain $35-195 of median and blow more accounts from $48,998 (14.8-14.9% against 14.5%). The
+extra size lands in the first +$2,000, where an account is most fragile.
