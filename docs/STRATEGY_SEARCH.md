@@ -704,6 +704,10 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
 89. **The gap trade's opening body again** (2026-11-24, a research round; `verification/zoo/stage83_gap_min_body.txt`).
    2% / 4% of the average range instead of 3%: both medians lower in both periods. 3% stays.
 
+90. **61's settings again after 87** (2026-11-24, a research round; `verification/zoo/stage84_61_recheck_after_87.txt`).
+   The wild-open skip at 1.5 / 2.0x and the stop step at 1.25 / 1.75R: each lowers at least one period's median. 1.75x
+   and 1.5R / 0.5R stay.
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-33; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |

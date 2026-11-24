@@ -1,0 +1,11 @@
+Stage 84 (2026-11-24, a research round): section 61's settings one step each way again, after section 87 (GapK 0.6)
+changed the gap trades. Fresh 50K starts by period (none lost anywhere), the TradingView window:
+
+shipped (skip 1.75x, step 1.5R / 0.5R): 2015-19 med $14,028 p25 $5,324 | 2020-25 med $18,980 p25 $15,811 | TV $+10,063 50tr PF 4.66
+wild-open skip 1.5x:                    2015-19 med $13,374 p25 $5,471 | 2020-25 med $18,764 p25 $15,602 | TV $+10,063
+wild-open skip 2.0x:                    2015-19 med $13,843 p25 $4,983 | 2020-25 med $18,614 p25 $15,800 | TV $+10,063
+stop step at 1.25R:                     2015-19 med $13,530 p25 $5,704 | 2020-25 med $18,555 p25 $15,864 | TV $+10,063
+stop step at 1.75R:                     2015-19 med $14,280 p25 $5,436 | 2020-25 med $18,245 p25 $15,486 | TV $+10,063
+
+Verdict: the shipped settings hold: every neighbour lowers at least one period's median, and none beats them on every
+gate. Gold's move threshold (1.25 / 1.75x against 1.5x) was re-tested with the current stop in section 39: not re-run.
