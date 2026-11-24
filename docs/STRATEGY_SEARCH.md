@@ -325,6 +325,23 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
      5-minute opening range breakout: 41% lost. (Research fix: `drive` now returns its exit bar for `merge`.)
    None used: every way found to trade more days costs profit or accounts on this data.
 
+35. **A second market for the days Nasdaq chops** (2026-11-24, the user: "if the market is chopped that day we look at
+   another market"; `zoo/markets.py`, `verification/zoo/stage28_other_markets.txt`). 1-minute history from histdata
+   (Hugging Face elthariel/histdata_fx_1m, UTC, no volume): spot gold (XAUUSD, for MGC) 2009 - Mar 2025, WTI (for MCL)
+   2010-23, EUR/USD (for M6E) 2000 - Mar 2025; each market's main session (gold 08:30, crude 09:00, also 09:30) on the
+   09:30-16:00 clock, prices rescaled month by month to today's level, the hard stop 0.15-0.25x the recent median day
+   range (NQ's $200 is about 0.2x), everything else the shipped band; dev 2009-17, unseen 2018 on.
+   - The band: gold PF 0.98-1.05 / 0.91-1.02 (8-10 of 17 years up), crude 0.66-0.74 / 0.90-1.03 (0-3 of 14), the euro
+     0.39-0.50 / 0.30-0.35 (0 of 26). Before costs gold is PF 1.13 / 1.16 (13 of 17 years up): a small edge that the
+     micro contract's fees and slippage take (MGC's 0.2x stop is about $80 against about $3 of costs; GC's $780 is too
+     big for the $2,000 floor). Crude before costs 0.98 / 1.17, the euro 0.83 / 0.64.
+   - The other families scaled to each market's range (opening range 5 / 15 / 30 minutes, the opening drive, gap and
+     go, the last half hour, the prior day's high / low, VWAP reversion): crude none above PF 1.05 on both; gold only
+     a full-day gap and go on 1x gaps (1.62 / 1.26, 20% of days, about $276 a contract a year).
+   Not used: the band's edge is Nasdaq's (the intraday momentum the noise-band papers find in equity indices); the
+   other index micros (MES, MYM, M2K) chop on the same days and ES is weaker (section 9). A file the user sent,
+   "FUND US ARCX MGC", is the Vanguard Mega Cap Growth ETF (daily bars), not micro gold.
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-33; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |

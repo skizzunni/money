@@ -1,0 +1,70 @@
+gold      stop 0.15 x range: dev PF 1.00 230/yr $9/yr win 19% | unseen PF 0.97 $-129/yr win 17% | years up 8/17 | days traded 40%
+gold      stop 0.2 x range: dev PF 1.02 204/yr $131/yr win 19% | unseen PF 1.02 $105/yr win 18% | years up 9/17 | days traded 40%
+gold      stop 0.25 x range: dev PF 1.05 185/yr $296/yr win 19% | unseen PF 1.01 $42/yr win 18% | years up 10/17 | days traded 40%
+gold930   stop 0.15 x range: dev PF 0.98 208/yr $-108/yr win 17% | unseen PF 0.91 $-340/yr win 17% | years up 7/17 | days traded 34%
+gold930   stop 0.2 x range: dev PF 1.03 185/yr $165/yr win 18% | unseen PF 0.94 $-235/yr win 17% | years up 8/17 | days traded 34%
+gold930   stop 0.25 x range: dev PF 1.04 168/yr $209/yr win 18% | unseen PF 0.97 $-120/yr win 18% | years up 10/17 | days traded 34%
+crude     stop 0.15 x range: dev PF 0.66 204/yr $-679/yr win 15% | unseen PF 0.92 $-195/yr win 19% | years up 0/14 | days traded 41%
+crude     stop 0.2 x range: dev PF 0.71 183/yr $-573/yr win 15% | unseen PF 0.90 $-232/yr win 18% | years up 3/14 | days traded 41%
+crude     stop 0.25 x range: dev PF 0.74 171/yr $-503/yr win 16% | unseen PF 0.95 $-123/yr win 19% | years up 2/14 | days traded 41%
+crude930  stop 0.15 x range: dev PF 0.66 202/yr $-703/yr win 14% | unseen PF 0.94 $-132/yr win 17% | years up 1/14 | days traded 40%
+crude930  stop 0.2 x range: dev PF 0.66 181/yr $-655/yr win 14% | unseen PF 0.95 $-111/yr win 18% | years up 3/14 | days traded 40%
+crude930  stop 0.25 x range: dev PF 0.72 167/yr $-512/yr win 14% | unseen PF 1.03 $59/yr win 19% | years up 3/14 | days traded 40%
+gold
+  orb     n=5, stop=mid, cap=3.12: dev PF 0.87 | unseen PF 0.89 $-592/yr | days 100%
+  orb     n=15, stop=far, cap=3.12: dev PF 1.03 | unseen PF 0.96 $-221/yr | days 100%
+  orb     n=30, stop=far, cap=6.25: dev PF 1.04 | unseen PF 1.00 $40/yr | days 99%
+  orb     n=30, stop=mid, cap=6.25, r=2: dev PF 0.92 | unseen PF 0.85 $-1,165/yr | days 99%
+  drive   n=15, top=0.7, stop=mid, cap=4.69: dev PF 0.87 | unseen PF 0.79 $-471/yr | days 36%
+  drive   n=30, top=0.85, stop=mid, cap=9.37: dev PF 0.93 | unseen PF 1.03 $49/yr | days 18%
+  gap_go  k=0.5, exit_m=590, cap=2.34: dev PF 0.96 | unseen PF 1.13 $122/yr | days 33%
+  gap_go  k=1, exit_m=955, cap=4.69: dev PF 1.62 | unseen PF 1.26 $276/yr | days 20%
+  imom    sig_end=600, enter=930, exit_m=955, stop_pts=4.69, from_close=True: dev PF 0.86 | unseen PF 0.77 $-855/yr | days 100%
+  imom    sig_end=930, enter=930, exit_m=955, stop_pts=4.69, from_close=False: dev PF 0.83 | unseen PF 0.69 $-1,175/yr | days 100%
+  pdhl    mode=break, stop_pts=3.12: dev PF 1.34 | unseen PF 0.97 $-152/yr | days 81%
+  vwap_rev k=2, ks=3.5: dev PF 0.92 | unseen PF 0.87 $-1,553/yr | days 98%
+multiprocessing.pool.RemoteTraceback: 
+"""
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.13/multiprocessing/pool.py", line 125, in worker
+    result = (True, func(*args, **kwds))
+                    ~~~~^^^^^^^^^^^^^^^
+  File "/tmp/claude-0/-home-user-money/a932a565-3474-5ea9-80d7-5853e3bebb0c/scratchpad/mk2.py", line 22, in run
+    for tr in getattr(S,name)(d,i,tick,**p) or []:
+              ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "/home/user/money/research/zoo/strats.py", line 197, in orb
+    hi, lw = d["h"][rng].max(), d["l"][rng].min()
+             ~~~~~~~~~~~~~~~^^
+  File "/usr/local/lib/python3.13/site-packages/numpy/_core/_methods.py", line 41, in _amax
+    return umr_maximum(a, axis, None, out, keepdims, initial, where)
+ValueError: zero-size array to reduction operation maximum which has no identity
+"""
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/tmp/claude-0/-home-user-money/a932a565-3474-5ea9-80d7-5853e3bebb0c/scratchpad/mk2.py", line 31, in <module>
+    for mk,out in p.imap(run,['gold','crude']):
+                  ~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.13/multiprocessing/pool.py", line 873, in next
+    raise value
+ValueError: zero-size array to reduction operation maximum which has no identity
+crude
+  orb     n=5, stop=mid, cap=0.158: dev PF 0.75 | unseen PF 0.77 $-749/yr | days 100%
+  orb     n=15, stop=far, cap=0.158: dev PF 0.77 | unseen PF 0.75 $-907/yr | days 100%
+  orb     n=30, stop=far, cap=0.317: dev PF 0.86 | unseen PF 0.91 $-512/yr | days 100%
+  orb     n=30, stop=mid, cap=0.317, r=2: dev PF 0.79 | unseen PF 0.94 $-270/yr | days 100%
+  drive   n=15, top=0.7, stop=mid, cap=0.238: dev PF 0.82 | unseen PF 0.96 $-44/yr | days 36%
+  drive   n=30, top=0.85, stop=mid, cap=0.475: dev PF 0.98 | unseen PF 1.03 $30/yr | days 17%
+  gap_go  k=0.5, exit_m=590, cap=0.119: dev PF 0.61 | unseen PF 0.72 $-177/yr | days 34%
+  gap_go  k=1, exit_m=955, cap=0.238: dev PF 1.05 | unseen PF 0.97 $-21/yr | days 21%
+  imom    sig_end=600, enter=930, exit_m=955, stop_pts=0.238, from_close=True: dev PF 0.71 | unseen PF 0.65 $-858/yr | days 100%
+  imom    sig_end=930, enter=930, exit_m=955, stop_pts=0.238, from_close=False: dev PF 0.71 | unseen PF 0.70 $-737/yr | days 99%
+  pdhl    mode=break, stop_pts=0.158: dev PF 0.98 | unseen PF 0.92 $-245/yr | days 82%
+  vwap_rev k=2, ks=3.5: dev PF 0.68 | unseen PF 0.81 $-1,265/yr | days 98%
+euro      stop 0.15 x range: dev PF 0.39 232/yr $-1,118/yr win 12% | unseen PF 0.30 $-1,057/yr win 11% | years up 0/26 | days traded 37%
+euro      stop 0.2 x range: dev PF 0.48 205/yr $-885/yr win 13% | unseen PF 0.32 $-978/yr win 11% | years up 0/26 | days traded 37%
+euro      stop 0.25 x range: dev PF 0.50 188/yr $-809/yr win 14% | unseen PF 0.35 $-897/yr win 12% | years up 0/26 | days traded 37%
+before costs: gold      stop 0.2 x range: dev PF 1.13 204/yr $721/yr win 41% | unseen PF 1.16 $611/yr win 43% | years up 13/17 | days traded 40%
+before costs: crude     stop 0.2 x range: dev PF 0.98 183/yr $-29/yr win 41% | unseen PF 1.17 $318/yr win 46% | years up 9/14 | days traded 41%
+before costs: euro      stop 0.2 x range: dev PF 0.83 205/yr $-189/yr win 38% | unseen PF 0.64 $-316/yr win 36% | years up 8/26 | days traded 37%
