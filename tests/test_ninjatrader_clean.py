@@ -219,6 +219,33 @@ def test_clean_band_no_trading_on_a_history_hole(sim, tmp_path):  # noqa: F811
     assert any(60 <= idx[int(x.split(",")[2])][0] < 72 for x in out_off if x.startswith("T,"))
 
 
+def holiday_days() -> list:
+    """synthetic_days() with a holiday calendar's worst three weeks (Jan 2025 in 2015-2025 NQ): four weekdays without
+    a complete session inside one 14-session window (two Thursdays and Fridays a week apart, as Christmas and New Year
+    or Thanksgiving's closed Thursday and half Friday, which the history leaves out)."""
+    days = synthetic_days()
+    thu = next(i for i, d in enumerate(days) if i >= 50 and pd.Timestamp(d["d"]).dayofweek == 3)
+    drop = {thu, thu + 1, thu + 5, thu + 6}
+    out = [d for i, d in enumerate(days) if i not in drop]
+    dates = [pd.Timestamp(d["d"]) for d in out]
+    assert max((dates[i] - dates[i - 14]).days for i in range(14, len(dates))) > 23  # the old guard would have blocked
+    return out
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+def test_clean_band_trades_through_holidays(sim, tmp_path):  # noqa: F811
+    """Holidays and half days are not a hole: with the guard on (the default) the trades are the guard-free reference's,
+    trade for trade, and the log has no NO TRADING (the Mondays after Thanksgiving, Christmas and New Year trade)."""
+    days = holiday_days()
+    path = tmp_path / "bars.csv"
+    idx = write_bars(days, path)
+    out = _run_all(sim, path, MaxContracts=1, DayStop=0)
+    got = [(int(t[0]), int(t[1]), round(float(t[2]), 6), round(float(t[4]), 6)) for t in
+           (x.split(",")[1:] for x in out if x.startswith("T,"))]
+    assert got == [(s, b, e, x) for s, b, e, x, _q in py_trades(days, idx)]
+    assert not any("NO TRADING" in x for x in out)
+
+
 @pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
 def test_clean_band_sizes_from_the_account_when_live(sim, tmp_path):  # noqa: F811
     """Enabled mid-session: from the switch to real time the size comes from the account (here $56,000: 3 MNQ), not

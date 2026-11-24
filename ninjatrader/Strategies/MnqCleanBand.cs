@@ -159,6 +159,16 @@ namespace NinjaTrader.NinjaScript.Strategies
             return Math.Max(1, Math.Min(q, MaxContracts));
         }
 
+        const int MaxMissingWeekdays = 5;
+
+        static int MissingWeekdays(DateTime from, DateTime to)  // weekdays in [from, to) less the 14 sessions held
+        {
+            int n = 0;
+            for (DateTime d = from.Date; d < to.Date; d = d.AddDays(1))
+                if (d.DayOfWeek != DayOfWeek.Saturday && d.DayOfWeek != DayOfWeek.Sunday) n++;
+            return n - 14;
+        }
+
         void NewDay(DateTime date)
         {
             if (today != null && today.Bars >= 76)
@@ -180,15 +190,17 @@ namespace NinjaTrader.NinjaScript.Strategies
             ready = hist.Count >= Math.Max(21, TrendDays + 1);
             sigma.Clear();
             if (!ready) return;
-            // the chart's history must be whole: 14 sessions span at most 23 calendar days (holidays included). A hole
-            // (NinjaTrader's Oct 19 - Nov 6 2026 gap) would compute the noise area from stale days.
-            double span = (date - hist[hist.Count - 14].Date).TotalDays;
-            if (BlockOnDataGap && span > 23)
+            // the chart's history must be whole. A hole (NinjaTrader's Oct 19 - Nov 6 2026 gap) would compute the noise
+            // area from stale days. Counted in weekdays without a complete session in the 14-session window: holidays
+            // and half days leave at most 4 (Jan 2025, 2015-2025 NQ), a real hole many more. (Calendar days, the old
+            // test, blocked the Mondays after Thanksgiving, Christmas and New Year: docs/STRATEGY_SEARCH.md, 27.)
+            int missing = MissingWeekdays(hist[hist.Count - 14].Date, date);
+            if (BlockOnDataGap && missing > MaxMissingWeekdays)
             {
                 ready = false;
                 if (!gapWarned)
-                    Print(Time[0] + "  Clean band: NO TRADING - the chart's history has a hole (the last 14 sessions span " + span +
-                          " days). Reload the historical data (Tools > Historical Data, or right-click the chart > Reload All Historical Data).");
+                    Print(Time[0] + "  Clean band: NO TRADING - the chart's history has a hole (" + missing + " weekdays without a session " +
+                          "in the last 14). Reload the historical data (Tools > Historical Data, or right-click the chart > Reload All Historical Data).");
                 gapWarned = true;
                 return;
             }

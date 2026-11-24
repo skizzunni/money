@@ -87,3 +87,26 @@ def test_pine_clean_band_news_days():
         cum += day
     assert len(ref) > 20
     assert got == ref
+
+
+@pytest.mark.slow
+def test_pine_clean_band_trades_through_holidays():
+    """Holidays are not a hole (the history guard counts weekdays without a session): as the NinjaTrader test, trade
+    for trade with the guard-free reference; and six sessions missing still block until they leave the window."""
+    pytest.importorskip("pynescript", reason="pip install pynescript to check the .pine files")
+    from pine_interpreter import PineRuntime, load_pine
+    from test_ninjatrader_clean import holiday_days, synthetic_days
+    days = holiday_days()
+    bars, idx = bars_of(days)
+    one = {"Most contracts": 1, "Day stop: no new entry once the day is down $ (0 = off)": 0}
+    rt = PineRuntime(load_pine(PINE), bars, one, timeframe_seconds=300)
+    rt.run(lambda i, g: None)
+    got = [(t["dir"], t["entry_bar"], round(t["entry"], 6), round(t["exit"], 6), t["qty"]) for t in rt.strategy.closed]
+    assert got == py_trades(days, idx, tp_fill_bar=False)
+    full = synthetic_days()
+    holed = full[:60] + full[66:]
+    bars, idx = bars_of(holed)
+    rt = PineRuntime(load_pine(PINE), bars, one, timeframe_seconds=300)
+    rt.run(lambda i, g: None)
+    entries = {idx[t["entry_bar"]][0] for t in rt.strategy.closed}
+    assert not any(60 <= d < 72 for d in entries) and any(d >= 75 for d in entries)

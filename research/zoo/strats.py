@@ -50,7 +50,7 @@ def _tick(x, tick):
 
 def noise(days, i, tick, vwap=True, trend=0, hard=250.0, vwap_stop=False, pv=2.0, k=1.0, last=900, max_trades=9,
           be_r=0.0, stop_slip=2, nt=True, tp_r=0.0, tp_fill_bar=True, step=30, range_pos=0.0, tp_frac=1.0,
-          runner_lock=0.0, max_move=0.0, be_plus=0.0, counter_k=0.0, after_target="", move_free=""):
+          runner_lock=0.0, max_move=0.0, be_plus=0.0, counter_k=0.0, after_target="", move_free="", min_stretch=0.0, stretch_gap=False, move_ref="open", hard_vol=0.0, hard_lo=0.0, hard_hi=1e9):
     """The user's Clean Noise-Band spec (research/clean_noise_band.py): checks 10:00-15:00, the band (k x sigma) past
     max/min(open, prior close), the session VWAP agreeing, the band as a stop moved at the checks, a hard stop $hard a
     contract, out at 15:55. trend: also the close past the `trend`-session average of closes. be_r: the stop to entry +
@@ -69,6 +69,9 @@ def noise(days, i, tick, vwap=True, trend=0, hard=250.0, vwap_stop=False, pv=2.0
     up_ref, dn_ref = max(o[0], pc), min(o[0], pc)
     sma = np.mean([prev(days, i, "c", j) for j in range(1, trend + 1)]) if trend else np.nan
     vw = _vwap(d)
+    if hard_vol:  # research (2026-11-24): the hard stop (and so break-even and target) hard_vol x the 14-day average range
+        avg14 = np.mean([(days[j]["h"].max() - days[j]["l"].min()) * d["s"] / days[j]["s"] for j in range(i - 14, i)])
+        hard = pv * min(max(hard_vol * avg14, hard_lo), hard_hi)
     out = []
     pos, entry, stop, pend, pend_stop, ebar, exit_next, hard_ref = 0, 0.0, np.nan, 0, np.nan, 0, False, 0.0
     banked = None  # research (tp_frac < 1): the part taken at the target; the rest runs on the band / break-even stop
@@ -138,10 +141,19 @@ def noise(days, i, tick, vwap=True, trend=0, hard=250.0, vwap_stop=False, pv=2.0
                     pos_r = (c[b] - lo_s) / (hi_s - lo_s) if hi_s > lo_s else 0.5
                     if (want > 0 and pos_r < range_pos) or (want < 0 and pos_r > 1 - range_pos):
                         want = 0
+                if want and min_stretch:  # research (2026-11-24): the close at least min_stretch x sigma past the band
+                    ref = up_ref if want > 0 else dn_ref       # (stretch_gap: only for trades against the day's gap)
+                    edge = up if want > 0 else dn
+                    if want * (c[b] - edge) < min_stretch * sig[end] * ref and not (
+                            stretch_gap and want * (o[0] - pc) > 0):
+                        want = 0
                 if want and max_move:  # research (2026-11-24): skip when the day has already run past max_move x its usual range
                     avg_rng = np.mean([(days[j]["h"].max() - days[j]["l"].min()) * d["s"] / days[j]["s"] for j in range(i - 14, i)])
-                    free = (move_free == "first_check" and end == 600) or (move_free == "first_trade" and not out)
-                    if want * (c[b] - o[0]) > max_move * avg_rng and not free:
+                    free = (move_free in ("first_check", "check_target") and end == 600) or (move_free == "first_trade" and not out) or (
+                        move_free in ("after_target", "check_target") and any(t[4] == "target" and t[0] == want for t in out))
+                    # move_ref (research 2026-11-24): from the open, the band's reference (max/min(open, prior close)), or the prior close
+                    mref = o[0] if move_ref == "open" else pc if move_ref == "close" else (up_ref if want > 0 else dn_ref)
+                    if want * (c[b] - mref) > max_move * avg_rng and not free:
                         want = 0
                 if want:
                     hard_ref = c[b] + want * tick

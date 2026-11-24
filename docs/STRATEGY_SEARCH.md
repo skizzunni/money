@@ -211,6 +211,30 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    is not a chase: without the cap there, dev, unseen NQ and ES are unchanged to the dollar (it hardly happens), live
    +$1,208 a year at 1 MNQ (Nov 5: 2 trades +$436 against 1, -$63), 0 of 104 starts lost. Shipped (NinjaTrader, Pine).
 
+27. **More work on +$6,322 (TradingView, Aug 27 - Nov 23 2026: 47 trades, 40% winners, PF 3.98)** (2026-11-24).
+   A breakdown of the band trades by how far past the band the entry closed, VWAP distance, the gap's and yesterday's
+   direction, trend strength and volatility (dev / unseen NQ / live): only the stretch past the band was weak in the
+   same place twice (0.1-0.25 sigma: PF 0.89 / 1.22 / 0.55; past 0.5 sigma 1.60-1.96 on all three), and trades with the
+   gap beat those against it everywhere (1.62 / 1.63 / 6.37 against 1.33 / 1.56 / 1.79). Tested on the 104 starts, none
+   used (`verification/zoo/stage21_*.txt`):
+   - a minimum stretch past the band (0.10-0.35 sigma, or only against the gap): win rate up (live 42% to 46% at 0.25)
+     but 15-20% fewer trades, the median $15,275 to $13,328-14,169, two settings lose 1.9-2.9% of starts;
+   - the move cap measured from the band's reference (max/min of open and prior close: Nov 19's 14:00 short after a
+     +472 gap that reversed) or the prior close: median $15,184 / $11,788, live +$4 / -$7,368 a year;
+   - no move cap for a re-entry the way of a target already hit that day (Nov 5): 6 trades +$237 against 2, +$436,
+     median $14,624;
+   - the hard stop (and so break-even and target) 0.25-0.35x the 14-day average range: without bounds 6.7-8.7% of
+     starts lost; bounded to 75-150 points the 25th percentile $9,478 to $11,265 but the median $14,417 and live wins
+     42% to 36%.
+
+   One live fix from the walk through Nov 13 - 23: the history guard blocked the Mondays after Thanksgiving, Christmas
+   and New Year. It counted calendar days (14 complete sessions within 23), but holidays and half days (out of the
+   history: under 76 bars) push that to 24-26 on 8-10 days a year in 2015-2025 (Nov 30 2026 would have been one), days
+   the backtest trades. It now counts weekdays without a complete session in the 14-session window and blocks only past
+   5: holidays leave at most 4 (Jan 2025: Christmas Eve, Christmas, New Year, Jan 9), the Oct 19 - Nov 6 2026 hole 14.
+   Tests: a holiday calendar trades exactly the guard-free reference (NinjaTrader, Pine), six missing sessions still
+   block. Shipped (NinjaTrader, Pine).
+
 ## The result (the shipped defaults, research numbers, 2 ticks of stop slippage, $0.62 a side)
 
 | set | band trades | win | PF | band net (1 MNQ) | gap trades (PF, net) | 50K starts lost | median 12 months |
@@ -274,13 +298,14 @@ NinjaTrader 8, on each funded account:
    top-right corner must say **Setup: OK**. The Output window prints the settings and every order.
 
 Defaults: trend 20 sessions, hard stop $200 a contract, break-even at 0.4, take profit at 2.5 hard stops, last entry
-14:00 (840), up to 9 trades a day, day stop $600, the gap trade from +$4,500, at most 3 contracts (2 from +$2,000, 3 from
+14:00 (840), up to 9 trades a day, day stop $600, the gap trade from the first day, at most 3 contracts (2 from +$2,000, 3 from
 +$4,500 over the $50,000 start balance; live it sizes from the account's net liquidation). An account below $50,000
-trades 1 contract and no gap trade until it is back above.
+trades 1 contract until it is back above.
 
 Live safety (tests/test_ninjatrader_clean.py): a stop the broker cancels or rejects while the position is open closes it
-at market ("No stop"); no entries while the chart's last 14 sessions span more than 23 days (a hole in the history, as
-NinjaTrader's Oct 19 - Nov 6 2026 gap; the Output window says to reload the data); NinjaTrader's exit on session close
+at market ("No stop"); no entries while the chart's last 14 sessions leave out more than 5 weekdays (a hole in the
+history, as NinjaTrader's Oct 19 - Nov 6 2026 gap; holidays and half days leave at most 4; the Output window says to
+reload the data); NinjaTrader's exit on session close
 as a backstop (half days, e.g. Nov 27 2026, close at 13:15 before the 15:55 exit). The no-stop exit waits out the
 race where a target's OCO cancel of the stop arrives before the position shows flat (closes at the bar's close, or live
 2 s later, only if still open and no stop is back), so a target never closes twice. The chart shows Setup: OK / NOT READY

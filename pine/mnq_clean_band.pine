@@ -134,8 +134,16 @@ if inRth and dayNum != tDay
     dayStartNet := strategy.netprofit
     gapToday := false
     ready := nH >= math.max(21, trendDays + 1)
-    if ready and blockHole and dayNum - array.get(hDays, nH - 14) > 23
-        ready := false
+    // a hole in the history: more than 5 weekdays without a complete session in the 14-session window (holidays and
+    // half days leave at most 4; calendar days, the old test, blocked the Mondays after Thanksgiving and New Year)
+    if ready and blockHole
+        int wk = 0
+        for dd = array.get(hDays, nH - 14) to dayNum - 1
+            dow = (dd + 4) % 7   // 1970-01-01 (day 0) was a Thursday: 0 Sunday .. 6 Saturday
+            if dow != 0 and dow != 6
+                wk += 1
+        if wk - 14 > 5
+            ready := false
     if ready
         prevC := array.get(hCloses, nH - 1)
         float s = 0.0
