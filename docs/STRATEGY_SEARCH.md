@@ -647,6 +647,11 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    trades after a wild first half hour (over 1.4x its average range) are strong in all three sets (PF 1.96 / 2.00 /
    8.49), but one more contract on them helps only 2015-19 (median +$1,186) and is flat on 2020-25. Not shipped.
 
+77. **Live drift and gold beside MNQ** (2026-11-24, a research round; `verification/zoo/stage71_live_drift_gold_pairing.txt`).
+   Since July 2026 the rules have run better than their history (PF 3.57 against 1.62-1.63; 0.70 trades a day against
+   0.94-1.04), so no degradation, but a full year should look like the history (PF about 1.6, losing months like July).
+   Gold and MNQ days correlate +0.04 / +0.11: gold diversifies; nothing to change.
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-33; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |

@@ -1,0 +1,19 @@
+Stage 71 (2026-11-24, a research round): live-period drift and gold beside MNQ (shipped rules, 1 contract, $0.62 a side)
+
+Trade statistics of the strategy on each period's data (the reference's trades on the live bars, not the accounts'
+own fills):
+set           trades/day  win%   PF    avg win   avg loss  payoff  band share  days traded
+dev 2015-19   0.94        41.0%  1.62  $140.1    -$60.2    2.33    75%         47%
+unseen 20-25  1.04        43.4%  1.63  $166.7    -$78.2    2.13    77%         47%
+live 2026     0.70        46.6%  3.57  $238.1    -$58.2    4.09    73%         32%
+live by month: Jul 6 trades 33% PF 0.38 -$159 | Aug 14, 50%, 2.31, +$511 | Sep 15, 40%, 3.58, +$885 |
+               Oct 20, 40%, 3.82, +$2,060 | Nov (to the 23rd) 18, 61%, 5.62, +$2,528
+
+No degradation: since July the rules have done better than their history (PF 3.57 against 1.62-1.63, the average win
+larger, the average loss the same). Fewer trades and traded days (32% against 47%). Expectation for a full year: the
+history's PF (about 1.6), trades on about half the days, and losing months like July 2026.
+
+Gold beside MNQ (gold5.pkl days that are also in the NQ sets, 1 contract each): correlation of the day's results
++0.04 (2015-19, 91 gold days) / +0.11 (2020-25, 98): gold diversifies. On MNQ's losing days gold made -$11.0 / +$0.5 a
+day against +$15.7 / +$21.2 on the rest (20 / 28 days); gold enters at 08:35, before MNQ trades, so this cannot be a
+skip rule, and the samples are small. Nothing to change.
