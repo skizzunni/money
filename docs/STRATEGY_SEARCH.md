@@ -129,6 +129,19 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    are the gap entries that trade on 1-2% of days (10-30 trades). No edge as rules; not used. (G14 had rejected the
    evening-session sweep with an inversion gap the same way.)
 
+17. **TJR's strategy as his 2026 tutorial states it** (the user's transcript of the 6.7-hour video; `tjr` in
+   `research/zoo/strats.py`, session levels in `overnight.py`, `verification/zoo/stage11_tjr_as_taught.csv`). His
+   steps: draws on liquidity (Asia 18:00-03:00 and London 03:00-08:30 session highs / lows, the prior day's), a sweep,
+   a 5-minute candle CLOSE through the most recent swing (his "up candle then down candle" high), a retrace to
+   equilibrium (50% of the most recent swing) or a fair value gap, a 5-minute candle closing back the trade's way
+   (his simpler entry), the stop above the retrace, targets at the next draws on liquidity; manipulation 09:30-09:50,
+   entry 09:50-10:10, done by 10:30, one trade. As stated: trades on 6% of days, PF 1.54 dev, 0.82 unseen NQ, 0.82 ES,
+   0.57 live. 432 variants (levels, equilibrium or gap, stop at the retrace or the sweep, the first / second draw or
+   2R / 3R, done by 10:30 / 11:00 / 12:00, 6-24 bars to break structure): 71 make money on dev and unseen NQ, 25 also
+   on ES, **none also on the live MNQ months**; those 71 trade on 4-9% of days (about 20 trades a year) for +$250 to
+   +$2,000 a contract over 5.5 years. His discretion (the 1-minute refinement, the daily bias read, SMT with ES) is
+   not in rules here; as rules, no usable edge. Not used.
+
 ## The result (the shipped defaults, research numbers, 2 ticks of stop slippage, $0.62 a side)
 
 | set | band trades | win | PF | band net (1 MNQ) | gap trades (PF, net) | 50K starts lost | median 12 months |

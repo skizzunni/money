@@ -614,3 +614,125 @@ def tjr_sweep(days, i, tick, k=3, window=6, entry="market", r=2.0, tgt="r", last
             losses += 1
         b = xb + 1
     return out
+
+
+def _pivots_tjr(o, h, lo, c, upto):
+    """TJR's swing points up to bar `upto`: a high is an up candle followed by a down candle (the higher of the two
+    highs), a low a down candle followed by an up candle (the lower low); each known once its second candle closes.
+    Returns ([(price, known_bar)] highs, [(price, known_bar)] lows)."""
+    hs, ls = [], []
+    for k in range(upto):
+        up0, up1 = c[k] > o[k], c[k + 1] > o[k + 1]
+        if up0 and not up1:
+            hs.append((max(h[k], h[k + 1]), k + 1))
+        if not up0 and up1:
+            ls.append((min(lo[k], lo[k + 1]), k + 1))
+    return hs, ls
+
+
+def tjr(days, i, tick, levels="sess+pd", cont="eq", stop_at="retrace", tgt="liq1", end=630, window=12, cap=150.0,
+        min_risk=4.0, min_r=1.0, first=570):
+    """TJR's strategy as his 2026 tutorial states it (the user's transcript, 2026-11-24), on 5-minute bars:
+    1. draws on liquidity: Asia (18:00-03:00) and London (03:00-08:30) session highs / lows and the prior day's high / low
+       ("sess+pd"; "pd" the prior day only, "sess" the sessions only);
+    2. a sweep: from `first` a bar trading past such a level not taken since it formed (above a high: a short setup);
+    3. confirmation: within `window` bars a 5-minute CLOSE beyond the most recent swing (his down-then-up candle low /
+       up-then-down candle high), a break of structure;
+    4. continuation: a retrace to equilibrium (50% of the leg from its high to its low, "eq") or into a fair value gap
+       the leg left ("fvg");
+    5. entry: the first 5-minute candle closing back the trade's way from there, at the next open; no entry after `end`;
+    6. the stop a tick past the retrace's extreme ("retrace") or the sweep's ("sweep"); the target the nearest draw on
+       liquidity at least min_r x the risk away ("liq1"), the next one ("liq2"), or 2R / 3R; out at 15:55. One trade."""
+    if i < 1:
+        return []
+    d = days[i]
+    o, h, lo, c, mm = d["o"], d["h"], d["l"], d["c"], d["mm"]
+    n = len(c)
+    ss = d.get("sess", {})
+    pdh, pdl = prev(days, i, "h"), prev(days, i, "l")
+    a_h, a_l = ss.get("asia", (np.nan, np.nan))
+    l_h, l_l = ss.get("london", (np.nan, np.nan))
+    p_h, p_l = ss.get("pre", (np.nan, np.nan))
+    hi_lv, lo_lv = [], []
+    if "sess" in levels:
+        if not np.isnan(a_h) and a_h > np.nanmax([l_h, p_h]):
+            hi_lv.append(a_h)  # not already taken in London / pre-market
+        if not np.isnan(l_h) and l_h > np.nan_to_num(p_h, nan=-np.inf):
+            hi_lv.append(l_h)
+        if not np.isnan(a_l) and a_l < np.nanmin([l_l, p_l]):
+            lo_lv.append(a_l)
+        if not np.isnan(l_l) and l_l < np.nan_to_num(p_l, nan=np.inf):
+            lo_lv.append(l_l)
+    if "pd" in levels:
+        on_h = np.nanmax([a_h, l_h, p_h]) if ss else -np.inf
+        on_l = np.nanmin([a_l, l_l, p_l]) if ss else np.inf
+        if pdh > on_h:
+            hi_lv.append(pdh)
+        if pdl < on_l:
+            lo_lv.append(pdl)
+    if not hi_lv and not lo_lv:
+        return []
+    for b in range(n - 2):
+        if mm[b] < first:
+            continue
+        if mm[b] + 5 > end:
+            return []
+        side = -1 if any(h[b] > L for L in hi_lv) else 1 if any(lo[b] < L for L in lo_lv) else 0
+        if not side:
+            continue
+        # 3. a close through the most recent swing on the other side, within `window` bars
+        ext = h[b] if side < 0 else lo[b]
+        bos = None
+        for q in range(b + 1, min(n - 1, b + 1 + window)):
+            ext = max(ext, h[q]) if side < 0 else min(ext, lo[q])
+            hs, ls = _pivots_tjr(o, h, lo, c, q - 1)
+            sw = [p for p, kb in (ls if side < 0 else hs) if kb < q]
+            if not sw:
+                continue
+            ref = sw[-1]
+            if (side < 0 and c[q] < ref) or (side > 0 and c[q] > ref):
+                bos = q
+                break
+        if bos is None or mm[bos] + 5 > end:
+            return []
+        top = max(h[b:bos + 1]) if side < 0 else min(lo[b:bos + 1])  # the leg's start (the most recent high / low)
+        tb = b + int(np.argmax(h[b:bos + 1]) if side < 0 else np.argmin(lo[b:bos + 1]))
+        gaps = [(h[k], lo[k - 2]) if side < 0 else (h[k - 2], lo[k]) for k in range(tb + 2, bos + 1)
+                if (side < 0 and lo[k - 2] > h[k]) or (side > 0 and h[k - 2] < lo[k])]
+        filled, rx = None, None
+        for r in range(bos + 1, n - 1):
+            if mm[r] + 5 > end:
+                return []
+            leg_end = min(lo[tb:r]) if side < 0 else max(h[tb:r])
+            if (side < 0 and c[r] > top) or (side > 0 and c[r] < top):
+                return []  # the new leg failed
+            if filled is None:
+                if cont == "eq":
+                    eq = (top + leg_end) / 2
+                    hit = (side < 0 and h[r] >= eq) or (side > 0 and lo[r] <= eq)
+                else:
+                    hit = any((side < 0 and h[r] >= g0) or (side > 0 and lo[r] <= g1) for g0, g1 in gaps)
+                if hit:
+                    filled, rx = r, (h[r] if side < 0 else lo[r])
+            if filled is not None:
+                rx = max(rx, h[r]) if side < 0 else min(rx, lo[r])
+                if (side < 0 and c[r] < o[r]) or (side > 0 and c[r] > o[r]):  # 5. a candle closing back our way
+                    e_exp = c[r] + side * tick
+                    stop = (rx if stop_at == "retrace" else top) - side * tick
+                    risk = side * (e_exp - stop)
+                    if risk < min_risk or risk > cap:
+                        return []
+                    if tgt in ("liq1", "liq2"):
+                        pool = [pdl, a_l, l_l, p_l] + [p for p, kb in _pivots_tjr(o, h, lo, c, r - 1)[1]] if side < 0 else \
+                            [pdh, a_h, l_h, p_h] + [p for p, kb in _pivots_tjr(o, h, lo, c, r - 1)[0]]
+                        far = sorted([x for x in pool if not np.isnan(x) and side * (x - e_exp) >= min_r * risk], key=lambda x: side * (x - e_exp))
+                        if not far:
+                            return []
+                        target = far[0] if tgt == "liq1" or len(far) == 1 else far[1]
+                    else:
+                        target = e_exp + side * float(tgt[1:]) * risk
+                    target = _tick(target, tick)
+                    px, x, xb, why = walk(d, r + 1, side, stop, target, 955, tick, at_open=True)
+                    return [(side, r + 1, px, x, why, xb)]
+        return []
+    return []
