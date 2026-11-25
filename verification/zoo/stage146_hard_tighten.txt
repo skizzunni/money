@@ -1,0 +1,13 @@
+shipped: 2015-19 lost 0.0% median $14,028 p25 $5,324 | 2020-25 lost 0.0% median $18,980 p25 $15,811 | TV $+10,063 50tr PF 4.66 dd $670
+hard stop min(100, 0.2 x 14-day range) from 75 points: 2015-19 lost 0.0% median $13,470 p25 $4,117 | 2020-25 lost 0.0% median $17,596 p25 $15,380 | TV $+8,874 52tr PF 4.23 dd $670
+hard stop min(100, 0.2 x 14-day range) from 85 points: 2015-19 lost 0.0% median $13,739 p25 $4,756 | 2020-25 lost 0.0% median $18,209 p25 $15,245 | TV $+8,830 51tr PF 4.21 dd $670
+hard stop min(100, 0.25 x 14-day range) from 75 points: 2015-19 lost 0.0% median $12,008 p25 $5,045 | 2020-25 lost 0.0% median $18,107 p25 $16,164 | TV $+9,737 52tr PF 4.54 dd $670
+hard stop min(100, 0.25 x 14-day range) from 85 points: 2015-19 lost 0.0% median $12,897 p25 $4,808 | 2020-25 lost 0.0% median $18,587 p25 $15,643 | TV $+8,980 51tr PF 4.27 dd $670
+
+Verdict (2026-11-25, docs section 151): rejected; the flat $200 hard stop stays.
+- The hard stop only tightened on calm days (0.2 / 0.25x the 14-day range, at most 100 points, at least 75 / 85):
+  both periods' medians lower in every version (-$289 to -$2,020), the window -$326 to -$1,233; one 2020-25 25th
+  percentile up (+$353 at 0.25x / 75), the rest down.
+- Calm days rarely reach the hard stop (section 149), but break-even (0.4 hard stops) and the target (2.5 hard stops)
+  are measured in hard-stop units, so a tighter stop also brings both closer: winners are cut short.
+- With 150 (only wider: 7.3% of 2020-25 starts lost), the flat $200 is better than a range-scaled stop either way.

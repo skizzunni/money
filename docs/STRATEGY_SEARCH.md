@@ -982,6 +982,10 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    `verification/zoo/stage145_hard_widen.txt`). The hard stop at 0.25 / 0.3x the 14-day range, never under 100 points,
    at most 125 / 150: 2015-19's median up (+$905 to +$1,548) but every version loses 7.3% of 2020-25 starts (as $225 in
    139). Rejected; $200 stays.
+151. **A tighter hard stop on calm days only** (2026-11-25, a research round; `risk_settings_by_period.py --tighten`,
+   `verification/zoo/stage146_hard_tighten.txt`). 0.2 / 0.25x the 14-day range, at most 100 points, at least 75 / 85:
+   both medians lower in every version (-$289 to -$2,020), the window lower; break-even and the target shrink with the
+   stop and cut the winners. With 150: the flat $200 beats a scaled stop either way.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
