@@ -1012,6 +1012,10 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    `verification/zoo/stage153_gap_sides.txt`). With / against the 20-session trend: opposite by period (PF 1.77 / 2.27
    on 2015-19, 1.81 / 1.59 on 2020-25), each up in 10 of 12 years at nearly equal totals; long / short up in 10 / 11 of
    12. Nothing to filter.
+158. **The band by entry check, by year** (2026-11-25, a research round; `research/zoo/check_times.py`,
+   `verification/zoo/stage154_check_times.txt`). Every check from 10:00 to 14:00 pays in both periods; the strongest
+   10:00 and 13:30 (up in 11 of 12 years), the weakest 14:00 (PF 1.29 / 1.18, 6 of 12), still positive (and section 99
+   found dropping it costs). Nothing to change.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
