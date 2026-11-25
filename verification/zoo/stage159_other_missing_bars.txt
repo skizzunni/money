@@ -1,0 +1,17 @@
+Stage 159 (2026-11-26, docs section 163): the rest of MnqCleanBand's bar needs, live, by reading the code.
+
+1. The 09:30 bar (the day's open). NewDay runs on the session's first regular-hours bar: Open[0] is dayOpen and
+   High - Low is Bar0Range. If the 09:30 bar is missing (a feed drop at the open), the 09:35 bar's open becomes the
+   day's open: the bands (max/min(open, prior close)), every check's move (|close / open - 1|, which also feeds the
+   next 14 sessions' sigma) and the gap are measured from the wrong price, and the day still counts as complete
+   (76+ bars). No message. The gap trade is safe: it enters only on the 09:30 bar (mm == 570), so it skips.
+   Never in the history (section 159: every day starts at 09:30), so the backtests are unaffected; live it needs a
+   feed drop right at the open. Not safe as it stands (a wrong trade, not no trade): to fix (no band trades that day,
+   the day kept out of the history, an Output line), with a parity test.
+2. The news bars (08:20, 08:25, 08:30 on an ETH chart). If any is missing the spike is NaN and the news rule is "n/a":
+   the bot trades normally, even on what was a 2-3x skip day. Visible only as "news n/a" on the chart's dashboard.
+   To add: an Output line when the chart has pre-open bars but the news bars are incomplete.
+3. The trend's 20 closes and the 14-session average range come from complete sessions only (76+ bars); a session
+   with fewer drops out, and the history guard counts missing weekdays. Safe.
+4. Monday Nov 30: the half day (Nov 27, closed 13:15, about 45 bars) is not a complete session, so Monday's prior
+   close is Wednesday Nov 25's, the same as every backtest (the day sets hold no half days either). Consistent.

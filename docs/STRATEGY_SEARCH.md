@@ -1034,6 +1034,11 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    that bar, at least 10 of the 14, so one missing bar (a halt, a feed drop) no longer turns a check off for 14
    sessions; an Output line names any check still off. Neutral on every backtest ("The result" exact); parity tests
    with a missing 10:00 bar for NinjaTrader and Pine.
+163. **The other bars it needs, live** (2026-11-26, a research round; `verification/zoo/stage159_other_missing_bars.txt`,
+   by reading MnqCleanBand.cs). A missing 09:30 bar makes the 09:35 open the day's open (the bands, the moves and the
+   gap all measured wrong, silently; the gap trade itself skips): to fix (no trades that day). Missing news bars make
+   the news rule "n/a" (trades normally): to add a warning. The trend and the average range use complete sessions
+   only: safe. Monday Nov 30's prior close is Wednesday's, as in every backtest.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
