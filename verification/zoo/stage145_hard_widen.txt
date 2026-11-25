@@ -1,0 +1,12 @@
+shipped: 2015-19 lost 0.0% median $14,028 p25 $5,324 | 2020-25 lost 0.0% median $18,980 p25 $15,811 | TV $+10,063 50tr PF 4.66 dd $670
+hard stop max(100, 0.25 x 14-day range) up to 125 points: 2015-19 lost 0.0% median $14,933 p25 $5,316 | 2020-25 lost 7.3% median $18,228 p25 $14,464 | TV $+10,017 49tr PF 4.56 dd $670
+hard stop max(100, 0.25 x 14-day range) up to 150 points: 2015-19 lost 0.0% median $15,202 p25 $5,344 | 2020-25 lost 7.3% median $18,169 p25 $14,684 | TV $+9,130 49tr PF 4.07 dd $834
+hard stop max(100, 0.3 x 14-day range) up to 125 points: 2015-19 lost 0.0% median $15,508 p25 $6,177 | 2020-25 lost 7.3% median $17,223 p25 $13,554 | TV $+8,664 49tr PF 4.08 dd $670
+hard stop max(100, 0.3 x 14-day range) up to 150 points: 2015-19 lost 0.0% median $15,576 p25 $6,173 | 2020-25 lost 7.3% median $19,411 p25 $14,758 | TV $+7,887 47tr PF 3.66 dd $834
+
+Verdict (2026-11-25, docs section 150): rejected; the flat $200 hard stop stays.
+- The hard stop only widened (never under 100 points / $200, at most 125 / 150 points; break-even and the target scale
+  with it, as `noise` hard_vol does): every version loses 7.3% of 2020-25 starts (4 of 55), as the flat $225 stop did
+  in section 139, while 2015-19's medians rise (+$905 to +$1,548). The window -$46 to -$2,176.
+- Section 149's wild tercile (the most hard stops) is where a wider stop costs most: the losers there run further.
+  Section 27 tried scaled stops both ways (lost starts unbounded, lower medians bounded).

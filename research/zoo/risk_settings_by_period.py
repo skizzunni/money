@@ -2,7 +2,7 @@
 
 Sections 63-65 checked them with 61 in on the pooled 104 starts (the per-set trade PF only by period). Here each
 period's fresh 50K starts on their own (the shipped account rules) and the TradingView window, one step each way.
-Run from research/: python zoo/risk_settings_by_period.py
+--widen (docs 150): the hard stop only widened on wild days. Run from research/: python zoo/risk_settings_by_period.py
 """
 import pickle
 import sys
@@ -32,6 +32,11 @@ def main():
             ("hard stop $175", {"hard": 175.0}), ("hard stop $225", {"hard": 225.0}),
             ("move cap 1.0", {"max_move": 1.0}), ("move cap 1.2", {"max_move": 1.2}),
             ("range rule 0.6", {"range_pos": 0.6}), ("range rule 0.7", {"range_pos": 0.7}))
+    if "--widen" in sys.argv:  # docs 150: the hard stop only widened on wild days (hard_vol, never under 100 points)
+        rows = (("shipped", {}),) + tuple(
+            (f"hard stop max(100, {hv} x 14-day range) up to {hi:.0f} points",
+             {"hard_vol": hv, "hard_lo": 100.0, "hard_hi": hi})
+            for hv in (0.25, 0.3) for hi in (125.0, 150.0))
     for lab, band in rows:
         tv = B.line("", B.run(band=band)).split("|")[1].strip()
         print(f"{lab}: 2015-19 {score(sets, 'dev', band)} | 2020-25 {score(sets, 'unseen_nq', band)} | {tv}",

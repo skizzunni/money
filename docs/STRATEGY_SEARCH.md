@@ -978,6 +978,10 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    at the hard stop 1% / 3%; wild PF 1.47 / 1.26 with the most hard stops (9% / 12%) but still $22 / $14 a trade. Calm
    markets are not the weak spot (2017's weakness is that year's); wild ones pay least, and sizing down there was
    section 107's loss. Nothing to use.
+150. **A wider hard stop on wild days only** (2026-11-25, a research round; `risk_settings_by_period.py --widen`,
+   `verification/zoo/stage145_hard_widen.txt`). The hard stop at 0.25 / 0.3x the 14-day range, never under 100 points,
+   at most 125 / 150: 2015-19's median up (+$905 to +$1,548) but every version loses 7.3% of 2020-25 starts (as $225 in
+   139). Rejected; $200 stays.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
