@@ -973,6 +973,11 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    market, stopped again and again (6 full $200 stops, up to 7 trades a day), 8 of 12 days lost, none past -$412. Strong
    breaks only after a stop fixes the month (+$7) but costs $16,750 over 2015-2026 (up in 1 of 12 years); at most 2
    losers a day makes it worse; 3 is noise (+$65 in 12 years). Nothing to change: this is the cost of the strategy.
+149. **The band in calm and wild markets** (2026-11-25, a research round; `research/zoo/calm_band.py`,
+   `verification/zoo/stage144_calm_band.txt`). By the band's width at 12:00 (terciles per period): calm PF 1.59 / 1.97,
+   at the hard stop 1% / 3%; wild PF 1.47 / 1.26 with the most hard stops (9% / 12%) but still $22 / $14 a trade. Calm
+   markets are not the weak spot (2017's weakness is that year's); wild ones pay least, and sizing down there was
+   section 107's loss. Nothing to use.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
