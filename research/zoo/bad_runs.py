@@ -5,7 +5,7 @@ starts each month, 12 months each, exactly as harness.account (checked start by 
 also recording per start: the deepest fall from the highest end-of-day balance, the closest the balance came to the
 trailing floor (the cushion's low), the longest run of losing trading days, the most trading days without a new
 high, the worst day and the worst 5-day stretch. Prints the median and the worst 10% / worst start.
-Run from research/: python zoo/bad_runs.py [--gold PATH/gold5.pkl] (gold first in the day, sized like MNQ, no
+Run from research/: python zoo/bad_runs.py [--gold PATH/gold5.pkl] [--guard] (gold first in the day, sized like MNQ, no
 day stop of its own, as harness.account's extra leg; no cushion guard either way).
 """
 import pickle
@@ -22,10 +22,15 @@ import harness as H  # noqa: E402
 import strats as S  # noqa: E402
 
 
-def runs(t, all_days, steps, day_stop, day_qty, max_q=3, extra=None):
-    """harness.account's loop (no eq / early options; extra: gold, first in the day, from +$0), with the path kept."""
+def runs(t, all_days, steps, day_stop, day_qty, max_q=3, extra=None, strong=None, guard=0.0, strong_below=0.0):
+    """harness.account's loop (no eq / early options; extra: gold, first in the day, from +$0), with the path kept.
+    guard (docs 38 / 50, as MnqCleanBand / MgcOvernightCarry): at a day's start under `guard` $ above the floor, 1
+    contract (no extra or news contract), a day stop of a quarter of the cushion ($100-600) and no gold; under
+    `strong_below` $ the day's trades from `strong` (the strategy run with min_stretch 1.5: strong breaks and the gap
+    trade only). guard 0: exactly harness.account."""
     days = [r["d"] for r in all_days]
     byday = {d: g.usd.to_numpy() for d, g in t.groupby("d")}
+    stday = {d: g.usd.to_numpy() for d, g in strong.groupby("d")} if strong is not None else {}
     exday = {d: g.usd.to_numpy() for d, g in extra.groupby("d")} if extra is not None else {}
     adds = {d: g["add"].to_numpy() for d, g in t.groupby("d")}
     idx = pd.Series(range(len(days)), index=pd.to_datetime(days))
@@ -40,8 +45,12 @@ def runs(t, all_days, steps, day_stop, day_qty, max_q=3, extra=None):
         for j in seg:
             d = days[j]
             floor = min(high - 2000.0, 50000.0)
-            day_pl, g = 0.0, byday.get(d)
-            if d in exday and bal - 50000.0 >= 0.0:  # as harness.account (extra_from 0: gold while not under the start)
+            cush = bal - floor
+            on = bool(guard) and cush < guard
+            day_pl, g = 0.0, (stday.get(d) if on and cush < strong_below else byday.get(d))
+            ds = max(100.0, min(day_stop, 0.25 * cush)) if on else day_stop
+            # gold as harness.account's extra leg (extra_from 0: while not under the start); none while guarded
+            if d in exday and bal - 50000.0 >= 0.0 and not on:
                 g = np.concatenate([exday[d], g]) if g is not None else exday[d]
             if g is not None:
                 prof = bal - 50000.0
@@ -52,10 +61,11 @@ def runs(t, all_days, steps, day_stop, day_qty, max_q=3, extra=None):
                 q = day_qty(d, q)
                 if q <= 0:
                     g, q = None, 0
-                ad = adds.get(d, np.zeros(0))
+                q = min(q, 1) if on else q
+                ad = adds.get(d, np.zeros(0)) if not on else np.zeros(0)
                 ad = np.concatenate([np.zeros(len(g) - len(ad)), ad]) if g is not None and len(ad) < len(g) else ad
                 for k_, usd in enumerate(g if g is not None else []):
-                    if day_stop and day_pl <= -day_stop:
+                    if ds and day_pl <= -ds:
                         break
                     day_pl += usd * (min(q + int(ad[k_]), max(q, max_q)) if len(ad) and q >= 1 else q)
                     if bal + day_pl <= floor:
@@ -95,17 +105,23 @@ def gold_trades(path):
 def main():
     sets = pickle.load(open(B.PK, "rb"))
     gold = gold_trades(sys.argv[sys.argv.index("--gold") + 1]) if "--gold" in sys.argv else None
+    guard = "--guard" in sys.argv  # docs 123: the shipped cushion guard ($1,500; strong breaks only under $1,000)
     for n, lab in (("dev", "2015-19"), ("unseen_nq", "2020-25")):
         d, s = sets[n]
         t = H.trades_of(S.everyday, d, s, legs=(("gap_go", B.GAP), ("noise", B.BAND)))
         t["add"] = (B._stretch(d, t, 1.0) >= 1.5).astype(int)
-        r = runs(t, d, B.STEPS, 600.0, B._news(d), extra=gold)
         ref = H.account(t, d, steps=B.STEPS, day_stop=600.0, day_qty=B._news(d), extra=gold)
+        r = runs(t, d, B.STEPS, 600.0, B._news(d), extra=gold)
         assert len(ref) == len(r) and all(a[0] == b and abs(a[1] - c) < 0.01
                                           for a, b, c in zip(ref, r.lost, r.profit, strict=True)), "not as harness"
+        if guard:
+            st = H.trades_of(S.everyday, d, s, legs=(("gap_go", B.GAP), ("noise", {**B.BAND, "min_stretch": 1.5})))
+            r = runs(t, d, B.STEPS, 600.0, B._news(d), extra=gold, strong=st, guard=1500.0, strong_below=1000.0)
+            lab += " with the cushion guard"
         q = r.drop(columns="lost").quantile([0.5, 0.9]).T
         what = f"{lab}{' MNQ + gold' if gold is not None else ''}"
-        print(f"{what}: {len(r)} fresh starts (matches harness.account start by start), lost {r.lost.mean():.1%}")
+        print(f"{what}: {len(r)} fresh starts (matches harness.account start by start with the guard off), "
+              f"lost {r.lost.mean():.1%}")
         print(f"  deepest fall from the high: median ${q.loc['dd', 0.5]:,.0f}, worst 10% ${q.loc['dd', 0.9]:,.0f}, "
               f"worst ${r.dd.max():,.0f}")
         print(f"  closest to the floor (cushion low): median ${r.cush_lo.median():,.0f}, worst 10% "

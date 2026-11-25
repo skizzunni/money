@@ -853,6 +853,12 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    MNQ + gold (gold as harness.account's extra leg, checked start by start): losing days in a row 7 / 9 (worst 7 / 12),
    days without a new high 24 / 20 (66 / 36), the deepest fall $2,051 / $2,875 ($3,289 / $4,832); the worst days as MNQ
    alone. Gold's frequent small losses lengthen the losing runs. Step 12 now covers both.
+123. **The bad run with the cushion guard** (2026-11-25, a research round; `bad_runs.py --guard`,
+   `verification/zoo/stage120_bad_runs.txt`). The shipped guard modelled ($1,500: 1 contract, a quarter-cushion day
+   stop, no gold; $1,000: strong breaks and the gap trade only, section 50's exact method). It barely changes the bad
+   runs: the closest approach to the floor $804 -> $648 (2015-19: one contract recovers more slowly, days without a new
+   high median 21 -> 27) and $500 -> $672 (2020-25); falls, losing runs and worst days about the same. Step 12 corrected
+   (it said live lows "a little shallower").
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
@@ -961,17 +967,17 @@ NinjaTrader 8, on each funded account (both the same way):
      Days to load to 30+).
    - Monday 09:35 / 10:00: the Output window shows the settings line and, if a trade fires, its order and stop.
 
-12. **What a normal bad run looks like (sections 121-122).** In the history (fresh 50K accounts, 12 months each,
-   2015-19 / 2020-25, MNQ alone and with gold; the research model has no cushion guard, which live cuts to 1 contract
-   near the floor, so live lows should be a little shallower and recoveries slower):
+12. **What a normal bad run looks like (sections 121-123).** In the history (fresh 50K accounts, 12 months each,
+   2015-19 / 2020-25, MNQ alone and with gold, with and without the cushion guard, which changes these little):
    - a fall of about $2,000-2,900 from the highest balance at some point in a typical year, up to $3,250-4,830 in the
      worst start (the floor stops trailing at $50,000 once the account is $2,000 up, so these do not end it);
    - 6-8 losing trading days in a row in a typical year, up to 8-10 (with gold, whose small losses are frequent: 7-9,
      up to 12);
-   - about 20 trading days without a new high in a typical year, up to 32-62 (with gold up to 66);
+   - about 20-27 trading days without a new high in a typical year, up to 32-62 (with gold up to 69);
    - a worst day of about -$800 to -$900 (the $600 day stop is checked between trades, so a day can end past it), up to
      about -$1,100; the worst 5 trading days about -$1,900 to -$2,250, up to -$3,180;
-   - in a typical year the balance came within about $1,200 of the floor at some point (as close as $500).
+   - in a typical year the balance came within about $1,200 of the floor at some point (as close as $500 without the
+     guard, $648-672 with it).
    None of those lost an account in the history. A run like this is not a fault; a run well past these is a reason to
    stop and check the setup (step 11) and the trades against TradingView.
 

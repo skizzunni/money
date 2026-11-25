@@ -38,3 +38,35 @@ Notes: gold first in the day, sized like MNQ, only while the account is not unde
 leg), no day stop of its own, no cushion guard. The MNQ-only lines above are unchanged by the script's gold option.
 Gold's many small losing days lengthen the losing runs (2020-25 median 9, worst 12, against 8 / 10) and the days
 without a new high (2015-19 worst 66); the deepest fall and the worst days barely change.
+
+With the cushion guard as shipped (python zoo/bad_runs.py --guard [--gold PATH]; 2026-11-25, docs section 123):
+2015-19 with the cushion guard: 49 fresh starts (matches harness.account start by start with the guard off), lost 0.0%
+  deepest fall from the high: median $1,767, worst 10% $3,250, worst $3,250
+  closest to the floor (cushion low): median $1,227, worst 10% $918, worst $648
+  longest run of losing trading days: median 6, worst 10% 6, worst 8
+  most trading days without a new high: median 27, worst 10% 35, worst 62
+  worst day: median $-772, worst $-1,085; worst 5 trading days: median $-1,728, worst $-2,597
+2020-25 with the cushion guard: 55 fresh starts (matches harness.account start by start with the guard off), lost 0.0%
+  deepest fall from the high: median $2,771, worst 10% $3,350, worst $4,790
+  closest to the floor (cushion low): median $1,245, worst 10% $742, worst $672
+  longest run of losing trading days: median 8, worst 10% 10, worst 10
+  most trading days without a new high: median 19, worst 10% 26, worst 32
+  worst day: median $-828, worst $-1,107; worst 5 trading days: median $-2,252, worst $-3,179
+2015-19 with the cushion guard MNQ + gold: 49 fresh starts (matches harness.account start by start with the guard off), lost 0.0%
+  deepest fall from the high: median $1,824, worst 10% $3,289, worst $3,289
+  closest to the floor (cushion low): median $1,227, worst 10% $838, worst $648
+  longest run of losing trading days: median 7, worst 10% 7, worst 7
+  most trading days without a new high: median 27, worst 10% 67, worst 69
+  worst day: median $-772, worst $-1,085; worst 5 trading days: median $-1,767, worst $-2,574
+2020-25 with the cushion guard MNQ + gold: 55 fresh starts (matches harness.account start by start with the guard off), lost 0.0%
+  deepest fall from the high: median $2,875, worst 10% $4,680, worst $4,832
+  closest to the floor (cushion low): median $1,215, worst 10% $742, worst $672
+  longest run of losing trading days: median 8, worst 10% 11, worst 12
+  most trading days without a new high: median 20, worst 10% 32, worst 36
+  worst day: median $-828, worst $-1,107; worst 5 trading days: median $-2,252, worst $-3,179
+Notes: the guard as MnqCleanBand / MgcOvernightCarry: at a day's start under $1,500 above the floor 1 contract (no
+extra or news contract), a day stop of a quarter of the cushion ($100-600), no gold; under $1,000 the day's trades
+from the strategy run with min_stretch 1.5 (strong breaks and the gap trade only; section 50's exact method). The
+plain run (guard off) still matches harness.account start by start. The guard barely changes these figures: the
+closest approach to the floor 2015-19 $804 -> $648 (smaller size recovers more slowly; days without a new high median
+21 -> 27), 2020-25 $500 -> $672; the falls, runs and worst days about the same. Step 12 now quotes these.
