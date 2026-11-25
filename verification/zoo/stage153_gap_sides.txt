@@ -1,0 +1,31 @@
+2015-19: with the trend 141 PF 1.77 $3,388 | against 131 PF 2.27 $5,134
+2020-25: with the trend 168 PF 1.81 $5,182 | against 138 PF 1.59 $3,492
+ES 2020-24: with the trend 49 PF 0.61 $-381 | against 40 PF 0.86 $-81
+live 2026: with the trend 9 PF 1.37 $145 | against 9 PF 1.51 $208
+
+the gap trade by year, 1 contract:
+      with $  against $  long $  short $
+y                                       
+2015    -157       1665    1130      378
+2016    1910       1060    2164      805
+2017     569        369     395      542
+2018     279        230     246      263
+2019     787       1810     900     1697
+2020    1684       1447    2475      656
+2021    1413       -938     314      162
+2022     843       2228    1115     1955
+2023    1022        390    1032      380
+2024      -6        633     -40      667
+2025     226       -268    -507      464
+2026     145        208     534     -180
+with $ up in 10 of 12 years, total $8,715
+against $ up in 10 of 12 years, total $8,835
+long $ up in 10 of 12 years, total $9,759
+short $ up in 11 of 12 years, total $7,790
+
+Verdict (2026-11-25, docs section 157): nothing to use; the gap trade pays every way.
+- With / against the 20-session trend: opposite by period (against better on 2015-19, PF 2.27 vs 1.77; worse on
+  2020-25, 1.59 vs 1.81), each up in 10 of 12 years, nearly equal totals ($8,715 / $8,835). Section 28 found no trend
+  bucket weak everywhere either.
+- Long / short: up in 10 / 11 of 12 years ($9,759 / $7,790). ES weak on both (known; the bot trades MNQ).
+- The trend test is known before the open (the prior close against the 20 prior closes): no hindsight.

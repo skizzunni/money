@@ -1008,6 +1008,10 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    files sent on Nov 24 differ from the repo only in two header comments; every MNQ and gold default, the half-day
    13:10 and the history guard match step 11 and the Pine inputs. One stale text fixed: gold's description said
    "held to 13:30" (it exits at 14:15, as coded). No reinstall needed.
+157. **The gap trade's sides by year** (2026-11-25, a research round; `research/zoo/gap_sides.py`,
+   `verification/zoo/stage153_gap_sides.txt`). With / against the 20-session trend: opposite by period (PF 1.77 / 2.27
+   on 2015-19, 1.81 / 1.59 on 2020-25), each up in 10 of 12 years at nearly equal totals; long / short up in 10 / 11 of
+   12. Nothing to filter.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
