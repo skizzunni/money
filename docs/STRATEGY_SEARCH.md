@@ -819,6 +819,9 @@ NinjaTrader 8, on each funded account (both the same way):
      back-adjusted the same way), so the MNQ 03-27 chart carries the 12-26 history. With "Do not merge" the 03-27 chart
      holds only 03-27's own pre-roll bars, which can be thin; if a session misses any 5-minute bar it does not count,
      and the dashboard may say NOT READY or NO TRADING (this could not be checked here: no 03-27 pre-roll bars).
+     Not **Merge not back adjusted**: it leaves the calendar spread (about 1%) as a price jump on the roll day, which
+     the strategy reads as a real gap (a gap trade can fire, at most its 30-point stop) and which tilts the 20-session
+     trend for weeks; safe (research/stress/torture.py's +8% / -7% gaps pass), but not the trades the research measured.
    - **After the close on Dec 9 (the strategy is flat by 15:55):** turn the strategy off, change the chart's instrument
      to **MNQ 03-27**, right-click > Reload All Historical Data, add the strategy again with the same settings (start
      balance, Highest end-of-day balance, Place orders), Enabled.

@@ -1,0 +1,10 @@
+Stage 94 (2026-11-25, a research round): the roll day's price jump.
+
+Only NinjaTrader's "Merge not back adjusted" puts the calendar spread (MNQ about 1%) into the chart as a jump between
+sessions; "Merge back adjusted" (recommended, step 10) removes it, and an unmerged chart holds one contract. The
+stand-in already covers jumps eight times larger: research/stress/torture.py "gaps +8% / -7%" passes in both runs (no
+errors, no entry without its stop, no stop on the wrong side, nothing overnight, trade for trade with the reference;
+stage 89's run). With a +1% jump the strategy does what its rules say: the gap trade may fire (if the 09:30 bar closes
+the jump's way; at most its 30-point stop, out by 09:55), the day's band reference max / min(open, prior close) widens,
+and the 20-session trend leans the jump's way for a few weeks. No new test needed; the rollover note now says not to use
+"Merge not back adjusted".
