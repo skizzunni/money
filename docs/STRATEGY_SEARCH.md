@@ -907,6 +907,9 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    and 1.4% / 6.3% / 3.6% against 1.5% / 6.5% / 3.7% (2020-25); medians +$246-356 and +$620-716. Gold lowers the risk a
    little and adds profit on both periods. (bad_runs.py --gold uses harness.account's convention, which applies the
    news rule to gold; noted.)
+134. **Gold's size, by period** (2026-11-25, a research round; `near_floor_tiers.py --gold PATH --gold-size`,
+   `verification/zoo/stage129_gold_size.txt`). Gold always 1 MGC: the same risk as the steps for less profit; always 2
+   / 3: +$12-283 of median for up to 0.3 points more risk in most cells. Gold stays on the steps (1 / 2 / 3).
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 

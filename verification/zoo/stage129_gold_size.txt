@@ -1,0 +1,16 @@
+2015-19 gold on the steps (shipped): shuffled years $50,000 0.4% / $11,771 $48,806 4.6% / $7,826 $48,998 2.5% / $8,770
+2015-19 gold always 1: shuffled years $50,000 0.4% / $11,513 $48,806 4.6% / $7,814 $48,998 2.5% / $8,668
+2015-19 gold always 2: shuffled years $50,000 0.4% / $11,766 $48,806 4.7% / $7,974 $48,998 2.6% / $8,782
+2015-19 gold always 3: shuffled years $50,000 0.5% / $12,054 $48,806 4.7% / $8,015 $48,998 2.6% / $8,863
+2020-25 gold on the steps (shipped): shuffled years $50,000 1.4% / $16,202 $48,806 6.3% / $12,267 $48,998 3.6% / $12,943
+2020-25 gold always 1: shuffled years $50,000 1.4% / $15,932 $48,806 6.3% / $11,718 $48,998 3.8% / $12,740
+2020-25 gold always 2: shuffled years $50,000 1.6% / $16,239 $48,806 6.2% / $12,003 $48,998 3.8% / $12,917
+2020-25 gold always 3: shuffled years $50,000 1.5% / $16,445 $48,806 6.2% / $12,375 $48,998 3.9% / $13,034
+
+Verdict (2026-11-25, docs section 134): no change; gold stays on the size steps (1 / 2 / 3 from +$0 / +$2,000 /
++$3,500), within the 3-contract cap.
+- Always 1: the same risk as the steps (2015-19 identical; 2020-25 from $48,998 3.8% against 3.6%) for less profit
+  (-$102 to -$549 shuffled medians).
+- Always 2 / always 3: medians +$12 to +$283, but more risk in most cells (2020-25 fresh 1.6% / 1.5% against 1.4%,
+  from $48,998 3.8% / 3.9% against 3.6%; 2015-19 0.1 points higher in 3 of 6 cells). Risk first: not taken.
+- Shuffled years as section 133 (gold as live, the guard in, 2,000 x 252 days per period).
