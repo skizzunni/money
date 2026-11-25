@@ -23,7 +23,7 @@ import strats as S  # noqa: E402
 
 
 def runs(t, all_days, steps, day_stop, day_qty, max_q=3, extra=None, strong=None, guard=0.0, strong_below=0.0,
-         start=50000.0):
+         start=50000.0, share=0.25):
     """harness.account's loop (no eq / early options; extra: gold, first in the day, from +$0), with the path kept.
     guard (docs 38 / 50, as MnqCleanBand / MgcOvernightCarry): at a day's start under `guard` $ above the floor, 1
     contract (no extra or news contract), a day stop of a quarter of the cushion ($100-600) and no gold; under
@@ -53,7 +53,7 @@ def runs(t, all_days, steps, day_stop, day_qty, max_q=3, extra=None, strong=None
             cush = bal - floor
             on = bool(guard) and cush < guard
             day_pl, g = 0.0, (stday.get(d) if on and cush < strong_below else byday.get(d))
-            ds = max(100.0, min(day_stop, 0.25 * cush)) if on else day_stop
+            ds = max(100.0, min(day_stop, share * cush)) if on else day_stop  # share: docs 127
             # gold as harness.account's extra leg (extra_from 0: while not under the start); none while guarded
             if d in exday and bal - 50000.0 >= 0.0 and not on:
                 g = np.concatenate([exday[d], g]) if g is not None else exday[d]

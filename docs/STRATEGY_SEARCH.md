@@ -873,6 +873,11 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    $50,000 / $48,806 / $48,998. No gap trade under $1,000: 2020-25 safer (from $48,806 shuffled 6.5% -> 3.1%) but
    2015-19 riskier (4.7% -> 5.5%), medians lower in both. The first trade a day only: the reverse (3.9% / 9.0%).
    Opposite by period: rejected; the shipped tier (strong breaks and the gap trade) stays.
+127. **The guard's day stop share** (2026-11-25, a research round; `near_floor_tiers.py --share`,
+   `verification/zoo/stage122_guard_day_stop_share.txt`). The first check of the share itself, with the strong-only tier
+   in: 0.15-0.35 of the cushion move shuffled-year losses by 0.3 points at most; 0.3 / 0.35 lose 1 of 49 2015-19 calendar
+   starts from $48,806 (none at 0.25); 0.15 / 0.2 cut the near-floor medians ($4,669 against $6,230 on 2015-19). 0.25
+   stays (`GuardDayStopShare`).
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 

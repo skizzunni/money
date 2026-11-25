@@ -1,0 +1,38 @@
+2015-19 day stop 0.15 x the cushion:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $9,059 | $48,806 0.0% / $4,669 | $48,998 0.0% / $4,991
+   shuffled years: $50,000 0.4% / $11,203 $48,806 4.6% / $7,395 $48,998 2.5% / $8,072
+2015-19 day stop 0.2 x the cushion:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $7,585 | $48,806 0.0% / $4,669 | $48,998 0.0% / $4,991
+   shuffled years: $50,000 0.4% / $11,261 $48,806 4.7% / $7,433 $48,998 2.4% / $8,287
+2015-19 day stop 0.25 x the cushion:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $9,810 | $48,806 0.0% / $6,230 | $48,998 0.0% / $6,781
+   shuffled years: $50,000 0.4% / $11,322 $48,806 4.7% / $7,580 $48,998 2.6% / $8,414
+2015-19 day stop 0.3 x the cushion:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $9,801 | $48,806 2.0% / $7,013 | $48,998 0.0% / $7,278
+   shuffled years: $50,000 0.5% / $11,325 $48,806 4.8% / $7,674 $48,998 2.5% / $8,408
+2015-19 day stop 0.35 x the cushion:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $9,801 | $48,806 2.0% / $7,013 | $48,998 0.0% / $7,278
+   shuffled years: $50,000 0.5% / $11,325 $48,806 4.8% / $7,699 $48,998 2.5% / $8,431
+2020-25 day stop 0.15 x the cushion:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $17,082 | $48,806 1.8% / $11,568 | $48,998 0.0% / $12,481
+   shuffled years: $50,000 1.5% / $15,379 $48,806 6.5% / $11,055 $48,998 3.6% / $12,037
+2020-25 day stop 0.2 x the cushion:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $17,082 | $48,806 1.8% / $12,224 | $48,998 0.0% / $13,112
+   shuffled years: $50,000 1.6% / $15,526 $48,806 6.5% / $11,335 $48,998 3.8% / $12,191
+2020-25 day stop 0.25 x the cushion:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $17,205 | $48,806 1.8% / $12,892 | $48,998 0.0% / $14,917
+   shuffled years: $50,000 1.5% / $15,582 $48,806 6.5% / $11,551 $48,998 3.7% / $12,272
+2020-25 day stop 0.3 x the cushion:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $17,205 | $48,806 1.8% / $12,947 | $48,998 0.0% / $15,068
+   shuffled years: $50,000 1.4% / $15,547 $48,806 6.2% / $11,561 $48,998 3.6% / $12,283
+2020-25 day stop 0.35 x the cushion:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $17,205 | $48,806 1.8% / $12,947 | $48,998 0.0% / $15,068
+   shuffled years: $50,000 1.4% / $15,550 $48,806 6.2% / $11,549 $48,998 3.5% / $12,213
+
+Verdict (2026-11-25, docs section 127): no change; 0.25 stays.
+- First time the share itself was varied (section 38 tried fixed $150-250 day stops, section 50 $100-150, before or
+  beside the strong-only tier). With the tier in, MNQ alone:
+- Shuffled years barely move (from $48,806: 4.6-4.8% on 2015-19, 6.2-6.5% on 2020-25 at every share).
+- Calendar: 0.3 / 0.35 lose 1 of 49 2015-19 starts from $48,806 (2.0%, none at 0.25); 0.15 / 0.2 cut the near-floor
+  medians (2015-19 from $48,806 $4,669 against $6,230; 2020-25 $11,568-12,224 against $12,892).
+- 0.25 is the middle of a flat plateau and the only setting at or near the best on every line.
