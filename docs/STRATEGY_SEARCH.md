@@ -938,6 +938,10 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    0.35-0.45R x the hard stop $190-210 (the 0.45R row loses 7.3% of 2020-25 starts; 0.35R cuts 2015-19; no cell better on
    both); the target 2.25-2.75R x the second stop step 1.25-1.75R (the shipped cell the best on 2020-25; 2.75R better
    on 2015-19 only). No interaction the one-at-a-time checks missed. Both stay.
+141. **Two more pairs** (2026-11-25, a research round; `pair_grids.py k_move / range_trend`,
+   `verification/zoo/stage136_pair_grids_2.txt`). The band width 0.95-1.05 sigma x the move cap 1.0-1.2: the shipped
+   cell has the best 2015-19 median and window (cap 1.0 better on 2020-25 only). The range rule 0.6-0.7 x the trend
+   15-25 sessions: the shipped cell has the best median in both periods. Four pairs now checked; both stay.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 

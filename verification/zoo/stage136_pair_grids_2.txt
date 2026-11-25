@@ -1,0 +1,30 @@
+k x max_move: 2015-19 lost / median / p25 | 2020-25 lost / median / p25 | TradingView window
+k 0.95 max_move 1.0: 0.0% $13,442 / $5,959 | 0.0% $18,822 / $13,832 | TV $+6,800 47tr PF 3.27 dd $741
+k 0.95 max_move 1.1: 0.0% $13,683 / $4,534 | 0.0% $17,123 / $14,036 | TV $+9,871 50tr PF 4.29 dd $741
+k 0.95 max_move 1.2: 0.0% $12,601 / $6,449 | 0.0% $15,911 / $12,812 | TV $+9,274 51tr PF 3.58 dd $741
+k 1.0 max_move 1.0: 0.0% $12,805 / $4,520 | 0.0% $19,841 / $15,417 | TV $+6,992 47tr PF 3.54 dd $670
+k 1.0 max_move 1.1 (shipped): 0.0% $14,028 / $5,324 | 0.0% $18,980 / $15,811 | TV $+10,063 50tr PF 4.66 dd $670
+k 1.0 max_move 1.2: 0.0% $12,700 / $5,374 | 0.0% $16,757 / $14,009 | TV $+9,465 51tr PF 3.83 dd $670
+k 1.05 max_move 1.0: 0.0% $12,293 / $4,023 | 0.0% $18,624 / $15,460 | TV $+5,497 49tr PF 3.09 dd $598
+k 1.05 max_move 1.1: 0.0% $13,557 / $3,236 | 0.0% $17,830 / $14,250 | TV $+8,568 52tr PF 4.26 dd $598
+k 1.05 max_move 1.2: 0.0% $12,672 / $3,659 | 0.0% $15,427 / $12,788 | TV $+7,970 53tr PF 3.47 dd $598
+range_pos x trend: 2015-19 lost / median / p25 | 2020-25 lost / median / p25 | TradingView window
+range_pos 0.6 trend 15: 0.0% $12,625 / $7,388 | 0.0% $17,184 / $14,703 | TV $+8,850 59tr PF 3.27 dd $1,276
+range_pos 0.6 trend 20: 0.0% $13,243 / $5,229 | 0.0% $17,639 / $15,510 | TV $+9,102 52tr PF 3.45 dd $1,276
+range_pos 0.6 trend 25: 0.0% $12,040 / $3,987 | 0.0% $17,476 / $11,062 | TV $+9,225 51tr PF 3.57 dd $1,276
+range_pos 0.65 trend 15: 0.0% $12,698 / $7,501 | 0.0% $17,828 / $15,004 | TV $+9,811 57tr PF 4.34 dd $670
+range_pos 0.65 trend 20 (shipped): 0.0% $14,028 / $5,324 | 0.0% $18,980 / $15,811 | TV $+10,063 50tr PF 4.66 dd $670
+range_pos 0.65 trend 25: 0.0% $12,239 / $4,054 | 0.0% $18,389 / $11,382 | TV $+10,186 49tr PF 4.88 dd $670
+range_pos 0.7 trend 15: 0.0% $12,784 / $7,277 | 0.0% $17,164 / $15,439 | TV $+9,933 53tr PF 4.53 dd $670
+range_pos 0.7 trend 20: 0.0% $13,049 / $6,092 | 0.0% $17,481 / $15,433 | TV $+10,242 47tr PF 4.98 dd $670
+range_pos 0.7 trend 25: 0.0% $9,965 / $5,668 | 0.0% $17,393 / $11,314 | TV $+10,302 46tr PF 5.10 dd $670
+
+Verdict (2026-11-25, docs section 141): both pairs stay at the shipped cell.
+- Band width x move cap: the shipped cell has the best 2015-19 median and the best window of the nine; its only
+  rival, cap 1.0 at 1.0 sigma, is +$861 on 2020-25's median but -$1,223 on 2015-19 and the window -$3,071 (section
+  139); the 0.95 / 1.05-sigma rows are lower on at least one period's median everywhere.
+- Range rule x trend length: the shipped cell has the best median in both periods of the nine; trend 15 lifts
+  2015-19's 25th percentile (+$1,953 to +$2,177) but lowers both medians; trend 25 cuts 2020-25's 25th percentile by
+  $4,429-4,748; range 0.7 / trend 25 has the best window (+$10,302) but 2015-19's median -$4,063.
+- With section 140, four pairs of interacting settings checked by period: no interaction the one-at-a-time checks
+  missed.
