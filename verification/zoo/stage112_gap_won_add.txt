@@ -1,0 +1,26 @@
+2015-19: band trades same way after a gap win 124 PF 2.43, after a gap loss 110 PF 1.03, no gap trade 626 PF 1.54
+  account, shipped: lost 0.0% median $14,028 p25 $5,324
+  +1 after a gap win over $0: 124 trades, lost 0.0% median -925 p25 +598
+  +1 after a gap win over $25: 118 trades, lost 0.0% median -925 p25 +598
+  +1 after a gap win over $50: 116 trades, lost 0.0% median -925 p25 +598
+  +1 after a gap win over $100: 92 trades, lost 0.0% median +869 p25 +199
+  placebo, +1 on random band trades at the same rate (14%): median -239 (-1,087 to +1,242) p25 -165 (-2,024 to +546)
+2020-25: band trades same way after a gap win 145 PF 2.49, after a gap loss 186 PF 1.36, no gap trade 742 PF 1.59
+  account, shipped: lost 0.0% median $18,980 p25 $15,811
+  +1 after a gap win over $0: 145 trades, lost 0.0% median +96 p25 +38
+  +1 after a gap win over $25: 142 trades, lost 0.0% median +96 p25 +38
+  +1 after a gap win over $50: 135 trades, lost 0.0% median +96 p25 +46
+  +1 after a gap win over $100: 120 trades, lost 0.0% median -352 p25 -31
+  placebo, +1 on random band trades at the same rate (13%): median -165 (-1,174 to +424) p25 +60 (-430 to +732)
+ES 2020-24: band trades same way after a gap win 28 PF 1.09, after a gap loss 44 PF 1.14, no gap trade 230 PF 1.31
+live 2026: band trades same way after a gap win 4 PF 15.15, after a gap loss 13 PF 15.53, no gap trade 36 PF 2.37
+
+Verdict (2026-11-25, docs section 113): nothing used.
+- The split is real on NQ: band trades the same way as a gap trade that won are PF 2.43 / 2.49 (2015-19 / 2020-25)
+  against 1.54 / 1.59 with no gap trade; after a gap loss 1.03 / 1.36. On ES it is not there (1.09 / 1.14 / 1.31), and
+  live 2026 trades after a gap loss were PF 15.5 (13 trades): skipping them would have cost the live months' profit.
+- On the account one contract more on those trades does not pay: 2015-19 median -$925 (+$869 only at a $100 minimum),
+  2020-25 +$96 (-$352 at $100), every result inside the placebo's range (-$1,087 to +$1,242; -$1,174 to +$424). The
+  extra-contract slot is often already used (the 1.5-sigma stretch) or the account is already at 3.
+- The overnight range for the gap trade: not testable (the NQ day data starts at 09:30; as section 45 found).
+- Hindsight: none (the gap trade is out at 09:55, before the band's first check at 10:00).

@@ -804,6 +804,11 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    filter): the first 15 minutes' run against the overnight move, and the signal close in the 08:20-08:35 range. By
    terciles both flip between periods (the weakest run tercile PF 0.57 on 2009-17 is the best on 2018-25 at 5.59; the
    low close tercile 0.17 / 2.51), and each holds 1-7 winners. Nothing used.
+113. **The band trades after the morning gap trade** (2026-11-25, a research round; `research/zoo/gap_won_add.py`,
+   `verification/zoo/stage112_gap_won_add.txt`). Band trades the same way as a gap trade that won: PF 2.43 / 2.49
+   (2015-19 / 2020-25) against 1.54 / 1.59 with no gap trade, but ES 1.09. One contract more on them: medians -$925 /
+   +$96, inside a placebo's range. After a gap loss PF 1.03 / 1.36 (live 15.5 on 13 trades): no skip. Nothing used.
+   The overnight range is not testable (the NQ data starts at 09:30).
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
