@@ -794,6 +794,11 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    (correlation 0.04 / 0.11); both lose on 22% / 26% of gold days, the worst such day -$582 a contract, inside the
    $600 day stop plus a gold loss. Nothing to use. Found on the way: gold wins only 9% of its trades (316 in 2009 -
    Mar 2025): losers $19.5 a contract on average (83% stopped by 09:30), winners $405. Now in "Running it" step 9.
+111. **Gold in again after an early stop** (2026-11-25, a research round; `research/zoo/gold_reentry.py`,
+   `verification/zoo/stage110_gold_reentry.txt`). Once, on the first close past the signal close by 09:00 / 09:30 /
+   10:00, out at 14:15. With a stop past the extreme since the stop-out the re-entries make $131-277 a year a contract on
+   2009-17 but -$33 to +$21 on 2018-25; with the first trade's stop the reverse (-$43 to -$67 / +$44 to +$105). Each
+   version fails one period, and the worst gold day deepens (to -$156 to -$268). Rejected.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 

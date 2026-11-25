@@ -1,0 +1,21 @@
+shipped: 2009-17 19/yr $+361/yr PF 2.02 worst $-141 years up 56% | 2018-25 20/yr $+286/yr PF 1.84 worst $-91 years up 75%
+again by 9:00, orig stop: re-entries 2009-17 6/yr $-48/yr PF 0.76 worst $-92 years up 33% | 2018-25 8/yr $+44/yr PF 1.18 worst $-124 years up 38%
+    with the first trades: 2009-17 19/yr $+313/yr PF 1.58 worst $-141 years up 67% | 2018-25 20/yr $+329/yr PF 1.58 worst $-215 years up 62%
+again by 9:00, swing stop: re-entries 2009-17 6/yr $+131/yr PF 1.51 worst $-133 years up 78% | 2018-25 8/yr $-33/yr PF 0.91 worst $-140 years up 38%
+    with the first trades: 2009-17 19/yr $+492/yr PF 1.84 worst $-156 years up 89% | 2018-25 20/yr $+253/yr PF 1.38 worst $-231 years up 62%
+again by 9:30, orig stop: re-entries 2009-17 10/yr $-43/yr PF 0.88 worst $-111 years up 33% | 2018-25 12/yr $+105/yr PF 1.27 worst $-124 years up 38%
+    with the first trades: 2009-17 19/yr $+318/yr PF 1.47 worst $-187 years up 67% | 2018-25 20/yr $+390/yr PF 1.57 worst $-215 years up 50%
+again by 9:30, swing stop: re-entries 2009-17 10/yr $+277/yr PF 1.57 worst $-185 years up 67% | 2018-25 12/yr $+21/yr PF 1.03 worst $-193 years up 50%
+    with the first trades: 2009-17 19/yr $+638/yr PF 1.81 worst $-199 years up 89% | 2018-25 20/yr $+307/yr PF 1.34 worst $-231 years up 50%
+again by 10:00, orig stop: re-entries 2009-17 12/yr $-67/yr PF 0.85 worst $-132 years up 22% | 2018-25 13/yr $+47/yr PF 1.11 worst $-169 years up 38%
+    with the first trades: 2009-17 19/yr $+294/yr PF 1.39 worst $-187 years up 56% | 2018-25 20/yr $+333/yr PF 1.45 worst $-215 years up 50%
+again by 10:00, swing stop: re-entries 2009-17 12/yr $+207/yr PF 1.33 worst $-245 years up 67% | 2018-25 13/yr $-16/yr PF 0.98 worst $-193 years up 38%
+    with the first trades: 2009-17 19/yr $+568/yr PF 1.62 worst $-268 years up 89% | 2018-25 20/yr $+270/yr PF 1.28 worst $-231 years up 50%
+
+(Trade counts on the "with the first trades" lines are days a year; the worst there is a day's total.)
+Verdict (2026-11-25, docs section 111): rejected.
+- Swing stop: the re-entries pay on 2009-17 (+$131 / +$277 / +$207 a year a contract by 09:00 / 09:30 / 10:00) but
+  not on 2018-25 (-$33 / +$21 / -$16, PF 0.91-1.03).
+- The first trade's stop again: the other way round (2009-17 -$43 to -$67, 2018-25 +$44 to +$105).
+- Every version fails one period, and the worst gold day gets worse (-$156 to -$268 a contract against -$141 / -$91).
+- Hindsight: none (the trigger is a bar's close after the stop-out; the entry at the next bar's open).
