@@ -1,0 +1,41 @@
+2015-19 (band trades, sigmas past the band at the signal close):
+              trades   win  $ a trade  losers' avg  at the hard stop
+bk                                                                  
+(-9.0, 0.25]     315  0.22        1.9        -28.3             0.000
+(0.25, 0.5]      191  0.38        5.6        -67.5             0.000
+(0.5, 1.0]       203  0.58       38.7       -103.5             0.054
+(1.0, 1.5]        69  0.61       31.0       -140.8             0.116
+(1.5, 2.5]        80  0.70       81.3       -141.4             0.138
+(2.5, 99.0]       15  0.40      -52.4       -151.4             0.333
+
+2020-25 (band trades, sigmas past the band at the signal close):
+              trades   win  $ a trade  losers' avg  at the hard stop
+bk                                                                  
+(-9.0, 0.25]     405  0.31        7.7        -40.6             0.000
+(0.25, 0.5]      231  0.49       26.9       -104.1             0.035
+(0.5, 1.0]       225  0.56       41.5       -132.5             0.147
+(1.0, 1.5]       133  0.64       34.2       -173.7             0.241
+(1.5, 2.5]        81  0.78       89.8       -184.9             0.173
+(2.5, 99.0]       16  0.62       58.8       -177.6             0.250
+
+ES 2020-24 (band trades, sigmas past the band at the signal close):
+              trades   win  $ a trade  losers' avg  at the hard stop
+bk                                                                  
+(-9.0, 0.25]     123  0.12       -1.0        -12.7               0.0
+(0.25, 0.5]       74  0.23        7.8        -22.8               0.0
+(0.5, 1.0]        66  0.42       10.5        -37.0               0.0
+(1.0, 1.5]        26  0.35       25.4        -46.8               0.0
+(1.5, 2.5]         9  0.11      -42.9        -52.2               0.0
+(2.5, 99.0]        7  0.29       10.2        -25.7               0.0
+
+Verdict (2026-11-25, docs section 120): nothing new to use.
+- On NQ the losses grow with the stretch as they should (the band stop sits farther from the entry): the losers'
+  average -$28 / -$41 under 0.25 sigma to -$141 / -$185 at 1.5-2.5 (2015-19 / 2020-25), and the share out at the full
+  hard stop 0% to 14-17%. Those trades also win most (70% / 78%) and make the most ($81 / $90 a trade a contract),
+  which is why they get the extra contract (section 30).
+- The weakest trades are the shallow ones (at most 0.25 sigma: $1.9 / $7.7 a trade, 22% / 31% winners, about a third
+  of the band's trades), the same finding as section 27, where a minimum stretch cut the median and lost 1.9-2.9% of
+  starts. Past 2.5 sigma: 15 / 16 trades, -$52 / +$59: opposite by period and too few.
+- ES: its points are worth less here, so no trade reaches a $190 loss; its pattern by stretch is flat. Not comparable
+  in $.
+- Hindsight: none (the stretch at the signal close).

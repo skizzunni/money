@@ -838,6 +838,11 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    09:30: medians -$5,932 / -$5,054 (2015-19), -$4,495 / -$3,946 (2020-25), the window $5,218 / $6,981 against $10,063:
    it starts at the entry price and stops the trades out early. Without the VWAP in the stop 7.3% of 2020-25 starts are
    lost. Rejected; the session VWAP stays.
+120. **The band's losses by stretch** (2026-11-25, a research round; `research/zoo/stretch_losses.py`,
+   `verification/zoo/stage119_stretch_losses.txt`). Analysis only. The deeper past the band, the bigger a loser (-$28 /
+   -$41 under 0.25 sigma to -$141 / -$185 at 1.5-2.5, 14-17% at the full hard stop) but the more winners (70% / 78%)
+   and $ a trade ($81 / $90): the extra contract's case (30). The shallow third ($2 / $8 a trade) is section 27's
+   finding again (a minimum stretch cost the median). Past 2.5 sigma: opposite by period, 15 / 16 trades. Nothing new.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
