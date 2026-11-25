@@ -738,6 +738,10 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    quarterly expiry are weaker in both periods (PF 1.04 / 1.37 against 1.74 / 1.68) but profitable; skipping them helps
    2015-19 and costs 2020-25 $1,792-2,020 of median. Rejected.
 
+98. **The most trades a day again, with 61 and 87 in** (2026-11-25, a research round;
+   `verification/zoo/stage97_gold_pine_and_max_trades.txt`). 5 a day: mixed (2020-25 median -$331, 25th percentile
+   +$333); 3: lower everywhere. 9 stays. Gold's Pine inputs match MgcOvernightCarry.cs one for one.
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |

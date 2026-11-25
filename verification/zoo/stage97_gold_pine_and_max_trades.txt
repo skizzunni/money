@@ -1,0 +1,14 @@
+Stage 97 (2026-11-25, a research round)
+
+1. pine/mgc_overnight_carry.pine against MgcOvernightCarry.cs: all 14 Pine inputs match the C# defaults (move 1.5x,
+   15 minutes, stop 0.6, 08:20 open (500), out 14:15 (855), reference 13:30 (810), 3 contracts, fixed 0, steps 2000 /
+   3500, start profit 0, cushion guard 1500, trailing drawdown 2000, highest balance 0); start balance and live sizing
+   are NinjaTrader-only (Pine: initial_capital 50000).
+
+2. The most band trades a day with sections 61 and 87 in (sections 27 and 33 tested this before them). Fresh 50K
+   starts by period, the TradingView window:
+   9 (shipped): 2015-19 lost 0.0% med $14,028 p25 $5,324 | 2020-25 lost 0.0% med $18,980 p25 $15,811 | TV $+10,063 50tr PF 4.66
+   5:           2015-19 lost 0.0% med $14,056 p25 $5,280 | 2020-25 lost 0.0% med $18,649 p25 $16,144 | TV $+10,230 48tr PF 4.96
+   3:           2015-19 lost 0.0% med $12,368 p25 $4,627 | 2020-25 lost 0.0% med $16,671 p25 $14,070 | TV $+9,138 42tr PF 5.79
+   Verdict: 9 stays. 5 is mixed (2020-25 median -$331, 25th percentile +$333; 2015-19 flat; the window +$167); 3 is
+   lower everywhere.
