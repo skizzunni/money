@@ -1,0 +1,10 @@
+Stage 103 (2026-11-25, a research round): the mild-news skip window (no trades on days with an 08:30 volume spike of
+2-3x) again, with sections 61 and 87 in (section 33 tested before them). Fresh 50K starts by period, the TV window:
+
+2-3x (shipped): 2015-19 lost 0.0% med $14,028 p25 $5,324 | 2020-25 lost 0.0% med $18,980 p25 $15,811 | TV $+10,063 50tr PF 4.66
+2-2.5x:         2015-19 lost 0.0% med $13,556 p25 $5,245 | 2020-25 lost 0.0% med $17,614 p25 $15,789 | TV $+10,063 50tr PF 4.66
+2.5-3.5x:       2015-19 lost 0.0% med $11,994 p25 $4,888 | 2020-25 lost 0.0% med $17,429 p25 $14,701 | TV $+12,551 55tr PF 4.85
+2-3.5x:         2015-19 lost 0.0% med $11,553 p25 $4,738 | 2020-25 lost 0.0% med $16,275 p25 $13,365 | TV $+10,063 50tr PF 4.66
+
+Verdict: 2-3x stays. Every other window lowers both periods' medians; 2.5-3.5x lifts the TradingView window +$2,488 but
+costs $2,034 / $1,551 of median, so the window's gain is this autumn's, not the history's (as section 33 found).
