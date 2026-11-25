@@ -1,0 +1,16 @@
+shipped: 2015-19 lost 0.0% median $14,028 p25 $5,324 | 2020-25 lost 0.0% median $18,980 p25 $15,811 | TV $+10,063 50tr PF 4.66 dd $670
+break-even 0.3R: 2015-19 lost 0.0% median $8,817 p25 $4,495 | 2020-25 lost 0.0% median $17,992 p25 $15,012 | TV $+10,115 50tr PF 4.83 dd $670
+break-even 0.5R: 2015-19 lost 0.0% median $13,581 p25 $5,375 | 2020-25 lost 7.3% median $19,007 p25 $13,216 | TV $+10,063 50tr PF 4.66 dd $670
+hard stop $175: 2015-19 lost 0.0% median $12,108 p25 $4,726 | 2020-25 lost 0.0% median $18,284 p25 $15,256 | TV $+8,437 51tr PF 4.29 dd $670
+hard stop $225: 2015-19 lost 0.0% median $14,805 p25 $6,280 | 2020-25 lost 7.3% median $17,547 p25 $13,677 | TV $+9,550 48tr PF 4.40 dd $670
+move cap 1.0: 2015-19 lost 0.0% median $12,805 p25 $4,520 | 2020-25 lost 0.0% median $19,841 p25 $15,417 | TV $+6,992 47tr PF 3.54 dd $670
+move cap 1.2: 2015-19 lost 0.0% median $12,700 p25 $5,374 | 2020-25 lost 0.0% median $16,757 p25 $14,009 | TV $+9,465 51tr PF 3.83 dd $670
+range rule 0.6: 2015-19 lost 0.0% median $13,243 p25 $5,229 | 2020-25 lost 0.0% median $17,639 p25 $15,510 | TV $+9,102 52tr PF 3.45 dd $1,276
+range rule 0.7: 2015-19 lost 0.0% median $13,049 p25 $6,092 | 2020-25 lost 0.0% median $17,481 p25 $15,433 | TV $+10,242 47tr PF 4.98 dd $670
+
+Verdict (2026-11-25, docs section 139): every shipped value holds by period.
+- Break-even 0.3R: both medians lower (-$5,211 / -$988); 0.5R: 7.3% of 2020-25 starts lost.
+- Hard stop $175: both medians lower and the window -$1,626; $225: 7.3% of 2020-25 starts lost.
+- Move cap 1.0: 2020-25 median +$861 but its p25 -$394, 2015-19 -$1,223, the window -$3,071; 1.2: lower on both.
+- Range rule 0.6: lower on both; 0.7: both medians lower (-$979 / -$1,499), 2015-19 p25 +$768, 2020-25 p25 -$378.
+- Sections 63-65 had checked these on the pooled starts only; this completes the by-period checks (docs index).

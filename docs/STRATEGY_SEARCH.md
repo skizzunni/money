@@ -928,6 +928,11 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    more risk (2015-19 fresh shuffled 0.4% -> 0.7%). Against 5 placebos (one more on random trades at the same rate): it
    beats every one on 2015-19 but sits inside their range on 2020-25. One period only; otherwise just more size.
    Not shipped. (Sections 87 / 88 / 98 already cover the gap minimum, the stop cap and the trades a day by period.)
+139. **Break-even, the hard stop, the move cap and the range rule by period** (2026-11-25, a research round;
+   `research/zoo/risk_settings_by_period.py`, `verification/zoo/stage134_risk_settings_by_period.txt`). Sections 63-65
+   were pooled. By period: break-even 0.3R lower on both, 0.5R loses 7.3% of 2020-25 starts; $175 lower on both, $225
+   loses 7.3%; cap 1.0 up on 2020-25's median only (the window -$3,071), 1.2 lower on both; range 0.6 / 0.7 lower medians
+   on both. All stay. Every shipped setting now has a by-period check (the index under "The result").
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
@@ -961,6 +966,30 @@ unseen NQ together, so the 0 of 104 is partly in-sample. A walk-forward that pic
 stop, a late break-even and entries to 14:30, and every one-step change in sections 32-33 that loosens risk (a $225
 stop, break-even 0.5, a band 0.9 or 1.1 sigma, the band from the open alone) loses 2.9-17% of starts. Expect a small
 chance of losing a fresh account in a year like 2020, mostly in its first months; never loosen the risk settings.
+
+**What was checked, and where (by period: 2015-19 and 2020-25 on their own; 2026-11-25).** Every shipped setting,
+one step each way at least, the latest check first:
+
+| setting (shipped) | by-period checks (earlier, pooled) |
+|---|---|
+| band width 1.0 sigma; noise lookback 14 sessions | 101; 72 |
+| trend filter: close past the 20-session average | 100 (EMA 43, slope 81) |
+| range rule 0.65; move cap 1.1 | 139 (65) |
+| hard stop $200; break-even 0.4R to entry + 2 points | 139, 102 (63, 64) |
+| second stop step 1.5R to entry + 0.5R | 90, 69 |
+| target 2.5R | 105 (62) |
+| last entry 14:00; at most 9 trades a day | 99; 98 |
+| the stop moved to the band / session VWAP at the checks | 119, 74 (47) |
+| checks every 30 minutes 10:00-15:00; out at 15:55 | 116, 117 (12, 40) |
+| gap trade: gap 0.6x, body 3%, no wild open over 1.75x | 87, 89, 90 |
+| gap trade: stop cap 30 points; out at 09:55 | 88; 137 (41) |
+| size steps 1 / 2 / 3 from +$0 / +$2,000 / +$3,500 | 131, 103 |
+| extra contract from 1.5 sigma; news 2-3x skip, 6x +1 | 130, 104 (67) |
+| day stop $600 | 132 (54) |
+| cushion guard $1,500, day stop share 0.25, strong only under $1,000 at 1.5 sigma | 129, 127, 128 (38, 50) |
+| gold: move 1.5x, confirm 15 minutes, out 14:15 | 108 (39, 41) |
+| gold: stop 60%, move from the 13:25 close | 109 (39) |
+| gold: size on the steps; none while guarded; with MNQ | 134; 135; 133 |
 
 **What it is not:** a trade-every-day strategy. It trades on about half of the sessions (a third live); the days it
 skips are inside the noise band, against the 20-day trend or mild-news days, and every rule tried that trades them
