@@ -3,7 +3,8 @@
 // account with the $2,000 trailing floor (docs/STRATEGY_SEARCH.md, sections 1-97). The same rules as
 // ninjatrader/Strategies/MnqCleanBand.cs; research/zoo/strats.py is the reference both are tested against.
 // 5-minute MNQ chart with extended hours (the news rule reads the 08:30 bar). Every half hour from 10:00 to 14:00:
-//   * noise area: sigma = the mean over the last 14 complete sessions of |close at that time / the 09:30 open - 1|;
+//   * noise area: sigma = the mean over the last 14 complete sessions of |close at that time / the 09:30 open - 1|
+//     (over those with that bar, at least 10 of them: docs 162, a missing bar keeps the check on);
 //     upper = max(open, prior close) x (1 + sigma), lower = min(...) x (1 - sigma);
 //   * flat: LONG when the close is above upper and above the 20-session average of closes, at least 65% up the day's
 //     range, and (after 10:00) the day not already 1.1 usual ranges up from its open; SHORT mirrored;
@@ -30,6 +31,7 @@ const string TZ = "America/New_York"
 const int NCH = 11   // the checks 10:00, 10:30, ..., 15:00
 
 trendDays = input.int(20, "Trend filter: sessions in the average of closes (0 = off)", minval = 0, maxval = 100)
+sigMin = input.int(10, "Sigma needs at least this many of the 14 sessions (14 = all, as before)", minval = 1, maxval = 14)
 hardStop = input.float(200, "Hard stop, $ a contract", minval = 1)
 beAt = input.float(0.4, "Break-even once up this many hard stops (0 = off)", minval = 0, step = 0.1)
 bePlus = input.float(2, "Break-even stop: points past the entry", minval = 0, step = 0.25)
@@ -188,15 +190,15 @@ if inRth and dayNum != tDay
             rsum += array.get(hRanges, j)
         avgRange := rsum / 14
         for k = 0 to NCH - 1
+            // docs/STRATEGY_SEARCH.md 162: over the last 14 sessions that have this time's bar, if at least sigMin do
             float m = 0.0
-            bool all = true
+            int cnt = 0
             for j = nH - 14 to nH - 1
                 v = array.get(hMoves, j * NCH + k)
-                if na(v)
-                    all := false
-                else
+                if not na(v)
                     m += v
-            array.set(sig, k, all ? m / 14 : na)
+                    cnt += 1
+            array.set(sig, k, cnt >= sigMin ? m / cnt : na)
         prof = startProfit + strategy.netprofit
         qty := fixedQty > 0 ? fixedQty : math.min(prof >= step3 ? 3 : prof >= step2 ? 2 : 1, maxQty)
         // the cushion guard: the floor trails the highest day-start balance by trailDD (stopping at the start

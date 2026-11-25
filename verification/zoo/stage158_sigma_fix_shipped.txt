@@ -1,0 +1,22 @@
+Stage 158 (2026-11-25, docs section 162): sigma from at least 10 of the 14 sessions, built into the shipped strategy.
+
+Changed:
+- ninjatrader/Strategies/MnqCleanBand.cs: SigmaMinSessions (group "1. Entries", order 8, default 10, 1-14): each
+  check's sigma is the mean over the last 14 sessions that have that time's move, if at least SigmaMinSessions do
+  (14 = all, as first shipped). The stretch contract and the strong-only tier read the same sigma. An Output line at
+  the day's start names any check that is off ("fewer than N of the last 14 sessions have that bar") with the advice
+  to reload the chart's history.
+- pine/mnq_clean_band.pine: input "Sigma needs at least this many of the 14 sessions (14 = all, as before)" = 10, the
+  same rule.
+- research/zoo/strats.py: band_stretch takes sig_min as noise does; research/zoo/bench.py: BAND sig_min 10, _stretch
+  passes it.
+- tests: test_clean_band_missing_check_bar (NinjaTrader) and test_pine_clean_band_missing_check_bar (Pine): a
+  synthetic history with the bar ending 10:00 removed on day 60; trade for trade with the reference at 10 and at 14,
+  and the two trade lists differ (the 10:00 check keeps trading over the next 14 sessions only at 10). The test
+  defaults (DEFAULTS sig_min 10) and the stretch in both harnesses pass sig_min.
+
+Checked before the full suite:
+- zoo/verify_result.py: every number in docs "The result" reproduces exactly with BAND sig_min 10 (the history's
+  missing bars sit off the entry checks: section 161).
+- tests/test_ninjatrader_clean.py (matches_python x5 + missing_check_bar): 6 passed.
+- tests/test_pine_clean.py (matches_python x4 + news_days + missing_check_bar): 6 passed.

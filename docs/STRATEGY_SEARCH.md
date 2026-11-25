@@ -1029,6 +1029,11 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    `verification/zoo/stage157_sigma_min_sessions.txt`). The fix for 160 measured: every set's trades identical (no day
    differs), so neutral on the backtests; live it keeps a check working after a missing bar. Gold has the same rule but
    reports it in its status. To be built into MnqCleanBand.cs and Pine with a missing-bar parity test.
+162. **The missing-bar fix shipped** (2026-11-25, a research round; `verification/zoo/stage158_sigma_fix_shipped.txt`).
+   `SigmaMinSessions` 10 (NinjaTrader; Pine "Sigma needs at least"): each check's sigma from the sessions that have
+   that bar, at least 10 of the 14, so one missing bar (a halt, a feed drop) no longer turns a check off for 14
+   sessions; an Output line names any check still off. Neutral on every backtest ("The result" exact); parity tests
+   with a missing 10:00 bar for NinjaTrader and Pine.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
@@ -1068,7 +1073,7 @@ one step each way at least, the latest check first:
 
 | setting (shipped) | by-period checks (earlier, pooled) |
 |---|---|
-| band width 1.0 sigma; noise lookback 14 sessions | 101; 72 |
+| band width 1.0 sigma; noise lookback 14 sessions (sigma from at least 10 of them) | 101; 72 (162: neutral) |
 | trend filter: close past the 20-session average | 100 (EMA 43, slope 81) |
 | range rule 0.65; move cap 1.1 | 139 (65) |
 | hard stop $200; break-even 0.4R to entry + 2 points | 139, 102 (63, 64) |
@@ -1160,9 +1165,10 @@ NinjaTrader 8, on each funded account (both the same way):
    - Gold chart: "waiting for history" until Monday's 08:30 check is normal; it must then say OK (or NOT READY: raise
      Days to load to 30+).
    - Monday 09:35 / 10:00: the Output window shows the settings line and, if a trade fires, its order and stop.
-   - After a day the data feed dropped or the market halted during the session (section 160): after the close,
-     right-click the MNQ chart > Reload All Historical Data, so the missing 5-minute bars are refilled; a missing bar
-     at a check time otherwise turns that check off for the next 14 sessions without a message.
+   - After a day the data feed dropped or the market halted during the session (sections 160-162): after the close,
+     right-click the MNQ chart > Reload All Historical Data, so the missing 5-minute bars are refilled. Since 162 one
+     missing bar no longer turns a check off ("Sigma needs at least" 10 of 14), and the Output window says "check(s)
+     ... off today" if several are missing.
 
 12. **What a normal bad run looks like (sections 121-123).** In the history (fresh 50K accounts, 12 months each,
    2015-19 / 2020-25, MNQ alone and with gold, with and without the cushion guard, which changes these little):

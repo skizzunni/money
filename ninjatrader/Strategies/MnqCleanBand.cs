@@ -2,7 +2,8 @@
 // it needs to keep a 50K account with the $2,000 trailing floor (docs/STRATEGY_SEARCH.md, sections 1-97).
 //
 // 5-minute MNQ chart (ETH, so the news rule can read the 08:30 bar). Every half hour from 10:00 to LastEntry (14:00):
-//   * the noise area: sigma = the mean over the last 14 complete sessions of |close at that time / the 09:30 open - 1|;
+//   * the noise area: sigma = the mean over the last 14 complete sessions of |close at that time / the 09:30 open - 1|
+//     (over those with that bar, at least SigmaMinSessions = 10 of them: docs 162, a missing bar keeps the check on);
 //     upper = max(today's open, the prior close) x (1 + sigma), lower = min(...) x (1 - sigma);
 //   * flat: long when the close is above upper and above the TrendDays-session average of closes, at least RangePos up
 //     the day's range, and (after 10:00) the day not already MaxMove usual ranges up from its open; short mirrored;
@@ -88,6 +89,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 StartBehavior = StartBehavior.WaitUntilFlat;
                 RealtimeErrorHandling = RealtimeErrorHandling.StopCancelCloseIgnoreRejects;
                 TrendDays = 20;
+                SigmaMinSessions = 10;  // docs 162 (14 = all of the 14, as before)
                 HardStop = 200;
                 BreakEvenAt = 0.4;
                 BreakEvenPlus = 2;  // points past entry: the scratch exits close as small wins (docs/STRATEGY_SEARCH.md, 23)
@@ -276,18 +278,26 @@ namespace NinjaTrader.NinjaScript.Strategies
             double rs = 0;
             for (int j = hist.Count - 14; j < hist.Count; j++) rs += hist[j].Range;
             avgRange = rs / 14;
+            string off = "";
             foreach (int t in Checks)
             {
+                // docs/STRATEGY_SEARCH.md 160-162: the mean over the last 14 sessions that have this time's move, if at
+                // least SigmaMinSessions of them do (14 = all, as first shipped): one missing bar (a halt, a feed drop)
+                // no longer turns the check off for 14 sessions.
                 double sum = 0;
-                bool all = true;
+                int n = 0;
                 for (int j = hist.Count - 14; j < hist.Count; j++)
                 {
                     double m;
-                    if (!hist[j].Moves.TryGetValue(t, out m)) { all = false; break; }
-                    sum += m;
+                    if (hist[j].Moves.TryGetValue(t, out m)) { sum += m; n++; }
                 }
-                sigma[t] = all ? sum / 14 : double.NaN;
+                sigma[t] = n >= SigmaMinSessions ? sum / n : double.NaN;
+                if (double.IsNaN(sigma[t]))
+                    off += (off.Length > 0 ? ", " : "") + (t / 60) + ":" + (t % 60).ToString("00");
             }
+            if (off.Length > 0)
+                Print(Time[0] + "  Clean band: check(s) " + off + " off today - fewer than " + SigmaMinSessions +
+                      " of the last 14 sessions have that bar (reload the chart's history: Reload All Historical Data)");
             double prof = Profit();
             qty = Contracts(prof);
             ApplyGuard(prof);
@@ -664,6 +674,11 @@ namespace NinjaTrader.NinjaScript.Strategies
         [Range(0, 10)]
         [Display(Name = "No entry once the day has moved this many usual ranges its way (0 = off)", Order = 7, GroupName = "1. Entries")]
         public double MaxMove { get; set; }
+
+        [NinjaScriptProperty]
+        [Range(1, 14)]
+        [Display(Name = "Sigma needs at least this many of the 14 sessions (14 = all, as before)", Order = 8, GroupName = "1. Entries")]
+        public int SigmaMinSessions { get; set; }
 
         [NinjaScriptProperty]
         [Range(1, 2000)]

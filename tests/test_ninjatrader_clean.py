@@ -23,7 +23,8 @@ import harness as H  # noqa: E402
 import strats as S  # noqa: E402
 
 DEFAULTS = dict(vwap=False, trend=20, hard=200.0, vwap_stop=True, k=1.0, be_r=0.4, max_trades=9, last=840, tp_r=2.5,
-                range_pos=0.65, max_move=1.1, be_plus=2.0, move_free="first_check", lad_r=1.5, lad_lock=0.5)
+                range_pos=0.65, max_move=1.1, be_plus=2.0, move_free="first_check", lad_r=1.5, lad_lock=0.5,
+                sig_min=10)  # docs 162: SigmaMinSessions 10
 GAP = dict(k=0.6, exit_m=590, r=0.0, cap=30.0, min_body=0.03, max_bar=1.75)
 
 
@@ -130,7 +131,7 @@ def py_trades(days: list, idx: list, day_stop: float = 0.0, steps=None, gap_from
             if ds and day <= -ds:
                 break
             qq = q  # a band entry StretchAddAt sigmas past the band: one more contract, at most MaxContracts
-            if n_ >= ng and add_at and S.band_stretch(days, i, side, eb, cfg["k"]) >= add_at:
+            if n_ >= ng and add_at and S.band_stretch(days, i, side, eb, cfg["k"], cfg.get("sig_min", 0)) >= add_at:
                 qq = min(q + 1, cap)
             pnl = ((xpx - epx) * side * 2.0 - 2 * 0.62) * qq  # $0.62 a side, as the stand-in books it
             day += pnl
@@ -158,6 +159,34 @@ def test_clean_band_matches_python(sim, tmp_path, props, py):  # noqa: F811
     got = [(int(t[0]), int(t[1]), round(float(t[2]), 6), round(float(t[4]), 6)) for t in nt]
     want = [(s, b, e, x) for s, b, e, x, _q in ref]
     assert got == want
+
+
+def drop_bar(days: list, di: int, minute: int) -> list:
+    """The days with the bar starting at `minute` removed from day di (a halt or a feed drop, docs 160-162)."""
+    out = [dict(x) for x in days]
+    d = out[di]
+    keep = np.asarray(d["mm"]) != minute
+    out[di] = {**d, **{k: np.asarray(d[k])[keep] for k in ("mm", "o", "h", "l", "c", "v")}}
+    return out
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+def test_clean_band_missing_check_bar(sim, tmp_path):  # noqa: F811
+    """Docs 162: a day without the bar ending 10:00 (starting 09:55). With SigmaMinSessions 10 the 10:00 check keeps
+    working over the next 14 sessions (sigma from the 13 that have it); with 14 it is off for those 14 sessions, as
+    first shipped. NinjaTrader matches the reference trade for trade both ways, and the two differ."""
+    days = drop_bar(synthetic_days(), 60, 595)
+    assert len(days[60]["mm"]) == 77 and 595 not in days[60]["mm"]
+    path = tmp_path / "bars.csv"
+    idx = write_bars(days, path)
+    res = {}
+    for n, sm in ((10, 10), (14, 0)):
+        nt = run_nt(sim, path, MaxContracts=1, DayStop=0, SigmaMinSessions=n)
+        got = [(int(t[0]), int(t[1]), round(float(t[2]), 6), round(float(t[4]), 6)) for t in nt]
+        want = [(si, b, e, x) for si, b, e, x, _q in py_trades(days, idx, sig_min=sm)]
+        assert got == want, n
+        res[n] = got
+    assert res[10] != res[14]  # the 10:00 check traded in the 14 sessions after the missing bar only with 10
 
 
 @pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")

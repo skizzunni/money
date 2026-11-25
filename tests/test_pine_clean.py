@@ -53,6 +53,27 @@ def test_pine_clean_band_matches_python(inputs, kw):
 
 
 @pytest.mark.slow
+def test_pine_clean_band_missing_check_bar():
+    """Docs 162: a day without the bar ending 10:00; Pine matches the reference with "Sigma needs at least" 10 and 14
+    (the shipped 10 keeps the 10:00 check on over the next 14 sessions), and the two differ."""
+    pytest.importorskip("pynescript", reason="pip install pynescript to check the .pine files")
+    from pine_interpreter import PineRuntime, load_pine
+    from test_ninjatrader_clean import drop_bar, synthetic_days
+    days = drop_bar(synthetic_days(), 60, 595)
+    bars, idx = bars_of(days)
+    res = {}
+    for n, sm in ((10, 10), (14, 0)):
+        inputs = {"Most contracts": 1, "Day stop: no new entry once the day is down $ (0 = off)": 0,
+                  "Sigma needs at least this many of the 14 sessions (14 = all, as before)": n}
+        rt = PineRuntime(load_pine(PINE), bars, inputs, timeframe_seconds=300)
+        rt.run(lambda i, g: None)
+        got = [(t["dir"], t["entry_bar"], round(t["entry"], 6), round(t["exit"], 6), t["qty"]) for t in rt.strategy.closed]
+        assert got == py_trades(days, idx, tp_fill_bar=False, sig_min=sm), n
+        res[n] = got
+    assert res[10] != res[14]
+
+
+@pytest.mark.slow
 def test_pine_clean_band_news_days():
     """The news rule in Pine (extended hours): as tests/test_ninjatrader_clean.py's news test, trade for trade."""
     pytest.importorskip("pynescript", reason="pip install pynescript to check the .pine files")
@@ -93,7 +114,7 @@ def test_pine_clean_band_news_days():
         for n_, (side, eb, epx, xpx, _w, *_) in enumerate(legs):
             if ds and day <= -ds:
                 break
-            qq = min(q + 1, cap) if n_ >= ng and S.band_stretch(days, i, side, eb) >= 1.5 else q
+            qq = min(q + 1, cap) if n_ >= ng and S.band_stretch(days, i, side, eb, 1.0, DEFAULTS["sig_min"]) >= 1.5 else q
             day += ((xpx - epx) * side * 2.0 - 2 * 0.62) * qq
             ref.append((side, pos_of[(i, eb)], round(epx, 6), round(xpx, 6), qq))
         cum += day

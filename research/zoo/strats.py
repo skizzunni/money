@@ -893,13 +893,18 @@ def everyday(days, i, tick, legs=(), **_):
     return merge(out)
 
 
-def band_stretch(days, i, side, eb, k=1.0):
+def band_stretch(days, i, side, eb, k=1.0, sig_min=0):
     """research (2026-11-24): how far past the band the signal close (the bar before the fill, eb - 1) was, in sigmas
-    of the band's reference (max / min of the open and the prior close), as MnqCleanBand sizes it."""
+    of the band's reference (max / min of the open and the prior close), as MnqCleanBand sizes it. sig_min (docs 162):
+    sigma over the sessions that have the move, at least sig_min of the 14 (0: all 14), as noise."""
     d = days[i]
     b = eb - 1
     end = d["mm"][b] + 5
-    sg = np.mean([_moves(days, j).get(end, np.nan) for j in range(i - 14, i)]) * k
+    if not sig_min:
+        sg = np.mean([_moves(days, j).get(end, np.nan) for j in range(i - 14, i)]) * k
+    else:
+        v = [m for m in (_moves(days, j).get(end, np.nan) for j in range(i - 14, i)) if m == m]
+        sg = (float(np.mean(v)) if len(v) >= sig_min else np.nan) * k
     pc = prev(days, i, "c")
     ref = max(d["o"][0], pc) if side > 0 else min(d["o"][0], pc)
     edge = ref * (1 + sg) if side > 0 else ref * (1 - sg)

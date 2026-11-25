@@ -13,13 +13,16 @@ import strats as S
 PK = "/tmp/claude-0/-home-user-money/a932a565-3474-5ea9-80d7-5853e3bebb0c/scratchpad/data/zoo_days_news.pkl"
 GAP = dict(k=0.6, exit_m=590, r=0.0, cap=30.0, min_body=0.03, max_bar=1.75)  # max_bar: docs 61; k 0.6: docs 87
 BAND = dict(vwap=False, vwap_stop=True, hard=200.0, be_r=0.4, tp_r=2.5, last=840, trend=20, k=1.0, max_trades=9,
-            range_pos=0.65, max_move=1.1, be_plus=2.0, move_free="first_check", lad_r=1.5, lad_lock=0.5)  # lad: docs 61
+            range_pos=0.65, max_move=1.1, be_plus=2.0, move_free="first_check", lad_r=1.5, lad_lock=0.5,  # lad: docs 61
+            sig_min=10)  # docs 162: sigma from at least 10 of the 14 sessions (a missing bar keeps the check on)
 STEPS = ((0, 1), (2000, 2), (3500, 3))
 
 
-def _stretch(d, t, k):
+def _stretch(d, t, k, sig_min=None):
+    sm = BAND.get("sig_min", 0) if sig_min is None else sig_min  # docs 162
     idx = {x["d"]: i for i, x in enumerate(d)}
-    return np.array([np.nan if r.bar <= 1 else S.band_stretch(d, idx[r.d], r.side, r.bar, k) for r in t.itertuples()])
+    return np.array([np.nan if r.bar <= 1 else S.band_stretch(d, idx[r.d], r.side, r.bar, k, sm)
+                     for r in t.itertuples()])
 
 
 NEWS = (2.0, 3.0, 6.0)  # no trading from / to, one more contract from (08:30 volume spike)
