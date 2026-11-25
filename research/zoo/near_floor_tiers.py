@@ -7,7 +7,7 @@ period, the same daily rules). MNQ alone. Run from research/: python zoo/near_fl
 (--share, docs 127: the guard's day stop at 0.15-0.35 of the cushion instead; --stretch, docs 128: the tier's
 strong breaks from 1.0-2.0 sigma; --levels, docs 129: the guard from $1,250-2,000, the tier from $750-1,250;
 --extras, docs 130: the extra contract's stretch and the news rule; --steps, docs 131: the size steps;
---day-stop, docs 132: the regular day stop.)
+--day-stop, docs 132: the regular day stop; --gold PATH, docs 133: shuffled years with gold as live.)
 """
 import pickle
 import sys
@@ -26,8 +26,10 @@ STARTS = (50000.0, 48806.0, 48998.0)
 
 
 def shuffled(t, st, d, n_runs=2000, seed=1, share=0.25, guard=1500.0, below=1000.0, nw=None, steps=None,
-             day_stop=600.0):
-    """252 days drawn at random (with replacement), the shipped guard as bad_runs.runs; lost share and median."""
+             day_stop=600.0, gold=None):
+    """252 days drawn at random (with replacement), the shipped guard as bad_runs.runs; lost share and median.
+    gold (docs 133, as MgcOvernightCarry trades live): {day: [$ a contract]}, first in the day, sized by the steps alone
+    (no news rule), none while guarded; its P/L counts toward the floor, not toward MNQ's day stop."""
     by = {k: (g.usd.to_numpy(), g["add"].to_numpy()) for k, g in t.groupby("d")}
     sb = {k: g.usd.to_numpy() for k, g in st.groupby("d")}
     nf = B._news(d, nw) if nw else B._news(d)
@@ -53,16 +55,28 @@ def shuffled(t, st, d, n_runs=2000, seed=1, share=0.25, guard=1500.0, below=1000
                     g = np.zeros(0)
                 q = min(q, 1) if on else q
                 ds = max(100.0, min(day_stop, share * cush)) if on else day_stop
-                pl, dead = 0.0, False
+                pl, dead, gp = 0.0, False, 0.0
+                if gold is not None and not on:
+                    qg = 1
+                    for lim, qq in (steps or B.STEPS):
+                        if bal - 50000.0 >= lim:
+                            qg = qq
+                    for u in gold.get(day, ()):
+                        gp += u * qg
+                        if bal + gp <= floor:
+                            dead = True
+                    if dead:
+                        lost += 1
+                        break
                 for j, u in enumerate(g):
                     if pl <= -ds:
                         break
                     a = int(ad[j]) if ad is not None and not on else 0
                     pl += u * min(q + a, max(q, 3))
-                    if bal + pl <= floor:
+                    if bal + gp + pl <= floor:
                         dead = True
                         break
-                bal += pl
+                bal += pl + gp
                 if dead or bal <= floor:
                     lost += 1
                     break
@@ -90,6 +104,15 @@ def main():
                 S.everyday, d, s, legs=(("gap_go", B.GAP), ("noise", {**B.BAND, "min_stretch": x}))), 0.25)
                 for x in (1.0, 1.25, 1.5, 1.75, 2.0))
         levels, extras, stepset, dstops = {}, {}, {}, {}
+        if "--gold" in sys.argv:  # docs 133: shuffled years with and without gold (as live), the guard in
+            gp_ = sys.argv[sys.argv.index("--gold") + 1]
+            gdf = BR.gold_trades(gp_)
+            gold_by = {k: g.usd.to_numpy() for k, g in gdf.groupby("d")}
+            for nm, gb in (("MNQ alone", None), ("MNQ + gold (as live)", gold_by)):
+                sh = shuffled(t, st, d, gold=gb)
+                print(f"{lab} {nm}: shuffled years " + " ".join(f"${k:,.0f} {v[0]:.1%} / ${v[1]:,.0f}"
+                                                               for k, v in sh.items()), flush=True)
+            continue
         if "--day-stop" in sys.argv:  # docs 132: the regular day stop with the guard in
             dstops = {f"day stop ${x:,}": float(x) for x in (400, 500, 600, 700, 800)}
             tiers = tuple((name, st, 0.25) for name in dstops)

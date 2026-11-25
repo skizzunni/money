@@ -1,0 +1,16 @@
+2015-19 MNQ alone: shuffled years $50,000 0.4% / $11,322 $48,806 4.7% / $7,580 $48,998 2.6% / $8,414
+2015-19 MNQ + gold (as live): shuffled years $50,000 0.4% / $11,771 $48,806 4.6% / $7,826 $48,998 2.5% / $8,770
+2020-25 MNQ alone: shuffled years $50,000 1.5% / $15,582 $48,806 6.5% / $11,551 $48,998 3.7% / $12,272
+2020-25 MNQ + gold (as live): shuffled years $50,000 1.4% / $16,202 $48,806 6.3% / $12,267 $48,998 3.6% / $12,943
+
+Verdict (2026-11-25, docs section 133): gold lowers the risk a little and adds profit in both periods; it stays a
+user choice, but the numbers favour it.
+- Shuffled years (2,000 x 252 days per period, the guard in; a drawn day brings that date's MNQ and gold trades):
+  lost 0.4% / 4.6% / 2.5% against 0.4% / 4.7% / 2.6% (2015-19, from $50,000 / $48,806 / $48,998) and 1.4% / 6.3% /
+  3.6% against 1.5% / 6.5% / 3.7% (2020-25); medians +$246 to +$356 and +$620 to +$716.
+- Gold as MgcOvernightCarry trades it live: sized by the steps alone (no news rule, no 6x contract), every day the
+  guard is off (also below the $50,000 start), first in the day, its P/L counted toward the floor but not toward
+  MNQ's day stop. harness.account's extra leg (used by bad_runs.py --gold, section 122) differs: it applies MNQ's news
+  rule to gold and trades it only while not under the start. Section 122's figures are that convention; the
+  difference is small (gold's trades are ~$20 losers and ~$400 winners), noted, not re-run.
+- The gold history ends in March 2025, so 2020-25 draws from April-June 2025 have no gold trade.

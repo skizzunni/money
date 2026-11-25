@@ -901,6 +901,12 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    `verification/zoo/stage127_day_stop_with_guard.txt`). $400 / $500: lower medians in both periods at the same risk.
    $700 / $800: 2020-25 calendar higher (+$980 / +$1,455 fresh), 2015-19 lower (-$443 / -$274), a little more 2020-25
    shuffled risk (1.5% -> 1.7%), as section 54 found. $600 stays.
+133. **Gold's effect on the risk, by period** (2026-11-25, a research round; `near_floor_tiers.py --gold`,
+   `verification/zoo/stage128_gold_shuffled.txt`). Shuffled years with the guard, gold as it trades live (no news
+   rule, none while guarded): lost 0.4% / 4.6% / 2.5% against 0.4% / 4.7% / 2.6% (2015-19, fresh / $48,806 / $48,998)
+   and 1.4% / 6.3% / 3.6% against 1.5% / 6.5% / 3.7% (2020-25); medians +$246-356 and +$620-716. Gold lowers the risk a
+   little and adds profit on both periods. (bad_runs.py --gold uses harness.account's convention, which applies the
+   news rule to gold; noted.)
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
