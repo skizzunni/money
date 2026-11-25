@@ -1,0 +1,66 @@
+2015-19 shipped (extra contract from 1.5 sigma, news 2-3x skip / 6x +1):
+   calendar (lost / median 12-month profit): $50,000 0.0% / $9,810 | $48,806 0.0% / $6,230 | $48,998 0.0% / $6,781
+   shuffled years: $50,000 0.4% / $11,322 $48,806 4.7% / $7,580 $48,998 2.6% / $8,414
+2015-19 no extra contract:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $12,266 | $48,806 0.0% / $5,228 | $48,998 0.0% / $7,440
+   shuffled years: $50,000 0.6% / $10,323 $48,806 4.7% / $6,589 $48,998 2.7% / $7,555
+2015-19 extra contract from 1.25 sigma:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $9,233 | $48,806 0.0% / $7,049 | $48,998 0.0% / $7,662
+   shuffled years: $50,000 0.5% / $11,271 $48,806 4.8% / $7,553 $48,998 2.8% / $8,424
+2015-19 extra contract from 1.75 sigma:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $12,270 | $48,806 0.0% / $6,254 | $48,998 0.0% / $8,132
+   shuffled years: $50,000 0.5% / $11,324 $48,806 4.7% / $7,613 $48,998 2.5% / $8,450
+2015-19 extra contract from 2.0 sigma:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $12,269 | $48,806 0.0% / $6,164 | $48,998 0.0% / $7,590
+   shuffled years: $50,000 0.6% / $10,952 $48,806 4.6% / $7,203 $48,998 2.6% / $8,045
+2015-19 no mild-news skip:
+   calendar (lost / median 12-month profit): $50,000 4.1% / $9,610 | $48,806 16.3% / $3,610 | $48,998 14.3% / $4,135
+   shuffled years: $50,000 1.5% / $10,667 $48,806 7.0% / $6,756 $48,998 5.0% / $7,689
+2015-19 no 6x news contract:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $10,180 | $48,806 0.0% / $6,267 | $48,998 0.0% / $7,400
+   shuffled years: $50,000 0.4% / $10,750 $48,806 4.7% / $7,175 $48,998 2.8% / $7,790
+2015-19 skip 1.75-3x:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $8,414 | $48,806 0.0% / $5,588 | $48,998 0.0% / $5,965
+   shuffled years: $50,000 0.6% / $9,778 $48,806 5.7% / $6,218 $48,998 2.9% / $6,768
+2015-19 skip 2-4x:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $8,504 | $48,806 0.0% / $4,401 | $48,998 0.0% / $5,674
+   shuffled years: $50,000 0.5% / $11,189 $48,806 4.5% / $7,446 $48,998 2.8% / $8,211
+2020-25 shipped (extra contract from 1.5 sigma, news 2-3x skip / 6x +1):
+   calendar (lost / median 12-month profit): $50,000 0.0% / $17,205 | $48,806 1.8% / $12,892 | $48,998 0.0% / $14,917
+   shuffled years: $50,000 1.5% / $15,582 $48,806 6.5% / $11,551 $48,998 3.7% / $12,272
+2020-25 no extra contract:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $16,516 | $48,806 1.8% / $13,063 | $48,998 0.0% / $13,428
+   shuffled years: $50,000 1.5% / $14,794 $48,806 6.3% / $10,796 $48,998 3.7% / $11,222
+2020-25 extra contract from 1.25 sigma:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $17,015 | $48,806 1.8% / $12,929 | $48,998 0.0% / $13,816
+   shuffled years: $50,000 1.5% / $15,881 $48,806 6.4% / $11,472 $48,998 3.7% / $12,263
+2020-25 extra contract from 1.75 sigma:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $16,814 | $48,806 1.8% / $12,947 | $48,998 0.0% / $14,221
+   shuffled years: $50,000 1.5% / $15,231 $48,806 6.5% / $11,189 $48,998 3.7% / $11,770
+2020-25 extra contract from 2.0 sigma:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $17,206 | $48,806 1.8% / $13,276 | $48,998 0.0% / $14,158
+   shuffled years: $50,000 1.4% / $15,154 $48,806 6.4% / $10,958 $48,998 3.8% / $11,758
+2020-25 no mild-news skip:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $16,216 | $48,806 1.8% / $11,578 | $48,998 0.0% / $12,307
+   shuffled years: $50,000 2.6% / $15,938 $48,806 10.1% / $11,843 $48,998 7.3% / $12,577
+2020-25 no 6x news contract:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $17,320 | $48,806 1.8% / $12,591 | $48,998 0.0% / $13,773
+   shuffled years: $50,000 0.9% / $15,298 $48,806 6.0% / $11,073 $48,998 3.6% / $11,828
+2020-25 skip 1.75-3x:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $16,430 | $48,806 0.0% / $12,587 | $48,998 0.0% / $14,358
+   shuffled years: $50,000 1.1% / $14,928 $48,806 5.5% / $10,987 $48,998 3.6% / $11,422
+2020-25 skip 2-4x:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $13,859 | $48,806 1.8% / $10,954 | $48,998 0.0% / $10,856
+   shuffled years: $50,000 1.5% / $14,176 $48,806 5.7% / $10,244 $48,998 3.6% / $10,829
+
+Verdict (2026-11-25, docs section 130): no change.
+- The extra contract (1.5 sigma): shuffled risk flat at every stretch (within 0.2 points); 1.5 at or near the best
+  shuffled median in both periods (1.25 +$299 on 2020-25 fresh but -$51 on 2015-19). Off: lower medians in both.
+- The mild-news skip (2-3x) is essential: without it 2015-19 calendar starts are lost 4.1% fresh, 16.3% / 14.3% from
+  $48,806 / $48,998; shuffled 2020-25 from $48,806 10.1% against 6.5%.
+- No 6x news contract: 2020-25 a little safer (fresh 1.5% -> 0.9%, near-floor 6.5% -> 6.0%), 2015-19 no safer
+  (0.4% / 4.7% / 2.8%), shuffled medians lower in both (-$572 / -$284 fresh). A small risk-for-profit trade that only
+  one period supports: kept.
+- Skip 1.75-3x: 2020-25 safer (5.5%, calendar 0.0%) but 2015-19 riskier (5.7% against 4.7%). Skip 2-4x: medians lower
+  in both ($133-3,346 less). Neither passes on both.
+- Section 104 re-checked the skip without the guard; this is with the guard in, near the floor and shuffled.

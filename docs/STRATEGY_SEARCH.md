@@ -888,6 +888,11 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    points more shuffled risk (not taken: risk first); from $1,750 / $2,000: a little less risk for $370-1,130 less
    median. Strong only from $1,250: 2020-25 safer (6.5% -> 5.1%) but 1 of 49 2015-19 calendar starts lost from $48,806;
    from $750 riskier in both. $1,500 / $1,000 stay (`CushionGuard`, `GuardStrongOnlyBelow`).
+130. **The extra contract and the news rule with the guard in** (2026-11-25, a research round; `near_floor_tiers.py
+   --extras`, `verification/zoo/stage125_extras_with_guard.txt`). The extra contract from 1.25-2.0 sigma or off: shuffled
+   risk flat, 1.5 at or near the best median in both periods. Without the mild-news skip 2015-19 calendar starts are
+   lost 4.1% fresh and 14-16% near the floor: essential. No 6x contract: a little safer on 2020-25 only, lower medians
+   in both. Skip 1.75-3x / 2-4x: opposite by period or lower medians. No change.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
