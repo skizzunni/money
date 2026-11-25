@@ -6,7 +6,8 @@ $50,000 / $48,806 / $48,998 against a $48,000 floor; then shuffled years (2,000 
 period, the same daily rules). MNQ alone. Run from research/: python zoo/near_floor_tiers.py [--share]
 (--share, docs 127: the guard's day stop at 0.15-0.35 of the cushion instead; --stretch, docs 128: the tier's
 strong breaks from 1.0-2.0 sigma; --levels, docs 129: the guard from $1,250-2,000, the tier from $750-1,250;
---extras, docs 130: the extra contract's stretch and the news rule; --steps, docs 131: the size steps.)
+--extras, docs 130: the extra contract's stretch and the news rule; --steps, docs 131: the size steps;
+--day-stop, docs 132: the regular day stop.)
 """
 import pickle
 import sys
@@ -24,7 +25,8 @@ import strats as S  # noqa: E402
 STARTS = (50000.0, 48806.0, 48998.0)
 
 
-def shuffled(t, st, d, n_runs=2000, seed=1, share=0.25, guard=1500.0, below=1000.0, nw=None, steps=None):
+def shuffled(t, st, d, n_runs=2000, seed=1, share=0.25, guard=1500.0, below=1000.0, nw=None, steps=None,
+             day_stop=600.0):
     """252 days drawn at random (with replacement), the shipped guard as bad_runs.runs; lost share and median."""
     by = {k: (g.usd.to_numpy(), g["add"].to_numpy()) for k, g in t.groupby("d")}
     sb = {k: g.usd.to_numpy() for k, g in st.groupby("d")}
@@ -50,7 +52,7 @@ def shuffled(t, st, d, n_runs=2000, seed=1, share=0.25, guard=1500.0, below=1000
                 if q <= 0:
                     g = np.zeros(0)
                 q = min(q, 1) if on else q
-                ds = max(100.0, min(600.0, share * cush)) if on else 600.0
+                ds = max(100.0, min(day_stop, share * cush)) if on else day_stop
                 pl, dead = 0.0, False
                 for j, u in enumerate(g):
                     if pl <= -ds:
@@ -87,7 +89,10 @@ def main():
             tiers = tuple((f"strong breaks from {x} sigma (+ the gap trade)", H.trades_of(
                 S.everyday, d, s, legs=(("gap_go", B.GAP), ("noise", {**B.BAND, "min_stretch": x}))), 0.25)
                 for x in (1.0, 1.25, 1.5, 1.75, 2.0))
-        levels, extras, stepset = {}, {}, {}
+        levels, extras, stepset, dstops = {}, {}, {}, {}
+        if "--day-stop" in sys.argv:  # docs 132: the regular day stop with the guard in
+            dstops = {f"day stop ${x:,}": float(x) for x in (400, 500, 600, 700, 800)}
+            tiers = tuple((name, st, 0.25) for name in dstops)
         if "--steps" in sys.argv:  # docs 131: the size steps with the guard in
             sets_ = (("shipped 2 / 3 from +$2,000 / +$3,500", ((0, 1), (2000, 2), (3500, 3))),
                      ("2 / 3 from +$1,500 / +$3,000", ((0, 1), (1500, 2), (3000, 3))),
@@ -118,12 +123,13 @@ def main():
                 t["add"] = (stretch >= ax).astype(int)
             nf = B._news(d, nw) if nw else B._news(d)
             stp = stepset.get(name, B.STEPS)
+            dsx = dstops.get(name, 600.0)
             cal = []
             for start in STARTS:
-                r = BR.runs(t, d, stp, 600.0, nf, strong=tier, guard=gl, strong_below=bl,
+                r = BR.runs(t, d, stp, dsx, nf, strong=tier, guard=gl, strong_below=bl,
                             start=start, share=share)
                 cal.append(f"${start:,.0f} {r.lost.mean():.1%} / ${r.profit.median():,.0f}")
-            sh = shuffled(t, tier, d, share=share, guard=gl, below=bl, nw=nw, steps=stp)
+            sh = shuffled(t, tier, d, share=share, guard=gl, below=bl, nw=nw, steps=stp, day_stop=dsx)
             shs = " ".join(f"${k:,.0f} {v[0]:.1%} / ${v[1]:,.0f}" for k, v in sh.items())
             if extras:
                 t["add"] = base_add

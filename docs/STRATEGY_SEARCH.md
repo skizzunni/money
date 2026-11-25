@@ -897,6 +897,10 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    `verification/zoo/stage126_steps_with_guard.txt`). Earlier steps (+$1,500 / +$3,000): more profit for a little more
    risk; later (+$2,500 / +$4,000): the reverse. 3 from +$3,000: the same shuffled risk, +$70-194 shuffled median, but
    lower calendar medians (as 103); 3 from +$4,500: lower medians. +$2,000 / +$3,500 stay.
+132. **The day stop with the guard in** (2026-11-25, a research round; `near_floor_tiers.py --day-stop`,
+   `verification/zoo/stage127_day_stop_with_guard.txt`). $400 / $500: lower medians in both periods at the same risk.
+   $700 / $800: 2020-25 calendar higher (+$980 / +$1,455 fresh), 2015-19 lower (-$443 / -$274), a little more 2020-25
+   shuffled risk (1.5% -> 1.7%), as section 54 found. $600 stays.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 

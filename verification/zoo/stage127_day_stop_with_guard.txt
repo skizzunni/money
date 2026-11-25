@@ -1,0 +1,39 @@
+2015-19 day stop $400:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $10,229 | $48,806 0.0% / $6,014 | $48,998 0.0% / $6,537
+   shuffled years: $50,000 0.4% / $10,398 $48,806 4.7% / $7,093 $48,998 2.5% / $7,960
+2015-19 day stop $500:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $9,122 | $48,806 0.0% / $6,319 | $48,998 0.0% / $6,856
+   shuffled years: $50,000 0.4% / $10,460 $48,806 4.7% / $7,189 $48,998 2.6% / $7,935
+2015-19 day stop $600:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $9,810 | $48,806 0.0% / $6,230 | $48,998 0.0% / $6,781
+   shuffled years: $50,000 0.4% / $11,322 $48,806 4.7% / $7,580 $48,998 2.6% / $8,414
+2015-19 day stop $700:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $9,367 | $48,806 0.0% / $6,230 | $48,998 0.0% / $6,781
+   shuffled years: $50,000 0.4% / $11,367 $48,806 4.6% / $7,584 $48,998 2.6% / $8,484
+2015-19 day stop $800:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $9,536 | $48,806 0.0% / $6,230 | $48,998 0.0% / $6,781
+   shuffled years: $50,000 0.5% / $11,442 $48,806 4.6% / $7,587 $48,998 2.6% / $8,378
+2020-25 day stop $400:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $15,509 | $48,806 1.8% / $11,438 | $48,998 0.0% / $12,206
+   shuffled years: $50,000 1.7% / $14,478 $48,806 6.5% / $10,718 $48,998 3.8% / $11,426
+2020-25 day stop $500:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $16,954 | $48,806 1.8% / $12,891 | $48,998 0.0% / $14,790
+   shuffled years: $50,000 1.5% / $14,965 $48,806 6.5% / $11,165 $48,998 3.8% / $11,855
+2020-25 day stop $600:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $17,205 | $48,806 1.8% / $12,892 | $48,998 0.0% / $14,917
+   shuffled years: $50,000 1.5% / $15,582 $48,806 6.5% / $11,551 $48,998 3.7% / $12,272
+2020-25 day stop $700:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $18,185 | $48,806 1.8% / $12,932 | $48,998 0.0% / $14,509
+   shuffled years: $50,000 1.7% / $15,605 $48,806 6.5% / $11,439 $48,998 3.9% / $12,130
+2020-25 day stop $800:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $18,660 | $48,806 1.8% / $14,109 | $48,998 0.0% / $15,186
+   shuffled years: $50,000 1.7% / $15,833 $48,806 6.6% / $11,774 $48,998 3.9% / $12,438
+
+Verdict (2026-11-25, docs section 132): no change; $600 stays.
+- $400 / $500: shuffled medians lower in both periods ($860-1,104 less on 2020-25 fresh, $862-924 on 2015-19) at the
+  same risk.
+- $700 / $800: 2020-25 calendar medians higher (+$980 / +$1,455 fresh) but 2015-19 lower (-$443 / -$274); shuffled
+  medians +$23 to +$251; 2020-25 fresh shuffled risk 1.5% -> 1.7%. Mixed by period with a little more risk, as
+  section 54 found before the guard and the strong-only tier.
+- With the guard, the guarded days' stop is min(the day stop, a quarter of the cushion), so the regular stop only
+  matters above $1,500 of cushion; near-floor results barely move with it.
