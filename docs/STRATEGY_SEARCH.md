@@ -959,6 +959,10 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    `verification/zoo/stage140_gold_k_account.txt`). With MNQ and the guard, shuffled years: both MNQ periods' medians up
    (+$149 to +$772) at about the same risk. By year, though, 1.35x beats 1.5x in only 5 of 17 years and is lower in 12
    (all of 2009-14); 2024 alone is +$927 of 2020-25's +$965. A gain carried by a year or two: not shipped, 1.5x stays.
+146. **The near-misses by year** (2026-11-25, a research round; `research/zoo/near_miss_years.py`,
+   `verification/zoo/stage141_near_miss_years.txt`). 1 contract, 2015-2026, against the shipped: the move cap 1.0 up in
+   5 of 12 years (-$1,667 in all), the stop step from 1.75R 3 of 12 (-$590), the gap 0.65x 7 of 12 but by little (-$206),
+   the trend 15 2 of 12 (-$1,887). Every one loses money in total: the rejections stand.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 

@@ -1,0 +1,28 @@
+      shipped  move cap 1.0  stop step 1.75R  gap 0.65x  trend 15
+d                                                                
+2015     3574          3075             3877       3416      3346
+2016     6361          5903             6189       6045      7641
+2017     1788          2010             1788       1850      1299
+2018     7762          7665             7711       7904      7957
+2019     6432          6052             6487       6531      6137
+2020     6498          7116             6236       6233      6257
+2021     8983          9113             8862       9042      8400
+2022    10585          9799            10729      10688      9451
+2023     6811          8096             6704       6923      6553
+2024     6540          5575             6355       6663      6512
+2025      682           944              586        682       636
+2026     5908          4909             5810       5741      5848
+move cap 1.0: beats the shipped in 5 of 12 years (2017, 2020, 2021, 2023, 2025); total -1,667; largest year 2023 +1,285; without it -2,952
+stop step 1.75R: beats the shipped in 3 of 12 years (2015, 2019, 2022); total -590; largest year 2015 +303; without it -893
+gap 0.65x: beats the shipped in 7 of 12 years (2017, 2018, 2019, 2021, 2022, 2023, 2024); total -206; largest year 2018 +142; without it -348
+trend 15: beats the shipped in 2 of 12 years (2016, 2018); total -1,887; largest year 2016 +1,280; without it -3,167
+
+Verdict (2026-11-25, docs section 146): the four rejections stand; each loses money in total at 1 contract over
+2015-2026.
+- Move cap 1.0: up in 5 of 12 years, -$1,667 in all (2023 alone +$1,285).
+- Stop step from 1.75R: up in 3 of 12, -$590.
+- Gap 0.65x: up in 7 of 12 but by little (at most +$142, 2018), down more in the others (2016 -$316, 2020 -$265,
+  2026 -$167, 2015 -$158): -$206 in all. The guarded shuffled years liked it on 2020-25 (143) through the account's
+  path, not through more profit.
+- Trend 15: up in 2 of 12, -$1,887 (2016 alone +$1,280).
+- 1 contract, all trades (gap + band), NQ dev + unseen + live (2025 is H1 only, 2026 Jun 29 - Nov 23).
