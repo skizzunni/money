@@ -814,6 +814,10 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    trades: no order that holds (the low tercile best on 2015-19 at PF 1.73, worst on 2020-25 at 1.39). The gap trade
    looks far better on high 09:30-10:00 volume (PF 3.97 / 2.27), but that is hindsight (the trade's own bars); with only
    the 09:30 bar's volume, known at entry, it is gone (over 1.2x 2.04 / 1.68 against 2.15 / 1.69). Nothing used.
+115. **Out on a stretched day** (2026-11-25, a research round; `noise` exh_k, `research/zoo/exhaustion_exit.py`,
+   `verification/zoo/stage114_exhaustion_exit.txt`). A band trade in profit closed once the day's range reaches 1.5 /
+   1.75 / 2.0x its 14-session average: medians -$1,841 / -$1,365 / -$1,036 (2015-19) and -$551 / -$522 / -$225
+   (2020-25); 2.5x and up never changes a trade. Stretched days keep running. Rejected.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 

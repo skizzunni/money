@@ -1,0 +1,14 @@
+exh_k 0.0: 2015-19 lost 0.0% median $14,028 p25 $5,324 (13 early exits) | 2020-25 lost 0.0% median $18,980 p25 $15,811 (15 early exits) | TV $+10,063 50tr PF 4.66 dd $670
+exh_k 1.5: 2015-19 lost 0.0% median $12,187 p25 $5,558 (81 early exits) | 2020-25 lost 0.0% median $18,429 p25 $15,358 (63 early exits) | TV $+8,365 51tr PF 4.04 dd $670
+exh_k 1.75: 2015-19 lost 0.0% median $12,663 p25 $5,515 (30 early exits) | 2020-25 lost 0.0% median $18,458 p25 $15,457 (24 early exits) | TV $+9,984 50tr PF 4.63 dd $670
+exh_k 2.0: 2015-19 lost 0.0% median $12,992 p25 $4,804 (17 early exits) | 2020-25 lost 0.0% median $18,755 p25 $15,750 (17 early exits) | TV $+10,063 50tr PF 4.66 dd $670
+exh_k 2.5: 2015-19 lost 0.0% median $14,028 p25 $5,324 (13 early exits) | 2020-25 lost 0.0% median $18,980 p25 $15,811 (15 early exits) | TV $+10,063 50tr PF 4.66 dd $670
+exh_k 3.0: 2015-19 lost 0.0% median $14,028 p25 $5,324 (13 early exits) | 2020-25 lost 0.0% median $18,980 p25 $15,811 (15 early exits) | TV $+10,063 50tr PF 4.66 dd $670
+
+("early exits" counts every market exit sent at a bar's close, so the shipped band's own check exits too: 13 / 15.)
+Verdict (2026-11-25, docs section 115): rejected.
+- Out on a winner once the day's range is 1.5 / 1.75 / 2.0x its 14-session average: 2015-19 median -$1,841 / -$1,365 /
+  -$1,036, 2020-25 -$551 / -$522 / -$225, the TradingView window -$1,698 / -$79 / $0. Lower on both periods at every
+  level that acts; 2.5x and 3.0x never change a trade. Stretched days keep running: the target (2.5R) and the stops
+  already take these trades out better.
+- Hindsight: none (the day's range so far and the 14 sessions before; the exit at the next bar's open).
