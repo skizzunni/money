@@ -770,6 +770,12 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
 106. **Strong breaks only after a stop-out** (2026-11-25, a research round; `noise` reentry_min,
    `verification/zoo/stage105_reentry_after_stop.txt`). After a stop the same day, re-entries only 1.0-2.0 sigma past the
    band: medians $7,194-14,260 against $14,028 / $18,980. The re-entries pay. Rejected.
+107. **Contracts by the day's range** (2026-11-25, a research round; `research/zoo/range_sizing.py`,
+   `verification/zoo/stage106_range_sizing.txt`). The 14-session average range against its median over the year before.
+   One contract fewer over 1.4-2.0x: 2015-19 medians -$1,294 to -$3,148. One more under 0.9x: +$1,458 / +$681, but
+   one more on random days at the same rate gives +$734 / +$561, and both are inside that range: it is size, not the
+   range. From 0.95x, 5.5% of 2020-25 accounts lost. Rejected. (A band exit after 15:00 is already in: every check
+   through 15:30 moves the stop to the band, and a close back inside exits.)
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 

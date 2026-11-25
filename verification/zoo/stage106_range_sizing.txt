@@ -1,0 +1,36 @@
+2015-19 shipped: lost 0.0% median $14,028 p25 $5,324
+  one fewer over 1.4: 25% of days, lost 0.0% median -2,598 p25 +188
+  one fewer over 1.7: 14% of days, lost 0.0% median -1,294 p25 +176
+  one fewer over 2.0: 9% of days, lost 0.0% median -1,358 p25 +7
+  1 contract over 1.7: 14% of days, lost 0.0% median -3,148 p25 -64
+  one more under 0.8: 20% of days, lost 0.0% median +969 p25 +541
+  one more under 0.85: 24% of days, lost 0.0% median +894 p25 +732
+  one more under 0.9: 28% of days, lost 0.0% median +1,458 p25 +1,147
+  one more under 0.95: 36% of days, lost 0.0% median +1,350 p25 +2,839
+  one more under 1.0: 43% of days, lost 0.0% median +1,412 p25 +2,972
+  one more under 1.1: 56% of days, lost 0.0% median +1,295 p25 +2,936
+  placebo, one more on random 28% of days (20 draws): median +734 (-1,146 to +1,944) p25 +961 (-149 to +2,718)
+2020-25 shipped: lost 0.0% median $18,980 p25 $15,811
+  one fewer over 1.4: 19% of days, lost 0.0% median +334 p25 -293
+  one fewer over 1.7: 11% of days, lost 0.0% median +183 p25 +291
+  one fewer over 2.0: 6% of days, lost 0.0% median -225 p25 +25
+  1 contract over 1.7: 11% of days, lost 0.0% median +14 p25 +525
+  one more under 0.8: 16% of days, lost 0.0% median -8 p25 +474
+  one more under 0.85: 23% of days, lost 0.0% median +846 p25 +441
+  one more under 0.9: 32% of days, lost 0.0% median +681 p25 +591
+  one more under 0.95: 40% of days, lost 5.5% median +664 p25 -531
+  one more under 1.0: 49% of days, lost 5.5% median +577 p25 -295
+  one more under 1.1: 63% of days, lost 5.5% median +664 p25 -122
+  placebo, one more on random 32% of days (20 draws): median +561 (-243 to +1,373) p25 +490 (-656 to +1,912)
+
+Verdict (2026-11-25, docs section 107): rejected.
+- One contract fewer on high-range days: 2015-19 medians -$1,294 to -$3,148; 2020-25 -$225 to +$334. It cuts profit
+  where it matters and no account was being lost anyway (0.0% shipped on both periods).
+- One contract more on quiet days: under 0.9 looks good on both periods (+$1,458 / +$681 median), but the placebo (one
+  more on random days at the same rate) gives +$734 / +$561 on average, and both results are inside the placebo's
+  range (-$1,146 to +$1,944; -$243 to +$1,373). The gain is extra size, not the range. Under 0.95 and above loses
+  5.5% of 2020-25 accounts. More size early is a risk choice already declined (sections 67, 103).
+- Hindsight: none. The ratio uses only the 14 sessions before today and the year before them.
+- The other candidate this round (exit when the close goes back inside the band after 15:00) is already the code:
+  every half-hour check through 15:30 moves the stop to the band, and a close at or past it exits at the next bar's
+  open (strats.noise; NinjaTrader and Pine match it trade for trade).
