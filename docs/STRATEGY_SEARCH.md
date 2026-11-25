@@ -756,6 +756,9 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    `verification/zoo/stage101_break_even_lock.txt`). +1 / +4 / +6 points: +4 helps 2015-19 but costs 2020-25 $2,057 of
    median; the others lower. +2 points stays.
 
+103. **The size steps again, with 61 and 87 in** (2026-11-25, a research round; `verification/zoo/stage102_size_steps.txt`).
+   2 from +$1,750 / +$2,250 and 3 from +$3,000 / +$4,000: every one lowers 2020-25's median. +$2,000 / +$3,500 stay.
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |

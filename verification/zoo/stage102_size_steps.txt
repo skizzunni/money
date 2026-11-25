@@ -1,0 +1,11 @@
+Stage 102 (2026-11-25, a research round): the size steps (2 contracts from +$2,000, 3 from +$3,500) once more, with
+sections 61 and 87 in (section 32 set them before). Fresh 50K starts on the real sequence, by period:
+
++$2,000 / +$3,500 (shipped): 2015-19 lost 0.0% med $14,028 p25 $5,324 | 2020-25 lost 0.0% med $18,980 p25 $15,811
++$1,750 / +$3,500:           2015-19 lost 0.0% med $14,936 p25 $4,972 | 2020-25 lost 0.0% med $18,755 p25 $15,572
++$2,250 / +$3,500:           2015-19 lost 0.0% med $13,728 p25 $5,382 | 2020-25 lost 0.0% med $18,600 p25 $15,616
++$2,000 / +$3,000:           2015-19 lost 0.0% med $13,976 p25 $4,941 | 2020-25 lost 0.0% med $18,660 p25 $15,854
++$2,000 / +$4,000:           2015-19 lost 0.0% med $14,209 p25 $5,379 | 2020-25 lost 0.0% med $18,481 p25 $15,544
+
+Verdict: the shipped steps hold: every neighbour lowers 2020-25's median, and each costs a 25th percentile in at least
+one period. No neighbour passed this first gate, so shuffled years were not run.
