@@ -1,0 +1,9 @@
+Stage 100 (2026-11-25, a research round): the noise band's width (1.0 sigma, fixed in the code, not a NinjaTrader
+setting) at 0.95 / 1.05, with sections 61 and 87 in (section 32 tested 0.9 / 1.1 before them: 2.9-3.8% of starts lost).
+The strong-break contract still measured in 1.0 sigma, as the code does. Fresh 50K starts by period, the window:
+
+1.0 (shipped): 2015-19 lost 0.0% med $14,028 p25 $5,324 | 2020-25 lost 0.0% med $18,980 p25 $15,811 | TV $+10,063 50tr PF 4.66
+0.95:          2015-19 lost 0.0% med $13,683 p25 $4,534 | 2020-25 lost 0.0% med $17,123 p25 $14,036 | TV $+9,871 50tr PF 4.29
+1.05:          2015-19 lost 0.0% med $13,557 p25 $3,236 | 2020-25 lost 0.0% med $17,830 p25 $14,250 | TV $+8,568 52tr PF 4.26
+
+Verdict: 1.0 stays: both half-steps are lower on every number in both periods and the window.
