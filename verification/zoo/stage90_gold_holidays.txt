@@ -1,0 +1,8 @@
+Stage 90 (2026-11-25, a research round): gold (MgcOvernightCarry, shipped rules, 1 MGC, $0.62 a side) around holidays,
+gold5.pkl by period:
+
+2009-17: all 171 tr PF 2.02 $+19.0 | half days (Fri after Thanksgiving, Dec 24) 0 tr | day before a holiday 2 tr PF 0.00 $-11.2 | day after a holiday 6 tr PF 0.00 $-34.6
+2018-25: all 145 tr PF 1.84 $+14.1 | half days 0 tr | day before a holiday 1 tr PF 0.00 $-5.2 | day after a holiday 7 tr PF 1.31 $+4.6
+
+Verdict: nothing to change. Gold never traded the half days in 16 years (its signal did not fire on them); the days
+around holidays are 16 trades in all with opposite results by period (the day after: PF 0.00 then 1.31).

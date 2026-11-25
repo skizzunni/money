@@ -725,6 +725,10 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    $400 from +$5,000 / +$7,500: medians lower and no fewer fall-backs. Rejected. Starts that reached +$5,000 fell back
    under +$3,500 in 4 of 37 / 6 of 55 cases and none was lost.
 
+95. **Gold around holidays** (2026-11-25, a research round; `verification/zoo/stage90_gold_holidays.txt`). No gold trade on
+   a half day in 16 years; the days before / after holidays are 16 trades with opposite results by period. Nothing to
+   change.
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |
