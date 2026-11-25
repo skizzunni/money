@@ -721,6 +721,10 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    entries for the month once it is down $1,000 / $1,500 / $2,000: 2020-25 medians $15,740-17,836 against $18,980, and
    $1,500 loses 1.8% of starts. The recovery days come right after the bad ones. Rejected.
 
+94. **Protecting gains with a tighter day stop** (2026-11-24, a research round; `verification/zoo/stage88_profit_protection.txt`).
+   $400 from +$5,000 / +$7,500: medians lower and no fewer fall-backs. Rejected. Starts that reached +$5,000 fell back
+   under +$3,500 in 4 of 37 / 6 of 55 cases and none was lost.
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |

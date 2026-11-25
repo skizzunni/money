@@ -1,0 +1,10 @@
+Stage 88 (2026-11-24, a research round): a tighter day stop ($400) once the account is up +$5,000 / +$7,500 (a 50K's
+payout zone), the real sequence, fresh 50K starts by period; "fell back" = starts that reached +$5,000 and later closed
+a day under +$3,500.
+
+shipped ($600 always):       2015-19 lost 0.0% med $14,028 p25 $5,324 fell back 4/37 | 2020-25 lost 0.0% med $18,980 p25 $15,811 fell back 6/55
+$400 day stop from +$5,000:  2015-19 lost 0.0% med $13,341 p25 $5,324 fell back 5/37 | 2020-25 lost 0.0% med $17,666 p25 $14,578 fell back 8/55
+$400 day stop from +$7,500:  2015-19 lost 0.0% med $13,341 p25 $5,324 fell back 4/37 | 2020-25 lost 0.0% med $17,666 p25 $14,578 fell back 6/55
+
+Verdict: rejected: lower medians and no fewer fall-backs (more from +$5,000). For the record: once a start reached
++$5,000, it fell back under +$3,500 in 4 of 37 (2015-19) and 6 of 55 (2020-25) cases, and none was lost.
