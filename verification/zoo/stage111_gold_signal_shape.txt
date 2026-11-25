@@ -1,0 +1,26 @@
+first 15 minutes / overnight move (terciles cut at [0.03, 0.08]):
+               n  mean $    PF   win
+per     q                           
+2009-17 low   61    -4.2  0.57  0.02
+        mid   57    20.9  2.38  0.12
+        high  53    43.6  2.33  0.13
+2018-25 low   45    33.2  5.59  0.07
+        mid   48    14.8  2.08  0.06
+        high  52    -3.1  0.89  0.12
+signal close in the 08:20-08:35 range (terciles cut at [0.65, 0.84]):
+               n  mean $    PF   win
+per     q                           
+2009-17 low   58   -11.6  0.17  0.02
+        mid   62    15.9  1.75  0.13
+        high  51    57.5  3.76  0.12
+2018-25 low   48    17.3  2.51  0.06
+        mid   43    12.5  1.65  0.07
+        high  54    12.5  1.64  0.11
+
+Verdict (2026-11-25, docs section 112): nothing to use.
+- The first 15 minutes' run against the overnight move: the low tercile loses on 2009-17 (PF 0.57) and is the best on
+  2018-25 (PF 5.59); the high tercile the other way (2.33 / 0.89). Opposite by period.
+- The signal close in its range: the low tercile PF 0.17 on 2009-17, 2.51 on 2018-25. Opposite by period.
+- With 9% winners each bucket holds 1-7 winning trades, so a handful of trades decide each cell.
+- Hindsight: none (both are known at the 08:30 bar's close, when the order goes). The 08:35 open itself is the fill
+  and cannot be used as a filter for a market order sent at the 08:30 close.

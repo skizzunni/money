@@ -799,6 +799,11 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    10:00, out at 14:15. With a stop past the extreme since the stop-out the re-entries make $131-277 a year a contract on
    2009-17 but -$33 to +$21 on 2018-25; with the first trade's stop the reverse (-$43 to -$67 / +$44 to +$105). Each
    version fails one period, and the worst gold day deepens (to -$156 to -$268). Rejected.
+112. **The gold signal's shape** (2026-11-25, a research round; `research/zoo/gold_signal_shape.py`,
+   `verification/zoo/stage111_gold_signal_shape.txt`). Known at the 08:30 close (the 08:35 open is the fill, so not a
+   filter): the first 15 minutes' run against the overnight move, and the signal close in the 08:20-08:35 range. By
+   terciles both flip between periods (the weakest run tercile PF 0.57 on 2009-17 is the best on 2018-25 at 5.59; the
+   low close tercile 0.17 / 2.51), and each holds 1-7 winners. Nothing used.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
