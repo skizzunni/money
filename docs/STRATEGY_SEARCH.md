@@ -787,6 +787,13 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    Mar 2025: the 60% stop $361 / $286; 70-80% $215-252 / $333-368; 40-50% $290-320 / $312-322: mixed, 60% stays. The
    move from the 13:30 bar's close: $374 / $351, but 13:20 and 13:40 are lower on 2009-17: a spike, under the bar for a
    change. No change.
+110. **Gold and MNQ on the same day** (2026-11-25, a research round; `research/zoo/gold_mnq_same_day.py`,
+   `verification/zoo/stage109_gold_mnq_same_day.txt`). Gold enters at 08:35, before MNQ, so no gold rule can use
+   MNQ's day; the other way, MNQ's day (1 contract) after gold is stopped by 09:30 / still open: 2015-19 $30.6 / $22.8,
+   2020-25 $14.6 / $59.3 (13 / 19 days open): opposite by period, too few days. The two days' $ barely move together
+   (correlation 0.04 / 0.11); both lose on 22% / 26% of gold days, the worst such day -$582 a contract, inside the
+   $600 day stop plus a gold loss. Nothing to use. Found on the way: gold wins only 9% of its trades (316 in 2009 -
+   Mar 2025): losers $19.5 a contract on average (83% stopped by 09:30), winners $405. Now in "Running it" step 9.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
@@ -862,7 +869,9 @@ NinjaTrader 8, on each funded account (both the same way):
    is needed), Days to load **30**. Right-click > Strategies > **MgcOvernightCarry** > the same funded account,
    defaults, Enabled. The top-right corner says "waiting for history" until the first 08:30 check after loading, then
    OK once 14 complete sessions are loaded (NOT READY with fewer). It trades at most once a day
-   (08:35 to 14:15) and sizes from the same account balance as MNQ.
+   (08:35 to 14:15) and sizes from the same account balance as MNQ. Expect most gold trades to lose: about 9 in 10 are
+   stopped out within minutes of 08:35 for about $20 a contract (at most $141 in 2009 - Mar 2025), and the 1 in 10 that
+   runs to 14:15 makes about $400 a contract (section 110). A run of 10-20 small gold losses is normal, not a fault.
 
 10. **The contract roll (MNQ: Thursday Dec 10 2026, 8 days before the Dec 18 expiry; then every March, June, September
    and December the same way).** The strategy needs 21 or more complete sessions (every 5-minute bar 09:30-16:00) on

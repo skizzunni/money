@@ -1,0 +1,3 @@
+gold, all 316 trades 2009 - Mar 2025: 9% win, mean $16.8; losers $-19.5 on average (worst $-141), winners $405; stopped by 09:30: 83%
+2015-19: 91 gold days; MNQ $ a day (1 contract) on all days 20.8, on gold days 29.5; gold stopped by 09:30 (78 days) 30.6, gold still open (13 days) 22.8; both lose 22% of gold days; correlation 0.04; worst both-lose day $-582
+2020-25: 98 gold days; MNQ $ a day (1 contract) on all days 29.3, on gold days 23.3; gold stopped by 09:30 (79 days) 14.6, gold still open (19 days) 59.3; both lose 26% of gold days; correlation 0.11; worst both-lose day $-370
