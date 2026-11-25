@@ -1,0 +1,9 @@
+Stage 89 (2026-11-25 00:xx UTC): a health check before the US Thanksgiving holiday (markets closed Thu Nov 26; CME
+index futures close 13:15, COMEX metals 13:45, on Fri Nov 27), current code (commit 1c12b1a / ebbe908).
+
+tests/test_ninjatrader_clean.py + test_ninjatrader_gold.py -k "half_day or holiday or early_close or hole": 8 passed
+tests/test_pine_clean.py + test_pine_gold.py -k "half_day or holiday": 5 passed
+research/stress/torture.py: 20 of 22 PASS; the 2 FAILs are the known "half days" scenario with no early close in the
+  template on a date the calendar does not know (the next-bar backstop); Nov 27 is in the built-in calendar (out by 13:10)
+research/stress/torture_gold.py: 10 of 10 PASS (5 scenarios x 2 runs; an earlier report of "12/12" at 19:49 UTC
+  Nov 24 was a miscount: the two extra lines counted were MNQ's)
