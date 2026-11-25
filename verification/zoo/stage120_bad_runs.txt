@@ -70,3 +70,25 @@ from the strategy run with min_stretch 1.5 (strong breaks and the gap trade only
 plain run (guard off) still matches harness.account start by start. The guard barely changes these figures: the
 closest approach to the floor 2015-19 $804 -> $648 (smaller size recovers more slowly; days without a new high median
 21 -> 27), 2020-25 $500 -> $672; the falls, runs and worst days about the same. Step 12 now quotes these.
+
+Sessions to the size steps (docs section 124; the same runs, guard on, MNQ alone then with gold):
+2015-19 with the cushion guard: 49 fresh starts (matches harness.account start by start with the guard off), lost 0.0%
+  sessions to +$2,000 (2 contracts): median 93, 75% of starts within 145, slowest 231; not in 12 months 0%
+  sessions to +$3,500 (3 contracts): median 150, 75% of starts within 219, slowest not reached; not in 12 months 20%
+2020-25 with the cushion guard: 55 fresh starts (matches harness.account start by start with the guard off), lost 0.0%
+  sessions to +$2,000 (2 contracts): median 48, 75% of starts within 86, slowest 160; not in 12 months 0%
+  sessions to +$3,500 (3 contracts): median 82, 75% of starts within 114, slowest 187; not in 12 months 0%
+2015-19 with the cushion guard MNQ + gold: 49 fresh starts (matches harness.account start by start with the guard off), lost 0.0%
+  sessions to +$2,000 (2 contracts): median 79, 75% of starts within 134, slowest not reached; not in 12 months 4%
+  sessions to +$3,500 (3 contracts): median 141, 75% of starts within 224, slowest not reached; not in 12 months 16%
+2020-25 with the cushion guard MNQ + gold: 55 fresh starts (matches harness.account start by start with the guard off), lost 0.0%
+  sessions to +$2,000 (2 contracts): median 41, 75% of starts within 82, slowest 160; not in 12 months 0%
+  sessions to +$3,500 (3 contracts): median 77, 75% of starts within 104, slowest 166; not in 12 months 0%
+2015-19: 49 fresh starts (matches harness.account start by start with the guard off), lost 0.0%
+  sessions to +$2,000 (2 contracts): median 70, 75% of starts within 124, slowest 231; not in 12 months 0%
+  sessions to +$3,500 (3 contracts): median 129, 75% of starts within 183, slowest not reached; not in 12 months 12%
+2020-25: 55 fresh starts (matches harness.account start by start with the guard off), lost 0.0%
+  sessions to +$2,000 (2 contracts): median 42, 75% of starts within 74, slowest 125; not in 12 months 0%
+  sessions to +$3,500 (3 contracts): median 75, 75% of starts within 102, slowest 187; not in 12 months 0%
+(The last two blocks: no guard, MNQ alone.) A "session" is a trading day; about 21 a month. Not reached in the 12
+months counts as slowest. The floor stops trailing at $50,000 on the same close that reaches +$2,000.

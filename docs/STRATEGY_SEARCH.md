@@ -859,6 +859,10 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    runs: the closest approach to the floor $804 -> $648 (2015-19: one contract recovers more slowly, days without a new
    high median 21 -> 27) and $500 -> $672 (2020-25); falls, losing runs and worst days about the same. Step 12 corrected
    (it said live lows "a little shallower").
+124. **How long the size steps take** (2026-11-25, a research round; `bad_runs.py`, `verification/zoo/stage120_bad_runs.txt`).
+   Fresh 50K, the guard on, trading days to the first close at +$2,000 / +$3,500: 2015-19 median 93 / 150 (20% never
+   reach +$3,500 in 12 months), 2020-25 48 / 82 (all reach both). With gold: 79 / 141 (4% never reach +$2,000, 16%
+   never +$3,500) and 41 / 77. Without the guard: 70 / 107 and 42 / 75. A live expectation, now in step 12.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
@@ -978,6 +982,10 @@ NinjaTrader 8, on each funded account (both the same way):
      about -$1,100; the worst 5 trading days about -$1,900 to -$2,250, up to -$3,180;
    - in a typical year the balance came within about $1,200 of the floor at some point (as close as $500 without the
      guard, $648-672 with it).
+   - the size steps take time (with the guard, about 21 trading days a month): +$2,000 (2 contracts, and the floor stops
+     trailing at $50,000) after a median 48-93 trading days (2020-25 / 2015-19; 75% of starts within 86-145, the
+     slowest 160-231); +$3,500 (3 contracts) after a median 82-150, and in 2015-19 20% of fresh years never got there
+     in 12 months (16% with gold; with gold 4% of 2015-19 years also never reached +$2,000).
    None of those lost an account in the history. A run like this is not a fault; a run well past these is a reason to
    stop and check the setup (step 11) and the trades against TradingView.
 

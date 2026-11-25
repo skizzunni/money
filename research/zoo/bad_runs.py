@@ -42,7 +42,8 @@ def runs(t, all_days, steps, day_stop, day_qty, max_q=3, extra=None, strong=None
             continue
         bal, high, lost = 50000.0, 50000.0, False
         dd, cush_lo, streak, worst_streak, since_high, worst_since, pls = 0.0, 2000.0, 0, 0, 0, 0, []
-        for j in seg:
+        to2 = to3 = np.nan  # docs 124: sessions until the first close at +$2,000 / +$3,500 (2 / 3 contracts next day)
+        for n_, j in enumerate(seg, 1):
             d = days[j]
             floor = min(high - 2000.0, 50000.0)
             cush = bal - floor
@@ -80,6 +81,10 @@ def runs(t, all_days, steps, day_stop, day_qty, max_q=3, extra=None, strong=None
                 lost = True
                 break
             cush_lo = min(cush_lo, bal - floor)
+            if to2 != to2 and bal - 50000.0 >= 2000.0:
+                to2 = n_
+            if to3 != to3 and bal - 50000.0 >= 3500.0:
+                to3 = n_
             high = max(high, bal)
             dd = max(dd, high - bal)
             since_high = 0 if bal >= high else since_high + (g is not None)
@@ -87,7 +92,7 @@ def runs(t, all_days, steps, day_stop, day_qty, max_q=3, extra=None, strong=None
         p = np.array(pls) if pls else np.zeros(1)
         wk = min(p[k:k + 5].sum() for k in range(max(1, len(p) - 4)))
         out.append(dict(lost=lost, profit=bal - 50000.0, dd=dd, cush_lo=cush_lo, streak=worst_streak,
-                        no_high=worst_since, worst_day=p.min(), worst_5=wk))
+                        no_high=worst_since, worst_day=p.min(), worst_5=wk, to2=to2, to3=to3))
     return pd.DataFrame(out)
 
 
@@ -131,7 +136,13 @@ def main():
         print(f"  most trading days without a new high: median {q.loc['no_high', 0.5]:.0f}, worst 10% "
               f"{q.loc['no_high', 0.9]:.0f}, worst {r.no_high.max():.0f}")
         print(f"  worst day: median ${r.worst_day.median():,.0f}, worst ${r.worst_day.min():,.0f}; worst 5 trading "
-              f"days: median ${r.worst_5.median():,.0f}, worst ${r.worst_5.min():,.0f}", flush=True)
+              f"days: median ${r.worst_5.median():,.0f}, worst ${r.worst_5.min():,.0f}")
+        for col, lv in (("to2", "+$2,000 (2 contracts)"), ("to3", "+$3,500 (3 contracts)")):
+            x = r[col].fillna(np.inf)  # not reached in the 12 months counts as slowest
+            def f(v):
+                return "not reached" if v == np.inf else f"{v:.0f}"
+            print(f"  sessions to {lv}: median {f(x.median())}, 75% of starts within {f(x.quantile(0.75))}, "
+                  f"slowest {f(x.max())}; not in 12 months {np.isinf(x).mean():.0%}", flush=True)
 
 
 if __name__ == "__main__":
