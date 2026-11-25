@@ -843,6 +843,12 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    -$41 under 0.25 sigma to -$141 / -$185 at 1.5-2.5, 14-17% at the full hard stop) but the more winners (70% / 78%)
    and $ a trade ($81 / $90): the extra contract's case (30). The shallow third ($2 / $8 a trade) is section 27's
    finding again (a minimum stretch cost the median). Past 2.5 sigma: opposite by period, 15 / 16 trades. Nothing new.
+121. **What a normal bad run looks like** (2026-11-25, a research round; `research/zoo/bad_runs.py`,
+   `verification/zoo/stage120_bad_runs.txt`). harness.account's loop with the path kept (checked to match it start by
+   start), fresh 50K starts, 2015-19 / 2020-25 medians (worst): fall from the high $2,051 / $2,771 ($3,250 / $4,790),
+   cushion low $1,175 / $1,245 ($804 / $500), losing days in a row 6 / 8 (8 / 10), trading days without a new high 21 /
+   19 (62 / 32), worst day -$772 / -$912 (-$1,085 / -$1,107), worst 5 days -$1,882 / -$2,252 (-$2,597 / -$3,179). MNQ
+   alone, no cushion guard (as every account figure here). Now "Running it" step 12.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
@@ -950,6 +956,19 @@ NinjaTrader 8, on each funded account (both the same way):
    - Gold chart: "waiting for history" until Monday's 08:30 check is normal; it must then say OK (or NOT READY: raise
      Days to load to 30+).
    - Monday 09:35 / 10:00: the Output window shows the settings line and, if a trade fires, its order and stop.
+
+12. **What a normal bad run looks like (section 121).** In the history (MNQ alone, fresh 50K accounts, 12 months each,
+   2015-19 / 2020-25; the research model has no cushion guard, which live cuts to 1 contract near the floor, so live
+   lows should be a little shallower and recoveries slower):
+   - a fall of about $2,000-2,800 from the highest balance at some point in a typical year, up to $3,250-4,790 in the
+     worst start (the floor stops trailing at $50,000 once the account is $2,000 up, so these do not end it);
+   - 6-8 losing trading days in a row in a typical year, up to 8-10;
+   - about 20 trading days without a new high in a typical year, up to 32-62;
+   - a worst day of about -$800 to -$900 (the $600 day stop is checked between trades, so a day can end past it), up to
+     about -$1,100; the worst 5 trading days about -$1,900 to -$2,250, up to -$3,180;
+   - in a typical year the balance came within about $1,200 of the floor at some point (as close as $500).
+   None of those lost an account in the history. A run like this is not a fault; a run well past these is a reason to
+   stop and check the setup (step 11) and the trades against TradingView.
 
 Defaults: trend 20 sessions; hard stop $200 a contract; take profit 2.5 hard stops; break-even at 0.4 to entry + 2
 points, and at 1.5 to entry + 0.5 hard stops (section 61); last entry 14:00 (840); at most 9 trades a day; day stop

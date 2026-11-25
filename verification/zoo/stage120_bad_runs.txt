@@ -1,0 +1,22 @@
+2015-19: 49 fresh starts (matches harness.account start by start), lost 0.0%
+  deepest fall from the high: median $2,051, worst 10% $3,250, worst $3,250
+  closest to the floor (cushion low): median $1,175, worst 10% $905, worst $804
+  longest run of losing trading days: median 6, worst 10% 6, worst 8
+  most trading days without a new high: median 21, worst 10% 35, worst 62
+  worst day: median $-772, worst $-1,085; worst 5 trading days: median $-1,882, worst $-2,597
+2020-25: 55 fresh starts (matches harness.account start by start), lost 0.0%
+  deepest fall from the high: median $2,771, worst 10% $3,350, worst $4,790
+  closest to the floor (cushion low): median $1,245, worst 10% $733, worst $500
+  longest run of losing trading days: median 8, worst 10% 10, worst 10
+  most trading days without a new high: median 19, worst 10% 23, worst 32
+  worst day: median $-912, worst $-1,107; worst 5 trading days: median $-2,252, worst $-3,179
+
+Notes (2026-11-25, docs section 121): an expectation for live, not a rule.
+- MNQ alone (no gold), the shipped rules, no cushion guard (bench.py and harness.account have none; live, the guard
+  cuts to 1 contract, a smaller day stop and no gold within $1,500 of the floor, so live lows should be a little
+  shallower and recoveries slower). The median cushion low ($1,175 / $1,245) means the guard would act at some point
+  in most fresh years.
+- A fall from the high can pass $2,000 without ending the account: the floor stops trailing at $50,000.
+- The worst day can pass the $600 day stop: it is checked between trades, and a trade that starts at -$590 can lose
+  its full stop.
+- Now "Running it" step 12 in docs/STRATEGY_SEARCH.md.
