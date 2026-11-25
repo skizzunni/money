@@ -1,0 +1,11 @@
+Stage 87 (2026-11-24, a research round): a monthly loss limit: no new entries for the rest of the month once the month
+is down $1,000 / $1,500 / $2,000 at the sizes taken (a path rule: the real sequence, fresh 50K starts by period; a copy
+of harness.account with the limit; the $0 row reproduces the shipped numbers exactly).
+
+no limit (shipped):  2015-19 lost 0.0% med $14,028 p25 $5,324 | 2020-25 lost 0.0% med $18,980 p25 $15,811
+$1,000 a month:      2015-19 lost 0.0% med $14,028 p25 $3,869 | 2020-25 lost 0.0% med $15,740 p25 $12,240
+$1,500 a month:      2015-19 lost 0.0% med $14,028 p25 $5,324 | 2020-25 lost 1.8% med $17,030 p25 $12,673
+$2,000 a month:      2015-19 lost 0.0% med $14,028 p25 $5,324 | 2020-25 lost 0.0% med $17,836 p25 $15,811
+
+Verdict: rejected. Every limit lowers 2020-25 (median -$1,144 to -$3,240) and $1,500 loses 1.8% of starts: sitting out
+the rest of a bad month skips the recovery days (as the weekly limit, section 44, and the losing-streak cut, 85).

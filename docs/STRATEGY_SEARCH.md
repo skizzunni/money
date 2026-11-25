@@ -717,6 +717,10 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    alone; the strong-break contracts 9 of 9 won. No rule known in advance avoids it (the weekly loss limit, 44, was
    rejected). Nothing to change: a weak half-year is part of the history's PF of about 1.6.
 
+93. **A monthly loss limit** (2026-11-24, a research round; `verification/zoo/stage87_monthly_loss_limit.txt`). No new
+   entries for the month once it is down $1,000 / $1,500 / $2,000: 2020-25 medians $15,740-17,836 against $18,980, and
+   $1,500 loses 1.8% of starts. The recovery days come right after the bad ones. Rejected.
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |
