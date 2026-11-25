@@ -767,6 +767,10 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    `verification/zoo/stage104_target_half_steps.txt`). 2.25R: lower everywhere; 2.75R: 2015-19 up, 2020-25 and the
    window down. 2.5R stays.
 
+106. **Strong breaks only after a stop-out** (2026-11-25, a research round; `noise` reentry_min,
+   `verification/zoo/stage105_reentry_after_stop.txt`). After a stop the same day, re-entries only 1.0-2.0 sigma past the
+   band: medians $7,194-14,260 against $14,028 / $18,980. The re-entries pay. Rejected.
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |

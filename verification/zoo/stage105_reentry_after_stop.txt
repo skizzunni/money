@@ -1,0 +1,11 @@
+Stage 105 (2026-11-25, a research round): after a stop-out the same day, the next band entry only on a break
+reentry_min sigmas past the band (strats.noise reentry_min). Fresh 50K starts by period, the TradingView window:
+
+any break (shipped): 2015-19 lost 0.0% med $14,028 p25 $5,324 | 2020-25 lost 0.0% med $18,980 p25 $15,811 | TV $+10,063 50tr PF 4.66
+1.0 sigma:           2015-19 lost 0.0% med $8,969  p25 $3,539 | 2020-25 lost 0.0% med $14,260 p25 $10,989 | TV $+8,325 34tr PF 4.87
+1.5 sigma:           2015-19 lost 0.0% med $7,471  p25 $3,534 | 2020-25 lost 0.0% med $12,328 p25 $8,964  | TV $+7,424 30tr PF 5.80
+2.0 sigma:           2015-19 lost 0.0% med $7,194  p25 $2,342 | 2020-25 lost 0.0% med $10,074 p25 $8,313  | TV $+4,809 28tr PF 5.41
+
+Verdict: rejected. "A stop" includes the break-even and second-step stops, which often close a trade flat or ahead;
+the breaks after them pay. The other candidate, a trailing gold exit once 2R up, is stage 60's stop step for gold
+(rejected: 2018-25 down a third).
