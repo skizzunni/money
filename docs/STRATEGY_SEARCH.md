@@ -812,6 +812,20 @@ NinjaTrader 8, on each funded account (both the same way):
    defaults, Enabled. The top-right corner says OK once 14 complete sessions are loaded. It trades at most once a day
    (08:35 to 14:15) and sizes from the same account balance as MNQ.
 
+10. **The contract roll (MNQ: Thursday Dec 10 2026, 8 days before the Dec 18 expiry; then every March, June, September
+   and December the same way).** The strategy needs 21 or more complete sessions (every 5-minute bar 09:30-16:00) on
+   the chart it trades, so on the new contract:
+   - **Before the roll day:** Tools > Options > Market data > Merge policy **Merge back adjusted** (the research data is
+     back-adjusted the same way), so the MNQ 03-27 chart carries the 12-26 history. With "Do not merge" the 03-27 chart
+     holds only 03-27's own pre-roll bars, which can be thin; if a session misses any 5-minute bar it does not count,
+     and the dashboard may say NOT READY or NO TRADING (this could not be checked here: no 03-27 pre-roll bars).
+   - **After the close on Dec 9 (the strategy is flat by 15:55):** turn the strategy off, change the chart's instrument
+     to **MNQ 03-27**, right-click > Reload All Historical Data, add the strategy again with the same settings (start
+     balance, Highest end-of-day balance, Place orders), Enabled.
+   - **Check:** the top-right corner must say OK, not NOT READY / NO TRADING, before 09:30 on Dec 10.
+   - **Gold (MGC 02-27):** the same steps on its own rollover date, which NinjaTrader lists under Tools > Instruments >
+     MGC > Rollovers (gold's active months are Feb / Apr / Jun / Aug / Oct / Dec).
+
 Defaults: trend 20 sessions; hard stop $200 a contract; take profit 2.5 hard stops; break-even at 0.4 to entry + 2
 points, and at 1.5 to entry + 0.5 hard stops (section 61); last entry 14:00 (840); at most 9 trades a day; day stop
 $600; range rule 0.65; move cap 1.1; the gap trade every day (gap 0.6x, section 87; 09:30 bar 3% of the range and not over 1.75x

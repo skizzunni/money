@@ -1,0 +1,13 @@
+Stage 93 (2026-11-25, a research round): the December 2026 MNQ rollover, steps for the user (docs/STRATEGY_SEARCH.md,
+Running it, step 10).
+
+Dates: MNQ 12-26 expires Fri Dec 18 2026 (the third Friday); NinjaTrader rolls 8 days before, Thu Dec 10 (as it rolled
+09-26 to 12-26 on Thu Sep 10, docs/B_NATIVE.md). The strategy needs 21+ complete sessions (Bars >= 76 a session) for
+its 20-session trend and 14-session noise area, and blocks trading when the 14-session window leaves out more than 5
+weekdays.
+
+What was checked: the strategy's history needs (the code); the research data is back-adjusted like NinjaTrader's
+"Merge back adjusted". What could not be checked here: whether MNQ 03-27's own pre-roll 5-minute bars are complete
+every session ("Do not merge"), since no 03-27 pre-roll data is available; hence the recommendation to use "Merge back
+adjusted" around the roll and to check the dashboard says OK before the first session on the new contract.
+Gold's rollover date is not stated here (not verified); NinjaTrader lists it under Tools > Instruments > MGC.
