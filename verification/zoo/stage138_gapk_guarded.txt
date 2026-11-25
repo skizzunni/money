@@ -1,0 +1,29 @@
+2015-19 gap 0.6x (shipped):
+   calendar: $50,000 0.0% / $9,810 | $48,806 0.0% / $6,230 | $48,998 0.0% / $6,781
+   shuffled years: $50,000 0.4% / $11,322 $48,806 4.7% / $7,580 $48,998 2.6% / $8,414
+2015-19 gap 0.65x:
+   calendar: $50,000 0.0% / $9,435 | $48,806 0.0% / $6,452 | $48,998 0.0% / $6,330
+   shuffled years: $50,000 0.4% / $11,290 $48,806 4.6% / $7,491 $48,998 2.6% / $8,239
+2015-19 gap 0.7x:
+   calendar: $50,000 0.0% / $9,610 | $48,806 0.0% / $6,140 | $48,998 0.0% / $6,504
+   shuffled years: $50,000 0.5% / $11,309 $48,806 4.3% / $7,328 $48,998 2.4% / $8,176
+2020-25 gap 0.6x (shipped):
+   calendar: $50,000 0.0% / $17,205 | $48,806 1.8% / $12,892 | $48,998 0.0% / $14,917
+   shuffled years: $50,000 1.5% / $15,582 $48,806 6.5% / $11,551 $48,998 3.7% / $12,272
+2020-25 gap 0.65x:
+   calendar: $50,000 0.0% / $17,512 | $48,806 1.8% / $13,305 | $48,998 0.0% / $15,148
+   shuffled years: $50,000 0.8% / $15,718 $48,806 5.5% / $11,666 $48,998 3.2% / $12,364
+2020-25 gap 0.7x:
+   calendar: $50,000 0.0% / $17,059 | $48,806 1.8% / $12,465 | $48,998 0.0% / $13,834
+   shuffled years: $50,000 1.1% / $15,551 $48,806 5.1% / $11,138 $48,998 3.1% / $11,915
+
+Verdict (2026-11-25, docs section 143): closed; 0.6x stays.
+- With the guard, MNQ alone (calendar and 2,000 shuffled years per period, the strong-only trade lists rebuilt at
+  each gap minimum):
+- 0.65x on 2020-25: less risk (shuffled 0.8% / 5.5% / 3.2% against 1.5% / 6.5% / 3.7%) and higher medians (+$136 /
+  +$115 / +$92; calendar +$307 / +$413 / +$231).
+- 0.65x on 2015-19: the same risk (0.4% / 4.6% / 2.6% against 0.4% / 4.7% / 2.6%) at lower medians (shuffled -$32 /
+  -$89 / -$175; calendar -$375 / +$222 / -$451).
+- 0.7x: less 2020-25 and 2015-19 near-floor risk but lower medians in both periods.
+- Better on one period only (2020-25), the same on the other for less: it fails the acceptance rule. A larger minimum
+  gap is the direction that lowers 2020-25 risk, noted; section 87 picked 0.6x on every gate.

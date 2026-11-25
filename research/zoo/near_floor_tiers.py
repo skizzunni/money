@@ -9,7 +9,7 @@ strong breaks from 1.0-2.0 sigma; --levels, docs 129: the guard from $1,250-2,00
 --extras, docs 130: the extra contract's stretch and the news rule; --steps, docs 131: the size steps;
 --day-stop, docs 132: the regular day stop; --gold PATH, docs 133: shuffled years with gold as live;
 --gold PATH --gold-size, docs 134: gold at 1 / 2 / 3 contracts always; --gold PATH --gold-guarded, docs 135;
---gap-add, docs 138: one more contract on the gap trade.)
+--gap-add, docs 138: one more contract on the gap trade; --gapk, docs 143: the gap minimum 0.6 / 0.65 / 0.7x.)
 """
 import pickle
 import sys
@@ -108,6 +108,22 @@ def main():
             tiers = tuple((f"strong breaks from {x} sigma (+ the gap trade)", H.trades_of(
                 S.everyday, d, s, legs=(("gap_go", B.GAP), ("noise", {**B.BAND, "min_stretch": x}))), 0.25)
                 for x in (1.0, 1.25, 1.5, 1.75, 2.0))
+        if "--gapk" in sys.argv:  # docs 143: the gap minimum 0.6 / 0.65 / 0.7x with the guard, calendar and shuffled
+            for gk in (0.6, 0.65, 0.7):
+                g_ = {**B.GAP, "k": gk}
+                tk = H.trades_of(S.everyday, d, s, legs=(("gap_go", g_), ("noise", B.BAND)))
+                tk["add"] = (B._stretch(d, tk, 1.0) >= 1.5).astype(int)
+                sk = H.trades_of(S.everyday, d, s, legs=(("gap_go", g_), ("noise", {**B.BAND, "min_stretch": 1.5})))
+                cal = []
+                for start in STARTS:
+                    r = BR.runs(tk, d, B.STEPS, 600.0, B._news(d), strong=sk, guard=1500.0, strong_below=1000.0,
+                                start=start)
+                    cal.append(f"${start:,.0f} {r.lost.mean():.1%} / ${r.profit.median():,.0f}")
+                sh = shuffled(tk, sk, d)
+                print(f"{lab} gap {gk}x{' (shipped)' if gk == 0.6 else ''}:\n   calendar: {' | '.join(cal)}\n"
+                      "   shuffled years: " + " ".join(f"${k:,.0f} {v[0]:.1%} / ${v[1]:,.0f}" for k, v in sh.items()),
+                      flush=True)
+            continue
         levels, extras, stepset, dstops = {}, {}, {}, {}
         if "--gold" in sys.argv:  # docs 133: shuffled years with and without gold (as live), the guard in
             gp_ = sys.argv[sys.argv.index("--gold") + 1]

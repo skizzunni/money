@@ -947,6 +947,10 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    (+$222 / +$281 at cap 30) but 2015-19's 25th percentile and the window slip and 0.7x is lower (87): a near-miss, not
    shipped. The body 2-4% x the wild open 1.5-2.0x: the shipped cell the best on 2015-19's median and 2020-25's 25th
    percentile. Six pairs checked; all stay.
+143. **The 0.65x near-miss with the guard** (2026-11-25, a research round; `near_floor_tiers.py --gapk`,
+   `verification/zoo/stage138_gapk_guarded.txt`). Shuffled years by period: 0.65x lowers 2020-25's risk (fresh 1.5% ->
+   0.8%, from $48,806 6.5% -> 5.5%) and lifts its medians, but on 2015-19 the risk is the same and the medians lower
+   (-$32 to -$451). One period only: closed, 0.6x stays.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
