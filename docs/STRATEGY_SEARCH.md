@@ -997,6 +997,9 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    within 70-150 raises all four numbers (medians +$747 / +$1,238). But by year it is up in only 5 of 12 (2022 alone
    +$1,795 of +$2,616; about +$75 a year otherwise), the window -$63. A one-year gain needing new order code: not
    shipped; the flat $200 stays, `hard_stop_only` documented (default off).
+154. **The scaled stop with the guard** (2026-11-25, a research round; `near_floor_tiers.py --stopcell`,
+   `verification/zoo/stage150_stopcell_guarded.txt`). Shuffled years by period: higher medians but more risk (2015-19
+   fresh 0.4% -> 0.7%, from $48,806 4.7% -> 5.3%; 2020-25 fresh 1.5% -> 1.8%). With 153's years: closed, $200 stays.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 

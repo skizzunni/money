@@ -1,0 +1,11 @@
+2015-19 shipped (flat $200): shuffled years $50,000 0.4% / $11,322 $48,806 4.7% / $7,580 $48,998 2.6% / $8,414
+2015-19 0.3x the 14-day range, 70-150 points (stop only): shuffled years $50,000 0.7% / $11,717 $48,806 5.3% / $7,989 $48,998 2.9% / $8,698
+2020-25 shipped (flat $200): shuffled years $50,000 1.5% / $15,582 $48,806 6.5% / $11,551 $48,998 3.7% / $12,272
+2020-25 0.3x the 14-day range, 70-150 points (stop only): shuffled years $50,000 1.8% / $16,999 $48,806 6.6% / $12,768 $48,998 3.6% / $13,319
+
+Verdict (2026-11-25, docs section 154): closed; the flat $200 hard stop stays.
+- 2,000 shuffled years per period with the guard (MNQ alone; the strong-only trade lists rebuilt with the stop):
+  the scaled stop raises the medians (+$284 to +$1,417) but also the risk: 2015-19 0.4% / 4.7% / 2.6% -> 0.7% / 5.3% /
+  2.9% (fresh / $48,806 / $48,998), 2020-25 fresh 1.5% -> 1.8% (near-floor 6.5% -> 6.6%, 3.7% -> 3.6%).
+- With 153 (up in 5 of 12 years, 2022 carrying it): more profit for more risk, from one year. The user's risk-first
+  rule and section 145's year rule both say no.

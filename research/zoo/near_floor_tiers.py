@@ -10,7 +10,7 @@ strong breaks from 1.0-2.0 sigma; --levels, docs 129: the guard from $1,250-2,00
 --day-stop, docs 132: the regular day stop; --gold PATH, docs 133: shuffled years with gold as live;
 --gold PATH --gold-size, docs 134: gold at 1 / 2 / 3 contracts always; --gold PATH --gold-guarded, docs 135;
 --gap-add, docs 138: one more contract on the gap trade; --gapk, docs 143: the gap minimum 0.6 / 0.65 / 0.7x;
---gold PATH --gold-k, docs 145: gold's move at 1.35 / 1.65x.)
+--gold PATH --gold-k, docs 145: gold's move at 1.35 / 1.65x; --stopcell, docs 154: 153's scaled stop with the guard.)
 """
 import pickle
 import sys
@@ -109,6 +109,18 @@ def main():
             tiers = tuple((f"strong breaks from {x} sigma (+ the gap trade)", H.trades_of(
                 S.everyday, d, s, legs=(("gap_go", B.GAP), ("noise", {**B.BAND, "min_stretch": x}))), 0.25)
                 for x in (1.0, 1.25, 1.5, 1.75, 2.0))
+        if "--stopcell" in sys.argv:  # docs 154: 153's scaled stop (0.3x the range, 70-150) with the guard
+            for nm, bx in (("shipped (flat $200)", {}), ("0.3x the 14-day range, 70-150 points (stop only)",
+                                                         {"hard_vol": 0.3, "hard_lo": 70.0, "hard_hi": 150.0,
+                                                          "hard_stop_only": True})):
+                tk = H.trades_of(S.everyday, d, s, legs=(("gap_go", B.GAP), ("noise", {**B.BAND, **bx})))
+                tk["add"] = (B._stretch(d, tk, 1.0) >= 1.5).astype(int)
+                sk = H.trades_of(S.everyday, d, s, legs=(("gap_go", B.GAP),
+                                                         ("noise", {**B.BAND, **bx, "min_stretch": 1.5})))
+                sh = shuffled(tk, sk, d)
+                print(f"{lab} {nm}: shuffled years " + " ".join(f"${k:,.0f} {v[0]:.1%} / ${v[1]:,.0f}"
+                                                               for k, v in sh.items()), flush=True)
+            continue
         if "--gapk" in sys.argv:  # docs 143: the gap minimum 0.6 / 0.65 / 0.7x with the guard, calendar and shuffled
             for gk in (0.6, 0.65, 0.7):
                 g_ = {**B.GAP, "k": gk}
