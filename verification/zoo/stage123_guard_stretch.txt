@@ -1,0 +1,41 @@
+2015-19 strong breaks from 1.0 sigma (+ the gap trade):
+   calendar (lost / median 12-month profit): $50,000 0.0% / $10,235 | $48,806 4.1% / $8,193 | $48,998 2.0% / $8,545
+   shuffled years: $50,000 1.1% / $11,409 $48,806 7.0% / $8,560 $48,998 3.9% / $8,968
+2015-19 strong breaks from 1.25 sigma (+ the gap trade):
+   calendar (lost / median 12-month profit): $50,000 0.0% / $9,786 | $48,806 2.0% / $6,985 | $48,998 2.0% / $7,192
+   shuffled years: $50,000 0.6% / $11,354 $48,806 5.1% / $8,095 $48,998 2.8% / $8,680
+2015-19 strong breaks from 1.5 sigma (+ the gap trade):
+   calendar (lost / median 12-month profit): $50,000 0.0% / $9,810 | $48,806 0.0% / $6,230 | $48,998 0.0% / $6,781
+   shuffled years: $50,000 0.4% / $11,322 $48,806 4.7% / $7,580 $48,998 2.6% / $8,414
+2015-19 strong breaks from 1.75 sigma (+ the gap trade):
+   calendar (lost / median 12-month profit): $50,000 0.0% / $10,037 | $48,806 0.0% / $7,417 | $48,998 0.0% / $7,920
+   shuffled years: $50,000 0.5% / $11,323 $48,806 2.9% / $7,430 $48,998 1.6% / $8,323
+2015-19 strong breaks from 2.0 sigma (+ the gap trade):
+   calendar (lost / median 12-month profit): $50,000 0.0% / $9,128 | $48,806 0.0% / $5,371 | $48,998 0.0% / $5,255
+   shuffled years: $50,000 0.2% / $11,229 $48,806 3.1% / $6,795 $48,998 1.8% / $7,859
+2020-25 strong breaks from 1.0 sigma (+ the gap trade):
+   calendar (lost / median 12-month profit): $50,000 0.0% / $18,162 | $48,806 0.0% / $14,336 | $48,998 0.0% / $14,974
+   shuffled years: $50,000 2.8% / $15,865 $48,806 10.3% / $12,926 $48,998 6.6% / $13,412
+2020-25 strong breaks from 1.25 sigma (+ the gap trade):
+   calendar (lost / median 12-month profit): $50,000 0.0% / $18,162 | $48,806 0.0% / $13,762 | $48,998 0.0% / $15,158
+   shuffled years: $50,000 1.9% / $15,677 $48,806 7.2% / $12,211 $48,998 4.8% / $12,774
+2020-25 strong breaks from 1.5 sigma (+ the gap trade):
+   calendar (lost / median 12-month profit): $50,000 0.0% / $17,205 | $48,806 1.8% / $12,892 | $48,998 0.0% / $14,917
+   shuffled years: $50,000 1.5% / $15,582 $48,806 6.5% / $11,551 $48,998 3.7% / $12,272
+2020-25 strong breaks from 1.75 sigma (+ the gap trade):
+   calendar (lost / median 12-month profit): $50,000 0.0% / $17,301 | $48,806 9.1% / $12,904 | $48,998 0.0% / $14,917
+   shuffled years: $50,000 1.8% / $15,401 $48,806 7.8% / $10,554 $48,998 4.8% / $11,272
+2020-25 strong breaks from 2.0 sigma (+ the gap trade):
+   calendar (lost / median 12-month profit): $50,000 0.0% / $16,814 | $48,806 0.0% / $12,305 | $48,998 0.0% / $13,275
+   shuffled years: $50,000 1.5% / $15,328 $48,806 6.7% / $9,988 $48,998 3.9% / $10,690
+
+Verdict (2026-11-25, docs section 128): no change; 1.5 sigma stays (GuardStrongOnlyStretch).
+- Section 50 varied the tier's $ level (750 / 1,000 / 1,250) at 1.5 sigma; this varies the stretch at $1,000.
+- 1.0 / 1.25 sigma: riskier in both periods (shuffled from $48,806 7.0% / 5.1% and 10.3% / 7.2% against 4.7% / 6.5%;
+  calendar 4.1% / 2.0% lost on 2015-19).
+- 1.75 sigma: 2015-19 safer (2.9% / 1.6% against 4.7% / 2.6%) but 2020-25 riskier (7.8% / 4.8% against 6.5% / 3.7%;
+  calendar from $48,806 9.1%, 5 of 55 starts, against 1.8%). Opposite by period.
+- 2.0 sigma: 2015-19 safer (3.1% / 1.8%), 2020-25 the same risk (6.7% / 3.9%), lower near-floor medians in both
+  (calendar 2015-19 $5,371 / $5,255 against $6,230 / $6,781; shuffled 2020-25 $9,988 / $10,690 against $11,551 /
+  $12,272). Not better on both.
+- How path-sensitive near-floor starts are: one notch (1.5 -> 1.75) moved 2020-25 calendar losses from 1 to 5 of 55.

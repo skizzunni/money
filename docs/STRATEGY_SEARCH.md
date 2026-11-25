@@ -878,6 +878,11 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    in: 0.15-0.35 of the cushion move shuffled-year losses by 0.3 points at most; 0.3 / 0.35 lose 1 of 49 2015-19 calendar
    starts from $48,806 (none at 0.25); 0.15 / 0.2 cut the near-floor medians ($4,669 against $6,230 on 2015-19). 0.25
    stays (`GuardDayStopShare`).
+128. **The guard's strong-break stretch** (2026-11-25, a research round; `near_floor_tiers.py --stretch`,
+   `verification/zoo/stage123_guard_stretch.txt`). Under $1,000, strong breaks from 1.0-2.0 sigma (section 50 varied
+   only the $ level): 1.0 / 1.25 riskier in both periods; 1.75 safer on 2015-19 (shuffled from $48,806 2.9% against
+   4.7%) but riskier on 2020-25 (7.8% against 6.5%, calendar 5 of 55 lost); 2.0 the same 2020-25 risk at lower
+   medians. 1.5 stays (`GuardStrongOnlyStretch`).
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 

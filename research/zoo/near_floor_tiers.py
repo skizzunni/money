@@ -4,7 +4,8 @@ Under $1,000 the shipped guard trades strong breaks (1.5 sigma) and the gap trad
 those days: no gap trade, or the first trade of the day only. Calendar starts (bad_runs.runs, the guard on) from
 $50,000 / $48,806 / $48,998 against a $48,000 floor; then shuffled years (2,000 runs of 252 days drawn from each
 period, the same daily rules). MNQ alone. Run from research/: python zoo/near_floor_tiers.py [--share]
-(--share, docs 127: the guard's day stop at 0.15-0.35 of the cushion instead.)
+(--share, docs 127: the guard's day stop at 0.15-0.35 of the cushion instead; --stretch, docs 128: the tier's
+strong breaks from 1.0-2.0 sigma.)
 """
 import pickle
 import sys
@@ -81,6 +82,10 @@ def main():
                  ("strong breaks + gap, first trade a day only", st.groupby("d").head(1), 0.25))
         if "--share" in sys.argv:  # docs 127: the guard's day stop as this share of the cushion ($100-600)
             tiers = tuple((f"day stop {x} x the cushion", st, x) for x in (0.15, 0.2, 0.25, 0.3, 0.35))
+        if "--stretch" in sys.argv:  # docs 128: the tier's strong-break stretch instead of 1.5 sigma
+            tiers = tuple((f"strong breaks from {x} sigma (+ the gap trade)", H.trades_of(
+                S.everyday, d, s, legs=(("gap_go", B.GAP), ("noise", {**B.BAND, "min_stretch": x}))), 0.25)
+                for x in (1.0, 1.25, 1.5, 1.75, 2.0))
         for name, tier, share in tiers:
             cal = []
             for start in STARTS:
