@@ -868,6 +868,11 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    2020-25: lost 0.0% / 1.8% and 0.0% / 0.0% (as section 50's calendar check); the guard off again after a median 50 /
    31 and 38 / 21 trading days; +$2,000 after 164 / 105 and 150 / 85 (2015-19: 22% / 18% never in 12 months); the
    closest calls $36-113 above the floor. Now in step 12.
+126. **A stricter last tier under $1,000** (2026-11-25, a research round; `research/zoo/near_floor_tiers.py`,
+   `verification/zoo/stage121_near_floor_tiers.txt`). MNQ alone, calendar and 2,000 shuffled years per period, from
+   $50,000 / $48,806 / $48,998. No gap trade under $1,000: 2020-25 safer (from $48,806 shuffled 6.5% -> 3.1%) but
+   2015-19 riskier (4.7% -> 5.5%), medians lower in both. The first trade a day only: the reverse (3.9% / 9.0%).
+   Opposite by period: rejected; the shipped tier (strong breaks and the gap trade) stays.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 

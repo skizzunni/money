@@ -1,0 +1,28 @@
+2015-19 shipped (strong breaks + the gap trade):
+   calendar (lost / median 12-month profit): $50,000 0.0% / $9,810 | $48,806 0.0% / $6,230 | $48,998 0.0% / $6,781
+   shuffled years: $50,000 0.4% / $11,322 $48,806 4.7% / $7,580 $48,998 2.6% / $8,414
+2015-19 strong breaks, no gap trade:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $9,367 | $48,806 0.0% / $3,347 | $48,998 0.0% / $5,551
+   shuffled years: $50,000 0.8% / $11,054 $48,806 5.5% / $4,119 $48,998 2.9% / $5,662
+2015-19 strong breaks + gap, first trade a day only:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $6,655 | $48,806 0.0% / $2,958 | $48,998 0.0% / $4,056
+   shuffled years: $50,000 0.7% / $11,203 $48,806 3.9% / $6,394 $48,998 2.2% / $7,360
+2020-25 shipped (strong breaks + the gap trade):
+   calendar (lost / median 12-month profit): $50,000 0.0% / $17,205 | $48,806 1.8% / $12,892 | $48,998 0.0% / $14,917
+   shuffled years: $50,000 1.5% / $15,582 $48,806 6.5% / $11,551 $48,998 3.7% / $12,272
+2020-25 strong breaks, no gap trade:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $16,138 | $48,806 0.0% / $9,666 | $48,998 0.0% / $10,761
+   shuffled years: $50,000 0.7% / $14,794 $48,806 3.1% / $6,844 $48,998 1.7% / $8,284
+2020-25 strong breaks + gap, first trade a day only:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $16,814 | $48,806 1.8% / $10,485 | $48,998 0.0% / $11,295
+   shuffled years: $50,000 2.0% / $15,357 $48,806 9.0% / $10,084 $48,998 5.5% / $11,117
+
+Verdict (2026-11-25, docs section 126): rejected; the shipped tier stays.
+- No gap trade under $1,000: 2020-25 safer (calendar from $48,806 1.8% -> 0.0%; shuffled 6.5% -> 3.1%, 3.7% -> 1.7%)
+  but 2015-19 riskier (shuffled 4.7% -> 5.5%, 2.6% -> 2.9%, fresh 0.4% -> 0.8%), and the near-floor medians lower in
+  both periods (calendar -$2,883 / -$1,230 on 2015-19, -$3,226 / -$4,156 on 2020-25). Opposite by period on the risk.
+- The first trade of the day only: 2015-19 a little safer (4.7% -> 3.9%) but 2020-25 riskier (6.5% -> 9.0%), medians
+  lower. Opposite by period.
+- Section 50 chose the tiers on 2020 - Mar 2025 shuffled years with gold (2.7% / 10.2% / 6.5% at the $1,000 tier);
+  these are MNQ alone per period, so the levels differ; the comparison within each table is what counts.
+- Hindsight: none (the tier from the cushion at the day's start).
