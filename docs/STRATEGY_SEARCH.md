@@ -942,6 +942,11 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    `verification/zoo/stage136_pair_grids_2.txt`). The band width 0.95-1.05 sigma x the move cap 1.0-1.2: the shipped
    cell has the best 2015-19 median and window (cap 1.0 better on 2020-25 only). The range rule 0.6-0.7 x the trend
    15-25 sessions: the shipped cell has the best median in both periods. Four pairs now checked; both stay.
+142. **The gap trade's pairs** (2026-11-25, a research round; `pair_grids.py gap_cap / body_bar`,
+   `verification/zoo/stage137_gap_pairs.txt`). The gap 0.55-0.65x x the stop cap 25-35: 0.65x lifts both medians
+   (+$222 / +$281 at cap 30) but 2015-19's 25th percentile and the window slip and 0.7x is lower (87): a near-miss, not
+   shipped. The body 2-4% x the wild open 1.5-2.0x: the shipped cell the best on 2015-19's median and 2020-25's 25th
+   percentile. Six pairs checked; all stay.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
