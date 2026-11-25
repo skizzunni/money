@@ -968,6 +968,11 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    were 2017 (PF 1.20, the calmest year, day range 0.78%) and 2025 H1 (PF 1.16, the worst month on record, March 2025
    -$1,104). The gap trade lost only in 2025 H1 (PF 0.96, -$42). A usual worst month: -$300 to -$620 a contract (band).
    Now in step 12.
+148. **March 2025, the worst month** (2026-11-25, a research round; `research/zoo/march_2025.py`,
+   `verification/zoo/stage143_march_2025.txt`). 35 trades, -$808 at 1 contract: nearly all short with the falling
+   market, stopped again and again (6 full $200 stops, up to 7 trades a day), 8 of 12 days lost, none past -$412. Strong
+   breaks only after a stop fixes the month (+$7) but costs $16,750 over 2015-2026 (up in 1 of 12 years); at most 2
+   losers a day makes it worse; 3 is noise (+$65 in 12 years). Nothing to change: this is the cost of the strategy.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 

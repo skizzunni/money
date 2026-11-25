@@ -1,0 +1,30 @@
+      shipped  strong only after a stop (1.0 sigma)  at most 2 losers a day  at most 3 losers a day
+d                                                                                                  
+2015     3574                                  2931                    3785                    3344
+2016     6361                                  3690                    6361                    6424
+2017     1788                                  1480                    2117                    1990
+2018     7762                                  5161                    7128                    8051
+2019     6432                                  5835                    6612                    6594
+2020     6498                                  3051                    4538                    5996
+2021     8983                                  7461                    9317                    9216
+2022    10585                                  8481                    9872                   10201
+2023     6811                                  4762                    6143                    7034
+2024     6540                                  5855                    5624                    6547
+2025      682                                  1671                     149                     682
+2026     5908                                  4796                    5296                    5910
+shipped: March 2025 35 trades $-808; vs shipped in all years +0, up in 0 of 12 years
+strong only after a stop (1.0 sigma): March 2025 23 trades $+7; vs shipped in all years -16,750, up in 1 of 12 years
+at most 2 losers a day: March 2025 27 trades $-1,225; vs shipped in all years -4,982, up in 4 of 12 years
+at most 3 losers a day: March 2025 35 trades $-808; vs shipped in all years +65, up in 8 of 12 years
+
+Verdict (2026-11-25, docs section 148): nothing to change; March 2025 is the strategy's normal cost in a choppy
+correction.
+- The month (the gap trade and the band, 1 contract): 35 trades, -$808; 30 stopped (-$2,278), 2 targets (+$998), 3 out
+  at the time (+$472). Nearly all short, with the falling market: repeated stops at or near the $200 hard stop (6
+  full ones) and re-entries the same day (4 trades on Mar 4, 7 on Mar 10). 8 of 12 traded days lost, the worst -$412
+  (inside the $600 day stop).
+- Strong breaks only after a stop the same day (section 106's rule at 1.0 sigma): March 2025 +$7 instead of -$808,
+  but -$16,750 over 2015-2026 and up in only 1 of 12 years (2025 itself): fixing the worst month by hindsight costs
+  every other year.
+- At most 2 losers a day: March worse (-$1,225), -$4,982 in all. At most 3: March unchanged, +$65 over 12 years
+  (8 of 12 up, about $5 a year): noise. Section 5 found the same (trades after 1-3 losers still pay).
