@@ -833,6 +833,11 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    (PF 2.34 / 3.00, ES 1.89), so no later first check. The later entries on those days are weaker in all three history
    sets (1.27 / 1.45 / ES 0.86 against 1.59 / 1.64 / 1.41) but pay on NQ and were live 2026's best (PF 18.3, 13 trades);
    dropping them: medians -$1,219 / -$4,101. Nothing used.
+119. **An anchored VWAP for the stop** (2026-11-25, a research round; `noise` vwap_anchor, `exit_checks.py --anchor`,
+   `verification/zoo/stage118_anchored_vwap.txt`). The VWAP from the entry / signal bar in place of the session's from
+   09:30: medians -$5,932 / -$5,054 (2015-19), -$4,495 / -$3,946 (2020-25), the window $5,218 / $6,981 against $10,063:
+   it starts at the entry price and stops the trades out early. Without the VWAP in the stop 7.3% of 2020-25 starts are
+   lost. Rejected; the session VWAP stays.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 

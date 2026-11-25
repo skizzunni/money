@@ -1,0 +1,11 @@
+shipped (VWAP from 09:30): 2015-19 lost 0.0% median $14,028 p25 $5,324 (13 early exits) | 2020-25 lost 0.0% median $18,980 p25 $15,811 (15 early exits) | TV $+10,063 50tr PF 4.66 dd $670
+VWAP from the entry bar: 2015-19 lost 0.0% median $8,096 p25 $2,775 (206 early exits) | 2020-25 lost 0.0% median $14,485 p25 $10,348 (180 early exits) | TV $+5,218 57tr PF 3.14 dd $609
+VWAP from the signal bar: 2015-19 lost 0.0% median $8,974 p25 $3,326 (183 early exits) | 2020-25 lost 0.0% median $15,034 p25 $11,067 (143 early exits) | TV $+6,981 55tr PF 3.43 dd $670
+no VWAP in the stop: 2015-19 lost 0.0% median $13,463 p25 $5,722 (13 early exits) | 2020-25 lost 7.3% median $18,248 p25 $13,810 (16 early exits) | TV $+10,177 48tr PF 4.85 dd $670
+
+Verdict (2026-11-25, docs section 119): rejected; the session VWAP from 09:30 stays.
+- Anchored at the entry bar / the signal bar: medians -$5,932 / -$5,054 (2015-19), -$4,495 / -$3,946 (2020-25), the
+  window +$5,218 / +$6,981 against +$10,063. The anchored VWAP starts at the entry price, so the stop sits next to it
+  and takes the trades out early (206 / 183 exits at the checks against 13).
+- For reference, no VWAP in the stop at all (the band and the hard stop only): 7.3% of 2020-25 starts lost.
+- Hindsight: none (bars up to the check's close).

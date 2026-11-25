@@ -1,4 +1,5 @@
-"""Research (2026-11-25, docs section 116 / 117): checks that only manage the band trade; out at 15:00 (--late).
+"""Research (2026-11-25, docs section 116 / 117 / 119): checks that only manage the band trade; out at 15:00 (--late);
+the VWAP stop anchored at the entry (--anchor).
 
 `noise` exit_checks: extra check times (bar ends, minutes) where an open band trade's stop moves to the band (the
 VWAP, the hard stop) and a close at or past it exits at the next bar's open, but no entry. The shipped checks are
@@ -39,6 +40,9 @@ def main():
     if "--late" in sys.argv:  # docs 117: out at the 15:00 check (the bar ending 15:00), or 14:30 / 15:30 for neighbours
         kws = [("shipped", {})] + [(f"out at {t // 60}:{t % 60:02d}, {m}", {"late_flat": t, "late_mode": m})
                                     for t in (870, 900, 930) for m in ("small_win", "under_be", "all")]
+    if "--anchor" in sys.argv:  # docs 119: the VWAP stop anchored at the entry / signal bar
+        kws = [("shipped (VWAP from 09:30)", {}), ("VWAP from the entry bar", {"vwap_anchor": 1}),
+               ("VWAP from the signal bar", {"vwap_anchor": 2}), ("no VWAP in the stop", {"vwap_stop": False})]
     for lab, band in kws:
         tv = B.line("", B.run(band=band)).split("|")[1].strip()
         print(f"{lab}: 2015-19 {score(sets, 'dev', band)} | 2020-25 {score(sets, 'unseen_nq', band)} | {tv}",
