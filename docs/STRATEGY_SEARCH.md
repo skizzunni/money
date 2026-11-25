@@ -776,6 +776,12 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    one more on random days at the same rate gives +$734 / +$561, and both are inside that range: it is size, not the
    range. From 0.95x, 5.5% of 2020-25 accounts lost. Rejected. (A band exit after 15:00 is already in: every check
    through 15:30 moves the stop to the band, and a close back inside exits.)
+108. **Gold's settings by period** (2026-11-25, a research round; `research/zoo/gold_recheck.py`,
+   `verification/zoo/stage107_gold_recheck.txt`). Gold alone, $ a year a contract, 2009-17 / 2018 - Mar 2025: shipped
+   $361 / $286 (PF 2.02 / 1.84). The move at 1.25 / 1.35x: $327 / $445, $318 / $478 (better on one period, worse on the
+   other); 1.65-2.0x lower on at least one. Confirmed over 10 / 20 minutes: lower on both. Out 13:45-14:45: 14:15 best
+   on 2009-17, 14:00 +$21 on 2018-25. The settings were chosen on these years, so this checks they hold in each half:
+   they do. No change.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 

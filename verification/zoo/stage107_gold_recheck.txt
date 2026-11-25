@@ -1,0 +1,22 @@
+shipped (1.5x, 15 min, 14:15): 2009-17 19/yr $+361/yr PF 2.02 worst $-141 years up 56% | 2018-25 20/yr $+286/yr PF 1.84 worst $-91 years up 75%
+move 1.25x: 2009-17 25/yr $+327/yr PF 1.72 worst $-141 years up 56% | 2018-25 26/yr $+445/yr PF 1.99 worst $-91 years up 75%
+move 1.35x: 2009-17 23/yr $+318/yr PF 1.75 worst $-141 years up 56% | 2018-25 23/yr $+478/yr PF 2.21 worst $-91 years up 75%
+move 1.65x: 2009-17 17/yr $+345/yr PF 2.09 worst $-141 years up 67% | 2018-25 18/yr $+280/yr PF 1.93 worst $-89 years up 62%
+move 1.75x: 2009-17 15/yr $+283/yr PF 2.03 worst $-141 years up 44% | 2018-25 17/yr $+298/yr PF 2.06 worst $-89 years up 62%
+move 2.0x: 2009-17 12/yr $-59/yr PF 0.75 worst $-141 years up 44% | 2018-25 12/yr $+267/yr PF 2.21 worst $-89 years up 50%
+confirm 10 min: 2009-17 20/yr $+169/yr PF 1.53 worst $-101 years up 33% | 2018-25 18/yr $+210/yr PF 1.83 worst $-57 years up 62%
+confirm 20 min: 2009-17 19/yr $+128/yr PF 1.32 worst $-148 years up 56% | 2018-25 18/yr $+190/yr PF 1.45 worst $-151 years up 50%
+out 13:45: 2009-17 19/yr $+303/yr PF 1.86 worst $-141 years up 56% | 2018-25 20/yr $+291/yr PF 1.85 worst $-91 years up 75%
+out 14:00: 2009-17 19/yr $+296/yr PF 1.84 worst $-141 years up 56% | 2018-25 20/yr $+307/yr PF 1.90 worst $-91 years up 75%
+out 14:30: 2009-17 19/yr $+337/yr PF 1.95 worst $-141 years up 67% | 2018-25 20/yr $+273/yr PF 1.80 worst $-91 years up 75%
+out 14:45: 2009-17 19/yr $+302/yr PF 1.84 worst $-141 years up 56% | 2018-25 20/yr $+237/yr PF 1.69 worst $-91 years up 75%
+
+Verdict (2026-11-25, docs section 108): the shipped gold settings hold; nothing changed.
+- Move threshold: 1.25x / 1.35x earn more on 2018-25 (+$159 / +$192 a year a contract) but less on 2009-17 (-$34 /
+  -$43, PF 1.72 / 1.75 against 2.02). 1.65x / 1.75x / 2.0x are lower on at least one period (2.0x loses on 2009-17).
+  Mixed by period: no change.
+- Confirmation: 15 minutes is best on both periods (10 min $169 / $210, 20 min $128 / $190 against $361 / $286).
+- Exit: 14:15 is best on 2009-17; 14:00 is +$21 a year on 2018-25 (noise). 13:45-14:45 is a plateau. No change.
+- Hindsight: the shipped settings were picked (sections 39, 41) on these same years, so this is a check that they
+  are not a one-period fit, not a fresh out-of-sample test. They are not: each setting is at or near the best in
+  both periods.
