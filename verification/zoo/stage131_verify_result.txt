@@ -1,0 +1,15 @@
+shipped: lost 0.0% median $17,032 p25 $12,433 | TV $+10,063 50tr PF 4.66 dd $670 | dev: PF 1.64 231/yr $5,237 | unseen_nq: PF 1.65 258/yr $7,392 | unseen_es: PF 1.15 217/yr $565 | live: PF 3.70 172/yr $14,315
+dev: 1,247 sessions | band 873 (42%, 1.54, $17,395) | gap 272 (2.01, $8,522) | days traded 46%
+   dev starts: 49, lost 0, median $14,028, p25 $5,324
+unseen_nq: 1,367 sessions | band 1091 (48%, 1.63, $31,425) | gap 306 (1.70, $8,675) | days traded 46%
+   unseen_nq starts: 55, lost 0, median $18,980, p25 $15,811
+unseen_es: 458 sessions | band 305 (24%, 1.27, $1,489) | gap 89 (0.71, $-462) | days traded 46%
+live: 104 sessions | band 53 (57%, 5.02, $5,555) | gap 18 (1.44, $353) | days traded 30%
+pooled 104 starts: lost 0, median $17,032, p25 $12,433, p10 $3,526, worst $1,404, best $28,053; reach $10k 79%, $15k 64%, $20k 30%, $25k 5%; green traded days 41%
+by year (1 contract, all trades, NQ / MNQ sets): 2015 $3,574, 2016 $6,361, 2017 $1,788, 2018 $7,762, 2019 $6,432, 2020 $6,498, 2021 $8,983, 2022 $10,585, 2023 $6,811, 2024 $6,540, 2025 $682, 2026 $5,908
+
+Verdict (2026-11-25, docs section 136): every number in docs "The result" reproduces exactly from the final code
+(after sections 107-135's default-off research params): the pooled 104 starts (0 lost, median $17,032, p25 $12,433,
+p10 $3,526, worst $1,404, best $28,053, 79% / 64% / 30% / 5% reach $10k-$25k, 41% green traded days), both periods
+($14,028 / $5,324 and $18,980 / $15,811), the four table rows (sessions, band / gap trades, win, PF, net, days
+traded), every year 2015-2026, and the TradingView window (+$10,063, 50 trades, PF 4.66, max drawdown $670).

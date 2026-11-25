@@ -915,6 +915,10 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    every 2015-19 cell, mixed on 2020-25, about the same median. 1 MGC at any cushion: riskier on both (from $48,806
    5.1% / 6.8% against 4.6% / 6.3%). Gold's frequent small losses hurt a cushion being rebuilt. No gold while guarded
    stays.
+136. **"The result" verified on the final code** (2026-11-25, a research round; `research/zoo/verify_result.py`,
+   `verification/zoo/stage131_verify_result.txt`). Every figure in "The result" (the pooled starts, both periods, the
+   table, the years, the TradingView window +$10,063 / 50 trades / PF 4.66) reproduces exactly after sections 107-135's
+   default-off research parameters.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
