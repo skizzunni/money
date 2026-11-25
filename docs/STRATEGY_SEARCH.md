@@ -864,6 +864,18 @@ NinjaTrader 8, on each funded account (both the same way):
    - **Gold (MGC 02-27):** the same steps on its own rollover date, which NinjaTrader lists under Tools > Instruments >
      MGC > Rollovers (gold's active months are Feb / Apr / Jun / Aug / Oct / Dec).
 
+11. **Before each week (Sunday evening; first: before Monday Nov 30 2026) and after any restart of NinjaTrader.**
+   - NinjaTrader connected; Control Center > Strategies: MnqCleanBand (and MgcOvernightCarry, if used) **Enabled** on
+     each funded account, nothing else enabled on those accounts.
+   - **Highest end-of-day balance so far**: the prop firm dashboard's figure after Friday's close, entered in both
+     strategies (MNQ group "7. Cushion guard", gold group "4. Cushion guard"); disable, change it, enable.
+   - MNQ chart top-right: **Setup: OK** and the size you expect (CUSHION GUARD if within $1,500 of the floor).
+     NOT READY: raise Days to load to 40+; NO TRADING: Reload All Historical Data.
+   - The settings you rely on: Gap at least 0.6; Second stop step 1.5 / 0.5; Gap: no trade over 1.75; Place orders on.
+   - Gold chart: "waiting for history" until Monday's 08:30 check is normal; it must then say OK (or NOT READY: raise
+     Days to load to 30+).
+   - Monday 09:35 / 10:00: the Output window shows the settings line and, if a trade fires, its order and stop.
+
 Defaults: trend 20 sessions; hard stop $200 a contract; take profit 2.5 hard stops; break-even at 0.4 to entry + 2
 points, and at 1.5 to entry + 0.5 hard stops (section 61); last entry 14:00 (840); at most 9 trades a day; day stop
 $600; range rule 0.65; move cap 1.1; the gap trade every day (gap 0.6x, section 87; 09:30 bar 3% of the range and not over 1.75x
