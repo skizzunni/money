@@ -883,6 +883,11 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    only the $ level): 1.0 / 1.25 riskier in both periods; 1.75 safer on 2015-19 (shuffled from $48,806 2.9% against
    4.7%) but riskier on 2020-25 (7.8% against 6.5%, calendar 5 of 55 lost); 2.0 the same 2020-25 risk at lower
    medians. 1.5 stays (`GuardStrongOnlyStretch`).
+129. **The guard's levels by period** (2026-11-25, a research round; `near_floor_tiers.py --levels`,
+   `verification/zoo/stage124_guard_levels.txt`). The guard from $1,250: more profit in both periods for up to 0.3
+   points more shuffled risk (not taken: risk first); from $1,750 / $2,000: a little less risk for $370-1,130 less
+   median. Strong only from $1,250: 2020-25 safer (6.5% -> 5.1%) but 1 of 49 2015-19 calendar starts lost from $48,806;
+   from $750 riskier in both. $1,500 / $1,000 stay (`CushionGuard`, `GuardStrongOnlyBelow`).
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 

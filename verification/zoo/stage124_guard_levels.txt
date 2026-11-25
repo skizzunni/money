@@ -1,0 +1,48 @@
+2015-19 guard under $1,500, strong only under $1,000:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $9,810 | $48,806 0.0% / $6,230 | $48,998 0.0% / $6,781
+   shuffled years: $50,000 0.4% / $11,322 $48,806 4.7% / $7,580 $48,998 2.6% / $8,414
+2015-19 guard under $1,250, strong only under $1,000:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $11,022 | $48,806 0.0% / $6,465 | $48,998 0.0% / $7,691
+   shuffled years: $50,000 0.7% / $11,464 $48,806 4.8% / $7,921 $48,998 2.7% / $8,780
+2015-19 guard under $1,750, strong only under $1,000:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $11,547 | $48,806 0.0% / $6,869 | $48,998 0.0% / $8,100
+   shuffled years: $50,000 0.5% / $10,944 $48,806 4.5% / $7,223 $48,998 2.6% / $7,995
+2015-19 guard under $2,000, strong only under $1,000:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $12,305 | $48,806 0.0% / $4,942 | $48,998 0.0% / $6,491
+   shuffled years: $50,000 0.4% / $10,193 $48,806 4.5% / $6,558 $48,998 2.6% / $7,199
+2015-19 guard under $1,500, strong only under $750:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $12,649 | $48,806 0.0% / $8,212 | $48,998 0.0% / $10,175
+   shuffled years: $50,000 0.7% / $11,494 $48,806 5.9% / $8,395 $48,998 3.5% / $9,119
+2015-19 guard under $1,500, strong only under $1,250:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $9,367 | $48,806 2.0% / $5,915 | $48,998 0.0% / $5,943
+   shuffled years: $50,000 0.5% / $11,023 $48,806 4.7% / $6,716 $48,998 2.5% / $7,506
+2020-25 guard under $1,500, strong only under $1,000:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $17,205 | $48,806 1.8% / $12,892 | $48,998 0.0% / $14,917
+   shuffled years: $50,000 1.5% / $15,582 $48,806 6.5% / $11,551 $48,998 3.7% / $12,272
+2020-25 guard under $1,250, strong only under $1,000:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $17,301 | $48,806 1.8% / $14,352 | $48,998 0.0% / $15,019
+   shuffled years: $50,000 1.5% / $15,864 $48,806 6.7% / $11,659 $48,998 3.9% / $12,481
+2020-25 guard under $1,750, strong only under $1,000:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $16,811 | $48,806 1.8% / $12,911 | $48,998 0.0% / $13,405
+   shuffled years: $50,000 1.4% / $15,266 $48,806 6.2% / $11,107 $48,998 3.8% / $11,601
+2020-25 guard under $2,000, strong only under $1,000:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $15,560 | $48,806 1.8% / $11,050 | $48,998 0.0% / $11,641
+   shuffled years: $50,000 1.1% / $14,547 $48,806 5.9% / $10,571 $48,998 3.5% / $11,111
+2020-25 guard under $1,500, strong only under $750:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $18,282 | $48,806 1.8% / $14,098 | $48,998 0.0% / $14,705
+   shuffled years: $50,000 1.7% / $15,865 $48,806 7.6% / $12,946 $48,998 5.8% / $13,764
+2020-25 guard under $1,500, strong only under $1,250:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $17,301 | $48,806 1.8% / $11,731 | $48,998 0.0% / $13,831
+   shuffled years: $50,000 0.8% / $14,931 $48,806 5.1% / $10,167 $48,998 2.6% / $10,949
+
+Verdict (2026-11-25, docs section 129): no change; the guard from $1,500 and the strong-only tier from $1,000 stay.
+- The guard from $1,250: more profit in both periods (calendar medians +$96 to +$1,460, shuffled +$110 to +$370) for
+  slightly more risk (shuffled +0.1 to +0.3 points; fresh 2015-19 0.4% -> 0.7%). The user's rule ("never lose the
+  account") puts risk first: not taken.
+- The guard from $1,750 / $2,000: shuffled risk -0.1 to -0.6 points for lower shuffled medians in both periods
+  ($370-1,130 less); the calendar mixed (fresh 2015-19 higher, near-floor lower). Not better on both.
+- Strong only from $1,250: 2020-25 safer (shuffled from $48,806 6.5% -> 5.1%, fresh 1.5% -> 0.8%) but 2015-19 loses 1
+  of 49 calendar starts from $48,806 (none shipped) and medians are lower in both. Strong only from $750: riskier in
+  both periods (5.9% / 7.6%).
+- The near-floor calendar figures move a lot for one step (path-sensitive); the shuffled years are the steadier
+  measure of risk.
