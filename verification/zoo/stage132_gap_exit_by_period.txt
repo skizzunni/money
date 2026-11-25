@@ -1,0 +1,14 @@
+out 9:45: 2015-19 gap PF 1.75 $5,467, lost 0.0% median $13,133 p25 $4,185 | 2020-25 gap PF 1.44 $5,116, lost 0.0% median $16,678 p25 $14,294 | TV $+9,389 50tr PF 4.42 dd $670
+out 9:50: 2015-19 gap PF 1.98 $7,761, lost 0.0% median $12,847 p25 $5,232 | 2020-25 gap PF 1.60 $7,199, lost 0.0% median $18,438 p25 $15,075 | TV $+9,832 50tr PF 4.58 dd $670
+out 9:55 (shipped): 2015-19 gap PF 2.01 $8,522, lost 0.0% median $14,028 p25 $5,324 | 2020-25 gap PF 1.70 $8,675, lost 0.0% median $18,980 p25 $15,811 | TV $+10,063 50tr PF 4.66 dd $670
+out 10:00: 2015-19 gap PF 1.89 $7,731, lost 0.0% median $12,734 p25 $5,290 | 2020-25 gap PF 1.70 $8,729, lost 0.0% median $19,117 p25 $16,257 | TV $+10,352 50tr PF 4.77 dd $670
+out 10:05: 2015-19 gap PF 2.04 $9,181, lost 0.0% median $12,182 p25 $4,424 | 2020-25 gap PF 1.90 $11,367, lost 0.0% median $16,018 p25 $13,143 | TV $+8,774 48tr PF 4.31 dd $670
+
+Verdict (2026-11-25, docs section 137): no change; out at the 09:55 open stays (GAP exit_m 590).
+- 09:45 / 09:50: lower on every line.
+- 10:00: 2020-25 up (median +$137, p25 +$446, the window +$289) but 2015-19 down (median -$1,294): opposite by
+  period (section 41 saw the window up and the pooled median down).
+- 10:05: the gap trade itself is better on both periods (PF 2.04 / 1.90, $9,181 / $11,367 against $8,522 / $8,675),
+  but the accounts are worse (medians -$1,846 / -$2,962, the window -$1,289): held past 10:00 it sits in the band's
+  10:00 check, whose entries on gap days are the band's best (section 118), and the trade cap / day stop then see a
+  different day. The gap trade alone is the wrong measure; the account is the right one.

@@ -919,6 +919,10 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    `verification/zoo/stage131_verify_result.txt`). Every figure in "The result" (the pooled starts, both periods, the
    table, the years, the TradingView window +$10,063 / 50 trades / PF 4.66) reproduces exactly after sections 107-135's
    default-off research parameters.
+137. **The gap trade's exit by period** (2026-11-25, a research round; `research/zoo/gap_exit_by_period.py`,
+   `verification/zoo/stage132_gap_exit_by_period.txt`). Out at 09:45 / 09:50: lower everywhere. 10:00: 2020-25 up
+   (+$137, the window +$289), 2015-19 down (-$1,294). 10:05: the gap trade alone better on both (PF 2.04 / 1.90) but the
+   accounts worse (-$1,846 / -$2,962): it blocks the band's best entries, the 10:00 ones on gap days (118). 09:55 stays.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
