@@ -1,0 +1,27 @@
+move 1.35x, stop 50%: 2009-17 23/yr $+231/yr PF 1.45 worst $-175 years up 56% | 2018-25 23/yr $+503/yr PF 2.09 worst $-113 years up 75%
+move 1.35x, stop 60%: 2009-17 23/yr $+318/yr PF 1.75 worst $-141 years up 56% | 2018-25 23/yr $+478/yr PF 2.21 worst $-91 years up 75%
+move 1.35x, stop 70%: 2009-17 23/yr $+185/yr PF 1.52 worst $-106 years up 56% | 2018-25 23/yr $+484/yr PF 2.47 worst $-69 years up 75%
+move 1.5x, stop 50%: 2009-17 19/yr $+290/yr PF 1.68 worst $-175 years up 56% | 2018-25 20/yr $+322/yr PF 1.81 worst $-113 years up 75%
+move 1.5x, stop 60%: 2009-17 19/yr $+361/yr PF 2.02 worst $-141 years up 56% | 2018-25 20/yr $+286/yr PF 1.84 worst $-91 years up 75%
+move 1.5x, stop 70%: 2009-17 19/yr $+215/yr PF 1.71 worst $-106 years up 56% | 2018-25 20/yr $+333/yr PF 2.17 worst $-69 years up 75%
+move 1.65x, stop 50%: 2009-17 17/yr $+281/yr PF 1.74 worst $-175 years up 33% | 2018-25 18/yr $+325/yr PF 1.94 worst $-110 years up 62%
+move 1.65x, stop 60%: 2009-17 17/yr $+345/yr PF 2.09 worst $-141 years up 67% | 2018-25 18/yr $+280/yr PF 1.93 worst $-89 years up 62%
+move 1.65x, stop 70%: 2009-17 17/yr $+252/yr PF 1.95 worst $-106 years up 56% | 2018-25 18/yr $+319/yr PF 2.28 worst $-68 years up 62%
+confirm 10 min, out 14:00: 2009-17 20/yr $+106/yr PF 1.33 worst $-101 years up 33% | 2018-25 18/yr $+207/yr PF 1.82 worst $-57 years up 62%
+confirm 10 min, out 14:15: 2009-17 20/yr $+169/yr PF 1.53 worst $-101 years up 33% | 2018-25 18/yr $+210/yr PF 1.83 worst $-57 years up 62%
+confirm 10 min, out 14:30: 2009-17 20/yr $+132/yr PF 1.41 worst $-101 years up 33% | 2018-25 18/yr $+197/yr PF 1.78 worst $-57 years up 62%
+confirm 15 min, out 14:00: 2009-17 19/yr $+296/yr PF 1.84 worst $-141 years up 56% | 2018-25 20/yr $+307/yr PF 1.90 worst $-91 years up 75%
+confirm 15 min, out 14:15: 2009-17 19/yr $+361/yr PF 2.02 worst $-141 years up 56% | 2018-25 20/yr $+286/yr PF 1.84 worst $-91 years up 75%
+confirm 15 min, out 14:30: 2009-17 19/yr $+337/yr PF 1.95 worst $-141 years up 67% | 2018-25 20/yr $+273/yr PF 1.80 worst $-91 years up 75%
+confirm 20 min, out 14:00: 2009-17 19/yr $+118/yr PF 1.30 worst $-148 years up 67% | 2018-25 18/yr $+207/yr PF 1.49 worst $-151 years up 50%
+confirm 20 min, out 14:15: 2009-17 19/yr $+128/yr PF 1.32 worst $-148 years up 56% | 2018-25 18/yr $+190/yr PF 1.45 worst $-151 years up 50%
+confirm 20 min, out 14:30: 2009-17 19/yr $+125/yr PF 1.31 worst $-148 years up 56% | 2018-25 18/yr $+174/yr PF 1.41 worst $-151 years up 50%
+
+Verdict (2026-11-25, docs section 144): both gold pairs stay at the shipped cell ($ a year a contract, gold alone).
+- Move x stop: 1.5x / 60% is the best of the nine on 2009-17 ($361); the 1.35x row earns more on 2018-25 ($478-503
+  against $286) but less on 2009-17 ($185-318), as section 108 found for the move alone; 70% stops raise 2018-25's PF
+  (2.17-2.47) but cut 2009-17 to $185-252. No cell better on both periods.
+- Confirm x exit: 15 minutes / 14:15 is the best on 2009-17; 15 / 14:00 is +$21 on 2018-25 only; 10 and 20 minutes
+  are lower on both periods at every exit.
+- Note for the user: over the whole 2009 - Mar 2025 history 1.35x / 60% earns more in total (about $6,300 against
+  $5,300 a contract), almost all of it after 2018. Kept at 1.5x by the rule that a change must hold in both periods.

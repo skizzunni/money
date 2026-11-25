@@ -5,6 +5,7 @@ one setting moved at a time from the shipped k 1.5 / confirm 15 / exit 14:15: pe
 the trades a year, $ a year a contract, PF, worst trade and the share of years up.
 Needs the 5-minute gold bars (the gold5.pkl the stress tests use): python zoo/gold_recheck.py PATH/gold5.pkl
 --stop (docs section 109): the stop 0-80% of the way to the signal close, and the move from another bar's close.
+--pairs (docs section 144): the move x the stop, and the confirmation x the exit, 3 x 3 each.
 """
 import pickle
 import sys
@@ -53,6 +54,11 @@ def main():
         rows += [(f"stop {int(a * 100)}%", {"stop_at": a}) for a in (0.0, 0.4, 0.5, 0.7, 0.75, 0.8)]
         refs = (1160, 1165, 1175, 1185)  # settle m: the close of the bar starting at m - 5 (New York m - 365)
         rows += [(f"from the {(m - 365) // 60}:{(m - 365) % 60:02d} close", {"settle": m}) for m in refs]
+    if "--pairs" in sys.argv:  # docs 144: two settings at once, 3 x 3, the shipped cell in the middle
+        rows = [(f"move {k}x, stop {int(a * 100)}%", {"k": k, "stop_at": a}) for k in (1.35, 1.5, 1.65)
+                for a in (0.5, 0.6, 0.7)]
+        rows += [(f"confirm {c} min, out {(m - 360) // 60}:{(m - 360) % 60:02d}", {"confirm": c, "exit_m": m})
+                 for c in (10, 15, 20) for m in (1200, 1215, 1230)]
     for lab, kw in rows:
         print(f"{lab}: {line(trades(G, **kw))}", flush=True)
 

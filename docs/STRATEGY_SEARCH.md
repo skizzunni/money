@@ -951,6 +951,10 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    `verification/zoo/stage138_gapk_guarded.txt`). Shuffled years by period: 0.65x lowers 2020-25's risk (fresh 1.5% ->
    0.8%, from $48,806 6.5% -> 5.5%) and lifts its medians, but on 2015-19 the risk is the same and the medians lower
    (-$32 to -$451). One period only: closed, 0.6x stays.
+144. **Gold's pairs** (2026-11-25, a research round; `gold_recheck.py --pairs`, `verification/zoo/stage139_gold_pairs.txt`).
+   The move 1.35-1.65x x the stop 50-70%: 1.5x / 60% the best on 2009-17 ($361 a year a contract); 1.35x better on
+   2018-25 only ($478-503 against $286; more in total over 2009-2025, almost all after 2018). The confirmation 10-20
+   minutes x the exit 14:00-14:30: 15 / 14:15 the best on 2009-17, 14:00 +$21 on 2018-25. Both stay.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
