@@ -103,14 +103,14 @@ def runs(t, all_days, steps, day_stop, day_qty, max_q=3, extra=None, strong=None
     return pd.DataFrame(out)
 
 
-def gold_trades(path):
+def gold_trades(path, **kw):  # kw: mk_search.carry settings (docs 145: k)
     import mk_search as K
     G = pickle.load(open(path, "rb"))
     for g in G:
         for k in ("o", "h", "l", "c"):
             g[k] = np.round(np.asarray(g[k]), 1)
     rows = [(G[i]["d"], (x - e) * side * 10 - 1.24)
-            for i in range(15, len(G)) for side, _k, e, x, _w, _b in K.carry(G, i, 0.1)]
+            for i in range(15, len(G)) for side, _k, e, x, _w, _b in K.carry(G, i, 0.1, **kw)]
     return pd.DataFrame(rows, columns=["d", "usd"])
 
 

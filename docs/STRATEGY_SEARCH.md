@@ -955,6 +955,10 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    The move 1.35-1.65x x the stop 50-70%: 1.5x / 60% the best on 2009-17 ($361 a year a contract); 1.35x better on
    2018-25 only ($478-503 against $286; more in total over 2009-2025, almost all after 2018). The confirmation 10-20
    minutes x the exit 14:00-14:30: 15 / 14:15 the best on 2009-17, 14:00 +$21 on 2018-25. Both stay.
+145. **Gold at 1.35x on the account** (2026-11-25, a research round; `near_floor_tiers.py --gold PATH --gold-k`,
+   `verification/zoo/stage140_gold_k_account.txt`). With MNQ and the guard, shuffled years: both MNQ periods' medians up
+   (+$149 to +$772) at about the same risk. By year, though, 1.35x beats 1.5x in only 5 of 17 years and is lower in 12
+   (all of 2009-14); 2024 alone is +$927 of 2020-25's +$965. A gain carried by a year or two: not shipped, 1.5x stays.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 

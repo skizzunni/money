@@ -9,7 +9,8 @@ strong breaks from 1.0-2.0 sigma; --levels, docs 129: the guard from $1,250-2,00
 --extras, docs 130: the extra contract's stretch and the news rule; --steps, docs 131: the size steps;
 --day-stop, docs 132: the regular day stop; --gold PATH, docs 133: shuffled years with gold as live;
 --gold PATH --gold-size, docs 134: gold at 1 / 2 / 3 contracts always; --gold PATH --gold-guarded, docs 135;
---gap-add, docs 138: one more contract on the gap trade; --gapk, docs 143: the gap minimum 0.6 / 0.65 / 0.7x.)
+--gap-add, docs 138: one more contract on the gap trade; --gapk, docs 143: the gap minimum 0.6 / 0.65 / 0.7x;
+--gold PATH --gold-k, docs 145: gold's move at 1.35 / 1.65x.)
 """
 import pickle
 import sys
@@ -130,7 +131,12 @@ def main():
             gdf = BR.gold_trades(gp_)
             gold_by = {k: g.usd.to_numpy() for k, g in gdf.groupby("d")}
             runs_ = (("MNQ alone", None, None, ""), ("MNQ + gold (as live)", gold_by, None, ""))
-            if "--gold-guarded" in sys.argv:  # docs 135: gold at 1 MGC while guarded
+            if "--gold-k" in sys.argv:  # docs 145: gold's move at 1.35x / 1.65x against 1.5x on the account
+                gk_by = {k_: {kk: g.usd.to_numpy() for kk, g in BR.gold_trades(gp_, k=k_).groupby("d")}
+                         for k_ in (1.35, 1.65)}
+                runs_ = (("gold move 1.5x (shipped)", gold_by, None, ""), ("gold move 1.35x", gk_by[1.35], None, ""),
+                         ("gold move 1.65x", gk_by[1.65], None, ""))
+            elif "--gold-guarded" in sys.argv:  # docs 135: gold at 1 MGC while guarded
                 runs_ = (("no gold while guarded (shipped)", gold_by, None, ""),
                          ("1 MGC while guarded, not under $1,000", gold_by, None, "tier"),
                          ("1 MGC while guarded, any cushion", gold_by, None, "all"))

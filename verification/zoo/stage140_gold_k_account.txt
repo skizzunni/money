@@ -1,0 +1,36 @@
+2015-19 gold move 1.5x (shipped): shuffled years $50,000 0.4% / $11,771 $48,806 4.6% / $7,826 $48,998 2.5% / $8,770
+2015-19 gold move 1.35x: shuffled years $50,000 0.4% / $12,008 $48,806 4.7% / $8,072 $48,998 2.6% / $8,919
+2015-19 gold move 1.65x: shuffled years $50,000 0.4% / $11,346 $48,806 4.7% / $7,548 $48,998 2.6% / $8,404
+2020-25 gold move 1.5x (shipped): shuffled years $50,000 1.4% / $16,202 $48,806 6.3% / $12,267 $48,998 3.6% / $12,943
+2020-25 gold move 1.35x: shuffled years $50,000 1.4% / $16,974 $48,806 6.3% / $12,794 $48,998 3.8% / $13,436
+2020-25 gold move 1.65x: shuffled years $50,000 1.5% / $16,337 $48,806 6.3% / $12,377 $48,998 3.7% / $13,058
+
+Gold alone by year, $ a contract (bad_runs.gold_trades, k = the move):
+        1.25    1.35    1.50    1.65
+2009     177     213     255     287
+2010    -266    -206     -98     -50
+2011    2969    2619    2719    2753
+2012      92     170     186      61
+2013    -175    -168     -96      22
+2014     -55     -55     -15      19
+2015    -255    -249    -178    -160
+2016     134     147      79    -257
+2017     324     387     396     427
+2018     445     521     346     365
+2019     362     464     230    -124
+2020     551     561     588     614
+2021     309     341     184     194
+2022    -417    -378    -318    -177
+2023     648     707     718     734
+2024    1439    1280     353     397
+2025    -150     -76     -55     -17
+2009-14: 2,742 / 2,573 / 2,951 / 3,092; 2015-19: 1,010 / 1,270 / 873 / 251; 2020-25: 2,380 / 2,435 / 1,470 / 1,745.
+
+Verdict (2026-11-25, docs section 145): not shipped; gold's move stays 1.5x.
+- On the combined account (MNQ + gold as live, the guard, shuffled years) 1.35x lifts both MNQ periods' medians
+  (+$149 to +$246 on 2015-19, +$493 to +$772 on 2020-25) at the same fresh risk and 0.1-0.2 points more in three
+  near-floor cells (within the noise of 2,000 runs).
+- But by year 1.35x beats 1.5x in only 5 of 17 years (2016, 2018, 2019, 2021, 2024) and is lower in 12, every year of
+  2009-14 among them; 2024 alone is +$927 of 2020-25's +$965. A gain carried by one or two years is not a rule. 1.65x
+  is lower after 2015; 1.25x tracks 1.35x (the same few years).
+- Hindsight check: picking 1.35x now would be picking the setting that caught 2024's gold run.
