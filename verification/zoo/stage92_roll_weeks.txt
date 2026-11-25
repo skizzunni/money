@@ -1,0 +1,16 @@
+Stage 92 (2026-11-25, a research round): MNQ in the contract roll weeks (the 8 calendar days up to the quarterly expiry,
+the 3rd Friday of Mar / Jun / Sep / Dec), shipped rules, 1 MNQ:
+
+dev 2015-19:    roll weeks 154 tr PF 1.04 $1.5 a trade  | other weeks 991 tr PF 1.74 $25.9
+unseen 2020-25: roll weeks 167 tr PF 1.37 $15.6 a trade | other weeks 1230 tr PF 1.68 $30.5
+live 2026:      roll weeks 2 tr PF 4.34 $67.3           | other weeks 69 tr PF 3.69 $83.7
+
+Skipping them (known in advance; fresh 50K starts by period):
+shipped:                        2015-19 lost 0.0% med $14,028 p25 $5,324 | 2020-25 lost 0.0% med $18,980 p25 $15,811
+skip the 8 days before expiry:  2015-19 lost 0.0% med $14,096 p25 $5,968 | 2020-25 lost 0.0% med $17,188 p25 $14,469
+skip the 4 days before expiry:  2015-19 lost 0.0% med $16,381 p25 $6,273 | 2020-25 lost 0.0% med $16,960 p25 $14,459
+
+Verdict: rejected. Roll weeks are weaker in both periods but still profitable, and on 2020-25 the account needs them
+(median -$1,792 / -$2,020). Part of the weakness may come from the back-adjusted continuous series around the roll
+(the research data stitches contracts); the live chart trades one contract month at a time (MNQ 12-26 now; NinjaTrader
+moves to the next month on its rollover date), so a stitching artefact would not repeat live.

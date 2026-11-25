@@ -734,6 +734,10 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    3.17 / 1.84); the guard's worst real window misses 4 weekdays (limit 5), so it blocks no real day, after a holiday or
    not.
 
+97. **Contract roll weeks** (2026-11-25, a research round; `verification/zoo/stage92_roll_weeks.txt`). The 8 days before a
+   quarterly expiry are weaker in both periods (PF 1.04 / 1.37 against 1.74 / 1.68) but profitable; skipping them helps
+   2015-19 and costs 2020-25 $1,792-2,020 of median. Rejected.
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |
