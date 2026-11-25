@@ -742,6 +742,10 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    `verification/zoo/stage97_gold_pine_and_max_trades.txt`). 5 a day: mixed (2020-25 median -$331, 25th percentile
    +$333); 3: lower everywhere. 9 stays. Gold's Pine inputs match MgcOvernightCarry.cs one for one.
 
+99. **The last entry check again, with 61 and 87 in** (2026-11-25, a research round;
+   `verification/zoo/stage98_last_entry.txt`). 13:30: lower everywhere; 14:30: 2020-25 median +$117 but its 25th
+   percentile -$1,451 and 2015-19's median -$1,171. 14:00 stays.
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |

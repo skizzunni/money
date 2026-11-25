@@ -1,0 +1,9 @@
+Stage 98 (2026-11-25, a research round): the last band entry check (14:00) again, with sections 61 and 87 in (section
+32 tested 13:30 / 14:30 before them). Fresh 50K starts by period, the TradingView window:
+
+14:00 (shipped): 2015-19 lost 0.0% med $14,028 p25 $5,324 | 2020-25 lost 0.0% med $18,980 p25 $15,811 | TV $+10,063 50tr PF 4.66
+13:30:           2015-19 lost 0.0% med $12,947 p25 $4,233 | 2020-25 lost 0.0% med $18,238 p25 $14,910 | TV $+8,567 49tr PF 4.12
+14:30:           2015-19 lost 0.0% med $12,857 p25 $5,281 | 2020-25 lost 0.0% med $19,097 p25 $14,360 | TV $+9,998 52tr PF 4.55
+
+Verdict: 14:00 stays. 13:30 is lower everywhere; 14:30 adds $117 to the 2020-25 median but costs $1,171 on 2015-19's
+median, $1,451 on 2020-25's 25th percentile and $65 on the window.
