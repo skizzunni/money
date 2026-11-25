@@ -1,0 +1,20 @@
+Stage 157 (2026-11-25, docs section 161): the noise band's sigma from at least 10 of 14 sessions (a fix for 160).
+
+strats.noise sig_min (default 0 = all sig_n sessions, as shipped): sigma at each check as the mean over the prior 14
+sessions that have that time's move, if at least sig_min of them do; otherwise off as before.
+
+Every set, the shipped strategy against sig_min 10 (trade lists compared as (day, bar, side, $)):
+  2015-19     1,145 trades $25,917 -> 1,145 $25,917, no day differs
+  2020-25     1,397 trades $40,099 -> 1,397 $40,099, no day differs
+  ES 2020-24    394 trades  $1,028 ->   394  $1,028, no day differs
+  live 2026      71 trades  $5,908 ->    71  $5,908, no day differs
+The fix is neutral on every backtest (the history's missing bars sit between checks, or at the 15:00 check with no
+open trade to manage), and live it keeps a check working after a missing bar instead of off for 14 sessions.
+
+Gold (MgcOvernightCarry.cs): the same all-or-nothing rule for its 14-session average move, but it is visible: the
+status reads "a session without its 08:20 / 13:25 bars in the last 14" and the day is skipped. Its two bars a session
+(08:20, 13:25) are far less exposed than MNQ's 11 check times. Left as is.
+MnqCleanBand.cs shows no message when a check's sigma is missing: it skips the check silently.
+
+Next: implement in MnqCleanBand.cs and Pine (default 10, so the shipped behaviour only changes when bars are
+missing), a status line when a check is off, a parity test with a missing check bar, the full suite, then send.

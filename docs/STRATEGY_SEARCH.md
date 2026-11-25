@@ -1025,6 +1025,10 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    after", so a missing bar only delays them; a missing check bar skips that check, and because each check's sigma
    needs all 14 prior sessions, it stays off for 14 sessions (the research model does the same). Advice: reload the
    chart's history after a day with a feed drop or a halt (step 11). A code fix (10 of 14 sessions) noted, not made.
+161. **Sigma from 10 of 14 sessions** (2026-11-25, a research round; `noise` sig_min,
+   `verification/zoo/stage157_sigma_min_sessions.txt`). The fix for 160 measured: every set's trades identical (no day
+   differs), so neutral on the backtests; live it keeps a check working after a missing bar. Gold has the same rule but
+   reports it in its status. To be built into MnqCleanBand.cs and Pine with a missing-bar parity test.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
