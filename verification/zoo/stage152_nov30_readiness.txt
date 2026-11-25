@@ -1,0 +1,19 @@
+Stage 152 (2026-11-25, docs section 156): live-readiness for Monday Nov 30, by reading the code.
+
+- The strategy files sent on Nov 24 (after d61de6b) against the repo now: only the two header comments changed
+  (289beac, "sections 1-97"); no code, default or order logic differs. The files the user has are current.
+- MnqCleanBand.cs defaults = docs "Running it" step 11 and the shipped list: TrendDays 20, HardStop 200, BreakEvenAt 0.4,
+  BreakEvenPlus 2, LadderAt 1.5, LadderLock 0.5, TakeProfitAt 2.5, LastEntry 840, MaxTradesPerDay 9, DayStop 600,
+  MaxContracts 3, Step2At 2000, Step3At 3500, RangePos 0.65, MaxMove 1.1, VwapStop on, VwapEntry off, GapK 0.6,
+  GapCap 30, GapMinBody 0.03, GapMaxBar 1.75, StretchAddAt 1.5, News 2-3x skip / 6x +1, CushionGuard 1500,
+  GuardDayStopShare 0.25, TrailingDrawdown 2000, GuardStrongOnlyBelow 1000, GuardStrongOnlyStretch 1.5, PlaceOrders
+  on; the half-day flat by 13:10 (790) on the Friday after Thanksgiving and Dec 24; the history guard (more than 5
+  missing weekdays blocks).
+- pine/mnq_clean_band.pine: every input above has the same default (checked line by line); the half-day and the
+  history guard are in.
+- MgcOvernightCarry.cs: K 1.5, ConfirmMinutes 15, StopAt 0.6, OpenAt 500, ExitAt 855 (14:15), SettleAt 810, steps
+  2000 / 3500, MaxContracts 3, CushionGuard 1500. Pine matched in stage 97.
+- One stale text found and fixed: gold's NinjaTrader Description said "held to 13:30" and a comment "out by 13:30"
+  (from before section 41 moved the exit to 14:15). Text only: the code exits at ExitAt 855 = 14:15, as tested. The
+  user does not need to reinstall for it (the description in the strategy list is the only visible change).
+- tests/test_ninjatrader_gold.py: 7 passed after the text fix.

@@ -1004,6 +1004,10 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    `verification/zoo/stage151_long_short.txt`). The band's longs and shorts: PF 1.53 / 1.55 (2015-19), 1.77 / 1.54
    (2020-25), each up in 11 of 12 years; the trend filter puts it on the year's side (2022 the shorts' +$6,106, 2023 the
    longs' +$5,871). The gap trade pays both ways on NQ. Nothing to use.
+156. **Ready for Monday Nov 30** (2026-11-25, a research round; `verification/zoo/stage152_nov30_readiness.txt`). The
+   files sent on Nov 24 differ from the repo only in two header comments; every MNQ and gold default, the half-day
+   13:10 and the history guard match step 11 and the Pine inputs. One stale text fixed: gold's description said
+   "held to 13:30" (it exits at 14:15, as coded). No reinstall needed.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 

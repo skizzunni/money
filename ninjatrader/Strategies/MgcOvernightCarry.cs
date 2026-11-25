@@ -57,11 +57,11 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (State == State.SetDefaults)
             {
                 Name = "MgcOvernightCarry";
-                Description = "Gold's overnight move carried on: a big overnight move confirmed by the COMEX open's first minutes, held to 13:30.";
+                Description = "Gold's overnight move carried on: a big overnight move confirmed by the COMEX open's first minutes, held to 14:15.";
                 Calculate = Calculate.OnBarClose;
                 EntriesPerDirection = 1;
                 EntryHandling = EntryHandling.UniqueEntries;
-                IsExitOnSessionCloseStrategy = true;  // a backstop only: the trade is out by 13:30
+                IsExitOnSessionCloseStrategy = true;  // a backstop only: the trade is out by 14:15 (ExitAt)
                 ExitOnSessionCloseSeconds = 60;
                 BarsRequiredToTrade = 0;
                 StartBehavior = StartBehavior.WaitUntilFlat;
