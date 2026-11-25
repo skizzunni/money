@@ -809,6 +809,11 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    (2015-19 / 2020-25) against 1.54 / 1.59 with no gap trade, but ES 1.09. One contract more on them: medians -$925 /
    +$96, inside a placebo's range. After a gap loss PF 1.03 / 1.36 (live 15.5 on 13 trades): no skip. Nothing used.
    The overnight range is not testable (the NQ data starts at 09:30).
+114. **The opening volume** (2026-11-25, a research round; `research/zoo/open_volume.py`,
+   `verification/zoo/stage113_open_volume.txt`). The 09:30-10:00 volume against its 14-session average for the band
+   trades: no order that holds (the low tercile best on 2015-19 at PF 1.73, worst on 2020-25 at 1.39). The gap trade
+   looks far better on high 09:30-10:00 volume (PF 3.97 / 2.27), but that is hindsight (the trade's own bars); with only
+   the 09:30 bar's volume, known at entry, it is gone (over 1.2x 2.04 / 1.68 against 2.15 / 1.69). Nothing used.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 

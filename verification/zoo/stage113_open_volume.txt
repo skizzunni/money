@@ -1,0 +1,32 @@
+2015-19: band 873 trades PF 1.54; terciles cut at [0.89, 1.14]
+   low: 291 tr $21.7 PF 1.73 | mid: 292 tr $18.0 PF 1.47 | high: 290 tr $20.1 PF 1.47
+   <0.8: 162 tr $24.0 PF 1.87 | 0.8-1.2: 469 tr $17.5 PF 1.47 | >1.2: 242 tr $22.0 PF 1.52
+   gap trade by 09:30-10:00 volume (hindsight: the trade is in 09:35-09:55): <0.8: 53 tr $5.7 PF 1.18 | 0.8-1.2: 146 tr $16.8 PF 1.51 | >1.2: 73 tr $79.1 PF 3.97
+   gap trade by the 09:30 bar's volume (known at entry): <0.8: 51 tr $20.4 PF 1.61 | 0.8-1.2: 155 tr $33.6 PF 2.15 | >1.2: 66 tr $34.5 PF 2.04
+   gap trade by the 09:30 bar's volume (known at entry): <1.0: 136 tr $27.7 PF 1.87 | 1.0-1.5: 117 tr $38.0 PF 2.31 | >1.5: 19 tr $16.5 PF 1.45
+2020-25: band 1091 trades PF 1.63; terciles cut at [0.92, 1.09]
+   low: 366 tr $17.0 PF 1.39 | mid: 364 tr $40.1 PF 1.87 | high: 361 tr $29.4 PF 1.63
+   <0.8: 119 tr $6.4 PF 1.14 | 0.8-1.2: 774 tr $31.6 PF 1.70 | >1.2: 198 tr $31.1 PF 1.67
+   gap trade by 09:30-10:00 volume (hindsight: the trade is in 09:35-09:55): <0.8: 36 tr $9.6 PF 1.21 | 0.8-1.2: 212 tr $24.9 PF 1.64 | >1.2: 58 tr $52.6 PF 2.27
+   gap trade by the 09:30 bar's volume (known at entry): <0.8: 33 tr $34.1 PF 1.81 | 0.8-1.2: 214 tr $27.9 PF 1.69 | >1.2: 59 tr $26.8 PF 1.68
+   gap trade by the 09:30 bar's volume (known at entry): <1.0: 142 tr $18.6 PF 1.44 | 1.0-1.5: 157 tr $38.7 PF 2.00 | >1.5: 7 tr $-7.3 PF 0.82
+ES 2020-24: band 305 trades PF 1.27; terciles cut at [0.91, 1.13]
+   low: 106 tr $3.0 PF 1.19 | mid: 98 tr $15.1 PF 1.86 | high: 101 tr $-3.0 PF 0.85
+   <0.8: 55 tr $-4.3 PF 0.76 | 0.8-1.2: 164 tr $13.9 PF 1.88 | >1.2: 86 tr $-6.4 PF 0.70
+   gap trade by 09:30-10:00 volume (hindsight: the trade is in 09:35-09:55): <0.8: 11 tr $-20.7 PF 0.05 | 0.8-1.2: 52 tr $-8.1 PF 0.53 | >1.2: 26 tr $7.1 PF 1.43
+   gap trade by the 09:30 bar's volume (known at entry): <0.8: 9 tr $-15.3 PF 0.00 | 0.8-1.2: 58 tr $-0.7 PF 0.96 | >1.2: 22 tr $-12.9 PF 0.35
+   gap trade by the 09:30 bar's volume (known at entry): <1.0: 39 tr $-2.4 PF 0.86 | 1.0-1.5: 47 tr $-6.6 PF 0.63 | >1.5: 3 tr $-18.7 PF 0.00
+live 2026: band 38 trades PF 5.73; terciles cut at [1.03, 1.12]
+   low: 13 tr $135.4 PF 6.79 | mid: 13 tr $113.7 PF 3.82 | high: 12 tr $138.4 PF 8.95
+   0.8-1.2: 26 tr $124.6 PF 4.91 | >1.2: 12 tr $138.4 PF 8.95
+   gap trade by 09:30-10:00 volume (hindsight: the trade is in 09:35-09:55): 0.8-1.2: 7 tr $69.4 PF 2.54 | >1.2: 4 tr $66.3 PF 3.91
+   gap trade by the 09:30 bar's volume (known at entry): 0.8-1.2: 7 tr $-19.6 PF 0.63 | >1.2: 4 tr $222.0 PF 23.07
+   gap trade by the 09:30 bar's volume (known at entry): <1.0: 3 tr $33.9 PF 1.80 | 1.0-1.5: 5 tr $66.7 PF 2.39 | >1.5: 3 tr $105.3 PF 8.85
+
+Verdict (2026-11-25, docs section 114): nothing used.
+- The band trades by the 09:30-10:00 volume (known at the 10:00 check): no order that holds. The low tercile is the
+  best on 2015-19 (PF 1.73) and the worst on 2020-25 (1.39); on ES the middle is best and the high tercile loses.
+- The gap trade looks far better on high 09:30-10:00 volume (PF 3.97 / 2.27 over 1.2x), but that volume includes the
+  trade's own 09:35-09:55 bars: hindsight (a big move brings the volume). With only the 09:30 bar's volume, known at
+  the 09:35 entry, it is gone: over 1.2x PF 2.04 / 1.68 against 2.15 / 1.69 for 0.8-1.2x; under 0.8x is the best on
+  2020-25 (1.81). Nothing to filter or size on.
