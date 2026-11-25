@@ -32,5 +32,5 @@ Verdict (2026-11-25, docs section 107): rejected.
   5.5% of 2020-25 accounts. More size early is a risk choice already declined (sections 67, 103).
 - Hindsight: none. The ratio uses only the 14 sessions before today and the year before them.
 - The other candidate this round (exit when the close goes back inside the band after 15:00) is already the code:
-  every half-hour check through 15:30 moves the stop to the band, and a close at or past it exits at the next bar's
+  every half-hour check from 10:00 to 15:00 (corrected 2026-11-25: not 15:30) moves the stop to the band, and a close at or past it exits at the next bar's
   open (strats.noise; NinjaTrader and Pine match it trade for trade).

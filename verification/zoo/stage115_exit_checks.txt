@@ -1,0 +1,15 @@
+shipped: 2015-19 lost 0.0% median $14,028 p25 $5,324 (13 early exits) | 2020-25 lost 0.0% median $18,980 p25 $15,811 (15 early exits) | TV $+10,063 50tr PF 4.66 dd $670
+15:30: 2015-19 lost 0.0% median $14,028 p25 $5,324 (13 early exits) | 2020-25 lost 0.0% median $18,980 p25 $15,821 (17 early exits) | TV $+10,063 50tr PF 4.66 dd $670
+15:15 15:30 15:45: 2015-19 lost 0.0% median $14,028 p25 $5,324 (13 early exits) | 2020-25 lost 0.0% median $18,980 p25 $15,708 (18 early exits) | TV $+10,063 50tr PF 4.66 dd $670
+every 15 min from 12:00: 2015-19 lost 0.0% median $13,726 p25 $4,864 (16 early exits) | 2020-25 lost 0.0% median $18,661 p25 $15,592 (15 early exits) | TV $+10,117 50tr PF 4.75 dd $670
+every 15 min from 10:00: 2015-19 lost 0.0% median $12,819 p25 $4,884 (15 early exits) | 2020-25 lost 0.0% median $18,091 p25 $15,369 (22 early exits) | TV $+10,090 51tr PF 4.71 dd $670
+every 15 min 10:00-15:00: 2015-19 lost 0.0% median $13,047 p25 $4,884 (15 early exits) | 2020-25 lost 0.0% median $18,107 p25 $15,446 (19 early exits) | TV $+10,090 51tr PF 4.71 dd $670
+
+Verdict (2026-11-25, docs section 116): rejected.
+- The shipped checks are 10:00-15:00 every 30 minutes (MnqCleanBand.cs Checks; strats.noise); after 15:00 the stop
+  holds until the 15:55 exit. (Section 107 first said "through 15:30": wrong, corrected.)
+- Exit-only checks after 15:00 (15:30, or 15:15 / 15:30 / 15:45): almost nothing changes (2015-19 identical; 2020-25
+  25th percentile +$10 / -$103), the window identical.
+- Exit-only checks every 15 minutes from 12:00 / from 10:00: medians -$302 / -$1,209 (2015-19), -$319 / -$889 (2020-25);
+  the window +$54 / +$27. Lower on both periods.
+- Section 12 tested checks every 15 / 10 / 5 minutes for entries and exits; this is exits alone. Hindsight: none.

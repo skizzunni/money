@@ -774,8 +774,8 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    `verification/zoo/stage106_range_sizing.txt`). The 14-session average range against its median over the year before.
    One contract fewer over 1.4-2.0x: 2015-19 medians -$1,294 to -$3,148. One more under 0.9x: +$1,458 / +$681, but
    one more on random days at the same rate gives +$734 / +$561, and both are inside that range: it is size, not the
-   range. From 0.95x, 5.5% of 2020-25 accounts lost. Rejected. (A band exit after 15:00 is already in: every check
-   through 15:30 moves the stop to the band, and a close back inside exits.)
+   range. From 0.95x, 5.5% of 2020-25 accounts lost. Rejected. (A band exit at the checks is already in: every check
+   to 15:00 moves the stop to the band, and a close back inside exits; after 15:00 the stop holds until 15:55, see 116.)
 108. **Gold's settings by period** (2026-11-25, a research round; `research/zoo/gold_recheck.py`,
    `verification/zoo/stage107_gold_recheck.txt`). Gold alone, $ a year a contract, 2009-17 / 2018 - Mar 2025: shipped
    $361 / $286 (PF 2.02 / 1.84). The move at 1.25 / 1.35x: $327 / $445, $318 / $478 (better on one period, worse on the
@@ -818,6 +818,11 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    `verification/zoo/stage114_exhaustion_exit.txt`). A band trade in profit closed once the day's range reaches 1.5 /
    1.75 / 2.0x its 14-session average: medians -$1,841 / -$1,365 / -$1,036 (2015-19) and -$551 / -$522 / -$225
    (2020-25); 2.5x and up never changes a trade. Stretched days keep running. Rejected.
+116. **Checks that only manage the trade** (2026-11-25, a research round; `noise` exit_checks,
+   `research/zoo/exit_checks.py`, `verification/zoo/stage115_exit_checks.txt`). The shipped checks run 10:00-15:00 every
+   30 minutes; after 15:00 the stop holds to 15:55. Extra checks that move the stop and exit but never enter: after
+   15:00 (15:15-15:45) almost no change; every 15 minutes from 12:00 / 10:00 medians -$302 / -$1,209 (2015-19) and -$319
+   / -$889 (2020-25). Rejected (section 12 was entries and exits together).
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
