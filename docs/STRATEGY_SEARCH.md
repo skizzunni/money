@@ -893,6 +893,10 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    risk flat, 1.5 at or near the best median in both periods. Without the mild-news skip 2015-19 calendar starts are
    lost 4.1% fresh and 14-16% near the floor: essential. No 6x contract: a little safer on 2020-25 only, lower medians
    in both. Skip 1.75-3x / 2-4x: opposite by period or lower medians. No change.
+131. **The size steps with the guard in** (2026-11-25, a research round; `near_floor_tiers.py --steps`,
+   `verification/zoo/stage126_steps_with_guard.txt`). Earlier steps (+$1,500 / +$3,000): more profit for a little more
+   risk; later (+$2,500 / +$4,000): the reverse. 3 from +$3,000: the same shuffled risk, +$70-194 shuffled median, but
+   lower calendar medians (as 103); 3 from +$4,500: lower medians. +$2,000 / +$3,500 stay.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 

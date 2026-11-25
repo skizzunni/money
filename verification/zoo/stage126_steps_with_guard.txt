@@ -1,0 +1,39 @@
+2015-19 shipped 2 / 3 from +$2,000 / +$3,500:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $9,810 | $48,806 0.0% / $6,230 | $48,998 0.0% / $6,781
+   shuffled years: $50,000 0.4% / $11,322 $48,806 4.7% / $7,580 $48,998 2.6% / $8,414
+2015-19 2 / 3 from +$1,500 / +$3,000:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $10,014 | $48,806 0.0% / $5,976 | $48,998 0.0% / $5,964
+   shuffled years: $50,000 0.6% / $11,828 $48,806 4.8% / $8,171 $48,998 2.8% / $8,979
+2015-19 2 / 3 from +$2,500 / +$4,000:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $9,121 | $48,806 0.0% / $6,292 | $48,998 0.0% / $6,721
+   shuffled years: $50,000 0.4% / $10,745 $48,806 4.5% / $7,052 $48,998 2.6% / $7,654
+2015-19 2 / 3 from +$2,000 / +$3,000:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $9,669 | $48,806 0.0% / $5,976 | $48,998 0.0% / $6,781
+   shuffled years: $50,000 0.4% / $11,441 $48,806 4.7% / $7,650 $48,998 2.6% / $8,608
+2015-19 2 / 3 from +$2,000 / +$4,500:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $9,367 | $48,806 0.0% / $6,548 | $48,998 0.0% / $6,402
+   shuffled years: $50,000 0.4% / $11,141 $48,806 4.7% / $7,280 $48,998 2.6% / $8,138
+2020-25 shipped 2 / 3 from +$2,000 / +$3,500:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $17,205 | $48,806 1.8% / $12,892 | $48,998 0.0% / $14,917
+   shuffled years: $50,000 1.5% / $15,582 $48,806 6.5% / $11,551 $48,998 3.7% / $12,272
+2020-25 2 / 3 from +$1,500 / +$3,000:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $17,474 | $48,806 1.8% / $13,361 | $48,998 0.0% / $14,314
+   shuffled years: $50,000 1.7% / $15,934 $48,806 6.6% / $12,036 $48,998 3.9% / $12,717
+2020-25 2 / 3 from +$2,500 / +$4,000:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $16,939 | $48,806 1.8% / $12,297 | $48,998 0.0% / $14,557
+   shuffled years: $50,000 1.4% / $15,048 $48,806 6.2% / $11,067 $48,998 3.6% / $11,672
+2020-25 2 / 3 from +$2,000 / +$3,000:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $17,082 | $48,806 1.8% / $12,967 | $48,998 0.0% / $14,314
+   shuffled years: $50,000 1.5% / $15,673 $48,806 6.5% / $11,704 $48,998 3.7% / $12,276
+2020-25 2 / 3 from +$2,000 / +$4,500:
+   calendar (lost / median 12-month profit): $50,000 0.0% / $16,260 | $48,806 1.8% / $12,912 | $48,998 0.0% / $14,256
+   shuffled years: $50,000 1.5% / $15,392 $48,806 6.5% / $11,313 $48,998 3.8% / $11,997
+
+Verdict (2026-11-25, docs section 131): no change; 1 / 2 / 3 from +$0 / +$2,000 / +$3,500 stay.
+- Earlier steps (+$1,500 / +$3,000): shuffled medians +$350 to +$590 for +0.1 to +0.2 points more risk in both periods;
+  calendar mixed (2015-19 near-floor lower). Later steps (+$2,500 / +$4,000): -0.1 to -0.3 points of risk for $480-760
+  less shuffled median. The usual size trade-off, the user's risk-first rule decides: not taken.
+- 3 from +$3,000 (2 from +$2,000): shuffled risk identical in both periods, shuffled medians +$70 to +$194, but the
+  calendar medians lower in most cells (2020-25 fresh -$123, $48,998 -$603), as section 103 found without the guard.
+  Too small and not consistent.
+- 3 from +$4,500 (the old step): lower medians in both periods at the same risk.
