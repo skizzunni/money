@@ -923,6 +923,11 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    `verification/zoo/stage132_gap_exit_by_period.txt`). Out at 09:45 / 09:50: lower everywhere. 10:00: 2020-25 up
    (+$137, the window +$289), 2015-19 down (-$1,294). 10:05: the gap trade alone better on both (PF 2.04 / 1.90) but the
    accounts worse (-$1,846 / -$2,962): it blocks the band's best entries, the 10:00 ones on gap days (118). 09:55 stays.
+138. **One more contract on the gap trade** (2026-11-25, a research round; `near_floor_tiers.py --gap-add`,
+   `verification/zoo/stage133_gap_add.txt`). Medians up in both periods (+$533 to +$1,263) for the same or slightly
+   more risk (2015-19 fresh shuffled 0.4% -> 0.7%). Against 5 placebos (one more on random trades at the same rate): it
+   beats every one on 2015-19 but sits inside their range on 2020-25. One period only; otherwise just more size.
+   Not shipped. (Sections 87 / 88 / 98 already cover the gap minimum, the stop cap and the trades a day by period.)
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 

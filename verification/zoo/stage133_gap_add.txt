@@ -1,0 +1,53 @@
+2015-19 shipped (no extra on the gap trade):
+   calendar: $50,000 0.0% / $9,810 | $48,806 0.0% / $6,230 | $48,998 0.0% / $6,781
+   shuffled years: $50,000 0.4% / $11,322 $48,806 4.7% / $7,580 $48,998 2.6% / $8,414
+2015-19 one more on the gap trade:
+   calendar: $50,000 0.0% / $10,780 | $48,806 0.0% / $7,444 | $48,998 0.0% / $7,815
+   shuffled years: $50,000 0.7% / $12,299 $48,806 4.8% / $8,843 $48,998 2.7% / $9,578
+2015-19 placebo 1: one more on random trades at the gap trade's rate (24%):
+   calendar: $50,000 0.0% / $12,304 | $48,806 0.0% / $5,555 | $48,998 0.0% / $7,160
+   shuffled years: $50,000 0.7% / $12,194 $48,806 4.9% / $8,477 $48,998 2.9% / $9,317
+2015-19 placebo 2: one more on random trades at the gap trade's rate (24%):
+   calendar: $50,000 0.0% / $9,425 | $48,806 0.0% / $6,084 | $48,998 0.0% / $7,385
+   shuffled years: $50,000 0.7% / $11,663 $48,806 4.9% / $7,824 $48,998 2.9% / $8,639
+2015-19 placebo 3: one more on random trades at the gap trade's rate (24%):
+   calendar: $50,000 0.0% / $8,733 | $48,806 0.0% / $7,107 | $48,998 0.0% / $7,060
+   shuffled years: $50,000 0.7% / $11,532 $48,806 4.6% / $7,781 $48,998 2.6% / $8,611
+2015-19 placebo 4: one more on random trades at the gap trade's rate (24%):
+   calendar: $50,000 0.0% / $10,700 | $48,806 0.0% / $7,401 | $48,998 0.0% / $7,859
+   shuffled years: $50,000 0.4% / $11,953 $48,806 4.8% / $8,306 $48,998 2.8% / $9,106
+2015-19 placebo 5: one more on random trades at the gap trade's rate (24%):
+   calendar: $50,000 0.0% / $10,771 | $48,806 0.0% / $7,920 | $48,998 0.0% / $7,794
+   shuffled years: $50,000 0.7% / $12,022 $48,806 5.0% / $8,346 $48,998 2.9% / $8,993
+2020-25 shipped (no extra on the gap trade):
+   calendar: $50,000 0.0% / $17,205 | $48,806 1.8% / $12,892 | $48,998 0.0% / $14,917
+   shuffled years: $50,000 1.5% / $15,582 $48,806 6.5% / $11,551 $48,998 3.7% / $12,272
+2020-25 one more on the gap trade:
+   calendar: $50,000 0.0% / $18,465 | $48,806 1.8% / $13,799 | $48,998 0.0% / $15,450
+   shuffled years: $50,000 1.5% / $16,364 $48,806 6.4% / $12,151 $48,998 3.7% / $12,836
+2020-25 placebo 1: one more on random trades at the gap trade's rate (22%):
+   calendar: $50,000 0.0% / $17,705 | $48,806 1.8% / $12,622 | $48,998 0.0% / $14,241
+   shuffled years: $50,000 1.4% / $15,981 $48,806 6.5% / $12,014 $48,998 3.8% / $12,631
+2020-25 placebo 2: one more on random trades at the gap trade's rate (22%):
+   calendar: $50,000 0.0% / $17,701 | $48,806 1.8% / $13,904 | $48,998 0.0% / $14,627
+   shuffled years: $50,000 1.6% / $16,208 $48,806 6.2% / $12,323 $48,998 3.8% / $12,832
+2020-25 placebo 3: one more on random trades at the gap trade's rate (22%):
+   calendar: $50,000 0.0% / $18,014 | $48,806 1.8% / $13,814 | $48,998 0.0% / $15,593
+   shuffled years: $50,000 1.8% / $15,683 $48,806 6.5% / $11,399 $48,998 3.5% / $12,167
+2020-25 placebo 4: one more on random trades at the gap trade's rate (22%):
+   calendar: $50,000 0.0% / $17,630 | $48,806 1.8% / $12,416 | $48,998 0.0% / $13,816
+   shuffled years: $50,000 1.7% / $16,063 $48,806 6.6% / $11,831 $48,998 4.0% / $12,720
+2020-25 placebo 5: one more on random trades at the gap trade's rate (22%):
+   calendar: $50,000 0.0% / $17,332 | $48,806 1.8% / $13,141 | $48,998 0.0% / $13,684
+   shuffled years: $50,000 1.6% / $16,486 $48,806 6.6% / $12,116 $48,998 3.6% / $12,904
+
+Verdict (2026-11-25, docs section 138): not shipped.
+- Sections 87 / 88 / 98 already cover this round's first candidates by period (the gap minimum 0.4-0.8x with shuffled
+  years, the stop cap 25 / 35, the trades a day), so this round took the gap trade's size instead.
+- One more contract on the gap trade (the existing extra slot, at most 3; none while guarded): medians up in both
+  periods (shuffled +$564 to +$1,263, calendar +$533 to +$1,260), risk the same or 0.1-0.3 points higher (2015-19 fresh
+  0.4% -> 0.7%).
+- Against 5 placebos (one more on random trades at the gap trade's rate, 24% / 22%): on 2015-19 it beats every one
+  (shuffled $12,299 / $8,843 / $9,578 against $11,532-12,194 / $7,781-8,477 / $8,611-9,317); on 2020-25 it is inside
+  their range ($16,364 / $12,151 / $12,836 against $15,683-16,486 / $11,399-12,323 / $12,167-12,904). One period only;
+  elsewhere it is just more size, which is the user's risk choice, not a research finding.

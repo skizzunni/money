@@ -8,7 +8,8 @@ period, the same daily rules). MNQ alone. Run from research/: python zoo/near_fl
 strong breaks from 1.0-2.0 sigma; --levels, docs 129: the guard from $1,250-2,000, the tier from $750-1,250;
 --extras, docs 130: the extra contract's stretch and the news rule; --steps, docs 131: the size steps;
 --day-stop, docs 132: the regular day stop; --gold PATH, docs 133: shuffled years with gold as live;
---gold PATH --gold-size, docs 134: gold at 1 / 2 / 3 contracts always; --gold PATH --gold-guarded, docs 135.)
+--gold PATH --gold-size, docs 134: gold at 1 / 2 / 3 contracts always; --gold PATH --gold-guarded, docs 135;
+--gap-add, docs 138: one more contract on the gap trade.)
 """
 import pickle
 import sys
@@ -136,6 +137,27 @@ def main():
                      ("2 / 3 from +$2,000 / +$4,500", ((0, 1), (2000, 2), (4500, 3))))
             tiers = tuple((name, st, 0.25) for name, _ in sets_)
             stepset = dict(sets_)
+        if "--gap-add" in sys.argv:  # docs 138: one more contract on the gap trade (the extra slot, at most 3)
+            base_add2 = t["add"].copy()
+            rate = float(np.mean(t.bar <= 1))
+            rng_ = np.random.default_rng(11)
+            plac = [rng_.random(len(t)) < rate for _ in range(5)]
+            variants = [("shipped (no extra on the gap trade)", None),
+                        ("one more on the gap trade", (t.bar <= 1).values)]
+            variants += [(f"placebo {k + 1}: one more on random trades at the gap trade's rate ({rate:.0%})", m)
+                         for k, m in enumerate(plac)]
+            for nm, sel in variants:
+                t["add"] = np.where(sel, 1, base_add2) if sel is not None else base_add2
+                cal = []
+                for start in STARTS:
+                    r = BR.runs(t, d, B.STEPS, 600.0, B._news(d), strong=st, guard=1500.0, strong_below=1000.0,
+                                start=start)
+                    cal.append(f"${start:,.0f} {r.lost.mean():.1%} / ${r.profit.median():,.0f}")
+                sh = shuffled(t, st, d)
+                print(f"{lab} {nm}:\n   calendar: {' | '.join(cal)}\n   shuffled years: "
+                      + " ".join(f"${k:,.0f} {v[0]:.1%} / ${v[1]:,.0f}" for k, v in sh.items()), flush=True)
+            t["add"] = base_add2
+            continue
         if "--extras" in sys.argv:  # docs 130: the extra contract's stretch and the news rule, the guard in
             stretch = B._stretch(d, t, 1.0)
             rows = [("shipped (extra contract from 1.5 sigma, news 2-3x skip / 6x +1)", 1.5, None),
