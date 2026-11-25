@@ -1,0 +1,29 @@
+be_r x hard: 2015-19 lost / median / p25 | 2020-25 lost / median / p25 | TradingView window
+be_r 0.35 hard 190.0: 0.0% $11,889 / $4,900 | 0.0% $18,059 / $15,801 | TV $+9,650 51tr PF 4.70 dd $670
+be_r 0.35 hard 200.0: 0.0% $9,626 / $4,797 | 0.0% $19,249 / $16,167 | TV $+10,179 50tr PF 4.86 dd $670
+be_r 0.35 hard 210.0: 0.0% $9,529 / $5,851 | 0.0% $18,103 / $15,720 | TV $+9,029 49tr PF 4.38 dd $670
+be_r 0.4 hard 190.0: 0.0% $13,331 / $4,951 | 0.0% $19,052 / $16,258 | TV $+9,598 51tr PF 4.53 dd $670
+be_r 0.4 hard 200.0 (shipped): 0.0% $14,028 / $5,324 | 0.0% $18,980 / $15,811 | TV $+10,063 50tr PF 4.66 dd $670
+be_r 0.4 hard 210.0: 0.0% $14,313 / $4,962 | 0.0% $17,966 / $15,298 | TV $+8,913 49tr PF 4.21 dd $670
+be_r 0.45 hard 190.0: 0.0% $13,710 / $4,921 | 7.3% $18,826 / $14,481 | TV $+9,598 51tr PF 4.53 dd $670
+be_r 0.45 hard 200.0: 0.0% $14,241 / $5,382 | 7.3% $17,696 / $14,036 | TV $+10,063 50tr PF 4.66 dd $670
+be_r 0.45 hard 210.0: 0.0% $14,343 / $5,150 | 7.3% $17,222 / $13,292 | TV $+8,913 49tr PF 4.21 dd $670
+tp_r x lad_r: 2015-19 lost / median / p25 | 2020-25 lost / median / p25 | TradingView window
+tp_r 2.25 lad_r 1.25: 0.0% $12,674 / $5,502 | 0.0% $18,176 / $15,220 | TV $+9,068 51tr PF 4.30 dd $670
+tp_r 2.25 lad_r 1.5: 0.0% $12,983 / $5,042 | 0.0% $18,161 / $15,342 | TV $+9,068 51tr PF 4.30 dd $670
+tp_r 2.25 lad_r 1.75: 0.0% $13,434 / $5,739 | 0.0% $18,064 / $14,970 | TV $+9,068 51tr PF 4.30 dd $670
+tp_r 2.5 lad_r 1.25: 0.0% $13,530 / $5,704 | 0.0% $18,555 / $15,864 | TV $+10,063 50tr PF 4.66 dd $670
+tp_r 2.5 lad_r 1.5 (shipped): 0.0% $14,028 / $5,324 | 0.0% $18,980 / $15,811 | TV $+10,063 50tr PF 4.66 dd $670
+tp_r 2.5 lad_r 1.75: 0.0% $14,280 / $5,436 | 0.0% $18,245 / $15,486 | TV $+10,063 50tr PF 4.66 dd $670
+tp_r 2.75 lad_r 1.25: 0.0% $13,154 / $6,149 | 0.0% $17,628 / $14,959 | TV $+9,388 48tr PF 4.42 dd $670
+tp_r 2.75 lad_r 1.5: 0.0% $15,078 / $6,548 | 0.0% $17,852 / $14,771 | TV $+9,388 48tr PF 4.42 dd $670
+tp_r 2.75 lad_r 1.75: 0.0% $14,139 / $6,149 | 0.0% $17,444 / $14,875 | TV $+9,388 48tr PF 4.42 dd $670
+
+Verdict (2026-11-25, docs section 140): both pairs stay at the shipped cell; no interaction found that one-at-a-time
+checks missed.
+- Break-even x hard stop: the 0.45R row loses 7.3% of 2020-25 starts at every stop; the 0.35R row cuts 2015-19's
+  median by $2,139-4,499; 0.4R / $190 trades 2015-19 (-$697 / -$373) for 2020-25 (+$72 / +$447); 0.4R / $210 lowers
+  2020-25 and the window. No cell better on both periods.
+- Target x second stop step: the shipped cell has the best 2020-25 median of all nine; 2.75R / 1.5R is the best on
+  2015-19 (+$1,050 / +$1,224) but -$1,128 / -$1,040 on 2020-25 and the window -$675 (as section 105); the rest lower on
+  at least one period.

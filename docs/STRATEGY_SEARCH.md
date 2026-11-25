@@ -933,6 +933,11 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    were pooled. By period: break-even 0.3R lower on both, 0.5R loses 7.3% of 2020-25 starts; $175 lower on both, $225
    loses 7.3%; cap 1.0 up on 2020-25's median only (the window -$3,071), 1.2 lower on both; range 0.6 / 0.7 lower medians
    on both. All stay. Every shipped setting now has a by-period check (the index under "The result").
+140. **Two settings at once** (2026-11-25, a research round; `research/zoo/pair_grids.py`,
+   `verification/zoo/stage135_pair_grids.txt`). 3 x 3 grids by period, the shipped cell in the middle: break-even
+   0.35-0.45R x the hard stop $190-210 (the 0.45R row loses 7.3% of 2020-25 starts; 0.35R cuts 2015-19; no cell better on
+   both); the target 2.25-2.75R x the second stop step 1.25-1.75R (the shipped cell the best on 2020-25; 2.75R better
+   on 2015-19 only). No interaction the one-at-a-time checks missed. Both stay.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
