@@ -1,0 +1,8 @@
+Stage 95 (2026-11-25): the "Running it" steps proofread against MnqCleanBand.cs / MgcOvernightCarry.cs.
+
+Every setting the steps name exists with that display name and group: "Most contracts", "Fixed contracts", "Highest
+end-of-day balance so far $ ...", group "7. Cushion guard" (MNQ), the trading-hours and chart settings; the dashboard
+words "Setup: OK" (built as "Setup: " + "OK"), "NOT READY", "NO TRADING", "CUSHION GUARD" all appear in the code.
+Two fixes: gold's cushion-guard settings are in its group "4. Cushion guard" (the step implied 7); gold's corner says
+"waiting for history" until its first 08:30 check after loading, then OK / NOT READY (the step said only OK).
+Defaults confirmed in code: GapK 0.6, GapMaxBar 1.75, LadderAt 1.5, LadderLock 0.5, CushionGuard 1500, DayStop 600.

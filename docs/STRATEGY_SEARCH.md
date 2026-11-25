@@ -803,13 +803,15 @@ NinjaTrader 8, on each funded account (both the same way):
 6. Leave NinjaTrader running through the session (09:30-16:00 New York); the strategy is flat by 15:55 every day.
 7. **The cushion guard (section 38):** in group "7. Cushion guard" set "Highest end-of-day balance so far" to the
    highest end-of-day balance the prop firm's dashboard shows (0 if the account never closed a day above its start
-   balance) and the trailing drawdown ($2,000 for the 50K); the same two numbers in MgcOvernightCarry. The chart then
+   balance) and the trailing drawdown ($2,000 for the 50K); the same two numbers in MgcOvernightCarry (its group is "4.
+   Cushion guard"). The chart then
    says CUSHION GUARD whenever the account is within $1,500 of its floor.
 8. **Before Monday Nov 30** install this version: the older one would block that day (the holiday guard, section 27).
 9. **Gold (optional, section 37):** copy `ninjatrader/Strategies/MgcOvernightCarry.cs` to the same folder, F5. Open an
    **MGC** 5-minute chart (front month, e.g. MGC 02-27; trading hours **CME/COMEX metals ETH**, the overnight session
    is needed), Days to load **30**. Right-click > Strategies > **MgcOvernightCarry** > the same funded account,
-   defaults, Enabled. The top-right corner says OK once 14 complete sessions are loaded. It trades at most once a day
+   defaults, Enabled. The top-right corner says "waiting for history" until the first 08:30 check after loading, then
+   OK once 14 complete sessions are loaded (NOT READY with fewer). It trades at most once a day
    (08:35 to 14:15) and sizes from the same account balance as MNQ.
 
 10. **The contract roll (MNQ: Thursday Dec 10 2026, 8 days before the Dec 18 expiry; then every March, June, September
