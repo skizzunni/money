@@ -1,0 +1,10 @@
+Stage 91 (2026-11-25, a research round): MNQ on the days after a market holiday, and the history guard on real
+calendars.
+
+Trades the day after a holiday (stage 69): dev 2015-19 40 tr PF 3.17 $69.6 a trade; unseen NQ 2020-25 69 tr PF 1.84
+$35.3 a trade (above each period's average). Nothing to filter.
+
+The history guard (no trading when the last 14 sessions leave out more than 5 weekdays): over every ready day of the
+real sets, the most weekdays missing from a 14-session window is 3 (2015-19), 4 (2020-25) and 1 (live 2026), half days
+counted as missing (the sets keep complete sessions only); the guard blocks 0 days, and none of the 44 / 55 / 1 days
+after a holiday. The Monday after Thanksgiving trades.

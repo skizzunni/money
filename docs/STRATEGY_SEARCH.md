@@ -729,6 +729,11 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    a half day in 16 years; the days before / after holidays are 16 trades with opposite results by period. Nothing to
    change.
 
+96. **MNQ after holidays and the history guard** (2026-11-25, a research round;
+   `verification/zoo/stage91_after_holiday_guard.txt`). The day after a holiday is above average in both periods (PF
+   3.17 / 1.84); the guard's worst real window misses 4 weekdays (limit 5), so it blocks no real day, after a holiday or
+   not.
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |
