@@ -1,4 +1,4 @@
-"""Research (2026-11-25, docs section 116): checks that only manage the band trade (exits, never entries).
+"""Research (2026-11-25, docs section 116 / 117): checks that only manage the band trade; out at 15:00 (--late).
 
 `noise` exit_checks: extra check times (bar ends, minutes) where an open band trade's stop moves to the band (the
 VWAP, the hard stop) and a close at or past it exits at the next bar's open, but no entry. The shipped checks are
@@ -35,8 +35,11 @@ def main():
             ("every 15 min from 12:00", tuple(range(735, 900, 30)) + (915, 930, 945)),
             ("every 15 min from 10:00", tuple(range(615, 900, 30)) + (915, 930, 945)),
             ("every 15 min 10:00-15:00", tuple(range(615, 900, 30))))
-    for lab, ex in rows:
-        band = {"exit_checks": ex} if ex else {}
+    kws = [(lab, {"exit_checks": ex} if ex else {}) for lab, ex in rows]
+    if "--late" in sys.argv:  # docs 117: out at the 15:00 check (the bar ending 15:00), or 14:30 / 15:30 for neighbours
+        kws = [("shipped", {})] + [(f"out at {t // 60}:{t % 60:02d}, {m}", {"late_flat": t, "late_mode": m})
+                                    for t in (870, 900, 930) for m in ("small_win", "under_be", "all")]
+    for lab, band in kws:
         tv = B.line("", B.run(band=band)).split("|")[1].strip()
         print(f"{lab}: 2015-19 {score(sets, 'dev', band)} | 2020-25 {score(sets, 'unseen_nq', band)} | {tv}",
               flush=True)

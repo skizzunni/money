@@ -1,0 +1,19 @@
+shipped: 2015-19 lost 0.0% median $14,028 p25 $5,324 (13 early exits) | 2020-25 lost 0.0% median $18,980 p25 $15,811 (15 early exits) | TV $+10,063 50tr PF 4.66 dd $670
+out at 14:30, small_win: 2015-19 lost 0.0% median $14,064 p25 $5,349 (40 early exits) | 2020-25 lost 0.0% median $18,545 p25 $15,509 (40 early exits) | TV $+10,070 50tr PF 4.66 dd $670
+out at 14:30, under_be: 2015-19 lost 0.0% median $13,403 p25 $5,349 (49 early exits) | 2020-25 lost 0.0% median $18,488 p25 $15,543 (52 early exits) | TV $+10,070 50tr PF 4.66 dd $670
+out at 14:30, all: 2015-19 lost 0.0% median $11,353 p25 $4,971 (130 early exits) | 2020-25 lost 0.0% median $17,375 p25 $15,263 (147 early exits) | TV $+9,768 50tr PF 4.55 dd $670
+out at 15:00, small_win: 2015-19 lost 0.0% median $14,186 p25 $5,417 (31 early exits) | 2020-25 lost 0.0% median $18,994 p25 $15,666 (22 early exits) | TV $+9,934 50tr PF 4.61 dd $670
+out at 15:00, under_be: 2015-19 lost 0.0% median $13,020 p25 $5,417 (35 early exits) | 2020-25 lost 0.0% median $18,994 p25 $15,540 (26 early exits) | TV $+9,934 50tr PF 4.61 dd $670
+out at 15:00, all: 2015-19 lost 0.0% median $12,015 p25 $4,535 (109 early exits) | 2020-25 lost 0.0% median $18,466 p25 $15,917 (113 early exits) | TV $+9,928 50tr PF 4.61 dd $670
+out at 15:30, small_win: 2015-19 lost 0.0% median $14,028 p25 $5,022 (29 early exits) | 2020-25 lost 0.0% median $19,214 p25 $15,915 (21 early exits) | TV $+10,063 50tr PF 4.66 dd $670
+out at 15:30, under_be: 2015-19 lost 0.0% median $13,642 p25 $4,978 (33 early exits) | 2020-25 lost 0.0% median $19,241 p25 $15,915 (23 early exits) | TV $+10,063 50tr PF 4.66 dd $670
+out at 15:30, all: 2015-19 lost 0.0% median $12,596 p25 $5,001 (93 early exits) | 2020-25 lost 0.0% median $19,904 p25 $17,021 (95 early exits) | TV $+10,111 50tr PF 4.68 dd $670
+
+Verdict (2026-11-25, docs section 117): rejected.
+- small_win: out with the close in profit but under the break-even distance (0.4 hard stops); under_be: every trade
+  under that distance (losers too); all: every open trade. "under break-even" is the close's gain, not whether the
+  break-even stop moved (strong-break entries skip break-even but can be far in profit).
+- 15:00 small_win: 2015-19 +$158 / +$93 (median / p25), 2020-25 +$14 / -$145, the window -$129: tiny and mixed.
+- 15:30 all: 2020-25 +$924 / +$1,210 but 2015-19 -$1,432: opposite by period (as section 40's 15:30 exit).
+- 14:30 and under_be / all at 15:00: lower on both periods' medians.
+- Hindsight: none (the bar's close at the check; out at the next bar's open).

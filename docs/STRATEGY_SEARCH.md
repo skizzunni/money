@@ -823,6 +823,11 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    30 minutes; after 15:00 the stop holds to 15:55. Extra checks that move the stop and exit but never enter: after
    15:00 (15:15-15:45) almost no change; every 15 minutes from 12:00 / 10:00 medians -$302 / -$1,209 (2015-19) and -$319
    / -$889 (2020-25). Rejected (section 12 was entries and exits together).
+117. **Out late without follow-through** (2026-11-25, a research round; `noise` late_flat / late_mode,
+   `exit_checks.py --late`, `verification/zoo/stage116_late_flat.txt`). At 14:30 / 15:00 / 15:30, out if the trade is a
+   small winner under the break-even distance, under it at all, or every trade. 15:00 small winners: 2015-19 +$158,
+   2020-25 +$14 (p25 -$145), the window -$129; 15:30 every trade: 2020-25 +$924 but 2015-19 -$1,432; the rest lower on
+   both. Rejected; 15:55 stays.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
