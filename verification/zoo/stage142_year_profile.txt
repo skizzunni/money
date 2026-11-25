@@ -1,0 +1,26 @@
+     NQ move day range trend days  band n  band PF  band $  band worst month  gap n  gap PF  gap $  gap worst month
+year                                                                                                               
+2015     +9%     1.27%        80%     172     1.35    2066              -561     42    2.13   1507             -158
+2016     +8%     1.16%        90%     176     1.53    3391              -362     53    3.25   2969              -61
+2017    +31%     0.78%        89%     142     1.20     850              -306     54    1.67    937             -222
+2018     -3%     1.65%        89%     214     1.75    7252              -504     63    1.21    509             -296
+2019    +37%     1.13%        94%     169     1.65    3833              -489     60    2.37   2597             -176
+2020    +45%     2.13%        85%     175     1.44    3367              -576     51    2.56   3131             -261
+2021    +29%     1.37%        90%     185     2.24    8507              -617     62    1.20    475             -433
+2022    -33%     2.44%        92%     270     1.48    7514              -461     58    2.17   3070             -363
+2023    +56%     1.45%        95%     187     1.67    5398              -465     60    1.65   1412             -421
+2024    +27%     1.30%        91%     173     1.84    5912              -371     53    1.31    627             -268
+2025     +8%     1.88%        91%     101     1.16     724             -1103     22    0.96    -42             -267
+2026    -12%     1.51%        74%      53     5.02    5554               -36     18    1.44    353             -247
+
+Notes (2026-11-25, docs section 147): analysis only. 1 contract, the shipped rules, NQ dev + unseen + live (2025 is
+Jan-Jun only, 2026 Jun 29 - Nov 23 only). "NQ move" is from the first to the last close of the year in the data (it
+matches the known years: 2020 +45%, 2022 -33%, 2023 +56%), "day range" the average high-low as % of the close, "trend
+days" the share of sessions on the same side of the 20-session average as the day before.
+- The band made money in every year. Its weakest: 2017 (PF 1.20, $850), the calmest year (day range 0.78%, the lowest
+  by far), and 2025 H1 (PF 1.16, $724) with its worst month on record, March 2025 -$1,104 (28 trades; April 2025
+  +$443). Its usual worst month: -$300 to -$620.
+- The gap trade's weakest: 2025 H1 (PF 0.96, -$42, the only losing year of either leg), 2021 (1.20) and 2018 (1.21);
+  its worst month at most -$433.
+- What a weak year looks like: a very quiet market (2017) or a sharp, choppy correction (March 2025). Neither lost
+  money for the year at 1 contract.

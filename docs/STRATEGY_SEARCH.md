@@ -963,6 +963,11 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    `verification/zoo/stage141_near_miss_years.txt`). 1 contract, 2015-2026, against the shipped: the move cap 1.0 up in
    5 of 12 years (-$1,667 in all), the stop step from 1.75R 3 of 12 (-$590), the gap 0.65x 7 of 12 but by little (-$206),
    the trend 15 2 of 12 (-$1,887). Every one loses money in total: the rejections stand.
+147. **The strategy year by year** (2026-11-25, a research round; `research/zoo/year_profile.py`,
+   `verification/zoo/stage142_year_profile.txt`). At 1 contract the band made money every year 2015-2026; its weakest
+   were 2017 (PF 1.20, the calmest year, day range 0.78%) and 2025 H1 (PF 1.16, the worst month on record, March 2025
+   -$1,104). The gap trade lost only in 2025 H1 (PF 0.96, -$42). A usual worst month: -$300 to -$620 a contract (band).
+   Now in step 12.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
@@ -1115,6 +1120,9 @@ NinjaTrader 8, on each funded account (both the same way):
      from $800 above never got the cushion back to $1,500 in 12 months); +$2,000 after a median 85-164 trading days
      (18-22% of 2015-19 starts never got there in 12 months); in the history 1 of 55 starts from $800 above was lost
      (2020-25), none from $1,000 above, and the closest calls came within $36-113 of the floor and recovered.
+   - the weakest years at 1 contract (section 147): a very quiet market (2017: the band PF 1.20) or a sharp choppy
+     correction (March 2025: the band's worst month on record, -$1,104 a contract); a usual worst month -$300 to -$620
+     a contract. Every year 2015-2026 still ended up at 1 contract.
    None of those lost an account in the history. A run like this is not a fault; a run well past these is a reason to
    stop and check the setup (step 11) and the trades against TradingView.
 
