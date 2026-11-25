@@ -20,3 +20,21 @@ Notes (2026-11-25, docs section 121): an expectation for live, not a rule.
 - The worst day can pass the $600 day stop: it is checked between trades, and a trade that starts at -$590 can lose
   its full stop.
 - Now "Running it" step 12 in docs/STRATEGY_SEARCH.md.
+
+With gold (python zoo/bad_runs.py --gold PATH/gold5.pkl; 2026-11-25, docs section 122):
+2015-19 MNQ + gold: 49 fresh starts (matches harness.account start by start), lost 0.0%
+  deepest fall from the high: median $2,051, worst 10% $3,289, worst $3,289
+  closest to the floor (cushion low): median $1,175, worst 10% $859, worst $760
+  longest run of losing trading days: median 7, worst 10% 7, worst 7
+  most trading days without a new high: median 24, worst 10% 63, worst 66
+  worst day: median $-772, worst $-1,085; worst 5 trading days: median $-1,799, worst $-2,574
+2020-25 MNQ + gold: 55 fresh starts (matches harness.account start by start), lost 0.0%
+  deepest fall from the high: median $2,875, worst 10% $4,680, worst $4,832
+  closest to the floor (cushion low): median $1,214, worst 10% $733, worst $500
+  longest run of losing trading days: median 9, worst 10% 12, worst 12
+  most trading days without a new high: median 20, worst 10% 32, worst 36
+  worst day: median $-912, worst $-1,107; worst 5 trading days: median $-2,252, worst $-3,179
+Notes: gold first in the day, sized like MNQ, only while the account is not under its start (harness.account's extra
+leg), no day stop of its own, no cushion guard. The MNQ-only lines above are unchanged by the script's gold option.
+Gold's many small losing days lengthen the losing runs (2020-25 median 9, worst 12, against 8 / 10) and the days
+without a new high (2015-19 worst 66); the deepest fall and the worst days barely change.

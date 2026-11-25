@@ -5,7 +5,8 @@ starts each month, 12 months each, exactly as harness.account (checked start by 
 also recording per start: the deepest fall from the highest end-of-day balance, the closest the balance came to the
 trailing floor (the cushion's low), the longest run of losing trading days, the most trading days without a new
 high, the worst day and the worst 5-day stretch. Prints the median and the worst 10% / worst start.
-Run from research/: python zoo/bad_runs.py
+Run from research/: python zoo/bad_runs.py [--gold PATH/gold5.pkl] (gold first in the day, sized like MNQ, no
+day stop of its own, as harness.account's extra leg; no cushion guard either way).
 """
 import pickle
 import sys
@@ -21,10 +22,11 @@ import harness as H  # noqa: E402
 import strats as S  # noqa: E402
 
 
-def runs(t, all_days, steps, day_stop, day_qty, max_q=3):
-    """harness.account's loop (no eq / early / extra options), with the path kept."""
+def runs(t, all_days, steps, day_stop, day_qty, max_q=3, extra=None):
+    """harness.account's loop (no eq / early options; extra: gold, first in the day, from +$0), with the path kept."""
     days = [r["d"] for r in all_days]
     byday = {d: g.usd.to_numpy() for d, g in t.groupby("d")}
+    exday = {d: g.usd.to_numpy() for d, g in extra.groupby("d")} if extra is not None else {}
     adds = {d: g["add"].to_numpy() for d, g in t.groupby("d")}
     idx = pd.Series(range(len(days)), index=pd.to_datetime(days))
     out = []
@@ -39,6 +41,8 @@ def runs(t, all_days, steps, day_stop, day_qty, max_q=3):
             d = days[j]
             floor = min(high - 2000.0, 50000.0)
             day_pl, g = 0.0, byday.get(d)
+            if d in exday and bal - 50000.0 >= 0.0:  # as harness.account (extra_from 0: gold while not under the start)
+                g = np.concatenate([exday[d], g]) if g is not None else exday[d]
             if g is not None:
                 prof = bal - 50000.0
                 q = 1
@@ -49,6 +53,7 @@ def runs(t, all_days, steps, day_stop, day_qty, max_q=3):
                 if q <= 0:
                     g, q = None, 0
                 ad = adds.get(d, np.zeros(0))
+                ad = np.concatenate([np.zeros(len(g) - len(ad)), ad]) if g is not None and len(ad) < len(g) else ad
                 for k_, usd in enumerate(g if g is not None else []):
                     if day_stop and day_pl <= -day_stop:
                         break
@@ -76,18 +81,31 @@ def runs(t, all_days, steps, day_stop, day_qty, max_q=3):
     return pd.DataFrame(out)
 
 
+def gold_trades(path):
+    import mk_search as K
+    G = pickle.load(open(path, "rb"))
+    for g in G:
+        for k in ("o", "h", "l", "c"):
+            g[k] = np.round(np.asarray(g[k]), 1)
+    rows = [(G[i]["d"], (x - e) * side * 10 - 1.24)
+            for i in range(15, len(G)) for side, _k, e, x, _w, _b in K.carry(G, i, 0.1)]
+    return pd.DataFrame(rows, columns=["d", "usd"])
+
+
 def main():
     sets = pickle.load(open(B.PK, "rb"))
+    gold = gold_trades(sys.argv[sys.argv.index("--gold") + 1]) if "--gold" in sys.argv else None
     for n, lab in (("dev", "2015-19"), ("unseen_nq", "2020-25")):
         d, s = sets[n]
         t = H.trades_of(S.everyday, d, s, legs=(("gap_go", B.GAP), ("noise", B.BAND)))
         t["add"] = (B._stretch(d, t, 1.0) >= 1.5).astype(int)
-        r = runs(t, d, B.STEPS, 600.0, B._news(d))
-        ref = H.account(t, d, steps=B.STEPS, day_stop=600.0, day_qty=B._news(d))
+        r = runs(t, d, B.STEPS, 600.0, B._news(d), extra=gold)
+        ref = H.account(t, d, steps=B.STEPS, day_stop=600.0, day_qty=B._news(d), extra=gold)
         assert len(ref) == len(r) and all(a[0] == b and abs(a[1] - c) < 0.01
                                           for a, b, c in zip(ref, r.lost, r.profit, strict=True)), "not as harness"
         q = r.drop(columns="lost").quantile([0.5, 0.9]).T
-        print(f"{lab}: {len(r)} fresh starts (matches harness.account start by start), lost {r.lost.mean():.1%}")
+        what = f"{lab}{' MNQ + gold' if gold is not None else ''}"
+        print(f"{what}: {len(r)} fresh starts (matches harness.account start by start), lost {r.lost.mean():.1%}")
         print(f"  deepest fall from the high: median ${q.loc['dd', 0.5]:,.0f}, worst 10% ${q.loc['dd', 0.9]:,.0f}, "
               f"worst ${r.dd.max():,.0f}")
         print(f"  closest to the floor (cushion low): median ${r.cush_lo.median():,.0f}, worst 10% "
