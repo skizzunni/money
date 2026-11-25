@@ -1,0 +1,28 @@
+2015-19: 1247 days, 0 with missing bars (0 of them end early or start late: half days or a short session), 0 with a hole inside the session
+   trades on those days: 0 ($0), $nan a traded day against $45.5 on all
+2020-25: 1367 days, 4 with missing bars (0 of them end early or start late: half days or a short session), 4 with a hole inside the session
+   2020-03-09: 77 bars, gaps after 9:35-9:45
+   2020-03-12: 76 bars, gaps after 9:35-9:50
+   2020-03-16: 76 bars, gaps after 9:30-9:45
+   2020-03-18: 76 bars, gaps after 12:55-13:10
+   trades on those days: 3 ($433), $433.3 a traded day against $63.8 on all
+ES 2020-24: 458 days, 0 with missing bars (0 of them end early or start late: half days or a short session), 0 with a hole inside the session
+   trades on those days: 0 ($0), $nan a traded day against $4.8 on all
+live 2026: 104 days, 1 with missing bars (0 of them end early or start late: half days or a short session), 1 with a hole inside the session
+   2026-10-30: 77 bars, gaps after 14:50-15:00
+   trades on those days: 4 ($366), $366.0 a traded day against $190.6 on all
+
+The trades on those days (1 contract):
+  2020-03-12 (halt 09:35-09:50): the gap trade short at the 09:35 open, stopped -$67 (-33 points: the 30-point cap and
+  slippage); band shorts at the 12:00 check (target +$499) and 12:30 (+$2). 2020-03-09 / 16 / 18: no trades.
+  2026-10-30 (no 14:55 bar): the gap trade -$63, band shorts at 10:30 / 12:30 (-$40 / -$29) and 13:00 (target +$499),
+  all closed before the missing bar.
+
+Verdict (2026-11-25, docs section 159): the data is clean; nothing distorts the results.
+- 2015-19 and ES: no day with a missing bar. 2020-25: 4 days, every one a real exchange halt: the market-wide circuit
+  breakers of March 9, 12, 16 and 18 2020 (the S&P down 7%, trading stopped 15 minutes); the gaps sit exactly at the
+  halts (after the 09:35 bar to 09:45, after the 09:35 bar to 09:50, after the 09:30 bar to 09:45, 12:55-13:10). Live 2026: 2026-10-30 lacks the 14:55 bar.
+- The strategy keys its checks on the bars' times, not their count (section 158's first-run mistake was in the
+  analysis, not the strategy), so a missing bar skips at most that bar; no trade on these days was mis-timed.
+- The half days are not in these sets as short sessions (0 days end early): the half-day rule (13:10) is covered by
+  the NinjaTrader and Pine tests on templates, not by this history.

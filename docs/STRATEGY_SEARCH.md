@@ -1016,6 +1016,10 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    `verification/zoo/stage154_check_times.txt`). Every check from 10:00 to 14:00 pays in both periods; the strongest
    10:00 and 13:30 (up in 11 of 12 years), the weakest 14:00 (PF 1.29 / 1.18, 6 of 12), still positive (and section 99
    found dropping it costs). Nothing to change.
+159. **Missing bars in the data** (2026-11-25, a research round; `research/zoo/data_gaps.py`,
+   `verification/zoo/stage155_data_gaps.txt`). 2015-19 and ES: none. 2020-25: 4 days, each a real exchange halt (the
+   market-wide circuit breakers of March 9, 12, 16 and 18 2020, 15 minutes each); live 2026: 2026-10-30 lacks the
+   14:55 bar. The strategy keys on bar times, and no trade on those days was mis-timed. The data is clean.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
