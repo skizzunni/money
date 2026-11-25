@@ -1,0 +1,13 @@
+shipped: dev lost 0.0% median $14,028 p25 $5,324 | unseen_nq lost 0.0% median $18,980 p25 $15,811
+0.2 x range, 70-140: 2015-19 lost 0.0% median +1,306 p25 +562 | 2020-25 lost 0.0% median -64 p25 -332
+0.2 x range, 70-150: 2015-19 lost 0.0% median +1,289 p25 +562 | 2020-25 lost 0.0% median +865 p25 -341
+0.2 x range, 70-160: 2015-19 lost 0.0% median +1,289 p25 +562 | 2020-25 lost 0.0% median +1,511 p25 -341
+0.2 x range, 75-140: 2015-19 lost 0.0% median +1,445 p25 +534 | 2020-25 lost 0.0% median -64 p25 -394
+0.2 x range, 75-150: 2015-19 lost 0.0% median +1,445 p25 +534 | 2020-25 lost 0.0% median +865 p25 -403
+0.2 x range, 75-160: 2015-19 lost 0.0% median +1,445 p25 +534 | 2020-25 lost 0.0% median +1,511 p25 -403
+0.2 x range, 80-140: 2015-19 lost 0.0% median +1,388 p25 +470 | 2020-25 lost 0.0% median -67 p25 -118
+0.2 x range, 80-150: 2015-19 lost 0.0% median +1,388 p25 +470 | 2020-25 lost 0.0% median +860 p25 -118
+0.2 x range, 80-160: 2015-19 lost 0.0% median +1,388 p25 +470 | 2020-25 lost 0.0% median +1,466 p25 -118
+0.25 x range, 70-140: 2015-19 lost 0.0% median +1,222 p25 +40 | 2020-25 lost 0.0% median +317 p25 +324
+0.25 x range, 70-150: 2015-19 lost 0.0% median +1,162 p25 +40 | 2020-25 lost 0.0% median +851 p25 +65
+0.25 x range, 70-160: 2015-19 lost 0.0% median +1,102 p25 +40 | 2020-25 lost 0.0% median +1,099 p25 -57
