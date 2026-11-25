@@ -8,7 +8,7 @@ period, the same daily rules). MNQ alone. Run from research/: python zoo/near_fl
 strong breaks from 1.0-2.0 sigma; --levels, docs 129: the guard from $1,250-2,000, the tier from $750-1,250;
 --extras, docs 130: the extra contract's stretch and the news rule; --steps, docs 131: the size steps;
 --day-stop, docs 132: the regular day stop; --gold PATH, docs 133: shuffled years with gold as live;
---gold PATH --gold-size, docs 134: gold at 1 / 2 / 3 contracts always.)
+--gold PATH --gold-size, docs 134: gold at 1 / 2 / 3 contracts always; --gold PATH --gold-guarded, docs 135.)
 """
 import pickle
 import sys
@@ -27,7 +27,7 @@ STARTS = (50000.0, 48806.0, 48998.0)
 
 
 def shuffled(t, st, d, n_runs=2000, seed=1, share=0.25, guard=1500.0, below=1000.0, nw=None, steps=None,
-             day_stop=600.0, gold=None, gold_steps=None):
+             day_stop=600.0, gold=None, gold_steps=None, gold_guarded=""):
     """252 days drawn at random (with replacement), the shipped guard as bad_runs.runs; lost share and median.
     gold (docs 133, as MgcOvernightCarry trades live): {day: [$ a contract]}, first in the day, sized by the steps alone
     (no news rule), none while guarded; its P/L counts toward the floor, not toward MNQ's day stop."""
@@ -57,11 +57,14 @@ def shuffled(t, st, d, n_runs=2000, seed=1, share=0.25, guard=1500.0, below=1000
                 q = min(q, 1) if on else q
                 ds = max(100.0, min(day_stop, share * cush)) if on else day_stop
                 pl, dead, gp = 0.0, False, 0.0
-                if gold is not None and not on:
+                # gold_guarded (docs 135): "tier" 1 MGC while guarded but not under `below`; "all" 1 MGC while guarded
+                g_on = not on or gold_guarded == "all" or (gold_guarded == "tier" and cush >= below)
+                if gold is not None and g_on:
                     qg = 1
                     for lim, qq in (gold_steps or steps or B.STEPS):  # gold_steps: docs 134
                         if bal - 50000.0 >= lim:
                             qg = qq
+                    qg = 1 if on else qg
                     for u in gold.get(day, ()):
                         gp += u * qg
                         if bal + gp <= floor:
@@ -109,12 +112,16 @@ def main():
             gp_ = sys.argv[sys.argv.index("--gold") + 1]
             gdf = BR.gold_trades(gp_)
             gold_by = {k: g.usd.to_numpy() for k, g in gdf.groupby("d")}
-            runs_ = (("MNQ alone", None, None), ("MNQ + gold (as live)", gold_by, None))
-            if "--gold-size" in sys.argv:  # docs 134: gold's contracts, within the 3-contract cap
-                runs_ = (("gold on the steps (shipped)", gold_by, None), ("gold always 1", gold_by, ((0, 1),)),
-                         ("gold always 2", gold_by, ((0, 2),)), ("gold always 3", gold_by, ((0, 3),)))
-            for nm, gb, gs_ in runs_:
-                sh = shuffled(t, st, d, gold=gb, gold_steps=gs_)
+            runs_ = (("MNQ alone", None, None, ""), ("MNQ + gold (as live)", gold_by, None, ""))
+            if "--gold-guarded" in sys.argv:  # docs 135: gold at 1 MGC while guarded
+                runs_ = (("no gold while guarded (shipped)", gold_by, None, ""),
+                         ("1 MGC while guarded, not under $1,000", gold_by, None, "tier"),
+                         ("1 MGC while guarded, any cushion", gold_by, None, "all"))
+            elif "--gold-size" in sys.argv:  # docs 134: gold's contracts, within the 3-contract cap
+                runs_ = (("gold on the steps (shipped)", gold_by, None, ""), ("gold always 1", gold_by, ((0, 1),), ""),
+                         ("gold always 2", gold_by, ((0, 2),), ""), ("gold always 3", gold_by, ((0, 3),), ""))
+            for nm, gb, gs_, gg in runs_:
+                sh = shuffled(t, st, d, gold=gb, gold_steps=gs_, gold_guarded=gg)
                 print(f"{lab} {nm}: shuffled years " + " ".join(f"${k:,.0f} {v[0]:.1%} / ${v[1]:,.0f}"
                                                                for k, v in sh.items()), flush=True)
             continue

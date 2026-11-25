@@ -1,0 +1,15 @@
+2015-19 no gold while guarded (shipped): shuffled years $50,000 0.4% / $11,771 $48,806 4.6% / $7,826 $48,998 2.5% / $8,770
+2015-19 1 MGC while guarded, not under $1,000: shuffled years $50,000 0.5% / $11,796 $48,806 4.7% / $7,871 $48,998 2.6% / $8,793
+2015-19 1 MGC while guarded, any cushion: shuffled years $50,000 0.7% / $11,898 $48,806 5.1% / $8,181 $48,998 2.8% / $8,997
+2020-25 no gold while guarded (shipped): shuffled years $50,000 1.4% / $16,202 $48,806 6.3% / $12,267 $48,998 3.6% / $12,943
+2020-25 1 MGC while guarded, not under $1,000: shuffled years $50,000 1.3% / $16,195 $48,806 6.2% / $12,368 $48,998 3.7% / $13,062
+2020-25 1 MGC while guarded, any cushion: shuffled years $50,000 1.4% / $16,301 $48,806 6.8% / $12,711 $48,998 4.4% / $13,501
+
+Verdict (2026-11-25, docs section 135): rejected; no gold while guarded stays.
+- 1 MGC while guarded but not under $1,000: 2015-19 +0.1 points of risk in every cell (0.5% / 4.7% / 2.6% against
+  0.4% / 4.6% / 2.5%), 2020-25 mixed (1.3% / 6.2% / 3.7% against 1.4% / 6.3% / 3.6%); medians -$7 to +$123.
+- 1 MGC while guarded at any cushion: riskier in both periods (from $48,806 5.1% / 6.8% against 4.6% / 6.3%; from
+  $48,998 2.8% / 4.4% against 2.5% / 3.6%) for +$127 to +$558 of median.
+- Gold's losers are small, but they come 9 days in 10, and near the floor each one eats into a cushion the guard is
+  trying to rebuild; its rare winners do not come often enough to outweigh that there.
+- Gold modelled as live (no news rule; its P/L counts toward the floor, not MNQ's day stop); shuffled years as 133.

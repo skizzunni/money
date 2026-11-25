@@ -910,6 +910,11 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
 134. **Gold's size, by period** (2026-11-25, a research round; `near_floor_tiers.py --gold PATH --gold-size`,
    `verification/zoo/stage129_gold_size.txt`). Gold always 1 MGC: the same risk as the steps for less profit; always 2
    / 3: +$12-283 of median for up to 0.3 points more risk in most cells. Gold stays on the steps (1 / 2 / 3).
+135. **Gold while guarded** (2026-11-25, a research round; `near_floor_tiers.py --gold PATH --gold-guarded`,
+   `verification/zoo/stage130_gold_guarded.txt`). 1 MGC while guarded but not under $1,000: +0.1 points of risk on
+   every 2015-19 cell, mixed on 2020-25, about the same median. 1 MGC at any cushion: riskier on both (from $48,806
+   5.1% / 6.8% against 4.6% / 6.3%). Gold's frequent small losses hurt a cushion being rebuilt. No gold while guarded
+   stays.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
