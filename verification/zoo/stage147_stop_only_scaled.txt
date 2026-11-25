@@ -1,0 +1,19 @@
+shipped: 2015-19 lost 0.0% median $14,028 p25 $5,324 | 2020-25 lost 0.0% median $18,980 p25 $15,811 | TV $+10,063 50tr PF 4.66 dd $670
+stop only: 0.25 x 14-day range, 100-125 points: 2015-19 lost 0.0% median $15,174 p25 $5,049 | 2020-25 lost 0.0% median $18,630 p25 $15,870 | TV $+10,000 50tr PF 4.56 dd $670
+stop only: 0.25 x 14-day range, 100-150 points: 2015-19 lost 0.0% median $14,909 p25 $4,904 | 2020-25 lost 0.0% median $19,828 p25 $15,847 | TV $+10,000 50tr PF 4.56 dd $670
+stop only: 0.25 x 14-day range, 75-100 points: 2015-19 lost 0.0% median $14,039 p25 $5,307 | 2020-25 lost 0.0% median $18,980 p25 $15,883 | TV $+10,063 50tr PF 4.66 dd $670
+stop only: 0.25 x 14-day range, 75-150 points: 2015-19 lost 0.0% median $15,137 p25 $5,294 | 2020-25 lost 0.0% median $19,831 p25 $15,876 | TV $+10,000 50tr PF 4.56 dd $670
+stop only: 0.3 x 14-day range, 100-150 points: 2015-19 lost 0.0% median $14,724 p25 $4,900 | 2020-25 lost 0.0% median $20,218 p25 $16,080 | TV $+10,000 50tr PF 4.56 dd $670
+stop only: 0.2 x 14-day range, 75-100 points: 2015-19 lost 0.0% median $15,144 p25 $5,938 | 2020-25 lost 0.0% median $19,038 p25 $15,688 | TV $+10,063 50tr PF 4.66 dd $670
+
+Notes (2026-11-25, docs section 152): a candidate, not shipped yet.
+- noise hard_stop_only (default off): the hard stop at hard_vol x the 14-day average range within hard_lo-hard_hi
+  points, while break-even (0.4), the target (2.5) and the second stop step (1.5 / 0.5) stay on the $200 unit. Section
+  151 found the coupling (a tighter stop also shrank break-even and the target); 150's wider stop scaled them up too.
+- Decoupled, no version loses a start in either period (150's coupled wider stops lost 7.3% of 2020-25).
+- The best: 0.25x within 75-150 points: medians +$1,109 / +$851, 25th percentiles -$30 / +$65, the window -$63. Its
+  neighbours are mixed (100-150: 2015-19 p25 -$420; 100-125: 2020-25 median -$350; 0.3x 100-150: 2015-19 p25 -$424;
+  0.2x 75-100: 2020-25 p25 -$123).
+- Still to do before any change: a grid around it (0.2 / 0.25 / 0.3 x 70-80 / 140-160), the by-year table at 1
+  contract, shuffled years with the guard by period, and the walk-forward; then NinjaTrader / Pine with parity tests.
+- Hindsight: none (the 14 sessions before today).

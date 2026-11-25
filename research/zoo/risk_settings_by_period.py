@@ -2,7 +2,8 @@
 
 Sections 63-65 checked them with 61 in on the pooled 104 starts (the per-set trade PF only by period). Here each
 period's fresh 50K starts on their own (the shipped account rules) and the TradingView window, one step each way.
---widen (docs 150): the hard stop only widened on wild days; --tighten (docs 151): only tightened on calm days.
+--widen (docs 150): the hard stop only widened on wild days; --tighten (docs 151): only tightened on calm days;
+--stop-only (docs 152): the stop scaled, break-even / target / stop step kept on $200.
 Run from research/: python zoo/risk_settings_by_period.py
 """
 import pickle
@@ -43,6 +44,12 @@ def main():
             (f"hard stop min(100, {hv} x 14-day range) from {lo:.0f} points",
              {"hard_vol": hv, "hard_lo": lo, "hard_hi": 100.0})
             for hv in (0.2, 0.25) for lo in (75.0, 85.0))
+    if "--stop-only" in sys.argv:  # docs 152: the hard stop scaled, break-even / target / stop step fixed on $200
+        combos = ((0.25, 100.0, 125.0), (0.25, 100.0, 150.0), (0.25, 75.0, 100.0), (0.25, 75.0, 150.0),
+                  (0.3, 100.0, 150.0), (0.2, 75.0, 100.0))
+        rows = (("shipped", {}),) + tuple(
+            (f"stop only: {hv} x 14-day range, {lo:.0f}-{hi:.0f} points",
+             {"hard_vol": hv, "hard_lo": lo, "hard_hi": hi, "hard_stop_only": True}) for hv, lo, hi in combos)
     for lab, band in rows:
         tv = B.line("", B.run(band=band)).split("|")[1].strip()
         print(f"{lab}: 2015-19 {score(sets, 'dev', band)} | 2020-25 {score(sets, 'unseen_nq', band)} | {tv}",
