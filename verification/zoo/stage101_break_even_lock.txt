@@ -1,0 +1,10 @@
+Stage 101 (2026-11-25, a research round): the break-even stop's lock (entry + 2 points) again, with sections 61 and 87
+in (sections 23 / 32 tested 1-8 points before them). Fresh 50K starts by period, the TradingView window:
+
++2 (shipped): 2015-19 lost 0.0% med $14,028 p25 $5,324 | 2020-25 lost 0.0% med $18,980 p25 $15,811 | TV $+10,063 50tr PF 4.66
++1:           2015-19 lost 0.0% med $13,874 p25 $5,354 | 2020-25 lost 0.0% med $18,822 p25 $15,671 | TV $+10,029 50tr PF 4.64
++4:           2015-19 lost 0.0% med $14,205 p25 $5,848 | 2020-25 lost 0.0% med $16,923 p25 $14,335 | TV $+10,131 50tr PF 4.69
++6:           2015-19 lost 0.0% med $13,910 p25 $5,889 | 2020-25 lost 0.0% med $17,236 p25 $14,822 | TV $+8,732 50tr PF 4.18
+
+Verdict: +2 stays. +1 is a little lower on most numbers; +4 helps 2015-19 but costs 2020-25 $2,057 of median and
+$1,476 of 25th percentile; +6 is lower on 2020-25 and the window.

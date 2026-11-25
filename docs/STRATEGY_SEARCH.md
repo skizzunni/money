@@ -752,6 +752,10 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
 101. **The band width again, with 61 and 87 in** (2026-11-25, a research round; `verification/zoo/stage100_band_width.txt`).
    0.95 / 1.05 sigma: lower on every number in both periods and the window. 1.0 stays.
 
+102. **The break-even lock again, with 61 and 87 in** (2026-11-25, a research round;
+   `verification/zoo/stage101_break_even_lock.txt`). +1 / +4 / +6 points: +4 helps 2015-19 but costs 2020-25 $2,057 of
+   median; the others lower. +2 points stays.
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |
