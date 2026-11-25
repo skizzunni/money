@@ -1020,6 +1020,11 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    `verification/zoo/stage155_data_gaps.txt`). 2015-19 and ES: none. 2020-25: 4 days, each a real exchange halt (the
    market-wide circuit breakers of March 9, 12, 16 and 18 2020, 15 minutes each); live 2026: 2026-10-30 lacks the
    14:55 bar. The strategy keys on bar times, and no trade on those days was mis-timed. The data is clean.
+160. **Halts and missing bars live** (2026-11-25, a research round; `verification/zoo/stage156_live_halts.txt`, by
+   reading MnqCleanBand.cs). Resting stops fill at the reopen (possible slippage); the 09:55 and 15:55 exits are "at or
+   after", so a missing bar only delays them; a missing check bar skips that check, and because each check's sigma
+   needs all 14 prior sessions, it stays off for 14 sessions (the research model does the same). Advice: reload the
+   chart's history after a day with a feed drop or a halt (step 11). A code fix (10 of 14 sessions) noted, not made.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
@@ -1151,6 +1156,9 @@ NinjaTrader 8, on each funded account (both the same way):
    - Gold chart: "waiting for history" until Monday's 08:30 check is normal; it must then say OK (or NOT READY: raise
      Days to load to 30+).
    - Monday 09:35 / 10:00: the Output window shows the settings line and, if a trade fires, its order and stop.
+   - After a day the data feed dropped or the market halted during the session (section 160): after the close,
+     right-click the MNQ chart > Reload All Historical Data, so the missing 5-minute bars are refilled; a missing bar
+     at a check time otherwise turns that check off for the next 14 sessions without a message.
 
 12. **What a normal bad run looks like (sections 121-123).** In the history (fresh 50K accounts, 12 months each,
    2015-19 / 2020-25, MNQ alone and with gold, with and without the cushion guard, which changes these little):

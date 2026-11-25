@@ -1,0 +1,25 @@
+Stage 156 (2026-11-25, docs section 160): what MnqCleanBand does live through a halt or a missing bar (by reading the
+code, ninjatrader/Strategies/MnqCleanBand.cs; the research model strats.noise matches it).
+
+1. Orders: the stop and the target rest at the broker (SetStopLoss / SetProfitTarget). During a halt nothing fills;
+   on the reopen a stop fills at the market, possibly past its price (gap slippage). Nothing in the code can avoid
+   that; the $200 hard stop is the order's price, not a guaranteed loss.
+2. Time exits use "at or after": the gap trade's 09:55 exit (mm >= 590), the 15:55 / half-day exit (end >= flatAt).
+   A missing bar only delays them to the first bar after it.
+3. Checks are exact times (Array.IndexOf(Checks, end)): a missing check bar skips that check that day (no entry, no
+   stop move to the band, no "back inside" exit there); the next check acts normally.
+4. The silent one: sigma for each check time needs that time's move from all 14 prior sessions
+   (hist[j].Moves.TryGetValue; all or NaN). A day missing a check bar leaves that check's sigma NaN for the next 14
+   sessions: the check is off for about 3 weeks. strats.noise does the same (np.mean with a NaN), so the parity holds,
+   but a live data drop over a check time costs that check for 14 sessions without any message.
+   In the history (section 159): the 2020 circuit-breaker gaps fall between checks (none lost); 2026-10-30's missing
+   bar is the 15:00 check (it only moves the stop; entries end at 14:00).
+5. The history guard (BlockOnDataGap) counts missing weekdays, not bars: it does not see a missing bar.
+
+Advice now (no code change): on any day the feed dropped or the market halted during the session, after the close
+right-click the MNQ chart > Reload All Historical Data, so NinjaTrader refills the missing bars from its server
+before the next session. Added to "Running it" step 11.
+
+A possible code fix (not made): sigma as the mean over the sessions that have the move (at least 10 of 14), in C#,
+Pine and strats with parity tests. It changes nothing in the history except the days after 2026-10-30 (the 15:00
+check). To weigh in a later round.
