@@ -1,0 +1,9 @@
+Stage 104 (2026-11-25, a research round): the take profit (2.5R) at the half-steps 2.25R / 2.75R, with sections 61 and
+87 in (section 62 tested 2.0 / 3.0 with 61 only). Fresh 50K starts by period, the TradingView window:
+
+2.5R (shipped): 2015-19 lost 0.0% med $14,028 p25 $5,324 | 2020-25 lost 0.0% med $18,980 p25 $15,811 | TV $+10,063 50tr PF 4.66
+2.25R:          2015-19 lost 0.0% med $12,983 p25 $5,042 | 2020-25 lost 0.0% med $18,161 p25 $15,342 | TV $+9,068 51tr PF 4.30
+2.75R:          2015-19 lost 0.0% med $15,078 p25 $6,548 | 2020-25 lost 0.0% med $17,852 p25 $14,771 | TV $+9,388 48tr PF 4.42
+
+Verdict: 2.5R stays. 2.25R is lower everywhere; 2.75R helps 2015-19 but costs 2020-25 (median -$1,128, 25th
+percentile -$1,040) and the window (-$675).

@@ -763,6 +763,10 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    2-2.5x / 2.5-3.5x / 2-3.5x: every one lowers both periods' medians (2.5-3.5x lifts the window +$2,488, a gain the
    history does not hold). 2-3x stays.
 
+105. **The target's half-steps, with 61 and 87 in** (2026-11-25, a research round;
+   `verification/zoo/stage104_target_half_steps.txt`). 2.25R: lower everywhere; 2.75R: 2015-19 up, 2020-25 and the
+   window down. 2.5R stays.
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |
