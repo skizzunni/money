@@ -1,0 +1,31 @@
+2015-19: band long 472 PF 1.53 $7,340 | band short 401 PF 1.55 $10,055 | gap long 164 PF 1.98 $4,836 | gap short 108 PF 2.06 $3,686
+2020-25: band long 591 PF 1.77 $16,135 | band short 500 PF 1.54 $15,290 | gap long 194 PF 1.57 $4,390 | gap short 112 PF 1.92 $4,285
+ES 2020-24: band long 209 PF 1.38 $1,150 | band short 96 PF 1.14 $340 | gap long 51 PF 0.47 $-506 | gap short 38 PF 1.07 $44
+live 2026: band long 20 PF 3.97 $1,242 | band short 33 PF 5.48 $4,313 | gap long 8 PF 2.53 $534 | gap short 10 PF 0.60 $-180
+
+the band by year, 1 contract:
+      short $  long $
+d                    
+2015      329    1737
+2016     1882    1510
+2017      299     552
+2018     5043    2209
+2019     2502    1332
+2020     1793    1574
+2021     3750    4757
+2022     6106    1409
+2023     -473    5871
+2024     3347    2566
+2025      767     -43
+2026     4313    1242
+longs up in 11 of 12 years, shorts in 11
+
+Verdict (2026-11-25, docs section 155): nothing to use; both sides pay.
+- The band's longs and shorts have about the same PF in both periods (1.53 / 1.55 on 2015-19, 1.77 / 1.54 on 2020-25),
+  and each side is up in 11 of 12 years (shorts down only in 2023, -$473; longs only in 2025 H1, -$43). The trend
+  filter puts the band on the year's side: 2022 (the -33% year) was the shorts' (+$6,106 against +$1,409), 2023 the
+  longs' (+$5,871 against -$473).
+- The gap trade pays on both sides on NQ (PF 1.57-2.06). ES is weaker on both (as known); live 2026 gap shorts -$180
+  on 10 trades.
+- So 2022's gain for the wider stop (153) came on the year's short side in a fast market, not from a side the band
+  trades badly. No long-only / short-only or side-sized rule.

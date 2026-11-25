@@ -1000,6 +1000,10 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
 154. **The scaled stop with the guard** (2026-11-25, a research round; `near_floor_tiers.py --stopcell`,
    `verification/zoo/stage150_stopcell_guarded.txt`). Shuffled years by period: higher medians but more risk (2015-19
    fresh 0.4% -> 0.7%, from $48,806 4.7% -> 5.3%; 2020-25 fresh 1.5% -> 1.8%). With 153's years: closed, $200 stays.
+155. **Long against short** (2026-11-25, a research round; `research/zoo/long_short.py`,
+   `verification/zoo/stage151_long_short.txt`). The band's longs and shorts: PF 1.53 / 1.55 (2015-19), 1.77 / 1.54
+   (2020-25), each up in 11 of 12 years; the trend filter puts it on the year's side (2022 the shorts' +$6,106, 2023 the
+   longs' +$5,871). The gap trade pays both ways on NQ. Nothing to use.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
