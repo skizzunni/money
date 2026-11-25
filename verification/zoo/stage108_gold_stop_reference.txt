@@ -1,0 +1,19 @@
+shipped (stop 60%, from the 13:25 close): 2009-17 19/yr $+361/yr PF 2.02 worst $-141 years up 56% | 2018-25 20/yr $+286/yr PF 1.84 worst $-91 years up 75%
+stop 0%: 2009-17 19/yr $+246/yr PF 1.36 worst $-347 years up 67% | 2018-25 20/yr $+322/yr PF 1.52 worst $-221 years up 62%
+stop 40%: 2009-17 19/yr $+320/yr PF 1.68 worst $-209 years up 56% | 2018-25 20/yr $+312/yr PF 1.69 worst $-134 years up 75%
+stop 50%: 2009-17 19/yr $+290/yr PF 1.68 worst $-175 years up 56% | 2018-25 20/yr $+322/yr PF 1.81 worst $-113 years up 75%
+stop 70%: 2009-17 19/yr $+215/yr PF 1.71 worst $-106 years up 56% | 2018-25 20/yr $+333/yr PF 2.17 worst $-69 years up 75%
+stop 75%: 2009-17 19/yr $+252/yr PF 1.95 worst $-89 years up 56% | 2018-25 20/yr $+368/yr PF 2.48 worst $-58 years up 75%
+stop 80%: 2009-17 19/yr $+236/yr PF 1.99 worst $-91 years up 56% | 2018-25 20/yr $+345/yr PF 2.57 worst $-47 years up 62%
+from the 13:15 close: 2009-17 20/yr $+233/yr PF 1.64 worst $-141 years up 56% | 2018-25 20/yr $+288/yr PF 1.85 worst $-89 years up 75%
+from the 13:20 close: 2009-17 20/yr $+342/yr PF 1.92 worst $-141 years up 44% | 2018-25 21/yr $+256/yr PF 1.69 worst $-91 years up 75%
+from the 13:30 close: 2009-17 20/yr $+374/yr PF 1.99 worst $-141 years up 56% | 2018-25 21/yr $+351/yr PF 2.02 worst $-91 years up 75%
+from the 13:40 close: 2009-17 19/yr $+248/yr PF 1.69 worst $-141 years up 44% | 2018-25 21/yr $+326/yr PF 1.91 worst $-91 years up 75%
+
+Verdict (2026-11-25, docs section 109): no change.
+- The stop: 60% is the best on 2009-17 ($361 a year a contract); 70-80% are better on 2018-25 ($333-368 against
+  $286, PF 2.17-2.57) but lower on 2009-17 ($215-252). 40-50% are lower on 2009-17 too. Mixed by period: 60% stays.
+- The move's reference bar: the 13:30 bar's close (just after the settle) is +$13 / +$65 a year a contract on the two
+  periods, but its neighbours on both sides (13:20, 13:40) are lower on 2009-17 (13:15 lower on both): a lone spike,
+  worth well under the ~$200 a year a contract a change needs. 13:25 stays (`SettleAt` 810).
+- Hindsight: these settings were picked on these years (section 39 with the 13:30 exit); here with the 14:15 exit.

@@ -782,6 +782,11 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    other); 1.65-2.0x lower on at least one. Confirmed over 10 / 20 minutes: lower on both. Out 13:45-14:45: 14:15 best
    on 2009-17, 14:00 +$21 on 2018-25. The settings were chosen on these years, so this checks they hold in each half:
    they do. No change.
+109. **Gold's stop and its move's reference by period** (2026-11-25, a research round; `gold_recheck.py --stop`,
+   `verification/zoo/stage108_gold_stop_reference.txt`). With the 14:15 exit, $ a year a contract, 2009-17 / 2018 -
+   Mar 2025: the 60% stop $361 / $286; 70-80% $215-252 / $333-368; 40-50% $290-320 / $312-322: mixed, 60% stays. The
+   move from the 13:30 bar's close: $374 / $351, but 13:20 and 13:40 are lower on 2009-17: a spike, under the bar for a
+   change. No change.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
