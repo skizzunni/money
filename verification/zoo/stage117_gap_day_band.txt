@@ -1,0 +1,16 @@
+2015-19: 10:00, gap day 65 tr $45.1 PF 2.34 | 10:00, no gap trade 114 tr $16.1 PF 1.36 | later, gap day 182 tr $9.4 PF 1.27 | later, no gap trade 512 tr $21.3 PF 1.59
+   shipped: lost 0.0% median $14,028 p25 $5,324
+   later band trades on gap days dropped: lost 0.0% median $12,809 p25 $5,459
+2020-25: 10:00, gap day 83 tr $67.8 PF 3.00 | 10:00, no gap trade 125 tr $15.5 PF 1.33 | later, gap day 266 tr $20.5 PF 1.45 | later, no gap trade 617 tr $29.8 PF 1.64
+   shipped: lost 0.0% median $18,980 p25 $15,811
+   later band trades on gap days dropped: lost 0.0% median $14,879 p25 $10,333
+ES 2020-24: 10:00, gap day 21 tr $18.4 PF 1.89 | 10:00, no gap trade 42 tr $-2.3 PF 0.86 | later, gap day 54 tr $-2.7 PF 0.86 | later, no gap trade 188 tr $7.1 PF 1.41
+live 2026: 10:00, gap day 4 tr $225.1 PF 10.12 | 10:00, no gap trade 7 tr $110.8 PF 4.44 | later, gap day 13 tr $241.6 PF 18.26 | later, no gap trade 29 tr $25.4 PF 1.84
+
+Verdict (2026-11-25, docs section 118): nothing used.
+- Waiting until 10:30 on gap days would drop the band's best trades: the 10:00 entries on gap days are PF 2.34 / 3.00
+  (2015-19 / 2020-25), ES 1.89, against 1.36 / 1.33 / 0.86 without a gap trade.
+- The later entries on gap days are weaker in all three history sets (PF 1.27 / 1.45 / ES 0.86 against 1.59 / 1.64 /
+  1.41) but still pay on NQ, and live 2026 they were the best group (13 trades, PF 18.3). Dropping them: medians
+  -$1,219 / -$4,101, 25th percentile +$135 / -$5,478. Rejected.
+- Hindsight: none (whether the gap trade traded is known at 09:35).

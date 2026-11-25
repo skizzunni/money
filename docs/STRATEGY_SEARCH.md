@@ -828,6 +828,11 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    small winner under the break-even distance, under it at all, or every trade. 15:00 small winners: 2015-19 +$158,
    2020-25 +$14 (p25 -$145), the window -$129; 15:30 every trade: 2020-25 +$924 but 2015-19 -$1,432; the rest lower on
    both. Rejected; 15:55 stays.
+118. **The band on gap-trade days** (2026-11-25, a research round; `research/zoo/gap_day_band.py`,
+   `verification/zoo/stage117_gap_day_band.txt`). The 10:00 entries on days the gap trade traded are the band's best
+   (PF 2.34 / 3.00, ES 1.89), so no later first check. The later entries on those days are weaker in all three history
+   sets (1.27 / 1.45 / ES 0.86 against 1.59 / 1.64 / 1.41) but pay on NQ and were live 2026's best (PF 18.3, 13 trades);
+   dropping them: medians -$1,219 / -$4,101. Nothing used.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
