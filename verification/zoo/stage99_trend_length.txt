@@ -1,0 +1,9 @@
+Stage 99 (2026-11-25, a research round): the trend filter's length (20 sessions) again, with sections 61 and 87 in.
+Fresh 50K starts by period, the TradingView window:
+
+20 (shipped): 2015-19 lost 0.0% med $14,028 p25 $5,324 | 2020-25 lost 0.0% med $18,980 p25 $15,811 | TV $+10,063 50tr PF 4.66
+15:           2015-19 lost 0.0% med $12,698 p25 $7,501 | 2020-25 lost 0.0% med $17,828 p25 $15,004 | TV $+9,811 57tr PF 4.34
+25:           2015-19 lost 0.0% med $12,239 p25 $4,054 | 2020-25 lost 0.0% med $18,389 p25 $11,382 | TV $+10,186 49tr PF 4.88
+
+Verdict: 20 stays. 15 lifts 2015-19's 25th percentile (+$2,177) but lowers both medians, 2020-25's 25th percentile and
+the window; 25 costs 2020-25's 25th percentile $4,429.

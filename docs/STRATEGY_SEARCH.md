@@ -746,6 +746,9 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    `verification/zoo/stage98_last_entry.txt`). 13:30: lower everywhere; 14:30: 2020-25 median +$117 but its 25th
    percentile -$1,451 and 2015-19's median -$1,171. 14:00 stays.
 
+100. **The trend length again, with 61 and 87 in** (2026-11-25, a research round; `verification/zoo/stage99_trend_length.txt`).
+   15 sessions: both medians and the window lower; 25: 2020-25 25th percentile -$4,429. 20 stays.
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |
