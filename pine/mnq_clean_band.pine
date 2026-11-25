@@ -1,6 +1,6 @@
 //@version=6
 // MNQ Clean Noise-Band: the user's "Clean Noise-Band Momentum (Prop Version)" spec with the changes that keep a 50K
-// account with the $2,000 trailing floor (docs/STRATEGY_SEARCH.md, sections 1-33). The same rules as
+// account with the $2,000 trailing floor (docs/STRATEGY_SEARCH.md, sections 1-97). The same rules as
 // ninjatrader/Strategies/MnqCleanBand.cs; research/zoo/strats.py is the reference both are tested against.
 // 5-minute MNQ chart with extended hours (the news rule reads the 08:30 bar). Every half hour from 10:00 to 14:00:
 //   * noise area: sigma = the mean over the last 14 complete sessions of |close at that time / the 09:30 open - 1|;

@@ -1,0 +1,9 @@
+Stage 96 (2026-11-25): pine/mnq_clean_band.pine's inputs against MnqCleanBand.cs's defaults, one for one.
+
+All 37 Pine inputs match their NinjaTrader defaults (trend 20, hard stop 200, break-even 0.4 / +2, second stop step 1.5
+/ 0.5, target 2.5, last entry 840, 9 trades, VWAP stop on, VWAP entry off, move cap 1.1, range 0.65, day stop 600,
+cushion guard 1500 / 0.25 / 2000 / 0 / 1000 / 1.5, 3 contracts, fixed 0, add 1.5, steps 2000 / 3500, gap on / from 0 /
+0.6x / 30 points / 3% body / 1.75x wild open, history guard on, news on 6x / 2-3x). NinjaTrader-only settings (start
+balance: the Pine script's initial_capital 50000; live sizing; Place orders; the Early settings, 0 = off) have no Pine
+input. One comment fix: both headers cited "sections 1-33"; now 1-97 (no rule changed; parity tests rerun: NinjaTrader 5
+passed, Pine 4 passed).

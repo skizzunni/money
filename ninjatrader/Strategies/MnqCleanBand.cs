@@ -1,5 +1,5 @@
 // MNQ Clean Noise-Band: the user's "Clean Noise-Band Momentum (Prop Version)" spec with the changes research/zoo found
-// it needs to keep a 50K account with the $2,000 trailing floor (docs/STRATEGY_SEARCH.md, sections 1-33).
+// it needs to keep a 50K account with the $2,000 trailing floor (docs/STRATEGY_SEARCH.md, sections 1-97).
 //
 // 5-minute MNQ chart (ETH, so the news rule can read the 08:30 bar). Every half hour from 10:00 to LastEntry (14:00):
 //   * the noise area: sigma = the mean over the last 14 complete sessions of |close at that time / the 09:30 open - 1|;
