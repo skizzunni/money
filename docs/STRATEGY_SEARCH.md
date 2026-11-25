@@ -712,6 +712,11 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    2015-19 alone (median, or median + 25th percentile), the minimum gap is 0.6x, the shipped value, and it beats 0.5x on
    2020-25 ($18,980 / $15,811 against $18,453 / $15,085). Section 87 holds out of sample.
 
+92. **The first half of 2025** (2026-11-24, a research round; `verification/zoo/stage86_2025_h1.txt`). +$682 at 1 MNQ
+   (an average half-year: $3,940): March -$808 and June -$544 on wider, choppier days; every setup weaker, none failed
+   alone; the strong-break contracts 9 of 9 won. No rule known in advance avoids it (the weekly loss limit, 44, was
+   rejected). Nothing to change: a weak half-year is part of the history's PF of about 1.6.
+
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |

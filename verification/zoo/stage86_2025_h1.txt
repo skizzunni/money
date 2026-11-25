@@ -1,0 +1,14 @@
+Stage 86 (2026-11-24, a research round): the first half of 2025 (the weakest stretch in the unseen NQ data, +$682 at 1
+MNQ against $3,940 for an average 2020-24 half-year), shipped rules, $0.62 a side.
+
+2020-24: 255 trades a year, PF 1.70, $7,880 a year. 2025 H1: 123 trades, PF 1.12, +$682.
+By month: Jan 24 tr, 46% won, PF 1.71, +$854 | Feb 14, 64%, 2.80, +$418 | Mar 35, 37%, 0.68, -$808 |
+          Apr 21, 52%, 1.33, +$262 | May 8, 50%, 4.20, +$500 | Jun 21, 24%, 0.16, -$544
+By setup (H1 against 2020-24): band long 44 tr PF 0.96 -$43 (1.81) | band short 57 tr PF 1.23 +$767 (1.58) |
+          gap 22 tr PF 0.96 -$42 (1.77) | the strong-break extra contract 9 tr, all won, +$1,627 (2.50)
+The average day's range 1.89% of the open against 1.74% in 2020-24; trades on 48 of 119 sessions.
+
+Verdict: nothing to change. March (-$808) and June (-$544) made the half; every setup was weaker, none failed alone, and
+the strong-break contracts all won. Wider, choppier days. A rule known in advance that would have avoided it is a
+loss limit over a week or a month, and section 44 tested the weekly one (rejected); anything else would be picking
+March and June after the fact. A weak half-year like this is what the history's PF of about 1.6 includes.
