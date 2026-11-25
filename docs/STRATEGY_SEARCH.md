@@ -863,6 +863,11 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    Fresh 50K, the guard on, trading days to the first close at +$2,000 / +$3,500: 2015-19 median 93 / 150 (20% never
    reach +$3,500 in 12 months), 2020-25 48 / 82 (all reach both). With gold: 79 / 141 (4% never reach +$2,000, 16%
    never +$3,500) and 41 / 77. Without the guard: 70 / 107 and 42 / 75. A live expectation, now in step 12.
+125. **Accounts starting near the floor** (2026-11-25, a research round; `bad_runs.py --guard --start`,
+   `verification/zoo/stage120_bad_runs.txt`). From $48,806 / $48,998 against a $48,000 floor, the guard on, 2015-19 /
+   2020-25: lost 0.0% / 1.8% and 0.0% / 0.0% (as section 50's calendar check); the guard off again after a median 50 /
+   31 and 38 / 21 trading days; +$2,000 after 164 / 105 and 150 / 85 (2015-19: 22% / 18% never in 12 months); the
+   closest calls $36-113 above the floor. Now in step 12.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
@@ -986,6 +991,11 @@ NinjaTrader 8, on each funded account (both the same way):
      trailing at $50,000) after a median 48-93 trading days (2020-25 / 2015-19; 75% of starts within 86-145, the
      slowest 160-231); +$3,500 (3 contracts) after a median 82-150, and in 2015-19 20% of fresh years never got there
      in 12 months (16% with gold; with gold 4% of 2015-19 years also never reached +$2,000).
+   - an account starting $800-1,000 above its floor (the user's two in November 2026; section 125), the guard on: the
+     guard stays on for a median 21-50 trading days (2020-25 / 2015-19; the slowest 109-192, and 2% of 2020-25 starts
+     from $800 above never got the cushion back to $1,500 in 12 months); +$2,000 after a median 85-164 trading days
+     (18-22% of 2015-19 starts never got there in 12 months); in the history 1 of 55 starts from $800 above was lost
+     (2020-25), none from $1,000 above, and the closest calls came within $36-113 of the floor and recovered.
    None of those lost an account in the history. A run like this is not a fault; a run well past these is a reason to
    stop and check the setup (step 11) and the trades against TradingView.
 

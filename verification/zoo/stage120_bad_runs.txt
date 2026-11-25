@@ -92,3 +92,45 @@ Sessions to the size steps (docs section 124; the same runs, guard on, MNQ alone
   sessions to +$3,500 (3 contracts): median 75, 75% of starts within 102, slowest 187; not in 12 months 0%
 (The last two blocks: no guard, MNQ alone.) A "session" is a trading day; about 21 a month. Not reached in the 12
 months counts as slowest. The floor stops trailing at $50,000 on the same close that reaches +$2,000.
+
+Accounts starting near the floor, the guard on (python zoo/bad_runs.py --guard --start 48806 / 48998; docs section 125):
+2015-19 with the cushion guard from $48,806 (floor $48,000): 49 starts (the plain fresh run matches harness.account start by start with the guard off), lost 0.0%
+  deepest fall from the high: median $1,225, worst 10% $2,775, worst $3,250
+  closest to the floor (cushion low): median $738, worst 10% $379, worst $46
+  longest run of losing trading days: median 6, worst 10% 6, worst 8
+  most trading days without a new high: median 25, worst 10% 32, worst 53
+  worst day: median $-722, worst $-913; worst 5 trading days: median $-989, worst $-2,567
+  sessions to a $1,500 cushion (the guard off): median 50, 75% of starts within 85, slowest 192; not in 12 months 0%
+  sessions to +$2,000 (2 contracts): median 164, 75% of starts within 246, slowest not reached; not in 12 months 22%
+  sessions to +$3,500 (3 contracts): median 224, 75% of starts within not reached, slowest not reached; not in 12 months 43%
+2020-25 with the cushion guard from $48,806 (floor $48,000): 55 starts (the plain fresh run matches harness.account start by start with the guard off), lost 1.8%
+  deepest fall from the high: median $2,411, worst 10% $3,329, worst $4,808
+  closest to the floor (cushion low): median $621, worst 10% $379, worst $46
+  longest run of losing trading days: median 7, worst 10% 9, worst 10
+  most trading days without a new high: median 19, worst 10% 30, worst 33
+  worst day: median $-805, worst $-1,107; worst 5 trading days: median $-1,602, worst $-3,179
+  sessions to a $1,500 cushion (the guard off): median 31, 75% of starts within 66, slowest not reached; not in 12 months 2%
+  sessions to +$2,000 (2 contracts): median 105, 75% of starts within 149, slowest not reached; not in 12 months 4%
+  sessions to +$3,500 (3 contracts): median 146, 75% of starts within 173, slowest not reached; not in 12 months 15%
+2015-19 with the cushion guard from $48,998 (floor $48,000): 49 starts (the plain fresh run matches harness.account start by start with the guard off), lost 0.0%
+  deepest fall from the high: median $1,387, worst 10% $2,775, worst $3,250
+  closest to the floor (cushion low): median $831, worst 10% $554, worst $36
+  longest run of losing trading days: median 6, worst 10% 6, worst 8
+  most trading days without a new high: median 26, worst 10% 32, worst 53
+  worst day: median $-736, worst $-1,085; worst 5 trading days: median $-1,178, worst $-2,597
+  sessions to a $1,500 cushion (the guard off): median 38, 75% of starts within 50, slowest 109; not in 12 months 0%
+  sessions to +$2,000 (2 contracts): median 150, 75% of starts within 220, slowest not reached; not in 12 months 18%
+  sessions to +$3,500 (3 contracts): median 203, 75% of starts within not reached, slowest not reached; not in 12 months 35%
+2020-25 with the cushion guard from $48,998 (floor $48,000): 55 starts (the plain fresh run matches harness.account start by start with the guard off), lost 0.0%
+  deepest fall from the high: median $2,443, worst 10% $3,329, worst $4,790
+  closest to the floor (cushion low): median $796, worst 10% $591, worst $113
+  longest run of losing trading days: median 7, worst 10% 9, worst 10
+  most trading days without a new high: median 19, worst 10% 30, worst 37
+  worst day: median $-805, worst $-1,107; worst 5 trading days: median $-1,737, worst $-3,179
+  sessions to a $1,500 cushion (the guard off): median 21, 75% of starts within 39, slowest 152; not in 12 months 0%
+  sessions to +$2,000 (2 contracts): median 85, 75% of starts within 129, slowest 222; not in 12 months 0%
+  sessions to +$3,500 (3 contracts): median 130, 75% of starts within 170, slowest not reached; not in 12 months 2%
+Notes: the floor $48,000 (a $50,000 high), the size steps from the $50,000 opening balance; the fall from the high is
+from the account's own best close since the start (fresh starts unchanged). The lost share matches section 50's
+calendar check (from $48,806 1.8%, from $48,998 0.0%). The closest calls: $46 / $36 / $113 above the floor (and
+survived). "Sessions to a $1,500 cushion": until the guard is off again.
