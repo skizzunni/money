@@ -991,6 +991,12 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    75-150 points, break-even / the target / the stop step kept on $200: no version loses a start in either period. The
    best, 0.25x within 75-150: medians +$1,109 / +$851, 25th percentiles -$30 / +$65, the window -$63; its neighbours
    mixed. A candidate: a grid around it, the years, shuffled years with the guard and the walk-forward come next.
+153. **The scaled stop's grid and years** (2026-11-25, a research round; `research/zoo/stop_only_grid.py`,
+   `verification/zoo/stage148_stop_only_grid.txt`, `stage148_stop_only_years.txt`, `stage149_stop_only_best_years.txt`).
+   27 cells (0.2-0.3x, 70-80 / 140-160 points): none loses a start, 2015-19's median up in all, 2020-25's in 24; 0.3x
+   within 70-150 raises all four numbers (medians +$747 / +$1,238). But by year it is up in only 5 of 12 (2022 alone
+   +$1,795 of +$2,616; about +$75 a year otherwise), the window -$63. A one-year gain needing new order code: not
+   shipped; the flat $200 stays, `hard_stop_only` documented (default off).
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 

@@ -11,3 +11,31 @@ shipped: dev lost 0.0% median $14,028 p25 $5,324 | unseen_nq lost 0.0% median $1
 0.25 x range, 70-140: 2015-19 lost 0.0% median +1,222 p25 +40 | 2020-25 lost 0.0% median +317 p25 +324
 0.25 x range, 70-150: 2015-19 lost 0.0% median +1,162 p25 +40 | 2020-25 lost 0.0% median +851 p25 +65
 0.25 x range, 70-160: 2015-19 lost 0.0% median +1,102 p25 +40 | 2020-25 lost 0.0% median +1,099 p25 -57
+0.25 x range, 75-140: 2015-19 lost 0.0% median +1,168 p25 -30 | 2020-25 lost 0.0% median +317 p25 +324
+0.25 x range, 75-150: 2015-19 lost 0.0% median +1,108 p25 -30 | 2020-25 lost 0.0% median +851 p25 +65
+0.25 x range, 75-160: 2015-19 lost 0.0% median +1,048 p25 -30 | 2020-25 lost 0.0% median +1,099 p25 -57
+0.25 x range, 80-140: 2015-19 lost 0.0% median +1,156 p25 -55 | 2020-25 lost 0.0% median +317 p25 +318
+0.25 x range, 80-150: 2015-19 lost 0.0% median +1,096 p25 -55 | 2020-25 lost 0.0% median +851 p25 +59
+0.25 x range, 80-160: 2015-19 lost 0.0% median +1,036 p25 -55 | 2020-25 lost 0.0% median +1,099 p25 -63
+0.3 x range, 70-140: 2015-19 lost 0.0% median +927 p25 +96 | 2020-25 lost 0.0% median +82 p25 +348
+0.3 x range, 70-150: 2015-19 lost 0.0% median +747 p25 +96 | 2020-25 lost 0.0% median +1,238 p25 +269
+0.3 x range, 70-160: 2015-19 lost 0.0% median +604 p25 +96 | 2020-25 lost 0.0% median +1,430 p25 +213
+0.3 x range, 75-140: 2015-19 lost 0.0% median +917 p25 -14 | 2020-25 lost 0.0% median +82 p25 +348
+0.3 x range, 75-150: 2015-19 lost 0.0% median +737 p25 -14 | 2020-25 lost 0.0% median +1,238 p25 +269
+0.3 x range, 75-160: 2015-19 lost 0.0% median +594 p25 -14 | 2020-25 lost 0.0% median +1,430 p25 +213
+0.3 x range, 80-140: 2015-19 lost 0.0% median +948 p25 -34 | 2020-25 lost 0.0% median +82 p25 +348
+0.3 x range, 80-150: 2015-19 lost 0.0% median +768 p25 -34 | 2020-25 lost 0.0% median +1,238 p25 +269
+0.3 x range, 80-160: 2015-19 lost 0.0% median +626 p25 -34 | 2020-25 lost 0.0% median +1,430 p25 +213
+DONE
+
+Verdict (2026-11-25, docs section 153): the neighbourhood agrees on the accounts, but the years do not; not shipped.
+- All 27 cells: 0 starts lost in both periods; 2015-19's median up in 27 of 27 (+$594 to +$1,445), 2020-25's in 24 of
+  27 (the 0.2x / 140 cap row -$64); 25th percentiles 2015-19 -$55 to +$562, 2020-25 -$403 to +$348. The best region,
+  0.3x within 70-140 / 150 / 160, raises all four numbers (0.3x 70-150: medians +$747 / +$1,238, p25 +$96 / +$269).
+- By year at 1 contract (stage149_stop_only_best_years.txt): 0.3x 70-150 up in only 5 of 12 years, +$2,616 in all,
+  2022 alone +$1,795 (69%); without 2022 about +$75 a year a contract. The window -$63. 0.25x 75-150 (stage148 years):
+  7 of 12, +$3,155, 2022 +$1,668.
+- So the accounts' gain comes mostly from one high-volatility bear year (2022), where a wider stop on wild days paid;
+  most years it is about even. Section 145's rule (a gain carried by a year or two is not a rule) applies, and it
+  would need new order logic in NinjaTrader / Pine (the stop from the 14-day range) for about $75 a year outside 2022.
+  Kept as a documented option (noise hard_stop_only, default off); the flat $200 stays.

@@ -3,7 +3,7 @@
 noise hard_stop_only: the hard stop at hard_vol x the 14-day average range within lo-hi points; break-even, the target
 and the stop step on the $200 unit. --grid: hard_vol 0.2 / 0.25 / 0.3 x lo 70 / 75 / 80 x hi 140 / 150 / 160, fresh
 50K starts per period. --years: 0.25 / 75-150 against the shipped at 1 contract by year (NQ dev + unseen + live).
-Run from research/: python zoo/stop_only_grid.py --grid | --years
+Run from research/: python zoo/stop_only_grid.py --grid | --years [--best: 0.3x / 70-150]
 """
 import pickle
 import sys
@@ -49,7 +49,8 @@ def main():
                     print(f"{hv} x range, {lo:.0f}-{hi:.0f}: " + " | ".join(parts), flush=True)
     if "--years" in sys.argv:
         cols = {}
-        for lab, band in (("shipped", {}), ("0.25x, 75-150", cell(0.25, 75.0, 150.0))):
+        hv, lo, hi = (0.3, 70.0, 150.0) if "--best" in sys.argv else (0.25, 75.0, 150.0)  # --best: docs 153's cell
+        for lab, band in (("shipped", {}), (f"{hv}x, {lo:.0f}-{hi:.0f}", cell(hv, lo, hi))):
             ys = []
             for n in ("dev", "unseen_nq", "live"):
                 d, s = sets[n]
@@ -61,6 +62,7 @@ def main():
         print(df.astype(int).to_string())
         print(f"up in {int((df['diff'] > 0).sum())} of {len(df)} years, total {df['diff'].sum():+,.0f}, "
               f"the largest year {df['diff'].idxmax()} {df['diff'].max():+,.0f}")
+        print(B.line("the window", B.run(band=cell(hv, lo, hi))).split("|")[1].strip())
 
 
 if __name__ == "__main__":
