@@ -1200,6 +1200,14 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    periods: band PF 1.56 / 1.66 to 1.50-1.53 / 1.59-1.65, shuffled-years medians from $50,000 $11,810 / $16,201 to
    $10,550-11,047 / $14,519-15,959; the loss share moves both ways by a few tenths. The tighter stop is hit by the
    noise before the trade works. ES unchanged (its band stop is always inside $200). Rejected; $200 stays.
+189. **What the worst days share** (2026-11-26, a research round; `research/zoo/worst_days.py`,
+   `verification/zoo/stage181_worst_days.txt`). The 20 worst traded days per period at 1 contract (FOMC and mild-news
+   days left out, as the strategy skips them): -$5,880 (2015-19) and -$7,668 (2020-25). In both periods they are
+   mostly short days (65% against 39% of all traded days; longs 25% against 59%) with more trades (median 4 against 2)
+   and a little wider ranges (1.11-1.12x the 14-day average against 1.03-1.04x); weekday, big-news days and the gap
+   trade look like any day. Overall the shorts pay as the longs do (section 155), so this is about how short days
+   lose: several entries in a falling, swinging market. A candidate for the next rounds: fewer re-entries or a smaller
+   day stop on short days, tested by period with a placebo. Descriptive; nothing changes.
 
 ## The result (the shipped defaults, 2026-11-26, sections 1-90 and 180; research numbers, $0.62 a side)
 
