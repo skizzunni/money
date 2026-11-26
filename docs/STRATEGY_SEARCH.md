@@ -1072,6 +1072,10 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    by reading the code). Both strategies start "wait until flat" and do not adopt the account's position, so after a
    restart or a long disconnect mid-trade the real position keeps its broker-side stop and target but gets no time
    exit from the strategy. Not testable here; a manual check added ("Running it" step 13).
+172. **Pine's status table** (2026-11-26, a research round). Pine had no on-chart status; on a TradingView chart without
+   extended hours its news rule is silently off (it trades the mild-news days NinjaTrader skips). Now a top-right table:
+   Setup (OK / NOT READY / NO TRADING TODAY: no 09:30 bar), the news rule ("n/a - turn on extended hours"), any check
+   that is off. No trade changes; a test reads the table. The TradingView section now says to turn on extended hours.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
@@ -1140,7 +1144,11 @@ the bot trades MNQ.
 `pine/mnq_clean_band.pine` is the same strategy for a TradingView MNQ 5-minute chart (add it, Strategy Tester for the
 results). `tests/test_pine_clean.py` holds it to the same Python reference trade for trade on the Pine interpreter, with
 one difference by design: Pine sets the take-profit from the fill price after the fill bar, so it works from the next
-bar (NinjaTrader's bracket works from the fill bar).
+bar (NinjaTrader's bracket works from the fill bar). **Turn on extended hours** on the TradingView chart (the chart's settings > Symbol >
+Session: Extended / ETH): the news rule reads the 08:20-08:30 bars, and without them it is off, so TradingView then
+trades the mild-news days that NinjaTrader (on its ETH chart) skips, and the two disagree. The chart's top-right table
+says "news n/a - turn on extended hours" when that is the case (section 172), and also shows "NOT READY" / "NO
+TRADING TODAY: no 09:30 bar" and any check that is off, as NinjaTrader's dashboard does.
 
 ## Running it
 

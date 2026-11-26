@@ -343,3 +343,26 @@ if inRth and ready and not carryOut
 
 plot(isCheck and not na(array.get(sig, int((endMin - 600) / 30))) ? math.max(dayOpen, prevC) * (1 + array.get(sig, int((endMin - 600) / 30))) : na, "Upper band", color.teal)
 plot(isCheck and not na(array.get(sig, int((endMin - 600) / 30))) ? math.min(dayOpen, prevC) * (1 - array.get(sig, int((endMin - 600) / 30))) : na, "Lower band", color.maroon)
+
+// docs/STRATEGY_SEARCH.md 172: what the chart's state is, as MnqCleanBand.cs's dashboard (no effect on the trades)
+var table dash = table.new(position.top_right, 1, 1, bgcolor = color.gray)
+if barstate.islast
+    nHist = array.size(hCloses)
+    string setup = "OK"
+    if nHist < math.max(21, trendDays + 1)
+        setup := "NOT READY: " + str.tostring(nHist) + " complete sessions, needs " + str.tostring(math.max(21, trendDays + 1)) + " (load more history)"
+    else if not ready
+        setup := "NO TRADING: the history has a hole"
+    else if tNoOpen
+        setup := "NO TRADING TODAY: no 09:30 bar"
+    string news = "off"
+    if newsDays
+        news := na(spike) ? "n/a - turn on extended hours (ETH) so the news rule can read the 08:30 bars" : newsSkip ? str.tostring(spike, "#.#") + "x: no trades today" : str.tostring(spike, "#.#") + "x"
+    string off = ""
+    if ready
+        for k = 0 to NCH - 1
+            if na(array.get(sig, k))
+                m = 600 + 30 * k
+                off := off + (off == "" ? "" : ", ") + str.tostring(math.floor(m / 60)) + ":" + (m % 60 == 0 ? "00" : "30")
+    table.cell(dash, 0, 0, "MNQ Clean Band | Setup: " + setup + " | news " + news + (off == "" ? "" : " | check(s) off today: " + off), text_color = color.white, text_size = size.small)
+

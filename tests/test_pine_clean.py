@@ -92,6 +92,21 @@ def test_pine_clean_band_missing_open_bar():
 
 
 @pytest.mark.slow
+def test_pine_clean_band_dashboard():
+    """Docs 172: the chart's status table, as MnqCleanBand.cs's dashboard: OK, and the news rule "n/a - turn on extended
+    hours" on a regular-hours chart; "NO TRADING TODAY: no 09:30 bar" when the last day lacks its 09:30 bar."""
+    pytest.importorskip("pynescript", reason="pip install pynescript to check the .pine files")
+    from pine_interpreter import PineRuntime, load_pine
+    from test_ninjatrader_clean import drop_bar, synthetic_days
+    for days, want in ((synthetic_days(), "Setup: OK"), (drop_bar(synthetic_days(), 159, 570), "NO TRADING TODAY: no 09:30 bar")):
+        bars, _idx = bars_of(days)
+        rt = PineRuntime(load_pine(PINE), bars, {}, timeframe_seconds=300)
+        rt.run(lambda i, g: None)
+        text = rt.tables[0].cells[(0, 0)]
+        assert want in text and "turn on extended hours" in text
+
+
+@pytest.mark.slow
 def test_pine_clean_band_news_days():
     """The news rule in Pine (extended hours): as tests/test_ninjatrader_clean.py's news test, trade for trade."""
     pytest.importorskip("pynescript", reason="pip install pynescript to check the .pine files")
