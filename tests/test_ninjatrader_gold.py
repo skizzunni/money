@@ -258,3 +258,25 @@ def test_gold_partial_entry_rest_cancelled(sim, tmp_path):  # noqa: F811
     later_base = [t[:6] for t in base if int(t[1]) > int(x[3])]
     later_got = [t[:6] for t in got if int(t[1]) > int(x[3])]
     assert len(later_got) >= 5 and later_got == later_base
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+@pytest.mark.parametrize("minutes,props,want", [
+    (5, {"SimInstrument": "MNQ 12-26"}, "WRONG INSTRUMENT: MgcOvernightCarry trades MGC only (this chart is MNQ 12-26)"),
+    (5, {"SimInstrument": "GC 02-27"}, "WRONG INSTRUMENT"),
+    (1, {}, "WRONG CHART: use a 5-minute MGC chart (this one is 1 Minute)"),
+])
+def test_gold_wrong_chart_trades_nothing(sim, tmp_path, minutes, props, want):  # noqa: F811
+    """Docs 178 (the user's setup had MgcOvernightCarry on MNQ DEC26, 1-minute bars): the gold strategy on anything but
+    a 5-minute MGC chart trades nothing, says so once in the Output window and on the chart; the right chart trades."""
+    days = synthetic_gold()
+    path = tmp_path / "g.csv"
+    write_gold(days, path)
+    args = [DOTNET, str(sim), str(path), str(minutes), "Strategy=Gold", *[f"{k}={v}" for k, v in props.items()]]
+    r = subprocess.run(args, capture_output=True, text=True, env=ENV)
+    assert r.returncode == 0, r.stdout[-3000:] + r.stderr[-3000:]
+    out = r.stdout.splitlines()
+    assert not [x for x in out if x.startswith("T,")]
+    assert sum(want in x for x in out if x.startswith("P,")) == 1
+    assert any(want in x for x in out if x.startswith("D,"))
+    assert _gtrades(run(sim, path, MaxContracts=3, StartProfit=5000))

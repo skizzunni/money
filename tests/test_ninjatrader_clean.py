@@ -650,3 +650,29 @@ def test_clean_band_ladder_and_wild_open_act(sim, tmp_path):  # noqa: F811
     both, no_ladder, no_skip = got(), got(LadderAt=0), got(GapMaxBar=0)
     assert no_ladder == want(lad_r=0.0) and no_skip == want(gap={**GAP, "max_bar": 0.0})
     assert both != no_ladder and both != no_skip
+
+
+def _raw(sim, path, minutes, strategy, **props):  # noqa: F811
+    args = [DOTNET, str(sim), str(path), str(minutes), strategy, *[f"{k}={v}" for k, v in props.items()]]
+    r = subprocess.run(args, capture_output=True, text=True, env=ENV)
+    assert r.returncode == 0, r.stdout[-3000:] + r.stderr[-3000:]
+    return r.stdout.splitlines()
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+@pytest.mark.parametrize("minutes,props,want", [
+    (5, {"SimInstrument": "MGC 02-27"}, "WRONG INSTRUMENT: MnqCleanBand trades MNQ only (this chart is MGC 02-27)"),
+    (5, {"SimInstrument": "NQ 12-26"}, "WRONG INSTRUMENT"),
+    (1, {}, "WRONG CHART: use a 5-minute MNQ chart (this one is 1 Minute)"),
+])
+def test_clean_band_wrong_chart_trades_nothing(sim, tmp_path, minutes, props, want):  # noqa: F811
+    """Docs 178 (the user's setup had MgcOvernightCarry on MNQ DEC26, 1-minute bars): MnqCleanBand on anything but a
+    5-minute MNQ chart trades nothing, says so once in the Output window and on the chart; the right chart trades."""
+    days = synthetic_days()
+    path = tmp_path / "bars.csv"
+    write_bars(days, path)
+    out = _raw(sim, path, minutes, "Strategy=Clean", **props)
+    assert not [x for x in out if x.startswith("T,")]
+    assert sum(want in x for x in out if x.startswith("P,")) == 1
+    assert any(want in x for x in out if x.startswith("D,"))
+    assert [x for x in _raw(sim, path, 5, "Strategy=Clean", SimInstrument="MNQ 03-27") if x.startswith("T,")]

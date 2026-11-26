@@ -1117,6 +1117,15 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    long) / low (a short) against inside it: PF 1.52 / 1.77 (2015-19), 1.64 / 1.55 (2020-25), ES 1.25 / 1.49; 90% of
    band trades are beyond, and the inside ones (83 / 109) are better in 5 of 11 years. The gap trade: 2.04 / 1.99,
    1.62 / 1.79. No side holds across the periods: nothing to filter or size on. Nothing changes.
+178. **The wrong chart trades nothing** (2026-11-26, from the user's setup screenshots: MgcOvernightCarry added from
+   Control Center > Strategies with Instrument MNQ DEC26, 1-minute bars, 5 days to load, Sim101, Highest end-of-day
+   balance 0). Both strategies already did nothing on a non-5-minute chart, silently (the chart's "WRONG CHART" text
+   was never drawn); neither checked the instrument, so the gold strategy on 5-minute MNQ would have traded MNQ (with
+   gold's rules, beside MnqCleanBand on the same account). Now MnqCleanBand trades only MNQ and MgcOvernightCarry only
+   MGC (not NQ / GC: 10x the risk a contract), on 5-minute bars; anything else trades nothing, prints "WRONG
+   INSTRUMENT" / "WRONG CHART" once in the Output window and shows it on the chart. Tests: both strategies on the
+   other's instrument, on the full-size contract and on 1-minute bars (no trades, one message), and on the right
+   chart (trades). "Running it" step 4 and 9 now say to add each from its own chart and check the Data Series.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
@@ -1223,7 +1232,10 @@ NinjaTrader 8, on each funded account (both the same way):
    **Minute**, value **5**; Trading hours **CME US Index Futures ETH** (the news rule reads the 08:30 bar); Load data
    based on **Days**, Days to load **40** or more. OK.
 4. **Add the strategy.** Right-click the chart > Strategies > **MnqCleanBand** > Add. Set **Account** to the funded
-   account. Leave every other setting at its default. Tick **Enabled**, then OK.
+   account. Leave every other setting at its default. Tick **Enabled**, then OK. Add it from the chart, not from Control Center >
+   Strategies > New (there the Data Series must be set by hand: MNQ, Minute, 5, Days to load 40, and the chart's
+   status box is not shown). On any other instrument or bar size it trades nothing and says WRONG INSTRUMENT / WRONG
+   CHART (section 178).
 5. **Check it.** The chart's top-right corner must say **Setup: OK**, the size (1 MNQ on a fresh account) and the
    news status. New > NinjaScript Output shows the settings line and every order. NOT READY: raise Days to load. NO
    TRADING: right-click the chart > Reload All Historical Data.
@@ -1237,7 +1249,8 @@ NinjaTrader 8, on each funded account (both the same way):
 9. **Gold (optional, section 37):** copy `ninjatrader/Strategies/MgcOvernightCarry.cs` to the same folder, F5. Open an
    **MGC** 5-minute chart (front month, e.g. MGC 02-27; trading hours **CME/COMEX metals ETH**, the overnight session
    is needed), Days to load **30**. Right-click > Strategies > **MgcOvernightCarry** > the same funded account,
-   defaults, Enabled. The top-right corner says "waiting for history" until the first 08:30 check after loading, then
+   defaults, Enabled. Check the Data Series is **MGC**, not MNQ (on MNQ it trades nothing and says WRONG
+   INSTRUMENT, section 178), and set "Highest end-of-day balance so far" as step 7. The top-right corner says "waiting for history" until the first 08:30 check after loading, then
    OK once 14 complete sessions are loaded (NOT READY with fewer). It trades at most once a day
    (08:35 to 14:15) and sizes from the same account balance as MNQ. Expect most gold trades to lose: about 9 in 10 are
    stopped out within minutes of 08:35 for about $20 a contract (at most $141 in 2009 - Mar 2025), and the 1 in 10 that

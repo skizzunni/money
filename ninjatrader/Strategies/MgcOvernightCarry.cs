@@ -203,10 +203,30 @@ namespace NinjaTrader.NinjaScript.Strategies
             guarded = CushionGuard > 0 && cushion < CushionGuard;
         }
 
-        protected override void OnBarUpdate()
+        // docs 178: only a 5-minute MGC chart; anything else (a 1-minute chart, an MNQ chart, GC at 10x the risk) trades
+        // nothing and says so on the chart and in the Output window
+        string WrongSetup()
         {
             if (BarsPeriod.BarsPeriodType != BarsPeriodType.Minute || BarsPeriod.Value != 5)
+                return "WRONG CHART: use a 5-minute MGC chart (this one is " + BarsPeriod.Value + " " + BarsPeriod.BarsPeriodType + ") - no trades";
+            string root = (Instrument.FullName ?? "").Trim().Split(' ')[0].ToUpperInvariant();
+            if (root != "MGC")
+                return "WRONG INSTRUMENT: MgcOvernightCarry trades MGC only (this chart is " + Instrument.FullName + ") - no trades";
+            return null;
+        }
+
+        bool wrongSaid;
+
+        protected override void OnBarUpdate()
+        {
+            string wrong = WrongSetup();
+            if (wrong != null)
+            {
+                if (!wrongSaid) { Print("Gold carry: " + wrong); wrongSaid = true; }
+                if (State == State.Realtime || CurrentBar >= Bars.Count - 2)
+                    Draw.TextFixed(this, "gold_dash", "MGC Overnight Carry | " + wrong, TextPosition.TopRight);
                 return;
+            }
             Bar();
             CheckNoStop(true);
             if (State == State.Realtime || CurrentBar >= Bars.Count - 2)

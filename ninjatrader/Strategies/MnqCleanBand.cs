@@ -361,10 +361,30 @@ namespace NinjaTrader.NinjaScript.Strategies
                 qty = Math.Min(qty + 1, capToday);
         }
 
-        protected override void OnBarUpdate()
+        // docs 178: only a 5-minute MNQ chart; anything else (a 1-minute chart, gold, NQ at 10x the risk) trades nothing
+        // and says so on the chart and in the Output window
+        string WrongSetup()
         {
             if (BarsPeriod.BarsPeriodType != BarsPeriodType.Minute || BarsPeriod.Value != 5)
+                return "WRONG CHART: use a 5-minute MNQ chart (this one is " + BarsPeriod.Value + " " + BarsPeriod.BarsPeriodType + ") - no trades";
+            string root = (Instrument.FullName ?? "").Trim().Split(' ')[0].ToUpperInvariant();
+            if (root != "MNQ")
+                return "WRONG INSTRUMENT: MnqCleanBand trades MNQ only (this chart is " + Instrument.FullName + ") - no trades";
+            return null;
+        }
+
+        bool wrongSaid;
+
+        protected override void OnBarUpdate()
+        {
+            string wrong = WrongSetup();
+            if (wrong != null)
+            {
+                if (!wrongSaid) { Print("Clean band: " + wrong); wrongSaid = true; }
+                if (State == State.Realtime || CurrentBar >= Bars.Count - 2)
+                    Draw.TextFixed(this, "clean_dash", "MNQ Clean Band | " + wrong, TextPosition.TopRight);
                 return;
+            }
             Bar();
             CheckNoStop(true);
             if (State == State.Realtime || CurrentBar >= Bars.Count - 2)
@@ -375,9 +395,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         void Dashboard()
         {
             string setup;
-            if (BarsPeriod.BarsPeriodType != BarsPeriodType.Minute || BarsPeriod.Value != 5)
-                setup = "WRONG CHART: use a 5-minute MNQ chart";
-            else if (hist.Count < Math.Max(21, TrendDays + 1))
+            if (hist.Count < Math.Max(21, TrendDays + 1))
                 setup = "NOT READY: " + hist.Count + " complete sessions loaded, needs " + Math.Max(21, TrendDays + 1) +
                         " - set the chart's Days to load to 40 or more";
             else if (!ready)
