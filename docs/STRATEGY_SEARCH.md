@@ -1165,6 +1165,12 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    entry on those days is weak (PF 0.94 / 0.06 / ES 0.45) but is only 13 / 5 / 2 trades (-$71 / -$85); without it the
    loss share falls in 2015-19 (4.7% to 3.6% from $48,806) and rises in 2020-25 (6.5% to 7.0%). Not FOMC's case:
    nothing changes.
+183. **The days next to an FOMC day** (2026-11-26, a research round; `research/zoo/fomc_neighbours.py`,
+   `verification/zoo/stage176_fomc_neighbours.txt`). The day before: PF 2.09 (2015-19, 23 trades), 0.67 (2020-25, 51;
+   4 of 6 years down), ES 1.80: the periods disagree; skipping it helps 2020-25 (lost 6.5% to 5.0% from $48,806,
+   median $11,551 to $11,814) but not 2015-19 (median $11,322 to $11,048 from $50,000). The day after: PF 1.62 /
+   1.99 / ES 1.64, as good as any day; skipping it costs in both periods. Nothing changes: only the statement day
+   itself (section 180) is skipped.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 

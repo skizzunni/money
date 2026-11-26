@@ -1,0 +1,98 @@
+Docs section 183 (2026-11-26): python zoo/fomc_neighbours.py (from research/).
+
+2015-19, the day before an FOMC day: 40 days
+  those days: 23 trades, PF 2.09, $+40.0 a trade, $+919
+  other days: 1122 trades, PF 1.63, $+22.3 a trade, $+24,997
+  by year, $ (trades): 2015 +130 (2), 2016 +689 (11), 2017 +52 (2), 2018 +196 (5), 2019 -148 (3)
+  shipped: 1145 trades, $+25,917 a contract
+     calendar: $50,000 0.0% / $9,810 | $48,806 0.0% / $6,230 | $48,998 0.0% / $6,781
+     shuffled years: $50,000 0.4% / $11,322 $48,806 4.7% / $7,580 $48,998 2.6% / $8,414
+  no trading the day before: 1122 trades, $+24,997 a contract
+     calendar: $50,000 0.0% / $10,166 | $48,806 0.0% / $6,354 | $48,998 0.0% / $7,742
+     shuffled years: $50,000 0.4% / $11,048 $48,806 4.7% / $7,421 $48,998 2.8% / $8,256
+  placebo 1: as many random days: 1110 trades, $+25,581 a contract
+     calendar: $50,000 0.0% / $8,191 | $48,806 0.0% / $5,466 | $48,998 0.0% / $5,750
+     shuffled years: $50,000 0.5% / $11,472 $48,806 4.3% / $7,800 $48,998 2.2% / $8,600
+  placebo 2: as many random days: 1117 trades, $+23,471 a contract
+     calendar: $50,000 0.0% / $6,938 | $48,806 2.0% / $4,578 | $48,998 0.0% / $4,413
+     shuffled years: $50,000 0.6% / $9,430 $48,806 5.5% / $5,631 $48,998 3.1% / $6,418
+  placebo 3: as many random days: 1099 trades, $+24,671 a contract
+     calendar: $50,000 0.0% / $7,023 | $48,806 10.2% / $4,283 | $48,998 6.1% / $4,709
+     shuffled years: $50,000 0.5% / $10,276 $48,806 4.8% / $6,793 $48,998 2.8% / $7,523
+
+2015-19, the day after an FOMC day: 40 days
+  those days: 46 trades, PF 1.62, $+21.2 a trade, $+974
+  other days: 1099 trades, PF 1.64, $+22.7 a trade, $+24,942
+  by year, $ (trades): 2015 +451 (8), 2016 +217 (7), 2017 -109 (2), 2018 -546 (19), 2019 +962 (10)
+  shipped: 1145 trades, $+25,917 a contract
+     calendar: $50,000 0.0% / $9,810 | $48,806 0.0% / $6,230 | $48,998 0.0% / $6,781
+     shuffled years: $50,000 0.4% / $11,322 $48,806 4.7% / $7,580 $48,998 2.6% / $8,414
+  no trading the day after: 1099 trades, $+24,942 a contract
+     calendar: $50,000 0.0% / $9,084 | $48,806 0.0% / $5,372 | $48,998 0.0% / $5,413
+     shuffled years: $50,000 0.6% / $10,565 $48,806 5.5% / $6,767 $48,998 2.9% / $7,649
+  placebo 1: as many random days: 1110 trades, $+25,581 a contract
+     calendar: $50,000 0.0% / $8,191 | $48,806 0.0% / $5,466 | $48,998 0.0% / $5,750
+     shuffled years: $50,000 0.5% / $11,472 $48,806 4.3% / $7,800 $48,998 2.2% / $8,600
+  placebo 2: as many random days: 1117 trades, $+23,471 a contract
+     calendar: $50,000 0.0% / $6,938 | $48,806 2.0% / $4,578 | $48,998 0.0% / $4,413
+     shuffled years: $50,000 0.6% / $9,430 $48,806 5.5% / $5,631 $48,998 3.1% / $6,418
+  placebo 3: as many random days: 1099 trades, $+24,671 a contract
+     calendar: $50,000 0.0% / $7,023 | $48,806 10.2% / $4,283 | $48,998 6.1% / $4,709
+     shuffled years: $50,000 0.5% / $10,276 $48,806 4.8% / $6,793 $48,998 2.8% / $7,523
+
+2020-25, the day before an FOMC day: 43 days
+  those days: 51 trades, PF 0.67, $-17.2 a trade, $-879
+  other days: 1346 trades, PF 1.69, $+30.4 a trade, $+40,978
+  by year, $ (trades): 2020 -455 (9), 2021 -382 (8), 2022 -321 (4), 2023 -443 (12), 2024 +534 (10), 2025 +190 (8)
+  shipped: 1397 trades, $+40,099 a contract
+     calendar: $50,000 0.0% / $17,205 | $48,806 1.8% / $12,892 | $48,998 0.0% / $14,917
+     shuffled years: $50,000 1.5% / $15,582 $48,806 6.5% / $11,551 $48,998 3.7% / $12,272
+  no trading the day before: 1346 trades, $+40,978 a contract
+     calendar: $50,000 0.0% / $18,620 | $48,806 1.8% / $15,199 | $48,998 0.0% / $16,275
+     shuffled years: $50,000 0.9% / $16,196 $48,806 5.0% / $11,814 $48,998 3.0% / $12,629
+  placebo 1: as many random days: 1358 trades, $+37,281 a contract
+     calendar: $50,000 0.0% / $16,603 | $48,806 1.8% / $12,694 | $48,998 0.0% / $13,055
+     shuffled years: $50,000 1.4% / $14,376 $48,806 6.5% / $10,029 $48,998 4.2% / $10,905
+  placebo 2: as many random days: 1346 trades, $+39,756 a contract
+     calendar: $50,000 0.0% / $17,032 | $48,806 1.8% / $13,498 | $48,998 0.0% / $14,685
+     shuffled years: $50,000 1.2% / $15,581 $48,806 5.6% / $11,278 $48,998 3.8% / $12,066
+  placebo 3: as many random days: 1340 trades, $+39,730 a contract
+     calendar: $50,000 0.0% / $16,011 | $48,806 0.0% / $12,203 | $48,998 0.0% / $14,538
+     shuffled years: $50,000 1.2% / $15,418 $48,806 5.8% / $11,182 $48,998 3.5% / $12,018
+
+2020-25, the day after an FOMC day: 43 days
+  those days: 65 trades, PF 1.99, $+46.6 a trade, $+3,031
+  other days: 1332 trades, PF 1.63, $+27.8 a trade, $+37,068
+  by year, $ (trades): 2020 -66 (1), 2021 +1,867 (13), 2022 +367 (23), 2023 +571 (19), 2024 +397 (6), 2025 -105 (3)
+  shipped: 1397 trades, $+40,099 a contract
+     calendar: $50,000 0.0% / $17,205 | $48,806 1.8% / $12,892 | $48,998 0.0% / $14,917
+     shuffled years: $50,000 1.5% / $15,582 $48,806 6.5% / $11,551 $48,998 3.7% / $12,272
+  no trading the day after: 1332 trades, $+37,068 a contract
+     calendar: $50,000 0.0% / $14,980 | $48,806 0.0% / $11,890 | $48,998 0.0% / $12,443
+     shuffled years: $50,000 1.5% / $13,919 $48,806 6.1% / $10,143 $48,998 3.9% / $10,916
+  placebo 1: as many random days: 1358 trades, $+37,281 a contract
+     calendar: $50,000 0.0% / $16,603 | $48,806 1.8% / $12,694 | $48,998 0.0% / $13,055
+     shuffled years: $50,000 1.4% / $14,376 $48,806 6.5% / $10,029 $48,998 4.2% / $10,905
+  placebo 2: as many random days: 1346 trades, $+39,756 a contract
+     calendar: $50,000 0.0% / $17,032 | $48,806 1.8% / $13,498 | $48,998 0.0% / $14,685
+     shuffled years: $50,000 1.2% / $15,581 $48,806 5.6% / $11,278 $48,998 3.8% / $12,066
+  placebo 3: as many random days: 1340 trades, $+39,730 a contract
+     calendar: $50,000 0.0% / $16,011 | $48,806 0.0% / $12,203 | $48,998 0.0% / $14,538
+     shuffled years: $50,000 1.2% / $15,418 $48,806 5.8% / $11,182 $48,998 3.5% / $12,018
+
+ES 2020-24, the day before an FOMC day: 16 days
+  those days: 10 trades, PF 1.80, $+10.0 a trade, $+100
+  other days: 384 trades, PF 1.14, $+2.4 a trade, $+928
+
+ES 2020-24, the day after an FOMC day: 16 days
+  those days: 25 trades, PF 1.64, $+14.7 a trade, $+368
+  other days: 369 trades, PF 1.10, $+1.8 a trade, $+660
+
+live 2026, the day before an FOMC day: 3 days
+  those days: 2 trades, PF 2.83, $+56.5 a trade, $+113
+  other days: 69 trades, PF 3.73, $+84.0 a trade, $+5,795
+
+live 2026, the day after an FOMC day: 3 days
+  those days: 0 trades, PF 0.00, $+nan a trade, $+0
+  other days: 71 trades, PF 3.70, $+83.2 a trade, $+5,908
+
