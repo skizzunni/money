@@ -1100,6 +1100,17 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    stretch shows whether the cushion guard would take it). The reference reproduces the Pine run's trades on the live
    set (Oct 16, Nov 13, Nov 20; Nov 5 a news day). A synthetic export tests it: a clean day matches at +0.00 points
    and is not flagged; a manual trade, a 120-point loss, a 15:58 exit and a news-day trade are flagged.
+176. **The pre-open move and the band trades** (2026-11-26, a research round; `research/zoo/preopen_align.py`,
+   `preopen_add.py`, `verification/zoo/stage170_preopen_move.txt`). The move from 08:29 to 09:29 (known before the
+   open, every day, not only news days; section 14 traded it on news days). Band trades the move's way are better than
+   those against it in both periods (PF 1.79 / 1.79 against 1.28 / 1.44; 9 of 11 years, not 2024 or 2025), but the
+   trades against it still make money (+$4,382 / +$10,383 a contract), and in the live 2026 months the trades against
+   it did better (14 trades). On the account with the guard: one more contract on the trades the move's way is no
+   better than one more on random band trades at the same rate (shuffled-years medians $11,941 / $16,581 against
+   placebos $11,648-12,258 / $16,010-16,575 from $50,000), with more accounts lost (0.4% to 0.8%, 1.5% to 2.4%): it
+   is only more size. No band trade against the move lowers the median in both periods ($11,322 to $8,538, $15,582 to
+   $11,622) and loses more of the near-floor calendar starts in 2020-25 (1.8% to 14.5%, 0% to 7.3%). Both rejected;
+   nothing changes.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 

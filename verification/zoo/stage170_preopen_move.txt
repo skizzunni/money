@@ -1,0 +1,118 @@
+Docs section 176 (2026-11-26): the band trades by the pre-open move (08:29 -> 09:29 close). Commands (from research/):
+python zoo/preopen_align.py ; python zoo/preopen_add.py (account: lost share / median profit; calendar starts and
+2,000 shuffled years of 252 days, the cushion guard on, from $50,000 / $48,806 / $48,998 against a $48,000 floor).
+
+== preopen_align.py ==
+2015-19 (flat under 0.0 x the range):
+  band agree: 463 trades, PF 1.79, $+28.1 a trade, $+13,013
+  band against: 410 trades, PF 1.28, $+10.7 a trade, $+4,382
+  gap agree: 174 trades, PF 1.92, $+28.4 a trade, $+4,950
+  gap against: 98 trades, PF 2.18, $+36.4 a trade, $+3,571
+2015-19 (flat under 0.1 x the range):
+  band agree: 227 trades, PF 1.63, $+24.3 a trade, $+5,525
+  band against: 145 trades, PF 1.40, $+14.5 a trade, $+2,106
+  band flat: 501 trades, PF 1.54, $+19.5 a trade, $+9,764
+  gap agree: 80 trades, PF 1.89, $+29.1 a trade, $+2,331
+  gap against: 28 trades, PF 2.02, $+29.0 a trade, $+812
+  gap flat: 164 trades, PF 2.07, $+32.8 a trade, $+5,378
+  2015-19 band by year, $ a trade agree / against (n):
+    2015: +16.4 (106) / +4.9 (66)
+    2016: +38.9 (83) / +1.8 (93)
+    2017: +6.8 (79) / +5.0 (63)
+    2018: +48.7 (107) / +19.0 (107)
+    2019: +26.1 (88) / +19.0 (81)
+
+2020-25 (flat under 0.0 x the range):
+  band agree: 632 trades, PF 1.79, $+32.5 a trade, $+20,541
+  band against: 457 trades, PF 1.44, $+22.7 a trade, $+10,383
+  gap agree: 211 trades, PF 1.71, $+28.5 a trade, $+6,008
+  gap against: 94 trades, PF 1.73, $+29.1 a trade, $+2,734
+2020-25 (flat under 0.1 x the range):
+  band agree: 356 trades, PF 1.70, $+29.8 a trade, $+10,606
+  band against: 227 trades, PF 1.24, $+14.7 a trade, $+3,340
+  band flat: 506 trades, PF 1.83, $+33.6 a trade, $+16,979
+  gap agree: 115 trades, PF 1.73, $+29.1 a trade, $+3,350
+  gap against: 29 trades, PF 2.40, $+50.0 a trade, $+1,451
+  gap flat: 161 trades, PF 1.59, $+24.5 a trade, $+3,941
+  2020-25 band by year, $ a trade agree / against (n):
+    2020: +22.3 (87) / +10.8 (86)
+    2021: +48.8 (100) / +42.6 (85)
+    2022: +36.1 (163) / +15.3 (107)
+    2023: +41.9 (117) / +7.1 (70)
+    2024: +23.2 (113) / +54.9 (60)
+    2025: +6.1 (52) / +8.3 (49)
+
+ES 2020-24 (flat under 0.0 x the range):
+  band agree: 192 trades, PF 1.37, $+6.4 a trade, $+1,222
+  band against: 113 trades, PF 1.13, $+2.4 a trade, $+267
+  gap agree: 61 trades, PF 0.89, $-1.7 a trade, $-106
+  gap against: 28 trades, PF 0.41, $-12.7 a trade, $-356
+ES 2020-24 (flat under 0.1 x the range):
+  band agree: 128 trades, PF 1.57, $+10.3 a trade, $+1,320
+  band against: 58 trades, PF 1.73, $+12.1 a trade, $+699
+  band flat: 119 trades, PF 0.75, $-4.5 a trade, $-530
+  gap agree: 35 trades, PF 1.01, $+0.2 a trade, $+8
+  gap against: 13 trades, PF 0.88, $-2.2 a trade, $-29
+  gap flat: 41 trades, PF 0.41, $-10.8 a trade, $-441
+
+live 2026 (flat under 0.0 x the range):
+  band agree: 24 trades, PF 3.87, $+100.1 a trade, $+2,402
+  band against: 14 trades, PF 13.57, $+178.4 a trade, $+2,497
+  gap agree: 3 trades, PF 15.81, $+250.4 a trade, $+751
+  gap against: 8 trades, PF 1.00, $-0.1 a trade, $-0
+live 2026 (flat under 0.1 x the range):
+  band agree: 13 trades, PF 4.99, $+126.8 a trade, $+1,648
+  band against: 4 trades, PF 1498040000000.00, $+374.5 a trade, $+1,498
+  band flat: 21 trades, PF 3.81, $+83.5 a trade, $+1,753
+  gap agree: 3 trades, PF 15.81, $+250.4 a trade, $+751
+  gap against: 3 trades, PF 0.00, $-56.1 a trade, $-168
+  gap flat: 5 trades, PF 1.89, $+33.6 a trade, $+168
+
+== preopen_add.py, 2015-19 (shipped, the rule, placebo 1; placebos 2-5 and the skip rule below) ==
+  shipped: calendar $50,000 0.0% / $9,810 | $48,806 0.0% / $6,230 | $48,998 0.0% / $6,781
+     shuffled years: $50,000 0.4% / $11,322 $48,806 4.7% / $7,580 $48,998 2.6% / $8,414
+  one more on band trades the pre-open move's way (40% of trades): calendar $50,000 0.0% / $12,366 | $48,806 0.0% / $8,846 | $48,998 0.0% / $8,647
+     shuffled years: $50,000 0.8% / $11,941 $48,806 5.0% / $8,365 $48,998 3.0% / $9,237
+  placebo 1: calendar $50,000 0.0% / $10,704 | $48,806 0.0% / $7,395 | $48,998 0.0% / $7,780
+     shuffled years: $50,000 0.7% / $12,134 $48,806 4.7% / $8,409 $48,998 2.9% / $9,406
+  placebo 2: one more on random band trades at that rate:
+     calendar: $50,000 0.0% / $12,365 | $48,806 0.0% / $8,088 | $48,998 0.0% / $9,492
+     shuffled years: $50,000 0.8% / $11,861 $48,806 4.9% / $8,285 $48,998 3.0% / $9,088
+  placebo 3: one more on random band trades at that rate:
+     calendar: $50,000 0.0% / $8,623 | $48,806 0.0% / $6,194 | $48,998 0.0% / $5,361
+     shuffled years: $50,000 0.7% / $11,648 $48,806 4.9% / $8,004 $48,998 2.9% / $8,743
+  placebo 4: one more on random band trades at that rate:
+     calendar: $50,000 0.0% / $10,035 | $48,806 0.0% / $8,046 | $48,998 0.0% / $7,992
+     shuffled years: $50,000 0.8% / $12,053 $48,806 5.2% / $8,516 $48,998 3.1% / $9,281
+  placebo 5: one more on random band trades at that rate:
+     calendar: $50,000 0.0% / $11,271 | $48,806 0.0% / $8,695 | $48,998 0.0% / $8,442
+     shuffled years: $50,000 0.9% / $12,258 $48,806 5.1% / $8,595 $48,998 3.0% / $9,437
+  no band trade against the pre-open move:
+     calendar: $50,000 0.0% / $10,473 | $48,806 0.0% / $4,690 | $48,998 0.0% / $5,862
+     shuffled years: $50,000 0.1% / $8,538 $48,806 1.4% / $5,429 $48,998 0.4% / $5,965
+2020-25
+  shipped:
+     calendar: $50,000 0.0% / $17,205 | $48,806 1.8% / $12,892 | $48,998 0.0% / $14,917
+     shuffled years: $50,000 1.5% / $15,582 $48,806 6.5% / $11,551 $48,998 3.7% / $12,272
+  one more on band trades the pre-open move's way (45% of trades):
+     calendar: $50,000 0.0% / $17,641 | $48,806 1.8% / $12,733 | $48,998 0.0% / $13,297
+     shuffled years: $50,000 2.4% / $16,581 $48,806 6.8% / $12,413 $48,998 4.0% / $13,053
+  placebo 1: one more on random band trades at that rate:
+     calendar: $50,000 0.0% / $16,897 | $48,806 1.8% / $10,963 | $48,998 0.0% / $12,617
+     shuffled years: $50,000 2.5% / $16,010 $48,806 7.3% / $11,579 $48,998 4.8% / $12,222
+  placebo 2: one more on random band trades at that rate:
+     calendar: $50,000 0.0% / $18,409 | $48,806 1.8% / $14,439 | $48,998 0.0% / $15,082
+     shuffled years: $50,000 2.2% / $16,423 $48,806 7.0% / $12,379 $48,998 4.5% / $12,924
+  placebo 3: one more on random band trades at that rate:
+     calendar: $50,000 0.0% / $16,858 | $48,806 1.8% / $12,142 | $48,998 0.0% / $12,641
+     shuffled years: $50,000 2.1% / $15,705 $48,806 7.0% / $11,514 $48,998 4.2% / $11,942
+  placebo 4: one more on random band trades at that rate:
+     calendar: $50,000 0.0% / $17,108 | $48,806 1.8% / $13,391 | $48,998 0.0% / $14,291
+     shuffled years: $50,000 2.1% / $15,980 $48,806 6.8% / $12,031 $48,998 4.5% / $12,570
+  placebo 5: one more on random band trades at that rate:
+     calendar: $50,000 0.0% / $16,890 | $48,806 1.8% / $11,215 | $48,998 0.0% / $12,204
+     shuffled years: $50,000 2.8% / $16,575 $48,806 7.1% / $12,440 $48,998 4.2% / $12,980
+  no band trade against the pre-open move:
+     calendar: $50,000 0.0% / $13,939 | $48,806 14.5% / $9,548 | $48,998 7.3% / $10,676
+     shuffled years: $50,000 0.9% / $11,622 $48,806 5.3% / $7,728 $48,998 3.2% / $8,421
+

@@ -53,7 +53,8 @@ def main():
                 for a in ("agree", "against", "flat"):
                     u = t[(t.leg == leg) & (t.al == a)].usd
                     if len(u):
-                        print(f"  {leg} {a}: {len(u)} trades, PF {pf(u):.2f}, ${u.mean():+.1f} a trade, ${u.sum():+,.0f}")
+                        print(f"  {leg} {a}: {len(u)} trades, PF {pf(u):.2f}, ${u.mean():+.1f} a trade, "
+                              f"${u.sum():+,.0f}")
         if n in ("dev", "unseen_nq"):
             t["al"] = tag(d, t, 0.0)
             t["y"] = pd.to_datetime(t.d).dt.year
