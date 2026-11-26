@@ -1,0 +1,20 @@
+Docs section 181 (2026-11-26): gold (mk_search.carry as MgcOvernightCarry: 1.5x, 15 min, the 60% stop, out 14:15) on
+FOMC statement days (research/fomc_dates.csv); an inline run of gold_recheck.trades on data/gold5.pkl.
+
+gold sessions 2009-03-16 to 2025-03-21 4125
+FOMC days in the data 113
+2009-17 FOMC days 4 trades PF 13.43, $+104.8 a trade, $+419, winners 25%
+2009-17 other days 167 trades PF 1.90, $+16.9 a trade, $+2,829, winners 8%
+2018-25 FOMC days 5 trades PF 0.00, $-14.8 a trade, $-74, winners 0%
+2018-25 other days 140 trades PF 1.89, $+15.1 a trade, $+2,120, winners 9%
+FOMC-day trades:
+         d    usd    f
+2011-03-15 452.76 True
+2012-08-01 -17.24 True
+2014-03-19  -6.24 True
+2015-09-17 -10.24 True
+2018-08-01  -7.24 True
+2020-11-05 -27.24 True
+2021-04-28  -5.24 True
+2022-06-15 -27.24 True
+2024-07-31  -7.24 True

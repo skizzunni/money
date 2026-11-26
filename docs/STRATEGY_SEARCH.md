@@ -1151,8 +1151,12 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    2011 to Nov 2027, federalreserve.gov's calendar, the 2027 dates tentative until confirmed): no trades that day, the
    day kept in the history; the chart says "FOMC day: no trades today". Next: 2026-12-09. Each year add the next
    year's dates (step 11). Tests: NinjaTrader and Pine against the reference (the list's days and three traded days
-   as FOMC days), the default lists equal the csv; live_check.py says so on an FOMC day. Gold is unchanged (its
-   FOMC days not yet studied).
+   as FOMC days), the default lists equal the csv; live_check.py says so on an FOMC day. Gold is unchanged (section
+   181).
+181. **Gold on FOMC days** (2026-11-26, a research round; `verification/zoo/stage174_gold_fomc.txt`). Gold's trade is
+   held to 14:15, through the 14:00 statement, but it fires on only 9 of 113 FOMC days in 2009 - Mar 2025: 2009-17
+   4 trades +$419 (one +$453 winner in 2011), 2018-25 5 trades -$74 (all small stops). Too few to tell, and the
+   periods disagree: gold keeps trading FOMC days. Nothing changes.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
