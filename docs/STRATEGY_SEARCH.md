@@ -1091,6 +1091,15 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    would have made. The plotted bands drew a diagonal from each day's 15:00 check to the next day's 10:00 check; now
    each check's level is held until the next check and the line breaks between sessions (display only, no trade
    changes; a test checks the held levels and the break).
+175. **A live-against-backtest checker** (2026-11-26, a research round; `research/live_check.py`,
+   `tests/test_live_check.py`, `verification/zoo/stage169_live_check.txt`). After a session, NinjaTrader's trade export
+   is checked against the rules the strategies keep (entry names and times, at most 3 contracts, no loss past the hard
+   stop + 4 points of slippage, out by 15:55 / 14:15 and never overnight, at most 9 trades, the $600 day stop, the exit
+   names, the safety-net exits flagged), and with a 1-minute bars export each day is matched to the reference trade by
+   trade, in points (side, entry bar, entry and exit prices, the exit; a mild-news day says so; each band trade's
+   stretch shows whether the cushion guard would take it). The reference reproduces the Pine run's trades on the live
+   set (Oct 16, Nov 13, Nov 20; Nov 5 a news day). A synthetic export tests it: a clean day matches at +0.00 points
+   and is not flagged; a manual trade, a 120-point loss, a 15:58 exit and a news-day trade are flagged.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
@@ -1283,6 +1292,15 @@ NinjaTrader 8, on each funded account (both the same way):
    Positions (the account) with the Strategies tab (the strategy). If the account holds a position the strategy does not
    show, check its stop is working in Orders and close the position by hand before the session ends (MNQ by 15:55,
    gold by 14:15); the strategy will not send its time exit for it.
+
+14. **After a session: check live against the backtest (section 175).** Control Center > New > Account Performance (the
+   account, today, Generate) > Trades tab > right-click > Export, as a .csv. Then, from the repository folder:
+   `python research/live_check.py trades.csv`. Each trade is listed with "CHECK:" under anything the strategy should
+   not do (a manual trade, a loss past the stop, an exit after 15:55, a trade past the day stop, a safety-net exit).
+   For the trade-by-trade match, also export the bars (Tools > Historical Data > Export: MNQ 12-26, 1 Minute, Last,
+   the last 3 months) and add `--bars MNQ_12-26.Last.txt`. If NinjaTrader's time zone is not New York, add
+   `--tz` and the zone (e.g. `--tz Europe/London`). Or send me the trades export (it holds the account number: send it
+   in the chat, not to the repository).
 
 Defaults: trend 20 sessions; hard stop $200 a contract; take profit 2.5 hard stops; break-even at 0.4 to entry + 2
 points, and at 1.5 to entry + 0.5 hard stops (section 61); last entry 14:00 (840); at most 9 trades a day; day stop

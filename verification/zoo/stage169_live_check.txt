@@ -1,0 +1,24 @@
+Docs section 175 (2026-11-26): research/live_check.py's reference on the live MNQ set (zoo_days_news.pkl), four days,
+against the Pine run in stage168 (the same entries and exits; Nov 5 a mild-news day). Tests: tests/test_live_check.py.
+
+2026-10-16
+   09:35 GapShort 29970.25 -> 29854.75 Gap exit
+   10:00 Short    29837.00 -> 29885.50 Stop loss stretch 1.46
+   11:00 Short    29861.75 -> 29611.75 Profit target stretch 0.47
+   12:30 Short    29675.50 -> 29425.50 Profit target stretch 1.91
+2026-11-05
+   mild-news day, spike 2.29x: no trades
+2026-11-13
+   10:00 Short    28087.50 -> 27837.50 Profit target stretch 0.62
+   10:30 Short    27840.50 -> 27838.75 Stop loss stretch 1.57
+   11:00 Short    27827.25 -> 27825.50 Stop loss stretch 1.14
+   11:30 Short    27847.25 -> 27845.50 Stop loss stretch 1.35
+   12:00 Short    27826.75 -> 27926.75 Stop loss stretch 1.04
+   12:30 Short    27924.25 -> 27932.75 Stop loss stretch 0.59
+   13:00 Short    27914.50 -> 27932.00 Stop loss stretch 0.56
+2026-11-20
+   09:35 GapShort 26163.50 -> 26195.25 Stop loss
+   10:30 Short    26049.50 -> 25799.50 Profit target stretch 0.03
+   11:30 Short    25786.00 -> 25536.00 Profit target stretch 0.96
+   12:30 Short    25576.25 -> 25574.50 Stop loss stretch 1.29
+   14:00 Short    25619.50 -> 25369.50 Profit target stretch 1.03
