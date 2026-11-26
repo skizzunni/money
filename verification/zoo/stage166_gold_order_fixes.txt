@@ -1,0 +1,16 @@
+Stage 166 (2026-11-26, docs section 170): section 169's gold order-path gaps fixed, and one refinement to MNQ's 168.
+
+MgcOvernightCarry.cs (as MnqCleanBand.cs in 168): Exit() records its bar; OnOrderUpdate marks a refused market exit
+and tracks the CarryLong / CarryShort entry (Working / PartFilled / Filled / Cancelled / Rejected); at every bar, after
+its bookkeeping, RetryExit() sends a refused exit again ("Exit retry"), and a part-filled entry's unfilled rest is
+cancelled.
+
+The refinement (both strategies): the unfilled rest is cancelled whether or not the filled part is still open. The
+first gold run showed why: most gold trades are stopped on their entry bar (section 110), so the position was already
+flat at the bar's close and the rest stayed working, blocking every later entry. MnqCleanBand.cs gets the same
+condition (its test trade happened to be still open).
+
+Tests: test_gold_rejected_exit_retries (a refused 14:15 exit -> "Exit retry" one bar later, the refused / sent-again
+Output lines; before: held overnight, closed next day by its stop) and test_gold_partial_entry_rest_cancelled (1 of 3
+filled, the rest never -> cancelled, every later trade as the baseline; before: no gold trade after it).
+Targeted: tests/test_ninjatrader_gold.py + the MNQ order / parity tests: 16 passed. No backtest trade changes.

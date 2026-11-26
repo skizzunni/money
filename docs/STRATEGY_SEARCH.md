@@ -1064,6 +1064,10 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
 169. **Gold's order path** (2026-11-26, a research round; `verification/zoo/stage165_gold_order_path.txt`). The same two
    gaps in MgcOvernightCarry.cs: a refused 14:15 exit held the position overnight (closed next day by its stop), and a
    part-filled entry's unfilled rest stopped all later gold trades. A refused entry is safe. To fix as in 168.
+170. **Gold's order-path fixes** (2026-11-26, a research round; `verification/zoo/stage166_gold_order_fixes.txt`). As 168
+   in MgcOvernightCarry.cs: a refused exit is sent again, a part-filled entry's rest is cancelled, now in both
+   strategies even when the filled part is already out (most gold trades stop on their entry bar). Tests for both; no
+   backtest trade changes.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 

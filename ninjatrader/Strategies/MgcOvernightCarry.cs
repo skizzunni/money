@@ -48,6 +48,10 @@ namespace NinjaTrader.NinjaScript.Strategies
         DateTime posDay = DateTime.MinValue;  // the trading day the open trade entered
         bool tradedToday, entryPending, exiting, stopGone;
         DateTime stopGoneUtc = DateTime.MinValue;
+        // docs/STRATEGY_SEARCH.md 169-170: an exit the broker refused is sent again; an entry's unfilled rest is cancelled
+        int exitBar = -1;
+        bool exitRefused, entryPart;
+        Order entryOrder;
         string status = "waiting for history";
         double hwm = double.NaN, cushion = double.NaN;  // the cushion guard (as MnqCleanBand's): no gold trade near the floor
         bool guarded, hwmLive;
@@ -224,6 +228,13 @@ namespace NinjaTrader.NinjaScript.Strategies
                 dayCumStart = CumProfit;
             }
             today.Bars++;
+            RetryExit();  // docs 170: a refused exit, sent again
+            if (entryPart && entryOrder != null)  // also when the filled part is already out (stopped on its entry bar)
+            {
+                Print(Time[0] + "  Gold carry: cancelling the entry's unfilled rest (" + entryOrder.Name + ")");
+                CancelOrder(entryOrder);
+                entryPart = false;
+            }
             if (mm == OpenAt)
             {
                 today.Open = Open[0];
@@ -295,9 +306,23 @@ namespace NinjaTrader.NinjaScript.Strategies
         void Exit(string why)
         {
             int d = Position.MarketPosition == MarketPosition.Long ? 1 : Position.MarketPosition == MarketPosition.Short ? -1 : pos;
+            exitRefused = false;
+            exitBar = CurrentBar;
             if (d > 0) ExitLong(why, "CarryLong"); else ExitShort(why, "CarryShort");
             exiting = true;
             pos = 0;
+        }
+
+        // docs 170: an exit sent on an earlier bar that has not closed the position (the broker refused it) goes again
+        void RetryExit()
+        {
+            int mp = Position.MarketPosition == MarketPosition.Long ? 1 : Position.MarketPosition == MarketPosition.Short ? -1 : 0;
+            if (!exiting || mp == 0 || (!exitRefused && CurrentBar <= exitBar))
+                return;
+            Print(Time[0] + "  Gold carry: the exit was not filled - sending it again (" + (mp > 0 ? "long" : "short") + ")");
+            exitRefused = false;
+            exitBar = CurrentBar;
+            if (mp > 0) ExitLong("Exit retry", "CarryLong"); else ExitShort("Exit retry", "CarryShort");
         }
 
         // a position must never be without its stop: if the broker cancels or rejects it, out at market (as MnqCleanBand)
@@ -305,7 +330,29 @@ namespace NinjaTrader.NinjaScript.Strategies
                                               double averageFillPrice, OrderState orderState, DateTime time, ErrorCode error,
                                               string comment)
         {
-            if (order == null || order.Name != "Stop loss")
+            if (order == null)
+                return;
+            string nm = order.Name;
+            if (nm == "CarryLong" || nm == "CarryShort")  // the entry (docs 170)
+            {
+                if (orderState == OrderState.PartFilled) { entryOrder = order; entryPart = true; }
+                else if (orderState == OrderState.Working || orderState == OrderState.Accepted) entryOrder = order;
+                else if (orderState == OrderState.Filled || orderState == OrderState.Cancelled || orderState == OrderState.Rejected)
+                {
+                    if (entryOrder == null || entryOrder == order) { entryOrder = null; entryPart = false; }
+                }
+                return;
+            }
+            if (nm != "Stop loss" && nm != "Profit target")  // an exit at market (docs 170)
+            {
+                if (orderState == OrderState.Rejected && Position.MarketPosition != MarketPosition.Flat)
+                {
+                    exitRefused = true;
+                    Print(time + "  Gold carry: the exit (" + nm + ") was refused (" + comment + ") - it is sent again on the next bar");
+                }
+                return;
+            }
+            if (nm != "Stop loss")
                 return;
             if (orderState == OrderState.Accepted || orderState == OrderState.Working || orderState == OrderState.Filled)
             {

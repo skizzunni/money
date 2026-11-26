@@ -219,3 +219,42 @@ def test_gold_carry_out_before_an_early_close(sim, tmp_path, mode):  # noqa: F81
         assert (d1, days[i]["mm"][k1], mine[0][5]) == (i, out_at, "Time exit"), (i, d1, days[d1]["mm"][k1], mine[0][5])
     assert all(idx[int(t[1])][0] == idx[int(t[3])][0] for t in tt)
     assert [(t[0], idx[int(t[1])], t[2], t[4]) for t in tt if idx[int(t[1])][0] not in halves] == rest
+
+
+def _gtrades(out: list) -> list:
+    return [x.split(",")[1:] for x in out if x.startswith("T,")]
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+def test_gold_rejected_exit_retries(sim, tmp_path):  # noqa: F811
+    """Docs 169-170: a refused 14:15 time exit is sent again on the next bar (it used to be held overnight and closed the
+    next day by its stop)."""
+    days = synthetic_gold()
+    path = tmp_path / "g.csv"
+    write_gold(days, path)
+    props = dict(MaxContracts=3, StartProfit=5000)
+    base = _gtrades(run(sim, path, **props))
+    te = next(t for t in base if "Time" in t[5])
+    out = run(sim, path, **props, RejectExitsAt=int(te[3]) - 1)
+    hit = next(t for t in _gtrades(out) if t[1] == te[1])
+    assert hit[5] == "Exit retry" and int(hit[3]) == int(te[3]) + 1
+    assert any("was refused" in x for x in out) and any("sending it again" in x for x in out)
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+def test_gold_partial_entry_rest_cancelled(sim, tmp_path):  # noqa: F811
+    """Docs 169-170: an entry filling 1 of 3 and never the rest: the rest is cancelled and gold keeps trading (it used to
+    trade no more)."""
+    days = synthetic_gold()
+    path = tmp_path / "g.csv"
+    write_gold(days, path)
+    props = dict(MaxContracts=3, StartProfit=5000, CushionGuard=0)
+    base = _gtrades(run(sim, path, **props))
+    pe = int(base[2][1])
+    out = run(sim, path, **props, SimPartialEntryAt=pe - 1, SimPartialFirstQty=1, SimPartialDelayBars=-1)
+    got = _gtrades(out)
+    assert any("cancelling the entry's unfilled rest" in x for x in out)
+    x = next(t for t in got if int(t[1]) == pe)
+    later_base = [t[:6] for t in base if int(t[1]) > int(x[3])]
+    later_got = [t[:6] for t in got if int(t[1]) > int(x[3])]
+    assert len(later_got) >= 5 and later_got == later_base

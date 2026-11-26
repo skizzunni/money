@@ -411,7 +411,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             }
             bool inTrade = Position.MarketPosition != MarketPosition.Flat;
             RetryExit();  // docs 168: a refused exit, sent again (any time of day; the bar's bookkeeping still runs)
-            if (entryPart && entryOrder != null && inTrade)  // docs 168: a part-filled entry: cancel its unfilled rest
+            if (entryPart && entryOrder != null)  // docs 168: a part-filled entry: cancel its unfilled rest (in or out)
             {
                 Print(Time[0] + "  Clean band: cancelling the entry's unfilled rest (" + entryOrder.Name + ")");
                 CancelOrder(entryOrder);
