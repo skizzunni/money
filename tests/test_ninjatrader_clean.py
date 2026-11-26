@@ -710,3 +710,21 @@ def test_clean_band_fomc_days(sim, tmp_path):  # noqa: F811
         csv_days = [r["date"] for r in csv.DictReader(f)]
     src = (root / "ninjatrader" / "Strategies" / "MnqCleanBand.cs").read_text()
     assert f'FomcDates = "{",".join(csv_days)}";' in src
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+def test_clean_band_fomc_list_running_out(sim, tmp_path):  # noqa: F811
+    """Docs 185: within 30 days of the FOMC list's last date the chart and the Output window say to add next year's
+    dates (once in the Output window); the shipped list (to Nov 2027) and FomcSkip off say nothing; trades unchanged."""
+    days = synthetic_days()
+    path = tmp_path / "bars.csv"
+    write_bars(days, path)
+    want = "ADD NEXT YEAR'S FOMC DATES (the list ends 2026-01-28)"
+    out = _run_all(sim, path, FomcDates="2026-01-28")
+    assert any(want in x for x in out if x.startswith("D,"))
+    assert sum("the FOMC dates end 2026-01-28" in x for x in out if x.startswith("P,")) == 1
+    for props in ({}, {"FomcSkip": False, "FomcDates": "2026-01-28"}):
+        o = _run_all(sim, path, **props)
+        assert not any("FOMC DATES" in x or "FOMC dates end" in x for x in o)
+    assert [x for x in out if x.startswith("T,")] == [x for x in _run_all(sim, path, FomcDates="2026-01-28,2027-11-17")
+                                                      if x.startswith("T,")]

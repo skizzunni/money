@@ -77,6 +77,8 @@ namespace NinjaTrader.NinjaScript.Strategies
         bool newsSkip;
         bool fomcToday;  // docs 180: an FOMC statement day (14:00): no trades
         HashSet<DateTime> fomcSet;
+        DateTime fomcLast = DateTime.MinValue;
+        bool fomcListOld;  // docs 185: within 30 days of the list's last date (or an empty list): add next year's dates
         // the cushion guard (docs/STRATEGY_SEARCH.md, 38): the trailing floor from the high-water mark, today's cap and day stop
         double hwm = double.NaN, cushion = double.NaN, dayStopToday;
         bool guarded, strongOnly, hwmLive;  // strongOnly: under GuardStrongOnlyBelow $ above the floor, only strong breaks (and the gap trade)
@@ -164,7 +166,10 @@ namespace NinjaTrader.NinjaScript.Strategies
                 {
                     DateTime f;
                     if (DateTime.TryParseExact(x.Trim(), "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out f))
+                    {
                         fomcSet.Add(f.Date);
+                        if (f.Date > fomcLast) fomcLast = f.Date;
+                    }
                     else
                         Print("Clean band: FOMC date '" + x + "' is not yyyy-MM-dd - ignored");
                 }
@@ -269,6 +274,11 @@ namespace NinjaTrader.NinjaScript.Strategies
             // and moves would come from a later bar: no trades today and the day kept out of the history
             today.NoOpen = firstMm != 570;
             fomcToday = FomcSkip && fomcSet != null && fomcSet.Contains(date.Date);
+            bool wasOld = fomcListOld;
+            fomcListOld = FomcSkip && (fomcSet == null || fomcSet.Count == 0 || date.Date > fomcLast.AddDays(-30));
+            if (fomcListOld && !wasOld)
+                Print(Time[0] + "  Clean band: the FOMC dates end " + (fomcLast == DateTime.MinValue ? "(none listed)" : fomcLast.ToString("yyyy-MM-dd")) +
+                      " - add next year's statement days to \"FOMC statement days\" (federalreserve.gov, docs 180)");
             if (fomcToday)
                 Print(Time[0] + "  Clean band: an FOMC day (the 14:00 Fed statement) - no trades today (docs 180)");
             if (today.NoOpen)
@@ -430,6 +440,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                                        newsSkip ? newsSpike.ToString("F1", CultureInfo.InvariantCulture) + "x: no trades today" :
                                        newsSpike.ToString("F1", CultureInfo.InvariantCulture) + "x" + (newsSpike >= NewsBigAt ? " (+1 contract)" : "")) +
                          (fomcToday ? " | FOMC day (14:00 Fed statement): no trades today" : "") +
+                         (fomcListOld ? " | ADD NEXT YEAR'S FOMC DATES (the list ends " + (fomcLast == DateTime.MinValue ? "empty" : fomcLast.ToString("yyyy-MM-dd")) + ")" : "") +
                          " | trades today " + tradesToday + " | profit over start $" + Profit().ToString("F0", CultureInfo.InvariantCulture);
             Draw.TextFixed(this, "clean_dash", txt, TextPosition.TopRight);
         }

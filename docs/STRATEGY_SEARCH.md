@@ -1176,6 +1176,11 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    58 (2015-19) and 48 of 63 (2020-25) are big-news days (6x and up: a contract more), 3 each mild (no trades), the
    rest as usual. A separate NFP rule would re-test the news rule (sections 15, 104); not run. CPI and the other 08:30
    releases are the same case.
+185. **A warning before the FOMC list runs out** (2026-11-26, a research round). Section 180's list ends with the last
+   date entered (now Nov 17 2027); past it the FOMC skip would stop without a word. From 30 days before the list's
+   last date (or with an empty list), MnqCleanBand's chart says "ADD NEXT YEAR'S FOMC DATES (the list ends ...)" and
+   the Output window says so once. No effect on the trades; a test checks the warning, its silence on the shipped
+   list and with the skip off, and that the trades do not change.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
@@ -1333,7 +1338,8 @@ NinjaTrader 8, on each funded account (both the same way):
    - **FOMC days (section 180):** the strategy sits out the Fed's statement days (next: Wed Dec 9 2026; 2027: Jan 27,
      Mar 17, Apr 28, Jun 9, Jul 28, Sep 15, Oct 27, Nov 17, tentative). Each December, add the next year's dates from
      federalreserve.gov (Monetary Policy > Meeting calendars, the last day of each meeting) to "FOMC statement days"
-     (MNQ group "6. News"; the same in the Pine inputs).
+     (MNQ group "6. News"; the same in the Pine inputs). The MNQ chart says ADD NEXT YEAR'S FOMC DATES from 30
+     days before the list's last date (section 185).
    - The settings you rely on: Gap at least 0.6; Second stop step 1.5 / 0.5; Gap: no trade over 1.75; Place orders on.
    - Gold chart: "waiting for history" until Monday's 08:30 check is normal; it must then say OK (or NOT READY: raise
      Days to load to 30+).
