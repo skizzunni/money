@@ -107,6 +107,37 @@ def test_pine_clean_band_dashboard():
 
 
 @pytest.mark.slow
+def test_pine_clean_band_band_lines():
+    """Docs 174: the plotted bands are level lines: nothing before the session's first check (10:00), each check's band
+    (the formula on the check bar) held until the next check, never carried into the next session (display only)."""
+    pytest.importorskip("pynescript", reason="pip install pynescript to check the .pine files")
+    import math
+
+    from pine_interpreter import PineRuntime, load_pine
+    days = fixture_days()
+    bars, idx = bars_of(days)
+    rt = PineRuntime(load_pine(PINE), bars, {}, timeframe_seconds=300)
+    seen, held = [], 0
+
+    def on_bar(i, g):
+        seen.append((g["upBand"], g["loBand"], g["isCheck"]))
+    rt.run(on_bar)
+    for i, (up, lo, chk) in enumerate(seen):
+        di, k = idx[i]
+        mm = days[di]["mm"][k]
+        if mm + 5 < 600:   # before the first check: no line (so the line breaks between sessions)
+            assert up is None or math.isnan(up), (days[di]["d"], mm)
+            continue
+        if not chk and i > 0 and idx[i - 1][0] == di:
+            assert (up, lo) == seen[i - 1][:2] or (math.isnan(up) and math.isnan(seen[i - 1][0]))
+            held += up == up
+        if up == up:
+            assert up > lo
+    assert held > 1000
+    assert sum(1 for up, _lo, chk in seen if chk and up == up) > 100
+
+
+@pytest.mark.slow
 def test_pine_clean_band_news_days():
     """The news rule in Pine (extended hours): as tests/test_ninjatrader_clean.py's news test, trade for trade."""
     pytest.importorskip("pynescript", reason="pip install pynescript to check the .pine files")

@@ -1080,6 +1080,17 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    side, 1 tick of slippage on every fill: the research's figures). The six differences by design (extended hours, the
    target's first bar, size from the account vs the Strategy Tester, costs set in the Properties tab, the data at the
    roll, broker events) are now listed under "TradingView", so a mismatch can be told apart from a bug.
+174. **The user's TradingView charts, trade by trade; the bands as level lines** (2026-11-26, a research round;
+   `verification/zoo/stage168_tv_window_trades.txt`). The Pine script run on the live set (regular hours, as the user's
+   chart) gives the same days, sides and exits as the user's TradingView charts for Oct 5 - Nov 20 (Oct 5's four longs,
+   Oct 14's target, Oct 15-16, Oct 20, Oct 22, Oct 30, Nov 5, Nov 9's gap long, Nov 13, Nov 16, Nov 19-20); only the
+   sizes differ, by the Strategy Tester's start (checklist item 3). The user's chart is regular hours ("news n/a"), so
+   it trades two news days NinjaTrader skips: Oct 22 (+$1,001 at 3 contracts) and Nov 5 (+$1,496 at 3); Sep 16 (-$40)
+   too. In this window the news rule would have given up about $2,450 at these sizes; it was chosen on 2015-2025 and
+   kept (one window is not a test), but the TradingView number for this window is that much above what the live bot
+   would have made. The plotted bands drew a diagonal from each day's 15:00 check to the next day's 10:00 check; now
+   each check's level is held until the next check and the line breaks between sessions (display only, no trade
+   changes; a test checks the held levels and the break).
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
@@ -1152,11 +1163,13 @@ bar (NinjaTrader's bracket works from the fill bar). **Turn on extended hours** 
 Session: Extended / ETH): the news rule reads the 08:20-08:30 bars, and without them it is off, so TradingView then
 trades the mild-news days that NinjaTrader (on its ETH chart) skips, and the two disagree. The chart's top-right table
 says "news n/a - turn on extended hours" when that is the case (section 172), and also shows "NOT READY" / "NO
-TRADING TODAY: no 09:30 bar" and any check that is off, as NinjaTrader's dashboard does.
+TRADING TODAY: no 09:30 bar" and any check that is off, as NinjaTrader's dashboard does. The teal / maroon lines are
+the bands: each check's level (10:00, 10:30, ... 15:00), held until the next check, with no line before 10:00.
 
 **TradingView against NinjaTrader: what differs by design (section 173).** Check these before calling a mismatch a bug:
 1. **Extended hours.** The TradingView chart needs extended hours (ETH) for the news rule, as NinjaTrader's chart does;
-   without them TradingView trades the mild-news days NinjaTrader skips (its table says "news n/a").
+   without them TradingView trades the mild-news days NinjaTrader skips (its table says "news n/a"). In Aug 27 - Nov 23
+   2026 that is Oct 22 and Nov 5, both winners (section 174): a regular-hours chart shows more than the live bot made.
 2. **The take-profit's first bar.** Pine sets the target from the fill price after the fill bar, so it can only fill
    from the next bar; NinjaTrader's bracket works from the fill bar. A trade that hit +2.5R on its entry bar is a
    target in NinjaTrader and runs on in TradingView.

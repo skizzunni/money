@@ -1,0 +1,64 @@
+Docs section 174 (2026-11-26): pine/mnq_clean_band.pine run on the Pine interpreter over the live MNQ set (regular hours
+only, as a TradingView chart without extended hours: the news rule off), Jun 29 - Nov 23 2026, default inputs, a fresh
+$50,000 from Jun 29; trades from Aug 27. 'news skip' marks the days the news rule (2-3x spike: no trades) skips on an
+extended-hours chart and in NinjaTrader. Command: tests' bars_of + PineRuntime on sets['live'][0].
+
+2026-08-27 12:30 long  x1 29888.25 -> 29922.75 Stop loss         +67.76  
+2026-08-28 11:00 long  x1 30080.75 -> 30077.50 Stop loss          -7.74  
+2026-08-28 12:30 short x1 29773.00 -> 29832.75 Stop loss        -120.74  
+2026-08-28 13:00 short x1 29786.25 -> 29784.50 Stop loss          +2.26  
+2026-09-01 09:35 short x1 29383.75 -> 29396.50 Stop loss         -26.74  
+2026-09-04 10:00 long  x1 29975.75 -> 29943.25 Stop loss         -66.24  
+2026-09-15 10:30 short x1 29326.25 -> 29238.25 Session end      +174.76  
+2026-09-16 09:35 long  x1 29406.00 -> 29386.50 Stop loss         -40.24  news skip
+2026-09-21 09:35 long  x1 30252.25 -> 30407.75 Gap exit         +309.76  
+2026-09-21 10:00 long  x2 30416.75 -> 30666.75 Profit target    +997.52  
+2026-09-22 10:00 long  x1 30930.00 -> 30931.75 Stop loss          +2.26  
+2026-09-22 11:00 long  x1 30925.25 -> 30920.00 Stop loss         -11.74  
+2026-09-22 11:30 long  x1 30928.50 -> 30921.00 Stop loss         -16.24  
+2026-09-22 13:00 long  x1 30941.25 -> 31040.25 Session end      +196.76  
+2026-09-28 09:35 short x2 30677.00 -> 30653.25 Gap exit          +92.52  
+2026-09-30 10:00 long  x2 30841.25 -> 30824.25 Stop loss         -70.48  
+2026-09-30 11:00 long  x2 30844.00 -> 30828.00 Stop loss         -66.48  
+2026-09-30 11:30 long  x2 30855.75 -> 30835.25 Stop loss         -84.48  
+2026-09-30 12:00 long  x2 30879.50 -> 30846.25 Back inside      -135.48  
+2026-10-05 10:30 long  x1 31233.25 -> 31205.75 Stop loss         -56.24  
+2026-10-05 11:00 long  x1 31248.25 -> 31212.25 Stop loss         -73.24  
+2026-10-05 12:30 long  x1 31239.50 -> 31238.50 Stop loss          -3.24  
+2026-10-05 13:30 long  x1 31276.00 -> 31309.50 Session end       +65.76  
+2026-10-14 11:30 short x1 30393.25 -> 30143.25 Profit target    +498.76  
+2026-10-15 09:35 short x2 29721.00 -> 29745.75 Stop loss        -101.48  
+2026-10-16 09:35 short x2 29970.25 -> 29854.75 Gap exit         +459.52  
+2026-10-16 10:00 short x2 29837.00 -> 29885.50 Stop loss        -196.48  
+2026-10-16 11:00 short x2 29861.75 -> 29611.75 Profit target    +997.52  
+2026-10-16 12:30 short x3 29675.50 -> 29425.50 Profit target   +1496.28  
+2026-10-20 09:35 short x3 29530.75 -> 29561.75 Stop loss        -189.72  
+2026-10-22 10:30 short x3 29358.50 -> 29356.75 Stop loss          +6.78  news skip
+2026-10-22 11:30 short x3 29288.25 -> 29371.25 Stop loss        -501.72  news skip
+2026-10-22 12:30 short x3 29338.50 -> 29088.50 Profit target   +1496.28  news skip
+2026-10-30 09:35 short x3 28693.00 -> 28724.00 Stop loss        -189.72  
+2026-10-30 10:30 short x3 28672.75 -> 28692.00 Stop loss        -119.22  
+2026-10-30 12:30 short x3 28613.00 -> 28626.75 Stop loss         -86.22  
+2026-10-30 13:00 short x3 28523.00 -> 28273.00 Profit target   +1496.28  
+2026-11-05 10:00 short x3 27533.75 -> 27283.75 Profit target   +1496.28  news skip
+2026-11-09 09:35 long  x3 27458.00 -> 27744.75 Gap exit        +1716.78  
+2026-11-13 10:00 short x3 28087.50 -> 27837.50 Profit target   +1496.28  
+2026-11-13 10:30 short x3 27840.50 -> 27838.75 Stop loss          +6.78  
+2026-11-13 11:00 short x3 27827.25 -> 27825.50 Stop loss          +6.78  
+2026-11-13 11:30 short x3 27847.25 -> 27845.50 Stop loss          +6.78  
+2026-11-13 12:00 short x3 27826.75 -> 27926.75 Stop loss        -603.72  
+2026-11-13 12:30 short x3 27924.25 -> 27932.75 Stop loss         -54.72  
+2026-11-13 13:00 short x3 27914.50 -> 27932.00 Stop loss        -108.72  
+2026-11-16 09:35 short x3 27542.25 -> 27573.25 Stop loss        -189.72  
+2026-11-16 10:30 short x3 27383.00 -> 27432.25 Stop loss        -299.22  
+2026-11-16 13:30 short x3 27325.25 -> 27323.50 Stop loss          +6.78  
+2026-11-19 09:35 long  x3 27808.00 -> 27777.75 Stop loss        -185.22  
+2026-11-20 09:35 short x3 26163.50 -> 26195.25 Stop loss        -194.22  
+2026-11-20 10:30 short x3 26049.50 -> 25799.50 Profit target   +1496.28  
+2026-11-20 11:30 short x3 25786.00 -> 25536.00 Profit target   +1496.28  
+2026-11-20 12:30 short x3 25576.25 -> 25574.50 Stop loss          +6.78  
+2026-11-20 14:00 short x3 25619.50 -> 25369.50 Profit target   +1496.28  
+
+News days in the window (spike x): 09-16 2.03, 09-25 2.0, 10-09 2.42, 10-22 2.47, 11-03 2.13, 11-04 2.11, 11-05 2.29,
+11-06 2.63, 11-23 2.23 (no trades); 11-10 7.28 (+1 contract, no trade). The skipped trades: 09-16 -$40, 10-22 +$1,001,
+11-05 +$1,496 at these sizes.

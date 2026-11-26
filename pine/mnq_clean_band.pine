@@ -341,8 +341,17 @@ if inRth and ready and not carryOut
     if pos != 0 and leg == 1 and strategy.position_size != 0
         strategy.exit(bandId + " exit", bandId, stop = stopPx, limit = tgtPx, comment_loss = "Stop loss", comment_profit = "Profit target")
 
-plot(isCheck and not na(array.get(sig, int((endMin - 600) / 30))) ? math.max(dayOpen, prevC) * (1 + array.get(sig, int((endMin - 600) / 30))) : na, "Upper band", color.teal)
-plot(isCheck and not na(array.get(sig, int((endMin - 600) / 30))) ? math.min(dayOpen, prevC) * (1 - array.get(sig, int((endMin - 600) / 30))) : na, "Lower band", color.maroon)
+// the bands as level lines: each check's level held until the next check, broken between sessions (display only)
+var float upBand = na
+var float loBand = na
+if inRth and tBars == 1
+    upBand := na
+    loBand := na
+if isCheck and not na(array.get(sig, int((endMin - 600) / 30)))
+    upBand := math.max(dayOpen, prevC) * (1 + array.get(sig, int((endMin - 600) / 30)))
+    loBand := math.min(dayOpen, prevC) * (1 - array.get(sig, int((endMin - 600) / 30)))
+plot(inRth ? upBand : na, "Upper band", color.teal, style = plot.style_linebr)
+plot(inRth ? loBand : na, "Lower band", color.maroon, style = plot.style_linebr)
 
 // docs/STRATEGY_SEARCH.md 172: what the chart's state is, as MnqCleanBand.cs's dashboard (no effect on the trades)
 var table dash = table.new(position.top_right, 1, 1, bgcolor = color.gray)
