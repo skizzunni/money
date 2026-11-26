@@ -25,9 +25,10 @@
 // News days (the 08:30 volume against 08:20-08:29): NewsSkipFrom-NewsSkipTo x no trades; NewsBigAt x and up a contract
 // more. FOMC statement days (FomcDates, the 14:00 Fed statement; docs 180): no trades. Account: no new entry once the
 // day's closed P/L is down DayStop $; contracts by profit over the start balance (1, 2 from Step2At, 3 from Step3At,
-// never more than MaxContracts); the cushion guard: less than CushionGuard $ above the trailing floor, 1 contract and a day stop of GuardDayStopShare x the cushion; under GuardStrongOnlyBelow $, only band
-// entries GuardStrongOnlyStretch sigmas past the band (and the gap trade). research/zoo/strats.py (noise with nt=True, gap_go)
-// is the same rule in Python and tests/test_ninjatrader_clean.py holds the two to trade-for-trade agreement.
+// never more than MaxContracts); the cushion guard: less than CushionGuard $ above the trailing floor, 1 contract and a
+// day stop of GuardDayStopShare x the cushion; under GuardStrongOnlyBelow $, only band entries GuardStrongOnlyStretch
+// sigmas past the band (and the gap trade). research/zoo/strats.py (noise with nt=True, gap_go) is the same rule in
+// Python and tests/test_ninjatrader_clean.py holds the two to trade-for-trade agreement.
 #region Using declarations
 using System;
 using System.Collections.Generic;
