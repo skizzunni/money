@@ -123,3 +123,23 @@ def test_live_check_cli(tmp_path, capsys):
     L.main([str(path)])
     out = capsys.readouterr().out
     assert "1 trade(s): 1 MNQ" in out and "All trades keep the rules." in out and "+10.00 pts" in out
+
+
+def test_live_check_no_negative_zero_and_no_volume_note(tmp_path, capsys):
+    """Docs 191: a short trade matched exactly prints +0.00, not -0.00; a bars file without volume says the news rule
+    cannot be checked."""
+    days = synthetic_days()
+    for d in days:
+        d["v"] = d["v"] * 0
+    bars = tmp_path / "MNQ.Last.txt"
+    write_bars(days, bars)
+    ref_days = L.days_from_bars(str(bars))
+    assert "has no volume" in capsys.readouterr().out
+    i, r = next((i, r[0]) for i in range(len(ref_days)) for r in [L.reference(ref_days, i)] if r and r[0]["side"] < 0)
+    t = pd.Timestamp(ref_days[i]["d"]) + pd.Timedelta(minutes=r["mm"], seconds=2)
+    path = tmp_path / "t.csv"
+    path.write_text(HEADER + "\n" + row(1, -1, 1, r["entry"], r["exit"], t, t + pd.Timedelta(minutes=10), r["name"],
+                                        r["why"]) + "\n")
+    out = L.report(L.read_trades(str(path)), ref_days)
+    line = next(x for x in out.splitlines() if "matched:" in x)
+    assert "entry +0.00 pts, exit +0.00 pts" in line and "-0.00" not in out

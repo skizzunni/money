@@ -168,6 +168,9 @@ def days_from_bars(path: str) -> list[dict]:
     nm = N.news_map(bars, 1)
     for d in days:
         d["news"] = nm.get(d["d"], (np.nan, np.nan, np.nan))
+    if not (bars.volume > 0).any():
+        print("Note: the bars file has no volume, so the news rule cannot be checked: a mild-news day the strategy sat "
+              "out shows as reference-only trades (export the bars with volume, or read those days with that in mind).")
     return days
 
 
@@ -230,7 +233,8 @@ def compare(trades: list[Trade], days: list[dict]) -> list[str]:
                                                              "stretch is under 1.5" if st else ""))
                 continue
             used.add(id(hit))
-            de, dx = (hit.entry - r["entry"]) * r["side"], (hit.exit - r["exit"]) * r["side"]
+            de = round((hit.entry - r["entry"]) * r["side"], 2) + 0.0  # + 0.0: no "-0.00"
+            dx = round((hit.exit - r["exit"]) * r["side"], 2) + 0.0
             lines.append(f"  matched: {desc} | live {hit.entry:.2f} -> {hit.exit:.2f} ({hit.name_out}), entry "
                          f"{de:+.2f} pts, exit {dx:+.2f} pts")
         for t in live:

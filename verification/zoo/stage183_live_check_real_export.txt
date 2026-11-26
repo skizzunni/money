@@ -1,0 +1,62 @@
+Docs section 191 (2026-11-26): research/live_check.py end to end on a real NinjaTrader export (MNQ 12-26, 1 Minute, Last,
+Jun 28 - Oct 16 2026; no volume in it), with a trades CSV in NinjaTrader's export format built from the reference's
+trades on the last 25 sessions (the account column a placeholder). Output:
+
+Note: the bars file has no volume, so the news rule cannot be checked: a mild-news day the strategy sat out shows as reference-only trades (export the bars with volume, or read those days with that in mind).
+22 trade(s): 22 MNQ, 0 other
+2026-09-15 10:30:03 MNQ 12-26 Short x1 29326.25 -> 29238.25 10:50:03 Session end: +88.00 pts, $+174.76
+2026-09-21 09:35:03 MNQ 12-26 GapLong x1 30252.25 -> 30407.75 09:55:03 Gap exit: +155.50 pts, $+309.76
+2026-09-21 10:00:03 MNQ 12-26 Long x1 30416.75 -> 30666.75 10:20:03 Profit target: +250.00 pts, $+498.76
+2026-09-22 10:00:03 MNQ 12-26 Long x1 30930.00 -> 30931.75 10:20:03 Stop loss: +1.75 pts, $+2.26
+2026-09-22 11:00:03 MNQ 12-26 Long x1 30925.25 -> 30927.50 11:20:03 Stop loss: +2.25 pts, $+3.26
+2026-09-22 13:00:03 MNQ 12-26 Long x1 30941.25 -> 30924.00 13:20:03 Stop loss: -17.25 pts, $-35.74
+2026-09-22 14:00:03 MNQ 12-26 Long x1 30977.75 -> 31040.25 14:20:03 Session end: +62.50 pts, $+123.76
+2026-09-28 09:35:03 MNQ 12-26 GapShort x1 30677.00 -> 30653.25 09:55:03 Gap exit: +23.75 pts, $+46.26
+2026-09-30 10:00:03 MNQ 12-26 Long x1 30841.25 -> 30824.25 10:20:03 Stop loss: -17.00 pts, $-35.24
+2026-09-30 11:00:03 MNQ 12-26 Long x1 30844.00 -> 30828.00 11:20:03 Stop loss: -16.00 pts, $-33.24
+2026-09-30 11:30:03 MNQ 12-26 Long x1 30855.75 -> 30835.25 11:50:03 Stop loss: -20.50 pts, $-42.24
+2026-09-30 12:00:03 MNQ 12-26 Long x1 30879.50 -> 30846.25 12:20:03 Back inside: -33.25 pts, $-67.74
+2026-10-05 10:30:03 MNQ 12-26 Long x1 31233.25 -> 31205.75 10:50:03 Stop loss: -27.50 pts, $-56.24
+2026-10-05 11:00:03 MNQ 12-26 Long x1 31248.25 -> 31212.25 11:20:03 Stop loss: -36.00 pts, $-73.24
+2026-10-05 12:30:03 MNQ 12-26 Long x1 31239.50 -> 31238.50 12:50:03 Stop loss: -1.00 pts, $-3.24
+2026-10-05 13:30:03 MNQ 12-26 Long x1 31276.00 -> 31309.50 13:50:03 Session end: +33.50 pts, $+65.76
+2026-10-14 11:30:03 MNQ 12-26 Short x1 30393.25 -> 30143.25 11:50:03 Profit target: +250.00 pts, $+498.76
+2026-10-15 09:35:03 MNQ 12-26 GapShort x1 29721.00 -> 29745.75 09:55:03 Stop loss: -24.75 pts, $-50.74
+2026-10-16 09:35:03 MNQ 12-26 GapShort x1 29970.25 -> 29854.75 09:55:03 Gap exit: +115.50 pts, $+229.76
+2026-10-16 10:00:03 MNQ 12-26 Short x1 29837.00 -> 29874.25 10:20:03 Stop loss: -37.25 pts, $-75.74
+2026-10-16 11:00:03 MNQ 12-26 Short x1 29861.75 -> 29611.75 11:20:03 Profit target: +250.00 pts, $+498.76
+2026-10-16 12:30:03 MNQ 12-26 Short x1 29675.50 -> 29425.50 12:50:03 Profit target: +250.00 pts, $+498.76
+All trades keep the rules.
+
+Against the reference (points; contracts come from the account):
+2026-09-15: reference 1 trade(s), live 1
+  matched: 10:30 Short    29326.25 -> 29238.25 (Session end, stretch 0.38) | live 29326.25 -> 29238.25 (Session end), entry +0.00 pts, exit +0.00 pts
+2026-09-21: reference 2 trade(s), live 2
+  matched: 09:35 GapLong  30252.25 -> 30407.75 (Gap exit) | live 30252.25 -> 30407.75 (Gap exit), entry +0.00 pts, exit +0.00 pts
+  matched: 10:00 Long     30416.75 -> 30666.75 (Profit target, stretch 2.31) | live 30416.75 -> 30666.75 (Profit target), entry +0.00 pts, exit +0.00 pts
+2026-09-22: reference 4 trade(s), live 4
+  matched: 10:00 Long     30930.00 -> 30931.75 (Stop loss, stretch 0.94) | live 30930.00 -> 30931.75 (Stop loss), entry +0.00 pts, exit +0.00 pts
+  matched: 11:00 Long     30925.25 -> 30927.50 (Stop loss, stretch 0.23) | live 30925.25 -> 30927.50 (Stop loss), entry +0.00 pts, exit +0.00 pts
+  matched: 13:00 Long     30941.25 -> 30924.00 (Stop loss, stretch 0.15) | live 30941.25 -> 30924.00 (Stop loss), entry +0.00 pts, exit +0.00 pts
+  matched: 14:00 Long     30977.75 -> 31040.25 (Session end, stretch 0.37) | live 30977.75 -> 31040.25 (Session end), entry +0.00 pts, exit +0.00 pts
+2026-09-28: reference 1 trade(s), live 1
+  matched: 09:35 GapShort 30677.00 -> 30653.25 (Gap exit) | live 30677.00 -> 30653.25 (Gap exit), entry +0.00 pts, exit +0.00 pts
+2026-09-30: reference 4 trade(s), live 4
+  matched: 10:00 Long     30841.25 -> 30824.25 (Stop loss, stretch 0.69) | live 30841.25 -> 30824.25 (Stop loss), entry +0.00 pts, exit +0.00 pts
+  matched: 11:00 Long     30844.00 -> 30828.00 (Stop loss, stretch 0.12) | live 30844.00 -> 30828.00 (Stop loss), entry +0.00 pts, exit +0.00 pts
+  matched: 11:30 Long     30855.75 -> 30835.25 (Stop loss, stretch 0.15) | live 30855.75 -> 30835.25 (Stop loss), entry +0.00 pts, exit +0.00 pts
+  matched: 12:00 Long     30879.50 -> 30846.25 (Back inside, stretch 0.23) | live 30879.50 -> 30846.25 (Back inside), entry +0.00 pts, exit +0.00 pts
+2026-10-05: reference 4 trade(s), live 4
+  matched: 10:30 Long     31233.25 -> 31205.75 (Stop loss, stretch 0.19) | live 31233.25 -> 31205.75 (Stop loss), entry +0.00 pts, exit +0.00 pts
+  matched: 11:00 Long     31248.25 -> 31212.25 (Stop loss, stretch 0.40) | live 31248.25 -> 31212.25 (Stop loss), entry +0.00 pts, exit +0.00 pts
+  matched: 12:30 Long     31239.50 -> 31238.50 (Stop loss, stretch 0.12) | live 31239.50 -> 31238.50 (Stop loss), entry +0.00 pts, exit +0.00 pts
+  matched: 13:30 Long     31276.00 -> 31309.50 (Session end, stretch 0.37) | live 31276.00 -> 31309.50 (Session end), entry +0.00 pts, exit +0.00 pts
+2026-10-14: reference 1 trade(s), live 1
+  matched: 11:30 Short    30393.25 -> 30143.25 (Profit target, stretch 0.57) | live 30393.25 -> 30143.25 (Profit target), entry +0.00 pts, exit +0.00 pts
+2026-10-15: reference 1 trade(s), live 1
+  matched: 09:35 GapShort 29721.00 -> 29745.75 (Stop loss) | live 29721.00 -> 29745.75 (Stop loss), entry +0.00 pts, exit +0.00 pts
+2026-10-16: reference 4 trade(s), live 4
+  matched: 09:35 GapShort 29970.25 -> 29854.75 (Gap exit) | live 29970.25 -> 29854.75 (Gap exit), entry +0.00 pts, exit +0.00 pts
+  matched: 10:00 Short    29837.00 -> 29874.25 (Stop loss, stretch 1.46) | live 29837.00 -> 29874.25 (Stop loss), entry +0.00 pts, exit +0.00 pts
+  matched: 11:00 Short    29861.75 -> 29611.75 (Profit target, stretch 0.47) | live 29861.75 -> 29611.75 (Profit target), entry +0.00 pts, exit +0.00 pts
+  matched: 12:30 Short    29675.50 -> 29425.50 (Profit target, stretch 1.91) | live 29675.50 -> 29425.50 (Profit target), entry +0.00 pts, exit +0.00 pts

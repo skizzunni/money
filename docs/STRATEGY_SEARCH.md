@@ -1215,6 +1215,13 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    below the placebo (the same cap on random days: $10,460-10,968 / $13,957-15,384); at most 3 and 2 losers also
    lower in both periods. The re-entries on short days pay for themselves; the bad short days are their price, and the
    day stop already bounds them. Rejected; nothing changes.
+191. **live_check.py on a real NinjaTrader export; the defaults audit** (2026-11-26, a research round;
+   `verification/zoo/stage183_live_check_real_export.txt`). The checker run end to end on the real MNQ 12-26 1-minute
+   export (Jun 28 - Oct 16 2026) with a trades file in NinjaTrader's format for the last 25 sessions: all 22 trades
+   matched at 0.00 points, none flagged, none on one side only. Two fixes: an exact match on a short printed "-0.00"
+   (now "+0.00"); that export has no volume, so the news rule cannot be read from it, and the checker now says so (a
+   mild-news day would show as reference-only trades). Also checked: every MnqCleanBand default equals the Pine input's
+   and the "Defaults" paragraph (trend 20 ... FOMC skip on); gold's as the user's screenshot. Test added.
 
 ## The result (the shipped defaults, 2026-11-26, sections 1-90 and 180; research numbers, $0.62 a side)
 
