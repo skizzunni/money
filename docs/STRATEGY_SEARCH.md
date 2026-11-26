@@ -1208,6 +1208,13 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    trade look like any day. Overall the shorts pay as the longs do (section 155), so this is about how short days
    lose: several entries in a falling, swinging market. A candidate for the next rounds: fewer re-entries or a smaller
    day stop on short days, tested by period with a placebo. Descriptive; nothing changes.
+190. **Fewer re-entries on short days** (2026-11-26, a research round; `research/zoo/short_day_cap.py`,
+   `verification/zoo/stage182_short_day_cap.txt`). Section 189's candidate. On days whose first band trade is short:
+   at most 2 / 3 band entries, or at most 2 losing band trades. Every variant cuts profitable trades: at most 2 costs
+   $3,850 / $6,935 a contract (2015-19 / 2020-25), medians from $50,000 $11,810 to $8,825 and $16,201 to $13,689,
+   below the placebo (the same cap on random days: $10,460-10,968 / $13,957-15,384); at most 3 and 2 losers also
+   lower in both periods. The re-entries on short days pay for themselves; the bad short days are their price, and the
+   day stop already bounds them. Rejected; nothing changes.
 
 ## The result (the shipped defaults, 2026-11-26, sections 1-90 and 180; research numbers, $0.62 a side)
 

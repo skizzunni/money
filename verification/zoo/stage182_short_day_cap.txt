@@ -1,0 +1,42 @@
+Docs section 190 (2026-11-26): python zoo/short_day_cap.py (from research/).
+
+2015-19: 162 short first-band days, 249 long
+  shipped: $50,000 0.4% / $11,810 $48,806 3.8% / $8,008 $48,998 2.1% / $8,835
+  short days, at most 2 band entries: 124 trades cut, $-3,850 a contract; by year 2015:-738 2016:-861 2017:-174 2018:-977 2019:-1,101
+     shuffled: $50,000 0.2% / $8,825 $48,806 3.5% / $5,853 $48,998 2.0% / $6,317
+  long days, at most 2 band entries: 96 trades cut, $+16 a contract; by year 2015:-177 2016:-454 2017:+219 2018:+75 2019:+353
+     shuffled: $50,000 0.3% / $12,011 $48,806 3.6% / $8,360 $48,998 1.9% / $8,983
+  short days, at most 3 band entries: 58 trades cut, $-2,080 a contract; by year 2015:-660 2016:-814 2017:+10 2018:-370 2019:-245
+     shuffled: $50,000 0.4% / $10,243 $48,806 3.9% / $6,935 $48,998 2.3% / $7,618
+  long days, at most 3 band entries: 37 trades cut, $+365 a contract; by year 2015:-182 2016:+105 2017:+201 2018:+306 2019:-65
+     shuffled: $50,000 0.3% / $12,207 $48,806 3.6% / $8,496 $48,998 2.2% / $9,266
+  short days, at most 2 losing band trades: 43 trades cut, $-253 a contract; by year 2015:+334 2016:-88 2017:+161 2018:-701 2019:+41
+     shuffled: $50,000 0.2% / $11,511 $48,806 3.8% / $7,733 $48,998 2.1% / $8,607
+  long days, at most 2 losing band trades: 65 trades cut, $+338 a contract; by year 2015:-124 2016:+87 2017:+167 2018:+68 2019:+139
+     shuffled: $50,000 0.4% / $12,331 $48,806 3.6% / $8,601 $48,998 2.1% / $9,310
+  placebo 1: random days at the short rate, at most 2 band entries: 96 trades cut, $-1,322 a contract; by year 2015:-1,221 2016:-318 2017:+322 2018:+206 2019:-311
+     shuffled: $50,000 0.1% / $10,460 $48,806 3.6% / $7,062 $48,998 1.9% / $7,754
+  placebo 2: random days at the short rate, at most 2 band entries: 89 trades cut, $-1,686 a contract; by year 2015:-453 2016:-621 2017:-88 2018:+463 2019:-986
+     shuffled: $50,000 0.4% / $10,646 $48,806 3.9% / $7,047 $48,998 2.1% / $7,906
+  placebo 3: random days at the short rate, at most 2 band entries: 86 trades cut, $-972 a contract; by year 2015:-227 2016:-592 2017:-178 2018:+787 2019:-762
+     shuffled: $50,000 0.2% / $10,968 $48,806 3.6% / $7,602 $48,998 2.1% / $8,321
+2020-25: 193 short first-band days, 261 long
+  shipped: $50,000 1.3% / $16,201 $48,806 5.8% / $11,922 $48,998 3.4% / $12,872
+  short days, at most 2 band entries: 172 trades cut, $-6,935 a contract; by year 2020:-1,233 2021:-1,504 2022:-4,430 2023:+92 2024:+27 2025:+112
+     shuffled: $50,000 1.1% / $13,689 $48,806 5.2% / $9,578 $48,998 3.1% / $10,231
+  long days, at most 2 band entries: 146 trades cut, $-5,445 a contract; by year 2020:-1,309 2021:-770 2022:-1,528 2023:-895 2024:-1,242 2025:+298
+     shuffled: $50,000 1.2% / $13,595 $48,806 5.7% / $10,031 $48,998 2.9% / $10,517
+  short days, at most 3 band entries: 84 trades cut, $-1,492 a contract; by year 2020:-901 2021:+275 2022:-30 2023:+7 2024:-325 2025:-518
+     shuffled: $50,000 0.9% / $15,773 $48,806 5.7% / $11,771 $48,998 3.3% / $12,563
+  long days, at most 3 band entries: 47 trades cut, $-1,202 a contract; by year 2020:-373 2021:-87 2022:-508 2023:-369 2024:+29 2025:+106
+     shuffled: $50,000 1.1% / $15,916 $48,806 5.4% / $11,696 $48,998 3.0% / $12,553
+  short days, at most 2 losing band trades: 69 trades cut, $-2,388 a contract; by year 2020:-1,308 2021:+216 2022:-1,100 2023:-82 2024:+307 2025:-421
+     shuffled: $50,000 1.0% / $15,124 $48,806 5.9% / $10,682 $48,998 3.4% / $11,617
+  long days, at most 2 losing band trades: 60 trades cut, $-2,078 a contract; by year 2020:-652 2021:+118 2022:+387 2023:-585 2024:-1,234 2025:-112
+     shuffled: $50,000 1.1% / $15,436 $48,806 5.7% / $11,257 $48,998 3.1% / $11,963
+  placebo 1: random days at the short rate, at most 2 band entries: 137 trades cut, $-3,382 a contract; by year 2020:-680 2021:+544 2022:-3,170 2023:-476 2024:+528 2025:-128
+     shuffled: $50,000 1.1% / $15,384 $48,806 5.2% / $11,402 $48,998 2.9% / $12,051
+  placebo 2: random days at the short rate, at most 2 band entries: 123 trades cut, $-4,443 a contract; by year 2020:-274 2021:-615 2022:-1,922 2023:-530 2024:-1,227 2025:+125
+     shuffled: $50,000 1.1% / $13,957 $48,806 5.7% / $10,100 $48,998 2.9% / $10,874
+  placebo 3: random days at the short rate, at most 2 band entries: 130 trades cut, $-3,383 a contract; by year 2020:-880 2021:-1,098 2022:-1,000 2023:+295 2024:-1,268 2025:+568
+     shuffled: $50,000 1.1% / $14,227 $48,806 5.5% / $10,262 $48,998 3.0% / $11,030
