@@ -1115,7 +1115,7 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    `verification/zoo/stage171_overnight_range.txt`). Section 113 said the overnight range could not be tested; it can
    (the NQ 1-minute data holds 18:00-09:29, `zoo/overnight.py`). Band trades entering beyond the overnight high (a
    long) / low (a short) against inside it: PF 1.52 / 1.77 (2015-19), 1.64 / 1.55 (2020-25), ES 1.25 / 1.49; 90% of
-   band trades are beyond, and the inside ones (83 / 109) are better in 6 of 11 years. The gap trade: 2.04 / 1.99,
+   band trades are beyond, and the inside ones (83 / 109) are better in 5 of 11 years. The gap trade: 2.04 / 1.99,
    1.62 / 1.79. No side holds across the periods: nothing to filter or size on. Nothing changes.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
