@@ -1,0 +1,40 @@
+Docs section 177 (2026-11-26): python zoo/overnight_range.py (from research/), the overnight range from zoo_days_on.pkl
+(zoo/overnight.py: 18:00-09:29 from the NQ / ES / MNQ 1-minute data, which hold the overnight hours).
+
+2015-19
+  band beyond: 790 trades, PF 1.52, $+19.0 a trade, $+15,023
+  band inside: 83 trades, PF 1.77, $+28.6 a trade, $+2,372
+  gap beyond: 119 trades, PF 2.04, $+33.7 a trade, $+4,006
+  gap inside: 153 trades, PF 1.99, $+29.5 a trade, $+4,516
+  band by year, $ a trade beyond / inside (n):
+    2015: +13.4 (156) / -1.2 (16)
+    2016: +15.9 (155) / +44.1 (21)
+    2017: +7.3 (133) / -13.2 (9)
+    2018: +33.9 (193) / +33.7 (21)
+    2019: +19.3 (153) / +54.8 (16)
+
+2020-25
+  band beyond: 982 trades, PF 1.64, $+29.0 a trade, $+28,429
+  band inside: 109 trades, PF 1.55, $+27.5 a trade, $+2,995
+  gap beyond: 152 trades, PF 1.62, $+25.0 a trade, $+3,796
+  gap inside: 154 trades, PF 1.79, $+31.7 a trade, $+4,879
+  band by year, $ a trade beyond / inside (n):
+    2020: +21.2 (152) / +6.2 (23)
+    2021: +55.7 (160) / -16.3 (25)
+    2022: +30.0 (239) / +11.5 (31)
+    2023: +27.7 (181) / +64.7 (6)
+    2024: +25.9 (157) / +115.0 (16)
+    2025: +0.5 (93) / +84.4 (8)
+
+ES 2020-24
+  band beyond: 268 trades, PF 1.25, $+4.6 a trade, $+1,235
+  band inside: 37 trades, PF 1.49, $+6.9 a trade, $+254
+  gap beyond: 34 trades, PF 0.84, $-2.8 a trade, $-96
+  gap inside: 55 trades, PF 0.62, $-6.6 a trade, $-366
+
+live 2026
+  band beyond: 48 trades, PF 5.20, $+104.2 a trade, $+5,003
+  band inside: 5 trades, PF 3.91, $+110.3 a trade, $+551
+  gap beyond: 6 trades, PF 1.84, $+43.5 a trade, $+261
+  gap inside: 12 trades, PF 1.19, $+7.7 a trade, $+92
+

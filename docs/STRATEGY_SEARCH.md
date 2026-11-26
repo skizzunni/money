@@ -808,7 +808,7 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    `verification/zoo/stage112_gap_won_add.txt`). Band trades the same way as a gap trade that won: PF 2.43 / 2.49
    (2015-19 / 2020-25) against 1.54 / 1.59 with no gap trade, but ES 1.09. One contract more on them: medians -$925 /
    +$96, inside a placebo's range. After a gap loss PF 1.03 / 1.36 (live 15.5 on 13 trades): no skip. Nothing used.
-   The overnight range is not testable (the NQ data starts at 09:30).
+   The overnight range: section 177 (the NQ 1-minute data does hold the overnight hours).
 114. **The opening volume** (2026-11-25, a research round; `research/zoo/open_volume.py`,
    `verification/zoo/stage113_open_volume.txt`). The 09:30-10:00 volume against its 14-session average for the band
    trades: no order that holds (the low tercile best on 2015-19 at PF 1.73, worst on 2020-25 at 1.39). The gap trade
@@ -1111,6 +1111,12 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    is only more size. No band trade against the move lowers the median in both periods ($11,322 to $8,538, $15,582 to
    $11,622) and loses more of the near-floor calendar starts in 2020-25 (1.8% to 14.5%, 0% to 7.3%). Both rejected;
    nothing changes.
+177. **The overnight range** (2026-11-26, a research round; `research/zoo/overnight_range.py`,
+   `verification/zoo/stage171_overnight_range.txt`). Section 113 said the overnight range could not be tested; it can
+   (the NQ 1-minute data holds 18:00-09:29, `zoo/overnight.py`). Band trades entering beyond the overnight high (a
+   long) / low (a short) against inside it: PF 1.52 / 1.77 (2015-19), 1.64 / 1.55 (2020-25), ES 1.25 / 1.49; 90% of
+   band trades are beyond, and the inside ones (83 / 109) are better in 6 of 11 years. The gap trade: 2.04 / 1.99,
+   1.62 / 1.79. No side holds across the periods: nothing to filter or size on. Nothing changes.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
