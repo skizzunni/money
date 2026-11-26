@@ -1076,6 +1076,10 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    extended hours its news rule is silently off (it trades the mild-news days NinjaTrader skips). Now a top-right table:
    Setup (OK / NOT READY / NO TRADING TODAY: no 09:30 bar), the news rule ("n/a - turn on extended hours"), any check
    that is off. No trade changes; a test reads the table. The TradingView section now says to turn on extended hours.
+173. **TradingView against NinjaTrader: a checklist** (2026-11-26, a research round). Pine's costs checked ($0.62 a
+   side, 1 tick of slippage on every fill: the research's figures). The six differences by design (extended hours, the
+   target's first bar, size from the account vs the Strategy Tester, costs set in the Properties tab, the data at the
+   roll, broker events) are now listed under "TradingView", so a mismatch can be told apart from a bug.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
@@ -1149,6 +1153,23 @@ Session: Extended / ETH): the news rule reads the 08:20-08:30 bars, and without 
 trades the mild-news days that NinjaTrader (on its ETH chart) skips, and the two disagree. The chart's top-right table
 says "news n/a - turn on extended hours" when that is the case (section 172), and also shows "NOT READY" / "NO
 TRADING TODAY: no 09:30 bar" and any check that is off, as NinjaTrader's dashboard does.
+
+**TradingView against NinjaTrader: what differs by design (section 173).** Check these before calling a mismatch a bug:
+1. **Extended hours.** The TradingView chart needs extended hours (ETH) for the news rule, as NinjaTrader's chart does;
+   without them TradingView trades the mild-news days NinjaTrader skips (its table says "news n/a").
+2. **The take-profit's first bar.** Pine sets the target from the fill price after the fill bar, so it can only fill
+   from the next bar; NinjaTrader's bracket works from the fill bar. A trade that hit +2.5R on its entry bar is a
+   target in NinjaTrader and runs on in TradingView.
+3. **Size.** TradingView sizes from its own Strategy Tester profit on a fresh $50,000 (inputs "Profit already made at
+   the start $" and "Highest end-of-day balance"); NinjaTrader sizes from the live account. The same trade can be 1
+   contract in one and 2-3 in the other, so compare points, not dollars, unless the inputs are set to the account.
+4. **Costs.** Pine's defaults are $0.62 a contract a side and 1 tick of slippage on every fill (the research's
+   figures). If the Strategy Tester's Properties tab shows other values, they were changed there.
+5. **Data at the roll.** TradingView's continuous MNQ1! and NinjaTrader's dated contract (MNQ 12-26, then 03-27) differ
+   by the roll gap around each roll (step 10); the bands (14 sessions back) can differ for up to 3 weeks after it.
+6. **Fills NinjaTrader can see and TradingView cannot.** A refused or part-filled order (sections 168 / 170), a feed
+   drop or a missing bar (160-164), a restart mid-trade (171): TradingView simulates clean fills on clean data.
+Anything else (a trade on one side only on the same data, a different stop price) is worth sending me.
 
 ## Running it
 
