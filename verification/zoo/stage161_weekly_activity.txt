@@ -1,0 +1,9 @@
+2015-19: 262 weeks | trades a week median 4 (quiet 10% 1, busy 10% 8) | days with a trade median 2 of 5 | weeks with no trade 7% | weeks up 52%, $ a week median 8 at 1 MNQ
+2020-25: 288 weeks | trades a week median 4 (quiet 10% 1, busy 10% 9) | days with a trade median 2 of 5 | weeks with no trade 8% | weeks up 52%, $ a week median 35 at 1 MNQ
+live 2026: 22 weeks | trades a week median 3 (quiet 10% 0, busy 10% 8) | days with a trade median 2 of 5 | weeks with no trade 32% | weeks up 45%, $ a week median 0 at 1 MNQ
+
+Notes (2026-11-26, docs section 165): an expectation for live, not a rule.
+- A normal week brings about 4 trades on 2 of the 5 days (busy weeks 8-9, quiet weeks 0-1).
+- Only about half the weeks end up (52% in both periods, 45% in the 2026 live months): the typical week is small ($8 /
+  $35 at 1 MNQ), and the year's profit comes from fewer, bigger weeks (a target day is +$499 a contract).
+- The 2026 live months were quieter: 32% of weeks without a trade (7-8% in the history).

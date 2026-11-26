@@ -1044,6 +1044,10 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    places no trade and stays out of the history ("NO TRADING TODAY" on the dashboard, an Output line); an Output line
    also warns when an ETH chart's news bars are incomplete. No backtest can change (every day starts at 09:30); parity
    tests with the 09:30 bar removed.
+165. **A normal week** (2026-11-26, a research round; `research/zoo/weekly_activity.py`,
+   `verification/zoo/stage161_weekly_activity.txt`). About 4 trades on 2 of 5 days a week; only about half the weeks
+   end up (52%; 45% live), the typical week small, the profit from fewer big weeks; live 2026 had 32% of weeks without
+   a trade (7-8% in the history). Now in step 12.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
@@ -1203,6 +1207,8 @@ NinjaTrader 8, on each funded account (both the same way):
    - the weakest years at 1 contract (section 147): a very quiet market (2017: the band PF 1.20) or a sharp choppy
      correction (March 2025: the band's worst month on record, -$1,104 a contract); a usual worst month -$300 to -$620
      a contract. Every year 2015-2026 still ended up at 1 contract.
+   - a normal week (section 165): about 4 trades on 2 of the 5 days; only about half the weeks end up, and the year's
+     profit comes from fewer, bigger weeks; a week without a trade happens (7-8% of weeks, 32% in the 2026 live months).
    None of those lost an account in the history. A run like this is not a fault; a run well past these is a reason to
    stop and check the setup (step 11) and the trades against TradingView.
 
