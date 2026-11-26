@@ -1,0 +1,19 @@
+Stage 164 (2026-11-26, docs section 168): section 167's two order-path gaps fixed in MnqCleanBand.cs.
+
+1. A refused exit is sent again. Exit() records its bar and the entry it closes; OnOrderUpdate marks a refused market
+   exit (any order that is not an entry, the stop or the target) while a position is open; RetryExit(), at the start
+   of every bar (any time of day, before the outside-hours and carried-position checks, without skipping the bar's
+   bookkeeping), sends the exit again ("Exit retry") when the last exit was refused or did not close the position by
+   the next bar. Nothing exits twice: the retry runs only while "exiting" and not flat.
+2. A part-filled entry's unfilled rest is cancelled at the first bar with the position open (CancelOrder on the
+   entry order tracked from OnOrderUpdate); the filled part trades on with its stop.
+
+Tests (tests/test_ninjatrader_clean.py, the NinjaTrader stand-in):
+- test_clean_band_rejected_exit_retries: a midday exit refused -> the trade is closed within one bar (by the retry, or
+  first by its own resting stop, which never left); a 15:55 exit refused -> "Exit retry" at the next session's first
+  bar on a regular-hours chart (the earliest possible; on the user's ETH chart the 16:00 bar), with the "was refused" and
+  "sending it again" Output lines. Before: carried overnight and closed at 09:40 by its target.
+- test_clean_band_partial_entry_rest_cancelled: an entry filling 1 of 3 and never the rest -> the rest is cancelled
+  and every later trade matches the baseline (93 trades after it; before: no trade after it). CushionGuard 0 so the
+  trades do not depend on the 1-contract loss's effect on the account.
+No backtest trade changes (fills are whole and exits accepted in every backtest).

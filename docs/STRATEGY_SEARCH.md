@@ -1057,6 +1057,10 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    rejected stop and the target's OCO are covered by tests. Probed: a rejected entry is safe; a rejected 15:55 exit left
    the position open overnight (the "exiting" flag silences every later guard), and a partial entry whose rest never
    fills stopped the bot from trading again. Both to fix in the order handling, with tests.
+168. **The order-path fixes** (2026-11-26, a research round; `verification/zoo/stage164_order_path_fixed.txt`).
+   MnqCleanBand.cs: a refused exit is sent again at the next bar ("Exit retry"), so a refused 15:55 exit can no longer
+   hold a position overnight; a part-filled entry's unfilled rest is cancelled, so the bot keeps trading. Tests for both
+   on the NinjaTrader stand-in; no backtest trade changes.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 

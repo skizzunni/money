@@ -212,6 +212,53 @@ def test_clean_band_missing_open_bar(sim, tmp_path):  # noqa: F811
     assert not any(b in day60 for _s, b, _e, _x in got)
 
 
+def _trades(out: list) -> list:
+    return [x.split(",")[1:] for x in out if x.startswith("T,")]
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+def test_clean_band_rejected_exit_retries(sim, tmp_path):  # noqa: F811
+    """Docs 167-168: an exit the broker refuses is sent again on the next bar (it used to stay open: the "exiting" flag
+    silenced every later guard). Midday: out one bar later the same day. At 15:55 on a regular-hours chart: out at the
+    next session's first bar (the earliest possible), never held longer."""
+    days = synthetic_days()
+    path = tmp_path / "bars.csv"
+    idx = write_bars(days, path)
+    props = dict(MaxContracts=3, StartProfit=5000, DayStop=0)
+    base = _trades(_run_all(sim, path, **props))
+    mid = next(t for t in base if t[5] == "Back inside")
+    out = _run_all(sim, path, **props, RejectExitsAt=int(mid[3]) - 1)
+    hit = next(t for t in _trades(out) if t[1] == mid[1])
+    assert int(hit[3]) <= int(mid[3]) + 1  # closed within one bar: by the retry, or first by its own resting stop
+    late = next(t for t in base if t[5] == "Session end")
+    out2 = _run_all(sim, path, **props, RejectExitsAt=int(late[3]) - 1)
+    hit2 = next(t for t in _trades(out2) if t[1] == late[1])
+    day = idx[int(late[3]) - 1][0]
+    assert hit2[5] == "Exit retry" and idx[int(hit2[3])] == (day + 1, 0)
+    assert any("sending it again" in x for x in out2) and any("was refused" in x for x in out2)
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+def test_clean_band_partial_entry_rest_cancelled(sim, tmp_path):  # noqa: F811
+    """Docs 167-168: an entry that fills 1 of 3 contracts and never the rest: the rest is cancelled, the 1 contract
+    trades on with its stop, and the strategy keeps trading afterwards (it used to stop: the working rest blocked every
+    later entry)."""
+    days = synthetic_days()
+    path = tmp_path / "bars.csv"
+    idx = write_bars(days, path)
+    props = dict(MaxContracts=3, StartProfit=5000, DayStop=0, CushionGuard=0)  # no guard: trades independent of the $
+    base = _trades(_run_all(sim, path, **props))
+    band = [t for t in base if idx[int(t[1])][1] > 1]
+    pe = int(band[5][1])
+    out = _run_all(sim, path, **props, SimPartialEntryAt=pe - 1, SimPartialFirstQty=1, SimPartialDelayBars=-1)
+    got = _trades(out)
+    assert any("cancelling the entry's unfilled rest" in x for x in out)
+    x = next(t for t in got if int(t[1]) == pe)
+    later_base = [t[:6] for t in base if int(t[1]) > int(x[3])]
+    later_got = [t[:6] for t in got if int(t[1]) > int(x[3])]
+    assert len(later_got) > 20 and later_got == later_base
+
+
 @pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
 def test_clean_band_defaults_with_account_rules(sim, tmp_path):  # noqa: F811
     """The shipped defaults: the $600 day stop and 1 / 2 / 3 contracts from +$2,000 / +$3,500 (StartProfit puts the

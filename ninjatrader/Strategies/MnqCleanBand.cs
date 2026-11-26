@@ -65,6 +65,11 @@ namespace NinjaTrader.NinjaScript.Strategies
         int pos, tradesToday, qty, gapPos;
         bool ready, beDone, early, exiting, gapWarned, noisePending, gapPending, gapToday, stopGone;
         DateTime stopGoneUtc = DateTime.MinValue;
+        // docs/STRATEGY_SEARCH.md 167-168: an exit the broker refused is sent again; an entry's unfilled rest is cancelled
+        int exitBar = -1;
+        string exitFrom = "";
+        bool exitRefused, entryPart;
+        Order entryOrder;
         // news days (docs/STRATEGY_SEARCH.md, 15): the 08:30 bar's volume against the 08:20 and 08:25 bars' average
         DateTime preDate = DateTime.MinValue;
         double preVol, atVol, newsSpike = double.NaN;
@@ -405,6 +410,13 @@ namespace NinjaTrader.NinjaScript.Strategies
                 else atVol = Volume[0];
             }
             bool inTrade = Position.MarketPosition != MarketPosition.Flat;
+            RetryExit();  // docs 168: a refused exit, sent again (any time of day; the bar's bookkeeping still runs)
+            if (entryPart && entryOrder != null && inTrade)  // docs 168: a part-filled entry: cancel its unfilled rest
+            {
+                Print(Time[0] + "  Clean band: cancelling the entry's unfilled rest (" + entryOrder.Name + ")");
+                CancelOrder(entryOrder);
+                entryPart = false;
+            }
             if (mm < 570 || mm >= 960)
             {
                 // a trade still open outside regular hours (a half day's 13:15 close came before the 15:55 exit, and the
@@ -602,10 +614,26 @@ namespace NinjaTrader.NinjaScript.Strategies
             int d = Position.MarketPosition == MarketPosition.Long ? 1 : Position.MarketPosition == MarketPosition.Short ? -1 : pos;
             bool gapLeg = gapPos != 0 && pos == 0;
             string from = gapLeg ? (d > 0 ? "GapLong" : "GapShort") : (d > 0 ? "Long" : "Short");
+            exitRefused = false;
+            exitBar = CurrentBar;
+            exitFrom = from;
             if (d > 0) ExitLong(why, from); else ExitShort(why, from);
             exiting = true;
             pos = 0;
             gapPos = 0;
+        }
+
+        // docs 168: an exit sent on an earlier bar that has not closed the position (the broker refused it) goes again
+        bool RetryExit()
+        {
+            int mp = Position.MarketPosition == MarketPosition.Long ? 1 : Position.MarketPosition == MarketPosition.Short ? -1 : 0;
+            if (!exiting || mp == 0 || (!exitRefused && CurrentBar <= exitBar))
+                return false;
+            Print(Time[0] + "  Clean band: the exit was not filled - sending it again (" + (mp > 0 ? "long" : "short") + ")");
+            exitRefused = false;
+            exitBar = CurrentBar;
+            if (mp > 0) ExitLong("Exit retry", exitFrom); else ExitShort("Exit retry", exitFrom);
+            return true;
         }
 
         // a position must never be without its stop: if the broker cancels or rejects it, out at market (live 2026-11-17).
@@ -616,7 +644,29 @@ namespace NinjaTrader.NinjaScript.Strategies
                                               double averageFillPrice, OrderState orderState, DateTime time, ErrorCode error,
                                               string comment)
         {
-            if (order == null || order.Name != "Stop loss")
+            if (order == null)
+                return;
+            string nm = order.Name;
+            if (nm == "Long" || nm == "Short" || nm == "GapLong" || nm == "GapShort")  // an entry (docs 168)
+            {
+                if (orderState == OrderState.PartFilled) { entryOrder = order; entryPart = true; }
+                else if (orderState == OrderState.Working || orderState == OrderState.Accepted) entryOrder = order;
+                else if (orderState == OrderState.Filled || orderState == OrderState.Cancelled || orderState == OrderState.Rejected)
+                {
+                    if (entryOrder == null || entryOrder == order) { entryOrder = null; entryPart = false; }
+                }
+                return;
+            }
+            if (nm != "Stop loss" && nm != "Profit target")  // an exit at market (docs 168)
+            {
+                if (orderState == OrderState.Rejected && Position.MarketPosition != MarketPosition.Flat)
+                {
+                    exitRefused = true;
+                    Print(time + "  Clean band: the exit (" + nm + ") was refused (" + comment + ") - it is sent again on the next bar");
+                }
+                return;
+            }
+            if (nm != "Stop loss")
                 return;
             if (orderState == OrderState.Accepted || orderState == OrderState.Working || orderState == OrderState.Filled)
             {
