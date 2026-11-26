@@ -1,0 +1,6 @@
+Docs section 184 (2026-11-26): how the 08:30 news rule (research/zoo/news.py's spike, docs 15 / 104) sees the jobs-report
+days (research/nfp_dates.csv, the BLS rule); inline count on zoo_days_news.pkl.
+
+2015-19: 58 NFP days; spike n/a 0, under 2x (as usual) 2, 2-3x (no trades) 3, 3-6x (as usual) 12, 6x+ (+1 contract) 41
+2020-25: 63 NFP days; spike n/a 0, under 2x (as usual) 2, 2-3x (no trades) 3, 3-6x (as usual) 10, 6x+ (+1 contract) 48
+live 2026: 5 NFP days; spike n/a 3, under 2x (as usual) 0, 2-3x (no trades) 1, 3-6x (as usual) 1, 6x+ (+1 contract) 0

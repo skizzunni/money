@@ -1171,6 +1171,11 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    median $11,551 to $11,814) but not 2015-19 (median $11,322 to $11,048 from $50,000). The day after: PF 1.62 /
    1.99 / ES 1.64, as good as any day; skipping it costs in both periods. Nothing changes: only the statement day
    itself (section 180) is skipped.
+184. **Jobs-report (NFP) days are already the news rule's** (2026-11-26, a research round;
+   `verification/zoo/stage177_nfp_overlap.txt`). The 08:30 volume spike sees every NFP day in 2015-25 (none n/a): 41 of
+   58 (2015-19) and 48 of 63 (2020-25) are big-news days (6x and up: a contract more), 3 each mild (no trades), the
+   rest as usual. A separate NFP rule would re-test the news rule (sections 15, 104); not run. CPI and the other 08:30
+   releases are the same case.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
