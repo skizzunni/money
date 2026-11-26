@@ -189,6 +189,29 @@ def test_clean_band_missing_check_bar(sim, tmp_path):  # noqa: F811
     assert res[10] != res[14]  # the 10:00 check traded in the 14 sessions after the missing bar only with 10
 
 
+def without_day(idx: list, di: int) -> list:
+    """The bar map for a reference run on the days with day di removed: rows of day di map nowhere, later days shift."""
+    return [(-1, k) if d == di else (d if d < di else d - 1, k) for d, k in idx]
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+def test_clean_band_missing_open_bar(sim, tmp_path):  # noqa: F811
+    """Docs 164: a day whose 09:30 bar is missing (a feed drop at the open) trades nothing and stays out of the
+    history: NinjaTrader matches the reference run on the days with that day removed, trade for trade."""
+    full = drop_bar(synthetic_days(), 60, 570)
+    assert full[60]["mm"][0] == 575
+    path = tmp_path / "bars.csv"
+    idx = write_bars(full, path)
+    nt = run_nt(sim, path, MaxContracts=1, DayStop=0)
+    got = [(int(t[0]), int(t[1]), round(float(t[2]), 6), round(float(t[4]), 6)) for t in nt]
+    ref_days = full[:60] + full[61:]
+    want = [(si, b, e, x) for si, b, e, x, _q in py_trades(ref_days, without_day(idx, 60))]
+    assert len(want) > 20
+    assert got == want
+    day60 = {i for i, (d, _k) in enumerate(idx) if d == 60}
+    assert not any(b in day60 for _s, b, _e, _x in got)
+
+
 @pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
 def test_clean_band_defaults_with_account_rules(sim, tmp_path):  # noqa: F811
     """The shipped defaults: the $600 day stop and 1 / 2 / 3 contracts from +$2,000 / +$3,500 (StartProfit puts the

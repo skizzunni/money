@@ -96,6 +96,7 @@ var int tDay = -1
 var float dayOpen = na
 var float tGap = na
 var float tBar0 = na
+var bool tNoOpen = false   // docs 164: the session's first bar is not 09:30: no trades, not in the history
 var float dHi = na
 var float dLo = na
 var float vNum = 0.0
@@ -136,7 +137,7 @@ if tMin >= 500 and tMin <= 510   // extended hours: the news spike's inputs (08:
         atVol := volume
 
 if inRth and dayNum != tDay
-    if tDay >= 0 and tBars >= 76   // only complete sessions count
+    if tDay >= 0 and tBars >= 76 and not tNoOpen   // only complete sessions count (and only with their 09:30 bar)
         array.push(hCloses, tClose)
         array.push(hDays, tDay)
         array.push(hGaps, tGap)
@@ -155,6 +156,7 @@ if inRth and dayNum != tDay
     nH = array.size(hCloses)
     tDay := dayNum
     tBars := 0
+    tNoOpen := tMin != 570
     dHi := high
     dLo := low
     dayOpen := open
@@ -305,7 +307,7 @@ if inRth and ready and not carryOut
                     strategy.close(bandId, comment = "Back inside")
                 else
                     stopPx := nw
-            else if pos == 0 and endMin <= lastEntry and endMin < flatAt and tradesToday < maxTrades and (dsToday <= 0 or strategy.netprofit - dayStartNet > -dsToday)
+            else if pos == 0 and not tNoOpen and endMin <= lastEntry and endMin < flatAt and tradesToday < maxTrades and (dsToday <= 0 or strategy.netprofit - dayStartNet > -dsToday)
                 want = close > up ? 1 : close < dn ? -1 : 0
                 if want != 0 and vwapEntry and want * (close - vwapNow) <= 0
                     want := 0

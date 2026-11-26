@@ -1039,6 +1039,11 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    gap all measured wrong, silently; the gap trade itself skips): to fix (no trades that day). Missing news bars make
    the news rule "n/a" (trades normally): to add a warning. The trend and the average range use complete sessions
    only: safe. Monday Nov 30's prior close is Wednesday's, as in every backtest.
+164. **A missing 09:30 bar: no trades that day** (2026-11-26, a research round;
+   `verification/zoo/stage160_missing_open_bar.txt`). NinjaTrader and Pine: a session whose first bar is not 09:30
+   places no trade and stays out of the history ("NO TRADING TODAY" on the dashboard, an Output line); an Output line
+   also warns when an ETH chart's news bars are incomplete. No backtest can change (every day starts at 09:30); parity
+   tests with the 09:30 bar removed.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 

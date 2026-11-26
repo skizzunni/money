@@ -1,0 +1,15 @@
+Stage 160 (2026-11-26, docs section 164): the missing 09:30 bar and the news-bar warning, built in.
+
+- MnqCleanBand.cs: Day.NoOpen, set in NewDay when the session's first regular-hours bar is not the 09:30 bar (a feed
+  drop at the open). Such a day places no band entry (the gap trade already needs the 09:30 bar), is kept out of the
+  history (as an incomplete session: its open, moves and gap would be from a later bar), the dashboard says "NO
+  TRADING TODAY: the 09:30 bar is missing - reload the historical data" and the Output window says so at the start.
+  An Output line also warns when an ETH chart's 08:20 / 08:25 / 08:30 news bars are incomplete ("news rule n/a today:
+  the day trades as a normal day; reload the chart's history").
+- pine/mnq_clean_band.pine: tNoOpen, the same day-skip and history exclusion.
+- Reference: strats is unchanged (every day in the sets starts at 09:30, section 159), so the backtests cannot change.
+- Tests: test_clean_band_missing_open_bar (NinjaTrader) and test_pine_clean_band_missing_open_bar (Pine): a synthetic
+  history with day 60's 09:30 bar removed; both match the reference run on the days with day 60 removed, trade for
+  trade, and nothing trades on day 60. Kept with the wrong open (the old behaviour), the reference would have traded
+  twice on day 60 and differed afterwards (65 against 64 trades): the test pins the fix down.
+- Targeted: NinjaTrader 7 passed (matches_python x5, missing_check_bar, missing_open_bar), Pine 2 passed.

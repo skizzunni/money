@@ -74,6 +74,24 @@ def test_pine_clean_band_missing_check_bar():
 
 
 @pytest.mark.slow
+def test_pine_clean_band_missing_open_bar():
+    """Docs 164: a day without its 09:30 bar trades nothing and stays out of the history; Pine matches the reference
+    run on the days with that day removed."""
+    pytest.importorskip("pynescript", reason="pip install pynescript to check the .pine files")
+    from pine_interpreter import PineRuntime, load_pine
+    from test_ninjatrader_clean import drop_bar, synthetic_days, without_day
+    full = drop_bar(synthetic_days(), 60, 570)
+    bars, idx = bars_of(full)
+    inputs = {"Most contracts": 1, "Day stop: no new entry once the day is down $ (0 = off)": 0}
+    rt = PineRuntime(load_pine(PINE), bars, inputs, timeframe_seconds=300)
+    rt.run(lambda i, g: None)
+    got = [(t["dir"], t["entry_bar"], round(t["entry"], 6), round(t["exit"], 6), t["qty"]) for t in rt.strategy.closed]
+    want = py_trades(full[:60] + full[61:], without_day(idx, 60), tp_fill_bar=False)
+    assert len(want) > 20
+    assert got == want
+
+
+@pytest.mark.slow
 def test_pine_clean_band_news_days():
     """The news rule in Pine (extended hours): as tests/test_ninjatrader_clean.py's news test, trade for trade."""
     pytest.importorskip("pynescript", reason="pip install pynescript to check the .pine files")

@@ -3,7 +3,8 @@
 //
 // 5-minute MNQ chart (ETH, so the news rule can read the 08:30 bar). Every half hour from 10:00 to LastEntry (14:00):
 //   * the noise area: sigma = the mean over the last 14 complete sessions of |close at that time / the 09:30 open - 1|
-//     (over those with that bar, at least SigmaMinSessions = 10 of them: docs 162, a missing bar keeps the check on);
+//     (over those with that bar, at least SigmaMinSessions = 10 of them: docs 162, a missing bar keeps the check on;
+//     a session without its 09:30 bar trades nothing and stays out of the history: docs 164);
 //     upper = max(today's open, the prior close) x (1 + sigma), lower = min(...) x (1 - sigma);
 //   * flat: long when the close is above upper and above the TrendDays-session average of closes, at least RangePos up
 //     the day's range, and (after 10:00) the day not already MaxMove usual ranges up from its open; short mirrored;
@@ -53,6 +54,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             public double Gap = double.NaN;  // the 09:30 open less the prior complete session's close
             public double Range;  // the session's high - low (09:30-16:00)
             public double Bar0Range = double.NaN;  // the first regular-hours bar's high - low (the 09:30 bar)
+            public bool NoOpen;  // docs 164: the session's first bar is not the 09:30 bar: no trades, not in the history
             public readonly Dictionary<int, double> Moves = new Dictionary<int, double>();
         }
 
@@ -235,9 +237,9 @@ namespace NinjaTrader.NinjaScript.Strategies
             return n - 14;
         }
 
-        void NewDay(DateTime date)
+        void NewDay(DateTime date, int firstMm)
         {
-            if (today != null && today.Bars >= 76)
+            if (today != null && today.Bars >= 76 && !today.NoOpen)
             {
                 today.Range = dayHigh - dayLow;
                 hist.Add(today);
@@ -245,6 +247,12 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (hist.Count > 60) hist.RemoveAt(0);
             today = new Day();
             today.Date = date;
+            // docs/STRATEGY_SEARCH.md 163-164: without the 09:30 bar (a feed drop at the open) the day's open, its bands
+            // and moves would come from a later bar: no trades today and the day kept out of the history
+            today.NoOpen = firstMm != 570;
+            if (today.NoOpen)
+                Print(Time[0] + "  Clean band: NO TRADING TODAY - the session's first bar is " + (firstMm / 60) + ":" +
+                      (firstMm % 60).ToString("00") + ", not 09:30 (the 09:30 bar is missing: reload the chart's history)");
             today.Bar0Range = High[0] - Low[0];
             dayOpen = Open[0];
             dayHigh = double.MinValue;
@@ -304,6 +312,9 @@ namespace NinjaTrader.NinjaScript.Strategies
             early = EarlyMaxTrades > 0 && prof < EarlyCushion;  // decided at the day's start
             gapToday = GapLeg && (GapFrom <= 0 || prof >= GapFrom);  // GapFrom 0: always; else once the account has that cushion
             newsSpike = preDate == date && preBars == 2 && preVol > 0 && !double.IsNaN(atVol) ? atVol / (preVol / 2) : double.NaN;
+            if (NewsDays && preDate == date && double.IsNaN(newsSpike))  // docs 164: an ETH chart, but a news bar missing
+                Print(Time[0] + "  Clean band: news rule n/a today - the 08:20 / 08:25 / 08:30 bars are incomplete " +
+                      "(the day trades as a normal day; reload the chart's history)");
             ApplyNews();
         }
 
@@ -366,6 +377,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                         " - set the chart's Days to load to 40 or more";
             else if (!ready)
                 setup = "NO TRADING: the chart's history has a hole - reload the historical data";
+            else if (today != null && today.NoOpen)
+                setup = "NO TRADING TODAY: the 09:30 bar is missing - reload the historical data";
             else
                 setup = "OK";
             string txt = "MNQ Clean Noise-Band | Setup: " + setup +
@@ -404,7 +417,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (today == null || t.Date != today.Date)
             {
                 carried = inTrade && today != null;  // the same on a regular-hours chart: out on the new session's first bar
-                NewDay(t.Date);
+                NewDay(t.Date, mm);
             }
             today.Bars++;
             dayHigh = Math.Max(dayHigh, High[0]);
@@ -498,7 +511,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 }
                 return;
             }
-            if (mp != 0 || end > LastEntry || end >= flatAt || tradesToday >= MaxTradesPerDay || !PlaceOrders)
+            if (mp != 0 || end > LastEntry || end >= flatAt || tradesToday >= MaxTradesPerDay || !PlaceOrders || today.NoOpen)
                 return;
             if (dayStopToday > 0 && CumProfit - dayCumStart <= -dayStopToday)
                 return;
