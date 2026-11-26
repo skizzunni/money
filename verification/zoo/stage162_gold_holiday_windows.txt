@@ -1,0 +1,20 @@
+Stage 162 (2026-11-26, docs section 166): gold's missing bars, live, and the 14-session window after holidays.
+
+By reading MgcOvernightCarry.cs:
+- A missing 08:20 bar today: no move, no trade ("no move today"). A missing 08:35 confirm bar: no entry (an exact
+  time). The 14:15 exit is "at or after". Safe.
+- Its 14-session average move needs a move for every one of the 14 sessions (the same all-or-nothing rule MNQ had
+  before section 162), shown on the status line ("a session without its 08:20 / 13:25 bars in the last 14").
+- In the gold history 133 full-length sessions (180+ bars, so kept as complete by NinjaTrader and by the reference
+  alike) lack the 08:20 or the 13:25 bar: holiday sessions (Memorial Day, Thanksgiving and the day after, MLK, Presidents'
+  Day, Dec 24). Each blocks gold for the next 14 sessions: 598 of 4,110 sessions (15%) cannot trade. NinjaTrader and
+  the reference agree (the gold parity tests pass), so the backtests show what live does.
+
+The fix measured (mk_search.carry ref_min, default off: the average over the sessions that have a move, if at least
+10 or 12 of the 14):
+  14 (shipped): 2009-17 19 trades a year $361 a year a contract PF 2.02 | 2018-25 20 / $282 / 1.84
+  12 or 10:     2009-17 24 / $408 / 1.91                                | 2018-25 23 / $251 / 1.60
+  by year against 14: up in 5, down in 11 of 17 years, +$198 in all.
+Verdict: not shipped. About 4-5 more gold trades a year, but they break even (2018-25 worse, 11 of 17 years down), so
+it does not earn a code change; the holiday windows stay, and the status line already says when gold is waiting one
+out. tests/test_ninjatrader_gold.py and tests/test_pine_gold.py: 11 passed, 1 skipped with ref_min in (default off).

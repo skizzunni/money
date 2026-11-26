@@ -1048,6 +1048,11 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    `verification/zoo/stage161_weekly_activity.txt`). About 4 trades on 2 of 5 days a week; only about half the weeks
    end up (52%; 45% live), the typical week small, the profit from fewer big weeks; live 2026 had 32% of weeks without
    a trade (7-8% in the history). Now in step 12.
+166. **Gold after holidays** (2026-11-26, a research round; `mk_search.carry` ref_min,
+   `verification/zoo/stage162_gold_holiday_windows.txt`). Gold's 14-session average needs every session's move, and 133
+   holiday sessions lack the 08:20 or 13:25 bar, so gold sits out the 14 sessions after each (15% of sessions; live and
+   the backtests agree, and the status line says so). Averaging over 10-12 of 14: 4-5 more trades a year that break
+   even (2018-25 worse, 11 of 17 years down). Not shipped.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
