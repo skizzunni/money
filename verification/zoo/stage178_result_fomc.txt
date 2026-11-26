@@ -1,0 +1,11 @@
+Docs section 186 (2026-11-26): python zoo/verify_result.py --fomc (from research/): docs 'The result' with no trades on FOMC days.
+
+dev: 1,247 sessions | band 865 (42%, 1.56, $17,906) | gap 264 (2.09, $8,830) | days traded 45%
+   dev starts: 49, lost 0, median $14,090, p25 $5,873
+unseen_nq: 1,367 sessions | band 1067 (48%, 1.66, $32,118) | gap 298 (1.74, $8,774) | days traded 45%
+   unseen_nq starts: 55, lost 0, median $19,067, p25 $16,459
+unseen_es: 458 sessions | band 299 (24%, 1.29, $1,560) | gap 88 (0.71, $-448) | days traded 45%
+   TradingView window: $+10,063, 50 trades, PF 4.66, max drawdown $670
+live: 104 sessions | band 49 (57%, 5.49, $5,591) | gap 17 (1.51, $393) | days traded 28%
+pooled 104 starts: lost 0, median $17,899, p25 $12,810, p10 $4,097, worst $1,437, best $27,147; reach $10k 80%, $15k 65%, $20k 33%, $25k 7%; green traded days 42%
+by year (1 contract, all trades, NQ / MNQ sets): 2015 $3,624, 2016 $6,762, 2017 $1,923, 2018 $7,934, 2019 $6,493, 2020 $6,808, 2021 $9,120, 2022 $10,323, 2023 $7,039, 2024 $6,888, 2025 $714, 2026 $5,985

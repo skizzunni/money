@@ -2,8 +2,10 @@
 
 The pooled fresh 50K starts, the per-period medians, the per-set table (band / gap trades, win, PF, net 1 MNQ, days
 traded), the by-year figures and the TradingView window, from bench.run / harness with the shipped defaults.
-Run from research/: python zoo/verify_result.py
+Run from research/: python zoo/verify_result.py [--fomc]   (--fomc, docs 186: no trades on FOMC days, as shipped
+since section 180)
 """
+import os
 import pickle
 import sys
 import warnings
@@ -22,15 +24,26 @@ def pf(u):
     return u[u > 0].sum() / -u[u < 0].sum()
 
 
+FOMC = set(pd.to_datetime(pd.read_csv(os.path.join(os.path.dirname(__file__), "..", "fomc_dates.csv")).date).dt.date)
+
+
 def main():
-    r = B.run()
-    print(B.line("shipped", r))
+    fomc = "--fomc" in sys.argv
+    if not fomc:
+        r = B.run()
+        print(B.line("shipped", r))
     sets = pickle.load(open(B.PK, "rb"))
     pool, yr = [], {}
     for n in ("dev", "unseen_nq", "unseen_es", "live"):
         d, s = sets[n]
         t = H.trades_of(S.everyday, d, s, legs=(("gap_go", B.GAP), ("noise", B.BAND)))
+        if fomc:  # docs 180: no trades on an FOMC statement day
+            t = t[~t.d.isin(FOMC)].reset_index(drop=True)
         t["add"] = (B._stretch(d, t, 1.0) >= 1.5).astype(int)
+        if fomc and n == "live":
+            tv_ = B.tv(d, t)
+            print(f"   TradingView window: ${tv_['net']:+,.0f}, {tv_['trades']} trades, PF {tv_['pf']:.2f}, "
+                  f"max drawdown ${tv_['dd']:,.0f}")
         band, gap = t[t.bar > 1].usd, t[t.bar <= 1].usd
         print(f"{n}: {len(d):,} sessions | band {len(band)} ({np.mean(band > 0):.0%}, {pf(band):.2f}, "
               f"${band.sum():,.0f}) | gap {len(gap)} ({pf(gap):.2f}, ${gap.sum():,.0f}) | "

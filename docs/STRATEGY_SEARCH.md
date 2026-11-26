@@ -1181,31 +1181,45 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    last date (or with an empty list), MnqCleanBand's chart says "ADD NEXT YEAR'S FOMC DATES (the list ends ...)" and
    the Output window says so once. No effect on the trades; a test checks the warning, its silence on the shipped
    list and with the skip off, and that the trades do not change.
+186. **"The result" with the FOMC skip** (2026-11-26, a research round; `zoo/verify_result.py --fomc`,
+   `verification/zoo/stage178_result_fomc.txt`). Every number in "The result" recomputed with no trades on FOMC days:
+   still none of 104 fresh starts lost; median $17,032 to $17,899, 25th percentile $12,433 to $12,810, 10th $3,526 to
+   $4,097; every year but 2022 a little higher; the TradingView window unchanged. The table now shows these numbers
+   (the earlier ones kept beside them).
 
-## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
+## The result (the shipped defaults, 2026-11-26, sections 1-90 and 180; research numbers, $0.62 a side)
 
 | set | sessions | band trades (win, PF, net 1 MNQ) | gap trades (PF, net 1 MNQ) | days traded | 50K starts lost | median 12 months |
 |---|---|---|---|---|---|---|
-| dev NQ 2015-19 | 1,247 | 873 (42%, 1.54, $17,395) | 272 (2.01, $8,522) | 46% | 0 of 49 | $14,028 |
-| unseen NQ 2020 - Jun 2025 | 1,367 | 1,091 (48%, 1.63, $31,425) | 306 (1.70, $8,675) | 46% | 0 of 55 | $18,980 |
-| unseen ES 2020-24 (a cross-check) | 458 | 305 (24%, 1.27, $1,489) | 89 (0.71, -$462) | 46% | | |
-| live MNQ Jun 29 - Nov 23 2026 | 104 | 53 (57%, 5.02, $5,555) | 18 (1.44, $353) | 30% | | |
+| dev NQ 2015-19 | 1,247 | 865 (42%, 1.56, $17,906) | 264 (2.09, $8,830) | 45% | 0 of 49 | $14,090 |
+| unseen NQ 2020 - Jun 2025 | 1,367 | 1,067 (48%, 1.66, $32,118) | 298 (1.74, $8,774) | 45% | 0 of 55 | $19,067 |
+| unseen ES 2020-24 (a cross-check) | 458 | 299 (24%, 1.29, $1,560) | 88 (0.71, -$448) | 45% | | |
+| live MNQ Jun 29 - Nov 23 2026 | 104 | 49 (57%, 5.49, $5,591) | 17 (1.51, $393) | 28% | | |
+
+With no trades on FOMC days (section 180; `zoo/verify_result.py --fomc`, `verification/zoo/stage178_result_fomc.txt`).
+Before 180: dev 873 band trades (1.54, $17,395) / 272 gap (2.01, $8,522), median $14,028; unseen 1,091 (1.63,
+$31,425) / 306 (1.70, $8,675), median $18,980; ES 305 (1.27, $1,489) / 89 (-$462); live 53 (5.02, $5,555) / 18
+(1.44, $353).
 
 The accounts: the news rule, the $600 day stop, 1 / 2 / 3 contracts from +$0 / +$2,000 / +$3,500 and one more on a
 break 1.5 sigma past the band; the second stop step and the wild-open gap skip (61); the gap at least 0.6x (87). Pooled
-104 fresh 50K starts, 12 months each: **none lost**, median **+$17,032**, 25th percentile +$12,433, 10th +$3,526, worst
-+$1,404, best +$28,053; 79% reach +$10,000, 64% +$15,000, 30% +$20,000, 5% +$25,000; 41% of traded days green. A "win"
-includes the break-even exits at +2 points. By period (68, 87): 2015-19 median $14,028, 25th percentile $5,324;
-2020-25 median $18,980, 25th percentile $15,811.
+104 fresh 50K starts, 12 months each: **none lost**, median **+$17,899**, 25th percentile +$12,810, 10th +$4,097, worst
++$1,437, best +$27,147; 80% reach +$10,000, 65% +$15,000, 33% +$20,000, 7% +$25,000; 42% of traded days green. A "win"
+includes the break-even exits at +2 points. By period: 2015-19 median $14,090, 25th percentile $5,873; 2020-25
+median $19,067, 25th percentile $16,459. (Before section 180: median $17,032, 25th percentile $12,433, 10th $3,526,
+worst $1,404, best $28,053; 2015-19 $14,028 / $5,324, 2020-25 $18,980 / $15,811.)
 
-By year, 1 contract, all trades (shipped now, section 87's table): 2015 $3,574, 2016 $6,361, 2017 $1,788, 2018 $7,762,
+By year, 1 contract, all trades (shipped now, with section 180): 2015 $3,624, 2016 $6,762, 2017 $1,923, 2018 $7,934,
+2019 $6,493, 2020 $6,808, 2021 $9,120, 2022 $10,323, 2023 $7,039, 2024 $6,888, 2025 H1 $714, 2026 $5,985 (only 2022
+lower than without it: -$262). Section 87's table, before 180: 2015 $3,574, 2016 $6,361, 2017 $1,788, 2018 $7,762,
 2019 $6,432, 2020 $6,498, 2021 $8,983, 2022 $10,585, 2023 $6,811, 2024 $6,540, 2025 H1 $682, 2026 $5,908. Before
 sections 61 and 87 (the figures below were for those rules): 2015 $3,543, 2016 $6,251, 2017 $2,038, 2018 $7,140, 2019
 $6,360, 2020 $5,398, 2021 $8,777, 2022 $11,240, 2023 $6,074, 2024 $5,933, 2025 H1 $395; live 2026 by month Jul -$257, Aug +$511, Sep +$885, Oct
 +$1,997, Nov (to the 23rd) +$2,465. (No data here for Jul 2025 - Jun 2026.)
 
 The user's TradingView window (Aug 27 - Nov 23 2026, a fresh 50K, `zoo/tv_window.py`): the reference +$9,796, 53
-trades, PF 4.25, max drawdown $670 before section 61; now (61 and 87): +$10,063, 50 trades, PF 4.66, max drawdown $670. TradingView itself on the versions before: +$6,322 (section 27), +$6,345 (28),
+trades, PF 4.25, max drawdown $670 before section 61; now (61, 87 and 180; its FOMC days had no other trade): +$10,063,
+50 trades, PF 4.66, max drawdown $670. TradingView itself on the versions before: +$6,322 (section 27), +$6,345 (28),
 +$9,186 (30); the reference's direction matched every time, its trade count runs higher.
 
 **How sure is "none lost"?** (`verification/zoo/walkforward_dev_only.txt`) The protections were picked on dev and
@@ -1234,6 +1248,7 @@ one step each way at least, the latest check first:
 | size steps 1 / 2 / 3 from +$0 / +$2,000 / +$3,500 | 131, 103 |
 | extra contract from 1.5 sigma; news 2-3x skip, 6x +1 | 130, 104 (67) |
 | day stop $600 | 132 (54) |
+| no trades on FOMC statement days | 180 (the days next to it 183; gold 181) |
 | cushion guard $1,500, day stop share 0.25, strong only under $1,000 at 1.5 sigma | 129, 127, 128 (38, 50) |
 | gold: move 1.5x, confirm 15 minutes, out 14:15 | 108 (39, 41) |
 | gold: stop 60%, move from the 13:25 close | 109 (39) |
