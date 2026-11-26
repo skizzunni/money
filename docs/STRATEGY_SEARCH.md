@@ -1126,6 +1126,16 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    INSTRUMENT" / "WRONG CHART" once in the Output window and shows it on the chart. Tests: both strategies on the
    other's instrument, on the full-size contract and on 1-minute bars (no trades, one message), and on the right
    chart (trades). "Running it" step 4 and 9 now say to add each from its own chart and check the Data Series.
+179. **A third guard tier deep near the floor** (2026-11-26, a research round; `research/zoo/deep_tier.py`,
+   `verification/zoo/stage172_deep_tier.txt`). Under $500 above the floor one hard stop is 40% of what is left. Under
+   $300 / $500 / $700: the gap trade only (a 30-point stop), or no trade at all; shuffled years from $50,000 /
+   $48,500 / $48,806 / $48,998. The gap trade only under $500: lost 4.7% to 2.1% / 6.5% to 5.0% from $48,806
+   (2015-19 / 2020-25) and 2.6% to 1.2% / 3.7% to 3.4% from $48,998, medians $487 / $598 and $293 / $91 lower; from
+   $48,500 no better in 2020-25 (14.2% to 14.3%). No trade under the line loses nothing by construction, but only by
+   parking the account: under $300 14% / 17% of the runs from $48,806 are parked within the year (against 4.7% /
+   6.5% lost without the line), so most parked accounts would have climbed back; trading one again brings the risk
+   back. Neither is a clear gain over the shipped two tiers (a smaller loss share for a lower median, mostly in
+   2015-19); not shipped. A pause line stays the user's own decision (stop the strategy by hand under a level).
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
