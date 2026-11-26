@@ -1061,6 +1061,9 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    MnqCleanBand.cs: a refused exit is sent again at the next bar ("Exit retry"), so a refused 15:55 exit can no longer
    hold a position overnight; a part-filled entry's unfilled rest is cancelled, so the bot keeps trading. Tests for both
    on the NinjaTrader stand-in; no backtest trade changes.
+169. **Gold's order path** (2026-11-26, a research round; `verification/zoo/stage165_gold_order_path.txt`). The same two
+   gaps in MgcOvernightCarry.cs: a refused 14:15 exit held the position overnight (closed next day by its stop), and a
+   part-filled entry's unfilled rest stopped all later gold trades. A refused entry is safe. To fix as in 168.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 

@@ -1,0 +1,12 @@
+Stage 165 (2026-11-26, docs section 169): MgcOvernightCarry's order path, probed on the NinjaTrader stand-in
+(Strategy=Gold, tests/test_ninjatrader_gold.synthetic_gold, MaxContracts 3, StartProfit 5000; 14 baseline trades).
+
+1. A refused 14:15 time exit (RejectExitsAt on the exit's bar): the position was held overnight and closed the next day
+   by its stop (-$67). Exit() sets pos = 0 and exiting = true; the refused exit leaves the position open, and the
+   "session ended" guard (pos != 0 && posDay != today) and the time exit both read pos, so nothing tries again. Live,
+   NinjaTrader's exit on session close (17:00) may flatten it; if refused too, it stays. The same gap as MNQ's (167).
+2. A refused entry: that trade does not happen, the rest unaffected (13 trades). Safe.
+3. A part-filled entry whose rest never fills: no gold trade at all afterwards (0 against 11 in the baseline): the
+   working rest blocks every later entry. The same gap as MNQ's.
+To fix as in section 168 (RetryExit at every bar; cancel an entry's unfilled rest), with tests, once the running full
+suite has finished (the gold tests compile MgcOvernightCarry.cs as they run).
