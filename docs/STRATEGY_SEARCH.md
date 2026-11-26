@@ -1186,6 +1186,14 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    still none of 104 fresh starts lost; median $17,032 to $17,899, 25th percentile $12,433 to $12,810, 10th $3,526 to
    $4,097; every year but 2022 a little higher; the TradingView window unchanged. The table now shows these numbers
    (the earlier ones kept beside them).
+187. **ES as a confirmation for the band entries** (2026-11-26, a research round; `research/zoo/es_confirm.py`,
+   `verification/zoo/stage179_es_confirm.txt`). Where NQ and ES overlap (Nov 2020 - Jul 2024), at each NQ band entry
+   was ES past its own band the same way? The opposite of a confirmation holds: NQ breaking alone (ES inside its band)
+   PF 2.47 ($51 a trade, 122 trades) against 1.56 ($28, 237) with ES along, in both halves (2020-22 2.35 / 1.45,
+   2023-24 2.61 / 1.67) and each year 2021-24. So no ES filter (removing the NQ-alone entries: median $17,943 to
+   $14,388). One more contract on the NQ-alone entries: median $17,598 to $17,907 from $50,000, inside five placebos
+   of as many random band trades ($17,050-18,400), with a little more lost (1.8% to 1.9%). Only 3.7 years of overlap
+   and a second data series live. Nothing changes.
 
 ## The result (the shipped defaults, 2026-11-26, sections 1-90 and 180; research numbers, $0.62 a side)
 
