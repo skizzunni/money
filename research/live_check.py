@@ -16,8 +16,9 @@ column is never read or printed.
    safety net working: worth a look, see docs sections 166 and 168).
 2. With --bars (NinjaTrader > Tools > Historical Data > Export, MNQ 1 Minute, Last; the same file as
    research/mnq_bars.py reads, with 60+ sessions before the day): the reference trades for each day in the export
-   (research/zoo/strats.py: the gap trade and the band with the shipped settings, the news rule from the 08:20-08:34
-   volume), matched to the live trades by side and entry bar. Points, not dollars (the size comes from the account).
+   (research/zoo/strats.py: the gap trade and the band with the shipped settings, no trades on FOMC days, the news
+   rule from the 08:20-08:34 volume), matched to the live trades by side and entry bar. Points, not dollars (the
+   size comes from the account).
    The cushion guard (under $1,000 over the floor: only band breaks 1.5 sigma past the band) is not known from the
    export, so each reference band trade shows its stretch; under the guard only those at 1.5 or more are taken.
 """
@@ -178,6 +179,9 @@ def reference(days: list[dict], i: int) -> list[dict]:
     import strats as S
     if i < max(21, B.BAND["trend"] + 1):
         return []
+    fomc = set(pd.to_datetime(pd.read_csv(os.path.join(HERE, "fomc_dates.csv")).date).dt.date)
+    if days[i]["d"] in fomc:  # docs 180: no trades on an FOMC statement day
+        return [{"fomc": True}]
     sp = days[i]["news"][0]
     if sp == sp and B.NEWS[0] <= sp < B.NEWS[1]:
         return [{"news_skip": True, "spike": sp}]
@@ -205,6 +209,10 @@ def compare(trades: list[Trade], days: list[dict]) -> list[str]:
             lines.append(f"{day}: not in the bars file (or a short session) - no reference")
             continue
         ref = reference(days, idx[day])
+        if ref and ref[0].get("fomc"):
+            lines.append(f"{day}: an FOMC day (the 14:00 Fed statement): the reference has no trades, live has "
+                         f"{len(live)}" + (" - is FomcSkip on and the date in FomcDates?" if live else ""))
+            continue
         if ref and ref[0].get("news_skip"):
             lines.append(f"{day}: a mild-news day (08:30 spike {ref[0]['spike']:.1f}x): the reference has no trades, "
                          f"live has {len(live)} - is NinjaTrader's chart on extended hours (ETH)?")

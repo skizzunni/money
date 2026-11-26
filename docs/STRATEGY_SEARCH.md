@@ -1136,6 +1136,23 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    6.5% lost without the line), so most parked accounts would have climbed back; trading one again brings the risk
    back. Neither is a clear gain over the shipped two tiers (a smaller loss share for a lower median, mostly in
    2015-19); not shipped. A pause line stays the user's own decision (stop the strategy by hand under a level).
+180. **No trading on FOMC days: shipped** (2026-11-26, a research round; `research/zoo/fomc_days.py`,
+   `verification/zoo/stage173_fomc_days.txt`). The Fed's scheduled 14:00 statement days (`research/fomc_dates.csv`,
+   published a year ahead, so no hindsight). The shipped trades on those days lose in every set: PF 0.02 (2015-19, 16
+   trades, -$819 a contract), 0.40 (2020-25, 32, -$793), ES 0.11 (7), live 2026 0.56 (5); 10 of 11 years lost (2022
+   +$262). Almost all are entries before 14:00 (the morning breaks fail while the market waits for the statement).
+   No trading on those days, on the account with the guard (shuffled years, from $50,000 / $48,806 / $48,998):
+   2015-19 lost 0.4% / 4.7% / 2.6% to 0.4% / 3.8% / 2.1%, medians $11,322 / $7,580 / $8,414 to $11,810 / $8,008 /
+   $8,835; 2020-25 lost 1.5% / 6.5% / 3.7% to 1.3% / 5.8% / 3.4%, medians $15,582 / $11,551 / $12,272 to $16,201 /
+   $11,922 / $12,872; the calendar starts also better or equal. Skipping as many random days (5 draws): medians
+   $9,430-11,472 / $5,631-7,800 / $6,418-8,600 and $14,376-15,581 / $10,029-11,355 / $10,905-12,066, all under the
+   FOMC skip's. Flat before 14:00 or no entry after 13:00 on those days does almost nothing (the losses come earlier).
+   Shipped in MnqCleanBand.cs and the Pine script ("FOMC days: no trades", on; the dates as an editable list from
+   2011 to Nov 2027, federalreserve.gov's calendar, the 2027 dates tentative until confirmed): no trades that day, the
+   day kept in the history; the chart says "FOMC day: no trades today". Next: 2026-12-09. Each year add the next
+   year's dates (step 11). Tests: NinjaTrader and Pine against the reference (the list's days and three traded days
+   as FOMC days), the default lists equal the csv; live_check.py says so on an FOMC day. Gold is unchanged (its
+   FOMC days not yet studied).
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
@@ -1290,6 +1307,10 @@ NinjaTrader 8, on each funded account (both the same way):
      strategies (MNQ group "7. Cushion guard", gold group "4. Cushion guard"); disable, change it, enable.
    - MNQ chart top-right: **Setup: OK** and the size you expect (CUSHION GUARD if within $1,500 of the floor).
      NOT READY: raise Days to load to 40+; NO TRADING: Reload All Historical Data.
+   - **FOMC days (section 180):** the strategy sits out the Fed's statement days (next: Wed Dec 9 2026; 2027: Jan 27,
+     Mar 17, Apr 28, Jun 9, Jul 28, Sep 15, Oct 27, Nov 17, tentative). Each December, add the next year's dates from
+     federalreserve.gov (Monetary Policy > Meeting calendars, the last day of each meeting) to "FOMC statement days"
+     (MNQ group "6. News"; the same in the Pine inputs).
    - The settings you rely on: Gap at least 0.6; Second stop step 1.5 / 0.5; Gap: no trade over 1.75; Place orders on.
    - Gold chart: "waiting for history" until Monday's 08:30 check is normal; it must then say OK (or NOT READY: raise
      Days to load to 30+).
@@ -1346,7 +1367,7 @@ Defaults: trend 20 sessions; hard stop $200 a contract; take profit 2.5 hard sto
 points, and at 1.5 to entry + 0.5 hard stops (section 61); last entry 14:00 (840); at most 9 trades a day; day stop
 $600; range rule 0.65; move cap 1.1; the gap trade every day (gap 0.6x, section 87; 09:30 bar 3% of the range and not over 1.75x
 its usual size, stop at most 30 points); news days on (2-3x no trades, 6x a contract
-more); 1 contract, 2 from +$2,000, 3 from +$3,500 over the $50,000 start balance, one more on a break 1.5 sigma past
+more); no trades on FOMC statement days (section 180); 1 contract, 2 from +$2,000, 3 from +$3,500 over the $50,000 start balance, one more on a break 1.5 sigma past
 the band, never more than 3 ("Most contracts"; "Fixed contracts" overrides all of it). Live it sizes from the
 account's net liquidation; an account below $50,000 trades 1 contract until it is back above.
 

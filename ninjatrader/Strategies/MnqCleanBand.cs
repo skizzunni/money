@@ -23,7 +23,7 @@
 // range, its own range not over GapMaxBar (1.75) x the last 14 sessions' 09:30 bars' average (a wild open); in at
 // 09:35, the stop at the 09:30 open (at most GapCap points), out at 09:55.
 // News days (the 08:30 volume against 08:20-08:29): NewsSkipFrom-NewsSkipTo x no trades; NewsBigAt x and up a contract
-// more. Account: no new entry once the day's closed P/L is down DayStop $; contracts by profit over the start balance
+// more. FOMC statement days (FomcDates, the 14:00 Fed statement; docs 180): no trades. Account: no new entry once the day's closed P/L is down DayStop $; contracts by profit over the start balance
 // (1, 2 from Step2At, 3 from Step3At, never more than MaxContracts); the cushion guard: less than CushionGuard $ above the
 // trailing floor, 1 contract and a day stop of GuardDayStopShare x the cushion; under GuardStrongOnlyBelow $, only band
 // entries GuardStrongOnlyStretch sigmas past the band (and the gap trade). research/zoo/strats.py (noise with nt=True, gap_go)
@@ -75,6 +75,8 @@ namespace NinjaTrader.NinjaScript.Strategies
         double preVol, atVol, newsSpike = double.NaN;
         int preBars;
         bool newsSkip;
+        bool fomcToday;  // docs 180: an FOMC statement day (14:00): no trades
+        HashSet<DateTime> fomcSet;
         // the cushion guard (docs/STRATEGY_SEARCH.md, 38): the trailing floor from the high-water mark, today's cap and day stop
         double hwm = double.NaN, cushion = double.NaN, dayStopToday;
         bool guarded, strongOnly, hwmLive;  // strongOnly: under GuardStrongOnlyBelow $ above the floor, only strong breaks (and the gap trade)
@@ -132,6 +134,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 NewsBigAt = 6;
                 NewsSkipFrom = 2;
                 NewsSkipTo = 3;
+                FomcSkip = true;  // docs 180
+                FomcDates = "2011-01-26,2011-03-15,2011-04-27,2011-06-22,2011-08-09,2011-09-21,2011-11-02,2011-12-13,2012-01-25,2012-03-13,2012-04-25,2012-06-20,2012-08-01,2012-09-13,2012-10-24,2012-12-12,2013-01-30,2013-03-20,2013-05-01,2013-06-19,2013-07-31,2013-09-18,2013-10-30,2013-12-18,2014-01-29,2014-03-19,2014-04-30,2014-06-18,2014-07-30,2014-09-17,2014-10-29,2014-12-17,2015-01-28,2015-03-18,2015-04-29,2015-06-17,2015-07-29,2015-09-17,2015-10-28,2015-12-16,2016-01-27,2016-03-16,2016-04-27,2016-06-15,2016-07-27,2016-09-21,2016-11-02,2016-12-14,2017-02-01,2017-03-15,2017-05-03,2017-06-14,2017-07-26,2017-09-20,2017-11-01,2017-12-13,2018-01-31,2018-03-21,2018-05-02,2018-06-13,2018-08-01,2018-09-26,2018-11-08,2018-12-19,2019-01-30,2019-03-20,2019-05-01,2019-06-19,2019-07-31,2019-09-18,2019-10-30,2019-12-11,2020-01-29,2020-04-29,2020-06-10,2020-07-29,2020-09-16,2020-11-05,2020-12-16,2021-01-27,2021-03-17,2021-04-28,2021-06-16,2021-07-28,2021-09-22,2021-11-03,2021-12-15,2022-01-26,2022-03-16,2022-05-04,2022-06-15,2022-07-27,2022-09-21,2022-11-02,2022-12-14,2023-02-01,2023-03-22,2023-05-03,2023-06-14,2023-07-26,2023-09-20,2023-11-01,2023-12-13,2024-01-31,2024-03-20,2024-05-01,2024-06-12,2024-07-31,2024-09-18,2024-11-07,2024-12-18,2025-01-29,2025-03-19,2025-05-07,2025-06-18,2025-07-30,2025-09-17,2025-10-29,2025-12-10,2026-01-28,2026-03-18,2026-04-29,2026-06-17,2026-07-29,2026-09-16,2026-10-28,2026-12-09,2027-01-27,2027-03-17,2027-04-28,2027-06-09,2027-07-28,2027-09-15,2027-10-27,2027-11-17";
                 CushionGuard = 1500;
                 GuardDayStopShare = 0.25;
                 TrailingDrawdown = 2000;
@@ -155,6 +159,15 @@ namespace NinjaTrader.NinjaScript.Strategies
             else if (State == State.DataLoaded)
             {
                 newYork = NewYork();
+                fomcSet = new HashSet<DateTime>();
+                foreach (string x in (FomcDates ?? "").Split(new[] { ',', ';', ' ' }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    DateTime f;
+                    if (DateTime.TryParseExact(x.Trim(), "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out f))
+                        fomcSet.Add(f.Date);
+                    else
+                        Print("Clean band: FOMC date '" + x + "' is not yyyy-MM-dd - ignored");
+                }
                 sessions = new SessionIterator(Bars);
                 Print("Clean band settings: " + Instrument.FullName + ", " + BarsPeriod.Value + " " + BarsPeriod.BarsPeriodType +
                       ", account " + (Account == null ? "none" : Account.Name) + ", trend " + TrendDays + " days, hard stop $" +
@@ -255,6 +268,9 @@ namespace NinjaTrader.NinjaScript.Strategies
             // docs/STRATEGY_SEARCH.md 163-164: without the 09:30 bar (a feed drop at the open) the day's open, its bands
             // and moves would come from a later bar: no trades today and the day kept out of the history
             today.NoOpen = firstMm != 570;
+            fomcToday = FomcSkip && fomcSet != null && fomcSet.Contains(date.Date);
+            if (fomcToday)
+                Print(Time[0] + "  Clean band: an FOMC day (the 14:00 Fed statement) - no trades today (docs 180)");
             if (today.NoOpen)
                 Print(Time[0] + "  Clean band: NO TRADING TODAY - the session's first bar is " + (firstMm / 60) + ":" +
                       (firstMm % 60).ToString("00") + ", not 09:30 (the 09:30 bar is missing: reload the chart's history)");
@@ -413,6 +429,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                          " | news " + (!NewsDays ? "off" : double.IsNaN(newsSpike) ? "n/a (needs an ETH chart)" :
                                        newsSkip ? newsSpike.ToString("F1", CultureInfo.InvariantCulture) + "x: no trades today" :
                                        newsSpike.ToString("F1", CultureInfo.InvariantCulture) + "x" + (newsSpike >= NewsBigAt ? " (+1 contract)" : "")) +
+                         (fomcToday ? " | FOMC day (14:00 Fed statement): no trades today" : "") +
                          " | trades today " + tradesToday + " | profit over start $" + Profit().ToString("F0", CultureInfo.InvariantCulture);
             Draw.TextFixed(this, "clean_dash", txt, TextPosition.TopRight);
         }
@@ -497,7 +514,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 Exit("Gap exit");
                 return;
             }
-            if (newsSkip && mp == 0)  // a mild-news day: no new trades
+            if ((newsSkip || fomcToday) && mp == 0)  // a mild-news day or an FOMC day (docs 180): no new trades
                 return;
             if (mm == 570 && gapToday && mp == 0 && PlaceOrders)
                 GapEntry(tick);
@@ -799,6 +816,14 @@ namespace NinjaTrader.NinjaScript.Strategies
         [NinjaScriptProperty]
         [Display(Name = "News days (needs an ETH chart: the 08:30 volume)", Order = 1, GroupName = "6. News")]
         public bool NewsDays { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "FOMC days (the 14:00 Fed statement): no trades", Order = 5, GroupName = "6. News")]
+        public bool FomcSkip { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "FOMC statement days (yyyy-MM-dd, comma-separated; federalreserve.gov's calendar)", Order = 6, GroupName = "6. News")]
+        public string FomcDates { get; set; }
 
         [NinjaScriptProperty]
         [Range(1, 100)]

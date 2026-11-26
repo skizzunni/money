@@ -283,3 +283,30 @@ def test_pine_clean_band_half_day_never_holds_overnight(eth, calendar):
     for t in rt.strategy.closed:
         (d0, _), (d1, k1) = idx[t["entry_bar"]], idx[t["exit_bar"]]
         assert d1 == d0 or (d1 == d0 + 1 and k1 <= 1 and d0 in halves), (d0, d1, k1)
+
+
+@pytest.mark.slow
+def test_pine_clean_band_fomc_days():
+    """Docs 180: no trades on an FOMC statement day, as MnqCleanBand.cs and the reference; the default list is
+    research/fomc_dates.csv; three traded days of the fixture as the FOMC days."""
+    pytest.importorskip("pynescript", reason="pip install pynescript to check the .pine files")
+    import csv
+
+    from pine_interpreter import PineRuntime, load_pine
+    days = fixture_days()
+    bars, idx = bars_of(days)
+    base = {"Most contracts": 1, "Day stop: no new entry once the day is down $ (0 = off)": 0}
+
+    def run(extra):
+        rt = PineRuntime(load_pine(PINE), bars, {**base, **extra}, timeframe_seconds=300)
+        rt.run(lambda i, g: None)
+        return [(t["dir"], t["entry_bar"], round(t["entry"], 6), round(t["exit"], 6), t["qty"]) for t in rt.strategy.closed]
+    off = run({"FOMC days (the 14:00 Fed statement): no trades": False})
+    assert off == py_trades(days, idx, tp_fill_bar=False, fomc=False)
+    traded = sorted({idx[t[1]][0] for t in off})
+    pick = {days[i]["d"] for i in traded[25:28]}
+    got = run({"FOMC statement days (yyyy-MM-dd, comma-separated)": ",".join(sorted(str(x) for x in pick))})
+    assert got == py_trades(days, idx, tp_fill_bar=False, fomc_days=pick) and len(got) < len(off)
+    with open(ROOT / "research" / "fomc_dates.csv") as f:
+        want = ",".join(r["date"] for r in csv.DictReader(f))
+    assert f'fomcDates = input.string("{want}",' in PINE.read_text()

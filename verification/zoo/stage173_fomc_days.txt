@@ -1,0 +1,66 @@
+Docs section 180 (2026-11-26): python zoo/fomc_days.py (from research/), research/fomc_dates.csv (2027 added from
+federalreserve.gov's FOMC calendar, read 2026-11-26: tentative until each prior meeting confirms it). Placebo: skip
+the same number of random days (5 draws), shuffled years with the guard.
+
+2015-19: 40 FOMC days of 1247
+  FOMC days: 16 trades, PF 0.02, $-51.2 a trade, $-819, worst $-202
+  other days: 1129 trades, PF 1.67, $+23.7 a trade, $+26,736, worst $-207
+  FOMC days, entries before 14:00: 16 trades, PF 0.02, $-51.2 a trade, $-819, worst $-202
+  other days, the 14:00 entry: 76 trades, PF 1.29, $+10.0 a trade, $+758, worst $-189
+  FOMC days by year, $ (trades): 2015 -49 (2), 2016 -401 (5), 2017 -134 (3), 2018 -173 (5), 2019 -62 (1)
+  shipped: 1145 trades, $+25,917 a contract
+     calendar: $50,000 0.0% / $9,810 | $48,806 0.0% / $6,230 | $48,998 0.0% / $6,781
+     shuffled years: $50,000 0.4% / $11,322 $48,806 4.7% / $7,580 $48,998 2.6% / $8,414
+  no trading on FOMC days: 1129 trades, $+26,736 a contract
+     calendar: $50,000 0.0% / $12,976 | $48,806 0.0% / $7,585 | $48,998 0.0% / $9,479
+     shuffled years: $50,000 0.4% / $11,810 $48,806 3.8% / $8,008 $48,998 2.1% / $8,835
+  FOMC days: last entry 13:00, out by 13:55: 1144 trades, $+25,915 a contract
+     calendar: $50,000 0.0% / $9,810 | $48,806 0.0% / $6,230 | $48,998 0.0% / $6,781
+     shuffled years: $50,000 0.4% / $11,322 $48,806 4.7% / $7,580 $48,998 2.6% / $8,414
+  FOMC days: last entry 13:00: 1144 trades, $+25,915 a contract
+     calendar: $50,000 0.0% / $9,810 | $48,806 0.0% / $6,230 | $48,998 0.0% / $6,781
+     shuffled years: $50,000 0.4% / $11,322 $48,806 4.7% / $7,580 $48,998 2.6% / $8,414
+
+2020-25: 43 FOMC days of 1367
+  FOMC days: 32 trades, PF 0.40, $-24.8 a trade, $-793, worst $-173
+  other days: 1365 trades, PF 1.68, $+30.0 a trade, $+40,892, worst $-208
+  FOMC days, entries before 14:00: 30 trades, PF 0.42, $-23.7 a trade, $-712, worst $-173
+  FOMC days, the 14:00 entry: 2 trades, PF 0.00, $-40.7 a trade, $-81, worst $-71
+  other days, the 14:00 entry: 82 trades, PF 1.20, $+9.4 a trade, $+769, worst $-204
+  FOMC days by year, $ (trades): 2020 -310 (3), 2021 -137 (4), 2022 +262 (10), 2023 -228 (3), 2024 -348 (11), 2025 -32 (1)
+  shipped: 1397 trades, $+40,099 a contract
+     calendar: $50,000 0.0% / $17,205 | $48,806 1.8% / $12,892 | $48,998 0.0% / $14,917
+     shuffled years: $50,000 1.5% / $15,582 $48,806 6.5% / $11,551 $48,998 3.7% / $12,272
+  no trading on FOMC days: 1365 trades, $+40,892 a contract
+     calendar: $50,000 0.0% / $17,813 | $48,806 1.8% / $13,091 | $48,998 0.0% / $15,023
+     shuffled years: $50,000 1.3% / $16,201 $48,806 5.8% / $11,922 $48,998 3.4% / $12,872
+  FOMC days: last entry 13:00, out by 13:55: 1393 trades, $+40,433 a contract
+     calendar: $50,000 0.0% / $17,301 | $48,806 1.8% / $12,947 | $48,998 0.0% / $15,112
+     shuffled years: $50,000 1.4% / $15,866 $48,806 6.5% / $11,691 $48,998 3.6% / $12,503
+  FOMC days: last entry 13:00: 1393 trades, $+40,296 a contract
+     calendar: $50,000 0.0% / $17,301 | $48,806 1.8% / $12,892 | $48,998 0.0% / $15,076
+     shuffled years: $50,000 1.5% / $15,719 $48,806 6.6% / $11,601 $48,998 3.6% / $12,360
+
+ES 2020-24: 16 FOMC days of 458
+  FOMC days: 7 trades, PF 0.11, $-12.1 a trade, $-85, worst $-21
+  other days: 387 trades, PF 1.16, $+2.9 a trade, $+1,113, worst $-121
+  FOMC days, entries before 14:00: 7 trades, PF 0.11, $-12.1 a trade, $-85, worst $-21
+  other days, the 14:00 entry: 23 trades, PF 4.06, $+28.1 a trade, $+645, worst $-44
+
+live 2026: 3 FOMC days of 104
+  FOMC days: 5 trades, PF 0.56, $-15.3 a trade, $-77, worst $-123
+  other days: 66 trades, PF 3.98, $+90.7 a trade, $+5,985, worst $-202
+  FOMC days, entries before 14:00: 5 trades, PF 0.56, $-15.3 a trade, $-77, worst $-123
+  other days, the 14:00 entry: 1 trades, PF 498760000000.00, $+498.8 a trade, $+499, worst $499
+
+== placebo ==
+2015-19 placebo 1: skip 40 random days (35 trades, $+336 removed): $50,000 0.5% / $11,472 $48,806 4.3% / $7,800 $48,998 2.2% / $8,600
+2015-19 placebo 2: skip 40 random days (28 trades, $+2,445 removed): $50,000 0.6% / $9,430 $48,806 5.5% / $5,631 $48,998 3.1% / $6,418
+2015-19 placebo 3: skip 40 random days (46 trades, $+1,245 removed): $50,000 0.5% / $10,276 $48,806 4.8% / $6,793 $48,998 2.8% / $7,523
+2015-19 placebo 4: skip 40 random days (28 trades, $-178 removed): $50,000 0.4% / $11,425 $48,806 4.0% / $7,569 $48,998 2.3% / $8,458
+2015-19 placebo 5: skip 40 random days (36 trades, $+2,822 removed): $50,000 0.9% / $9,604 $48,806 6.9% / $5,738 $48,998 4.2% / $6,597
+2020-25 placebo 1: skip 43 random days (39 trades, $+2,818 removed): $50,000 1.4% / $14,376 $48,806 6.5% / $10,029 $48,998 4.2% / $10,905
+2020-25 placebo 2: skip 43 random days (51 trades, $+343 removed): $50,000 1.2% / $15,581 $48,806 5.6% / $11,278 $48,998 3.8% / $12,066
+2020-25 placebo 3: skip 43 random days (57 trades, $+369 removed): $50,000 1.2% / $15,418 $48,806 5.8% / $11,182 $48,998 3.5% / $12,018
+2020-25 placebo 4: skip 43 random days (35 trades, $+300 removed): $50,000 1.2% / $15,500 $48,806 5.6% / $11,345 $48,998 3.6% / $11,903
+2020-25 placebo 5: skip 43 random days (39 trades, $+849 removed): $50,000 1.2% / $15,284 $48,806 6.5% / $11,355 $48,998 4.0% / $11,940

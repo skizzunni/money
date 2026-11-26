@@ -26,6 +26,8 @@ DEFAULTS = dict(vwap=False, trend=20, hard=200.0, vwap_stop=True, k=1.0, be_r=0.
                 range_pos=0.65, max_move=1.1, be_plus=2.0, move_free="first_check", lad_r=1.5, lad_lock=0.5,
                 sig_min=10)  # docs 162: SigmaMinSessions 10
 GAP = dict(k=0.6, exit_m=590, r=0.0, cap=30.0, min_body=0.03, max_bar=1.75)
+# docs 180: FOMC statement days, no trades (MnqCleanBand's FomcDates default holds the same list)
+FOMC_DAYS = set(pd.to_datetime(pd.read_csv(Path(__file__).resolve().parents[1] / "research" / "fomc_dates.csv").date).dt.date)
 
 
 def fixture_days() -> list:
@@ -101,7 +103,7 @@ class Guard:
 
 def py_trades(days: list, idx: list, day_stop: float = 0.0, steps=None, gap_from: float | None = 0.0,
               start: float = 0.0, gap: dict | None = None, max_q: int | None = None, add_at: float = 1.5,
-              guard: Guard | None = None, **p) -> list:
+              guard: Guard | None = None, fomc: bool = True, fomc_days=None, **p) -> list:
     """The reference trades as (direction, entry bar, entry, exit, contracts), with the account rules the C# applies:
     contracts by the profit at the day's start, the gap leg (first in the day) once the profit reaches gap_from, the day
     stop across both."""
@@ -127,6 +129,8 @@ def py_trades(days: list, idx: list, day_stop: float = 0.0, steps=None, gap_from
             legs += S.gap_go(days, i, 0.25, **(gap or GAP))
         ng = len(legs)
         legs += S.noise(days, i, 0.25, stop_slip=1, nt=True, **{**cfg, "min_stretch": 1.5 if guard.strong else 0.0})
+        if fomc and days[i]["d"] in (FOMC_DAYS if fomc_days is None else fomc_days):  # docs 180: no trades
+            legs = []
         for n_, (side, eb, epx, xpx, _why, *_) in enumerate(legs):
             if ds and day <= -ds:
                 break
@@ -676,3 +680,33 @@ def test_clean_band_wrong_chart_trades_nothing(sim, tmp_path, minutes, props, wa
     assert sum(want in x for x in out if x.startswith("P,")) == 1
     assert any(want in x for x in out if x.startswith("D,"))
     assert [x for x in _raw(sim, path, 5, "Strategy=Clean", SimInstrument="MNQ 03-27") if x.startswith("T,")]
+
+
+@pytest.mark.skipif(DOTNET is None, reason="needs the .NET SDK")
+def test_clean_band_fomc_days(sim, tmp_path):  # noqa: F811
+    """Docs 180: no trades on an FOMC statement day (FomcDates, the same list as research/fomc_dates.csv), the day in
+    the history as any other; FomcSkip off trades it, as the reference without the rule; an unparsable date is said."""
+    days = synthetic_days()
+    path = tmp_path / "bars.csv"
+    idx = write_bars(days, path)
+    base = dict(MaxContracts=1, DayStop=0)
+    on, off = run_nt(sim, path, **base), run_nt(sim, path, **base, FomcSkip=False)
+    assert [(int(t[0]), int(t[1])) for t in on] == [(d, b) for d, b, *_ in py_trades(days, idx)]
+    assert [(int(t[0]), int(t[1])) for t in off] == [(d, b) for d, b, *_ in py_trades(days, idx, fomc=False)]
+    # the shipped list has no trade on this fixture's FOMC days: three days with trades as the FOMC days instead
+    traded = sorted({idx[int(t[1])][0] for t in off})
+    pick = {days[i]["d"] for i in traded[25:28]}
+    fd = ",".join(sorted(str(x) for x in pick))
+    got = run_nt(sim, path, **base, FomcDates=fd)
+    want = py_trades(days, idx, fomc_days=pick)
+    assert [(int(t[0]), int(t[1])) for t in got] == [(d, b) for d, b, *_ in want]
+    assert not any(days[idx[int(t[1])][0]]["d"] in pick for t in got) and len(got) < len(off)
+    out = _run_all(sim, path, FomcDates="2026-01-28,2026-13-01")
+    assert any("FOMC day" in x for x in out if x.startswith("P,"))
+    assert any("'2026-13-01' is not yyyy-MM-dd" in x for x in out)
+    import csv
+    root = Path(__file__).resolve().parents[1]
+    with open(root / "research" / "fomc_dates.csv") as f:
+        csv_days = [r["date"] for r in csv.DictReader(f)]
+    src = (root / "ninjatrader" / "Strategies" / "MnqCleanBand.cs").read_text()
+    assert f'FomcDates = "{",".join(csv_days)}";' in src
