@@ -1194,6 +1194,12 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    $14,388). One more contract on the NQ-alone entries: median $17,598 to $17,907 from $50,000, inside five placebos
    of as many random band trades ($17,050-18,400), with a little more lost (1.8% to 1.9%). Only 3.7 years of overlap
    and a second data series live. Nothing changes.
+188. **A smaller hard stop for late entries** (2026-11-26, a research round; `noise` late_hard_at / late_hard,
+   `research/zoo/late_hard.py`, `verification/zoo/stage180_late_hard.txt`). $100 / $150 instead of $200 for band
+   entries after 11:30 / 12:30 (break-even, target and the stop step still on $200). Every variant is lower in both
+   periods: band PF 1.56 / 1.66 to 1.50-1.53 / 1.59-1.65, shuffled-years medians from $50,000 $11,810 / $16,201 to
+   $10,550-11,047 / $14,519-15,959; the loss share moves both ways by a few tenths. The tighter stop is hit by the
+   noise before the trade works. ES unchanged (its band stop is always inside $200). Rejected; $200 stays.
 
 ## The result (the shipped defaults, 2026-11-26, sections 1-90 and 180; research numbers, $0.62 a side)
 
