@@ -1157,6 +1157,14 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    held to 14:15, through the 14:00 statement, but it fires on only 9 of 113 FOMC days in 2009 - Mar 2025: 2009-17
    4 trades +$419 (one +$453 winner in 2011), 2018-25 5 trades -$74 (all small stops). Too few to tell, and the
    periods disagree: gold keeps trading FOMC days. Nothing changes.
+182. **ISM days (10:00)** (2026-11-26, a research round; `research/zoo/ism_days.py`,
+   `verification/zoo/stage175_ism_days.txt`). The ISM manufacturing number comes out at 10:00, as the first check
+   fires (`research/ism_dates.csv`: the first business day of February-December, by rule). ISM days as a whole make
+   money: PF 2.10 (2015-19, 72 trades) and 1.14 (2020-25, 59); no trading on them lowers the median in both periods
+   ($11,322 to $9,115, $15,582 to $15,219 from $50,000) and is no better than skipping as many random days. The 10:00
+   entry on those days is weak (PF 0.94 / 0.06 / ES 0.45) but is only 13 / 5 / 2 trades (-$71 / -$85); without it the
+   loss share falls in 2015-19 (4.7% to 3.6% from $48,806) and rises in 2020-25 (6.5% to 7.0%). Not FOMC's case:
+   nothing changes.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 
