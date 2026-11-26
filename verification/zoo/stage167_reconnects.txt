@@ -1,0 +1,19 @@
+Stage 167 (2026-11-26, docs section 171): what the strategies do on a restart or reconnect with a trade open, by reading
+MnqCleanBand.cs / MgcOvernightCarry.cs. Real NinjaTrader cannot be run here, so this rests on the code and on
+NinjaTrader 8's documented behaviour, not on a live test.
+
+- Both use StartBehavior.WaitUntilFlat: when enabled (or re-enabled after a restart) they replay the loaded history; if
+  that replay ends inside a trade, they place no live orders until the replayed position is flat. They do not adopt
+  the account's real position (no "AdoptAccountPosition"). On reaching realtime, MnqCleanBand re-sizes from the
+  account's balance (State.Realtime handling).
+- Neither sets ConnectionLossHandling, so NinjaTrader's default applies (in NinjaTrader 8: recalculate on reconnect).
+  A short drop with the strategy still enabled normally leaves its orders and position tracking in place; a long one,
+  a restart or a disable / enable recalculates from history as above.
+- The risk: a real position open in the account that the strategy no longer manages. Its stop and target were sent
+  to the broker and normally stay working there (they protect it), but the strategy's own exits (MNQ 15:55, gold 14:15,
+  the band-back-inside exit, the retry of 168 / 170) are not sent for it, so it could be held past the session.
+- No code change (the right fix depends on NinjaTrader behaviour that cannot be tested here; adopting account positions
+  without a test would be riskier than the manual check). Added to "Running it" step 13: after any disconnect,
+  restart or disable / enable while a trade is open, compare the account's position (Control Center > Positions) with
+  the strategy's (Strategies tab); if the account holds a position the strategy does not show, close it by hand
+  before the session ends, and check its stop is working.
