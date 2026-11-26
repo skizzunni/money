@@ -1233,14 +1233,14 @@ NinjaTrader 8, on each funded account (both the same way):
      a contract. Every year 2015-2026 still ended up at 1 contract.
    - a normal week (section 165): about 4 trades on 2 of the 5 days; only about half the weeks end up, and the year's
      profit comes from fewer, bigger weeks; a week without a trade happens (7-8% of weeks, 32% in the 2026 live months).
-   None of those lost an account in the history.
+   None of those lost an account in the history. A run like this is not a fault; a run well past these is a reason to
+   stop and check the setup (step 11) and the trades against TradingView.
 
 13. **After a disconnect, a restart, or a disable / enable while a trade is open (section 171).** The strategies replay
    history and wait until flat (they do not take over a position already in the account). Compare Control Center >
    Positions (the account) with the Strategies tab (the strategy). If the account holds a position the strategy does not
    show, check its stop is working in Orders and close the position by hand before the session ends (MNQ by 15:55,
-   gold by 14:15); the strategy will not send its time exit for it. A run like this is not a fault; a run well past these is a reason to
-   stop and check the setup (step 11) and the trades against TradingView.
+   gold by 14:15); the strategy will not send its time exit for it.
 
 Defaults: trend 20 sessions; hard stop $200 a contract; take profit 2.5 hard stops; break-even at 0.4 to entry + 2
 points, and at 1.5 to entry + 0.5 hard stops (section 61); last entry 14:00 (840); at most 9 trades a day; day stop
