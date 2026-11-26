@@ -1053,6 +1053,10 @@ works and commit it to an auto-trading NinjaTrader script". The step process, ea
    holiday sessions lack the 08:20 or 13:25 bar, so gold sits out the 14 sessions after each (15% of sessions; live and
    the backtests agree, and the status line says so). Averaging over 10-12 of 14: 4-5 more trades a year that break
    even (2018-25 worse, 11 of 17 years down). Not shipped.
+167. **The live order path** (2026-11-26, a research round; `verification/zoo/stage163_order_path.txt`). A cancelled or
+   rejected stop and the target's OCO are covered by tests. Probed: a rejected entry is safe; a rejected 15:55 exit left
+   the position open overnight (the "exiting" flag silences every later guard), and a partial entry whose rest never
+   fills stopped the bot from trading again. Both to fix in the order handling, with tests.
 
 ## The result (the shipped defaults, 2026-11-24, sections 1-90; research numbers, $0.62 a side)
 

@@ -1,0 +1,21 @@
+Stage 163 (2026-11-26, docs section 167): MnqCleanBand's live order path, read and probed on the NinjaTrader
+stand-in (ninjatrader/tests/Sim; synthetic history, MaxContracts 3, StartProfit 5000).
+
+Covered and safe (existing tests): a stop cancelled or rejected with the position open -> out at market (that bar's
+close, or live 2 s after the cancel): test_clean_band_never_without_a_stop (cancel / reject x backtest / live); a
+target's OCO cancel of the stop never exits twice: test_clean_band_oco_cancel_does_not_exit_twice.
+
+Probed (no test existed for MnqCleanBand):
+1. A rejected entry (SimRejectEntriesAt): the trade does not happen, later trades unaffected. Safe.
+2. A rejected exit (RejectExitsAt on the 15:50 bar of a trade out at 15:55): the position was NOT closed that day; it
+   was carried overnight and closed the next morning at 09:40 by its target. Cause: Exit() sets exiting = true and
+   pos = 0; when the exit is rejected the position stays open, exiting never clears (it clears only when flat), and
+   that flag silences every later guard: the carried-position exit on the next session's first bar (carried && mp != 0
+   && !exiting), the outside-regular-hours exit and the no-stop watchdog. Live NinjaTrader's own exit on session close
+   (IsExitOnSessionCloseStrategy, 60 s before the close) may still flatten it, but if that is refused too, nothing in
+   the strategy tries again. A real gap: to fix (an exit not filled by the next bar is sent again, from the position).
+3. A partially filled entry whose rest never fills (SimPartialEntryAt, first 1 of 3, the rest never): the 1 contract
+   trades and is stopped out, but the rest of the entry order stays working and the strategy places no further trade
+   for the rest of the run (1 trade after it against 4+ in the baseline). Market orders on MNQ practically always fill
+   whole, so this is rare, but it would stop the bot silently. To fix: cancel an entry's unfilled rest at the next bar.
+Both fixes change MnqCleanBand.cs only in order handling (no backtest trade changes), with tests for each.
